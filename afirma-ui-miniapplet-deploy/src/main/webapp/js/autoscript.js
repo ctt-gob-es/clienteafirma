@@ -1261,7 +1261,7 @@ var AutoScript = ( function ( window, undefined ) {
 			var spinnerClass = "afirmaDefaultSpinner";
 			var adminContactInfo = null;
 			var alternativeAndroidAppLink = null;
-			var alternativeiOSAppLink = null;
+			var alternativeIOSAppLink = null;
 			var enabled = true;
 			var enabledLoading = true;
 			var enabledError = true;
@@ -1332,8 +1332,8 @@ var AutoScript = ( function ( window, undefined ) {
 				alternativeAndroidAppLink = text;
 			}
 			
-			function setAlternativeiOSAppLink(text) {
-				alternativeiOSAppLink = text;
+			function setAlternativeIOSAppLink(text) {
+				alternativeIOSAppLink = text;
 			}
 			
 			function setWarningClass(customClass) {
@@ -1529,8 +1529,8 @@ var AutoScript = ( function ( window, undefined ) {
 				var noCompatibleMsg = currentLocale.no_compatible_procedure;
 				if (Platform.isAndroid() && alternativeAndroidAppLink != null) {
 					noCompatibleMsg += currentLocale.procedure_from_url + " " + alternativeAndroidAppLink;
-				} else if (Platform.isIOS() && alternativeiOSAppLink != null) {
-					noCompatibleMsg += currentLocale.procedure_from_url + " " + alternativeiOSAppLink;
+				} else if (Platform.isIOS() && alternativeIOSAppLink != null) {
+					noCompatibleMsg += currentLocale.procedure_from_url + " " + alternativeIOSAppLink;
 				} else {
 					noCompatibleMsg += currentLocale.access_from_pc;
 				}
@@ -1567,7 +1567,7 @@ var AutoScript = ( function ( window, undefined ) {
 				setSpinnerClass : setSpinnerClass,
 				isEnabled : isEnabled,
 				setAlternativeAndroidAppLink : setAlternativeAndroidAppLink,
-				setAlternativeiOSAppLink : setAlternativeiOSAppLink,
+				setAlternativeIOSAppLink : setAlternativeIOSAppLink,
 				setPCDownloadURL : setPCDownloadURL,
 				setAndroidDownloadURL : setAndroidDownloadURL,
 				setIOSDownloadURL : setIOSDownloadURL,
@@ -1600,7 +1600,7 @@ var AutoScript = ( function ( window, undefined ) {
 				setIOSDownloadURL: Dialog.setIOSDownloadURL,
 				setAdminContactInfo: Dialog.setAdminContactInfo,
 				setAlternativeAndroidAppLink : Dialog.setAlternativeAndroidAppLink,
-				setAlternativeiOSAppLink : Dialog.setAlternativeiOSAppLink,
+				setAlternativeIOSAppLink : Dialog.setAlternativeIOSAppLink,
 			};
 		})();
 		
@@ -4813,7 +4813,8 @@ var AutoScript = ( function ( window, undefined ) {
 																	function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
 																	function (){errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback);});
 					if (!enabled) {
-						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback); }
+						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback);
+					}
 					return;
 				}
 			
@@ -4827,16 +4828,16 @@ var AutoScript = ( function ( window, undefined ) {
 							errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);
 						}
 					} else {
-						var errorMsg;
+						var errorType;
 						var errorCallbackMsg;
 						if (!!isCompatibleProcedure) {
-							errorMsg = ERROR_CONNECTING_AFIRMA;
+							errorType = ERROR_CONNECTING_AFIRMA;
 							errorCallbackMsg = Dialog.buildErrorConnectingApplicationMsg();
 						} else {
-							errorMsg = ERROR_CONNECTING_SERVICE;
+							errorType = ERROR_CONNECTING_SERVICE;
 							errorCallbackMsg = Dialog.buildCustomErrorServerMsg();
 						}
-						var enabled = Dialog.showErrorDialog(errorMsg,
+						var enabled = Dialog.showErrorDialog(errorType,
 																	function (){execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
 																	function (){errorCallback("java.lang.IOException", errorCallbackMsg.replace(/<br>/g,""));});
 						if(!enabled) {
