@@ -169,11 +169,17 @@ var AutoScript = ( function ( window, undefined ) {
 		// Metodo para enviar eco
 		var sendEcho;
 		
-		// Indica si hay errores o no en las comprobaciones de los servicios cuando se use sevridor
+		// Indica si hay errores o no en las comprobaciones de los servicios cuando se use servidor intermedio
 		var isErrorCheckingServices = false;
 		
 		// Indica si es un tramite compatible con dispositivos moviles
 		var isCompatibleProcedure = true;
+		
+		// Indica si se ha hecho una comprobacion de los servicios o no
+		var isCheckedServices = false;
+		
+		// Contador con las llamadas realizadas al metodo para comprobar el estado de los servicios
+		var counterCallService = 0;
         
         /**
          * Indica si el navegador soporta WebSockets.
@@ -598,6 +604,14 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 		
 		var setServlets = function(storageServlet, retrieverServlet) {
+			
+			Dialog.disposeSupportDialog();
+
+			if (Platform.isIOS() || Platform.isAndroid()) {
+				checkComunicationServices(storageServlet, retrieverServlet, true);	
+			} else {
+				checkComunicationServices(storageServlet, retrieverServlet, false);
+			}
 	
 			storageServletAddress = storageServlet;
 			retrieverServletAddress = retrieverServlet;
@@ -625,6 +639,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!httpStorageRequest) {
 					throw new Error("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
 				}
+				
+				var callOrder = ++counterCallService;
+				
 				httpStorageRequest.open("POST", storageAddress, true);
 				httpStorageRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				
@@ -635,7 +652,7 @@ var AutoScript = ( function ( window, undefined ) {
 							isCompatibleProcedure = true;
 							console.log('Conexion correcta con el servicio de almacenamiento');
 						}
-						else {
+						else if (callOrder == counterCallService) {
 							isErrorCheckingServices = true;
 							if (!!isCheckingCompatibleProcedure) {
 								isCompatibleProcedure = false;
@@ -649,6 +666,20 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				try {
 					httpStorageRequest.onerror = function() {
+						if (callOrder == counterCallService) {
+							isErrorCheckingServices = true;
+							if (!!isCheckingCompatibleProcedure) {
+								isCompatibleProcedure = false;
+								Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
+							} else {
+								isCompatibleProcedure = true;
+								Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
+							}
+						}
+					}
+				}
+				catch (e) {
+					if (callOrder == counterCallService) {
 						isErrorCheckingServices = true;
 						if (!!isCheckingCompatibleProcedure) {
 							isCompatibleProcedure = false;
@@ -657,16 +688,6 @@ var AutoScript = ( function ( window, undefined ) {
 							isCompatibleProcedure = true;
 							Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
 						}
-					}
-				}
-				catch (e) {
-					isErrorCheckingServices = true;
-					if (!!isCheckingCompatibleProcedure) {
-						isCompatibleProcedure = false;
-						Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
-					} else {
-						isCompatibleProcedure = true;
-						Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
 					}
 				}
 				
@@ -684,7 +705,7 @@ var AutoScript = ( function ( window, undefined ) {
 							isCompatibleProcedure = true;
 							console.log('Conexion correcta con el servicio de recuperacion');
 						}
-						else {
+						else if (callOrder == counterCallService) {
 							isErrorCheckingServices = true;
 							if (!!isCheckingCompatibleProcedure) {
 								isCompatibleProcedure = false;
@@ -700,6 +721,20 @@ var AutoScript = ( function ( window, undefined ) {
 				try {
 					httpRetrieveRequest.onerror = function() {
 						isErrorCheckingServices = true;
+						if (callOrder == counterCallService) {
+							if (!!isCheckingCompatibleProcedure) {
+								isCompatibleProcedure = false;
+								Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
+							} else {
+								isCompatibleProcedure = true;
+								Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
+							}
+						}
+					}
+				}
+				catch (e) {
+					if (callOrder == counterCallService) {
+						isErrorCheckingServices = true;
 						if (!!isCheckingCompatibleProcedure) {
 							isCompatibleProcedure = false;
 							Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
@@ -709,19 +744,10 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 					}
 				}
-				catch (e) {
-					isErrorCheckingServices = true;
-					if (!!isCheckingCompatibleProcedure) {
-						isCompatibleProcedure = false;
-						Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
-					} else {
-						isCompatibleProcedure = true;
-						Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
-					}
-				}
 	
 				httpRetrieveRequest.send("");		
-			
+				
+				isCheckedServices = true;			
 			}			
 		}
 
@@ -869,7 +895,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!!storageServletAddress || !!retrieverServletAddress) {
 					clienteFirma.setServlets(storageServletAddress, retrieverServletAddress);
 				}
-				setTimeout(checkServletsConfig, 2000, clientAddress);
+				if (!isCheckedServices) {
+					checkServletsConfig(clientAddress);
+				}
 			}
 			// Si podemos utilizar un WebSocket local y no estamos en Internet Explorer
 			// (en el que no podemos asegurar el funcionamiento si se encuentra habilitada
@@ -896,7 +924,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!!storageServletAddress || !!retrieverServletAddress) {
 					clienteFirma.setServlets(storageServletAddress, retrieverServletAddress);
 				}
-				setTimeout(checkServletsConfig, 2000, clientAddress);
+				if (!isCheckedServices) {
+					checkServletsConfig(clientAddress);
+				}
 			}
 			
 			if (!keystore) {
@@ -923,17 +953,25 @@ var AutoScript = ( function ( window, undefined ) {
 		    	"}" +
 		    	"@media all and (max-width: 1600px) {" +  
 		        	"#afirmaChildDiv {" +
-				  	  "left: 30%;" +
 				  	  "width: 40%;" +
+				  	  "margin-top: 200px;" +
 					"}" +
 		    	"}" +
 		    	".afirmaDefaultDialogClass {" +
 				  "background-color: white;" +
+				  "width: 30%;" +
+				  "padding: 20px;" +
+				  "margin-top: 300px;" +
+				  "border: 2px solid black;" +
+				  "border-radius: 15px;" +
+				"}" +
+				".afirmaDefaultCompatibleDialogClass {" +
+				  "background-color: white;" +
+				  "width: 30%;" +
+				  "padding: 20px;" +
 				  "position: fixed;" +
 				  "top: 30%;" +
 				  "left: 35%;" +
-				  "width: 30%;" +
-				  "padding: 20px;" +
 				  "border: 2px solid black;" +
 				  "border-radius: 15px;" +
 				"}" +
@@ -1118,8 +1156,8 @@ var AutoScript = ( function ( window, undefined ) {
 					storageServletDefaultAddress = clientAddress + "/afirma-signature-storage/StorageService";
 					retrieverServletDefaultAddress = clientAddress + "/afirma-signature-retriever/RetrieveService";
 				} else {
-					storageServletDefaultAddress = window.location.origin + "/afirma-signature-storage/StorageService";
-					retrieverServletDefaultAddress = window.location.origin + "/afirma-signature-retriever/RetrieveService";
+					storageServletDefaultAddress = window.location.origin + "/aafirma-signature-storage/StorageService";
+					retrieverServletDefaultAddress = window.location.origin + "/aafirma-signature-retriever/RetrieveService";
 				}
 				if (Platform.isIOS() || Platform.isAndroid()) {
 					checkComunicationServices(storageServletDefaultAddress, retrieverServletDefaultAddress, true);	
@@ -1258,6 +1296,7 @@ var AutoScript = ( function ( window, undefined ) {
 			var closeButtonClass = "afirmaDefaultCloseButtonClass";
 			var logoClass = "afirmaDefaultLogoClass";
 			var dialogClass = "afirmaDefaultDialogClass";
+			var dialogCompatibleClass = "afirmaDefaultCompatibleDialogClass";
 			var spinnerClass = "afirmaDefaultSpinner";
 			var adminContactInfo = null;
 			var alternativeAndroidAppLink = null;
@@ -1285,7 +1324,11 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			function setDialogClass(customClass) {
-				dialogClass = customClass;
+				if (!!Platform.isInternetExplorer()) {
+					dialogCompatibleClass = customClass;
+				} else {
+					dialogClass = customClass;
+				}			
 			}
 			
 			function setLoadingTextClass(customClass) {
@@ -1387,11 +1430,12 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 
 				disposeSupportDialog();
-				//DIV PADRE
-				var parentDiv = document.createElement("div");
+				
+				//DIV HIJO
+				var parentDiv = null;
 
 				//DIV HIJO
-				var childDiv = document.createElement("div");
+				var childDiv;
 
 				//PANEL CON LOGO Y MENSAJE
 				var messagePanel = document.createElement("div");
@@ -1405,11 +1449,19 @@ var AutoScript = ( function ( window, undefined ) {
 				//SPAN CON MENSAJE
 				var spanSupportMessage = document.createElement("span");
 				
-				parentDiv.setAttribute('id', 'afirmaSupportDialog');
-				parentDiv.setAttribute('class', backgroundClass);
+				if (!!Platform.isInternetExplorer()) {
+					parentDiv = document.createElement("div");
+					parentDiv.setAttribute('id', 'afirmaSupportDialog');
+					parentDiv.setAttribute('class', backgroundClass);
+					childDiv = document.createElement("div");
+					childDiv.setAttribute('class', dialogCompatibleClass);
+				} else {
+					childDiv = document.createElement("dialog");
+					childDiv.setAttribute('class', dialogClass);
+				}
 
-				childDiv.setAttribute('id', 'afirmaChildDiv');
-				childDiv.setAttribute('class', dialogClass);
+				childDiv.setAttribute('id', 'afirmaChildDiv');			
+				childDiv.setAttribute('tabindex', '0');				
 
 				messagePanel.setAttribute('id', 'afirmaMessagePanel');
 				messagePanel.setAttribute('style', 'display: flex; align-items:center; justify-content: center;');
@@ -1484,17 +1536,27 @@ var AutoScript = ( function ( window, undefined ) {
 				messageDiv.appendChild(spanSupportMessage);
 				messagePanel.appendChild(messageDiv);
 				childDiv.appendChild(messagePanel);			
-				childDiv.appendChild(buttonsPanel);
-				parentDiv.appendChild(childDiv);
+				childDiv.appendChild(buttonsPanel);		
 
-				document.body.appendChild(parentDiv);
+				if (parentDiv != null) {
+					parentDiv.appendChild(childDiv);
+					document.body.appendChild(parentDiv);
+				} else {
+					document.body.appendChild(childDiv);
+					
+					childDiv.showModal();
+				}
 
 				return true;	
 			}
 			
 			function disposeSupportDialog() {
-				if (document.getElementById("afirmaSupportDialog") != null) {
-					document.body.removeChild(document.getElementById("afirmaSupportDialog"));
+				if (document.getElementById("afirmaChildDiv") != null) {
+					if (!!Platform.isInternetExplorer()) {
+						document.body.removeChild(document.getElementById("afirmaSupportDialog"));
+					} else {
+						document.body.removeChild(document.getElementById("afirmaChildDiv"));
+					}				
 				}
 			}
 			
