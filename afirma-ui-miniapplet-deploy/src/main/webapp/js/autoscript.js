@@ -1456,6 +1456,14 @@ var AutoScript = ( function ( window, undefined ) {
 				} else {
 					childDiv = document.createElement("dialog");
 					childDiv.setAttribute('class', dialogClass);
+					childDiv.addEventListener("keydown", function(event) {
+						if (event.key === "Escape") {
+							Dialog.disposeSupportDialog(); 
+						    if (!!closeButtonCallback) { 
+								closeButtonCallback(); 
+							}
+						}
+					});
 				}
 
 				childDiv.setAttribute('id', 'afirmaChildDiv');			
