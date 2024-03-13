@@ -1154,8 +1154,8 @@ var AutoScript = ( function ( window, undefined ) {
 					storageServletDefaultAddress = clientAddress + "/afirma-signature-storage/StorageService";
 					retrieverServletDefaultAddress = clientAddress + "/afirma-signature-retriever/RetrieveService";
 				} else {
-					storageServletDefaultAddress = window.location.origin + "/aafirma-signature-storage/StorageService";
-					retrieverServletDefaultAddress = window.location.origin + "/aafirma-signature-retriever/RetrieveService";
+					storageServletDefaultAddress = window.location.origin + "/afirma-signature-storage/StorageService";
+					retrieverServletDefaultAddress = window.location.origin + "/afirma-signature-retriever/RetrieveService";
 				}
 				if (Platform.isIOS() || Platform.isAndroid()) {
 					checkComunicationServices(storageServletDefaultAddress, retrieverServletDefaultAddress, true);	
