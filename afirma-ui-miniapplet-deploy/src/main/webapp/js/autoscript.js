@@ -606,10 +606,8 @@ var AutoScript = ( function ( window, undefined ) {
 		var setServlets = function(storageServlet, retrieverServlet) {
 			
 			Dialog.disposeSupportDialog();
-
-			if (Platform.isIOS() || Platform.isAndroid()) {
-				checkComunicationServices(storageServlet, retrieverServlet, true);	
-			} else {
+			
+			if (forceWSMode || Platform.isIOS() || Platform.isAndroid()) {
 				checkComunicationServices(storageServlet, retrieverServlet, false);
 			}
 	
