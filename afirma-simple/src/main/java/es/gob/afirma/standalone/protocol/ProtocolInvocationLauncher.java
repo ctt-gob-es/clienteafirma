@@ -42,11 +42,11 @@ import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
 import es.gob.afirma.signers.batch.client.TriphaseDataParser;
 import es.gob.afirma.standalone.JMulticardUtilities;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.InvalidEncryptedDataLengthException;
 import es.gob.afirma.standalone.ui.AboutDialog;
 import es.gob.afirma.standalone.ui.OSXHandler;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /**
  * Gestiona la ejecuci&oacute;n de AutoFirma en una invocaci&oacute;n por
@@ -296,7 +296,7 @@ public final class ProtocolInvocationLauncher {
 
         	try {
                 UrlParametersForBatch params =
-                		ProtocolInvocationUriParserUtil.getParametersToBatch(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToBatch(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -327,11 +327,10 @@ public final class ProtocolInvocationLauncher {
 
                     if (params.isJsonBatch()) {
                     	paramsMap = TriphaseDataParser.parseParamsListJson(batchDefinition);
-                    	params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
                     } else {
                     	paramsMap = ProtocolInvocationUriParserUtil.parseXml(batchDefinition);
-                    	params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap);
                     }
+					params = ProtocolInvocationUriParserUtil.getParametersToBatch(paramsMap, !bySocket);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -374,7 +373,7 @@ public final class ProtocolInvocationLauncher {
 
             try {
                 UrlParametersToSelectCert params =
-                		ProtocolInvocationUriParserUtil.getParametersToSelectCert(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToSelectCert(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -447,7 +446,7 @@ public final class ProtocolInvocationLauncher {
 
             try {
                 UrlParametersToSave params =
-                		ProtocolInvocationUriParserUtil.getParametersToSave(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToSave(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -536,7 +535,7 @@ public final class ProtocolInvocationLauncher {
 
             try {
                 UrlParametersToSignAndSave params =
-                		ProtocolInvocationUriParserUtil.getParametersToSignAndSave(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToSignAndSave(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -649,7 +648,7 @@ public final class ProtocolInvocationLauncher {
 
             try {
                 UrlParametersToSign params =
-                		ProtocolInvocationUriParserUtil.getParametersToSign(urlParams);
+                		ProtocolInvocationUriParserUtil.getParametersToSign(urlParams, !bySocket);
 
                 if (requestedProtocolVersion == -1) {
                		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
@@ -710,7 +709,7 @@ public final class ProtocolInvocationLauncher {
                     }
                     if (!bySocket) {
                     	msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
-                    	sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
+						sendDataToServer(msg, params.getStorageServletUrl().toString(), params.getId());
                     }
                     return msg;
                 }

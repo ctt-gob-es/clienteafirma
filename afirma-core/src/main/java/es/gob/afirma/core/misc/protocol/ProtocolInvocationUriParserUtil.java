@@ -39,10 +39,13 @@ public final class ProtocolInvocationUriParserUtil {
 	 * operaci&oacute;n de guardado de datos en el dispositivo. Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
 	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
+	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
+	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersToSave getParametersToSave(final Map<String, String> params) throws ParameterException {
-		final UrlParametersToSave ret = new UrlParametersToSave();
+	public static UrlParametersToSave getParametersToSave(final Map<String, String> params,
+			final boolean servicesRequired) throws ParameterException {
+		final UrlParametersToSave ret = new UrlParametersToSave(servicesRequired);
 
 		ret.setCommonParameters(params);
 		ret.setSaveParameters(params);
@@ -54,10 +57,13 @@ public final class ProtocolInvocationUriParserUtil {
 	 * operaci&oacute;n de firma de lote. Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
 	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
-	 * @return Par&aacute;metros
+	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
+	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
+	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersForBatch getParametersToBatch(final Map<String, String> params) throws ParameterException {
-		final UrlParametersForBatch ret = new UrlParametersForBatch();
+	public static UrlParametersForBatch getParametersToBatch(final Map<String, String> params,
+			final boolean servicesRequired) throws ParameterException {
+		final UrlParametersForBatch ret = new UrlParametersForBatch(servicesRequired);
 		ret.setCommonParameters(params);
 		ret.setBatchParameters(params);
 		return ret;
@@ -85,7 +91,6 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToGetCurrentLog getParametersToGetCurrentLog(final Map<String, String> params) throws ParameterException {
 		final UrlParametersToGetCurrentLog ret = new UrlParametersToGetCurrentLog();
-
 		ret.setCommonParameters(params);
 		ret.setGetCurrentLogParameters(params);
 
@@ -141,10 +146,13 @@ public final class ProtocolInvocationUriParserUtil {
 	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de
 	 * datos para la operaci&oacute;n de firma.
 	 * @param params Par&aacute;metros para el proceso de firma.
+	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
+	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
 	 * @return Par&aacute;metros para la operaci&oacute;n de firma.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersToSign getParametersToSign(final Map<String, String> params) throws ParameterException {
-		final UrlParametersToSign ret = new UrlParametersToSign();
+	public static UrlParametersToSign getParametersToSign(final Map<String, String> params,
+			final boolean servicesRequired) throws ParameterException {
+		final UrlParametersToSign ret = new UrlParametersToSign(servicesRequired);
 		ret.setCommonParameters(params);
 		ret.setSignParameters(params);
 		ret.setAnotherParams(params);
@@ -154,10 +162,13 @@ public final class ProtocolInvocationUriParserUtil {
 	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de
 	 * datos para la operaci&oacute;n de firma.
 	 * @param params Par&aacute;metros para el proceso de firma.
+	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
+	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
 	 * @return Par&aacute;metros para la operaci&oacute;n de firma y guardado.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersToSignAndSave getParametersToSignAndSave(final Map<String, String> params) throws ParameterException {
-		final UrlParametersToSignAndSave ret = new UrlParametersToSignAndSave();
+	public static UrlParametersToSignAndSave getParametersToSignAndSave(final Map<String, String> params,
+			final boolean servicesRequired) throws ParameterException {
+		final UrlParametersToSignAndSave ret = new UrlParametersToSignAndSave(servicesRequired);
 		ret.setCommonParameters(params);
 		ret.setSignAndSaveParameters(params);
 		return ret;
@@ -165,11 +176,14 @@ public final class ProtocolInvocationUriParserUtil {
 
 	/** Comprueba que est&eacute;n disponibles todos los parametros disponibles en la entrada de
 	 * datos para la operaci&oacute;n de selecci&oacute;n de certificado.
-	 * @param params Par&aacute;metros para el proceso de firma
+	 * @param params Par&aacute;metros para el proceso de firma.
+	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
+	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
 	 * @return Par&aacute;metros para la operaci&oacute;n de selecci&oacute;n de certificado.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersToSelectCert getParametersToSelectCert(final Map<String, String> params) throws ParameterException {
-		final UrlParametersToSelectCert ret = new UrlParametersToSelectCert();
+	public static UrlParametersToSelectCert getParametersToSelectCert(final Map<String, String> params,
+			final boolean servicesRequired) throws ParameterException {
+		final UrlParametersToSelectCert ret = new UrlParametersToSelectCert(servicesRequired);
 		ret.setCommonParameters(params);
 		ret.setSelectCertParameters(params);
 		return ret;
