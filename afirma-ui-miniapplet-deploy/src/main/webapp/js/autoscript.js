@@ -1110,6 +1110,7 @@ var AutoScript = ( function ( window, undefined ) {
 					"background-position: left;" +
 					"display: block;" +
 					"width: 15%;" +
+					"min-width: 70px;" +
 					"height: 70px;" +
 				"}" +
 				".afirmaDefaultBackgroundClass {" +
