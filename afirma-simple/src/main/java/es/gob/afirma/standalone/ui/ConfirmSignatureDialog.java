@@ -64,12 +64,6 @@ public class ConfirmSignatureDialog {
 					"ConfirmSignatureDialog.2", Integer.toString(numDocuments)))); //$NON-NLS-1$
 		}
 
-		// Implicaciones de firma
-		panel.add(Box.createRigidArea(new Dimension(0, 8)));
-
-		panel.add(new JLabel(SimpleAfirmaMessages.getString(
-				"ConfirmSignatureDialog.3", Integer.toString(numDocuments)))); //$NON-NLS-1$
-
 		// Intrucciones
 		panel.add(Box.createRigidArea(new Dimension(0, 8)));
 		panel.add(new JLabel(SimpleAfirmaMessages.getString("ConfirmSignatureDialog.4"))); //$NON-NLS-1$
