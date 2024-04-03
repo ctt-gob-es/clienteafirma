@@ -24,7 +24,7 @@ var SupportDialog;
 var AutoScript = ( function ( window, undefined ) {
 
 		var VERSION = "1.9.0";
-		var VERSION_CODE = 2;
+		var VERSION_CODE = 3;
 
 		/* ========== DEPRECADO: No se utiliza, pero se mantiene por compatibilidad con los despliegues del MiniApplet. */
 		var JAVA_ARGUMENTS = null;
