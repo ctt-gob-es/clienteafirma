@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.help.UnsupportedOperationException;
+import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
@@ -43,14 +44,15 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOConfigurableContext;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.filters.CertFilterManager;
-import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.odf.AOODFSigner;
@@ -102,11 +104,6 @@ final class CommandLineLauncher {
 
 	static void processCommandLine(final String[] args) {
 
-		// Desactivamos el Logger de consola para que no interfiera con los comandos
-		deactivateConsoleLog("es.gob.afirma"); //$NON-NLS-1$
-		deactivateConsoleLog("es.gob.jmulticard"); //$NON-NLS-1$
-		deactivateSlf4JLogs();
-
 		final Console console = System.console();
 		try (final PrintWriter pw = console != null ? console.writer() : new PrintWriter(System.out)) {
 
@@ -145,24 +142,40 @@ final class CommandLineLauncher {
 					}
 				}
 			}
-			catch (final CommandLineException e) {
+			catch (final CommandLineParameterException e) {
+				if (e.isUsingGui() || command == CommandLineCommand.VERIFY) {
+					showErrorDialog(e.getMessage(), e);
+				}
+
 				final String msg = CommandLineParameters.buildSyntaxError(command, e.getMessage());
 				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
-			catch (final AOKeystoreAlternativeException e) {
-				String msg = CommandLineMessages.getString("CommandLineLauncher.49", e.getMessage()); //$NON-NLS-1$
+			catch (final CommandLineException e) {
+				if (e.isUsingGui() || command == CommandLineCommand.VERIFY) {
+					showErrorDialog(e.getMessage(), e);
+				}
+
+				String msg;
+				final Throwable cause = e.getCause();
+				if (cause != null && cause instanceof AOKeystoreAlternativeException) {
+					msg = CommandLineMessages.getString("CommandLineLauncher.49", cause.getMessage()); //$NON-NLS-1$
+				} else if (cause != null) {
+					msg = cause.getMessage();
+				} else {
+					msg = e.getMessage();
+				}
 				if (needXmlResponse) {
 					msg = buildXmlResponse(false, msg, null);
 				}
 				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
-			catch (final AOException | PluginControlledException | IOException
-					| IllegalArgumentException | UnsupportedOperationException e) {
-				final String msg = !needXmlResponse
-						? e.getMessage()
-						: buildXmlResponse(false, e.getMessage(), null);
+			catch (PluginControlledException | UnsupportedOperationException e) {
+				String msg = e.getMessage();
+				if (needXmlResponse) {
+					msg = buildXmlResponse(false, msg, null);
+				}
 				closeApp(STATUS_ERROR, pw, msg);
 				return;
 			}
@@ -195,8 +208,7 @@ final class CommandLineLauncher {
 	}
 
 	private static String processCommand(final CommandLineCommand command, final String[] args)
-			throws CommandLineException, IOException, AOException, AOKeystoreAlternativeException,
-			UnsupportedOperationException {
+			throws CommandLineException, UnsupportedOperationException {
 
 		// Comprobamos si se debe mostrar la ayuda del comando
 		if (args.length > 1 && PARAM_HELP.equalsIgnoreCase(args[1])) {
@@ -311,7 +323,7 @@ final class CommandLineLauncher {
 	/** Desactiva el log por consola.
 	 * @param handlerName Nombre del manejador. */
 	private static void deactivateConsoleLog(final String handlerName) {
-		Logger.getLogger(handlerName).setLevel(Level.SEVERE);
+		Logger.getLogger(handlerName).setLevel(Level.OFF);
 	}
 
 	/**
@@ -329,7 +341,7 @@ final class CommandLineLauncher {
 
  		final File inputFile = params.getInputFile();
  		if (inputFile == null) {
- 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5"));  //$NON-NLS-1$
+ 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5"), true);  //$NON-NLS-1$
  		}
  		new VisorFirma(true, null).initialize(false, inputFile);
  	}
@@ -342,35 +354,35 @@ final class CommandLineLauncher {
 
 		final File inputFile = params.getInputFile();
 		if (inputFile == null) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5"), true); //$NON-NLS-1$
 		}
 
 		final SimpleAfirma simpleAfirma = new SimpleAfirma();
 		simpleAfirma.initGUI(inputFile);
 		simpleAfirma.loadFileToSign(inputFile);
-		}
+	}
 
 	private static String batchByCommandLine(final CommandLineParameters params) throws CommandLineException {
 
 		final File inputFile = params.getInputFile();
 		if (inputFile == null) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
 		}
 
 		String selectedAlias = params.getAlias();
 		if (selectedAlias == null && params.getFilter() == null) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
 		}
 
 		final File outputFile  = params.getOutputFile();
 		if (outputFile == null && !params.isXml()) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
 		}
 
 		final URL preUrl = params.getPreSignUrl();
 		final URL postUrl = params.getPostSignUrl();
 		if (preUrl == null || postUrl == null) {
-			throw new CommandLineException(
+			throw new CommandLineParameterException(
 				CommandLineMessages.getString("CommandLineLauncher.60") //$NON-NLS-1$
 			);
 		}
@@ -446,22 +458,21 @@ final class CommandLineLauncher {
 	 * @param command Comando ejecutado en l&iacute;nea de comandos.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
 	 * @return Mensaje con el resultado de la operaci&oacute;n.
-	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario.
-	 * @throws IOException Cuando no se puede imprimir texto en la l&iacute;nea de comandos.
-	 * @throws AOException Cuando falla la operaci&oacute;n de firma. */
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario
+	 * o se produce un error en la operaci&oacute;n. */
 	private static String signByCommandLine(final CommandLineCommand command, final CommandLineParameters params)
-			throws CommandLineException, IOException, AOException {
+			throws CommandLineException {
 
 		if (params.getInputFile() == null) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
 		}
 
 		if (params.getAlias() == null && params.getFilter() == null && !params.isCertGui()) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.17")); //$NON-NLS-1$
 		}
 
 		if (params.getOutputFile() == null && !params.isXml()) {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.19")); //$NON-NLS-1$
 		}
 
 		byte[] res;
@@ -516,7 +527,7 @@ final class CommandLineLauncher {
 			);
 		}
 		catch (IOException | AOException | AOKeystoreAlternativeException e) {
-			throw new AOException(e.getMessage(), e);
+			throw new CommandLineException(e.getMessage(), e);
 		}
 
 		// Si se ha proporcionado un fichero de salida, se guarda el resultado de la firma en el.
@@ -529,7 +540,7 @@ final class CommandLineLauncher {
 				fos.write(res);
 			}
 			catch(final Exception e) {
-				throw new IOException(CommandLineMessages.getString(
+				throw new CommandLineException(CommandLineMessages.getString(
 					"CommandLineLauncher.21", //$NON-NLS-1$
 					params.getOutputFile().getAbsolutePath())
 				, e);
@@ -670,7 +681,7 @@ final class CommandLineLauncher {
 			signer = new AOODFSigner();
 		}
 		else {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.4", format)); //$NON-NLS-1$
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.4", format)); //$NON-NLS-1$
 		}
 
 		// Si el firmador admite la configuracion de su contexto, rebajamos el modo de seguridad para permitir
@@ -719,7 +730,7 @@ final class CommandLineLauncher {
 				);
 			}
 			else {
-				throw new CommandLineException("Operacion no soportada: " + command.getOp()); //$NON-NLS-1$
+				throw new CommandLineParameterException("Operacion no soportada: " + command.getOp()); //$NON-NLS-1$
 			}
 		}
 		catch(InvalidSignaturePositionException | IncorrectPageException e) {
@@ -734,9 +745,15 @@ final class CommandLineLauncher {
 		return resBytes;
 	}
 
-	private static String listAliasesByCommandLine(final CommandLineParameters params) throws IOException, CommandLineException, AOKeystoreAlternativeException {
+	private static String listAliasesByCommandLine(final CommandLineParameters params) throws CommandLineException {
 
-		final String[] aliases = getKsm(params.getStore(), params.getPassword()).getAliases();
+		String[] aliases;
+		try {
+			aliases = getKsm(params.getStore(), params.getPassword()).getAliases();
+		}
+		catch (IOException | AOKeystoreAlternativeException e) {
+			throw new CommandLineException(e.getMessage(), e);
+		}
 		final StringBuilder sb = new StringBuilder();
 
 		if (params.isXml()) {
@@ -809,7 +826,7 @@ final class CommandLineLauncher {
 			lib = cleanedLibFile.getAbsolutePath();
 		}
 		else {
-			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.48", storeType)); //$NON-NLS-1$
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.48", storeType)); //$NON-NLS-1$
 		}
 
 		return AOKeyStoreManagerFactory.getAOKeyStoreManager(
@@ -847,9 +864,12 @@ final class CommandLineLauncher {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$;
 		}
 		else {
-			sb.append(CommandLineMessages.getString("CommandLineLauncher.34")).append("\n\n"); //$NON-NLS-1$; //$NON-NLS-2$;
+			sb.append(CommandLineMessages.getString("CommandLineLauncher.34")).append("\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(": AutoFirma cmd [options...]\n\n")  //$NON-NLS-1$//$NON-NLS-2$
+
+		final String appName = AutoFirmaUtil.getApplicationFilename();
+
+		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(": ").append(appName).append(" cmd [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		.append(CommandLineMessages.getString("CommandLineLauncher.33")) .append(" cmd:\n\n") //$NON-NLS-1$ //$NON-NLS-2$
 		.append("  ").append(CommandLineCommand.SIGN.getOp())			 .append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.8")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(CommandLineCommand.COSIGN.getOp())		     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.9")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -944,6 +964,15 @@ final class CommandLineLauncher {
 
 	public static void main(final String[] args) {
 
+		// Desactivamos el Logger de consola para que no interfiera con los comandos
+		deactivateConsoleLog("java.util.prefs"); //$NON-NLS-1$
+		deactivateConsoleLog("es.gob.afirma"); //$NON-NLS-1$
+		deactivateConsoleLog("es.gob.jmulticard"); //$NON-NLS-1$
+		deactivateSlf4JLogs();
+
+    	// Se define el look and feel
+    	LookAndFeelManager.applyLookAndFeel();
+
 		if (pluginsManager == null) {
 			pluginsManager = SimpleAfirma.getPluginsManager();
 		}
@@ -1000,5 +1029,10 @@ final class CommandLineLauncher {
 			}
 		}
 		return result;
+	}
+
+	private static void showErrorDialog(final String message, final Exception t) {
+		final String title = CommandLineMessages.getString("CommandLineLauncher.127"); //$NON-NLS-1$
+		AOUIFactory.showErrorMessage(message, title, JOptionPane.ERROR_MESSAGE, t);
 	}
 }

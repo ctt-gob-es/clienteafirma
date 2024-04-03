@@ -85,6 +85,14 @@ final class CommandLineParameters {
 	private URL postUrl = null;
 	private URL preUrl = null;
 
+	// Variables temporales para la carga de los parametros
+	private String formatParam = null;
+	private String hashFormatParam = null;
+	private String preUrlParam = null;
+	private String postUrlParam = null;
+	private String inputFileParam = null;
+	private String outputFileParam = null;
+
 	private final Platform.OS system;
 
 	public CommandLineParameters(final CommandLineCommand command, final String[] params) throws CommandLineException {
@@ -116,29 +124,23 @@ final class CommandLineParameters {
 				this.xml = true;
 			}
 			else if (PARAM_PREURL.equals(params[i])) {
-				try {
-					this.preUrl = new URL(params[i+1]);
+				if (this.preUrlParam != null) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
 				}
-				catch (final MalformedURLException e) {
-					throw new CommandLineException(
-							CommandLineMessages.getString(
-									"CommandLineLauncher.59", params[i+1], e.toString() //$NON-NLS-1$
-									)
-							);
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.128"), this.gui); //$NON-NLS-1$
 				}
+				this.preUrlParam = params[i+1];
 				i++;
 			}
 			else if (PARAM_POSTURL.equals(params[i])) {
-				try {
-					this.postUrl = new URL(params[i+1]);
+				if (this.postUrlParam != null) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
 				}
-				catch (final MalformedURLException e) {
-					throw new CommandLineException(
-							CommandLineMessages.getString(
-									"CommandLineLauncher.59", params[i+1], e.toString() //$NON-NLS-1$
-									)
-							);
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.129"), this.gui); //$NON-NLS-1$
 				}
+				this.postUrlParam = params[i+1];
 				i++;
 			}
 			else if (PARAM_GUI.equals(params[i])) {
@@ -152,137 +154,218 @@ final class CommandLineParameters {
 			}
 			else if (PARAM_STORE.equals(params[i])) {
 				if (this.store != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
+				}
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.130"), this.gui); //$NON-NLS-1$
 				}
 				this.store = params[i+1];
 				i++;
 			}
 			else if (PARAM_OP.equals(params[i])) {
 				if (this.massiveOp != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
+				}
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.131"), this.gui); //$NON-NLS-1$
 				}
 				this.massiveOp = params[i+1];
 				i++;
 			}
 			else if (PARAM_ALGO.equals(params[i])) {
 				if (this.algorithm != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
+				}
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.132"), this.gui); //$NON-NLS-1$
 				}
 				this.algorithm = params[i+1];
 				i++;
 			}
 			else if (PARAM_HASH_ALGO.equals(params[i])) {
 				if (this.hashAlgorithm != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
+				}
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.133"), this.gui); //$NON-NLS-1$
 				}
 				this.hashAlgorithm = params[i+1];
 				i++;
 			}
 			else if (PARAM_CONFIG.equals(params[i])) {
 				if (this.extraParams != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
+				}
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.134"), this.gui); //$NON-NLS-1$
 				}
 				this.extraParams = params[i+1];
 				i++;
 			}
 			else if (PARAM_PASSWD.equals(params[i])) {
 				if (this.password != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
+				}
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.135"), this.gui); //$NON-NLS-1$
 				}
 				this.password = params[i+1];
 				i++;
 			}
 			else if (PARAM_ALIAS.equals(params[i])) {
 				if (this.alias != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
 				}
 				if (this.filter != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.28")); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.28"), this.gui); //$NON-NLS-1$
+				}
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.136"), this.gui); //$NON-NLS-1$
 				}
 				this.alias = params[i+1];
 				i++;
 			}
 			else if (PARAM_FILTER.equals(params[i])) {
-
 				if (this.filter != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
 				}
 				if (this.alias != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.28")); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.28"), this.gui); //$NON-NLS-1$
+				}
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.137"), this.gui); //$NON-NLS-1$
 				}
 				this.filter = params[i+1];
 				i++;
 			}
 			else if (PARAM_INPUT.equals(params[i])) {
-
-				if (this.inputFile != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+				if (this.inputFileParam != null) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
 				}
-
 				if (i >= params.length - 1) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.74")); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.74"), this.gui); //$NON-NLS-1$
 				}
-
-				this.inputFile = getFile(params[i + 1]);
-
-				if (!this.inputFile.exists()) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.0", params[i + 1])); //$NON-NLS-1$
-				}
-				if (!this.inputFile.canRead()) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.1", params[i + 1])); //$NON-NLS-1$
-				}
+				this.inputFileParam = params[i + 1];
 				i++;
 			}
 			else if (PARAM_FORMAT.equals(params[i])) {
-				if (this.format != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+				if (this.formatParam != null) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
 				}
-
-				this.format = params[i+1].toLowerCase();
-				if (!this.format.equals(FORMAT_XADES) &&
-						!this.format.equals(FORMAT_CADES) &&
-						!this.format.equals(FORMAT_PADES) &&
-						!this.format.equals(FORMAT_FACTURAE) &&
-						!this.format.equals(FORMAT_OOXML) &&
-						!this.format.equals(FORMAT_ODF) &&
-						!this.format.equals(FORMAT_AUTO)) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.4", params[i + 1])); //$NON-NLS-1$
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.138"), this.gui); //$NON-NLS-1$
 				}
+				this.formatParam = params[i+1];
 				i++;
 			}
 			else if (PARAM_HASH_FORMAT.equals(params[i])) {
-				if (this.hashFormat != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+				if (this.hashFormatParam != null) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
 				}
-
-				this.hashFormat = params[i+1].toLowerCase();
-				if (!this.hashFormat.equals(FORMAT_HASH_FILE_HEX) &&
-						!this.hashFormat.equals(FORMAT_HASH_FILE_BIN) &&
-						!this.hashFormat.equals(FORMAT_HASH_FILE_BASE64) &&
-						!this.hashFormat.equals(FORMAT_HASH_DIR_XML) &&
-						!this.hashFormat.equals(FORMAT_HASH_DIR_PLAIN)) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.89", params[i + 1])); //$NON-NLS-1$
+				if (i >= params.length - 1) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.139"), this.gui); //$NON-NLS-1$
 				}
+				this.hashFormatParam = params[i + 1];
 				i++;
 			}
 			else if (PARAM_OUTPUT.equals(params[i])) {
-				if (this.outputFile != null) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i])); //$NON-NLS-1$
+				if (this.outputFileParam != null) {
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.26", params[i]), this.gui); //$NON-NLS-1$
 				}
-
 				if (i >= params.length - 1) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.75")); //$NON-NLS-1$
+					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.75"), this.gui); //$NON-NLS-1$
 				}
-
-				this.outputFile = getFile(params[i + 1]);
-				final File parentFile = this.outputFile.getParentFile();
-				if (parentFile != null && !parentFile.canWrite()) {
-					throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.3", params[i + 1])); //$NON-NLS-1$
-				}
+				this.outputFileParam = params[i + 1];
 				i++;
 			}
 			else {
-				throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.25", params[i])); //$NON-NLS-1$
+				throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.25", params[i]), this.gui); //$NON-NLS-1$
+			}
+		}
+
+		// Hacemos las comprobaciones finales sobre los parametros
+		checkParams();
+	}
+
+	/**
+	 * Hace las comprobaciones de los distintos parametros una vez ya se han cargado todos.
+	 * @throws CommandLineException Cuando se detecta un error en un par&aacute;metro.
+	 */
+	private void checkParams() throws CommandLineException {
+
+		// Se comprueba el formato de firma
+		if (this.formatParam != null) {
+			this.format = this.formatParam.toLowerCase();
+			if (!this.format.equals(FORMAT_XADES) &&
+					!this.format.equals(FORMAT_CADES) &&
+					!this.format.equals(FORMAT_PADES) &&
+					!this.format.equals(FORMAT_FACTURAE) &&
+					!this.format.equals(FORMAT_OOXML) &&
+					!this.format.equals(FORMAT_ODF) &&
+					!this.format.equals(FORMAT_AUTO)) {
+				throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.4", this.formatParam), this.gui); //$NON-NLS-1$
+			}
+		}
+
+		// Se comprueba el formato de hash
+		if (this.hashFormatParam != null) {
+			this.hashFormat = this.hashFormatParam.toLowerCase();
+			if (!this.hashFormat.equals(FORMAT_HASH_FILE_HEX) &&
+					!this.hashFormat.equals(FORMAT_HASH_FILE_BIN) &&
+					!this.hashFormat.equals(FORMAT_HASH_FILE_BASE64) &&
+					!this.hashFormat.equals(FORMAT_HASH_DIR_XML) &&
+					!this.hashFormat.equals(FORMAT_HASH_DIR_PLAIN)) {
+				throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.89", this.hashFormatParam), this.gui); //$NON-NLS-1$
+			}
+		}
+
+		// Se comprueba la URL de prefirma
+		if (this.preUrlParam != null) {
+			try {
+				this.preUrl = new URL(this.preUrlParam);
+			}
+			catch (final MalformedURLException e) {
+				throw new CommandLineParameterException(
+						CommandLineMessages.getString(
+								"CommandLineLauncher.59", this.preUrlParam, e.toString() //$NON-NLS-1$
+								), this.gui
+						);
+			}
+		}
+
+
+		// Se comprueba la URL de prefirma
+		if (this.postUrlParam != null) {
+			try {
+				this.postUrl = new URL(this.postUrlParam);
+			}
+			catch (final MalformedURLException e) {
+				throw new CommandLineParameterException(
+						CommandLineMessages.getString(
+								"CommandLineLauncher.59", this.postUrlParam, e.toString() //$NON-NLS-1$
+								), this.gui
+						);
+			}
+		}
+
+		// Se comprueba el fichero de entrada
+		if (this.inputFileParam != null) {
+			this.inputFile = getFile(this.inputFileParam);
+
+			if (!this.inputFile.exists()) {
+				throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.0", this.inputFileParam), this.gui); //$NON-NLS-1$
+			}
+			if (!this.inputFile.canRead()) {
+				throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.1", this.inputFileParam), this.gui); //$NON-NLS-1$
+			}
+		}
+
+		// Se comprueba el parametro del fichero de salida
+		if (this.outputFileParam != null) {
+			this.outputFile = getFile(this.outputFileParam);
+			final File parentFile = this.outputFile.getParentFile();
+			if (parentFile != null && !parentFile.canWrite()) {
+				throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.3", this.outputFileParam), this.gui); //$NON-NLS-1$
 			}
 		}
 	}
@@ -474,12 +557,15 @@ final class CommandLineParameters {
 	 * @param errorMessage Mensaje que explica el error cometido.
 	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
 	private static String buildOperationSignSyntaxError(final String op, final String errorMessage) {
+
+		final String appName = AutoFirmaUtil.getApplicationFilename();
+
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-			.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+			.append(": ").append(appName).append(" ").append(op).append(" [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 			.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_CERT_GUI).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.76")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -517,12 +603,15 @@ final class CommandLineParameters {
 	 * @param errorMessage Mensaje que explica el error cometido.
 	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
 	private static String buildOperationBatchSignSyntaxError(final String op, final String errorMessage) {
+
+		final String appName = AutoFirmaUtil.getApplicationFilename();
+
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-			.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+			.append(": ").append(appName).append(" ").append(op).append(" [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 			.append("  ").append(PARAM_INPUT).append(" inputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.62")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_OUTPUT).append(" outputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.63")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -550,12 +639,15 @@ final class CommandLineParameters {
 	 * @param errorMessage Mensaje que explica el error cometido.
 	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
 	private static String buildOperationMassiveSyntaxError(final String op, final String errorMessage) {
+
+		final String appName = AutoFirmaUtil.getApplicationFilename();
+
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-		.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+		.append(": ").append(appName).append(" ").append(op).append(" [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		.append("  ").append(PARAM_OP).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.55")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  \t sign\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.56")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -593,12 +685,15 @@ final class CommandLineParameters {
 	 * @param errorMessage Mensaje que explica el error cometido.
 	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
 	private static String buildOperationVerifySyntaxError(final String op, final String errorMessage) {
+
+		final String appName = AutoFirmaUtil.getApplicationFilename();
+
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-		.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+		.append(": ").append(appName).append(" ").append(op).append(" [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		//.append("  ").append(PARAM_GUI).append(" \t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(PARAM_INPUT).append(" inputfile\t (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -612,12 +707,15 @@ final class CommandLineParameters {
 	 * @param errorMessage Mensaje que explica el error cometido.
 	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
 	private static String buildOperationListSyntaxError(final String op, final String errorMessage) {
+
+		final String appName = AutoFirmaUtil.getApplicationFilename();
+
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {
 			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
 		}
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-		.append(": AutoFirma ").append(op).append(" [opciones...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$
+		.append(": ").append(appName).append(" ").append(op).append(" [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		.append("  ").append(PARAM_STORE).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.31")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  \t auto\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.36")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

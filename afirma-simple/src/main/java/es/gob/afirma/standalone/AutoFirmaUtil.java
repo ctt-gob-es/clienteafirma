@@ -17,8 +17,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -150,8 +153,10 @@ public final class AutoFirmaUtil {
 		}
 	}
 
-	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n.
-	 * @return Directorio de ejecuci&oacute;n. */
+	/**
+	 * Recupera el directorio en el que se encuentra la aplicaci&oacute;n.
+	 * @return Directorio de ejecuci&oacute;n.
+	 */
 	public static File getApplicationDirectory() {
 
 		if (isJnlpDeployment()) {
@@ -169,6 +174,30 @@ public final class AutoFirmaUtil {
 		}
 
 		return null;
+	}
+
+
+	/**
+	 * Obtiene el nombre del ejecutable de la operaci&oacute;n.
+	 * @return Nombre del ejecutable de la aplicaci&oacute;n siempre y cuando no se haya ejecutado directamente
+	 * la clase java.
+	 */
+	public static String getApplicationFilename() {
+		String filename;
+		final String path = CommandLineLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		if (path != null && !path.isEmpty()) {
+			String decodedPath;
+			try {
+				decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8.name());
+			} catch (final UnsupportedEncodingException e) {
+				decodedPath = path;
+			}
+			filename = new File(decodedPath).getName();
+		}
+		else {
+			filename = "AutoFirma"; //$NON-NLS-1$
+		}
+		return filename;
 	}
 
 	/**

@@ -11,9 +11,11 @@ package es.gob.afirma.standalone;
 
 /** Excepcion que encapsula cualquier excepcion que se lance durante la operativa en modo consola.
  * @author Carlos Gamuci */
-public final class CommandLineException extends Exception {
+public class CommandLineException extends Exception {
 
 	private static final long serialVersionUID = 3756189019018723691L;
+
+	private boolean usingGui = false;
 
 	CommandLineException(final String message) {
 		super(message);
@@ -25,5 +27,29 @@ public final class CommandLineException extends Exception {
 
 	CommandLineException(final String message, final Throwable cause) {
 		super(message, cause);
+	}
+
+	CommandLineException(final String message, final boolean usingGui) {
+		super(message);
+		this.usingGui = usingGui;
+	}
+
+	CommandLineException(final Throwable cause, final boolean usingGui) {
+		super(cause);
+		this.usingGui = usingGui;
+	}
+
+	CommandLineException(final String message, final Throwable cause, final boolean usingGui) {
+		super(message, cause);
+		this.usingGui = usingGui;
+	}
+
+	/**
+	 * Indica si se ha configurado el uso de interfaz gr&aacute;fica o no.
+	 * @return {@code true} si el comando requiere usar interfaz gr&aacute;fica,
+	 * {@code false} en caso contrario.
+	 */
+	public boolean isUsingGui() {
+		return this.usingGui;
 	}
 }
