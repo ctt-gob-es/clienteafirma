@@ -14,6 +14,10 @@
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
   <icon>ic_launcher.ico</icon>
+  <classPath>
+    <mainClass>es.gob.afirma.standalone.CommandLineLauncher</mainClass>
+    <cp>.</cp>
+  </classPath>
   <jre>
     <path>./jre</path>
     <bundledJre64Bit>true</bundledJre64Bit>
