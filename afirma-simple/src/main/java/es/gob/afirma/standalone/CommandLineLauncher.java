@@ -869,7 +869,7 @@ final class CommandLineLauncher {
 
 		final String appName = AutoFirmaUtil.getApplicationFilename();
 
-		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(": ").append(appName).append(" cmd [options...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(": ").append(appName).append(" cmd [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		.append(CommandLineMessages.getString("CommandLineLauncher.33")) .append(" cmd:\n\n") //$NON-NLS-1$ //$NON-NLS-2$
 		.append("  ").append(CommandLineCommand.SIGN.getOp())			 .append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.8")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(CommandLineCommand.COSIGN.getOp())		     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.9")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -898,7 +898,7 @@ final class CommandLineLauncher {
 		}
 
 		// Indicacios para el uso de la ayuda
-		sb.append(CommandLineMessages.getString("CommandLineLauncher.30")) ; //$NON-NLS-1$
+		sb.append(CommandLineMessages.getString("CommandLineLauncher.30", appName)) ; //$NON-NLS-1$
 
 		return sb.toString();
 	}
