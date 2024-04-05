@@ -538,7 +538,6 @@ public class SingleSign {
 				this.signSaver.saveSign(this.ss, dataToSave);
 			}
 			catch(final Exception e) {
-				LOGGER.warning("No se puede recuperar para su guardado como firma el recurso: " + this.ss.getId()); //$NON-NLS-1$
 				return new CallableResult(this.ss.getId(), e);
 			}
 			return new CallableResult(this.ss.getId());

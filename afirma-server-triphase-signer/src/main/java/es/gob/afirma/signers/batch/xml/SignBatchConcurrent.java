@@ -277,6 +277,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			}
 			else {
 				error = true;
+				LOGGER.warning("No se pudo guardar la firma '" + result.getSignatureId() + "': " + result.getError()); //$NON-NLS-1$ //$NON-NLS-2$
 				getSingleSignById(result.getSignatureId()).setProcessResult(
 					new ProcessResult(
 						ProcessResult.Result.DONE_BUT_ERROR_SAVING,
