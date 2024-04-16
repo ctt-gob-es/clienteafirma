@@ -242,6 +242,12 @@ public final class AOFacturaESigner implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
         return XADES_SIGNER.getSignersStructure(sign, asSimpleSignInfo);
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] sign, final Properties params) throws IOException{
+		return isSign(sign);
+	}
 
     /** {@inheritDoc} */
     @Override

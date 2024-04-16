@@ -308,6 +308,12 @@ public final class AOCMSSigner implements AOSigner {
         }
         return null;
     }
+    
+	/** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params) throws IOException{
+		return isSign(signData);
+	}
 
     /** {@inheritDoc} */
     @Override

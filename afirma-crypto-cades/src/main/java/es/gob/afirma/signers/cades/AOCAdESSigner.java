@@ -384,6 +384,15 @@ public final class AOCAdESSigner implements AOSigner {
         }
         return null;
     }
+    
+    /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
+     * @param data Datos que deseamos comprobar.
+     * @param params Par&aacute;metros de firma
+     * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario. */
+	@Override
+	public boolean isSign(final byte[] data, final Properties params){
+		return isSign(data);
+	}
 
     /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
      * @param data Datos que deseamos comprobar.

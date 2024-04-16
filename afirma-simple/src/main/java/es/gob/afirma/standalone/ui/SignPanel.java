@@ -33,6 +33,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +58,6 @@ import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
@@ -456,7 +456,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 		 final byte[] data;
 		 try (final InputStream fis = new FileInputStream(dataFile)) {
-			 data = AOUtil.getDataFromInputStream(fis);
+			 data = Files.readAllBytes(dataFile.toPath());
 		 }
 		 catch(final OutOfMemoryError e) {
 			 throw new IOException("No hay memoria suficiente para leer el fichero", e); //$NON-NLS-1$
@@ -537,7 +537,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 		 // Si los datos seleccionados son considerados firma por el firmador con el que se vaya
 		 // a utilizar, se validan con el
-		 if (config.getSigner().isSign(data)) {
+		 if (config.getSigner().isSign(data, config.getExtraParams())) {
 			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
 			 if (validator != null) {
 				 SignValidity validity = null;

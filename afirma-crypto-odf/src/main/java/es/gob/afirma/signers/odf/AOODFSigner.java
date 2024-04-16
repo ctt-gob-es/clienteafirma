@@ -667,6 +667,12 @@ public final class AOODFSigner implements AOSigner {
             return new AOTreeModel(new AOTreeNode("Ra\u00EDz")); //$NON-NLS-1$
         }
     }
+    
+	/** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params) throws IOException{
+		return isSign(signData);
+	}
 
     /** Indica si los datos indicados son un documento ODF susceptible de contener una firma
      * electr&oacute;nica.

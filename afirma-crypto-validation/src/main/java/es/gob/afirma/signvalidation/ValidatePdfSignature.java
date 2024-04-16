@@ -27,6 +27,7 @@ import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
+import es.gob.afirma.signers.pades.PdfUtil;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pades.common.PdfFormModifiedException;
 import es.gob.afirma.signers.pades.common.SuspectedPSAException;
@@ -101,7 +102,8 @@ public final class ValidatePdfSignature extends SignValider {
 		AcroFields af;
 		PdfReader reader;
 		try {
-			reader = new PdfReader(sign);
+			reader = PdfUtil.getPdfReader(sign, params,
+					Boolean.parseBoolean(params.getProperty(PdfExtraParams.HEADLESS)));		
 			af = reader.getAcroFields();
 		}
 		catch (final Exception e) {

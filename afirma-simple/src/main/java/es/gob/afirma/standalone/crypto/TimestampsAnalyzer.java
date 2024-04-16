@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.spongycastle.asn1.ASN1Encodable;
@@ -31,6 +32,8 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.PdfUtil;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /** Analizador de sellos de tiempo en firmas.
@@ -51,6 +54,30 @@ public final class TimestampsAnalyzer {
 		}
 		if (new AOPDFSigner().isSign(sign)) {
 			return getPdfTimestamps(sign);
+		}
+		try {
+			if (new AOCAdESSigner().isSign(sign) || new AOCMSSigner().isSign(sign)) {
+				return getCmsTimestamps(sign);
+			}
+		}
+		catch(final Exception e) {
+			LOGGER.warning(
+				"Error comprobando si la firma es CMS: " + e //$NON-NLS-1$
+			);
+		}
+		return new ArrayList<>(0);
+	}
+	
+	/** Obtiene informaci&oacute;n de los sellos de tiempo de una firma.
+	 * @param sign Firma.
+	 * @param params Par&aacute;metros de firma.
+	 * @return Informaci&oacute;n de los sellos de tiempo de la firma proporcionada. */
+	public static List<AOTimestampInfo> getTimestamps(final byte[] sign, final Properties params) {
+		if (sign == null) {
+			return new ArrayList<>(0);
+		}
+		if (new AOPDFSigner().isSign(sign, params)) {
+			return getPdfTimestamps(sign, params);
 		}
 		try {
 			if (new AOCAdESSigner().isSign(sign) || new AOCMSSigner().isSign(sign)) {
@@ -147,6 +174,110 @@ public final class TimestampsAnalyzer {
     	PdfReader pdfReader;
     	try {
     		pdfReader = new PdfReader(sign);
+    	}
+    	catch (final BadPasswordException e) {
+    		try {
+    			pdfReader = new PdfReader(
+					sign,
+					new String(
+						AOUIFactory.getPassword(
+							SimpleAfirmaMessages.getString("TimestampsAnalyzer.0"), //$NON-NLS-1$
+							null
+						)
+					).getBytes()
+				);
+    		}
+    		catch (final BadPasswordException e2) {
+    			LOGGER.severe("La contrasena del PDF no es valida, se devolvera una lista de sellos vacia: " + e2); //$NON-NLS-1$
+    			return new ArrayList<>(0);
+    		}
+    		catch (final Exception e3) {
+    			LOGGER.severe("No se ha podido leer el PDF, se devolvera una lista de sellos vacia: " + e3); //$NON-NLS-1$
+    			return new ArrayList<>(0);
+    		}
+    	}
+    	catch (final Exception e) {
+    		LOGGER.severe("No se ha podido leer el PDF, se devolvera una lista de sellos vacia: " + e); //$NON-NLS-1$
+    		return new ArrayList<>(0);
+    	}
+
+    	final AcroFields af;
+    	try {
+    		af = pdfReader.getAcroFields();
+    	}
+    	catch (final Exception e) {
+    		LOGGER.severe(
+				"No se ha podido obtener la informacion de los sellos del PDF, se devolvera una lista de sellos vacia: " + e //$NON-NLS-1$
+			);
+    		return new ArrayList<>(0);
+    	}
+
+    	final List<String> names = af.getSignatureNames();
+
+    	final List<AOTimestampInfo> ret = new ArrayList<>();
+
+    	for (final String signatureName : names) {
+    		final PdfDictionary pdfDictionary = af.getSignatureDictionary(signatureName);
+
+			final byte[] ts = pdfDictionary.getAsString(PdfName.CONTENTS).getOriginalBytes();
+
+			final CMSSignedData signedData;
+			try {
+				signedData = new CMSSignedData(ts);
+			}
+			catch (final CMSException e) {
+				LOGGER.severe(
+					"La firma encontrada no es compatible CMS, se continua con las siguientes: " + e //$NON-NLS-1$
+				);
+				continue;
+			}
+
+			ret.addAll(getCmsTimestamps(signedData));
+
+    		if (PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER)) || PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
+
+				final TimeStampToken tst;
+				try {
+					tst = new TimeStampToken(signedData);
+				}
+				catch (final Exception e) {
+					LOGGER.warning(
+						"El sello encontrado no es compatible, se continua con los siguientes: " + e //$NON-NLS-1$
+					);
+					continue;
+				}
+
+	    		final PdfPKCS7 pcks7;
+	    		try {
+	    			pcks7 = af.verifySignature(signatureName);
+	    		}
+	    		catch(final Exception e) {
+	    			LOGGER.warning(
+						"El PDF contiene una firma corrupta o con un formato desconocido (" + //$NON-NLS-1$
+							signatureName +
+								"), se continua con las siguientes si las hubiese: " + e //$NON-NLS-1$
+					);
+	    			continue;
+	    		}
+
+				ret.add(
+					new AOTimestampInfo(
+						pcks7.getSigningCertificate(),
+						tst.getTimeStampInfo().getGenTime()
+					)
+				);
+
+			}
+    	}
+
+    	return ret;
+	}
+	
+	private static List<AOTimestampInfo> getPdfTimestamps(final byte[] sign, final Properties params) {
+    	PdfReader pdfReader;
+    	try {
+    		pdfReader = PdfUtil.getPdfReader(sign, params,
+					Boolean.parseBoolean(params.getProperty(PdfExtraParams.HEADLESS))); 		
     	}
     	catch (final BadPasswordException e) {
     		try {

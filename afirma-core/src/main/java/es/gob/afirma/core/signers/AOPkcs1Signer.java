@@ -183,4 +183,9 @@ public final class AOPkcs1Signer implements AOSigner {
 		throw new UnsupportedOperationException("No se puede obtener informacion de las firmas PKCS#1"); //$NON-NLS-1$
 	}
 
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params) {
+		return isSign(signData);
+	}
+
 }

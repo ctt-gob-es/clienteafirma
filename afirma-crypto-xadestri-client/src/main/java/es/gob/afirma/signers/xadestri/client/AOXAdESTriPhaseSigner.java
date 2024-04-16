@@ -241,6 +241,12 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			                                     final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
+	
+    /** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] sign, final Properties params){
+		return isSign(sign);
+	}
 
 	/** {@inheritDoc} */
 	@Override

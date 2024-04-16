@@ -153,6 +153,12 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 			                                     final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params) {
+		return isSign(signData);
+	}
 
 	/** {@inheritDoc} */
 	@Override

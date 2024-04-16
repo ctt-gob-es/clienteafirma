@@ -145,6 +145,12 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta la obtencion de estructura de firmas en firma trifasica"); //$NON-NLS-1$
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params){
+		return isSign(signData);
+	}
 
 	/** {@inheritDoc} */
 	@Override

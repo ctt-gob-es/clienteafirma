@@ -1130,6 +1130,12 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
         return arrayNodes.toArray(new AOTreeNode[0]);
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] sign, final Properties params){
+		return isSign(sign);
+	}
 
     /** {@inheritDoc} */
     @Override

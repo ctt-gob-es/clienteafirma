@@ -37,7 +37,7 @@ public final class PdfIsPasswordProtectedException extends RuntimePasswordNeeded
 	/**
 	 * Crea una excepci&oacute;n que indica que el PDF no ha podido abrirse o firmarse por estar protegido por una contrase&ntilde;a
      * y no se ha proporciondo ninguna.
-	 * @param e Causa inicial de la excepci&oacute;n
+	 * @param e Causa inicial de la excepci&oacute;n         
 	 */
 	public PdfIsPasswordProtectedException(final Throwable e) {
 		super("El PDF se encuentra protegido con contrasena",  //$NON-NLS-1$

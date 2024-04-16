@@ -146,7 +146,7 @@ public final class PdfUtil {
 	 * @throws InvalidPdfException Si el PDF era inv&aacute;lido o estaba corrupto.
 	 * @throws IOException Si hay errores en la lectura o escritura de datos.
 	 *  */
-	static PdfReader getPdfReader(final byte[] inPDF,
+	public static PdfReader getPdfReader(final byte[] inPDF,
 			                             final Properties xParams,
 			                             final boolean headless) throws PdfIsPasswordProtectedException,
 																		BadPdfPasswordException,

@@ -185,6 +185,11 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No soportado para firmas trifasicas"); //$NON-NLS-1$
 	}
+	
+	@Override
+	public boolean isSign(final byte[] sign, final Properties params){
+		return isSign(sign);
+	}
 
 	@Override
 	public boolean isSign(final byte[] data) {

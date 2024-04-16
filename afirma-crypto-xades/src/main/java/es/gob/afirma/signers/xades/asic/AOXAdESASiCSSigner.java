@@ -198,6 +198,11 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			asSimpleSignInfo
 		);
 	}
+	
+	@Override
+	public boolean isSign(final byte[] is, final Properties params) throws IOException{
+		return isSign(is);
+	}
 
 	@Override
 	public boolean isSign(final byte[] is) throws IOException {

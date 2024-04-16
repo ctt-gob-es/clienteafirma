@@ -10,6 +10,7 @@
 package es.gob.afirma.core.signers;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -46,6 +47,14 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
      *         esta clase, <code>false</code> en caso contrario.
      * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
     boolean isSign(byte[] is) throws IOException;
+    
+    /** Indica si un dato es una firma compatible con la implementaci&oacute;n concreta.
+     * @param is Dato que deseamos comprobar.
+     * @param is Par&aacute;metros de firma.
+     * @return <code>true</code> si el dato es una firma reconocida por
+     *         esta clase, <code>false</code> en caso contrario.
+     * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
+    boolean isSign(byte[] signData, Properties params) throws IOException;
 
     /** Comprueba si el dato introducido es v&aacute;lido para ser firmado por
      * este manejador de firma.<br>
@@ -92,5 +101,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
      *         datos.
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
     AOSignInfo getSignInfo(byte[] signData) throws AOException, IOException;
+
+	
 
 }

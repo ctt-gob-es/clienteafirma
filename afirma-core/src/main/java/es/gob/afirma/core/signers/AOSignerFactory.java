@@ -12,6 +12,7 @@ package es.gob.afirma.core.signers;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /** Factor&iacute;a que gestiona todos los formatos de firma disponibles en cada
@@ -110,6 +111,40 @@ public final class AOSignerFactory {
 			}
 			final AOSigner signer = SIGNERS.get(format[0]);
 			if (signer != null && signer.isSign(signData)) {
+				return signer;
+			}
+		}
+		return null;
+	}
+	
+	/** Recupera un manejador de firma capaz de tratar la firma indicada. En caso
+	 * de no tener ning&uacute;n manejador compatible se devolver&aacute; <code>null</code>.
+	 * @param signData Firma electr&oacute;nica
+	 * @param params Par&aacute;metros de la firma
+	 * @return Manejador de firma
+	 * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+	public static AOSigner getSigner(final byte[] signData, final Properties params) throws IOException {
+		if (signData == null) {
+			throw new IllegalArgumentException("No se han indicado datos de firma"); //$NON-NLS-1$
+		}
+		for (final String format[] : SIGNERS_CLASSES) {
+
+			// Solo buscaremos el signer compatible entre los que soportan la identificacion
+			if (!Boolean.parseBoolean(format[2])) {
+				continue;
+			}
+
+			if (SIGNERS.get(format[0]) == null) {
+				try {
+					SIGNERS.put(format[0], (AOSigner) Class.forName(format[1]).getDeclaredConstructor().newInstance());
+				}
+				catch(final Exception e) {
+					LOGGER.warning("No se ha podido instanciar un manejador para el formato de firma '" + format[0] + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					continue;
+				}
+			}
+			final AOSigner signer = SIGNERS.get(format[0]);
+			if (signer != null && signer.isSign(signData, params)) {
 				return signer;
 			}
 		}

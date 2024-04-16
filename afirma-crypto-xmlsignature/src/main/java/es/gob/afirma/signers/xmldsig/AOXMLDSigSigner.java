@@ -889,45 +889,40 @@ public final class AOXMLDSigSigner implements AOSigner {
             		referenceId,
             		data
         		);
-            }
-            // Tenemos URI y no nos han establecido algoritmo de message digest,
-            // por lo que es una referencia externa accesible
-            else {
-                // Si es una referencia de tipo file:// obtenemos el fichero y
-                // creamos una referencia solo con
-                // el message digest
-                if (uri != null && uri.getScheme().equals("file")) { //$NON-NLS-1$
-                    try {
-                        ref = fac.newReference(
-                    		"", //$NON-NLS-1$
-                            digestMethod,
-                            null,
-                            XMLConstants.OBJURI,
-                            referenceId,
-                            MessageDigest.getInstance(
-                        		AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm)
-                    		).digest(AOUtil.getDataFromInputStream(AOUtil.loadFile(uri)))
-                		);
-                    }
-                    catch (final Exception e) {
-                        throw new AOException("No se ha podido crear la referencia XML a partir de la URI local (" + uri.toASCIIString() + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
-                    }
-                }
-                // Si es una referencia distinta de file:// suponemos que es
-                // dereferenciable de forma universal
-                // por lo que dejamos que Java lo haga todo
-                else if (uri != null) {
-                    try {
-                        ref = fac.newReference(uri.toASCIIString(), digestMethod);
-                    }
-                    catch (final Exception e) {
-                        throw new AOException(
-                    		"No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest", //$NON-NLS-1$
-                            e
-                        );
-                    }
-                }
-            }
+            } else // Si es una referencia de tipo file:// obtenemos el fichero y
+			// creamos una referencia solo con
+			// el message digest
+			if (uri != null && uri.getScheme().equals("file")) { //$NON-NLS-1$
+			    try {
+			        ref = fac.newReference(
+			    		"", //$NON-NLS-1$
+			            digestMethod,
+			            null,
+			            XMLConstants.OBJURI,
+			            referenceId,
+			            MessageDigest.getInstance(
+			        		AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm)
+			    		).digest(AOUtil.getDataFromInputStream(AOUtil.loadFile(uri)))
+					);
+			    }
+			    catch (final Exception e) {
+			        throw new AOException("No se ha podido crear la referencia XML a partir de la URI local (" + uri.toASCIIString() + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
+			    }
+			}
+			// Si es una referencia distinta de file:// suponemos que es
+			// dereferenciable de forma universal
+			// por lo que dejamos que Java lo haga todo
+			else if (uri != null) {
+			    try {
+			        ref = fac.newReference(uri.toASCIIString(), digestMethod);
+			    }
+			    catch (final Exception e) {
+			        throw new AOException(
+			    		"No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest", //$NON-NLS-1$
+			            e
+			        );
+			    }
+			}
             if (ref == null) {
                 throw new AOException("Error al generar la firma Externally Detached, no se ha podido crear la referencia externa"); //$NON-NLS-1$
             }
@@ -2298,6 +2293,12 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
         return arrayNodes;
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] sign, final Properties params){
+		return isSign(sign);
+	}
 
     /** {@inheritDoc} */
     @Override

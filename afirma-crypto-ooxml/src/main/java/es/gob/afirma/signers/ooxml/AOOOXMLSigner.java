@@ -208,6 +208,17 @@ public final class AOOOXMLSigner implements AOSigner {
 
         return new AOTreeModel(tree);
     }
+    
+    /** Indica si los datos indicados son un documento OOXML susceptible de contener una firma
+     * electr&oacute;nica.
+     * @param sign Datos que deseamos comprobar.
+     * @param params Par&aacute;metros de la firma.
+     * @return Devuelve <code>true</code> si los datos indicados son un documento OOXML susceptible de contener una firma
+     * electr&oacute;nica, <code>false</code> en caso contrario. */
+	@Override
+	public boolean isSign(final byte[] sign, final Properties params){
+		return isSign(sign);
+	}
 
     /** Indica si los datos indicados son un documento OOXML susceptible de contener una firma
      * electr&oacute;nica.
