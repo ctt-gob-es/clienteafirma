@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -560,6 +561,11 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     	return XAdESUtil.isSignatureElementEnveloping(signatureElement, dataReferenceList);
     }
+    
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -989,6 +995,13 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 	    			extraParams
 	    			);
     }
+	
+	/** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, asSimpleSignInfo);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -1231,6 +1244,11 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
         return docAfirma;
     }
+    
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -1363,4 +1381,5 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         }
         return isBaselineSign;
     }
+
 }

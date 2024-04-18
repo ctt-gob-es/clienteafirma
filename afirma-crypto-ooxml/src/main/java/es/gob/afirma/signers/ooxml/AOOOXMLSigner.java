@@ -72,6 +72,11 @@ public final class AOOOXMLSigner implements AOSigner {
         	LOGGER.log(Level.WARNING, "Error en la instalacion del proveedor OOXML: " + e, e); //$NON-NLS-1$
         }
     }
+    
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign) ;
+	}
 
     /** Si la entrada es un documento OOXML, devuelve el mismo documento sin ninguna modificaci&oacute;n.
      * @param sign Documento OOXML
@@ -128,6 +133,12 @@ public final class AOOOXMLSigner implements AOSigner {
     private static boolean isZipData(final byte[] data) throws IOException {
     	return new MimeHelper(data).isZipData();
     }
+    
+    /** { {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
+	}
 
     /** { {@inheritDoc} */
     @Override
@@ -168,6 +179,13 @@ public final class AOOOXMLSigner implements AOSigner {
         }
         return originalName + inTextInt + EXTENSION_OOXML;
     }
+    
+    /** { {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, asSimpleSignInfo);
+	}
 
     /** { {@inheritDoc} */
     @Override
@@ -408,4 +426,5 @@ public final class AOOOXMLSigner implements AOSigner {
             throw new AOException("Error durante la firma OOXML: " + e, e); //$NON-NLS-1$
         }
     }
+
 }

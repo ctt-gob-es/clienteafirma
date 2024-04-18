@@ -583,6 +583,13 @@ public final class AOODFSigner implements AOSigner {
                               final Properties extraParams) {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros ODF"); //$NON-NLS-1$
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, asSimpleSignInfo);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -766,6 +773,11 @@ public final class AOODFSigner implements AOSigner {
             LOGGER.severe("Error al escribir el cuerpo del XML: " + ex); //$NON-NLS-1$
         }
     }
+    
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign);
+	}
 
     /** Si la entrada es un documento ODF, devuelve el mismo documento sin ninguna modificaci&oacute;n.
      * @param signData Documento ODF
@@ -782,6 +794,12 @@ public final class AOODFSigner implements AOSigner {
         // TODO: Por ahora, devolveremos el propio ODF firmado.
         return signData;
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -822,4 +840,5 @@ public final class AOODFSigner implements AOSigner {
 		}
 		return found ? entry : null;
 	}
+
 }

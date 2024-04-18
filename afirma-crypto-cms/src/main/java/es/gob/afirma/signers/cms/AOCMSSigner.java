@@ -294,6 +294,13 @@ public final class AOCMSSigner implements AOSigner {
 
         return dataSigned;
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, asSimpleSignInfo);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -351,6 +358,12 @@ public final class AOCMSSigner implements AOSigner {
     public void addUnsignedAttribute(final String oid, final byte[] value) {
         this.uatrib.put(oid, value);
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws IOException, AOException {
+		return getData(sign);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -373,6 +386,12 @@ public final class AOCMSSigner implements AOSigner {
 	public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".csig";  //$NON-NLS-1$//$NON-NLS-2$
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
+	}
 
     /** {@inheritDoc}
      * @throws IOException Si no es posible leer la firma. */
@@ -398,4 +417,5 @@ public final class AOCMSSigner implements AOSigner {
 
         return signInfo;
     }
+
 }

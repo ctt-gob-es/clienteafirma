@@ -88,6 +88,13 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	}
 	
 	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, 
+											final boolean asSimpleSignInfo) throws AOInvalidFormatException, 
+																					IOException {
+		return getSignersStructure(sign, asSimpleSignInfo);
+	}
+	
+	@Override
 	public boolean isSign(final byte[] signData, final Properties params) throws IOException {
 		return isSign(signData);
 	}
@@ -117,12 +124,22 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	public String getSignedName(final String originalName, final String inText) {
 		return originalName + (inText != null ? inText : "") + ".asics"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+	
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
+		return getData(sign);
+	}
 
 	@Override
 	public byte[] getData(final byte[] signData) throws IOException {
 		return ASiCUtil.getASiCSData(signData);
 	}
 
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
+	}
+	
 	@Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
 		return new AOCAdESSigner().getSignInfo(ASiCUtil.getASiCSBinarySignature(signData));
@@ -294,4 +311,6 @@ public final class AOCAdESASiCSSigner implements AOSigner {
         	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por motivos de seguridad: " + e, e); //$NON-NLS-1$
 		}
 	}
+
+
 }

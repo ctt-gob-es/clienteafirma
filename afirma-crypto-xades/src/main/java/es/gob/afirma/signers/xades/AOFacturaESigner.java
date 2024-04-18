@@ -236,6 +236,12 @@ public final class AOFacturaESigner implements AOSigner {
         }
     	return xParams;
     }
+    
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, asSimpleSignInfo);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -343,12 +349,24 @@ public final class AOFacturaESigner implements AOSigner {
 	public String getSignedName(final String originalName, final String inText) {
         return XADES_SIGNER.getSignedName(originalName, inText);
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign);
+	}
 
     /** {@inheritDoc} */
     @Override
 	public byte[] getData(final byte[] signData) throws AOException, IOException {
         return XADES_SIGNER.getData(signData);
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
+	}
 
     /** {@inheritDoc} */
     @Override

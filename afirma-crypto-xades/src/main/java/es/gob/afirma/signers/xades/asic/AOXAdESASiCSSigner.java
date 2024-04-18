@@ -188,6 +188,12 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 		);
 
 	}
+	
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, asSimpleSignInfo);
+	}
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign,
@@ -229,10 +235,20 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	public String getSignedName(final String originalName, final String inText) {
 		return originalName + (inText != null ? inText : "") + ".asics"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
+	
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign);
+	}
 
 	@Override
 	public byte[] getData(final byte[] signData) throws IOException {
 		return ASiCUtil.getASiCSData(signData);
+	}
+	
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
 	}
 
 	@Override

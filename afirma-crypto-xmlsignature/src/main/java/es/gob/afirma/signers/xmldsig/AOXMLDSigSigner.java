@@ -1200,6 +1200,12 @@ public final class AOXMLDSigSigner implements AOSigner {
         return XMLConstants.TAG_SIGNATURE.equals(element.getLocalName()) ||
         		AFIRMA.equals(element.getNodeName()) && XMLConstants.TAG_SIGNATURE.equals(element.getFirstChild().getLocalName());
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -2196,6 +2202,13 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
         }
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, asSimpleSignInfo);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -2376,6 +2389,11 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         return docAfirma;
     }
+    
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
+	}
 
     /** {@inheritDoc} */
     @Override
@@ -2483,4 +2501,5 @@ public final class AOXMLDSigSigner implements AOSigner {
 		}
     	return dataObjectElement;
     }
+
 }

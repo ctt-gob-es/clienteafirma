@@ -350,6 +350,12 @@ public final class AOCAdESSigner implements AOSigner {
 		}
 
     }
+    
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, asSimpleSignInfo);
+	}
 
     /** Recupera el &aacute;rbol de nodos de firma de una firma
      * electr&oacute;nica CAdES.
@@ -441,6 +447,11 @@ public final class AOCAdESSigner implements AOSigner {
         }
 		return ObtainContentSignedData.obtainData(signData);
     }
+    
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
+		return getData(sign);
+	}
 
     /** Devuelve el nombre de fichero de firma predeterminado que se recomienda usar para
      * un fichero firmado en formato CAdES con nombre original igual al proporcionado.
@@ -475,6 +486,11 @@ public final class AOCAdESSigner implements AOSigner {
         }
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_CADES);
     }
+    
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
+	}
 
     private static void checkAlgorithm(final String algorithm, final Properties extraParams) throws AOException {
     	if (algorithm == null) {
@@ -525,4 +541,5 @@ public final class AOCAdESSigner implements AOSigner {
 		   extraParams.remove(CAdESExtraParams.SIGNING_CERTIFICATE_V2);
 	   }
     }
+
 }

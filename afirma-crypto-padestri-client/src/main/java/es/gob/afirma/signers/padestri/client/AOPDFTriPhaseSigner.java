@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.padestri.client;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
@@ -179,6 +180,12 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			final Properties extraParams) throws AOException {
 		throw new UnsupportedOperationException("No se soportan contrafirmas en PAdES"); //$NON-NLS-1$
 	}
+	
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		throw new UnsupportedOperationException("No soportado para firmas trifasicas"); //$NON-NLS-1$
+	}
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign,
@@ -216,6 +223,11 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		}
 		return originalName + inTextInt + PDF_FILE_SUFFIX;
 	}
+	
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign);
+	}
 
 	@Override
 	public byte[] getData(final byte[] sign) throws AOException {
@@ -224,6 +236,11 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
 		}
 		return sign;
+	}
+	
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return getSignInfo(data);
 	}
 
 	@Override
@@ -319,4 +336,5 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
     	return newExtraParams;
     }
+
 }
