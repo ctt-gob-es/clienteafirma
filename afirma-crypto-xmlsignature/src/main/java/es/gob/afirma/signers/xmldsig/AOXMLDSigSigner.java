@@ -1203,13 +1203,13 @@ public final class AOXMLDSigSigner implements AOSigner {
     
     /** {@inheritDoc} */
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
-		return getData(sign);
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+		return getData(sign, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -2205,14 +2205,13 @@ public final class AOXMLDSigSigner implements AOSigner {
     
     /** {@inheritDoc} */
 	@Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
-		return getSignersStructure(sign, asSimpleSignInfo);
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) {
 
         // recupera la raiz del documento de firmas
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -2309,13 +2308,13 @@ public final class AOXMLDSigSigner implements AOSigner {
     
     /** {@inheritDoc} */
 	@Override
-	public boolean isSign(final byte[] sign, final Properties params){
-		return isSign(sign);
+	public boolean isSign(final byte[] sign){
+		return isSign(sign, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public boolean isSign(final byte[] sign) {
+	public boolean isSign(final byte[] sign, final Properties params) {
 
         if (sign == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -2391,18 +2390,18 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
     
 	@Override
-	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
-		return getSignInfo(data);
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException {
+		return getSignInfo(data, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
-        if (sign == null) {
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
-        if (!isSign(sign)) {
+        if (!isSign(data)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
@@ -2415,7 +2414,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         dbf.setNamespaceAware(true);
         Element rootSig = null;
         try {
-            rootSig = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+            rootSig = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(data)).getDocumentElement();
         }
         catch (final Exception e) {
             LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$

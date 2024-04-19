@@ -404,7 +404,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * La propia estructura de firma se considera el nodo ra&iacute;z, la firma y cofirmas
      * pender&aacute;n directamentede de este.
      * @param sign Firma electr&oacute;nica de la que se desea obtener la estructura.
-     * @param params Par&aacute;metros de la firma.
+     * @param params necesarios para comprobar si los datos son una firma compatible.
      * @param asSimpleSignInfo Si es <code>true</code> se devuelve un &aacute;rbol con la
      *                         informaci&oacute;n b&aacute;sica de cada firma individual
      *                         mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code>

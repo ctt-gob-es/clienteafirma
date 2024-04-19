@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /** Firmador simple en formato PKCS#1.
@@ -156,6 +155,11 @@ public final class AOPkcs1Signer implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se puede obtener la estructura de firmantes en PKCS#1"); //$NON-NLS-1$
 	}
+	
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params) {
+		return isSign(signData);
+	}
 
 	@Override
 	public boolean isSign(final byte[] is) {
@@ -185,7 +189,7 @@ public final class AOPkcs1Signer implements AOSigner {
 	}
 	
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign, final Properties params){
 		throw new UnsupportedOperationException("No se pueden obtener los datos firmados en PKCS#1"); //$NON-NLS-1$
 	}
 
@@ -197,11 +201,6 @@ public final class AOPkcs1Signer implements AOSigner {
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
 		throw new UnsupportedOperationException("No se puede obtener informacion de las firmas PKCS#1"); //$NON-NLS-1$
-	}
-
-	@Override
-	public boolean isSign(final byte[] signData, final Properties params) {
-		return isSign(signData);
 	}
 
 }

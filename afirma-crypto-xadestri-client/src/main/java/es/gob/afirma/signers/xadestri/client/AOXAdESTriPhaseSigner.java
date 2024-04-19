@@ -256,13 +256,13 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 	
     /** {@inheritDoc} */
 	@Override
-	public boolean isSign(final byte[] sign, final Properties params){
-		return isSign(sign);
+	public boolean isSign(final byte[] sign){
+		return isSign(sign, null);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isSign(final byte[] sign) {
+	public boolean isSign(final byte[] sign, final Properties params) {
         if (sign == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;

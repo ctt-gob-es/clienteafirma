@@ -51,7 +51,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
 	 * La propia estructura de firma se considera el nodo ra&iacute;z, la firma y cofirmas
 	 * pender&aacute;n directamentede de este.
 	 * @param sign Firma electr&oacute;nica de la que se desea obtener la estructura.
-	 * @param params Par&aacute;metros de la firma.
+	 * @param params Par&aacute;metros necesarios para comprobar si una firma es compatible.
 	 * @param asSimpleSignInfo Si es <code>true</code> se devuelve un &aacute;rbol con la
 	 *                         informaci&oacute;n b&aacute;sica de cada firma individual
 	 *                         mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code>
@@ -71,7 +71,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
     
     /** Indica si un dato es una firma compatible con la implementaci&oacute;n concreta.
      * @param is Dato que deseamos comprobar.
-     * @param params Par&aacute;metros de firma.
+     * @param params Par&aacute;metros necesarios para comprobar si una firma es compatible.
      * @return <code>true</code> si el dato es una firma reconocida por
      *         esta clase, <code>false</code> en caso contrario.
      * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
@@ -110,7 +110,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
     
 	/** Si la entrada es un documento PDF, devuelve el mismo documento PDF.
 	 * @param sign Documento PDF
-	 * @param params Par&aacute;metros de la firma.
+	 * @param params Par&aacute;metros necesarios para comprobar si una firma es compatible.
 	 * @return Mismo documento PDF de entrada, sin modificar en ning&uacute; aspecto.
 	 * @throws AOInvalidFormatException Si los datos de entrada no son un documento PDF. 
 	 * @throws IOException si no se puede leer la firma
@@ -135,7 +135,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner, AOSimpleSigner {
 	/** Si la entrada es un documento PDF, devuelve un objeto <code>AOSignInfo</code>
 	 * con el formato establecido a <code>AOSignConstants.SIGN_FORMAT_PDF</code>.
 	 * @param data Documento PDF.
-	 * @param params Par&aacute;metros de firma.
+	 * @param params Par&aacute;metros necesarios para comprobar si una firma es compatible.
 	 * @return Objeto <code>AOSignInfo</code> con el formato establecido a <code>AOSignConstants.SIGN_FORMAT_PDF</code>.
 	 * @throws AOException Si los datos de entrada no son un documento PDF. 
 	 * @throws IOException si ocurren problemas relacionados con la lectura de la firma.*/

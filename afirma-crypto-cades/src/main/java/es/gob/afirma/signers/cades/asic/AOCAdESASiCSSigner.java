@@ -81,34 +81,34 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign,
 			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException,
 			                                                                      IOException {
-		return new AOCAdESSigner().getSignersStructure(
-			ASiCUtil.getASiCSBinarySignature(sign),
-			asSimpleSignInfo
-		);
+		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 	
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, 
 											final boolean asSimpleSignInfo) throws AOInvalidFormatException, 
 																					IOException {
-		return getSignersStructure(sign, asSimpleSignInfo);
+		return new AOCAdESSigner().getSignersStructure(
+				ASiCUtil.getASiCSBinarySignature(sign),
+				asSimpleSignInfo
+			);
 	}
 	
 	@Override
 	public boolean isSign(final byte[] signData, final Properties params) throws IOException {
-		return isSign(signData);
-	}
-
-	@Override
-	public boolean isSign(final byte[] is) throws IOException {
 		final byte[] sign;
 		try {
-			sign = ASiCUtil.getASiCSBinarySignature(is);
+			sign = ASiCUtil.getASiCSBinarySignature(signData);
 		}
 		catch(final Exception e) {
 			return false;
 		}
 		return new AOCAdESASiCSSigner().isSign(sign);
+	}
+
+	@Override
+	public boolean isSign(final byte[] is) throws IOException {
+		return isSign(is, null);
 	}
 
 	@Override
@@ -127,22 +127,22 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	
 	@Override
 	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
-		return getData(sign);
+		return ASiCUtil.getASiCSData(sign);
 	}
 
 	@Override
-	public byte[] getData(final byte[] signData) throws IOException {
-		return ASiCUtil.getASiCSData(signData);
+	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
+		return getData(signData, null);
 	}
 
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
-		return getSignInfo(data);
+		return new AOCAdESSigner().getSignInfo(ASiCUtil.getASiCSBinarySignature(data));
 	}
 	
 	@Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
-		return new AOCAdESSigner().getSignInfo(ASiCUtil.getASiCSBinarySignature(signData));
+		return getSignInfo(signData, null);
 	}
 
     /** Cofirma en formato CAdES los datos encontrados en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,

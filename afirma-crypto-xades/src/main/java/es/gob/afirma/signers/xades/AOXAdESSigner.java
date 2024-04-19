@@ -10,7 +10,6 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -562,14 +561,15 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     	return XAdESUtil.isSignatureElementEnveloping(signatureElement, dataReferenceList);
     }
     
+    /** {@inheritDoc} */
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
-		return getData(sign);
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+		return getData(sign, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
 
     	// Construimos el arbol DOM
         Document doc;
@@ -998,15 +998,15 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 	
 	/** {@inheritDoc} */
 	@Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
-		return getSignersStructure(sign, asSimpleSignInfo);
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException {
+		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign,
-			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) 
+			throws AOInvalidFormatException {
 
         // Obtenemos el arbol del documento
         final Document signDoc;
@@ -1146,13 +1146,13 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     
     /** {@inheritDoc} */
 	@Override
-	public boolean isSign(final byte[] sign, final Properties params){
-		return isSign(sign);
+	public boolean isSign(final byte[] sign){
+		return isSign(sign, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public boolean isSign(final byte[] sign) {
+	public boolean isSign(final byte[] sign, final Properties params) {
 
         if (sign == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -1246,21 +1246,21 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     }
     
 	@Override
-	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
-		return getSignInfo(data);
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException {
+		return getSignInfo(data, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
-        if (sign == null) {
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
         // Cargamos el arbol DOM del documento
         Document signDocument;
         try {
-        	signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        	signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(data));
         }
         catch (final Exception e) {
             LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$

@@ -240,24 +240,25 @@ public final class AOFacturaESigner implements AOSigner {
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
 			throws AOInvalidFormatException, IOException {
-		return getSignersStructure(sign, asSimpleSignInfo);
-	}
+        return XADES_SIGNER.getSignersStructure(sign, asSimpleSignInfo);
+    }
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
-        return XADES_SIGNER.getSignersStructure(sign, asSimpleSignInfo);
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) 
+			throws AOInvalidFormatException, IOException {
+        return getSignersStructure(sign, null, asSimpleSignInfo);
     }
     
     /** {@inheritDoc} */
 	@Override
-	public boolean isSign(final byte[] sign, final Properties params) throws IOException{
-		return isSign(sign);
+	public boolean isSign(final byte[] sign) throws IOException{
+		return isSign(sign, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public boolean isSign(final byte[] sign) throws IOException {
+	public boolean isSign(final byte[] sign, final Properties params) throws IOException {
 
         if (sign == null || sign.length == 0) {
             return false;
@@ -352,25 +353,25 @@ public final class AOFacturaESigner implements AOSigner {
     
     /** {@inheritDoc} */
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
-		return getData(sign);
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public byte[] getData(final byte[] signData) throws AOException, IOException {
-        return XADES_SIGNER.getData(signData);
+	public byte[] getData(final byte[] sign, final Properties params) throws AOException, IOException {
+        return XADES_SIGNER.getData(sign);
     }
     
     /** {@inheritDoc} */
 	@Override
-	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
-		return getSignInfo(data);
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException, IOException {
+		return getSignInfo(data, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] signData) {
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) {
     	final AOSignInfo facturaeSignInfo = new AOSignInfo(AOSignConstants.SIGN_FORMAT_FACTURAE);
     	facturaeSignInfo.setVariant(null);
     	return facturaeSignInfo;

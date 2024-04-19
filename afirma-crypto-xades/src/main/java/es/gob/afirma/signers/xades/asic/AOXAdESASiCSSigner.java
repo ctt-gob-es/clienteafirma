@@ -190,15 +190,14 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	}
 	
 	@Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
 			throws AOInvalidFormatException, IOException {
-		return getSignersStructure(sign, asSimpleSignInfo);
+		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
 	@Override
-	public AOTreeModel getSignersStructure(final byte[] sign,
-			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException,
-			                                                                      IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) 
+			throws AOInvalidFormatException, IOException {
 		return new AOXAdESSigner().getSignersStructure(
 			ASiCUtil.getASiCSXMLSignature(sign),
 			asSimpleSignInfo
@@ -206,12 +205,12 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	}
 	
 	@Override
-	public boolean isSign(final byte[] is, final Properties params) throws IOException{
-		return isSign(is);
+	public boolean isSign(final byte[] is) throws IOException{
+		return isSign(is, null);
 	}
 
 	@Override
-	public boolean isSign(final byte[] is) throws IOException {
+	public boolean isSign(final byte[] is, final Properties params) throws IOException {
 		final byte[] sign;
 		try {
 			sign = ASiCUtil.getASiCSXMLSignature(is);
@@ -237,24 +236,24 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	}
 	
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
-		return getData(sign);
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign, null);
 	}
 
 	@Override
-	public byte[] getData(final byte[] signData) throws IOException {
-		return ASiCUtil.getASiCSData(signData);
+	public byte[] getData(final byte[] sign, final Properties params) throws IOException {
+		return ASiCUtil.getASiCSData(sign);
 	}
 	
 	@Override
-	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
-		return getSignInfo(data);
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException, IOException {
+		return getSignInfo(data, null);
 	}
 
 	@Override
-	public AOSignInfo getSignInfo(final byte[] signData) throws AOException,
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException,
 			                                                    IOException {
-		return new AOXAdESSigner().getSignInfo(ASiCUtil.getASiCSXMLSignature(signData));
+		return new AOXAdESSigner().getSignInfo(ASiCUtil.getASiCSXMLSignature(data));
 	}
 
 	/** Establece los par&aacute;metros necesarios (modificando los actuales incompatibles si fuese necesario)

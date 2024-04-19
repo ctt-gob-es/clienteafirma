@@ -156,7 +156,7 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 	/** {@inheritDoc} */
 	@Override
 	public boolean isSign(final byte[] signData, final Properties params){
-		return isSign(signData);
+		throw new UnsupportedOperationException("No se soporta comprobacion de si es firma en modo trifasico"); //$NON-NLS-1$
 	}
 
 	/** {@inheritDoc} */
