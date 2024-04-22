@@ -260,7 +260,7 @@ public final class ProtocolInvocationUriParser {
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
 	 * operaci&oacute;n de carga de datos.Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
-	  @param xml XML de entrada
+	 * @param xml XML de entrada
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToLoad getParametersToLoad(final byte[] xml) throws ParameterException {
@@ -280,7 +280,7 @@ public final class ProtocolInvocationUriParser {
 	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
 	 * operaci&oacute;n de carga de datos.Si falta alg&uacute;n par&aacute;metro o
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
-	  @param xml XML de entrada
+	 * @param xml XML de entrada
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
 	public static UrlParametersToGetCurrentLog getParametersToGetCurrentLog(final byte[] xml) throws ParameterException {

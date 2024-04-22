@@ -400,7 +400,7 @@ public final class ProtocolInvocationLauncher {
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
 
-                    params = ProtocolInvocationUriParser.getParametersToSelectCert(xmlData);
+                    params = ProtocolInvocationUriParser.getParametersToSelectCert(xmlData, true);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -476,7 +476,7 @@ public final class ProtocolInvocationLauncher {
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
 
-                    params = ProtocolInvocationUriParser.getParametersToSave(xmlData);
+                    params = ProtocolInvocationUriParser.getParametersToSave(xmlData, true);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -566,7 +566,7 @@ public final class ProtocolInvocationLauncher {
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
 
-                    params = ProtocolInvocationUriParser.getParametersToSignAndSave(xmlData);
+                    params = ProtocolInvocationUriParser.getParametersToSignAndSave(xmlData, true);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -675,7 +675,7 @@ public final class ProtocolInvocationLauncher {
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
-                    params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
+                    params = ProtocolInvocationUriParser.getParametersToSign(xmlData, true);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,

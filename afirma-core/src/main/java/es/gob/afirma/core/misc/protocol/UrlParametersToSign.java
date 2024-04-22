@@ -245,7 +245,8 @@ public final class UrlParametersToSign extends UrlParameters {
 				}
 				setStorageServletUrl(storageServletUrl);
 			}
-			else {
+			// Si no se encuentra a pesar de tener todos los parametros, falla la operacion
+			else if (params.containsKey(ID_PARAM)) {
 				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion"); //$NON-NLS-1$
 			}
 		}

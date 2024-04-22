@@ -139,10 +139,7 @@ public final class UrlParametersToSave extends UrlParameters {
 		// para descargar los datos y la ruta del servicio remoto para el
 		// fichero
 		if (!params.containsKey(FILE_ID_PARAM) && !params.containsKey(DATA_PARAM)) {
-			throw new ParameterException(
-				"Error al validar la URL del servlet de recuperacion: " + //$NON-NLS-1$
-					"La URI debe contener o un identificador de fichero o los datos a guardar" //$NON-NLS-1$
-			);
+			throw new ParameterException("No se ha proporcionado el identificador de fichero ni los datos a guardar"); //$NON-NLS-1$
 		}
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
@@ -177,9 +174,10 @@ public final class UrlParametersToSave extends UrlParameters {
 			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
 
-		// Validamos la URL del servlet de guardado en caso de ser necesaria
+		// Cargamos la URL del servlet si es necesaria
 		if (this.servicesRequired) {
 			if (params.containsKey(STORAGE_SERVLET_PARAM)) {
+
 
 				// Comprobamos que la URL sea valida
 				URL storageServletUrl;
@@ -194,7 +192,8 @@ public final class UrlParametersToSave extends UrlParameters {
 				}
 				setStorageServletUrl(storageServletUrl);
 			}
-			else {
+			// Si no se encuentra a pesar de tener todos los parametros, falla la operacion
+			else if (params.containsKey(ID_PARAM)) {
 				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion"); //$NON-NLS-1$
 			}
 		}
