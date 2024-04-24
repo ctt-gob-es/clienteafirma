@@ -57,6 +57,7 @@ var AutoScript = ( function ( window, undefined ) {
 				error_connecting_client: "No es posible conectar con el cliente de firma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
 				error_connecting_service: "No se ha podido conectar con el servicio de la aplicaci&oacute;n de firma. Es probable que no pueda completar firmas electr&oacute;nicas desde esta p&aacute;gina.",
 				error_connecting_server_recovering: "No se pudo conectar con el servicio de la aplicaci&oacute;n para recuperar el resultado de la operaci&oacute;n.",
+				error_locked_operation: "Operaci&oacute;n bloqueada por el navegador. Es posible que el tr&aacute;mite web est&eacute; ejecutando una operaci&oacute;n no soportada.",
 				firefox_reinstall_message: "Instalar o restaurar AutoFirma requerir&aacute; cerrar el navegador y reiniciar el tr&aacute;mite.",
 				install_client: "<br>Si lo tiene instalado o lo acaba de instalar, pulse el bot&oacute;n para reintentar la operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
@@ -82,6 +83,7 @@ var AutoScript = ( function ( window, undefined ) {
 				error_connecting_client: "Non se puido conectar ao cliente da sinatura debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
 				error_connecting_service: "Non se puido conectar ao servizo da aplicaci&oacute;n de sinatura. &Eacute; posible que non poida completar sinaturas electr&oacute;nicas desde esta p&aacute;xina.",
 				error_connecting_server_recovering: "Non se puido conectar ao servizo de aplicaci&oacute;n para recuperar o resultado da operaci&oacute;n",
+				error_locked_operation: "Operaci&oacute;n bloqueada polo navegador. &Eacute; posible que o procedemento web sexa executando unha operaci&oacute;n non compatible.",
 				firefox_reinstall_message: "Ser&aacute; necesario instalar ou restaurar AutoFirma pecha o navegador e reinicia o proceso.",
 				install_client: "Se o tes instalado ou o acabas de instalar, preme o bot&oacute;n para tentar de novo a operaci&oacute;n.",
 				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga na App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
@@ -180,6 +182,8 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		// Contador con las llamadas realizadas al metodo para comprobar el estado de los servicios
 		var counterCallService = 0;
+		
+		var successCallApp = false;
         
         /**
          * Indica si el navegador soporta WebSockets.
@@ -203,6 +207,7 @@ var AutoScript = ( function ( window, undefined ) {
 		var ERROR_NO_COMPATIBLE_PROCEDURE = 2;
 		var ERROR_CONNECTING_SERVICE = 3;
 		var ERROR_CHECKING_SERVICE = 4;
+		var ERROR_LOCKED_OPERATION = 5;
 		
 		/**
 		 * Realiza la descarga de datos de una URL y, una vez termina, llama al metodo
@@ -1415,6 +1420,13 @@ var AutoScript = ( function ( window, undefined ) {
 							adminMsg = " " + currentLocale.contact_admin + " " + adminContactInfo;
 						}
 						messageError = currentLocale.error_connecting_service + adminMsg;
+						break;
+					case ERROR_LOCKED_OPERATION:
+						var adminMsg = "";
+						if (adminContactInfo != null) {
+							adminMsg = " " + currentLocale.contact_admin + " " + adminContactInfo;
+						}
+						messageError = currentLocale.error_locked_operation + adminMsg;
 						break;
 				}
 				var enabled = showSupportDialog(messageError, actionButtonText, actionButtonCallback, 
@@ -4526,13 +4538,24 @@ var AutoScript = ( function ( window, undefined ) {
 			
 				Dialog.showLoadingDialog();
 				
+				successCallApp = false;
+				
+				// Comprobamos que la llamada se ha ejecutado correctamente y asi evitar
+				// que se quede el dialogo de carga en ejecucion
+				setTimeout(function () {
+					if (!successCallApp) {
+						Dialog.showErrorDialog(ERROR_LOCKED_OPERATION);
+					}				
+				}, 
+				5000);
+							
 				// Invocamos al cliente de firma
-				openUrl(intentURL);
+				openUrl(intentURL);			
 
-					// Preguntamos repetidamente por el resultado
-				if (!!idSession && (!!successCallback || !!errorCallback)) {
+				// Preguntamos repetidamente por el resultado
+				if (!!idSession && (!!successCallback || !!errorCallback)) {							
 					getStoredFileFromServlet(idSession, retrieverServletAddress, cipherKey, intentURL, successCallback, errorCallback);
-				}
+				} 
 				
 			}
 
@@ -4878,6 +4901,8 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 
 			function retrieveRequest(httpRequest, url, params, cipherKey, intentURL, idDocument, afirmaConnected, successCallback, errorCallback) {
+				
+				successCallApp = true;						
 				
 				if (wrongInstallation) {
 					var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
