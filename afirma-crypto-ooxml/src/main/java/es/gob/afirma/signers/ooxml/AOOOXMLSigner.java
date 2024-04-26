@@ -72,7 +72,7 @@ public final class AOOOXMLSigner implements AOSigner {
         	LOGGER.log(Level.WARNING, "Error en la instalacion del proveedor OOXML: " + e, e); //$NON-NLS-1$
         }
     }
-    
+
     /** Si la entrada es un documento OOXML, devuelve el mismo documento sin ninguna modificaci&oacute;n.
      * @param sign Documento OOXML
      * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso. */
@@ -133,7 +133,7 @@ public final class AOOOXMLSigner implements AOSigner {
     private static boolean isZipData(final byte[] data) throws IOException {
     	return new MimeHelper(data).isZipData();
     }
-    
+
     /** { {@inheritDoc} */
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data) throws AOException, IOException {
@@ -179,11 +179,11 @@ public final class AOOOXMLSigner implements AOSigner {
         }
         return originalName + inTextInt + EXTENSION_OOXML;
     }
-    
+
     /** { {@inheritDoc} */
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
+			throws IOException {
 		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
@@ -226,7 +226,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
         return new AOTreeModel(tree);
     }
-    
+
     /** Indica si los datos indicados son un documento OOXML susceptible de contener una firma
      * electr&oacute;nica.
      * @param sign Datos que deseamos comprobar.
