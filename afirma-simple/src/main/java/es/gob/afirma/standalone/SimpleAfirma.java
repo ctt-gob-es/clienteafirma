@@ -39,6 +39,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -70,6 +71,7 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signvalidation.SignValider;
@@ -77,6 +79,7 @@ import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.ValidateBinarySignature;
+import es.gob.afirma.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
@@ -624,6 +627,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             	    		validityListResult = ValidateBinarySignature.validate(signature, dataFile);
             	    	}
         			}
+        		} else if (sv instanceof ValidatePdfSignature) {
+        			final Properties params;
+        			if (signConfig.getExtraParams() != null) {
+        				params = signConfig.getExtraParams();
+        			} else {
+        				params = new Properties();
+        			}
+        			params.setProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.toString(true));
+        			validityListResult = sv.validate(signature, params);
         		} else {
         			validityListResult = sv.validate(signature);
         		}

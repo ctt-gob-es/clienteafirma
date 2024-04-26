@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,6 +54,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -84,11 +86,11 @@ final class SignDataPanel extends JPanel {
 
     private CompleteSignInfo currentSignInfo = null;
 
-    SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
-        SwingUtilities.invokeLater(() -> createUI(signFile, sign, fileTypeIcon, cert, extKeyListener));
+    SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener, final Properties params) {
+        SwingUtilities.invokeLater(() -> createUI(signFile, sign, fileTypeIcon, cert, extKeyListener, params));
     }
 
-    void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener) {
+    void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert, final KeyListener extKeyListener, final Properties params) {
 
     	// Color de fondo
     	if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST && Platform.getOS() == Platform.OS.WINDOWS) {
@@ -283,7 +285,7 @@ final class SignDataPanel extends JPanel {
         // Panel el detalle de la firma
         CompleteSignInfo signInfo;
         try {
-            signInfo = SignDataPanel.getSignInfo(sign);
+            signInfo = SignDataPanel.getSignInfo(sign, params);
         }
         catch (final Exception e) {
         	LOGGER.severe("Error obteniendo los datos de la firma: " + e); //$NON-NLS-1$
@@ -384,39 +386,58 @@ final class SignDataPanel extends JPanel {
 
     /** Recupera la informaci&oacute;n de la firma indicada.
      * @param signData Firma.
+     * @param params Par&aacute;metros de la firma.
      * @return Informaci&oacute;n de la firma.
      * @throws IOException Si ocurren problemas relacionados con la lectura de los datos */
-    private static CompleteSignInfo getSignInfo(final byte[] signData) throws IOException {
+    private static CompleteSignInfo getSignInfo(final byte[] signData, final Properties params) throws IOException {
         final CompleteSignInfo signInfo = new CompleteSignInfo();
         signInfo.setSignData(signData);
-        final AOSigner signer = AOSignerFactory.getSigner(signData);
+        final AOSigner signer = AOSignerFactory.getSigner(signData, params);
         if (signer == null) {
         	LOGGER.warning("Formato de firma no reconocido"); //$NON-NLS-1$
             throw new IllegalArgumentException("Formato de firma no reconocido"); //$NON-NLS-1$
         }
         try {
-            signInfo.setSignInfo(signer.getSignInfo(signData));
+            if (signer instanceof AOPDFSigner) {
+            	signInfo.setSignInfo(((AOPDFSigner)signer).getSignInfo(signData, params));
+        	} else {
+        		signInfo.setSignInfo(signer.getSignInfo(signData));
+        	}  
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al leer la informacion de la firma", e); //$NON-NLS-1$
-        }
+        } 
         try {
-        	signInfo.setSignsTree(signer.getSignersStructure(signData, true));
+        	if (signer instanceof AOPDFSigner) {
+        		signInfo.setSignsTree(((AOPDFSigner)signer).getSignersStructure(signData, params, true));
+        	} else {
+        		signInfo.setSignsTree(signer.getSignersStructure(signData, true));
+        	}       	
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al extraer el arbol de firmantes", e);  //$NON-NLS-1$
         	signInfo.setSignsTree(null);
         }
         try {
-            signInfo.setData(signer.getData(signData));
+        	if (signer instanceof AOPDFSigner) {
+        		signInfo.setData(((AOPDFSigner)signer).getData(signData, params));
+        	} else {
+        		signInfo.setData(signer.getData(signData));
+        	}           
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al extraer los datos firmados", e);  //$NON-NLS-1$
         }
         try {
-        	signInfo.setTimestampsInfo(
-    			TimestampsAnalyzer.getTimestamps(signData)
-			);
+        	if (signer instanceof AOPDFSigner) {
+        		signInfo.setTimestampsInfo(
+            			TimestampsAnalyzer.getTimestamps(signData, params)
+        			);
+        	} else {
+        		signInfo.setTimestampsInfo(
+            			TimestampsAnalyzer.getTimestamps(signData)
+        			);
+        	}      	
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al extraer los sellos de tiempo", e);  //$NON-NLS-1$

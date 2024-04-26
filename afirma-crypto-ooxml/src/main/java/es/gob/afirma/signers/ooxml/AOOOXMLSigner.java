@@ -72,12 +72,17 @@ public final class AOOOXMLSigner implements AOSigner {
         	LOGGER.log(Level.WARNING, "Error en la instalacion del proveedor OOXML: " + e, e); //$NON-NLS-1$
         }
     }
-
+    
     /** Si la entrada es un documento OOXML, devuelve el mismo documento sin ninguna modificaci&oacute;n.
      * @param sign Documento OOXML
      * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso. */
+	@Override
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign, null) ;
+	}
+
     @Override
-	public byte[] getData(final byte[] sign) throws AOException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOException {
 
         // Si no es una firma OOXML valida, lanzamos una excepcion
         if (!isSign(sign)) {
@@ -128,15 +133,21 @@ public final class AOOOXMLSigner implements AOSigner {
     private static boolean isZipData(final byte[] data) throws IOException {
     	return new MimeHelper(data).isZipData();
     }
+    
+    /** { {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException, IOException {
+		return getSignInfo(data, null);
+	}
 
     /** { {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
-        if (sign == null) {
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
-        if (!isSign(sign)) {
+        if (!isSign(data)) {
             throw new AOFormatFileException("Los datos introducidos no se corresponden con documento OOXML"); //$NON-NLS-1$
         }
 
@@ -168,10 +179,17 @@ public final class AOOOXMLSigner implements AOSigner {
         }
         return originalName + inTextInt + EXTENSION_OOXML;
     }
+    
+    /** { {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, null, asSimpleSignInfo);
+	}
 
     /** { {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) throws IOException {
         if (sign == null) {
             throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
         }
@@ -208,14 +226,25 @@ public final class AOOOXMLSigner implements AOSigner {
 
         return new AOTreeModel(tree);
     }
-
+    
     /** Indica si los datos indicados son un documento OOXML susceptible de contener una firma
      * electr&oacute;nica.
      * @param sign Datos que deseamos comprobar.
      * @return Devuelve <code>true</code> si los datos indicados son un documento OOXML susceptible de contener una firma
      * electr&oacute;nica, <code>false</code> en caso contrario. */
+	@Override
+	public boolean isSign(final byte[] sign){
+		return isSign(sign, null);
+	}
+
+    /** Indica si los datos indicados son un documento OOXML susceptible de contener una firma
+     * electr&oacute;nica.
+     * @param sign Datos que deseamos comprobar.
+     * @param params Par&aacute;metros necesarios para comprobar si los datos de la firma son compatibles.
+     * @return Devuelve <code>true</code> si los datos indicados son un documento OOXML susceptible de contener una firma
+     * electr&oacute;nica, <code>false</code> en caso contrario. */
     @Override
-	public boolean isSign(final byte[] sign) {
+	public boolean isSign(final byte[] sign, final Properties params) {
         if (sign == null) {
             LOGGER.warning("Se ha introducido una firma nula para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -397,4 +426,5 @@ public final class AOOOXMLSigner implements AOSigner {
             throw new AOException("Error durante la firma OOXML: " + e, e); //$NON-NLS-1$
         }
     }
+
 }

@@ -889,45 +889,40 @@ public final class AOXMLDSigSigner implements AOSigner {
             		referenceId,
             		data
         		);
-            }
-            // Tenemos URI y no nos han establecido algoritmo de message digest,
-            // por lo que es una referencia externa accesible
-            else {
-                // Si es una referencia de tipo file:// obtenemos el fichero y
-                // creamos una referencia solo con
-                // el message digest
-                if (uri != null && uri.getScheme().equals("file")) { //$NON-NLS-1$
-                    try {
-                        ref = fac.newReference(
-                    		"", //$NON-NLS-1$
-                            digestMethod,
-                            null,
-                            XMLConstants.OBJURI,
-                            referenceId,
-                            MessageDigest.getInstance(
-                        		AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm)
-                    		).digest(AOUtil.getDataFromInputStream(AOUtil.loadFile(uri)))
-                		);
-                    }
-                    catch (final Exception e) {
-                        throw new AOException("No se ha podido crear la referencia XML a partir de la URI local (" + uri.toASCIIString() + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
-                    }
-                }
-                // Si es una referencia distinta de file:// suponemos que es
-                // dereferenciable de forma universal
-                // por lo que dejamos que Java lo haga todo
-                else if (uri != null) {
-                    try {
-                        ref = fac.newReference(uri.toASCIIString(), digestMethod);
-                    }
-                    catch (final Exception e) {
-                        throw new AOException(
-                    		"No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest", //$NON-NLS-1$
-                            e
-                        );
-                    }
-                }
-            }
+            } else // Si es una referencia de tipo file:// obtenemos el fichero y
+			// creamos una referencia solo con
+			// el message digest
+			if (uri != null && uri.getScheme().equals("file")) { //$NON-NLS-1$
+			    try {
+			        ref = fac.newReference(
+			    		"", //$NON-NLS-1$
+			            digestMethod,
+			            null,
+			            XMLConstants.OBJURI,
+			            referenceId,
+			            MessageDigest.getInstance(
+			        		AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm)
+			    		).digest(AOUtil.getDataFromInputStream(AOUtil.loadFile(uri)))
+					);
+			    }
+			    catch (final Exception e) {
+			        throw new AOException("No se ha podido crear la referencia XML a partir de la URI local (" + uri.toASCIIString() + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
+			    }
+			}
+			// Si es una referencia distinta de file:// suponemos que es
+			// dereferenciable de forma universal
+			// por lo que dejamos que Java lo haga todo
+			else if (uri != null) {
+			    try {
+			        ref = fac.newReference(uri.toASCIIString(), digestMethod);
+			    }
+			    catch (final Exception e) {
+			        throw new AOException(
+			    		"No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest", //$NON-NLS-1$
+			            e
+			        );
+			    }
+			}
             if (ref == null) {
                 throw new AOException("Error al generar la firma Externally Detached, no se ha podido crear la referencia externa"); //$NON-NLS-1$
             }
@@ -1205,10 +1200,16 @@ public final class AOXMLDSigSigner implements AOSigner {
         return XMLConstants.TAG_SIGNATURE.equals(element.getLocalName()) ||
         		AFIRMA.equals(element.getNodeName()) && XMLConstants.TAG_SIGNATURE.equals(element.getFirstChild().getLocalName());
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+		return getData(sign, null);
+	}
 
     /** {@inheritDoc} */
     @Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -2201,10 +2202,16 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
         }
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+		return getSignersStructure(sign, null, asSimpleSignInfo);
+	}
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) {
 
         // recupera la raiz del documento de firmas
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -2298,10 +2305,16 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
         return arrayNodes;
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] sign){
+		return isSign(sign, null);
+	}
 
     /** {@inheritDoc} */
     @Override
-	public boolean isSign(final byte[] sign) {
+	public boolean isSign(final byte[] sign, final Properties params) {
 
         if (sign == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -2375,15 +2388,20 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         return docAfirma;
     }
+    
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException {
+		return getSignInfo(data, null);
+	}
 
     /** {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
-        if (sign == null) {
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
-        if (!isSign(sign)) {
+        if (!isSign(data)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
@@ -2396,7 +2414,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         dbf.setNamespaceAware(true);
         Element rootSig = null;
         try {
-            rootSig = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+            rootSig = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(data)).getDocumentElement();
         }
         catch (final Exception e) {
             LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$
@@ -2482,4 +2500,5 @@ public final class AOXMLDSigSigner implements AOSigner {
 		}
     	return dataObjectElement;
     }
+
 }

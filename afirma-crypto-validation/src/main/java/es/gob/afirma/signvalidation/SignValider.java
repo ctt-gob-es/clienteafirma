@@ -72,7 +72,7 @@ public abstract class SignValider {
      * confirmaci&oacute;n del usuario. S&oacute;lo se lanza en modo relajado.
 	 * @throws IOException Fallo durante la validaci&oacute;n de la firma. */
     public abstract List<SignValidity> validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException;
-
+    
     /**
      * Reordena la lista de validaciones para que en caso de que una firma sea logeva y solo se encuentren errores de
      * certificados caducados, se le de prioridad a la validación de tipo UNKNOWN.

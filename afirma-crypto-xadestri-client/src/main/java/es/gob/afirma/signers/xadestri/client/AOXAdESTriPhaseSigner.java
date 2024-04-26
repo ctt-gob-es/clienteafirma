@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AGEPolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -167,6 +168,11 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			xParams
 		);
 	}
+	
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -234,6 +240,12 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			params
 		);
 	}
+	
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -241,10 +253,16 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			                                     final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
+	
+    /** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] sign){
+		return isSign(sign, null);
+	}
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isSign(final byte[] sign) {
+	public boolean isSign(final byte[] sign, final Properties params) {
         if (sign == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -293,6 +311,11 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 	@Override
 	public String getSignedName(final String originalName, final String inText) {
 		return originalName + (inText != null ? inText : "") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
 	/** {@inheritDoc} */
@@ -580,4 +603,5 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
     			|| !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(config.getProperty(EXTRAPARAM_FORMAT))
     					&& !Boolean.parseBoolean(config.getProperty(EXTRAPARAM_USE_MANIFEST));
     }
+
 }

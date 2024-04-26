@@ -45,6 +45,7 @@ import es.gob.afirma.core.signers.SignEnhancer;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
 
 /** Manejador de firmas binarias de ficheros Adobe PDF en formato PAdES.
  * <p>Para compatibilidad estricta con PAdES-BES/EPES se utiliza <i>ETSI.CAdES.detached</i> como nombre del subfiltro.</p>
@@ -389,6 +390,28 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
     @Override
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+    	
+    	return getSignersStructure(sign, null, asSimpleSignInfo);
+    }
+    
+    /** Recupera el &aacute;rbol de nodos de firma de una firma electr&oacute;nica.
+     * Los nodos del &aacute;rbol ser&aacute;n textos con el <i>CommonName</i> (CN X.500)
+     * del titular del certificado u objetos de tipo AOSimpleSignInfo con la
+     * informaci&oacute;n b&aacute;sica de las firmas individuales, seg&uacute;n
+     * el valor del par&aacute;metro <code>asSimpleSignInfo</code>. Los nodos se
+     * mostrar&aacute;n en el mismo orden y con la misma estructura con el que
+     * aparecen en la firma electr&oacute;nica.<br>
+     * La propia estructura de firma se considera el nodo ra&iacute;z, la firma y cofirmas
+     * pender&aacute;n directamentede de este.
+     * @param sign Firma electr&oacute;nica de la que se desea obtener la estructura.
+     * @param params necesarios para comprobar si los datos son una firma compatible.
+     * @param asSimpleSignInfo Si es <code>true</code> se devuelve un &aacute;rbol con la
+     *                         informaci&oacute;n b&aacute;sica de cada firma individual
+     *                         mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code>
+     *                         un &aacute;rbol con los nombres (CN X.500) de los titulares certificados.
+     * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
+    @Override
+    public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) {
 
     	final AOTreeNode root = new AOTreeNode("Datos"); //$NON-NLS-1$
 
@@ -397,12 +420,22 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
     	}
 
     	PdfReader pdfReader;
-    	try {
-    		pdfReader = new PdfReader(sign);
+    	boolean headLessProp = false;
+    	try {  		
+    		if (params != null && params.containsKey(PdfExtraParams.HEADLESS)) {
+    			headLessProp = Boolean.parseBoolean(params.getProperty(PdfExtraParams.HEADLESS));
+    		}
+			pdfReader = PdfUtil.getPdfReader(sign, params, headLessProp);
     	}
     	catch (final BadPasswordException e) {
     		LOGGER.info(
 				"El PDF necesita contrasena. Se devolvera el arbol vacio: " + e //$NON-NLS-1$
+			);
+    		return new AOTreeModel(root);
+    	}
+    	catch (final PdfIsPasswordProtectedException e) {
+    		LOGGER.info(
+				"El PDF necesita contrasena." + e //$NON-NLS-1$
 			);
     		return new AOTreeModel(root);
     	}
@@ -478,13 +511,23 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
     	return new AOTreeModel(root);
     }
-
+    
     /** Comprueba que los datos proporcionados sean un documento PDF.
      * @param data Datos a comprobar.
      * @return <code>true</code> si los datos proporcionados son un documento PDF,
      *         <code>false</code> en caso contrario. */
     @Override
 	public boolean isSign(final byte[] data) {
+        return isSign(data, null);
+    }
+    
+    /** Comprueba que los datos proporcionados sean un documento PDF.
+     * @param data Datos a comprobar.
+     * @param params Par&aacute;metros de la firma.
+     * @return <code>true</code> si los datos proporcionados son un documento PDF,
+     *         <code>false</code> en caso contrario. */
+	@Override
+	public boolean isSign(final byte[] data, final Properties params){
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
@@ -492,7 +535,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
         if (!isPdfFile(data)) {
         	return false;
         }
-        final Object root = getSignersStructure(data, false).getRoot();
+        final Object root = getSignersStructure(data, params, false).getRoot();
         if (root instanceof AOTreeNode) {
         	// Si el arbol contiene firmas...
         	if (AOTreeModel.getChildCount(root) > 0) {
@@ -500,7 +543,6 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
         	}
         	// Si no las contiene aun puede haber firmas no registradas
 
-        	// Como el metodo no recibe "extraParams" buscamos en las propiedades de sistema
         	final Properties extraParams = System.getProperties();
         	try {
 				if (PdfUtil.pdfHasUnregisteredSignatures(data, extraParams) &&
@@ -549,7 +591,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
         return true;
     }
-
+    
     /** Comprueba que los datos proporcionados sean un documento PDF.
      * @param data Datos a comprobar
      * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario */
@@ -581,6 +623,23 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
         }
         return originalName + ".signed.pdf"; //$NON-NLS-1$
     }
+    
+    /** Si la entrada es un documento PDF, devuelve el mismo documento PDF.
+     * @param sign Documento PDF
+     * @param params Par&aacute;metros de la firma.
+     * @return Mismo documento PDF de entrada, sin modificar en ning&uacute; aspecto.
+     * @throws AOInvalidFormatException Si los datos de entrada no son un documento PDF. */
+    @Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
+        // Si no es una firma PDF valida, lanzamos una excepcion
+        if (!isSign(sign, params)) {
+            throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
+        }
+
+        // TODO: Devolver el PDF sin firmar
+        return sign;
+    
+	}
 
     /** Si la entrada es un documento PDF, devuelve el mismo documento PDF.
      * @param sign Documento PDF
@@ -605,11 +664,23 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * @throws AOException Si los datos de entrada no son un documento PDF. */
     @Override
 	public AOSignInfo getSignInfo(final byte[] data) throws AOException {
+
+    	return getSignInfo(data, null);
+    }
+    
+    /** Si la entrada es un documento PDF, devuelve un objeto <code>AOSignInfo</code>
+     * con el formato establecido a <code>AOSignConstants.SIGN_FORMAT_PDF</code>.
+     * @param data Documento PDF.
+     * @param params Par&aacute;metros de firma.
+     * @return Objeto <code>AOSignInfo</code> con el formato establecido a <code>AOSignConstants.SIGN_FORMAT_PDF</code>.
+     * @throws AOException Si los datos de entrada no son un documento PDF. */
+    @Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
         if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
-        if (!isSign(data)) {
+        if (!isSign(data, params)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
@@ -708,4 +779,5 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
     public boolean isSecureMode() {
     	return this.secureMode;
     }
+
 }

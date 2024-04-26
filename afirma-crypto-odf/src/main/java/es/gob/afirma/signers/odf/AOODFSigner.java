@@ -583,10 +583,17 @@ public final class AOODFSigner implements AOSigner {
                               final Properties extraParams) {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros ODF"); //$NON-NLS-1$
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, null, asSimpleSignInfo);
+	}
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
 
     	if (sign.length >= THRESHOLD_FILE_SIZE) {
     		throw new IOException("Los datos tienen un tamano superior al permitido."); //$NON-NLS-1$
@@ -667,15 +674,21 @@ public final class AOODFSigner implements AOSigner {
             return new AOTreeModel(new AOTreeNode("Ra\u00EDz")); //$NON-NLS-1$
         }
     }
-
+    
     /** Indica si los datos indicados son un documento ODF susceptible de contener una firma
      * electr&oacute;nica.
      * @param signData Datos que deseamos comprobar.
      * @return Devuelve <code>true</code> si los datos indicados son un documento ODF susceptible de contener una firma
      * electr&oacute;nica, <code>false</code> en caso contrario.
-     * @throws IOException Si ocurren problemas durante la lectura de la firma */
-    @Override
+     * @throws IOException Si ocurren problemas durante la lectura de la firma */	
+	@Override
 	public boolean isSign(final byte[] signData) throws IOException {
+		return isSign(signData, null);
+	}
+
+	/** {@inheritDoc} */
+    @Override
+	public boolean isSign(final byte[] signData, final Properties params) throws IOException {
 
         if(!isValidDataFile(signData)) {
         	return false;
@@ -760,30 +773,41 @@ public final class AOODFSigner implements AOSigner {
             LOGGER.severe("Error al escribir el cuerpo del XML: " + ex); //$NON-NLS-1$
         }
     }
-
+    
     /** Si la entrada es un documento ODF, devuelve el mismo documento sin ninguna modificaci&oacute;n.
      * @param signData Documento ODF
      * @return Documento de entrada si este es ODF, <code>null</code> en cualquier otro caso
      * @throws IOException Si ocurren problemas al leer la firma */
+	@Override
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign, null);
+	}
+
     @Override
-	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
 
         // Si no es una firma ODF valida, lanzamos una excepcion
-        if (!isSign(signData)) {
+        if (!isSign(sign)) {
             throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
         }
 
         // TODO: Por ahora, devolveremos el propio ODF firmado.
-        return signData;
+        return sign;
     }
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException, IOException {
+		return getSignInfo(data, null);
+	}
 
     /** {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
-        if (signData == null) {
+	public AOSignInfo getSignInfo(final byte[] data, final Properties param) throws AOException, IOException {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
-        if (!isSign(signData)) {
+        if (!isSign(data)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_ODF);
@@ -816,4 +840,5 @@ public final class AOODFSigner implements AOSigner {
 		}
 		return found ? entry : null;
 	}
+
 }

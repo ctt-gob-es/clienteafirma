@@ -350,6 +350,22 @@ public final class AOCAdESSigner implements AOSigner {
 		}
 
     }
+    
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+    	new SCChecker().checkSpongyCastle();
+    	if (!CAdESValidator.isCAdESValid(sign, false)) {
+    		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma CAdES"); //$NON-NLS-1$
+    	}
+    	try {
+            return new ReadNodesTree().readNodesTree(sign, asSimpleSignInfo);
+        }
+        catch (final Exception ex) {
+            LOGGER.severe("No se ha podido obtener el arbol de firmantes de la firma, se devolvera null: " + ex); //$NON-NLS-1$
+        }
+        return null;
+    }
 
     /** Recupera el &aacute;rbol de nodos de firma de una firma
      * electr&oacute;nica CAdES.
@@ -372,17 +388,21 @@ public final class AOCAdESSigner implements AOSigner {
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
     @Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
-    	new SCChecker().checkSpongyCastle();
-    	if (!CAdESValidator.isCAdESValid(sign, false)) {
-    		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma CAdES"); //$NON-NLS-1$
-    	}
-    	try {
-            return new ReadNodesTree().readNodesTree(sign, asSimpleSignInfo);
+    	return getSignersStructure(sign, null, asSimpleSignInfo);
+    }
+    
+    /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
+     * @param data Datos que deseamos comprobar.
+     * @param params Par&aacute;metros de firma
+     * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario. */
+	@Override
+	public boolean isSign(final byte[] data, final Properties params){
+        if (data == null) {
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+            return false;
         }
-        catch (final Exception ex) {
-            LOGGER.severe("No se ha podido obtener el arbol de firmantes de la firma, se devolvera null: " + ex); //$NON-NLS-1$
-        }
-        return null;
+        new SCChecker().checkSpongyCastle();
+		return CAdESValidator.isCAdESSignedData(data, true);
     }
 
     /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
@@ -390,12 +410,7 @@ public final class AOCAdESSigner implements AOSigner {
      * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario. */
     @Override
 	public boolean isSign(final byte[] data) {
-        if (data == null) {
-            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
-            return false;
-        }
-        new SCChecker().checkSpongyCastle();
-		return CAdESValidator.isCAdESSignedData(data, true);
+    	return isSign(data, null);
     }
 
     /** Comprueba si unos datos sos susceptibles de ser firmados por esta clase.
@@ -423,14 +438,19 @@ public final class AOCAdESSigner implements AOSigner {
      * @throws IllegalArgumentException Si la firma introducida es nula. */
     @Override
 	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
-        if (signData == null) {
+        return getData(signData, null);
+    }
+    
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
+        if (sign == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
         new SCChecker().checkSpongyCastle();
-        if (!CAdESValidator.isCAdESValid(signData, false)) {
+        if (!CAdESValidator.isCAdESValid(sign, false)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
-		return ObtainContentSignedData.obtainData(signData);
+		return ObtainContentSignedData.obtainData(sign);
     }
 
     /** Devuelve el nombre de fichero de firma predeterminado que se recomienda usar para
@@ -458,10 +478,15 @@ public final class AOCAdESSigner implements AOSigner {
      * @throws IllegalArgumentException Si La firma introducida es nula. */
     @Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException {
-        if (signData == null) {
+        return getSignInfo(signData, null);
+    }
+    
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOInvalidFormatException {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
-        if (!isSign(signData)) {
+        if (!isSign(data)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_CADES);
@@ -516,4 +541,5 @@ public final class AOCAdESSigner implements AOSigner {
 		   extraParams.remove(CAdESExtraParams.SIGNING_CERTIFICATE_V2);
 	   }
     }
+
 }
