@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -70,28 +71,10 @@ final class XmpHelper {
 			"  <stEvt:when>" + TAG_DATE + "</stEvt:when>\n" + //$NON-NLS-1$ //$NON-NLS-2$
 			"</rdf:li>"; //$NON-NLS-1$
 
-	private static String getOriginalCreationDateAsW3C(final byte[] inPdf) {
-		final String pdfStr = new String(inPdf);
-
-		int pos = pdfStr.indexOf("/CreationDate"); //$NON-NLS-1$
-		if (pos == -1) {
-			return null;
-		}
-		pos += "/CreationDate".length(); //$NON-NLS-1$
-
-		pos = pdfStr.indexOf("(", pos); //$NON-NLS-1$
-		if (pos == -1) {
-			return null;
-		}
-		pos += "(".length(); //$NON-NLS-1$
-		final int pos2 = pdfStr.indexOf(")", pos); //$NON-NLS-1$
-		if (pos2 == -1) {
-			return null;
-		}
-		final String pdfDateStr = pdfStr.substring(pos, pos2).trim();
-		return PdfDate.getW3CDate(
-			pdfDateStr
-		);
+	private static String getOriginalCreationDateAsW3C(final PdfReader pdfReader) {
+		final HashMap<String, String> info = pdfReader.getInfo();
+		final String pdfDate = info.get("CreationDate"); //$NON-NLS-1$
+		return pdfDate != null ? PdfDate.getW3CDate(pdfDate) : null;
 	}
 
 	/** A&ntilde;ade una entrada de firma al hist&oacute;rico XMP de un PDF.
@@ -131,30 +114,22 @@ final class XmpHelper {
 	                                                                    IOException,
 	                                                                    ParserConfigurationException {
 
-		final String originalCreationDate = getOriginalCreationDateAsW3C(inPdf);
-		final PdfReader reader;
-		
-		// Contrasena del propietario del PDF
-		final String ownerPassword = extraParams.getProperty(PdfExtraParams.OWNER_PASSWORD_STRING);
+		final byte[] pdfPassword = getPdfPassword(extraParams);
 
-		// Contrasena del usuario del PDF
-		final String userPassword =  extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING);
-		
-		String pdfPassword = null;
-		if (ownerPassword != null) {
-			pdfPassword = ownerPassword;
-		}
-		else if (userPassword != null) {
-			pdfPassword = userPassword;
+		final PdfReader reader = pdfPassword != null
+			? new PdfReader(inPdf, pdfPassword)
+			: new PdfReader(inPdf);
+
+		// Si el PDF estaba cifrado, no actualizamos el XMP
+		if (reader.isEncrypted()) {
+			reader.close();
+			return inPdf;
 		}
 
-		if (pdfPassword != null) {
-			reader = new PdfReader(inPdf, pdfPassword.getBytes());
-		} else {
-			reader = new PdfReader(inPdf);
-		}
-		
 		final byte[] xmpBytes = reader.getMetadata();
+
+		// Obtenemos la fecha de creacion del documento
+		final String originalCreationDate = getOriginalCreationDateAsW3C(reader);
 
 		if (!PdfUtil.isPdfAx(xmpBytes) || new AOPDFSigner().isSign(inPdf, extraParams)) {
 			reader.close();
@@ -167,7 +142,7 @@ final class XmpHelper {
 			originalXmp.indexOf(PROCESSING_INSTRUCTION_SUFFIX) + PROCESSING_INSTRUCTION_SUFFIX.length()
 		);
 		final String originalXmpFooter = originalXmp.substring(
-			originalXmp.lastIndexOf("<?")
+			originalXmp.lastIndexOf("<?") //$NON-NLS-1$
 		);
 
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -194,6 +169,7 @@ final class XmpHelper {
 		if (nl.getLength() != 1) {
 			nl = doc.getElementsByTagName("pdfaid:conformance"); //$NON-NLS-1$
 			if (nl.getLength() != 1) {
+				reader.close();
 				throw new IllegalStateException(
 					"El PDF no tiene una entrada RDF XMP valida" //$NON-NLS-1$
 				);
@@ -213,6 +189,7 @@ final class XmpHelper {
 			n = nl.item(0);
 		}
 
+		try {
 		final Node node = doc.importNode(
 			db.parse(
 				new InputSource(
@@ -225,6 +202,11 @@ final class XmpHelper {
 		);
 
 		n.appendChild(node);
+		}
+		catch (IOException | SAXException | DOMException e) {
+			reader.close();
+			throw e;
+		}
 
 		final Map<String, String> props = new ConcurrentHashMap<>(1);
 		props.put("encoding", DEFAULT_ENCODING.name()); //$NON-NLS-1$
@@ -270,6 +252,7 @@ final class XmpHelper {
 			stamper = new PdfStamper(reader, baos, globalDate);
 		}
 		catch(final DocumentException ex) {
+			reader.close();
 			throw new IOException(ex);
 		}
 
@@ -278,6 +261,7 @@ final class XmpHelper {
 			stamper.close(globalDate);
 		}
 		catch(final DocumentException ex) {
+			reader.close();
 			throw new IOException(ex);
 		}
 
@@ -289,6 +273,31 @@ final class XmpHelper {
 
 		return baos.toByteArray();
 
+	}
+
+	/**
+	 * Comprobamos si se ha indicado la contrase&ntilde;a de usuario o de propietario en
+	 * el PDF y obtenemos aquella necesaria para la apertura del documento.
+	 * @param extraParams Configuraci&oacute;n con la contrase&ntilde;a del PDF.
+	 * @return Contrase&ntilde;a necesaria para abrir/editar el documento o {@code null}
+	 * si no se ha configurado.
+	 */
+	private static byte[] getPdfPassword(final Properties extraParams) {
+
+		// Contrasena del propietario del PDF
+		final String ownerPassword = extraParams.getProperty(PdfExtraParams.OWNER_PASSWORD_STRING);
+
+		// Contrasena del usuario del PDF
+		final String userPassword =  extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING);
+
+		byte[] pwdBytes = null;
+		if (ownerPassword != null) {
+			pwdBytes = ownerPassword.getBytes(DEFAULT_ENCODING);
+		} else if (userPassword != null) {
+			pwdBytes = userPassword.getBytes(DEFAULT_ENCODING);
+		}
+
+		return pwdBytes;
 	}
 
     /** Escribe un XML como texto.
