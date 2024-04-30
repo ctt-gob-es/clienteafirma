@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -44,6 +45,7 @@ import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 
 final class XmpHelper {
 
@@ -116,23 +118,45 @@ final class XmpHelper {
 	 * </pre>
 	 * @param inPdf PDF de entrada.
 	 * @param globalDate Fecha de la firma del PDF.
+	 * @param extraParams Par&aacute;metros necesarios para comprobar si una firma es compatible.
 	 * @return PDF con la entrada de firma a&ntilde;adida a su hist&oacute;rico XMP.
 	 * @throws DOMException Si hay errores en el tratamiento del XML.
 	 * @throws SAXException Si hay errores en el tratamiento del XML.
 	 * @throws IOException Si hay errores en la lectura del PDF.
 	 * @throws ParserConfigurationException Si hay problemas con el analizador XML. */
 	static byte[] addSignHistoryToXmp(final byte[] inPdf,
-			                          final Calendar globalDate) throws DOMException,
+			                          final Calendar globalDate,
+			                          final Properties extraParams) throws DOMException,
 	                                                                    SAXException,
 	                                                                    IOException,
 	                                                                    ParserConfigurationException {
 
 		final String originalCreationDate = getOriginalCreationDateAsW3C(inPdf);
+		final PdfReader reader;
+		
+		// Contrasena del propietario del PDF
+		final String ownerPassword = extraParams.getProperty(PdfExtraParams.OWNER_PASSWORD_STRING);
 
-		final PdfReader reader = new PdfReader(inPdf);
+		// Contrasena del usuario del PDF
+		final String userPassword =  extraParams.getProperty(PdfExtraParams.USER_PASSWORD_STRING);
+		
+		String pdfPassword = null;
+		if (ownerPassword != null) {
+			pdfPassword = ownerPassword;
+		}
+		else if (userPassword != null) {
+			pdfPassword = userPassword;
+		}
+
+		if (pdfPassword != null) {
+			reader = new PdfReader(inPdf, pdfPassword.getBytes());
+		} else {
+			reader = new PdfReader(inPdf);
+		}
+		
 		final byte[] xmpBytes = reader.getMetadata();
 
-		if (!PdfUtil.isPdfAx(xmpBytes) || new AOPDFSigner().isSign(inPdf)) {
+		if (!PdfUtil.isPdfAx(xmpBytes) || new AOPDFSigner().isSign(inPdf, extraParams)) {
 			reader.close();
 			return inPdf;
 		}
@@ -143,8 +167,7 @@ final class XmpHelper {
 			originalXmp.indexOf(PROCESSING_INSTRUCTION_SUFFIX) + PROCESSING_INSTRUCTION_SUFFIX.length()
 		);
 		final String originalXmpFooter = originalXmp.substring(
-			originalXmp.lastIndexOf("<?"), //$NON-NLS-1$
-			originalXmp.length()
+			originalXmp.lastIndexOf("<?")
 		);
 
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
