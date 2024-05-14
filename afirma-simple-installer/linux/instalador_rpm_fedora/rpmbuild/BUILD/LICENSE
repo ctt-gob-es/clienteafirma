@@ -41,9 +41,6 @@ jMimeMagic - http://sourceforge.net/projects/jmimemagic/
 juniversalchardet - https://code.google.com/p/juniversalchardet/
   Mozilla Public License 1.1 - https://www.mozilla.org/MPL/			(Fichero adjunto "analytics-LICENSE.txt")
 
-Google Analytics - https://developers.google.com/api-client-library/java/
-  Apache License 2.0 - http://www.apache.org/licenses/LICENSE-2.0			(Fichero adjunto "juniversalchardet-LICENSE.txt")
-
 Puede consultar las respectivas licencias en sus correspondientes URL. En todo caso, las bibliotecas mencionadas, hayan sido modificadas o no como parte de este proyecto, se proporcionan sin ninguna garantía explícita o implícita hasta el extremo permitido por la Ley.
 Se declina toda responsabilidad por cualquier daño pérdida provocada por este código, aunque hubiese sido previamente advertido de la posibilidad de que ocurriese el mismo.
 
