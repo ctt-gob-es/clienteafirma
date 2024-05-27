@@ -23,8 +23,8 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.8.2"
-!define FILE_VERSION "1.8.2.0"
+!define VERSION "1.8.3"
+!define FILE_VERSION "1.8.3.0"
 
 VIProductVersion "${FILE_VERSION}"
 VIFileVersion "${FILE_VERSION}"

@@ -28,12 +28,12 @@
     <opt>-Xms256m -Xmx1g</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.8.2.0</fileVersion>
-    <txtFileVersion>1.8.2</txtFileVersion>
+    <fileVersion>1.8.3.0</fileVersion>
+    <txtFileVersion>1.8.3</txtFileVersion>
     <fileDescription>Configurador AutoFirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.8.2.0</productVersion>
-    <txtProductVersion>1.8.2</txtProductVersion>
+    <productVersion>1.8.3.0</productVersion>
+    <txtProductVersion>1.8.3</txtProductVersion>
     <productName>Configurador AutoFirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>Configurador AutoFirma</internalName>
