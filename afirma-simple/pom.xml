@@ -341,9 +341,6 @@
 						</execution>
 					</executions>
 					<configuration>
-						<archive>
-							<addMavenDescriptor>false</addMavenDescriptor>
-						</archive>
 						<filters>
 							<filter>
 								<artifact>*:*</artifact>

@@ -50,7 +50,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	/** Indica la ruta del certificado pasado por el administrador. */
 	public static final String PARAMETER_KEYSTORE_PATH = "-keystore_path"; //$NON-NLS-1$
 
-	/** Indica la ruta del fichero de configuraci&oacute;nn PList con preferencias para el sistema. */
+	/** Indica la ruta del fichero de configuraci&oacute;n PList con preferencias para el sistema. */
 	public static final String CONFIG_PATH = "-config_path"; //$NON-NLS-1$
 
 	/** Indica la ruta del fichero de actualizaci&oacute;n de preferencias del sistema. */

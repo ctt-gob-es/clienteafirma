@@ -65,6 +65,13 @@ final class ConfiguratorFirefoxWindows {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	/**
+	 * A partir de determinado momento CertUtil dejo de reconocer el certificado de confianza
+	 * en Windows con el alias con el que se instalaba (CertUtil.CERT_ALIAS) y lo reconocio por
+	 * su
+	 */
+	private static final String CERT_ALIAS = "AutoFirma ROOT"; //$NON-NLS-1$
+
 	private static String PROFILES_INI_RELATIVE_PATH;
 	private static String USERS_PATH;
 
@@ -179,7 +186,7 @@ final class ConfiguratorFirefoxWindows {
 				uninstallCACertFromMozillaKeyStore(appDir, profileDir, console);
 			}
 			catch (final Exception e) {
-				LOGGER.log(Level.WARNING, "No se pudo desinstalar el certificado SSL raiz del almacen de Mozilla Firefox", e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "No se pudo desinstalar o no se encontro el certificado SSL raiz del almacen de Mozilla Firefox", e); //$NON-NLS-1$
 			}
 		}
 
@@ -313,21 +320,35 @@ final class ConfiguratorFirefoxWindows {
 		final boolean sqlDb = new File(profileDir, "pkcs11.txt").exists(); //$NON-NLS-1$
 		final String profileReference = (sqlDb ? "sql:" : "") + profileDir.getAbsolutePath(); //$NON-NLS-1$ //$NON-NLS-2$
 
+		try {
+			deleteCertificate(ConfiguratorUtil.CERT_ALIAS, certutilFile, appDir, profileReference, console);
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se encontro o no se pudo borrar el certificado '" + ConfiguratorUtil.CERT_ALIAS //$NON-NLS-1$
+					+ "' de CA en el perfil de Firefox del usuario '" //$NON-NLS-1$
+					+ profileDir.getAbsolutePath() + "'. Se buscara con el alias " + CERT_ALIAS); //$NON-NLS-1$
+
+			try {
+				deleteCertificate(CERT_ALIAS, certutilFile, appDir, profileReference, console);
+			}
+			catch (final Exception e2) {
+				throw new KeyStoreException("No se encontro o no se pudo borrar el certificado de CA en el perfil de usuario de Firefox " + profileDir.getAbsolutePath(), e2); //$NON-NLS-1$
+			}
+		}
+	}
+
+	private static void deleteCertificate(final String alias, final File certutilFile, final File appDir, final String profileReference, final Console console) throws IOException {
+
 		final String[] certutilCommands = new String[] {
 				escapePath(certutilFile.getAbsolutePath()),
 				"-D", //$NON-NLS-1$
 				"-d", //$NON-NLS-1$
 				escapePath(profileReference),
 				"-n", //$NON-NLS-1$
-				"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+				"\"" + alias + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 		};
 
-		try {
-			execCertUtilCommandLine(appDir, certutilCommands, console);
-		}
-		catch (final Exception e) {
-			throw new KeyStoreException("Error en el borrado del certificado de CA en el perfil de usuario " + profileDir.getAbsolutePath(), e); //$NON-NLS-1$
-		}
+		execCertUtilCommandLine(appDir, certutilCommands, console);
 	}
 
 	/**
