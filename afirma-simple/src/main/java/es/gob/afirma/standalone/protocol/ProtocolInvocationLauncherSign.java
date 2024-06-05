@@ -566,7 +566,7 @@ final class ProtocolInvocationLauncherSign {
 					pke = pkeSelected;
 				}
 				
-				if (!algorithm.contains("withRSA") || !algorithm.contains("withDSA") || !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+				if (!algorithm.contains("withRSA") && !algorithm.contains("withDSA") && !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 		        	final String certAlgo = pke.getPrivateKey().getAlgorithm();
 		        	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
 		        		algorithm = algorithm + "withRSA"; //$NON-NLS-1$

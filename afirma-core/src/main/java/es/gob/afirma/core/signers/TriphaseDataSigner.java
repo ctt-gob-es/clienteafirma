@@ -73,7 +73,7 @@ public final class TriphaseDataSigner {
 				throw new AOException("Error decodificando la prefirma: " + e, e); //$NON-NLS-1$
 			}
 			
-			if (!algorithm.contains("withRSA") || !algorithm.contains("withDSA") || !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+			if (!algorithm.contains("withRSA") && !algorithm.contains("withDSA") && !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 	        	final String certAlgo = key.getAlgorithm();
 	        	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
 	        		algorithm = algorithm + "withRSA"; //$NON-NLS-1$

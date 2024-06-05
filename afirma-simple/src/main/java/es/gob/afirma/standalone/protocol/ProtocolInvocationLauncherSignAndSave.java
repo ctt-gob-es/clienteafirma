@@ -553,7 +553,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		    	final KeyStoreManager currentKsm = context.getKeyStoreManager();
 				pke = currentKsm.getKeyEntry(context.getAlias());
 				
-				if (!algorithm.contains("withRSA") || !algorithm.contains("withDSA") || !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+				if (!algorithm.contains("withRSA") && !algorithm.contains("withDSA") && !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 		        	final String certAlgo = pke.getPrivateKey().getAlgorithm();
 		        	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
 		        		algorithm = algorithm + "withRSA"; //$NON-NLS-1$

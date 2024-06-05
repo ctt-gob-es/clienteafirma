@@ -89,7 +89,7 @@ public class LocalBatchSigner {
 		final byte[] data = singleConfig.getData();
 		String algorithm = singleConfig.getAlgorithm();
     	final String certAlgo = pke.getPrivateKey().getAlgorithm();
-		if (!algorithm.contains("withRSA") || !algorithm.contains("withDSA") || !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+		if (!algorithm.contains("withRSA") && !algorithm.contains("withDSA") && !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 	    	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
 	    		algorithm = algorithm + "withRSA"; //$NON-NLS-1$
 	    	}
