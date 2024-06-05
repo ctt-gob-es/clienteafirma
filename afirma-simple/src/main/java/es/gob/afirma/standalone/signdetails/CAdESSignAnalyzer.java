@@ -8,10 +8,8 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -36,7 +34,6 @@ import org.spongycastle.util.Store;
 
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.MimeHelper;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.cades.CAdESAttributes;
@@ -56,21 +53,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 	private CMSSignedData cmsSignedData;
 	private Properties oidMimetypeProp;
 
-	public static final Map<String, String> SIGN_ALGOS_URI;
-
 	private static final String CADES = "CAdES"; //$NON-NLS-1$s
-    public static final String SHA1 = "SHA1"; //$NON-NLS-1$
-    private static final String SHA256 = "SHA-256"; //$NON-NLS-1$
-    private static final String SHA384 = "SHA-384"; //$NON-NLS-1$
-    private static final String SHA512 = "SHA-512"; //$NON-NLS-1$
-
-	static {
-		SIGN_ALGOS_URI = new HashMap<>();
-		SIGN_ALGOS_URI.put(SHA1, "SHA1withRSA"); //$NON-NLS-1$
-		SIGN_ALGOS_URI.put(SHA256, "SHA256withRSA"); //$NON-NLS-1$
-		SIGN_ALGOS_URI.put(SHA384, "SHA384withRSA"); //$NON-NLS-1$
-		SIGN_ALGOS_URI.put(SHA512, "SHA512withRSA"); //$NON-NLS-1$
-	}
 
 	public CAdESSignAnalyzer(final byte [] data) throws Exception {
     	try {
@@ -162,11 +145,6 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 			cadesSignDetails.setSigningTime(signingTimeDate);
 		}
 
-		// Algoritmo
-		String algorithm = AOSignConstants.getDigestAlgorithmName(signer.getDigestAlgorithmID().getAlgorithm().toString());
-		algorithm = SIGN_ALGOS_URI.get(algorithm);
-		cadesSignDetails.setAlgorithm(algorithm);
-
 		// Politica
 		analyzePolicy(signer, cadesSignDetails);
 
@@ -216,6 +194,10 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 
 		final CertificateDetails certDetails = new CertificateDetails(x509Cert);
 		cadesSignDetails.setSigner(certDetails);
+		
+		// Algoritmo de firma
+		final String algorithm = x509Cert.getSigAlgName();
+		cadesSignDetails.setAlgorithm(algorithm);
 
 		final boolean signWithData = this.cmsSignedData.getSignedContent() != null;
 

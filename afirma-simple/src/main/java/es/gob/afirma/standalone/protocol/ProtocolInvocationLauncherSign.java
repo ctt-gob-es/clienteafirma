@@ -77,7 +77,8 @@ import es.gob.afirma.standalone.AutoFirmaUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;import es.gob.afirma.standalone.plugins.AfirmaPlugin;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.EncryptingException;
 import es.gob.afirma.standalone.plugins.Permission;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
@@ -245,7 +246,7 @@ final class ProtocolInvocationLauncherSign {
 
 		byte[] data = signOperation.getData();
 		String format = signOperation.getFormat();
-		final String algorithm = signOperation.getAlgorithm();
+		String algorithm = signOperation.getAlgorithm();
 		Properties extraParams = signOperation.getExtraParams();
 		if (extraParams == null) {
 			extraParams = new Properties();
@@ -563,6 +564,23 @@ final class ProtocolInvocationLauncherSign {
 					pke = currentKsm.getKeyEntry(context.getAlias());
 				} else {
 					pke = pkeSelected;
+				}
+				
+				if (!algorithm.contains("withRSA") || !algorithm.contains("withDSA") || !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+		        	final String certAlgo = pke.getPrivateKey().getAlgorithm();
+		        	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
+		        		algorithm = algorithm + "withRSA"; //$NON-NLS-1$
+		        	}
+		        	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
+		        		algorithm = algorithm + "withDSA"; //$NON-NLS-1$
+		        	}
+		        	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
+		        		algorithm = algorithm + "withECDSA"; //$NON-NLS-1$
+		        	}
+		        	else {
+						final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INCOMPATIBLE_ALGORITHM;
+						throw new SocketOperationException(errorCode, new IllegalArgumentException("Algoritmo no soportado: " + certAlgo)); //$NON-NLS-1$
+		        	}
 				}
 
 				if (options.getSticky()) {

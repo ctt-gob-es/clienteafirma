@@ -169,10 +169,10 @@ public final class AOCAdESASiCSSigner implements AOSigner {
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512</i></li>
      * </ul>
      * @param key Clave privada a usar para firmar
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams-asic-s.html">detalle</a>).<br>

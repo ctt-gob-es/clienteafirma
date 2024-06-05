@@ -276,18 +276,16 @@ final class ProtocolInvocationLauncherBatch {
 			if (e.getResponseCode() == 400) {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
 				LOGGER.severe("Error en los parametros enviados al servicio: " + e.toString());  //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			}
 			else if (e.getResponseCode() / 100 == 4) {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE;
 				LOGGER.severe("Error en la comunicacion con el servicio de firma de lotes: " + e);//$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			}
 			else {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
 				LOGGER.severe("Error en el servicio de firma de lotes: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 			}
+			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);

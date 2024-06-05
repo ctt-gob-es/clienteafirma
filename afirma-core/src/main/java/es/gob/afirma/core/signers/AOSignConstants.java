@@ -214,6 +214,18 @@ public final class AOSignConstants {
 	// ************************************************************
 	// ************* ALGORITMOS DE FIRMA **************************
 	// ************************************************************
+	
+	/** Algoritmo de firma SHA1. */
+	public static final String SIGN_ALGORITHM_SHA1 = "SHA1"; //$NON-NLS-1$
+
+	/** Algoritmo de firma SHA256. */
+	public static final String SIGN_ALGORITHM_SHA256= "SHA256"; //$NON-NLS-1$
+
+	/** Algoritmo de firma SHA384. */
+	public static final String SIGN_ALGORITHM_SHA384= "SHA384"; //$NON-NLS-1$
+
+	/** Algoritmo de firma SHA512. */
+	public static final String SIGN_ALGORITHM_SHA512= "SHA512"; //$NON-NLS-1$
 
 	/** Algoritmo de firma SHA1withRSA. */
 	public static final String SIGN_ALGORITHM_SHA1WITHRSA = "SHA1withRSA"; //$NON-NLS-1$
@@ -255,6 +267,10 @@ public final class AOSignConstants {
 
 	/** Algoritmos de firma soportados. */
 	public static final String[] SUPPORTED_SIGN_ALGOS = new String[] {
+		SIGN_ALGORITHM_SHA256,
+		SIGN_ALGORITHM_SHA384,
+		SIGN_ALGORITHM_SHA512,
+		SIGN_ALGORITHM_SHA1,
 		SIGN_ALGORITHM_SHA1WITHRSA,
 		SIGN_ALGORITHM_NONEWITHRSA,
 		SIGN_ALGORITHM_SHA256WITHRSA,

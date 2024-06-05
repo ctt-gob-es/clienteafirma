@@ -87,7 +87,23 @@ public class LocalBatchSigner {
 
 		final Operation cryptoOperation = singleConfig.getCryptoOperation();
 		final byte[] data = singleConfig.getData();
-		final String algorithm = singleConfig.getAlgorithm();
+		String algorithm = singleConfig.getAlgorithm();
+    	final String certAlgo = pke.getPrivateKey().getAlgorithm();
+		if (!algorithm.contains("withRSA") || !algorithm.contains("withDSA") || !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+	    	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
+	    		algorithm = algorithm + "withRSA"; //$NON-NLS-1$
+	    	}
+	    	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
+	    		algorithm = algorithm + "withDSA"; //$NON-NLS-1$
+	    	}
+	    	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
+	    		algorithm = algorithm + "withECDSA"; //$NON-NLS-1$
+	    	}
+	    	else {
+				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INCOMPATIBLE_ALGORITHM;
+				throw new SocketOperationException(errorCode, new IllegalArgumentException("Algoritmo no soportado: " + certAlgo)); //$NON-NLS-1$
+	    	}
+		}
 		final String format = singleConfig.getFormat();
 		final Properties extraParams = singleConfig.getExtraParams();
 

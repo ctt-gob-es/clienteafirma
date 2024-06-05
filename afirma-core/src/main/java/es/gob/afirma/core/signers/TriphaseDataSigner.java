@@ -46,7 +46,7 @@ public final class TriphaseDataSigner {
 	 * @return Sesi&oacute;n trif&aacute;sica con las firmas PKCS#1 incluidas.
 	 * @throws AOException Si ocurre cualquier error durante la firma. */
 	public static TriphaseData doSign(final AOPkcs1Signer signer,
-			                          final String algorithm,
+			                          String algorithm,
 			                          final PrivateKey key,
 			                          final Certificate[] certChain,
 			                          final TriphaseData triphaseData,
@@ -72,7 +72,25 @@ public final class TriphaseDataSigner {
 			catch (final IOException e) {
 				throw new AOException("Error decodificando la prefirma: " + e, e); //$NON-NLS-1$
 			}
-
+			
+			if (!algorithm.contains("withRSA") || !algorithm.contains("withDSA") || !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+	        	final String certAlgo = key.getAlgorithm();
+	        	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
+	        		algorithm = algorithm + "withRSA"; //$NON-NLS-1$
+	        	}
+	        	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
+	        		algorithm = algorithm + "withDSA"; //$NON-NLS-1$
+	        	}
+	        	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
+	        		algorithm = algorithm + "withECDSA"; //$NON-NLS-1$
+	        	}
+	        	else {
+					throw new IllegalArgumentException(
+							"Algoritmo no soportado " + certAlgo //$NON-NLS-1$
+						);        	
+				}
+			}
+		
 			final byte[] pkcs1sign = signer.sign(
 				preSign,
 				algorithm,

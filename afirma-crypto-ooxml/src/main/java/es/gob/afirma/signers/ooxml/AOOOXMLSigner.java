@@ -393,10 +393,10 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param algorithm Algoritmo de firma
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512</i></li>
      * </ul>
      * @param key Clave privada del firmante
      * @param certChain Cadena de certificados del firmante

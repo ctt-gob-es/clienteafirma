@@ -127,7 +127,7 @@ public final class SingleSignConstants {
 
 	/** Algoritmo de firma. */
 	public enum SignAlgorithm {
-
+		
 		/** SHA1withRSA. */
 		SHA1WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA),
 
@@ -138,7 +138,19 @@ public final class SingleSignConstants {
 		SHA384WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA),
 
 		/** SHA512withRSA. */
-		SHA512WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA);
+		SHA512WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA),
+
+		/** SHA1. */
+		SHA1(AOSignConstants.SIGN_ALGORITHM_SHA1),
+
+		/** SHA256. */
+		SHA256(AOSignConstants.SIGN_ALGORITHM_SHA256),
+
+		/** SHA284. */
+		SHA384(AOSignConstants.SIGN_ALGORITHM_SHA384),
+
+		/** SHA512. */
+		SHA512(AOSignConstants.SIGN_ALGORITHM_SHA512);
 
 		private final String name;
 
@@ -155,6 +167,18 @@ public final class SingleSignConstants {
 		 * @param name Nombre del algoritmo de firma.
 		 * @return Algoritmo firma. */
 		public static SignAlgorithm getAlgorithm(final String name) {
+			if (SHA1.toString().equalsIgnoreCase(name)) {
+				return SHA1;
+			}
+			if (SHA256.toString().equalsIgnoreCase(name)) {
+				return SHA256;
+			}
+			if (SHA384.toString().equalsIgnoreCase(name)) {
+				return SHA384;
+			}
+			if (SHA512.toString().equalsIgnoreCase(name)) {
+				return SHA512;
+			}
 			if (SHA1WITHRSA.toString().equalsIgnoreCase(name)) {
 				return SHA1WITHRSA;
 			}
