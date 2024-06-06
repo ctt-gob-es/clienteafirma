@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.xades;
 
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -201,13 +202,29 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
             getSignatureValueId(signatureIdPrefix)
         );
 
-        this.signContext = new DOMSignContext(
-        	// Si llega una clave ECDSA de BC la convertimos a una EC de JSE para evitar problemas
-    		privateKey instanceof BCECPrivateKey ?
-				KeyUtil.ecBc2Jce((BCECPrivateKey)privateKey) :
-					privateKey,
-    		this.baseElement
-		);
+
+
+//        System.out.println("Class: " + privateKey.getClass());
+//        System.out.println("Algorithm: " + privateKey.getAlgorithm());
+//        System.out.println("Format: " + privateKey.getFormat());
+
+        Key normalizedPk;
+
+        // Si llega una clave ECDSA de BC la convertimos a una EC de JSE para evitar problemas
+        if (privateKey instanceof BCECPrivateKey) {
+        	normalizedPk = KeyUtil.ecBc2Jce((BCECPrivateKey)privateKey);
+        }
+        else {
+			normalizedPk = privateKey;
+        }
+
+//        System.out.println(" ---- Proveedores antes del contexto ----");
+//        for (final Provider prov : Security.getProviders()) {
+//        	System.out.println(prov.getInfo());
+//        }
+//        System.out.println(" ----------------------------------------");
+
+        this.signContext = new DOMSignContext(normalizedPk, this.baseElement);
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
 
@@ -225,8 +242,24 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 			);
         }
 
+//        final java.security.Signature sig = java.security.Signature.getInstance("SHA256withECDSA");
+//        this.signContext.setProperty("org.jcp.xml.dsig.internal.dom.SignatureProvider", sig.getProvider());
+
+//        System.out.println(" ---- Proveedores despues del contexto ----");
+//        for (final Provider prov : Security.getProviders()) {
+//        	System.out.println(prov.getInfo());
+//        }
+//        System.out.println(" ----------------------------------------");
+
+
         // Generamos la firma
         this.signature.sign(this.signContext);
+
+//        System.out.println(" ---- Proveedores despues de la firma ----");
+//        for (final Provider prov : Security.getProviders()) {
+//        	System.out.println(prov.getInfo());
+//        }
+//        System.out.println(" ----------------------------------------");
 
 		// Siguiendo la recomendacion de la ETSI TS 119 102-1, verificamos que el dispositivo de
         // creacion de firma realmente ha generado el PKCS#1 usando la clave privada del
