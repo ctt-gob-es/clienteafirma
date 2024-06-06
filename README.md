@@ -8,9 +8,9 @@ Es software libre con licencia GPL 2+ y EUPL 1.1. Puede consular más informaci�
 
 ## Construcción del Cliente @firma
 
-Los módulos del Cliente @firma se encuentran preparados para su compilación y empaquetado mediante Apache Maven. A continuación se indican los distintos parámetros a utilizar para construir sus artefactos según el uso que se desee dar.
+Los módulos del Cliente @firma se encuentran preparados para su compilación y empaquetado mediante Apache Maven. Los módulos básicos del Cliente son compatibles con Java 1.7. Sin embargo, las bibliotecas JUnit que se importan ya requieren el uso de Java 1.8 o superior, por lo que deberemos tener configurado una JDK 1.8 o superior para compilar el proyecto. La aplicación AutoFirma se compila directamente para Java 1.8.
 
-A cualquiera de los comandos que se indican se le puede agregar el parámetro `-DskipTests` para omitir los tests JUnit.
+A continuación se indican los distintos parámetros a utilizar para construir sus artefactos según el uso que se desee dar. A cualquiera de los comandos que se indican se le puede agregar el parámetro `-DskipTests` para omitir los tests JUnit.
 
 ### Módulos básicos
 
