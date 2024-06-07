@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.xades;
 
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -23,6 +24,7 @@ import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -57,15 +59,18 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
 	static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
 
-    private AOXMLAdvancedSignature(final XAdESBase xades) {
-        super(xades);
-    }
+
+    private URIDereferencer uriDereferencer = null;
 
     private String canonicalizationMethod = CanonicalizationMethod.INCLUSIVE;
     private Element styleElement = null;
     private String styleType = "text/xsl"; //$NON-NLS-1$
     private String styleEncoding = null;
     private String styleId = null;
+
+    private AOXMLAdvancedSignature(final XAdESBase xades) {
+        super(xades);
+    }
 
     /** A&ntilde;ade una hoja de estilo en modo <i>enveloping</i> dentro de la
      * firma. La referencia para firmarla debe construirse de forma externa,
@@ -101,6 +106,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
     	final List<Certificate> certificates = EscapeHelper.getEscapedCertificates(certs);
         final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
+
         final List<Certificate> x509DataList = new ArrayList<>();
         if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
             for (final Certificate cert : certificates) {
@@ -201,28 +207,37 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
             getSignatureValueId(signatureIdPrefix)
         );
 
-        this.signContext = new DOMSignContext(
-        	// Si llega una clave ECDSA de BC la convertimos a una EC de JSE para evitar problemas
-    		privateKey instanceof BCECPrivateKey ?
-				KeyUtil.ecBc2Jce((BCECPrivateKey)privateKey) :
-					privateKey,
-    		this.baseElement
-		);
+        Key normalizedPk;
+
+        // Si llega una clave ECDSA de BC la convertimos a una EC de JSE para evitar problemas
+        if (privateKey instanceof BCECPrivateKey) {
+        	normalizedPk = KeyUtil.ecBc2Jce((BCECPrivateKey)privateKey);
+        }
+        else {
+			normalizedPk = privateKey;
+        }
+
+        this.signContext = new DOMSignContext(normalizedPk, this.baseElement);
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
 
+        // Instalamos un nuevo dereferenciador. Si se nos indica, usamos el indicado. Si no, usaremos
+        // uno que derreferencia tal como el por defecto, pero realiza comprobaciones adicional si falla
+
         try {
-        	// Instalamos un dereferenciador nuevo que solo actua cuando falla el por defecto
-        	this.signContext.setURIDereferencer(
-    			new CustomUriDereferencer()
-			);
+        	if (this.uriDereferencer != null) {
+        		this.signContext.setURIDereferencer(this.uriDereferencer);
+        	}
+        	else {
+        		this.signContext.setURIDereferencer(new CustomUriDereferencer());
+        	}
         }
         catch (final Exception e) {
         	LOGGER.log(
-    			Level.WARNING,
-    			"No se ha podido instalar un dereferenciador a medida, es posible que fallen las firmas de nodos concretos: " + e, //$NON-NLS-1$
-    			e
-			);
+        			Level.WARNING,
+        			"No se ha podido instalar un dereferenciador a medida, es posible que fallen las firmas de nodos concretos: " + e, //$NON-NLS-1$
+        			e
+        			);
         }
 
         // Generamos la firma
@@ -237,6 +252,15 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         			certificates.get(0).getPublicKey(),
         			signatureMethod);
         }
+    }
+
+    /**
+     * Establece un derreferenciador de URI a medida para poder resolver el contenido de los datos
+     * en firma con referencias especiales.
+     * @param uriDereferencer Derreferenciador a medida.
+     */
+    public void setUriDereferencer(final URIDereferencer uriDereferencer) {
+    	this.uriDereferencer = uriDereferencer;
     }
 
     /** Obtiene una instancia de la clase.

@@ -24,6 +24,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
@@ -56,7 +57,8 @@ public final class XAdESCounterSigner {
 
 	private static final Logger	LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	/** Contrafirma firmas en formato XAdES.
+	/**
+	 * Contrafirma firmas en formato XAdES.
 	 * <p>
 	 * Contrafirma los nodos de firma indicados de un
 	 * documento de firma.
@@ -64,16 +66,6 @@ public final class XAdESCounterSigner {
 	 * @param sign Documento con las firmas iniciales.
 	 * @param algorithm
 	 *            Algoritmo a usar para la firma.
-	 *            <p>
-	 *            Se aceptan los siguientes algoritmos en el par&aacute;metro
-	 *            <code>algorithm</code>:
-	 *            </p>
-	 *            <ul>
-	 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-	 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-	 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-	 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-	 *            </ul>
 	 * @param targetType
 	 *            Mecanismo de selecci&oacute;n de los nodos de firma que se
 	 *            deben contrafirmar.
@@ -97,7 +89,8 @@ public final class XAdESCounterSigner {
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
 	 * @return Contrafirma en formato XAdES.
-	 * @throws AOException Cuando ocurre cualquier problema durante el proceso. */
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+	 */
 	public static byte[] countersign(final byte[] sign,
 			                  final String algorithm,
 			                  final CounterSignTarget targetType,
@@ -105,6 +98,52 @@ public final class XAdESCounterSigner {
 			                  final PrivateKey key,
 			                  final Certificate[] certChain,
 			                  final Properties xParams) throws AOException {
+		return countersign(sign, algorithm, targetType, targets, key, certChain, xParams, null);
+	}
+
+	/**
+	 * Contrafirma firmas en formato XAdES.
+	 * <p>
+	 * Contrafirma los nodos de firma indicados de un
+	 * documento de firma.
+	 * </p>
+	 * @param sign Documento con las firmas iniciales.
+	 * @param algorithm
+	 *            Algoritmo a usar para la firma.
+	 * @param targetType
+	 *            Mecanismo de selecci&oacute;n de los nodos de firma que se
+	 *            deben contrafirmar.
+	 *            <p>
+	 *            Las distintas opciones son:
+	 *            </p>
+	 *            <ul>
+	 *             <li>Todos los nodos del &aacute;rbol de firma</li>
+	 *             <li>Los nodos hoja del &aacute;rbol de firma</li>
+	 *             <li>Los nodos de firma cuyas posiciones se especifican en
+	 *              <code>target</code></li>
+	 *             <li>Los nodos de firma realizados por los firmantes cuyo
+	 *              <i>Common Name</i> se indica en <code>target</code></li>
+	 *            </ul>
+	 *            <p>
+	 *            Cada uno de estos tipos se define en
+	 *            {@link es.gob.afirma.core.signers.CounterSignTarget}.
+	 * @param targets Listado de nodos o firmantes que se deben contrafirmar
+	 *                seg&uacute;n el {@code targetType} seleccionado.
+	 * @param key Clave privada a usar para firmar.
+	 * @param certChain Cadena de certificados del firmante.
+	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+	 * @param uriDereferencer Derreferenciador a medida.
+	 * @return Contrafirma en formato XAdES.
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+	 */
+	public static byte[] countersign(final byte[] sign,
+			                  final String algorithm,
+			                  final CounterSignTarget targetType,
+			                  final Object[] targets,
+			                  final PrivateKey key,
+			                  final Certificate[] certChain,
+			                  final Properties xParams,
+			                  final URIDereferencer uriDereferencer) throws AOException {
 
 		Document signDocument;
 		try {
@@ -114,51 +153,43 @@ public final class XAdESCounterSigner {
 			throw new AOException("No se ha podido cargar el documento de firmas", e); //$NON-NLS-1$
 		}
 
-		return countersign(signDocument, algorithm, targetType, targets, key, certChain, xParams);
+		return countersign(signDocument, algorithm, targetType, targets, key, certChain, xParams, uriDereferencer);
 	}
 
-		/** Contrafirma firmas en formato XAdES.
-		 * <p>
-		 * Contrafirma los nodos de firma indicados de un
-		 * documento de firma.
-		 * </p>
-		 * @param signDocument Documento XML con las firmas iniciales.
-		 * @param signAlgorithm
-		 *            Algoritmo a usar para la firma.
-		 *            <p>
-		 *            Se aceptan los siguientes algoritmos en el par&aacute;metro
-		 *            <code>algorithm</code>:
-		 *            </p>
-		 *            <ul>
-		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i> (No recomendado)</li>
-		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-		 *             <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-		 *            </ul>
-		 * @param targetType
-		 *            Mecanismo de selecci&oacute;n de los nodos de firma que se
-		 *            deben contrafirmar.
-		 *            <p>
-		 *            Las distintas opciones son:
-		 *            </p>
-		 *            <ul>
-		 *             <li>Todos los nodos del &aacute;rbol de firma</li>
-		 *             <li>Los nodos hoja del &aacute;rbol de firma</li>
-		 *             <li>Los nodos de firma cuyas posiciones se especifican en
-		 *              <code>target</code></li>
-		 *             <li>Los nodos de firma realizados por los firmantes cuyo
-		 *              <i>Common Name</i> se indica en <code>target</code></li>
-		 *            </ul>
-		 *            <p>
-		 *            Cada uno de estos tipos se define en
-		 *            {@link es.gob.afirma.core.signers.CounterSignTarget}.
-		 * @param targets Listado de nodos o firmantes que se deben contrafirmar
-		 *                seg&uacute;n el {@code targetType} seleccionado.
-		 * @param key Clave privada a usar para firmar.
-		 * @param certChain Cadena de certificados del firmante.
-		 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
-		 * @return Contrafirma en formato XAdES.
-		 * @throws AOException Cuando ocurre cualquier problema durante el proceso. */
+	/**
+	 * Contrafirma firmas en formato XAdES.
+	 * <p>
+	 * Contrafirma los nodos de firma indicados de un
+	 * documento de firma.
+	 * </p>
+	 * @param signDocument Documento XML con las firmas iniciales.
+	 * @param signAlgorithm
+	 *            Algoritmo a usar para la firma.
+	 * @param targetType
+	 *            Mecanismo de selecci&oacute;n de los nodos de firma que se
+	 *            deben contrafirmar.
+	 *            <p>
+	 *            Las distintas opciones son:
+	 *            </p>
+	 *            <ul>
+	 *             <li>Todos los nodos del &aacute;rbol de firma</li>
+	 *             <li>Los nodos hoja del &aacute;rbol de firma</li>
+	 *             <li>Los nodos de firma cuyas posiciones se especifican en
+	 *              <code>target</code></li>
+	 *             <li>Los nodos de firma realizados por los firmantes cuyo
+	 *              <i>Common Name</i> se indica en <code>target</code></li>
+	 *            </ul>
+	 *            <p>
+	 *            Cada uno de estos tipos se define en
+	 *            {@link es.gob.afirma.core.signers.CounterSignTarget}.
+	 * @param targets Listado de nodos o firmantes que se deben contrafirmar
+	 *                seg&uacute;n el {@code targetType} seleccionado.
+	 * @param key Clave privada a usar para firmar.
+	 * @param certChain Cadena de certificados del firmante.
+	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+	 * @return Contrafirma en formato XAdES.
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+	 */
 	public static byte[] countersign(final Document signDocument,
 			final String signAlgorithm,
 			final CounterSignTarget targetType,
@@ -166,6 +197,54 @@ public final class XAdESCounterSigner {
 			final PrivateKey key,
 			final Certificate[] certChain,
 			final Properties xParams) throws AOException {
+		return countersign(signDocument, signAlgorithm, targetType, targets, key, certChain, xParams, null);
+	}
+
+	/**
+	 * Contrafirma firma
+	 *
+	 * s en formato XAdES.
+	 * <p>
+	 * Contrafirma los nodos de firma indicados de un
+	 * documento de firma.
+	 * </p>
+	 * @param signDocument Documento XML con las firmas iniciales.
+	 * @param signAlgorithm
+	 *            Algoritmo a usar para la firma.
+	 * @param targetType
+	 *            Mecanismo de selecci&oacute;n de los nodos de firma que se
+	 *            deben contrafirmar.
+	 *            <p>
+	 *            Las distintas opciones son:
+	 *            </p>
+	 *            <ul>
+	 *             <li>Todos los nodos del &aacute;rbol de firma</li>
+	 *             <li>Los nodos hoja del &aacute;rbol de firma</li>
+	 *             <li>Los nodos de firma cuyas posiciones se especifican en
+	 *              <code>target</code></li>
+	 *             <li>Los nodos de firma realizados por los firmantes cuyo
+	 *              <i>Common Name</i> se indica en <code>target</code></li>
+	 *            </ul>
+	 *            <p>
+	 *            Cada uno de estos tipos se define en
+	 *            {@link es.gob.afirma.core.signers.CounterSignTarget}.
+	 * @param targets Listado de nodos o firmantes que se deben contrafirmar
+	 *                seg&uacute;n el {@code targetType} seleccionado.
+	 * @param key Clave privada a usar para firmar.
+	 * @param certChain Cadena de certificados del firmante.
+	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+	 * @param uriDereferencer Derreferenciador a medida.
+	 * @return Contrafirma en formato XAdES.
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+	 */
+	public static byte[] countersign(final Document signDocument,
+			final String signAlgorithm,
+			final CounterSignTarget targetType,
+			final Object[] targets,
+			final PrivateKey key,
+			final Certificate[] certChain,
+			final Properties xParams,
+			final URIDereferencer uriDereferencer) throws AOException {
 
 		if (signDocument == null) {
 			throw new IllegalArgumentException(
@@ -243,7 +322,8 @@ public final class XAdESCounterSigner {
 						certChain,
 						extraParams,
 						algorithm,
-						doc
+						doc,
+						uriDereferencer
 						);
 			}
 			else if (targetType == CounterSignTarget.LEAFS) {
@@ -253,7 +333,8 @@ public final class XAdESCounterSigner {
 						certChain,
 						extraParams,
 						algorithm,
-						doc
+						doc,
+						uriDereferencer
 						);
 			}
 			else if (targetType == CounterSignTarget.NODES) {
@@ -264,7 +345,8 @@ public final class XAdESCounterSigner {
 						certChain,
 						extraParams,
 						algorithm,
-						doc
+						doc,
+						uriDereferencer
 						);
 			}
 			else if (targetType == CounterSignTarget.SIGNERS) {
@@ -275,7 +357,8 @@ public final class XAdESCounterSigner {
 						certChain,
 						extraParams,
 						algorithm,
-						doc
+						doc,
+						uriDereferencer
 						);
 			}
 		}
@@ -327,7 +410,8 @@ public final class XAdESCounterSigner {
 			                             final Certificate[] certChain,
 			                             final Properties extraParams,
 			                             final String algorithm,
-			                             final Document doc) throws AOException {
+			                             final Document doc,
+			                             final URIDereferencer uriDereferencer) throws AOException {
 
 		int numSignatures = signaturesList.getLength();
 
@@ -341,7 +425,7 @@ public final class XAdESCounterSigner {
 
 				// y crea sus contrafirmas
 				if (numCounterSigns == 0) {
-					cs(signature, key, certChain, extraParams, algorithm, doc);
+					cs(signature, key, certChain, extraParams, algorithm, doc, uriDereferencer);
 					numSignatures++;
 					i++;
 				}
@@ -368,7 +452,8 @@ public final class XAdESCounterSigner {
 			                             final Certificate[] certChain,
 			                             final Properties extraParams,
 			                             final String algorithm,
-			                             final Document doc) throws AOException {
+			                             final Document doc,
+			                             final URIDereferencer uriDereferencer) throws AOException {
 
 		// descarta las posiciones que esten repetidas
 		final List<Integer> targetsList = new ArrayList<>();
@@ -396,7 +481,7 @@ public final class XAdESCounterSigner {
 		// y crea sus contrafirmas
 		try {
 			for (final Element node : nodes) {
-				cs(node, key, certChain, extraParams, algorithm, doc);
+				cs(node, key, certChain, extraParams, algorithm, doc, uriDereferencer);
 			}
 		} catch (final Exception e) {
 			throw new AOException(
@@ -420,7 +505,8 @@ public final class XAdESCounterSigner {
 			                               final Certificate[] certChain,
 			                               final Properties extraParams,
 			                               final String algorithm,
-			                               final Document doc) throws AOException {
+			                               final Document doc,
+			                               final URIDereferencer uriDereferencer) throws AOException {
 
 		final List<Object> signers = Arrays.asList(targets);
 		final List<Element> nodes = new ArrayList<>();
@@ -438,7 +524,7 @@ public final class XAdESCounterSigner {
 		// y crea sus contrafirmas
 		final Iterator<Element> i = nodes.iterator();
 		while (i.hasNext()) {
-			cs(i.next(), key, certChain, extraParams, algorithm, doc);
+			cs(i.next(), key, certChain, extraParams, algorithm, doc, uriDereferencer);
 		}
 	}
 
@@ -455,7 +541,8 @@ public final class XAdESCounterSigner {
 			                            final Certificate[] certChain,
 			                            final Properties extraParams,
 			                            final String algorithm,
-			                            final Document doc) throws AOException {
+			                            final Document doc,
+			                            final URIDereferencer uriDereferencer) throws AOException {
 
 		final int numSignatures = signaturesList.getLength();
 
@@ -473,7 +560,8 @@ public final class XAdESCounterSigner {
 					certChain,
 					extraParams,
 					algorithm,
-					doc
+					doc,
+					uriDereferencer
 				);
 			}
 		} catch (final Exception e) {
@@ -495,7 +583,8 @@ public final class XAdESCounterSigner {
 			               final Certificate[] certChain,
 			               final Properties xParams,
 			               final String algorithm,
-			               final Document doc) throws AOException {
+			               final Document doc,
+			               final URIDereferencer uriDereferencer) throws AOException {
 
 		if (doc == null) {
 			throw new IllegalArgumentException(
@@ -661,7 +750,8 @@ public final class XAdESCounterSigner {
 			xades,
 			signedPropertiesTypeUrl,
 			digestMethodAlgorithm,
-			canonicalizationAlgorithm
+			canonicalizationAlgorithm,
+			uriDereferencer
 		);
 
 		try {

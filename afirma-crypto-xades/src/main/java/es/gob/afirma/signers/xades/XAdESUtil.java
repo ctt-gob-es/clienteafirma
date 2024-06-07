@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
@@ -191,7 +192,8 @@ public final class XAdESUtil {
 	static AOXMLAdvancedSignature getXmlAdvancedSignature(final XAdESBase xades,
 			                                              final String signedPropertiesTypeUrl,
 			                                              final String digestMethodAlgorithm,
-			                                              final String canonicalizationAlgorithm) throws AOException {
+			                                              final String canonicalizationAlgorithm,
+			                                              final URIDereferencer uriDereferencer) throws AOException {
 		final AOXMLAdvancedSignature xmlSignature;
 		try {
 			xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
@@ -215,6 +217,8 @@ public final class XAdESUtil {
 		}
 
 		xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
+
+		xmlSignature.setUriDereferencer(uriDereferencer);
 
 		return xmlSignature;
 	}
