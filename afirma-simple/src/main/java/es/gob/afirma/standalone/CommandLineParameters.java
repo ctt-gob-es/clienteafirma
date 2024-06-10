@@ -61,7 +61,7 @@ final class CommandLineParameters {
 	public static final String MASSIVE_OP_COUNTERSIGN	= "countersign"; //$NON-NLS-1$
 	private static final String DEFAULT_MASSIVE_OP      = MASSIVE_OP_SIGN;
 
-	private static final String DEFAULT_ALGORITHM      = "SHA512withRSA"; //$NON-NLS-1$
+	private static final String DEFAULT_SIGNATURE_DIGEST_ALGORITHM      = "SHA512"; //$NON-NLS-1$
 	private static final String DEFAULT_HASH_ALGORITHM = "SHA-256"; //$NON-NLS-1$
 
 	private String store = null;
@@ -498,7 +498,7 @@ final class CommandLineParameters {
 	 * algoritmo por defecto.
 	 * @return Algoritmo de firma. */
 	public String getAlgorithm() {
-		return this.algorithm != null ? this.algorithm : DEFAULT_ALGORITHM;
+		return this.algorithm != null ? this.algorithm : DEFAULT_SIGNATURE_DIGEST_ALGORITHM;
 	}
 
 	/** Recupera el algoritmo de huella digital configurado o, si no se ha indicado, el

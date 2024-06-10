@@ -95,13 +95,6 @@ public final class AOFacturaESigner implements AOSigner {
     /** Firma Facturas en formato XAdES Factura-E.
      * @param data Factura electr&oacute;nica.
      * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante
      * @param extraParams Par&aacute;metros adicionales para la firma.
@@ -236,7 +229,7 @@ public final class AOFacturaESigner implements AOSigner {
         }
     	return xParams;
     }
-    
+
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
 			throws AOInvalidFormatException, IOException {
@@ -245,11 +238,11 @@ public final class AOFacturaESigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) 
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
 			throws AOInvalidFormatException, IOException {
         return getSignersStructure(sign, null, asSimpleSignInfo);
     }
-    
+
     /** {@inheritDoc} */
 	@Override
 	public boolean isSign(final byte[] sign) throws IOException{
@@ -350,7 +343,7 @@ public final class AOFacturaESigner implements AOSigner {
 	public String getSignedName(final String originalName, final String inText) {
         return XADES_SIGNER.getSignedName(originalName, inText);
     }
-    
+
     /** {@inheritDoc} */
 	@Override
 	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
@@ -362,7 +355,7 @@ public final class AOFacturaESigner implements AOSigner {
 	public byte[] getData(final byte[] sign, final Properties params) throws AOException, IOException {
         return XADES_SIGNER.getData(sign);
     }
-    
+
     /** {@inheritDoc} */
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data) throws AOException, IOException {

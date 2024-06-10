@@ -238,7 +238,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 
 		byte[] data = signOperation.getData();
 		String format = signOperation.getFormat();
-		String algorithm = signOperation.getAlgorithm();
+		final String algorithm = signOperation.getAlgorithm();
 		Properties extraParams = signOperation.getExtraParams();
 		if (extraParams == null) {
 			extraParams = new Properties();
@@ -552,23 +552,6 @@ final class ProtocolInvocationLauncherSignAndSave {
 				final CertificateContext context = dialog.getSelectedCertificateContext();
 		    	final KeyStoreManager currentKsm = context.getKeyStoreManager();
 				pke = currentKsm.getKeyEntry(context.getAlias());
-				
-				if (!algorithm.contains("withRSA") && !algorithm.contains("withDSA") && !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-		        	final String certAlgo = pke.getPrivateKey().getAlgorithm();
-		        	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
-		        		algorithm = algorithm + "withRSA"; //$NON-NLS-1$
-		        	}
-		        	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
-		        		algorithm = algorithm + "withDSA"; //$NON-NLS-1$
-		        	}
-		        	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
-		        		algorithm = algorithm + "withECDSA"; //$NON-NLS-1$
-		        	}
-		        	else {
-						final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INCOMPATIBLE_ALGORITHM;
-						throw new SocketOperationException(errorCode, new IllegalArgumentException("Algoritmo no soportado: " + certAlgo)); //$NON-NLS-1$
-		        	}
-				}
 
 				if (options.getSticky()) {
 					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
@@ -592,7 +575,18 @@ final class ProtocolInvocationLauncherSignAndSave {
 			}
 		}
 
-		final byte[] sign = executeSign(signer, cryptoOperation, data, algorithm, pke, extraParams);
+		// Seleccionamos el algoritmo de firma
+		final String keyType = pke.getPrivateKey().getAlgorithm();
+		String signatureAlgorithm;
+		try {
+			signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
+		}
+		catch (final Exception e) {
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INCOMPATIBLE_KEY_TYPE;
+			throw new SocketOperationException(errorCode, e);
+		}
+
+		final byte[] sign = executeSign(signer, cryptoOperation, data, signatureAlgorithm, pke, extraParams);
 
 		// Damos la opcion de guardar la firma generada
 		final String fileExts = options.getExtraParams().getProperty(AfirmaExtraParams.SAVE_FILE_EXTS);

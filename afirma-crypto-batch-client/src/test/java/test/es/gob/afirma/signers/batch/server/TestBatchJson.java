@@ -45,9 +45,9 @@ public class TestBatchJson {
 		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$
 		final String batchPostSignerUrl = BASE_URL + "postsign"; //$NON-NLS-1$
 
-//		final String batch = "{\"algorithm\":\"SHA256withRSA\", \"format\":\"CAdES\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"RW50cmFkYS50eHQ=\"}]}";
+//		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"RW50cmFkYS50eHQ=\"}]}";
 //		final String batchB64 = Base64.encode(batch.getBytes(StandardCharsets.UTF_8));
-		final String batchB64 = "eyJhbGdvcml0aG0iOiJTSEEyNTZ3aXRoUlNBIiwiZm9ybWF0IjoiQ0FkRVMiLCJzdWJvcGVyYXRpb24iOiJzaWduIiwic2luZ2xlc2lnbnMiOlt7ImlkIjoiOWMwMjY2OTctNzEyNC00ZDBiLThjMjktZDQ5ZTYyZmY1MzMxIiwiZGF0YXJlZmVyZW5jZSI6IlNHOXNZU0JOZFc1a2J5RWgifSx7ImlkIjoiZDc3MDIyOGYtYzAzMi00MTE5LTg2MDUtMGE0Mzk3MjIxMTAxIiwiZGF0YXJlZmVyZW5jZSI6IlNHOXNZU0JOZFc1a2J5RWhJREk9IiwiZm9ybWF0IjoiWEFkRVMiLCJzdWJvcGVyYXRpb24iOiJzaWduIiwiZXh0cmFwYXJhbXMiOiJabTl5YldGMFBWaEJaRVZUSUVSbGRHRmphR1ZrQ21WNGNGQnZiR2xqZVQxR2FYSnRZVUZIUlE9PSJ9XSwic3RvcG9uZXJyb3IiOmZhbHNlfQ=="; //$NON-NLS-1$
+		final String batchB64 = "eyJhbGdvcml0aG0iOiJTSEEyNTYiLCJmb3JtYXQiOiJDQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJzaW5nbGVzaWducyI6W3siaWQiOiI5YzAyNjY5Ny03MTI0LTRkMGItOGMyOS1kNDllNjJmZjUzMzEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaCJ9LHsiaWQiOiJkNzcwMjI4Zi1jMDMyLTQxMTktODYwNS0wYTQzOTcyMjExMDEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaElEST0iLCJmb3JtYXQiOiJYQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJleHRyYXBhcmFtcyI6IlptOXliV0YwUFZoQlpFVlRJRVJsZEdGamFHVmtDbVY0Y0ZCdmJHbGplVDFHYVhKdFlVRkhSUT09In1dLCJzdG9wb25lcnJvciI6ZmFsc2V9"; //$NON-NLS-1$
 
 		final String result = BatchSigner.signJSON(batchB64, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
 

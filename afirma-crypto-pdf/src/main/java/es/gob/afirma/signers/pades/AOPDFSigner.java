@@ -273,13 +273,6 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * @param data Se ignora el valor de este par&aacute;metro. <b>El documento PDF debe proporcionarse mediante el par&aacute;tro <code>sign</code></b>.
      * @param sign Documento PDF a firmar.
      * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>SHA256withRSA</i></li>
-     *  <li><i>SHA384withRSA</i></li>
-     *  <li><i>SHA512withRSA</i></li>
-     * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
@@ -319,13 +312,6 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * En general, es recomendable prescindir de este m&eacute;todo y llamar directamente al m&eacute;todo <code>sign(...)</code>
      * @param sign Documento PDF a firmar
      * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>SHA256withRSA</i></li>
-     *  <li><i>SHA384withRSA</i></li>
-     *  <li><i>SHA512withRSA</i></li>
-     * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
@@ -390,10 +376,10 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
     @Override
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
-    	
+
     	return getSignersStructure(sign, null, asSimpleSignInfo);
     }
-    
+
     /** Recupera el &aacute;rbol de nodos de firma de una firma electr&oacute;nica.
      * Los nodos del &aacute;rbol ser&aacute;n textos con el <i>CommonName</i> (CN X.500)
      * del titular del certificado u objetos de tipo AOSimpleSignInfo con la
@@ -421,7 +407,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
     	PdfReader pdfReader;
     	boolean headLessProp = false;
-    	try {  		
+    	try {
     		if (params != null && params.containsKey(PdfExtraParams.HEADLESS)) {
     			headLessProp = Boolean.parseBoolean(params.getProperty(PdfExtraParams.HEADLESS));
     		}
@@ -511,7 +497,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
     	return new AOTreeModel(root);
     }
-    
+
     /** Comprueba que los datos proporcionados sean un documento PDF.
      * @param data Datos a comprobar.
      * @return <code>true</code> si los datos proporcionados son un documento PDF,
@@ -520,7 +506,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 	public boolean isSign(final byte[] data) {
         return isSign(data, null);
     }
-    
+
     /** Comprueba que los datos proporcionados sean un documento PDF.
      * @param data Datos a comprobar.
      * @param params Par&aacute;metros de la firma.
@@ -591,7 +577,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
         return true;
     }
-    
+
     /** Comprueba que los datos proporcionados sean un documento PDF.
      * @param data Datos a comprobar
      * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario */
@@ -623,7 +609,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
         }
         return originalName + ".signed.pdf"; //$NON-NLS-1$
     }
-    
+
     /** Si la entrada es un documento PDF, devuelve el mismo documento PDF.
      * @param sign Documento PDF
      * @param params Par&aacute;metros de la firma.
@@ -638,7 +624,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
         // TODO: Devolver el PDF sin firmar
         return sign;
-    
+
 	}
 
     /** Si la entrada es un documento PDF, devuelve el mismo documento PDF.
@@ -667,7 +653,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 
     	return getSignInfo(data, null);
     }
-    
+
     /** Si la entrada es un documento PDF, devuelve un objeto <code>AOSignInfo</code>
      * con el formato establecido a <code>AOSignConstants.SIGN_FORMAT_PDF</code>.
      * @param data Documento PDF.

@@ -39,6 +39,7 @@ import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.RuntimePasswordNeededException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -279,18 +280,16 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     			}
             }
 
-            final String signatureHashAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
-
             byte[] data;
             try {
             	data = loadData(signConfig.getDataFile());
             }
             catch (final Exception e) {
+            	LOGGER.severe("Error cargando el fichero a firmar: " + e); //$NON-NLS-1$
             	if (onlyOneFile) {
             		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.123"), e); //$NON-NLS-1$
             		return;
             	}
-            	LOGGER.severe("Error cargando el fichero a firmar: " + e); //$NON-NLS-1$
             	continue;
 			}
 
@@ -298,19 +297,16 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		data,
         		signConfig.getSignatureFormatName()
     		);
-        	final String signatureAlgorithm;
-        	final String certAlgo = this.selectedPke.getPrivateKey().getAlgorithm();
-        	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
-        		signatureAlgorithm = signatureHashAlgorithm + "withRSA"; //$NON-NLS-1$
+
+        	String signatureAlgorithm;
+        	final String keyType = this.selectedPke.getPrivateKey().getAlgorithm();
+        	final String algorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
+        	try {
+        		signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
         	}
-        	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
-        		signatureAlgorithm = signatureHashAlgorithm + "withDSA"; //$NON-NLS-1$
-        	}
-        	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
-        		signatureAlgorithm = signatureHashAlgorithm + "withECDSA"; //$NON-NLS-1$
-        	}
-        	else {
-        		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.123", certAlgo), null); //$NON-NLS-1$
+        	catch (final Exception e) {
+        		LOGGER.severe("El tipo de clave del certificado no esta soportado: " + e); //$NON-NLS-1$
+        		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.123", keyType), null); //$NON-NLS-1$
         		return;
         	}
 

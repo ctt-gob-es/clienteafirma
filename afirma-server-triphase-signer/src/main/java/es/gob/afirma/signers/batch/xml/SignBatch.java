@@ -37,7 +37,7 @@ import es.gob.afirma.signers.batch.TempStoreFactory;
  * Un ejemplo de representaci&oacute;n XML de un lote podr&iacute;a ser:
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
- * &lt;signbatch stoponerror="false" algorithm="SHA256withRSA" concurrenttimeout="9223372036854775807" Id="LOTE001"&gt;
+ * &lt;signbatch stoponerror="false" algorithm="SHA256" concurrenttimeout="9223372036854775807" Id="LOTE001"&gt;
  *  &lt;singlesign Id="7725374e-728d-4a33-9db9-3a4efea4cead"&gt;
  *   &lt;datasource&gt;http://google.com&lt;/datasource&gt;
  *   &lt;format&gt;XAdES&lt;/format&gt;

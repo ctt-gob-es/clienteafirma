@@ -87,23 +87,19 @@ public class LocalBatchSigner {
 
 		final Operation cryptoOperation = singleConfig.getCryptoOperation();
 		final byte[] data = singleConfig.getData();
-		String algorithm = singleConfig.getAlgorithm();
-    	final String certAlgo = pke.getPrivateKey().getAlgorithm();
-		if (!algorithm.contains("withRSA") && !algorithm.contains("withDSA") && !algorithm.contains("withECDSA")) { //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-	    	if (certAlgo.equals("RSA")) { //$NON-NLS-1$
-	    		algorithm = algorithm + "withRSA"; //$NON-NLS-1$
-	    	}
-	    	else if (certAlgo.equals("DSA")) { //$NON-NLS-1$
-	    		algorithm = algorithm + "withDSA"; //$NON-NLS-1$
-	    	}
-	    	else if (certAlgo.startsWith("EC")) { //$NON-NLS-1$
-	    		algorithm = algorithm + "withECDSA"; //$NON-NLS-1$
-	    	}
-	    	else {
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INCOMPATIBLE_ALGORITHM;
-				throw new SocketOperationException(errorCode, new IllegalArgumentException("Algoritmo no soportado: " + certAlgo)); //$NON-NLS-1$
-	    	}
+		final String algorithm = singleConfig.getAlgorithm();
+    	final String keyType = pke.getPrivateKey().getAlgorithm();
+
+    	// Seleccionamos el algoritmo de firma
+		String signatureAlgorithm;
+		try {
+			signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
 		}
+		catch (final Exception e) {
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INCOMPATIBLE_KEY_TYPE;
+			throw new SocketOperationException(errorCode, e);
+		}
+
 		final String format = singleConfig.getFormat();
 		final Properties extraParams = singleConfig.getExtraParams();
 
@@ -147,7 +143,7 @@ public class LocalBatchSigner {
 				case SIGN:
 					sign = signer.sign(
 							data,
-							algorithm,
+							signatureAlgorithm,
 							pke.getPrivateKey(),
 							pke.getCertificateChain(),
 							extraParamsCopy
@@ -156,7 +152,7 @@ public class LocalBatchSigner {
 				case COSIGN:
 					sign = signer.cosign(
 							data,
-							algorithm,
+							signatureAlgorithm,
 							pke.getPrivateKey(),
 							pke.getCertificateChain(),
 							extraParamsCopy
@@ -165,7 +161,7 @@ public class LocalBatchSigner {
 				case COUNTERSIGN:
 					sign = signer.countersign(
 							data,
-							algorithm,
+							signatureAlgorithm,
 							CounterSignTarget.getTarget(extraParamsCopy.getProperty(AfirmaExtraParams.TARGET)) == CounterSignTarget.TREE ?
 									CounterSignTarget.TREE : CounterSignTarget.LEAFS,
 									null, // Targets

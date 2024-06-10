@@ -79,7 +79,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	static final String ERROR_PDF_SHADOW_ATTACK = "SAF_48"; //$NON-NLS-1$
 	static final String ERROR_SIGNING_LTS_SIGNATURE = "SAF_49"; //$NON-NLS-1$
 	static final String ERROR_CONFIRMATION_NEEDED = "SAF_50"; //$NON-NLS-1$
-	static final String ERROR_INCOMPATIBLE_ALGORITHM = "SAF_51"; //$NON-NLS-1$
+	static final String ERROR_INCOMPATIBLE_KEY_TYPE = "SAF_51"; //$NON-NLS-1$
 
 	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 
@@ -135,7 +135,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_PDF_SHADOW_ATTACK, ProtocolMessages.getString("ProtocolLauncher.63")); //$NON-NLS-1$
 		ERRORS.put(ERROR_SIGNING_LTS_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.64")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CONFIRMATION_NEEDED, ProtocolMessages.getString("ProtocolLauncher.65")); //$NON-NLS-1$
-		ERRORS.put(ERROR_INCOMPATIBLE_ALGORITHM, ProtocolMessages.getString("ProtocolLauncher.66")); //$NON-NLS-1$
+		ERRORS.put(ERROR_INCOMPATIBLE_KEY_TYPE, ProtocolMessages.getString("ProtocolLauncher.66")); //$NON-NLS-1$
 	}
 
 	static void showError(final String code) {

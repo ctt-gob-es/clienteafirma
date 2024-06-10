@@ -76,7 +76,7 @@ public final class KeyStoreUtilities {
     }
 
     /** Nombre de los ficheros de biblioteca de los controladores de la FNMT para DNIe, CERES y TIF
-     * que no tienen implementados el algoritmo SHA1withRSA. */
+     * que no implementan la firma con algoritmo de huella SHA1. */
     private static final String[] FNMT_PKCS11_LIBS_WITHOUT_SHA1 = {
     	"DNIe_P11_priv.dll", //$NON-NLS-1$
     	"DNIe_P11_pub.dll", //$NON-NLS-1$

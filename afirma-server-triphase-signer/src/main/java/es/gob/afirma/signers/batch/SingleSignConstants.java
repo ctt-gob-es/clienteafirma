@@ -127,7 +127,7 @@ public final class SingleSignConstants {
 
 	/** Algoritmo de firma. */
 	public enum SignAlgorithm {
-		
+
 		/** SHA1withRSA. */
 		SHA1WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA),
 
@@ -141,16 +141,16 @@ public final class SingleSignConstants {
 		SHA512WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA),
 
 		/** SHA1. */
-		SHA1(AOSignConstants.SIGN_ALGORITHM_SHA1),
+		SHA1(AOSignConstants.DIGEST_ALGORITHM_SHA1),
 
 		/** SHA256. */
-		SHA256(AOSignConstants.SIGN_ALGORITHM_SHA256),
+		SHA256(AOSignConstants.DIGEST_ALGORITHM_SHA256),
 
 		/** SHA284. */
-		SHA384(AOSignConstants.SIGN_ALGORITHM_SHA384),
+		SHA384(AOSignConstants.DIGEST_ALGORITHM_SHA384),
 
 		/** SHA512. */
-		SHA512(AOSignConstants.SIGN_ALGORITHM_SHA512);
+		SHA512(AOSignConstants.DIGEST_ALGORITHM_SHA512);
 
 		private final String name;
 

@@ -34,6 +34,7 @@ import org.spongycastle.util.Store;
 
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.cades.CAdESAttributes;
@@ -194,10 +195,12 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 
 		final CertificateDetails certDetails = new CertificateDetails(x509Cert);
 		cadesSignDetails.setSigner(certDetails);
-		
+
 		// Algoritmo de firma
-		final String algorithm = x509Cert.getSigAlgName();
-		cadesSignDetails.setAlgorithm(algorithm);
+		final String keyType = x509Cert.getPublicKey().getAlgorithm();
+		final String algorithm = signer.getDigestAlgorithmID().getAlgorithm().toString();
+		final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
+		cadesSignDetails.setAlgorithm(signAlgorithm);
 
 		final boolean signWithData = this.cmsSignedData.getSignedContent() != null;
 

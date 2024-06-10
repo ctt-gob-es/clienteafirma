@@ -31,6 +31,7 @@ import org.spongycastle.cms.DefaultCMSSignatureAlgorithmNameGenerator;
 import org.spongycastle.cms.SignerInformation;
 import org.spongycastle.cms.SignerInformationVerifier;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.spongycastle.operator.ContentVerifierProvider;
 import org.spongycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.spongycastle.operator.OperatorCreationException;
 import org.spongycastle.operator.bc.BcDigestCalculatorProvider;
@@ -93,7 +94,7 @@ public final class ValidateBinarySignature extends SignValider {
     public static List<SignValidity> validate(final byte[] sign,
     		                            final byte[] data,
     		                            final boolean checkCertificates) throws IOException {
-    	List<SignValidity> validityList = new ArrayList<SignValidity>();
+    	List<SignValidity> validityList = new ArrayList<>();
     	if (sign == null) {
     		throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
     	}
@@ -107,8 +108,10 @@ public final class ValidateBinarySignature extends SignValider {
     	    }
     	}
 
+    	byte[] signedData = null;
     	try {
-			if (data == null && signer.getData(sign) == null) {
+    		signedData = data != null ? data : signer.getData(sign);
+			if (signedData == null) {
 				Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 					"Se ha pedido validar una firma explicita sin proporcionar los datos firmados" //$NON-NLS-1$
 				);
@@ -131,7 +134,7 @@ public final class ValidateBinarySignature extends SignValider {
     	try {
     		verifySignatures(
 				sign,
-				data != null ? data : new AOCAdESSigner().getData(sign),
+				signedData,
 				checkCertificates,
 				validityList
 			);
@@ -212,7 +215,7 @@ public final class ValidateBinarySignature extends SignValider {
     										final CertificateFactory certFactory, final boolean checkCertificates,
     										final String signProfile, final boolean signWithData) {
 
-    	final List<SignValidity> result = new ArrayList<SignValidity>();
+    	final List<SignValidity> result = new ArrayList<>();
     	SignerInformation signer = null;
 		try {
 			signer = (SignerInformation) si;
@@ -223,10 +226,15 @@ public final class ValidateBinarySignature extends SignValider {
 			if (checkCertificates) {
 				cert.checkValidity();
 
-				if (!signer
-						.verify(new SignerInformationVerifier(new DefaultCMSSignatureAlgorithmNameGenerator(),
-								new DefaultSignatureAlgorithmIdentifierFinder(), new JcaContentVerifierProviderBuilder()
-										.setProvider(new BouncyCastleProvider()).build(cert),
+				final ContentVerifierProvider contentVerifierProvider =
+						new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert);
+
+
+				if (!signer.verify(
+						new SignerInformationVerifier(
+								new DefaultCMSSignatureAlgorithmNameGenerator(),
+								new DefaultSignatureAlgorithmIdentifierFinder(),
+								contentVerifierProvider,
 								new BcDigestCalculatorProvider()))) {
 					throw new CMSException("Firma no valida"); //$NON-NLS-1$
 				}

@@ -27,11 +27,11 @@ public final class TestBatchSigner {
 
 //	private static final String SAMPLE_BATCH_XML =
 //	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
-//	"<signbatch stoponerror=\"on\" algorithm=\"SHA1withRSA\"><singlesign Id=\"d5d7667b-f28e-4471-a182-97da7618eaa8\"><datasource>PEluaWNpbz5QYXJhIFBydWViYXM8L0luaWNpbz4=</datasource><format>XAdES</format><suboperation>sign</suboperation><extraparams>Zm9ybWF0PVhBZEVTIERldGFjaGVkCg==</extraparams><signsaver><class>es.gob.afirma.signers.batch.SignSaverFile</class><config>RmlsZU5hbWU9cHJ1ZWJhLnhtbA==</config></signsaver></singlesign></signbatch>";
+//	"<signbatch stoponerror=\"on\" algorithm=\"SHA1\"><singlesign Id=\"d5d7667b-f28e-4471-a182-97da7618eaa8\"><datasource>PEluaWNpbz5QYXJhIFBydWViYXM8L0luaWNpbz4=</datasource><format>XAdES</format><suboperation>sign</suboperation><extraparams>Zm9ybWF0PVhBZEVTIERldGFjaGVkCg==</extraparams><signsaver><class>es.gob.afirma.signers.batch.SignSaverFile</class><config>RmlsZU5hbWU9cHJ1ZWJhLnhtbA==</config></signsaver></singlesign></signbatch>";
 
 	private static final String SAMPLE_BATCH_XML =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n" + //$NON-NLS-1$
-			"<signbatch stoponerror=\"false\" algorithm=\"SHA256withRSA\">\r\n" + //$NON-NLS-1$
+			"<signbatch stoponerror=\"false\" algorithm=\"SHA256\">\r\n" + //$NON-NLS-1$
 			" <singlesign Id=\"7725374e-728d-4a33-9db9-3a4efea4cead\">\r\n" + //$NON-NLS-1$
 			"  <datasource>http://www.google.com</datasource>\r\n" + //$NON-NLS-1$
 			"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
