@@ -65,13 +65,9 @@ public class XmlDSigProviderHelper {
 
 
     	// Si damos preferencia al proveedor de Apache, nos aseguramos de que este el primero de la lista
+    	final String providerName = apachePreferred ? APACHE_PROVIDER_CLASS : SUN_PROVIDER_CLASS;
     	try {
-    		if (apachePreferred) {
-    			installProvider(APACHE_PROVIDER_CLASS);
-    		}
-    		else {
-    			installProvider(SUN_PROVIDER_CLASS);
-    		}
+    		installProvider(providerName);
 	    }
 	    catch (final Throwable e) {
 	    	LOGGER.log(Level.SEVERE, "No se pudo dar preferencia al proveedor configurado", e); //$NON-NLS-1$

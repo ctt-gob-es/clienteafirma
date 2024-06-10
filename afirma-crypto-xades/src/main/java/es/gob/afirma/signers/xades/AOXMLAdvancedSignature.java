@@ -208,8 +208,6 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         );
 
         Key normalizedPk;
-
-        // Si llega una clave ECDSA de BC la convertimos a una EC de JSE para evitar problemas
         if (privateKey instanceof BCECPrivateKey) {
         	normalizedPk = KeyUtil.ecBc2Jce((BCECPrivateKey)privateKey);
         }
