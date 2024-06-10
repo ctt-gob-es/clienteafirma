@@ -171,21 +171,19 @@ public class MassiveSignatureTest {
 
 							final MassiveSignatureHelper massive = new MassiveSignatureHelper(config);
 							byte[] signature = massive.signFile(fullpath);
-							Assert.assertNotNull(signature);
-							MassiveSignatureTest.saveData(
-									signature,
-									"Firma_file_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							String signatureName = "Firma_file_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							Assert.assertNotNull("Se ha obtenido una firma nula al firmar: " + signatureName, signature); //$NON-NLS-1$
+							MassiveSignatureTest.saveData(signature, signatureName);
 							signature = massive.signData(data);
-							Assert.assertNotNull(signature);
-							MassiveSignatureTest.saveData(
-									signature,
-									"Firma_data_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							signatureName = "Firma_data_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							Assert.assertNotNull("Se ha obtenido una firma nula al firmar: " + signatureName, signature); //$NON-NLS-1$
+							MassiveSignatureTest.saveData(signature, signatureName);
+
 							if (Boolean.parseBoolean(format[4]) && AOSignConstants.SIGN_MODE_IMPLICIT .equals(mode[1])) {
 								signature = massive.signHash(MassiveSignatureTest.getDigestData(data));
-								Assert.assertNotNull(signature);
-								MassiveSignatureTest.saveData(
-										signature,
-										"Firma_hash_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+								signatureName = "Firma_hash_" + file[1] + "_" + format[1] + "_" + /*originalFormat + "_" +*/mode[1] + "." + format[2]; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+								Assert.assertNotNull("Se ha obtenido una firma nula al firmar: " + signatureName, signature); //$NON-NLS-1$
+								MassiveSignatureTest.saveData(signature, signatureName);
 							}
 						}
 					}

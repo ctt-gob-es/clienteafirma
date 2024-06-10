@@ -214,18 +214,18 @@ public final class AOSignConstants {
 	// ************************************************************
 	// ************* ALGORITMOS DE FIRMA **************************
 	// ************************************************************
-	
-	/** Algoritmo de firma SHA1. */
-	public static final String SIGN_ALGORITHM_SHA1 = "SHA1"; //$NON-NLS-1$
 
-	/** Algoritmo de firma SHA256. */
-	public static final String SIGN_ALGORITHM_SHA256= "SHA256"; //$NON-NLS-1$
+	/** Algoritmo de huella digital SHA1. */
+	public static final String DIGEST_ALGORITHM_SHA1 = "SHA1"; //$NON-NLS-1$
 
-	/** Algoritmo de firma SHA384. */
-	public static final String SIGN_ALGORITHM_SHA384= "SHA384"; //$NON-NLS-1$
+	/** Algoritmo de huella digital SHA256. */
+	public static final String DIGEST_ALGORITHM_SHA256 = "SHA256"; //$NON-NLS-1$
 
-	/** Algoritmo de firma SHA512. */
-	public static final String SIGN_ALGORITHM_SHA512= "SHA512"; //$NON-NLS-1$
+	/** Algoritmo de huella digital SHA384. */
+	public static final String DIGEST_ALGORITHM_SHA384 = "SHA384"; //$NON-NLS-1$
+
+	/** Algoritmo de huella digital SHA512. */
+	public static final String DIGEST_ALGORITHM_SHA512 = "SHA512"; //$NON-NLS-1$
 
 	/** Algoritmo de firma SHA1withRSA. */
 	public static final String SIGN_ALGORITHM_SHA1WITHRSA = "SHA1withRSA"; //$NON-NLS-1$
@@ -264,24 +264,6 @@ public final class AOSignConstants {
 	/** Algoritmo de firma ECDSA que no incluye la generaci&oacute;n de la huella
 	 * digital (NONEwithEDSSA). */
 	public static final String SIGN_ALGORITHM_NONEWITHECDSA = "NONEwithECDSA"; //$NON-NLS-1$
-
-	/** Algoritmos de firma soportados. */
-	public static final String[] SUPPORTED_SIGN_ALGOS = new String[] {
-		SIGN_ALGORITHM_SHA256,
-		SIGN_ALGORITHM_SHA384,
-		SIGN_ALGORITHM_SHA512,
-		SIGN_ALGORITHM_SHA1,
-		SIGN_ALGORITHM_SHA1WITHRSA,
-		SIGN_ALGORITHM_NONEWITHRSA,
-		SIGN_ALGORITHM_SHA256WITHRSA,
-		SIGN_ALGORITHM_SHA384WITHRSA,
-		SIGN_ALGORITHM_SHA512WITHRSA,
-		SIGN_ALGORITHM_SHA1WITHECDSA,
-		SIGN_ALGORITHM_SHA256WITHECDSA,
-		SIGN_ALGORITHM_SHA384WITHECDSA,
-		SIGN_ALGORITHM_SHA512WITHECDSA,
-		SIGN_ALGORITHM_NONEWITHECDSA
-	};
 
 	/** Algoritmo de firma por defecto. */
 	public static final String DEFAULT_SIGN_ALGO = SIGN_ALGORITHM_SHA512WITHRSA;
@@ -363,6 +345,40 @@ public final class AOSignConstants {
 		);
 
 		return pseudoName;
+	}
+
+	/**
+	 * Compone el nombre del algoritmo de firma que utiliza un algoritmo de huella concreto y emplea un determinado tipo
+	 * de clave de cifrado. El algoritmo de huella se extrae del algoritmo proporcionado, que puede ser de huella, de firma
+	 * o una referencia al algoritmo (OID o URL).
+	 * @param algorithm Algoritmo de huella digital o firma.
+	 * @param keyType Tipo de clave de firma.
+	 * @return Nombre del algoritmo de firma. */
+	public static String composeSignatureAlgorithmName(final String algorithm, final String keyType) {
+		if (algorithm == null) {
+			throw new IllegalArgumentException(
+					"El nombre del algoritmo no puede ser nulo"); //$NON-NLS-1$
+		}
+		if (keyType == null) {
+			throw new IllegalArgumentException(
+					"El tipo de clave de certificado no puede ser nulo"); //$NON-NLS-1$
+		}
+
+		// Limpiamos el nombre del algorithm de huella
+		final String digestAlgorithm = getDigestAlgorithmName(algorithm).replace("-", ""); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Agregamos el algoritmo de cifrado correspondiente al tipo de clave del certificado
+		String suffix;
+		if (keyType.equals("RSA")) { //$NON-NLS-1$
+			suffix = "withRSA"; //$NON-NLS-1$
+		} else if (keyType.equals("DSA")) { //$NON-NLS-1$
+			suffix = "withDSA"; //$NON-NLS-1$
+		} else if (keyType.startsWith("EC")) { //$NON-NLS-1$
+			suffix = "withECDSA"; //$NON-NLS-1$
+		} else {
+			throw new IllegalArgumentException("Tipo de clave de firma no soportado: " + keyType); //$NON-NLS-1$
+		}
+		return digestAlgorithm + suffix;
 	}
 
 	/** Comprueba si un algoritmo de firma utiliza un algoritmo de huella digital
