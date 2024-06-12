@@ -88,7 +88,7 @@ public final class AOAlgorithmID {
         OIDS.put("SHA-256withRSA", OID_RSA_SHA256); //$NON-NLS-1$
 
         OIDS.put("SHA384withRSA", OID_RSA_SHA384); //$NON-NLS-1$
-        OIDS.put("SHA-238withRSA", OID_RSA_SHA384); //$NON-NLS-1$
+        OIDS.put("SHA-384withRSA", OID_RSA_SHA384); //$NON-NLS-1$
 
         OIDS.put("SHA512withRSA", OID_RSA_SHA512); //$NON-NLS-1$
         OIDS.put("SHA-512withRSA", OID_RSA_SHA512); //$NON-NLS-1$
@@ -103,7 +103,7 @@ public final class AOAlgorithmID {
         OIDS.put("SHA-256withECDSA", OID_ECDSA_SHA256); //$NON-NLS-1$
 
         OIDS.put("SHA384withECDSA", OID_ECDSA_SHA384); //$NON-NLS-1$
-        OIDS.put("SHA-238withECDSA", OID_ECDSA_SHA384); //$NON-NLS-1$
+        OIDS.put("SHA-384withECDSA", OID_ECDSA_SHA384); //$NON-NLS-1$
 
         OIDS.put("SHA512withECDSA", OID_ECDSA_SHA512); //$NON-NLS-1$
         OIDS.put("SHA-512withECDSA", OID_ECDSA_SHA512); //$NON-NLS-1$
