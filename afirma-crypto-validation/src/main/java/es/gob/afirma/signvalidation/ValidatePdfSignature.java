@@ -177,7 +177,8 @@ public final class ValidatePdfSignature extends SignValider {
 		final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(sign);
 
 		for (final String name : signNames) {
-			final List<SignValidity> validityListSign = validateSign(name, af, signProfile, true);
+			final boolean checkCert = Boolean.parseBoolean(params.getProperty(PdfExtraParams.CHECK_CERTIFICATES));
+			final List<SignValidity> validityListSign = validateSign(name, af, signProfile, checkCert);
 			for (final SignValidity sv : validityListSign) {
 				if (!validityList.contains(sv)) {
 					if (SIGN_DETAIL_TYPE.UNKNOWN.equals(sv.getValidity())) {

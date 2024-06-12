@@ -1,5 +1,6 @@
 package es.gob.afirma.standalone.signdetails;
 
+import java.security.InvalidKeyException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -7,6 +8,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.spongycastle.cms.CMSException;
+import org.spongycastle.cms.CMSSignerDigestMismatchException;
+import org.spongycastle.cms.DefaultCMSSignatureAlgorithmNameGenerator;
+import org.spongycastle.cms.SignerInformation;
+import org.spongycastle.cms.SignerInformationVerifier;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.spongycastle.operator.ContentVerifierProvider;
+import org.spongycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.spongycastle.operator.OperatorCreationException;
+import org.spongycastle.operator.bc.BcDigestCalculatorProvider;
+import org.spongycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -19,7 +32,7 @@ public class CertificateDetails {
 	private Properties validityResult;
 	private final List<CertificateDetails> subCertDetails;
 
-	public CertificateDetails(final X509Certificate x509Cert) {
+	public CertificateDetails(final X509Certificate x509Cert, final SignerInformation signer) {
 		this.name = AOUtil.getCN(x509Cert);
 		this.issuerName = AOUtil.getCN(x509Cert.getIssuerX500Principal().getName());
 		this.expirationDate = new SimpleDateFormat("dd-MM-yyyy").format(x509Cert.getNotAfter()).toString(); //$NON-NLS-1$
@@ -28,6 +41,20 @@ public class CertificateDetails {
 		String validationMessage;
 		try {
 			x509Cert.checkValidity();
+			
+			if (signer != null) {
+				final ContentVerifierProvider contentVerifierProvider =
+						new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(x509Cert);
+	
+				if (!signer.verify(
+						new SignerInformationVerifier(
+								new DefaultCMSSignatureAlgorithmNameGenerator(),
+								new DefaultSignatureAlgorithmIdentifierFinder(),
+								contentVerifierProvider,
+								new BcDigestCalculatorProvider()))) {
+					throw new CMSException("Firma no valida"); //$NON-NLS-1$
+				}
+			}
 			validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.40"); //$NON-NLS-1$
 		}
 		catch (final CertificateExpiredException e) {
@@ -35,6 +62,18 @@ public class CertificateDetails {
 		}
 		catch (final CertificateNotYetValidException e) {
 			validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.3"); //$NON-NLS-1$
+		}
+		catch (final CMSSignerDigestMismatchException e) {
+			// Esta excepcion es controlada en la validacion general del documento como NO_MATCH_DATA
+			validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.40");  //$NON-NLS-1$
+		}
+		catch (final CMSException e) {
+			if (e.getCause() != null && e.getCause() instanceof OperatorCreationException
+					&& e.getCause().getCause() != null && e.getCause().getCause() instanceof InvalidKeyException) {
+				validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.5"); //$NON-NLS-1$
+			} else {
+				validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.4"); //$NON-NLS-1$
+			}
 		}
 		catch (final Exception e) {
 			validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.4"); //$NON-NLS-1$

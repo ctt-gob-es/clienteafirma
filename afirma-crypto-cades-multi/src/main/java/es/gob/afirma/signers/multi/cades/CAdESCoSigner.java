@@ -218,9 +218,13 @@ final class CAdESCoSigner {
 			X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
 		);
 		final SignerIdentifier identifier = new SignerIdentifier(encSid);
+		
+		final String keyType = ((X509Certificate) certChain[0]).getPublicKey().getAlgorithm();
+		
+		final String algorithmName = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm, keyType);
 
 		// digEncryptionAlgorithm
-		final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+		final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(algorithmName));
 
 		// 5. SIGNERINFO
 		// raiz de la secuencia de SignerInfo

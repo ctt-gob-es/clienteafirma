@@ -193,7 +193,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 		final X509Certificate x509Cert = (X509Certificate) certFactory
 				.generateCertificate(new ByteArrayInputStream(certIt.next().getEncoded()));
 
-		final CertificateDetails certDetails = new CertificateDetails(x509Cert);
+		final CertificateDetails certDetails = new CertificateDetails(x509Cert, signer);
 		cadesSignDetails.setSigner(certDetails);
 
 		// Algoritmo de firma

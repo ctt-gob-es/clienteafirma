@@ -114,10 +114,16 @@ public final class AOCAdESTriPhaseCoSigner {
 			X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
 		);
 		final SignerIdentifier identifier = new SignerIdentifier(encSid);
+		
+		final String keyType = signerCertificateChain[0].getPublicKey().getAlgorithm();
+		
+		final String digestAlgorithmName = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+		
+		final String algorithmName = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithmName, keyType);
 
 		// digEncryptionAlgorithm
-		final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
-		final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)));
+		final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
+		final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(algorithmName));
 
 		final ASN1Sequence contentSignedData = getContentSignedData(sign);
 		final SignedData sd = SignedData.getInstance(contentSignedData);

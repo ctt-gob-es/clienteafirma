@@ -306,7 +306,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 		if (dataCertNode != null) {
 			final Element certElement = (Element) ((Element) dataCertNode).getElementsByTagNameNS(XMLConstants.DSIGNNS, XAdESConstants.TAG_X509_CERTIFICATE).item(0);
 			final X509Certificate cert = Utils.getCertificate(certElement);
-			final CertificateDetails certDetails = new CertificateDetails(cert);
+			final CertificateDetails certDetails = new CertificateDetails(cert, null);
 			return certDetails;
 		}
 		return null;

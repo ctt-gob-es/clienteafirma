@@ -438,9 +438,13 @@ final class CAdESCounterSigner {
 
         // AlgorithmIdentifier
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        
+        final String keyType = ((X509Certificate) certChain[0]).getPublicKey().getAlgorithm();
 
-        // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+		final String algorithmName = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm, keyType);
+
+		// digEncryptionAlgorithm
+		final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(algorithmName));
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
