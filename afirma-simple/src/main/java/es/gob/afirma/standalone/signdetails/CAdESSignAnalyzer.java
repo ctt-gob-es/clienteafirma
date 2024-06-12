@@ -3,6 +3,7 @@ package es.gob.afirma.standalone.signdetails;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
@@ -27,9 +28,19 @@ import org.spongycastle.asn1.esf.SignerLocation;
 import org.spongycastle.asn1.ess.ContentHints;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.cert.X509CertificateHolder;
+import org.spongycastle.cms.CMSException;
 import org.spongycastle.cms.CMSSignedData;
+import org.spongycastle.cms.CMSSignerDigestMismatchException;
+import org.spongycastle.cms.DefaultCMSSignatureAlgorithmNameGenerator;
 import org.spongycastle.cms.SignerInformation;
 import org.spongycastle.cms.SignerInformationStore;
+import org.spongycastle.cms.SignerInformationVerifier;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.spongycastle.operator.ContentVerifierProvider;
+import org.spongycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.spongycastle.operator.OperatorCreationException;
+import org.spongycastle.operator.bc.BcDigestCalculatorProvider;
+import org.spongycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.spongycastle.util.Store;
 
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -193,8 +204,9 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 		final X509Certificate x509Cert = (X509Certificate) certFactory
 				.generateCertificate(new ByteArrayInputStream(certIt.next().getEncoded()));
 
-		final CertificateDetails certDetails = new CertificateDetails(x509Cert, signer);
+		final CertificateDetails certDetails = new CertificateDetails(x509Cert);
 		cadesSignDetails.setSigner(certDetails);
+		checkCorrectSignerInformation(cadesSignDetails, x509Cert, signer);
 
 		// Algoritmo de firma
 		final String keyType = x509Cert.getPublicKey().getAlgorithm();
@@ -297,6 +309,52 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
         	LOGGER.severe("Formato de fecha deconocido: " + timeObject.getClass().getName()); //$NON-NLS-1$
         }
         return result;
+    }
+    
+    /**
+     * Comprueba que la informaci&oacute;n sobre el firmante esta correctamente formada.
+     * @param details Detalles de la firma.
+     * @param x509Cert Datos del certificado a comprobar.
+     * @param signer Informaci&ioacute;n del firmante.
+     */
+    private void checkCorrectSignerInformation(final SignDetails details, final X509Certificate x509Cert, final SignerInformation signer) {
+    	// Si en la validacion de los detalles del certificado no fue correcta, no sera necesario seguir comprobandolo
+    	// ya que no seria valido
+    	if (details.getSigner().isCorrectValidation()) {
+	    	String validationMessage = null;
+			try {
+		    	if (signer != null) {
+					final ContentVerifierProvider contentVerifierProvider =
+							new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(x509Cert);
+		
+					if (!signer.verify(
+							new SignerInformationVerifier(
+									new DefaultCMSSignatureAlgorithmNameGenerator(),
+									new DefaultSignatureAlgorithmIdentifierFinder(),
+									contentVerifierProvider,
+									new BcDigestCalculatorProvider()))) {
+						throw new CMSException("Firma no valida"); //$NON-NLS-1$
+					}
+				}
+			} catch (final CMSSignerDigestMismatchException e) {
+				// Esta excepcion es controlada en la validacion general del documento como NO_MATCH_DATA
+			}
+			catch (final CMSException e) {
+				if (e.getCause() != null && e.getCause() instanceof OperatorCreationException
+						&& e.getCause().getCause() != null && e.getCause().getCause() instanceof InvalidKeyException) {
+					validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.5"); //$NON-NLS-1$
+				} else {
+					validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.4"); //$NON-NLS-1$
+				}
+			}
+			catch (final Exception e) {
+				validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.4"); //$NON-NLS-1$
+			}
+			
+			if (validationMessage != null) {
+				details.getSigner().getValidityResult().put("Validacion", validationMessage); //$NON-NLS-1$
+			}
+    	}
     }
 
 }

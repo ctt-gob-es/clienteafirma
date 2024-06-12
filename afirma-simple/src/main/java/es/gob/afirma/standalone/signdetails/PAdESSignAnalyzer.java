@@ -191,7 +191,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		this.signersTree.add(new AOTreeNode(AOUtil.getCN(pkcs7.getSigningCertificate()) + " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(pkcs7.getSignDate().getTime()) + ")")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Detalles del certificado
-		final CertificateDetails certDetails = new CertificateDetails(pkcs7.getSigningCertificate(), null);
+		final CertificateDetails certDetails = new CertificateDetails(pkcs7.getSigningCertificate());
 		padesSignDetails.setSigner(certDetails);
 
 		// Metadatos
