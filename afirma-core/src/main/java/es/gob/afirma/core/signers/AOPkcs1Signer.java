@@ -74,8 +74,13 @@ public final class AOPkcs1Signer implements AOSigner {
 		}
 
 		final Signature sig;
+		final String algorithmName;
 		try {
-			sig = p != null ? Signature.getInstance(algorithm, p) : Signature.getInstance(algorithm);
+			final String keyType = key.getAlgorithm();
+			
+			algorithmName = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
+			
+			sig = p != null ? Signature.getInstance(algorithmName, p) : Signature.getInstance(algorithmName);
 		}
 		catch (final NoSuchAlgorithmException e) {
 			throw new AOException("No se soporta el algoritmo de firma (" + algorithm + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -113,7 +118,7 @@ public final class AOPkcs1Signer implements AOSigner {
         // certificado proporcionado
 		if (certChain != null && certChain.length > 0) {
 			try {
-				final Signature sigVerifier = Signature.getInstance(algorithm);
+				final Signature sigVerifier = Signature.getInstance(algorithmName);
 				sigVerifier.initVerify(certChain[0].getPublicKey());
 				sigVerifier.update(data);
 				if (!sigVerifier.verify(signature)) {
