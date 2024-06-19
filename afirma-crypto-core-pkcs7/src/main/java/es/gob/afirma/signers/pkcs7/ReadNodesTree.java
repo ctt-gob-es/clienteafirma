@@ -177,9 +177,9 @@ public final class ReadNodesTree {
     	final String oidString = oid.toString();
     	if (AOAlgorithmID.isRSAOID(oidString)) {	// Firma RSA
     		return "RSA"; //$NON-NLS-1$
-    	} else if (oidString.equals("1.2.840.10040.4.1")) {	// Firma DSA	//TODO: Sin verificar //$NON-NLS-1$
+    	} else if (AOAlgorithmID.isDSAOID(oidString)) {	// Firma DSA	
     		return "DSA"; //$NON-NLS-1$
-    	} else if (AOAlgorithmID.isECDSAOID(oidString)) {	// Firma ECDSA	//TODO: Sin verificar
+    	} else if (AOAlgorithmID.isECDSAOID(oidString)) {	// Firma ECDSA	
     		return "ECDSA"; //$NON-NLS-1$
     	}
     	return oidString;
