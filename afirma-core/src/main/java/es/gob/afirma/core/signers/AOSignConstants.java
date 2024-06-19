@@ -333,13 +333,23 @@ public final class AOSignConstants {
 			return "RIPEMD160"; //$NON-NLS-1$
 		}
 
+		// Comprobamos si el nombre del algoritmo tiene un formato conocido de algoritmo de firma
+		// e intentamos obtener el nombre del algoritmo de huella del mismo
+
+		// Nombre estandar de algoritmo de firma
 		if (pseudoName.contains("with")) { //$NON-NLS-1$
-			return pseudoName.substring(
-				0,
-				pseudoName.indexOf("with") //$NON-NLS-1$
-			);
+			final String subname = pseudoName.substring(0, pseudoName.indexOf("with")); //$NON-NLS-1$
+			return getDigestAlgorithmName(subname);
+		}
+		// Algoritmo de firma XML
+		else if (pseudoName.startsWith("http://www.w3.org/2001/04/xmldsig-more#") //$NON-NLS-1$
+				|| pseudoName.startsWith("http://www.w3.org/2000/09/xmldsig#") //$NON-NLS-1$
+				|| pseudoName.startsWith("http://www.w3.org/2009/xmldsig11#")) { //$NON-NLS-1$
+			final String subname = pseudoName.substring(pseudoName.lastIndexOf('-') + 1);
+			return getDigestAlgorithmName(subname);
 		}
 
+		// No se ha podido extraer el nombre del algoritmo
 		Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 			"Algoritmo de huella desconocido, no se normalizara su nombre: " + pseudoName //$NON-NLS-1$
 		);

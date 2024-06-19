@@ -328,7 +328,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             catch(final AOFormatFileException e) {
             	LOGGER.warning("La firma o el documento no son aptos para firmar: " + e); //$NON-NLS-1$
             	if (onlyOneFile) {
-            		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.153"), e); //$NON-NLS-1$
+            		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.154", e.getMessage()), e); //$NON-NLS-1$
             		return;
             	}
             	continue;
