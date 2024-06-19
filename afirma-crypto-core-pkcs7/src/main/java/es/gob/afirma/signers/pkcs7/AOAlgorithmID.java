@@ -135,5 +135,50 @@ public final class AOAlgorithmID {
         }
         return res;
     }
+    
+    /** Indica si el OID pertenece a una encriptaci&oacute;n de tipo RSA o no.
+     * @param oid OID del algoritmo.
+     * @return true en caso de que sea RSA. */
+    public static boolean isRSAOID(final String oid) {
+    	boolean isRSA = false;
+    	
+        if (OID_RSA.equals(oid)
+        || OID_RSA_SHA1.equals(oid)
+        || OID_RSA_SHA224.equals(oid)
+        || OID_RSA_SHA256.equals(oid)
+        || OID_RSA_SHA384.equals(oid)
+        || OID_RSA_SHA512.equals(oid)
+        || OID_RSA_SHA3_224.equals(oid)
+        || OID_RSA_SHA3_256.equals(oid)
+        || OID_RSA_SHA3_384.equals(oid)
+        || OID_RSA_SHA3_512.equals(oid)) {
+        	
+        	isRSA = true;
+        }
+        
+        return isRSA;
+    }
+    
+    /** Indica si el OID pertenece a una encriptaci&oacute;n de tipo ECDSA o no.
+     * @param oid OID del algoritmo.
+     * @return true en caso de que sea ECDSA. */
+    public static boolean isECDSAOID(final String oid) {
+    	boolean isECDSA = false;
+    	
+        if (OID_ECDSA_SHA1.equals(oid)
+        || OID_ECDSA_SHA224.equals(oid)
+        || OID_ECDSA_SHA256.equals(oid)
+        || OID_ECDSA_SHA384.equals(oid)
+        || OID_ECDSA_SHA512.equals(oid)
+        || OID_ECDSA_SHA3_224.equals(oid)
+        || OID_ECDSA_SHA3_256.equals(oid)
+        || OID_ECDSA_SHA3_384.equals(oid)
+        || OID_ECDSA_SHA3_512.equals(oid)) {
+        	
+        	isECDSA = true;
+        }
+        
+        return isECDSA;
+    }
 
 }

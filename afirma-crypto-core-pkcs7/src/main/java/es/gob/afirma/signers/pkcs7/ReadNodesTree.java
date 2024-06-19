@@ -175,11 +175,11 @@ public final class ReadNodesTree {
     private static String translateEncryptionOid(final ASN1ObjectIdentifier oid) {
 
     	final String oidString = oid.toString();
-    	if (oidString.equals("1.2.840.113549.1.1.1")) {	// Firma RSA //$NON-NLS-1$
+    	if (AOAlgorithmID.isRSAOID(oidString)) {	// Firma RSA
     		return "RSA"; //$NON-NLS-1$
     	} else if (oidString.equals("1.2.840.10040.4.1")) {	// Firma DSA	//TODO: Sin verificar //$NON-NLS-1$
     		return "DSA"; //$NON-NLS-1$
-    	} else if (oidString.equals("1.2.840.10045.4")) {	// Firma ECDSA	//TODO: Sin verificar //$NON-NLS-1$
+    	} else if (AOAlgorithmID.isECDSAOID(oidString)) {	// Firma ECDSA	//TODO: Sin verificar
     		return "ECDSA"; //$NON-NLS-1$
     	}
     	return oidString;
