@@ -41,7 +41,6 @@ public class XAdESValidator {
 	 * Valida una firma XML y, opcionalmente, la vigencia de sus certificados.
      * @param sign Firma a validar.
      * @param checkCertificates Indica si debe validarse la vigencia de los certificados.
-     * @return Validez de la firma.
      * @throws CertificateException Cuando se valide la vigencia del certificado no lo est&eacute;.
 	 * @throws InvalidSignatureException Cuando la firma no sea v&aacute;lida.
 	 * @throws AOInvalidFormatException Cuando los datos no est&eacute;n firmados con XAdES.

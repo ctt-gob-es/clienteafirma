@@ -226,7 +226,7 @@ public enum AOKeyStore {
     }
 
     /** Asigna el Nombre del almac&eacute;n de claves.
-     * @return Nombre del almac&eacute;n de claves. */
+     * @param name Nombre del almac&eacute;n de claves. */
     public void setName(final String name) {
         this.name = name;
     }

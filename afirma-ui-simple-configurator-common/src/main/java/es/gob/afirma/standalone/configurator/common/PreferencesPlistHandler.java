@@ -234,10 +234,11 @@ public final class PreferencesPlistHandler {
 	}
 
 	/**
-	 * Se importan las preferencias del usuario desde un XML
-	 * @param xml XML con la informaci&oacute;n
-	 * @param unprotected Indica si las preferencias est&aacute;n protegidas o no
-	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido
+	 * Se cargan las preferencias del usuario desde un XML.
+	 * @param xml XML con la informaci&oacute;n.
+	 * @param unprotected Indica si las preferencias est&aacute;n protegidas o no.
+	 * @return Mapa de preferencias cargadas.
+	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido.
 	 */
 	public static Map<String, Object> loadPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
 		final Map<String, Object> properties;

@@ -711,11 +711,14 @@ public final class PreferencesManager {
 					: defaultValue;
 	}
 
-	/** Recupera la cadena con el valor de una propiedad de configuraci&oacute;n. La propiedad se
-	 * buscar&aacute;, por orden, en las preferencia del usuario, del sistema o en la configuraci&oacute;n
-	 * por defecto.
+	/**
+	 * Recupera la cadena con el valor de una propiedad de configuraci&oacute;n. Si se indica un
+	 * conjunto de preferencias nulo, se obtendr&aacute; por orden el valor indicado en las
+	 * preferencias de usuario, del sistema o el por defecto.
 	 * @param key Clave del valor que queremos recuperar.
-	 * @return El valor almacenado de la propiedad o su valor por defecto si no se encontr&oacute;. */
+	 * @param src Conjunto de preferencias entre el que buscar la propiedad.
+	 * @return El valor almacenado de la propiedad o su valor por defecto si no se encontr&oacute;.
+	 */
 	public static String get(final String key, final PreferencesSource src) {
 
 		if (src == null) {
@@ -747,12 +750,15 @@ public final class PreferencesManager {
 					: defaultValue);
 	}
 
-	/** Recupera el valor {@code true} o {@code false} almacenado en el tipo de preferencia
-	 * indicado de la aplicaci&oacute;n.
-	 * Si se indica una fuente nula, se obtendr&aacute; por orden el valor indicado en las preferencias
-	 * de usuario, del sistema o el por defecto.
+	/**
+	 * Recupera el valor {@code true} o {@code false} almacenado en el tipo de preferencia
+	 * indicado de la aplicaci&oacute;n. Si se indica un conjunto de preferencias nulo, se
+	 * obtendr&aacute; por orden el valor indicado en las preferencias de usuario, del sistema o el
+	 * por defecto.
 	 * @param key Clave del valor que queremos recuperar.
-	 * @return El valor almacenado de la propiedad o {@code false} si no estaba declarado. */
+	 * @param src Conjunto de preferencias entre el que buscar la propiedad.
+	 * @return El valor almacenado de la propiedad o {@code false} si no estaba declarado.
+	 */
 	public static boolean getBoolean(final String key, final PreferencesSource src) {
 
 		if (src == null) {

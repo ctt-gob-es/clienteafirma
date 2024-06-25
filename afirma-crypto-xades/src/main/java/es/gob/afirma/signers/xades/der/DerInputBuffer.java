@@ -89,6 +89,9 @@ class DerInputBuffer extends ByteArrayInputStream implements Cloneable {
     /**
      * Compares this DerInputBuffer for equality with the specified
      * object.
+     * @param Other object.
+     * @return {@code true} if the object is a DerInputBuffer with the same
+     * content.
      */
     @Override
 	public boolean equals(final Object other) {
@@ -148,6 +151,7 @@ class DerInputBuffer extends ByteArrayInputStream implements Cloneable {
      * @param makePositive whether to always return a positive value,
      *   irrespective of actual encoding
      * @return the integer as a BigInteger.
+     * @throws IOException When no it possible read data.
      */
     BigInteger getBigInteger(final int len, final boolean makePositive) throws IOException {
         if (len > available()) {
@@ -183,6 +187,7 @@ class DerInputBuffer extends ByteArrayInputStream implements Cloneable {
      * Integer.MAX_VALUE.
      * @param len the number of bytes to use.
      * @return the integer.
+     * @throws IOException When no it possible read data.
      */
     public int getInteger(final int len) throws IOException {
 
@@ -199,6 +204,9 @@ class DerInputBuffer extends ByteArrayInputStream implements Cloneable {
     /**
      * Returns the bit string which takes up the specified
      * number of bytes in this buffer.
+     * @param len bit string's length.
+     * @return bit string
+     * @throws IOException When no it possible read data.
      */
     public byte[] getBitString(final int len) throws IOException {
         if (len > available()) {
@@ -226,6 +234,8 @@ class DerInputBuffer extends ByteArrayInputStream implements Cloneable {
 
     /**
      * Returns the bit string which takes up the rest of this buffer.
+     * @return BitString.
+     * @throws IOException When no it possible read data.
      */
     byte[] getBitString() throws IOException {
         return getBitString(available());
@@ -234,6 +244,8 @@ class DerInputBuffer extends ByteArrayInputStream implements Cloneable {
     /**
      * Returns the bit string which takes up the rest of this buffer.
      * The bit string need not be byte-aligned.
+     * @return BitArray.
+     * @throws IOException When no it possible read data.
      */
     BitArray getUnalignedBitString() throws IOException {
         if (this.pos >= this.count) {

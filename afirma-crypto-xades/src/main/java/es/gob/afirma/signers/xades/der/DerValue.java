@@ -178,22 +178,27 @@ public class DerValue {
 
     /**
      * Returns true if the tag class is UNIVERSAL.
+     * @return true if the tag class is UNIVERSAL.
      */
     public boolean isUniversal()      { return (this.tag & 0x0c0) == 0x000; }
 
     /**
      * Returns true if the tag class is APPLICATION.
+     * @return true if the tag class is APPLICATION.
      */
     public boolean isApplication()    { return (this.tag & 0x0c0) == 0x040; }
 
     /**
-     * Returns true iff the CONTEXT SPECIFIC bit is set in the type tag.
+     * Returns true if the CONTEXT SPECIFIC bit is set in the type tag.
      * This is associated with the ASN.1 "DEFINED BY" syntax.
+     * @return true if the CONTEXT SPECIFIC bit is set in the type tag.
      */
     public boolean isContextSpecific() { return (this.tag & 0x0c0) == 0x080; }
 
     /**
-     * Returns true iff the CONTEXT SPECIFIC TAG matches the passed tag.
+     * Returns true if the CONTEXT SPECIFIC TAG matches the passed tag.
+     * @param cntxtTag Content specific tag.
+     * @return true if the CONTEXT SPECIFIC TAG matches the passed tag.
      */
     public boolean isContextSpecific(final byte cntxtTag) {
         if (!isContextSpecific()) {
@@ -204,11 +209,16 @@ public class DerValue {
 
     boolean isPrivate()        { return (this.tag & 0x0c0) == 0x0c0; }
 
-    /** Returns true iff the CONSTRUCTED bit is set in the type tag. */
+    /**
+     * Returns true if the CONSTRUCTED bit is set in the type tag.
+     * @return true if the CONSTRUCTED bit is set in the type tag.
+     */
     public boolean isConstructed()    { return (this.tag & 0x020) == 0x020; }
 
     /**
-     * Returns true iff the CONSTRUCTED TAG matches the passed tag.
+     * Returns true if the CONSTRUCTED TAG matches the passed tag.
+     * @param constructedTag Constructed tag.
+     * @return true if the CONSTRUCTED TAG matches the passed tag.
      */
     public boolean isConstructed(final byte constructedTag) {
         if (!isConstructed()) {
@@ -219,6 +229,8 @@ public class DerValue {
 
     /**
      * Creates a PrintableString or UTF8string DER value from a string
+     * @param value the String object to use for the DER value
+     * @throws IOException When it is a invalid string.
      */
     public DerValue(final String value) throws IOException {
         boolean isPrintableString = true;
@@ -236,6 +248,7 @@ public class DerValue {
      * Creates a string type DER value from a String object
      * @param stringTag the tag for the DER value to create
      * @param value the String object to use for the DER value
+     * @throws IOException When it is a invalid value.
      */
     public DerValue(final byte stringTag, final String value) throws IOException {
         this.data = init(stringTag, value);
@@ -317,6 +330,7 @@ public class DerValue {
      * its tag and length.
      *
      * @param buf buffer holding a single DER-encoded datum.
+     * @throws IOException When fail to read data.
      */
     public DerValue(final byte[] buf) throws IOException {
         this(buf, true);
@@ -336,7 +350,8 @@ public class DerValue {
      *
      * @param buf the buffer
      * @param offset start point of the single DER-encoded dataum
-     * @param length how many bytes are in the encoded datum
+     * @param len how many bytes are in the encoded datum
+     * @throws IOException When fail to read data.
      */
     public DerValue(final byte[] buf, final int offset, final int len) throws IOException {
         this(buf, offset, len, true);
@@ -356,6 +371,7 @@ public class DerValue {
      *
      * @param in the input stream holding a single DER datum,
      *  which may be followed by additional data
+     * @throws IOException When fail to read data.
      */
     public DerValue(final InputStream in) throws IOException {
         this(in, true);
@@ -435,6 +451,8 @@ public class DerValue {
 
     /**
      * Encode an ASN1/DER encoded datum onto a DER output stream.
+     * @param out DER output stream
+     * @throws IOException When fail to write data.
      */
     public void encode(final DerOutputStream out)
     throws IOException {
@@ -466,6 +484,7 @@ public class DerValue {
      * Returns an ASN.1 BOOLEAN
      *
      * @return the boolean held in this DER value
+     * @throws IOException When next data is not a boolean value.
      */
     public boolean getBoolean() throws IOException {
         if (this.tag != tag_Boolean) {
@@ -485,6 +504,7 @@ public class DerValue {
      * Returns an ASN.1 OBJECT IDENTIFIER.
      *
      * @return the OID held in this DER value
+     * @throws IOException When next data is not a OID value.
      */
     public ObjectIdentifier getOID() throws IOException {
         if (this.tag != tag_ObjectId) {
@@ -509,6 +529,7 @@ public class DerValue {
      * Returns an ASN.1 OCTET STRING
      *
      * @return the octet string held in this DER value
+     * @throws IOException When next data is not a OctetString value.
      */
     public byte[] getOctetString() throws IOException {
 
@@ -547,6 +568,7 @@ public class DerValue {
      * Returns an ASN.1 INTEGER value as an integer.
      *
      * @return the integer held in this DER value.
+     * @throws IOException When next data is not a Integer value.
      */
     public int getInteger() throws IOException {
         if (this.tag != tag_Integer) {
@@ -559,6 +581,7 @@ public class DerValue {
      * Returns an ASN.1 INTEGER value as a BigInteger.
      *
      * @return the integer held in this DER value as a BigInteger.
+     * @throws IOException When next data is not a BigInteger value.
      */
     public BigInteger getBigInteger() throws IOException {
         if (this.tag != tag_Integer) {
@@ -573,6 +596,7 @@ public class DerValue {
      * some values as negative.
      *
      * @return the integer held in this DER value as a BigInteger.
+     * @throws IOException When next data is not a BigInteger value.
      */
     public BigInteger getPositiveBigInteger() throws IOException {
         if (this.tag != tag_Integer) {
@@ -585,6 +609,7 @@ public class DerValue {
      * Returns an ASN.1 ENUMERATED value.
      *
      * @return the integer held in this DER value.
+     * @throws IOException When next data is not a Enumerated value.
      */
     public int getEnumerated() throws IOException {
         if (this.tag != tag_Enumerated) {
@@ -598,6 +623,7 @@ public class DerValue {
      * Returns an ASN.1 BIT STRING value.  The bit string must be byte-aligned.
      *
      * @return the bit string held in this value
+     * @throws IOException When next data is not a BitString value.
      */
     public byte[] getBitString() throws IOException {
         if (this.tag != tag_BitString) {
@@ -612,6 +638,7 @@ public class DerValue {
      * Returns an ASN.1 BIT STRING value that need not be byte-aligned.
      *
      * @return a BitArray representing the bit string held in this value
+     * @throws IOException When next data is not a BitArray value.
      */
     public BitArray getUnalignedBitString() throws IOException {
         if (this.tag != tag_BitString) {
@@ -625,6 +652,8 @@ public class DerValue {
     /**
      * Returns the name component as a Java string, regardless of its
      * encoding restrictions (ASCII, T61, Printable, IA5, BMP, UTF8).
+     * @return Name component.
+     * @throws IOException When no it possible load data.
      */
     // TBD: Need encoder for UniversalString before it can be handled.
     public String getAsString() throws IOException {
@@ -649,8 +678,9 @@ public class DerValue {
      * Returns an ASN.1 BIT STRING value, with the tag assumed implicit
      * based on the parameter.  The bit string must be byte-aligned.
      *
-     * @params tagImplicit if true, the tag is assumed implicit.
+     * @param tagImplicit if true, the tag is assumed implicit.
      * @return the bit string held in this value
+     * @throws IOException When the tag is incorrect.
      */
     public byte[] getBitString(final boolean tagImplicit) throws IOException {
         if (!tagImplicit) {
@@ -666,8 +696,9 @@ public class DerValue {
      * Returns an ASN.1 BIT STRING value, with the tag assumed implicit
      * based on the parameter.  The bit string need not be byte-aligned.
      *
-     * @params tagImplicit if true, the tag is assumed implicit.
+     * @param tagImplicit if true, the tag is assumed implicit.
      * @return the bit string held in this value
+     * @throws IOException When the tag is incorrect.
      */
     public BitArray getUnalignedBitString(final boolean tagImplicit)
     throws IOException {
@@ -683,6 +714,8 @@ public class DerValue {
     /**
      * Helper routine to return all the bytes contained in the
      * DerInputStream associated with this object.
+     * @return Content.
+     * @throws IOException When no it possible load data.
      */
     public byte[] getDataBytes() throws IOException {
         final byte[] retVal = new byte[this.length];
@@ -697,6 +730,7 @@ public class DerValue {
      * Returns an ASN.1 STRING value
      *
      * @return the printable string held in this value
+     * @throws IOException When no it possible load data.
      */
     public String getPrintableString()
     throws IOException {
@@ -712,6 +746,7 @@ public class DerValue {
      * Returns an ASN.1 T61 (Teletype) STRING value
      *
      * @return the teletype string held in this value
+     * @throws IOException When no it possible load data.
      */
     public String getT61String() throws IOException {
         if (this.tag != tag_T61String) {
@@ -726,6 +761,7 @@ public class DerValue {
      * Returns an ASN.1 IA5 (ASCII) STRING value
      *
      * @return the ASCII string held in this value
+     * @throws IOException When no it possible load data.
      */
     public String getIA5String() throws IOException {
         if (this.tag != tag_IA5String) {
@@ -741,6 +777,7 @@ public class DerValue {
      *
      * @return a string corresponding to the encoded BMPString held in
      * this value
+     * @throws IOException When no it possible load data.
      */
     public String getBMPString() throws IOException {
         if (this.tag != tag_BMPString) {
@@ -758,6 +795,7 @@ public class DerValue {
      *
      * @return a string corresponding to the encoded UTF8String held in
      * this value
+     * @throws IOException When no it possible load data.
      */
     public String getUTF8String() throws IOException {
         if (this.tag != tag_UTF8String) {
@@ -773,6 +811,7 @@ public class DerValue {
      *
      * @return a string corresponding to the encoded GeneralString held in
      * this value
+     * @throws IOException When no it possible load data.
      */
     public String getGeneralString() throws IOException {
         if (this.tag != tag_GeneralString) {
@@ -829,6 +868,8 @@ public class DerValue {
      * efficient way to establish equivalence of the unencoded values.
      *
      * @param other the object being compared with this one
+     * @return {@code true} if the object is a DerValue with the same
+     * content.
      */
     public boolean equals(final DerValue other) {
         if (this == other) {
@@ -850,6 +891,10 @@ public class DerValue {
 
     /**
      * Helper for public method equals()
+     * @param d1 Value 1.
+     * @param d2 Value 2.
+     * @return {@code true} if the object is a DerValue with the same
+     * content.
      */
     private static boolean doEquals(final DerValue d1, final DerValue d2) {
         synchronized (d1.data) {
@@ -893,6 +938,7 @@ public class DerValue {
      * DerValue constructor, a value equivalent to "this" is returned.
      *
      * @return DER-encoded value, including tag and length.
+     * @throws IOException When no it possible load data.
      */
     public byte[] toByteArray() throws IOException {
         final DerOutputStream out = new DerOutputStream();
@@ -907,6 +953,8 @@ public class DerValue {
      * to return a DER stream of the members of the set or sequence.
      * This operation is not supported for primitive types such as
      * integers or bit strings.
+     * @return DER stream of the members of the set or sequence.
+     * @throws IOException When no it possible load data.
      */
     public DerInputStream toDerInputStream() throws IOException {
         if (this.tag == tag_Sequence || this.tag == tag_Set) {
@@ -917,6 +965,7 @@ public class DerValue {
 
     /**
      * Get the length of the encoded value.
+     * @return Length.
      */
     public int length() {
         return this.length;
@@ -938,6 +987,9 @@ public class DerValue {
      * and the control codes (0-31 and 127).
      *
      * This list is based on X.680 (the ASN.1 spec).
+     * @param ch Character.
+     * @return {@code true} if the character is one of the permissible
+     * characters for PrintableString.
      */
     public static boolean isPrintableStringChar(final char ch) {
         if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' ||
@@ -967,11 +1019,12 @@ public class DerValue {
     /**
      * Create the tag of the attribute.
      *
-     * @params class the tag class type, one of UNIVERSAL, CONTEXT,
+     * @param tagClass the tag class type, one of UNIVERSAL, CONTEXT,
      *               APPLICATION or PRIVATE
-     * @params form if true, the value is constructed, otherwise it
+     * @param form if true, the value is constructed, otherwise it
      * is primitive.
-     * @params val the tag value
+     * @param val the tag value
+     * @return Tag value.
      */
     public static byte createTag(final byte tagClass, final boolean form, final byte val) {
         byte tag = (byte)(tagClass | val);
@@ -985,7 +1038,7 @@ public class DerValue {
      * Set the tag of the attribute. Commonly used to reset the
      * tag value used for IMPLICIT encodings.
      *
-     * @params tag the tag value
+     * @param tag the tag value
      */
     public void resetTag(final byte tag) {
         this.tag = tag;
@@ -1061,7 +1114,6 @@ public class DerValue {
      * It is strongly recommended that the stream be promptly closed if an I/O
      * error occurs.
      *
-     * @implNote
      * The number of bytes allocated to read data from this stream and return
      * the result is bounded by {@code 2*(long)len}, inclusive.
      *

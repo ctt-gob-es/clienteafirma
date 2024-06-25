@@ -126,6 +126,8 @@ public final class KeyStorePreferencesManager {
 	/**
 	 * Registra los almacenes de claves de tarjetas inteligentes para el usuario, ignorando
 	 * aquellos que ya estuviesen definidos.
+	 * @param smartCards Mapa de tarjetas configuradas con su nombre y la ruta de la biblioteca
+	 * PKCS#11.
 	 */
 	public static void putUserSmartCardsMap(final Map<String, Object> smartCards) {
 
@@ -146,6 +148,8 @@ public final class KeyStorePreferencesManager {
 
 	/**
 	 * Registra los almacenes de claves de tarjetas inteligentes para el sistema.
+	 * @param smartCards Mapa de tarjetas configuradas con su nombre y la ruta de la biblioteca
+	 * PKCS#11.
 	 */
 	public static void putSystemSmartCardsMap(final Map<String, Object> smartCards) {
 

@@ -63,7 +63,6 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.keystores.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
@@ -204,9 +203,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
 	private CommonWaitDialog signWaitDialog = null;
 
-    /** Firma el fichero actualmente cargado.
-     * @throws AOKeystoreAlternativeException Error al seleccionar el tipo de certificado.
-     * @throws IOException Error al leer almac&eacute;n. */
+    /** Firma el fichero actualmente cargado. */
     public void sign() {
 
     	// Si se trata de firmar un documento que sabemos que es una firma invalida y no se
@@ -306,8 +303,6 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     /**
      * Inicia el proceso de firma.
      * @param signConfigs Operaciones de firma a ejecutar.
-     * @throws AOKeystoreAlternativeException Error al seleccionar el tipo de certificado.
-     * @throws IOException Error al leer almac&eacute;n.
      */
     @Override
     public void initSignTask(final List<SignOperationConfig> signConfigs) {

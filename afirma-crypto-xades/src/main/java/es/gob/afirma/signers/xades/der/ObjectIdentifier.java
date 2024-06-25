@@ -145,6 +145,8 @@ class ObjectIdentifier implements Serializable
     /**
      * Constructs, from a string.  This string should be of the form 1.23.56.
      * Validity check included.
+     * @param oid OID string.
+     * @throws IOException indicates a decoding error
      */
     public ObjectIdentifier (final String oid) throws IOException
     {
@@ -219,6 +221,8 @@ class ObjectIdentifier implements Serializable
     /**
      * Constructor, from an array of integers.
      * Validity check included.
+     * @param values OID fragments.
+     * @throws IOException indicates a decoding error
      */
     public ObjectIdentifier (final int values []) throws IOException
     {
@@ -241,7 +245,7 @@ class ObjectIdentifier implements Serializable
      * input stream has not been returned to its "initial" state.
      *
      * @param in DER-encoded data holding an object ID
-     * @exception IOException indicates a decoding error
+     * @throws IOException indicates a decoding error
      */
     public ObjectIdentifier (final DerInputStream in) throws IOException
     {
@@ -316,6 +320,8 @@ class ObjectIdentifier implements Serializable
      *
      * Old doc: Create a new ObjectIdentifier for internal use. The values are
      * neither checked nor cloned.
+     * @param values Object identifier fragments.
+     * @return ObjectIdentifier
      */
     public static ObjectIdentifier newInternal(final int[] values) {
         try {
@@ -335,6 +341,9 @@ class ObjectIdentifier implements Serializable
     }
 
     /**
+     * Compares this identifier with another, for equality.
+     * @param other Object to compare.
+     * @return true iff the names are identical.
      * @deprecated Use equals((Object)oid)
      */
     @Deprecated
@@ -344,7 +353,7 @@ class ObjectIdentifier implements Serializable
 
     /**
      * Compares this identifier with another, for equality.
-     *
+     * @param obj Object to compare
      * @return true iff the names are identical.
      */
     @Override

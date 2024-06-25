@@ -309,9 +309,10 @@ public final class SimpleKeyStoreManager {
     }
 
     /**
-     * Obtiene el &uacuteltimo almac&eacute;n de claves seleccionado por el usuario. En caso de que no est&eacute;
+     * Obtiene el &uacute;ltimo almac&eacute;n de claves seleccionado por el usuario. En caso de que no est&eacute;
      * definido o no sea un almac&eacute;n v&aacute;lido, se haya seleccionado.
-     * @return Almac&eacute;n de claves seleccionado por el usuario. */
+     * @return Almac&eacute;n de claves seleccionado por el usuario.
+     */
     public static AOKeyStore getLastSelectedKeystore() {
     	final String savedStoreName = KeyStorePreferencesManager.getLastSelectedKeystore();
     	return getValidKeyStoreType(savedStoreName);

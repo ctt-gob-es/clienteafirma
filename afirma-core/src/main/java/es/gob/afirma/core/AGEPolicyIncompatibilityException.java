@@ -44,6 +44,8 @@ public class AGEPolicyIncompatibilityException extends CustomRuntimeConfigNeeded
 	/**
 	 * Crear la excepci&oacute;n motivada por lo indicado en el mensaje.
 	 * @param message Mensaje descriptivo del problema.
+	 * @param operation C&oacute;digo de operaci&oacute;n que identifica el mensaje de solicitud
+	 * de confirmaci&oacute;n al usuario.
 	 */
 	public AGEPolicyIncompatibilityException(final String message, final int operation) {
 		super(message, RuntimeConfigNeededException.RequestType.CONFIRM, getMessageCode(operation), EXTRA_PARAM_NEEDED);
@@ -61,6 +63,8 @@ public class AGEPolicyIncompatibilityException extends CustomRuntimeConfigNeeded
 	/**
 	 * Crear la excepci&oacute;n motivada por lo indicado en el mensaje.
 	 * @param message Mensaje descriptivo del problema.
+	 * @param operation C&oacute;digo de operaci&oacute;n que identifica el mensaje de solicitud
+	 * de confirmaci&oacute;n al usuario.
 	 * @param cause Origen del problema.
 	 */
 	public AGEPolicyIncompatibilityException(final String message, final int operation, final Throwable cause) {

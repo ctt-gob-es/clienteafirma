@@ -108,20 +108,26 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	JDialog certDialog = null;
 
-	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
+	/**
+	 * Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Alias del certificado seleccionado o {@code null} si el usuario
 	 * cancela el di&aacute;logo o cierra sin seleccionar.
 	 * @throws CertificatesNotFoundException Cuando no el usuario cierra el
-	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido. */
+	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido.
+	 */
 	public String showDialog() throws  CertificatesNotFoundException {
 		return showDialog(true);
 	}
 
-	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
+	/**
+	 * Muestra el di&aacute;logo de selecci&oacute;n de certificados.
+	 * @param alwaysOnTop {@code true} si el di&aacute;logo se debe mantener por encima del resto
+	 * de ventanas, {@code false} en caso contrario.
 	 * @return Alias del certificado seleccionado o {@code null} si el usuario
 	 * cancela el di&aacute;logo o cierra sin seleccionar.
 	 * @throws CertificatesNotFoundException Cuando no el usuario cierra el
-	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido. */
+	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido.
+	 */
 	public String showDialog(final boolean alwaysOnTop) throws  CertificatesNotFoundException {
 
 		String title = CertificateSelectionDialogMessages.getString(
@@ -279,22 +285,18 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		}
 	}
 
-	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = new Comparator<NameCertificateBean>() {
-		/** {@inheritDoc} */
-		@Override
-		public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
-			if (o1 == null && o2 == null) {
-				return 0;
-			}
-			if (o1 == null) {
-				return 1;
-			}
-			else if (o2 == null) {
-				return -1;
-			}
-			else{
-				return o1.getName().compareToIgnoreCase(o2.getName());
-			}
+	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = (o1, o2) -> {
+		if (o1 == null && o2 == null) {
+			return 0;
+		}
+		if (o1 == null) {
+			return 1;
+		}
+		else if (o2 == null) {
+			return -1;
+		}
+		else{
+			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
 	};
 

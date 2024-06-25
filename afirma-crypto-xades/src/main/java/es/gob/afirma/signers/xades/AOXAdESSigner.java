@@ -916,7 +916,6 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
-     * @param dereferencer Derreferenciador a medida.
      * @return Contrafirma en formato XAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
      */

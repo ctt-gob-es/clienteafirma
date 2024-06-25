@@ -52,6 +52,8 @@ public class BitArray {
 
     /**
      * Creates a BitArray of the specified size, initialized to zeros.
+     * @param length Array length.
+     * @throws IllegalArgumentException When incorrect length is be used.
      */
     public BitArray(final int length) throws IllegalArgumentException {
         if (length < 0) {
@@ -69,7 +71,10 @@ public class BitArray {
      * specified byte array.  The most significant bit of a[0] gets
      * index zero in the BitArray.  The array a must be large enough
      * to specify a value for every bit in the BitArray.  In other words,
-     * 8*a.length <= length.
+     * 8*a.length &lt;= length.
+     * @param length Array length.
+     * @param a Initial content.
+     * @throws IllegalArgumentException When incorrect length is be used.
      */
     public BitArray(final int length, final byte[] a) throws IllegalArgumentException {
 
@@ -102,6 +107,7 @@ public class BitArray {
     /**
      * Create a BitArray whose bits are those of the given array
      * of Booleans.
+     * @param bits Content.
      */
     public BitArray(final boolean[] bits) {
         this.length = bits.length;
@@ -123,6 +129,9 @@ public class BitArray {
 
     /**
      *  Returns the indexed bit in this BitArray.
+     *  @param index Array index.
+     *  @return bit in this BitArray.
+     *  @throws ArrayIndexOutOfBoundsException When Array index is out of bounds.
      */
     public boolean get(final int index) throws ArrayIndexOutOfBoundsException {
         if (index < 0 || index >= this.length) {
@@ -134,6 +143,8 @@ public class BitArray {
 
     /**
      *  Sets the indexed bit in this BitArray.
+     *  @param index Array index.
+     *  @param value Value.
      */
     public void set(final int index, final boolean value)
     throws ArrayIndexOutOfBoundsException {
@@ -152,6 +163,7 @@ public class BitArray {
 
     /**
      * Returns the length of this BitArray.
+     * @return Length.
      */
     public int length() {
         return this.length;
@@ -165,6 +177,7 @@ public class BitArray {
      * will be contain zeros in any bits that do not have corresponding
      * bits in the BitArray.  (This matters only if the BitArray's size
      * is not a multiple of 8.)
+     * @return Content of this BitArray.
      */
     public byte[] toByteArray() {
         return this.repn.clone();
@@ -195,6 +208,7 @@ public class BitArray {
 
     /**
      * Return a boolean array with the same bit values a this BitArray.
+     * @return Content of this BitArray as booleans.
      */
     public boolean[] toBooleanArray() {
         final boolean[] bits = new boolean[this.length];

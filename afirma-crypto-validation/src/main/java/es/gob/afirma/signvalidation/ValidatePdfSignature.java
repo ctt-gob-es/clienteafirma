@@ -103,7 +103,7 @@ public final class ValidatePdfSignature extends SignValider {
 		PdfReader reader;
 		try {
 			reader = PdfUtil.getPdfReader(sign, params,
-					Boolean.parseBoolean(params.getProperty(PdfExtraParams.HEADLESS)));		
+					Boolean.parseBoolean(params.getProperty(PdfExtraParams.HEADLESS)));
 			af = reader.getAcroFields();
 		}
 		catch (final Exception e) {
@@ -203,10 +203,11 @@ public final class ValidatePdfSignature extends SignValider {
 
 
 
-	/** Valida una firma PDF (PKCS#7/PAdES). En caso de validar los certificados de firma,
+	/**
+	 * Valida una firma PDF (PKCS#7/PAdES). En caso de validar los certificados de firma,
 	 * s&oacute;lo se validar&aacute; el periodo de caducidad.
      * @param signName Nombre de firma.
-     * @param params Par&aacute;metros a tener en cuenta para la validaci&oacute;n.
+     * @param signAcrofields Campos de firma.
      * @param signProfile Perfil de firma.
      * @param checkCert Indica si se comprueba la validez del certificado o no.
      * @return Lista con las validaciones realizadas en la firma.
@@ -214,7 +215,8 @@ public final class ValidatePdfSignature extends SignValider {
      * que podr&iacute;a operarse sobre la firma si se cuenta con m&aacute;s informaci&oacute;n del
      * usuario.
      * @throws IOException Si ocurren problemas relacionados con la lectura del documento
-     * o si no se encuentran firmas PDF en el documento. */
+     * o si no se encuentran firmas PDF en el documento.
+     */
 	public static List<SignValidity> validateSign(final String signName, final AcroFields signAcrofields, final String signProfile, final boolean checkCert)
 			throws RuntimeConfigNeededException, IOException {
 

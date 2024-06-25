@@ -59,6 +59,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	 * Construye el objeto para la gesti&oacute;n de los eventos del di&aacute;logo de
 	 * gesti&oacute;n de plugins.
 	 * @param view Panel sobre en el que encuentran los componentes que gestinar.
+	 * @param pluginsManager Administrador de plugins.
 	 */
 	public PluginsManagementHandler(final PluginsManagementPanel view, final PluginsManager pluginsManager) {
 		this.view = view;

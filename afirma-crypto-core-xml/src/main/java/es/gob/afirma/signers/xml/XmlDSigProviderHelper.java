@@ -26,7 +26,14 @@ public class XmlDSigProviderHelper {
     	configureXmlDSigProvider(false, true);
     }
 
-    /** Configura el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso. */
+    /**
+     * Configura el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso.
+     * @param forced {@code true} para forzar a que se configure incluso si ya se configur&oacute;
+     * anteriormente, {@code false} en caso contrario.
+     * @param apachePreferred {@code true} para indicar que se configure un proveedor de Apache
+     * Santuario externo (que se habra agregado como dependencia), {@code false} para indicar el
+     * Apache Santuario interno de Java.
+     */
     public static void configureXmlDSigProvider(final boolean forced, final boolean apachePreferred) {
 
     	// Omitimos la configuracion si ya se realizo previamente
@@ -59,10 +66,8 @@ public class XmlDSigProviderHelper {
     	System.setProperty("com.sun.org.apache.xml.internal.security.lineFeedOnly", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
     	// A partir de Apache Santuario 2.1.2 se implementa la siguiente propiedad, tambien disponible
-    	// con Java 11.0.5 (que actualiza la version interna de Apache santuario a la 2.1.3).
+    	// con Java 11.0.5 que actualiza la version interna de Apache santuario a la 2.1.3.
     	System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-
-
 
     	// Si damos preferencia al proveedor de Apache, nos aseguramos de que este el primero de la lista
     	final String providerName = apachePreferred ? APACHE_PROVIDER_CLASS : SUN_PROVIDER_CLASS;

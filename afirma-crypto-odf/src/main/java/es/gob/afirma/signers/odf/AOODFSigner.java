@@ -583,7 +583,7 @@ public final class AOODFSigner implements AOSigner {
                               final Properties extraParams) {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros ODF"); //$NON-NLS-1$
     }
-    
+
     /** {@inheritDoc} */
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
@@ -674,13 +674,13 @@ public final class AOODFSigner implements AOSigner {
             return new AOTreeModel(new AOTreeNode("Ra\u00EDz")); //$NON-NLS-1$
         }
     }
-    
+
     /** Indica si los datos indicados son un documento ODF susceptible de contener una firma
      * electr&oacute;nica.
      * @param signData Datos que deseamos comprobar.
      * @return Devuelve <code>true</code> si los datos indicados son un documento ODF susceptible de contener una firma
      * electr&oacute;nica, <code>false</code> en caso contrario.
-     * @throws IOException Si ocurren problemas durante la lectura de la firma */	
+     * @throws IOException Si ocurren problemas durante la lectura de la firma */
 	@Override
 	public boolean isSign(final byte[] signData) throws IOException {
 		return isSign(signData, null);
@@ -773,9 +773,9 @@ public final class AOODFSigner implements AOSigner {
             LOGGER.severe("Error al escribir el cuerpo del XML: " + ex); //$NON-NLS-1$
         }
     }
-    
+
     /** Si la entrada es un documento ODF, devuelve el mismo documento sin ninguna modificaci&oacute;n.
-     * @param signData Documento ODF
+     * @param sign Documento ODF
      * @return Documento de entrada si este es ODF, <code>null</code> en cualquier otro caso
      * @throws IOException Si ocurren problemas al leer la firma */
 	@Override
@@ -794,7 +794,7 @@ public final class AOODFSigner implements AOSigner {
         // TODO: Por ahora, devolveremos el propio ODF firmado.
         return sign;
     }
-    
+
     /** {@inheritDoc} */
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data) throws AOException, IOException {

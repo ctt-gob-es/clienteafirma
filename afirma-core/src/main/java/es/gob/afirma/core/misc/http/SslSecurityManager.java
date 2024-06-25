@@ -22,7 +22,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -52,7 +51,7 @@ public final class SslSecurityManager {
 		}
 	};
 
-	static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
+		static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
 		@Override
 		public boolean verify(final String hostname, final SSLSession session) {
 			return true;
@@ -79,6 +78,7 @@ public final class SslSecurityManager {
 
 	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
 	 * cualquier certificado.
+	 * @param conn Conexi&oacute;n de la que desactivar las comprobaciones SSL.
 	 * @throws GeneralSecurityException Si hay problemas al desactivar el uso de almacen de claves. */
 	public static void disableSslChecks(final HttpsURLConnection conn) throws GeneralSecurityException {
 

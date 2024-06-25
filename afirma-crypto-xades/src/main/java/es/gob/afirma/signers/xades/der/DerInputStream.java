@@ -73,6 +73,7 @@ public class DerInputStream {
      * as read-only.
      *
      * @param data the buffer from which to create the string (CONSUMED)
+     * @throws IOException When no it possible load data.
      */
     public DerInputStream(final byte[] data) throws IOException {
         init(data, 0, data.length, true);
@@ -91,6 +92,7 @@ public class DerInputStream {
      *          starting at "offset"
      * @param allowBER whether to allow constructed indefinite-length
      *          encoding as well as tolerate leading 0s
+     * @throws IOException When no it possible load data.
      */
     public DerInputStream(final byte[] data, final int offset, final int len,
         final boolean allowBER) throws IOException {
@@ -107,6 +109,7 @@ public class DerInputStream {
      *          be read as DER input in the new stream
      * @param len how long a chunk of the buffer to use,
      *          starting at "offset"
+     * @throws IOException When no it possible load data.
      */
     public DerInputStream(final byte[] data, final int offset, final int len) throws IOException {
         init(data, offset, len, true);
@@ -150,6 +153,8 @@ public class DerInputStream {
      *          be skipped.  If this value is false, the next data read
      *          on this stream and the newly created stream will be the
      *          same.
+     * @return DER input stream.
+     * @throws IOException When no it possible load data.
      */
     public DerInputStream subStream(final int len, final boolean do_skip)
     throws IOException {
@@ -165,6 +170,7 @@ public class DerInputStream {
     /**
      * Return what has been written to this DerInputStream
      * as a byte array. Useful for debugging.
+     * @return Input stream content.
      */
     public byte[] toByteArray() {
         return this.buffer.toByteArray();
@@ -184,6 +190,7 @@ public class DerInputStream {
      * Get an integer from the input stream as an integer.
      *
      * @return the integer held in this DER input stream.
+     * @throws IOException When no it possible load data.
      */
     public int getInteger() throws IOException {
         if (this.buffer.read() != DerValue.tag_Integer) {
@@ -196,6 +203,7 @@ public class DerInputStream {
      * Get a integer from the input stream as a BigInteger object.
      *
      * @return the integer held in this DER input stream.
+     * @throws IOException When no it possible load data.
      */
     public BigInteger getBigInteger() throws IOException {
         if (this.buffer.read() != DerValue.tag_Integer) {
@@ -210,6 +218,7 @@ public class DerInputStream {
      * some values as negative.
      *
      * @return the integer held in this DER value as a BigInteger.
+     * @throws IOException When no it possible load data.
      */
     public BigInteger getPositiveBigInteger() throws IOException {
         if (this.buffer.read() != DerValue.tag_Integer) {
@@ -222,6 +231,7 @@ public class DerInputStream {
      * Get an enumerated from the input stream.
      *
      * @return the integer held in this DER input stream.
+     * @throws IOException When no it possible load data.
      */
     public int getEnumerated() throws IOException {
         if (this.buffer.read() != DerValue.tag_Enumerated) {
@@ -233,6 +243,8 @@ public class DerInputStream {
     /**
      * Get a bit string from the input stream. Padded bits (if any)
      * will be stripped off before the bit string is returned.
+     * @return a bit string from the input stream.
+     * @throws IOException When no it possible load data.
      */
     public byte[] getBitString() throws IOException {
         if (this.buffer.read() != DerValue.tag_BitString) {
@@ -245,6 +257,8 @@ public class DerInputStream {
     /**
      * Get a bit string from the input stream.  The bit string need
      * not be byte-aligned.
+     * @return an BitArray.
+     * @throws IOException When no it possible load data.
      */
     public BitArray getUnalignedBitString() throws IOException {
         if (this.buffer.read() != DerValue.tag_BitString) {
@@ -277,6 +291,8 @@ public class DerInputStream {
 
     /**
      * Returns an ASN.1 OCTET STRING from the input stream.
+     * @return an ASN.1 OCTET STRING.
+     * @throws IOException When no it possible load data.
      */
     public byte[] getOctetString() throws IOException {
         if (this.buffer.read() != DerValue.tag_OctetString) {
@@ -294,6 +310,8 @@ public class DerInputStream {
 
     /**
      * Returns the asked number of bytes from the input stream.
+     * @param val Buffer to store the bytes readed.
+     * @throws IOException When no it possible load data.
      */
     public void getBytes(final byte[] val) throws IOException {
         if (val.length != 0 && this.buffer.read(val) != val.length) {
@@ -303,6 +321,7 @@ public class DerInputStream {
 
     /**
      * Reads an encoded null value from the input stream.
+     * @throws IOException When no it possible load data.
      */
     public void getNull() throws IOException {
         if (this.buffer.read() != DerValue.tag_Null || this.buffer.read() != 0) {
@@ -312,6 +331,8 @@ public class DerInputStream {
 
     /**
      * Reads an X.200 style Object Identifier from the stream.
+     * @return an X.200 style Object Identifier.
+     * @throws IOException When no it possible load data.
      */
     public ObjectIdentifier getOID() throws IOException {
         return new ObjectIdentifier(this);
@@ -326,6 +347,7 @@ public class DerInputStream {
      * @param startLen guess about how long the sequence will be
      *          (used to initialize an auto-growing data structure)
      * @return array of the values in the sequence
+     * @throws IOException When no it possible load data.
      */
     public DerValue[] getSequence(final int startLen) throws IOException {
         this.tag = (byte)this.buffer.read();
@@ -344,6 +366,7 @@ public class DerInputStream {
      * @param startLen guess about how large the set will be
      *          (used to initialize an auto-growing data structure)
      * @return array of the values in the sequence
+     * @throws IOException When no it possible load data.
      */
     public DerValue[] getSet(final int startLen) throws IOException {
         this.tag = (byte)this.buffer.read();
@@ -363,6 +386,7 @@ public class DerInputStream {
      *          (used to initialize an auto-growing data structure)
      * @param implicit if true tag is assumed implicit.
      * @return array of the values in the sequence
+     * @throws IOException When no it possible load data.
      */
     public DerValue[] getSet(final int startLen, final boolean implicit)
         throws IOException {
@@ -457,6 +481,8 @@ public class DerInputStream {
      * and defer parsing it.  For example, you can pull a nested
      * sequence out with one call, and only examine its elements
      * later when you really need to.
+     * @return a single DER-encoded value.
+     * @throws IOException When no it possible load data.
      */
     public DerValue getDerValue() throws IOException {
         return new DerValue(this.buffer);
@@ -464,6 +490,8 @@ public class DerInputStream {
 
     /**
      * Read a string that was encoded as a UTF8String DER value.
+     * @return a string that was encoded as a UTF8String DER value.
+     * @throws IOException When no it possible load data.
      */
     public String getUTF8String() throws IOException {
         return readString(DerValue.tag_UTF8String, "UTF-8", "UTF8");
@@ -471,6 +499,8 @@ public class DerInputStream {
 
     /**
      * Read a string that was encoded as a PrintableString DER value.
+     * @return a string that was encoded as a PrintableString DER value.
+     * @throws IOException When no it possible load data from InputStream.
      */
     public String getPrintableString() throws IOException {
         return readString(DerValue.tag_PrintableString, "Printable",
@@ -479,6 +509,8 @@ public class DerInputStream {
 
     /**
      * Read a string that was encoded as a T61String DER value.
+     * @return a string that was encoded as a T61String DER value.
+     * @throws IOException When no it possible load data.
      */
     public String getT61String() throws IOException {
         /*
@@ -489,6 +521,8 @@ public class DerInputStream {
 
     /**
      * Read a string that was encoded as a IA5tring DER value.
+     * @return a string that was encoded as a IA5tring DER value.
+     * @throws IOException When no it possible load data.
      */
     public String getIA5String() throws IOException {
         return readString(DerValue.tag_IA5String, "IA5", "ASCII");
@@ -496,6 +530,8 @@ public class DerInputStream {
 
     /**
      * Read a string that was encoded as a BMPString DER value.
+     * @return a string that was encoded as a BMPString DER value.
+     * @throws IOException When no it possible load data.
      */
     public String getBMPString() throws IOException {
         return readString(DerValue.tag_BMPString, "BMP",
@@ -504,6 +540,8 @@ public class DerInputStream {
 
     /**
      * Read a string that was encoded as a GeneralString DER value.
+     * @return a string that was encoded as a GeneralString DER value.
+     * @throws IOException When no it possible load data from InputStream.
      */
     public String getGeneralString() throws IOException {
         return readString(DerValue.tag_GeneralString, "General",
@@ -517,6 +555,7 @@ public class DerInputStream {
      * @param stringName a name to display in error messages
      * @param enc the encoder to use to interpret the data. Should
      * correspond to the stringTag above.
+     * @throws IOException When no it possible load data.
      */
     private String readString(final byte stringTag, final String stringName,
                               final String enc) throws IOException {
@@ -638,6 +677,7 @@ public class DerInputStream {
     /**
      * Mark the current position in the buffer, so that
      * a later call to <code>reset</code> will return here.
+     * @param value current position in the buffer.
      */
     public void mark(final int value) { this.buffer.mark(value); }
 
@@ -654,6 +694,7 @@ public class DerInputStream {
      * Returns the number of bytes available for reading.
      * This is most useful for testing whether the stream is
      * empty.
+     * @return the number of bytes available for reading.
      */
     public int available() { return this.buffer.available(); }
 }

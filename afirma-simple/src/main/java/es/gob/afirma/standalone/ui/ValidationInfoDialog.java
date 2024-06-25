@@ -142,8 +142,8 @@ public class ValidationInfoDialog extends JDialog {
 		else if (DataAnalizerUtil.isFacturae(signData)) {
 			return new FacturaESignAnalyzer(signData);
 		}
-		// Comprobamos si es un fichero de firma CAdES o XAdES (los PDF, facturas, OOXML
-		// y ODF pasaran por las condiciones anteriores)
+		// Comprobamos si es un fichero de firma CAdES o XAdES (los PDF y facturas pasaran por las
+		// condiciones anteriores)
 		else {
 			AOSigner signer;
 			try {
