@@ -57,7 +57,7 @@
 		<afirma.legible.version>1_8_0</afirma.legible.version>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 
-		<jdk.version>1.7</jdk.version>
+		<jdk.version>1.8</jdk.version>
 		
 		<junit.version>4.13.2</junit.version>
 	</properties>
@@ -128,6 +128,12 @@
 				<groupId>es.uji.crypto.xades</groupId>
 				<artifactId>jxades</artifactId>
 				<version>0.2.2</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.santuario</groupId>
+				<artifactId>xmlsec</artifactId>
+				<version>3.0.5-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>

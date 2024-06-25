@@ -1,5 +1,6 @@
 package es.gob.afirma.signers.xades;
 
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -50,4 +51,14 @@ public final class KeyUtil {
 		return bcKey;
 	}
 
+	public static boolean isMsCapiPrivateKey(final Key key) {
+		try {
+			final Class<?> msCapiKey = Class.forName("sun.security.mscapi.CPrivateKey", false, KeyUtil.class.getClassLoader()); //$NON-NLS-1$
+			return msCapiKey.isAssignableFrom(key.getClass());
+		}
+		catch (final Exception e) {
+			LOGGER.info("La clase \"sun.security.mscapi.CPrivateKey\" no esta disponible para comprobar el tipo de clave"); //$NON-NLS-1$
+			return false;
+		}
+	}
 }

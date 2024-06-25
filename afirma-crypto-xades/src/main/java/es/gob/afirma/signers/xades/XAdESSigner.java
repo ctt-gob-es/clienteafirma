@@ -273,7 +273,6 @@ public final class XAdESSigner {
 		final String externalReferencesHashAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.PRECALCULATED_HASH_ALGORITHM, digestMethodAlgorithm);
 
-
 		String canonicalizationAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
 		if ("none".equalsIgnoreCase(canonicalizationAlgorithm)) { //$NON-NLS-1$
@@ -1410,7 +1409,7 @@ public final class XAdESSigner {
 					"OIDAsURN", //$NON-NLS-1$
 					dataOid,
 					null,
-					new ArrayList<String>(0));
+					new ArrayList<>(0));
 		}
 
 		return new DataObjectFormatImpl(

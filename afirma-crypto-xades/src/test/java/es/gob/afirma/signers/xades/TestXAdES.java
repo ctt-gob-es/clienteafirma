@@ -11,7 +11,6 @@
 package es.gob.afirma.signers.xades;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
@@ -29,15 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.xml.security.Init;
-import org.apache.xml.security.algorithms.SignatureAlgorithm;
-import org.apache.xml.security.c14n.Canonicalizer;
-import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.XMLUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -113,10 +104,18 @@ public final class TestXAdES {
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-//            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+    };
+
+    /** Algoritmos de firma a probar. */
+    private final static String[] ALGOS_EC = new String[] {
+            AOSignConstants.SIGN_ALGORITHM_SHA1WITHECDSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA512WITHECDSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA256WITHECDSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA384WITHECDSA
     };
 
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
@@ -894,10 +893,8 @@ public final class TestXAdES {
 
     	System.out.println("Prueba de firma de curva eliptica con JAVA: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-    	final String algorithm = "SHA256withECDSA";
-
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-        final PrivateKeyEntry pke;
+        PrivateKeyEntry pke;
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_EC_PATH), CERT_EC_PASS.toCharArray());
@@ -905,73 +902,49 @@ public final class TestXAdES {
 
         final AOSigner signer = new AOXAdESSigner();
 
-        final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILES_DATA[0]));
+        String prueba;
 
-        final Properties extraParams = new Properties();
-//        extraParams.setProperty(XAdESExtraParams.CONTENT_MIME_TYPE, MimeHelper.DEFAULT_MIMETYPE);
-//        extraParams.setProperty(XAdESExtraParams.CONTENT_TYPE_OID, MimeHelper.DEFAULT_CONTENT_OID_DATA);
+        for (final Properties extraParams : XADES_MODES) {
+        	for (final String algo : ALGOS_EC) {
+        		for (final String filename : TEST_FILES_DATA) {
 
-        final byte[] result = signer.sign(
-        		data,
-        		algorithm,
-        		pke.getPrivateKey(),
-        		pke.getCertificateChain(),
-        		extraParams
-        		);
+        			// Omitimos la firma de binarios en modo enveloped
+        			if ("XAdES Enveloped".equals(extraParams.getProperty("format")) && !filename.toLowerCase().endsWith(".xml")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        				continue;
+        			}
 
-        final File f = File.createTempFile("Firma_" + algorithm, ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
-        try (final java.io.FileOutputStream fos = new java.io.FileOutputStream(f)) {
-        	fos.write(result);
-        	fos.flush();
+        			prueba = "Firma XAdES en modo '" +  //$NON-NLS-1$
+        					extraParams.getProperty("mode") +  //$NON-NLS-1$
+        					", formato '" + //$NON-NLS-1$
+        					extraParams.getProperty("format") +  //$NON-NLS-1$
+        					"' con el algoritmo ': " + //$NON-NLS-1$
+        					algo +
+        					"' y el fichero '" + //$NON-NLS-1$
+        					filename + "'"; //$NON-NLS-1$
+
+        			System.out.println();
+        			System.out.println(prueba);
+
+
+        			final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
+
+        			final byte[] result = signer.sign(
+        					data,
+        					algo,
+        					pke.getPrivateKey(),
+        					pke.getCertificateChain(),
+        					extraParams
+        					);
+
+        			final File f = File.createTempFile("Firma_" + algo, ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+        			try (final java.io.FileOutputStream fos = new java.io.FileOutputStream(f)) {
+        				fos.write(result);
+        				fos.flush();
+        			}
+        			System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+        		}
+        	}
         }
-        System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
     }
 
-    @Test
-    public void doSign() throws Exception {
-
-    	Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-        final PrivateKeyEntry pke;
-        final X509Certificate cert;
-
-        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-        ks.load(ClassLoader.getSystemResourceAsStream(CERT_EC_PATH), CERT_EC_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_EC_ALIAS, new KeyStore.PasswordProtection(CERT_EC_PASS.toCharArray()));
-        cert = (X509Certificate) pke.getCertificate();
-
-        final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        final Document doc = docBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream("<document><node1>Valor</node1></document>".getBytes(StandardCharsets.UTF_8)));
-
-
-        final Element canonElem =
-            XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_CANONICALIZATIONMETHOD);
-
-        System.out.println(canonElem.getNodeName());
-        canonElem.setAttributeNS(
-            null, Constants._ATT_ALGORITHM, Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS
-        );
-
-        Init.init();
-
-        final SignatureAlgorithm signatureAlgorithm = new SignatureAlgorithm(doc, XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA256);
-        final XMLSignature sig =
-            new XMLSignature(doc, null, signatureAlgorithm.getElement(), canonElem);
-
-        doc.getDocumentElement().appendChild(sig.getElement());
-
-        final Transforms transforms = new Transforms(doc);
-        transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
-        transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
-        sig.addDocument("", transforms, Constants.ALGO_ID_DIGEST_SHA1);
-
-        sig.addKeyInfo(cert);
-        sig.sign(pke.getPrivateKey());
-
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        XMLUtils.outputDOMc14nWithComments(doc, bos);
-
-        System.out.println(new String(bos.toByteArray()));
-    }
 }

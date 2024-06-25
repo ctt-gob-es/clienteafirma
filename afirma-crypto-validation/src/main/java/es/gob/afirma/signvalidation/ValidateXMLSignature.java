@@ -76,7 +76,7 @@ public final class ValidateXMLSignature extends SignValider {
     @Override
 	public List<SignValidity> validate(final byte[] sign, final boolean checkCertificates) {
 
-    	List<SignValidity> result = new ArrayList<SignValidity>();
+    	List<SignValidity> result = new ArrayList<>();
         final Document doc;
         try {
             doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(sign));
@@ -102,7 +102,8 @@ public final class ValidateXMLSignature extends SignValider {
         				new KeyValueKeySelector(),
         				nl.item(i)
         				);
-        		
+				valContext.setURIDereferencer(new CustomUriDereferencer());
+
         		final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
         		if (!signature.validate(valContext) && !noMatchDataOcurred) {
         			LOGGER.info("La firma es invalida"); //$NON-NLS-1$
@@ -118,7 +119,7 @@ public final class ValidateXMLSignature extends SignValider {
         		// Ahora miramos las referencias una a una
         		final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
         		boolean isKO = false;
-        		while (it.hasNext() && !isKO && !noMatchDataOcurred) {
+        		while (it.hasNext()) {// && !isKO && !noMatchDataOcurred) {
         			final Reference iNext = (Reference) it.next();
         			if (!iNext.validate(valContext)) {
         				LOGGER.info("La referencia '" + iNext.getURI() + "' de la firma es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -201,13 +202,14 @@ public final class ValidateXMLSignature extends SignValider {
      */
 	public static List<SignValidity> validateSign(final Element signElement, final String signProfile, final boolean isExternalDetached) {
 
-		final ArrayList<SignValidity> result = new ArrayList<SignValidity>();
+		final ArrayList<SignValidity> result = new ArrayList<>();
 
 		if (!isExternalDetached) {
 			boolean validSign = true;
 
 			try {
 				final DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), signElement);
+				valContext.setURIDereferencer(new CustomUriDereferencer());
 
 				boolean noMatchData = false;
 
