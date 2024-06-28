@@ -39,6 +39,10 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
     private static final String URL_SHA256_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"; //$NON-NLS-1$
     private static final String URL_SHA384_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"; //$NON-NLS-1$
     private static final String URL_SHA512_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"; //$NON-NLS-1$
+    public static final String URL_SHA1_ECDSA   = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"; //$NON-NLS-1$
+    private static final String URL_SHA256_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"; //$NON-NLS-1$
+    private static final String URL_SHA384_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"; //$NON-NLS-1$
+    private static final String URL_SHA512_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"; //$NON-NLS-1$
 
     public static final Map<String, String> SIGN_ALGOS_URI;
 
@@ -63,6 +67,10 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 		SIGN_ALGOS_URI.put(URL_SHA256_RSA, "SHA256withRSA"); //$NON-NLS-1$
 		SIGN_ALGOS_URI.put(URL_SHA384_RSA, "SHA384withRSA"); //$NON-NLS-1$
 		SIGN_ALGOS_URI.put(URL_SHA512_RSA, "SHA512withRSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA1_ECDSA, "SHA1withECDSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA256_ECDSA, "SHA256withECDSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA384_ECDSA, "SHA384withECDSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA512_ECDSA, "SHA512withECDSA"); //$NON-NLS-1$
 	}
 
 	public XAdESSignAnalyzer(final byte [] data) throws Exception {
