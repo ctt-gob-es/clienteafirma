@@ -9,6 +9,7 @@
 
 package es.gob.afirma.signers.xades;
 
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyException;
@@ -42,6 +43,7 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.w3c.dom.Element;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.Pkcs1Utils;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
@@ -158,7 +160,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
               final boolean addKeyInfoKeyName,
               final boolean addKeyInfoX509IssuerSerial,
               final boolean keepKeyInfoUnsigned,
-              final boolean verifyPkcs1) throws MarshalException,
+              final boolean verify) throws MarshalException,
                                                         GeneralSecurityException,
                                                         XMLSignatureException {
 
@@ -268,10 +270,8 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         // creacion de firma realmente ha generado el PKCS#1 usando la clave privada del
         // certificado proporcionado. Para ello, desciframos el PKCS#1 con la clave publica de
         // ese certificado
-        if (certificates != null && !certificates.isEmpty() && verifyPkcs1) {
-        	verifyPkcs1(this.signature.getSignatureValue().getValue(),
-        			certificates.get(0).getPublicKey(),
-        			signatureMethod);
+        if (certificates != null && !certificates.isEmpty() && verify) {
+        	verifySignature(certificates.get(0).getPublicKey(), signatureMethod);
         }
     }
 
@@ -296,24 +296,24 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     }
 
     /**
-     * Verifica que un PKCS#1 se haya generado con la clave privada correspondiente a una clave
+     * Verifica que el PKCS#1 de la firma se haya generado con la clave privada correspondiente a una clave
      * p&uacute;blica dada.
-     * @param signatureValue PKCS#1 de la firma.
      * @param publicKey Clave p&uacute;blica con la que validar la firma.
      * @param signatureMethod URI del algoritmo de firma.
      * @throws XMLSignatureException Cuando no se proporciona un par&aacute;metro v&aacute;lido o
      * el PKCS#1 se gener&oacute; con una clave privada distinta a la esperada.
      */
-    private static void verifyPkcs1(final byte[] signatureValue, final PublicKey publicKey,
+    private void verifySignature(final PublicKey publicKey,
     		final String signatureMethod) throws XMLSignatureException {
 
+    	final byte[] signatureValue = this.signature.getSignatureValue().getValue();
 
     	final String signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(signatureMethod, publicKey.getAlgorithm());
     	byte[] normalizedSignatureValue = signatureValue;
 
     	boolean valid;
     	try {
-    		Signature signature;
+    		Signature sig;
 
     		// Cuando se usa Java 9 o superior, Apache Santuario utiliza el formato normalizado
     		// de las firmas ECDSA y DSA, lo que hace que no haya problemas con la validacion.
@@ -321,24 +321,29 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 			// hacer la validacion
     		if (signatureAlgorithm.endsWith("withECDSA") //$NON-NLS-1$
     				|| signatureAlgorithm.endsWith("withDSA")) { //$NON-NLS-1$
-    			final String normalizeSignatureAlgorithm = signatureAlgorithm + "inP1363Format"; //$NON-NLS-1$
     			try {
-    				signature = Signature.getInstance(normalizeSignatureAlgorithm);
+    				sig = Signature.getInstance(signatureAlgorithm + "inP1363Format"); //$NON-NLS-1$
     			}
     			catch (final Exception e) {
     				// Si el proveedor no soporta el formato P1363 (caso de Java 8 y anteriores), tendremos
     				// que decodificar la firma para obtener el resultado esperado
-    				signature = Signature.getInstance(signatureAlgorithm);
+    				sig  = Signature.getInstance(signatureAlgorithm);
     				normalizedSignatureValue = Pkcs1Utils.encodeSignature(signatureValue);
     			}
     		}
     		else {
-    			signature = Signature.getInstance(signatureAlgorithm);
+    			sig = Signature.getInstance(signatureAlgorithm);
     		}
 
-    		signature.initVerify(publicKey);
+    		sig.initVerify(publicKey);
 
-    		valid = signature.verify(normalizedSignatureValue);
+        	byte[] signedInfoEncoded;
+    		try (InputStream is = this.signature.getSignedInfo().getCanonicalizedData()) {
+    			signedInfoEncoded = AOUtil.getDataFromInputStream(is);
+    		}
+    		sig.update(signedInfoEncoded);
+
+    		valid = sig.verify(normalizedSignatureValue);
     	}
     	catch (final Exception e) {
     		throw new XMLSignatureException("Error al verificar el PKCS#1 de la firma", e); //$NON-NLS-1$

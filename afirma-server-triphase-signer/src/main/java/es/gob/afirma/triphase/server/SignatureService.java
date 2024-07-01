@@ -11,6 +11,7 @@ package es.gob.afirma.triphase.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -22,8 +23,6 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.Signature;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -49,7 +48,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
-import es.gob.afirma.core.signers.Pkcs1Utils;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
@@ -109,9 +107,6 @@ public final class SignatureService extends HttpServlet {
 
 	/** Propiedad de la informacion trifasica en la que se almacenan las prefirmas. */
 	private static final String TRIPHASE_PROP_PRESIGN = "PRE"; //$NON-NLS-1$
-
-	/** Propiedad de la informacion trifasica en la que se almacenan las prefirmas. */
-	private static final String TRIPHASE_PROP_PKCS1 = "PK1"; //$NON-NLS-1$
 
 	/**
 	 * Propiedad de la informacion trifasica en la que se almacenan los c&oacute;digos
@@ -219,8 +214,8 @@ public final class SignatureService extends HttpServlet {
 
 		final Map<String, String> parameters = new HashMap<>();
 		final String[] params;
-		try {
-			params = new String(AOUtil.getDataFromInputStream(request.getInputStream()), URL_DEFAULT_CHARSET).split("&"); //$NON-NLS-1$
+		try (InputStream is = request.getInputStream()) {
+			params = new String(AOUtil.getDataFromInputStream(is), URL_DEFAULT_CHARSET).split("&"); //$NON-NLS-1$
 		}
 		catch (final Exception | Error e) {
 			LOGGER.severe("No se pudieron leer los parametros de la peticion: " + e); //$NON-NLS-1$
@@ -793,10 +788,10 @@ public final class SignatureService extends HttpServlet {
 				throw new InvalidVerificationCodeException("Alguna de las firmas no contenida el codigo de verificacion"); //$NON-NLS-1$
 			}
 
-			//TODO: Integrar la validacion de HMAC con salto
 
 			final String preSign = triSign.getProperty(TRIPHASE_PROP_PRESIGN);
 
+			//TODO: Integrar la validacion de HMAC con salto
 			byte[] hmac;
 			try {
 				final Mac mac = Mac.getInstance(HMAC_ALGORITHM);
@@ -813,55 +808,8 @@ public final class SignatureService extends HttpServlet {
 			if (!Arrays.equals(hmac, Base64.decode(verificationHMac))) {
 				throw new InvalidVerificationCodeException("Se ha detectado un error de integridad en los datos de firma"); //$NON-NLS-1$
 			}
-
-			final String signatureValue = triSign.getProperty(TRIPHASE_PROP_PKCS1);
-			if (signatureValue == null) {
-				throw new InvalidVerificationCodeException("No se ha proporcionado el PKCS#1 de la firma"); //$NON-NLS-1$
-			}
-
-			verifyPkcs1(Base64.decode(signatureValue), cert.getPublicKey(), signatureAlgorithm, prep.isDecodedPkcs1Used());
 		}
 	}
-
-	/**
-     * Verifica que un PKCS#1 se haya generado con la clave privada correspondiente a una clave
-     * p&uacute;blica dada.
-     * @param signatureValue PKCS#1 de la firma.
-     * @param publicKey Clave p&uacute;blica con la que validar la firma.
-     * @param signatureAlgoritm Algoritmo de firma.
-     * @param decodedPkcs1 Indica si el PKCS#1 esta decodificado (concatenacion de R y S en firmas
-     * de curva elíptica). Solo aplica con algoritmos ECDSA/DSA.
-     * @throws InvalidVerificationCodeException Cuando no se proporciona un par&aacute;metro v&aacute;lido o
-     * el PKCS#1 se gener&oacute; con una clave privada distinta a la esperada.
-     * @throws NoSuchAlgorithmException
-     */
-    private static void verifyPkcs1(final byte[] signatureValue, final PublicKey publicKey,
-    		final String signatureAlgoritm, final boolean decodedPkcs1) throws InvalidVerificationCodeException {
-
-    	byte[] pkcs1Value = signatureValue;
-    	if (AOSignConstants.isDSAorECDSASignatureAlgorithm(signatureAlgoritm)) {
-    		try {
-    			pkcs1Value = Pkcs1Utils.encodeSignature(pkcs1Value);
-    		}
-    		catch (final Exception e) {
-    			LOGGER.warning("No se pudo codificar el PKCS#1 de la firma: " + e); //$NON-NLS-1$
-    		}
-    	}
-
-    	boolean valid = false;
-    	try {
-    		final Signature signature = Signature.getInstance(signatureAlgoritm);
-    		signature.initVerify(publicKey);
-    		valid = signature.verify(pkcs1Value);
-    	}
-    	catch (final Exception e) {
-    		throw new InvalidVerificationCodeException("Error al verificar el PKCS#1 de la firma", e); //$NON-NLS-1$
-    	}
-
-    	if (!valid) {
-    		throw new InvalidVerificationCodeException("El PKCS#1 de la firma no se ha generado con la clave publica indicada"); //$NON-NLS-1$
-    	}
-    }
 
 	private static class InvalidVerificationCodeException extends GeneralSecurityException {
 		private static final long serialVersionUID = -4647005073272724194L;
