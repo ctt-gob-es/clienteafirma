@@ -391,10 +391,12 @@ public final class AOSignConstants {
 		return digestAlgorithm + suffix;
 	}
 
-	/** Comprueba si un algoritmo de firma utiliza un algoritmo de huella digital
+	/**
+	 * Comprueba si un algoritmo de firma utiliza un algoritmo de huella digital
 	 * perteneciente a la familia de algoritmos SHA-2.
 	 * @param algorithm Algoritmo de firma.
-	 * @return {@code true} cuando el algoritmo es un SHA-2, {@code false} en caso contrario. */
+	 * @return {@code true} cuando el algoritmo es un SHA-2, {@code false} en caso contrario.
+	 */
 	public static boolean isSHA2SignatureAlgorithm(final String algorithm) {
 		return SIGN_ALGORITHM_SHA256WITHRSA.equals(algorithm)   ||
 			   SIGN_ALGORITHM_SHA384WITHRSA.equals(algorithm)   ||
@@ -404,13 +406,29 @@ public final class AOSignConstants {
 			   SIGN_ALGORITHM_SHA512WITHECDSA.equals(algorithm);
 	}
 
-	/** Comprueba si un algoritmo de firma utiliza el algoritmo de huella digital
+	/**
+	 * Comprueba si un algoritmo de firma utiliza el algoritmo de huella digital
 	 * SHA-1.
 	 * @param algorithm Algoritmo de firma.
-	 * @return {@code true} cuando el algoritmo es SHA-1, {@code false} en caso contrario. */
+	 * @return {@code true} cuando el algoritmo es SHA-1, {@code false} en caso contrario.
+	 */
 	public static boolean isSHA1SignatureAlgorithm(final String algorithm) {
 		return SIGN_ALGORITHM_SHA1WITHRSA.equals(algorithm)   ||
 			   SIGN_ALGORITHM_SHA1WITHDSA.equals(algorithm)   ||
 			   SIGN_ALGORITHM_SHA1WITHECDSA.equals(algorithm);
+	}
+
+	/**
+	 * Comprueba si un algoritmo de firma utiliza el cifrade ECDSA o DSA.
+	 * @param algorithm Algoritmo de firma.
+	 * @return {@code true} cuando el algoritmo usa cidrado ECDSA o DSA,
+	 * {@code false} en caso contrario.
+	 */
+	public static boolean isDSAorECDSASignatureAlgorithm(final String algorithm) {
+		return algorithm != null &&
+				(algorithm.endsWith("withECDSA") //$NON-NLS-1$
+						|| algorithm.endsWith("withECDSAinP1363Format") //$NON-NLS-1$
+						|| algorithm.endsWith("withDSA") //$NON-NLS-1$
+						|| algorithm.endsWith("withECDSAinP1363Format")); //$NON-NLS-1$
 	}
 }

@@ -11,6 +11,7 @@ package es.gob.afirma.core.signers;
 
 import java.io.IOException;
 import java.security.PrivateKey;
+import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.util.Properties;
 
@@ -51,6 +52,28 @@ public final class TriphaseDataSigner {
 			                          final Certificate[] certChain,
 			                          final TriphaseData triphaseData,
 			                          final Properties extraParams) throws AOException {
+		return doSign(signer, algorithm, key, certChain, triphaseData, extraParams, false);
+	}
+
+	/** Realiza la operaci&oacute;n de Firma (PKCS#1) sobre una sesi&oacute;n de firma
+	 * trif&aacute;sica.
+	 * @param signer Firmador PKCS#1.
+	 * @param algorithm Algoritmo de firma.
+	 * @param key Clave privada para la firma.
+	 * @param certChain Cadena de certificados del firmante.
+	 * @param triphaseData Datos de sesi&oacute;n trif&aacute;sica.
+	 * @param extraParams Par&aacute;metros adicionales (aqu&iacute; solo aplican a la
+	 *                    firma PKCS#1.
+	 * @param decodePkcs1	Indica si se usar el PKCS#1 decodificado (solo para firma firmas ECDSA o DSA).
+	 * @return Sesi&oacute;n trif&aacute;sica con las firmas PKCS#1 incluidas.
+	 * @throws AOException Si ocurre cualquier error durante la firma. */
+	public static TriphaseData doSign(final AOPkcs1Signer signer,
+			                          final String algorithm,
+			                          final PrivateKey key,
+			                          final Certificate[] certChain,
+			                          final TriphaseData triphaseData,
+			                          final Properties extraParams,
+			                          final boolean decodePkcs1) throws AOException {
 
 		if (triphaseData.getSignsCount() < 1) {
 			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
@@ -75,13 +98,21 @@ public final class TriphaseDataSigner {
 
 			final String signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, key.getAlgorithm());
 
-			final byte[] pkcs1sign = signer.sign(
+			byte[] pkcs1sign = signer.sign(
 				preSign,
 				signatureAlgorithm,
 				key,
 				certChain,
 				extraParams // Parametros para PKCS#1
 			);
+
+			if (decodePkcs1 && AOSignConstants.isDSAorECDSASignatureAlgorithm(signatureAlgorithm)) {
+				try {
+					pkcs1sign = Pkcs1Utils.decodeSignature(pkcs1sign);
+				} catch (final SignatureException e) {
+					throw new AOException("No se ha podido decodificar el PKCS#1 del servicio. Puede que no sea una version compatible con ECDSA/DSA", e); //$NON-NLS-1$
+				}
+			}
 
 			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
 			signConfig.addProperty(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));

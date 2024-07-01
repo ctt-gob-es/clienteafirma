@@ -290,4 +290,9 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			                                final CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException {
 		throw new UnsupportedOperationException("La operacion de contrafirma no esta soportada en PAdES."); //$NON-NLS-1$
 	}
+
+	@Override
+	public boolean isDecodedPkcs1Used() {
+		return false;
+	}
 }

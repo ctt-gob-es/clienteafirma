@@ -455,4 +455,9 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
     	return newExtraParams;
     }
+
+	@Override
+	public boolean isDecodedPkcs1Used() {
+		return false;
+	}
 }

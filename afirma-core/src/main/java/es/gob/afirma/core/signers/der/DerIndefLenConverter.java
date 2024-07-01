@@ -23,7 +23,7 @@
  * questions.
  */
 
-package es.gob.afirma.signers.xades.der;
+package es.gob.afirma.core.signers.der;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -175,4 +175,9 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 			                                                                           IOException {
 		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
 	}
+
+	@Override
+	public boolean isDecodedPkcs1Used() {
+		return false;
+	}
 }

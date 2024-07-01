@@ -10,6 +10,7 @@
 package es.gob.afirma.signers.xadestri.client;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,6 +48,10 @@ public class TestAOXAdESTriPhaseSigner {
 	private static final String CERT_PATH4 = "EIDAS_CERTIFICADO_PRUEBAS___99999999R.p12"; //$NON-NLS-1$
 	private static final String CERT_PASS4 = "1234"; //$NON-NLS-1$
 	private static final String CERT_ALIAS4 = "eidas_certificado_pruebas___99999999r"; //$NON-NLS-1$
+
+	private static final String CERT_PATH_EC = "ciudadanohw_ecc_2023v1.p12"; //$NON-NLS-1$
+	private static final String CERT_PASS_EC = "ciudadanohw_ecc_2023v1"; //$NON-NLS-1$
+	private static final String CERT_ALIAS_EC = "manuela blanco vidal - nif:10000322z"; //$NON-NLS-1$
 
 	private static final String DATA_FILENAME = "factura_sinFirmar.xml"; //$NON-NLS-1$
 	private static final String SIGNATURE_FILENAME = "firma.xml"; //$NON-NLS-1$
@@ -968,6 +973,45 @@ public class TestAOXAdESTriPhaseSigner {
 
 			System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Prueba de firma XAdES con certificado de curva eliptica.
+	 * @throws Exception Cuando falla la firma.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	@Ignore // Necesita un servidor trifasico
+	public void pruebaFirmaXAdES_ECDSA() throws Exception {
+
+		System.out.println("Java version: " + System.getProperty("java.version"));
+
+		byte[] data;
+		try (InputStream fis = new FileInputStream("C:\\Entrada\\autofirma_config.afconfig")) {
+			data = AOUtil.getDataFromInputStream(fis);
+		}
+
+		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH_EC), CERT_PASS_EC.toCharArray());
+		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS_EC, new KeyStore.PasswordProtection(CERT_PASS_EC.toCharArray()));
+
+		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
+
+		//for (final Properties config : CONFIGS) {
+
+		final Properties config = CONFIGS[0];
+
+			final byte[] result = signer.sign(data, AOSignConstants.SIGN_ALGORITHM_SHA256WITHECDSA, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+			final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+			try (
+				final OutputStream fos = new FileOutputStream(tempFile);
+			) {
+				fos.write(result);
+			}
+
+			System.out.println("El resultado de la firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+		//}
 	}
 
 	/**

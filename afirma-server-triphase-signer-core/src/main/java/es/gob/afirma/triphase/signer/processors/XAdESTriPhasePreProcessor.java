@@ -470,4 +470,8 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		return completeSignature;
 	}
 
+	@Override
+	public boolean isDecodedPkcs1Used() {
+		return true;
+	}
 }

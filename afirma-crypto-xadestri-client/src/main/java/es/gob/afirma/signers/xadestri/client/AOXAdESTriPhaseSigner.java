@@ -168,7 +168,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			xParams
 		);
 	}
-	
+
 	@Override
 	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
@@ -240,7 +240,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			params
 		);
 	}
-	
+
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
 			throws AOInvalidFormatException, IOException {
@@ -253,7 +253,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			                                     final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
-	
+
     /** {@inheritDoc} */
 	@Override
 	public boolean isSign(final byte[] sign){
@@ -312,7 +312,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 	public String getSignedName(final String originalName, final String inText) {
 		return originalName + (inText != null ? inText : "") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
@@ -484,7 +484,8 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 				key,
 				certChain,
 				triphaseData,
-				extraParams
+				extraParams,
+				true
 			).toString().getBytes(),
 			true
 		);

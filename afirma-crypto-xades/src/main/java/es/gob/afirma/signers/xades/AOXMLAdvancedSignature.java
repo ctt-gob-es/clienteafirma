@@ -9,7 +9,6 @@
 
 package es.gob.afirma.signers.xades;
 
-import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyException;
@@ -18,7 +17,6 @@ import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
 import java.security.Signature;
-import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -45,8 +43,7 @@ import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.xades.der.DerOutputStream;
-import es.gob.afirma.signers.xades.der.DerValue;
+import es.gob.afirma.core.signers.Pkcs1Utils;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.XmlStyle;
 import es.uji.crypto.xades.jxades.security.xml.XmlWrappedKeyInfo;
@@ -313,6 +310,8 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
     	final String signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(signatureMethod, publicKey.getAlgorithm());
     	byte[] normalizedSignatureValue = signatureValue;
+
+    	boolean valid;
     	try {
     		Signature signature;
 
@@ -330,7 +329,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     				// Si el proveedor no soporta el formato P1363 (caso de Java 8 y anteriores), tendremos
     				// que decodificar la firma para obtener el resultado esperado
     				signature = Signature.getInstance(signatureAlgorithm);
-    				normalizedSignatureValue = encodeSignature(signatureValue);
+    				normalizedSignatureValue = Pkcs1Utils.encodeSignature(signatureValue);
     			}
     		}
     		else {
@@ -339,35 +338,14 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
     		signature.initVerify(publicKey);
 
-    		signature.verify(normalizedSignatureValue);
+    		valid = signature.verify(normalizedSignatureValue);
     	}
     	catch (final Exception e) {
-    		throw new XMLSignatureException("El PKCS#1 de la firma no se ha generado con el certificado indicado", e); //$NON-NLS-1$
+    		throw new XMLSignatureException("Error al verificar el PKCS#1 de la firma", e); //$NON-NLS-1$
     	}
-    }
 
- 	// Convert the concatenation of R and S into their DER encoding
-    private static byte[] encodeSignature(final byte[] signature) throws SignatureException {
-
-        try {
-
-            final int n = signature.length >> 1;
-            final byte[] bytes = new byte[n];
-            System.arraycopy(signature, 0, bytes, 0, n);
-            final BigInteger r = new BigInteger(1, bytes);
-            System.arraycopy(signature, n, bytes, 0, n);
-            final BigInteger s = new BigInteger(1, bytes);
-
-            final DerOutputStream out = new DerOutputStream(signature.length + 10);
-            out.putInteger(r);
-            out.putInteger(s);
-            final DerValue result =
-                new DerValue(DerValue.tag_Sequence, out.toByteArray());
-
-            return result.toByteArray();
-
-        } catch (final Exception e) {
-            throw new SignatureException("Could not encode signature", e); //$NON-NLS-1$
-        }
+    	if (!valid) {
+    		throw new XMLSignatureException("El PKCS#1 de la firma no se ha generado con la clave publica indicada"); //$NON-NLS-1$
+    	}
     }
 }
