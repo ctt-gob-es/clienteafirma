@@ -11,5 +11,5 @@ public interface LoadDataFileListener {
 	 * Solicita la carga de unos ficheros.
 	 * @param files Listado de ficheros a cargar.
 	 */
-	void loadFiles(File[] files);
+	void loadFiles(File[] files, SignOperationConfig signConfig);
 }

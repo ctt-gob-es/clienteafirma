@@ -31,7 +31,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.help.UnsupportedOperationException;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOException;
@@ -42,6 +41,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOConfigurableContext;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -73,6 +73,8 @@ import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginLoader;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
+import es.gob.afirma.standalone.ui.SignOperationConfig;
+import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
 
 /** Clase para la gesti&oacute;n de los par&aacute;metros proporcionados desde l&iacute;nea de comandos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -229,7 +231,7 @@ final class CommandLineLauncher {
 			break;
 		case SIGN:
 			if (params.isGui()) {
-				signByGui(params);
+				signByGui(command, params);
 			}
 			else {
 				result = signByCommandLine(command, params);
@@ -239,11 +241,6 @@ final class CommandLineLauncher {
 		case COUNTERSIGN:
 			result = signByCommandLine(command, params);
 			break;
-		case MASSIVE:
-			//TODO: Implementar
-			throw new UnsupportedOperationException(
-					"Firma masiva en linea de comandos aun no implementada" //$NON-NLS-1$
-					);
 		case BATCHSIGN:
 			batchByCommandLine(params);
 			break;
@@ -350,16 +347,97 @@ final class CommandLineLauncher {
 	 * en la interfaz de AutoFirma.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
 	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
-	private static void signByGui(final CommandLineParameters params) throws CommandLineException {
+	private static void signByGui(final CommandLineCommand command, final CommandLineParameters params) throws CommandLineException {
 
 		final File inputFile = params.getInputFile();
 		if (inputFile == null) {
 			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5"), true); //$NON-NLS-1$
 		}
 
+		SignOperationConfig signConfig;
+		try {
+			signConfig = loadSignConfig(command, params);
+		} catch (final IOException e) {
+			throw new CommandLineException(e.getMessage(), e);
+		}
+
 		final SimpleAfirma simpleAfirma = new SimpleAfirma();
-		simpleAfirma.initGUI(inputFile);
-		simpleAfirma.loadFileToSign(inputFile);
+		simpleAfirma.initGUI(inputFile, signConfig);
+	}
+
+	/**
+	 * Obtiene la configuracion de firma a partir de los parametros proporcionados y los por
+	 * defecto.
+	 * @param params Par&aacute;metros de l&iacute;nea de comandos.
+	 * @return Configuraci&oacute;n de firma.
+	 * @throws CommandLineParameterException Cuando se indica un formato de firma no soportado.
+	 * @throws IOException
+	 */
+	private static SignOperationConfig loadSignConfig(final CommandLineCommand command, final CommandLineParameters params)
+			throws CommandLineParameterException, IOException {
+
+		final SignOperationConfig signConfig = new SignOperationConfig();
+		switch (command) {
+		case SIGN:
+			signConfig.setCryptoOperation(CryptoOperation.SIGN);
+			break;
+		case COSIGN:
+			signConfig.setCryptoOperation(CryptoOperation.COSIGN);
+			break;
+		case COUNTERSIGN:
+			signConfig.setCryptoOperation(CryptoOperation.COUNTERSIGN_LEAFS);
+			break;
+		default:
+			signConfig.setCryptoOperation(CryptoOperation.SIGN);
+			break;
+		}
+
+		final AOSigner signer;
+		String format = params.getFormat();
+		if (!CommandLineParameters.FORMAT_AUTO.equals(format)) {
+
+			final byte[] data;
+			try {
+				data = loadFile(params.getInputFile());
+			}
+			catch(final Exception e) {
+				throw new IOException(
+					"No se ha podido leer el fichero de entrada: " + params.getInputFile().getAbsolutePath(), e //$NON-NLS-1$
+				);
+			}
+
+			format = selectFormatByData(data);
+			try {
+				signer = getSigner(format);
+			}
+			catch (final Exception e) {
+				throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.4", format), e); //$NON-NLS-1$
+			}
+			signConfig.setSigner(signer);
+		}
+
+
+
+		if (params.getExtraParams() != null) {
+			final Properties extraParams = new Properties();
+			for (final String prop : params.getExtraParams().split("\n")) { //$NON-NLS-1$
+				final String propt = prop.trim();
+				final int eq = propt.indexOf("="); //$NON-NLS-1$
+				if (eq > 0 && !propt.startsWith("#")) { //$NON-NLS-1$
+					final String key = propt.substring(0, eq).trim();
+					final String value = propt.substring(eq + 1).trim();
+					extraParams.setProperty(key, value);
+				}
+			}
+			signConfig.setExtraParams(extraParams);
+		}
+
+		if (params.getAlgorithm() != null) {
+			final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(params.getAlgorithm());
+			signConfig.setDigestAlgorithm(digestAlgorithm);
+		}
+
+		return signConfig;
 	}
 
 	private static String batchByCommandLine(final CommandLineParameters params) throws CommandLineException {
@@ -618,50 +696,146 @@ final class CommandLineLauncher {
 
 		// Leemos el fichero de entrada
 		final byte[] data;
-		try (
-			final InputStream input = new FileInputStream(inputFile);
-		) {
-			data = AOUtil.getDataFromInputStream(input);
+		try {
+			data = loadFile(inputFile);
 		}
 		catch(final Exception e) {
 			throw new IOException(
 				"No se ha podido leer el fichero de entrada: " + inputFile.getAbsolutePath(), e //$NON-NLS-1$
 			);
 		}
-		String format = null;
-		Properties extraParamsProperties = null;
-		if (command != CommandLineCommand.MASSIVE) {
-			/* Si el formato es "auto", miramos si es XML o PDF para asignar XAdES o PAdES,
-			   Office para asignar OOXML, OpenOffice para asignar ODF */
-			if (CommandLineParameters.FORMAT_AUTO.equals(fmt)) {
-				final String ext = new MimeHelper(data).getExtension();
-				if ("pdf".equals(ext)) { //$NON-NLS-1$
-					format = CommandLineParameters.FORMAT_PADES;
-				}
-				else if ("xml".equals(ext)) { //$NON-NLS-1$
-					format = CommandLineParameters.FORMAT_XADES;
-				}
-				else if("docx".equals(ext) || "xlsx".equals(ext) || "pptx".equals(ext)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				{
-					format = CommandLineParameters.FORMAT_OOXML;
-				}
-				else if("odt".equals(ext) || "ods".equals(ext) || "odp".equals(ext)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				{
-					format = CommandLineParameters.FORMAT_ODF;
-				}
-				else {
-					format = CommandLineParameters.FORMAT_CADES;
-				}
-			}
-			else {
-				format = fmt;
-			}
 
-			extraParamsProperties = buildProperties(extraParams);
+		Properties extraParamsProperties = null;
+
+		// Si el formato es "auto", configuramos un formato valido para el tipo de fichero
+		String format = fmt;
+		if (CommandLineParameters.FORMAT_AUTO.equals(fmt)) {
+			format = selectFormatByData(data);
 		}
+
+		extraParamsProperties = buildProperties(extraParams);
 
 		// Instanciamos un firmador del tipo adecuado
 		final AOSigner signer;
+		try {
+			signer = getSigner(format);
+		}
+		catch (final Exception e) {
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.4", format), e); //$NON-NLS-1$
+		}
+
+		// Si el firmador admite la configuracion de su contexto, rebajamos el modo de seguridad para permitir
+		// que se puedan hacer cosas tales como cargar los recursos del firmador a partir de ficheros en lugar
+		// de deber proveerlos directamente como parmetros
+		if (signer instanceof AOConfigurableContext) {
+			((AOConfigurableContext) signer).setSecureMode(false);
+		}
+
+		// Seleccionamos el algoritmo de firma
+		final String keyType = ke.getPrivateKey().getAlgorithm();
+		String signatureAlgorithm;
+		try {
+			signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
+		}
+		catch (final Exception e) {
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.141", keyType), e); //$NON-NLS-1$
+		}
+
+		// Obtenemos el resultado de la operacion adecuada
+		byte[] resBytes = null;
+		try {
+			if (command == CommandLineCommand.SIGN) {
+				resBytes = signer.sign(
+					data,
+					signatureAlgorithm,
+					ke.getPrivateKey(),
+					ke.getCertificateChain(),
+					extraParamsProperties
+				);
+			}
+			else if (command == CommandLineCommand.COSIGN) {
+				resBytes = signer.cosign(
+					data, // Firma
+					signatureAlgorithm,
+					ke.getPrivateKey(),
+					ke.getCertificateChain(),
+					extraParamsProperties
+				);
+			}
+			else if (command == CommandLineCommand.COUNTERSIGN) {
+				CounterSignTarget csTarget = CounterSignTarget.LEAFS;
+				if (extraParamsProperties != null && extraParamsProperties.containsKey(EXTRA_PARAM_TARGET) &&
+						CounterSignTarget.TREE.name().equalsIgnoreCase(extraParamsProperties.getProperty(EXTRA_PARAM_TARGET))) {
+					csTarget = CounterSignTarget.TREE;
+				}
+
+				resBytes = signer.countersign(
+					data, // Firma
+					signatureAlgorithm,
+					csTarget,
+					null,
+					ke.getPrivateKey(),
+					ke.getCertificateChain(),
+					extraParamsProperties
+				);
+			}
+			else {
+				throw new CommandLineParameterException("Operacion no soportada: " + command.getOp()); //$NON-NLS-1$
+			}
+		}
+		catch(InvalidSignaturePositionException | IncorrectPageException e) {
+			// Si hay algun error de pagina no valida, se vuelve a firmar de manera invisible
+			final String xParams = removeSignaturePageProperties(extraParams);
+			resBytes = sign(command, fmt, signatureAlgorithm, xParams, inputFile, alias, ksm, storePassword);
+		}
+		catch(final Exception e) {
+			throw new AOException("Error en la operacion de firma: " + e.getMessage(), e); //$NON-NLS-1$
+		}
+
+		return resBytes;
+	}
+
+	private static byte[] loadFile(final File dataFile) throws IOException {
+		final byte[] data;
+		try (final InputStream input = new FileInputStream(dataFile)) {
+			data = AOUtil.getDataFromInputStream(input);
+		}
+		return data;
+	}
+
+	/**
+	 * Analiza los datos y selecciona un formato de firma adecuado para el mismo.
+	 * @param data Datos que se analizar&aacute;n.
+	 * @return Formato de firma.
+	 * @throws IOException Cuando no se puedan analizar los datos.
+	 */
+	private static String selectFormatByData(final byte[] data) throws IOException {
+		String format;
+		final String ext = new MimeHelper(data).getExtension();
+		if ("pdf".equals(ext)) { //$NON-NLS-1$
+			format = CommandLineParameters.FORMAT_PADES;
+		}
+		else if ("xml".equals(ext)) { //$NON-NLS-1$
+			format = CommandLineParameters.FORMAT_XADES;
+		}
+		// Desactivamos la firma por defecto con OOXML y ODF
+//		else if("docx".equals(ext) || "xlsx".equals(ext) || "pptx".equals(ext)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//		{
+//			format = CommandLineParameters.FORMAT_OOXML;
+//		}
+//		else if("odt".equals(ext) || "ods".equals(ext) || "odp".equals(ext)) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//		{
+//			format = CommandLineParameters.FORMAT_ODF;
+//		}
+		else {
+			format = CommandLineParameters.FORMAT_CADES;
+		}
+		return format;
+	}
+
+	private static AOSigner getSigner(final String format) {
+
+		AOSigner signer;
 		if (CommandLineParameters.FORMAT_CADES.equals(format)) {
 			signer = new AOCAdESSigner();
 		}
@@ -681,68 +855,9 @@ final class CommandLineLauncher {
 			signer = new AOODFSigner();
 		}
 		else {
-			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.4", format)); //$NON-NLS-1$
+			throw new IllegalArgumentException("Formato de firma no soportado: " + format); //$NON-NLS-1$
 		}
-
-		// Si el firmador admite la configuracion de su contexto, rebajamos el modo de seguridad para permitir
-		// que se puedan hacer cosas tales como cargar los recursos del firmador a partir de ficheros en lugar
-		// de deber proveerlos directamente como parmetros
-		if (signer instanceof AOConfigurableContext) {
-			((AOConfigurableContext) signer).setSecureMode(false);
-		}
-
-		// Obtenemos el resultado de la operacion adecuada
-		byte[] resBytes = null;
-		try {
-			if (command == CommandLineCommand.SIGN) {
-				resBytes = signer.sign(
-					data,
-					algorithm,
-					ke.getPrivateKey(),
-					ke.getCertificateChain(),
-					extraParamsProperties
-				);
-			}
-			else if (command == CommandLineCommand.COSIGN) {
-				resBytes = signer.cosign(
-					data, // Firma
-					algorithm,
-					ke.getPrivateKey(),
-					ke.getCertificateChain(),
-					extraParamsProperties
-				);
-			}
-			else if (command == CommandLineCommand.COUNTERSIGN) {
-				CounterSignTarget csTarget = CounterSignTarget.LEAFS;
-				if (extraParamsProperties != null && extraParamsProperties.containsKey(EXTRA_PARAM_TARGET) &&
-						CounterSignTarget.TREE.name().equalsIgnoreCase(extraParamsProperties.getProperty(EXTRA_PARAM_TARGET))) {
-					csTarget = CounterSignTarget.TREE;
-				}
-
-				resBytes = signer.countersign(
-					data, // Firma
-					algorithm,
-					csTarget,
-					null,
-					ke.getPrivateKey(),
-					ke.getCertificateChain(),
-					extraParamsProperties
-				);
-			}
-			else {
-				throw new CommandLineParameterException("Operacion no soportada: " + command.getOp()); //$NON-NLS-1$
-			}
-		}
-		catch(InvalidSignaturePositionException | IncorrectPageException e) {
-			// Si hay algun error de pagina no valida, se vuelve a firmar de manera invisible
-			final String xParams = removeSignaturePageProperties(extraParams);
-			resBytes = sign(command, fmt, algorithm, xParams, inputFile, alias, ksm, storePassword);
-		}
-		catch(final Exception e) {
-			throw new AOException("Error en la operacion de firma: " + e.getMessage(), e); //$NON-NLS-1$
-		}
-
-		return resBytes;
+		return signer;
 	}
 
 	private static String listAliasesByCommandLine(final CommandLineParameters params) throws CommandLineException {
@@ -874,8 +989,6 @@ final class CommandLineLauncher {
 		.append("  ").append(CommandLineCommand.SIGN.getOp())			 .append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.8")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(CommandLineCommand.COSIGN.getOp())		     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.9")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(CommandLineCommand.COUNTERSIGN.getOp())	 .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.10")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		//TODO: Descomentar cuando se soporte firma masiva
-		//.append("  ").append(CommandLineCommand.MASSIVE.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.35")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(CommandLineCommand.LIST.getOp())			 .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.11")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(CommandLineCommand.VERIFY.getOp())		     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.29")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(CommandLineCommand.BATCHSIGN.getOp())	     .append("\t (")  .append(CommandLineMessages.getString("CommandLineLauncher.69")).append(")\n\n");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -970,7 +1083,7 @@ final class CommandLineLauncher {
 		deactivateConsoleLog("es.gob.jmulticard"); //$NON-NLS-1$
 		deactivateSlf4JLogs();
 
-    	// Se define el look and feel
+    	// Se define el look and feel por si se solicita mostrar interfaces graficas
     	LookAndFeelManager.applyLookAndFeel();
 
 		if (pluginsManager == null) {

@@ -61,8 +61,13 @@ final class CommandLineParameters {
 	public static final String MASSIVE_OP_COUNTERSIGN	= "countersign"; //$NON-NLS-1$
 	private static final String DEFAULT_MASSIVE_OP      = MASSIVE_OP_SIGN;
 
-	private static final String DEFAULT_SIGNATURE_DIGEST_ALGORITHM      = "SHA512"; //$NON-NLS-1$
-	private static final String DEFAULT_HASH_ALGORITHM = "SHA-256"; //$NON-NLS-1$
+
+
+	public static final String ALGO_SHA1		= "sha1"; //$NON-NLS-1$
+	public static final String ALGO_SHA256		= "sha256"; //$NON-NLS-1$
+	public static final String ALGO_SHA384		= "sha384"; //$NON-NLS-1$
+	public static final String ALGO_SHA512		= "sha512"; //$NON-NLS-1$
+	private static final String DEFAULT_ALGO	= ALGO_SHA512;
 
 	private String store = null;
 	private String alias = null;
@@ -498,14 +503,7 @@ final class CommandLineParameters {
 	 * algoritmo por defecto.
 	 * @return Algoritmo de firma. */
 	public String getAlgorithm() {
-		return this.algorithm != null ? this.algorithm : DEFAULT_SIGNATURE_DIGEST_ALGORITHM;
-	}
-
-	/** Recupera el algoritmo de huella digital configurado o, si no se ha indicado, el
-	 * algoritmo por defecto.
-	 * @return Algoritmo de huella digital. */
-	public String getHashAlgorithm() {
-		return this.hashAlgorithm != null ? this.hashAlgorithm : DEFAULT_HASH_ALGORITHM;
+		return this.algorithm != null ? this.algorithm : DEFAULT_ALGO;
 	}
 
 	public String getExtraParams() {
@@ -538,8 +536,6 @@ final class CommandLineParameters {
 			case COSIGN:
 			case COUNTERSIGN:
 				return buildOperationSignSyntaxError(op.getOp(), errorMessage);
-			case MASSIVE:
-				return buildOperationMassiveSyntaxError(op.getOp(), errorMessage);
 			case LIST:
 				return buildOperationListSyntaxError(op.getOp(), errorMessage);
 			case VERIFY:
@@ -572,6 +568,10 @@ final class CommandLineParameters {
 			.append("  ").append(PARAM_INPUT).append(" inputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_OUTPUT).append(" outputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.14")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_ALGO).append(" algo\t (").append(CommandLineMessages.getString("CommandLineLauncher.20")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			.append("  \t ").append(ALGO_SHA1).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.142")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			.append("  \t ").append(ALGO_SHA256).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.143")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			.append("  \t ").append(ALGO_SHA384).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.144")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			.append("  \t ").append(ALGO_SHA512).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.145")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_FORMAT).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.32")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  \t ").append(FORMAT_AUTO).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.42")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  \t ").append(FORMAT_CADES).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.43")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -629,52 +629,6 @@ final class CommandLineParameters {
 			.append("  ").append(PARAM_PREURL).append(" url\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.64")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_POSTURL).append(" url\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.65")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_XML).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.18")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
-		return sb.toString();
-	}
-
-	/** Construye la cadena de texto que explica la sintaxis para el uso del
-	 * comando de firma masiva por l&iacute;nea de comandos.
-	 * @param op Comando.
-	 * @param errorMessage Mensaje que explica el error cometido.
-	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
-	private static String buildOperationMassiveSyntaxError(final String op, final String errorMessage) {
-
-		final String appName = AutoFirmaUtil.getApplicationFilename();
-
-		final StringBuilder sb = new StringBuilder();
-		if (errorMessage != null) {
-			sb.append(errorMessage).append("\n"); //$NON-NLS-1$
-		}
-		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
-		.append(": ").append(appName).append(" ").append(op).append(" [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  ").append(PARAM_OP).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.55")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t sign\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.56")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  \t cosign\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.57")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  \t countersign\t (").append(CommandLineMessages.getString("CommandLineLauncher.58")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  ").append(PARAM_INPUT).append(" inputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_OUTPUT).append(" outputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.14")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_ALGO).append(" algo\t (").append(CommandLineMessages.getString("CommandLineLauncher.20")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_FORMAT).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.32")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t ").append(FORMAT_AUTO).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.42")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t ").append(FORMAT_CADES).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.43")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t ").append(FORMAT_PADES).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.44")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t ").append(FORMAT_XADES).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.45")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t ").append(FORMAT_FACTURAE).append("\t (").append(CommandLineMessages.getString("CommandLineLauncher.46")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_CONFIG).append(" extraParams\t (").append(CommandLineMessages.getString("CommandLineLauncher.27")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_STORE).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.31")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  \t auto\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.36")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  \t windows\t (").append(CommandLineMessages.getString("CommandLineLauncher.37")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  \t mac\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.38")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  \t mozilla\t (").append(CommandLineMessages.getString("CommandLineLauncher.39")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  \t dni\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.40")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  \t pkcs12:p12file\t (").append(CommandLineMessages.getString("CommandLineLauncher.41")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  \t pkcs11:p11file\t (").append(CommandLineMessages.getString("CommandLineLauncher.47")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		.append("  ").append(PARAM_PASSWD).append(" password\t (").append(CommandLineMessages.getString("CommandLineLauncher.12")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_ALIAS).append(" alias\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.16")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_FILTER).append(" filter\t (").append(CommandLineMessages.getString("CommandLineLauncher.66")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  ").append(PARAM_XML).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.18")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		return sb.toString();
 	}

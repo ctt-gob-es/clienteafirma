@@ -14,14 +14,13 @@ enum CommandLineCommand {
 	SIGN("sign", false), //$NON-NLS-1$
 	COSIGN("cosign", false), //$NON-NLS-1$
 	COUNTERSIGN("countersign", false), //$NON-NLS-1$
-	MASSIVE("massive", false), //$NON-NLS-1$
 	VERIFY("verify", false), //$NON-NLS-1$
 	BATCHSIGN("batchsign", false); //$NON-NLS-1$
 
-	private String op;
-	private boolean mainFileNeeded;
+	private final String op;
+	private final boolean mainFileNeeded;
 
-	private CommandLineCommand(final String op, final boolean mainFileNeeded) {
+	CommandLineCommand(final String op, final boolean mainFileNeeded) {
 		this.op = op;
 		this.mainFileNeeded = mainFileNeeded;
 	}

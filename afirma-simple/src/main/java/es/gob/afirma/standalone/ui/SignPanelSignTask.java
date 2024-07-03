@@ -300,9 +300,12 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	String signatureAlgorithm;
         	final String keyType = this.selectedPke.getPrivateKey().getAlgorithm();
-        	final String algorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
+        	String digestAlgorithm = signConfig.getDigestAlgorithm();
+        	if (digestAlgorithm == null) {
+        		digestAlgorithm = PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SIGNATURE_ALGORITHM);
+        	}
         	try {
-        		signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
+        		signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm, keyType);
         	}
         	catch (final Exception e) {
         		LOGGER.severe("El tipo de clave del certificado no esta soportado: " + e); //$NON-NLS-1$

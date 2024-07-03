@@ -68,6 +68,7 @@ import es.gob.afirma.keystores.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.SkipAuthDNIeFilter;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
@@ -382,7 +383,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     }
 
 	@Override
-	public void loadFiles(final File[] files) {
+	public void loadFiles(final File[] files, final SignOperationConfig generalSignConfig) {
 
      	setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
@@ -394,7 +395,12 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
      		final List<SignOperationConfig> configs = new ArrayList<>();
      		for (final File dataFile : dataFiles) {
      			try {
-     				configs.add(prepareSignConfig(dataFile));
+     				if (generalSignConfig != null) {
+     					configs.add(prepareSignConfig(dataFile, generalSignConfig));
+     				}
+     				else {
+     					configs.add(prepareSignConfig(dataFile));
+     				}
      			}
      			catch (final Exception e) {
      				LOGGER.log(Level.WARNING,
@@ -467,6 +473,27 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 return config;
 	 }
 
+	 private static SignOperationConfig prepareSignConfig(final File dataFile, final SignOperationConfig signConfig) throws IOException {
+
+		 final byte[] data;
+		 try (final InputStream fis = new FileInputStream(dataFile)) {
+			 data = Files.readAllBytes(dataFile.toPath());
+		 }
+		 catch(final OutOfMemoryError e) {
+			 throw new IOException("No hay memoria suficiente para leer el fichero", e); //$NON-NLS-1$
+		 }
+		 catch(final Exception e) {
+			 throw new IOException("No se ha podido leer el fichero", e); //$NON-NLS-1$
+		 }
+
+		 final SignOperationConfig config = new SignOperationConfig();
+
+		 config.setDataFile(dataFile);
+		 configureDataSigner(config, signConfig, data);
+
+		 return config;
+	 }
+
 	 private static void configureDataSigner(final SignOperationConfig config, final byte[] data) throws IOException {
 
 		 // Comprobamos si es un fichero PDF
@@ -533,42 +560,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 // Si los datos seleccionados son considerados firma por el firmador con el que se vaya
 		 // a utilizar, se validan con el
 		 if (config.getSigner().isSign(data, config.getExtraParams())) {
-			 final SignValider validator = SignValiderFactory.getSignValider(config.getSigner());
-			 if (validator != null) {
-				 SignValidity validity = null;
-				 final Properties validationParams = new Properties();
-
-				 final boolean needCheckPsa = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
-				 if (!needCheckPsa) {
-					 validationParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.TRUE.toString());
-				 }
-
-				 validationParams.put(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString());
-				 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
-
-				 String errorText = null;
-				 List<SignValidity> validityList = new ArrayList<>();
-				 try {
-					validityList = validator.validate(data, validationParams);
-					validity = validityList.get(0);
-					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
-							|| validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
-						errorText = buildErrorText(validity.getValidity(), validity.getError());
-					}
-				} catch (final RuntimeConfigNeededException e) {
-					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.SUSPECTED_SIGNATURE , e));
-					errorText = e.getMessage();
-				} catch (final Exception e) {
-					final SignValidity signValidity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e);
-					validityList.add(signValidity);
-					errorText = buildErrorText(signValidity.getValidity(), signValidity.getError());
-				}
-
-				config.setSignValidity(validityList);
-				if (errorText != null) {
-					config.setInvalidSignatureText(errorText);
-				}
-			 }
+			 setValidationInfo(data, config);
 		 }
 
 		 config.setSignatureFormatName(getSignatureName(config.getSigner()));
@@ -576,7 +568,114 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 config.getExtraParams().put(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE, Boolean.TRUE);
 	 }
 
-	 private static String buildErrorText(final SIGN_DETAIL_TYPE result, final VALIDITY_ERROR error) {
+	 private static void configureDataSigner(final SignOperationConfig newConfig, final SignOperationConfig config, final byte[] data) throws IOException {
+
+		 String defaultSignFormat;
+
+		 // Comprobamos si es un fichero PDF
+		 if (DataAnalizerUtil.isPDF(data)) {
+			 newConfig.setFileType(FileType.PDF);
+			 defaultSignFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_PDF);
+		 }
+		 // Comprobamos si es una factura electronica
+		 else if (DataAnalizerUtil.isFacturae(data)) {
+			 newConfig.setFileType(FileType.FACTURAE);
+			 defaultSignFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_FACTURAE);
+		 }
+		 // Comprobamos si es un OOXML
+		 else if (DataAnalizerUtil.isOOXML(data)) {
+			 newConfig.setFileType(FileType.OOXML);
+			 defaultSignFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_OOXML);
+		 }
+		 // Comprobamos si es un ODF
+		 else if (DataAnalizerUtil.isODF(data)) {
+			 newConfig.setFileType(FileType.ODF);
+			 defaultSignFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_ODF);
+		 }
+		// Comprobamos si es un fichero XML
+		 else if (DataAnalizerUtil.isXML(data)) {
+			 newConfig.setFileType(FileType.XML);
+			 defaultSignFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_XML);
+		 }
+		 // Cualquier otro tipo de fichero
+		 else {
+			 newConfig.setFileType(FileType.BINARY);
+			 defaultSignFormat = PreferencesManager.get(PREFERENCE_GENERAL_DEFAULT_FORMAT_BIN);
+		 }
+
+		 // Si se establecio desde fuera el formato de firma, se utiliza ese. Si no, el por defecto
+		 // segun el tipo de archivo
+		 if (config.getSigner() != null) {
+			 newConfig.setSigner(config.getSigner());
+		 }
+		 else {
+			 newConfig.setSigner(AOSignerFactory.getSigner(defaultSignFormat));
+		 }
+
+		 // Si los datos seleccionados son considerados firma por el firmador con el que se vaya
+		 // a utilizar, se validan con el
+		 if (newConfig.getSigner().isSign(data, config.getExtraParams())) {
+
+			 // En caso de ser firma CAdES o XAdES, reajustamos el tipo
+			 if (newConfig.getSigner() instanceof AOCAdESSigner) {
+				 newConfig.setFileType(FileType.SIGN_CADES);
+			 }
+			 else if (newConfig.getSigner() instanceof AOXAdESSigner) {
+				 newConfig.setFileType(FileType.SIGN_XADES);
+			 }
+
+			 setValidationInfo(data, newConfig);
+		 }
+
+		 newConfig.setSignatureFormatName(getSignatureName(newConfig.getSigner()));
+
+		 newConfig.setCryptoOperation(config.getCryptoOperation());
+		 newConfig.setDigestAlgorithm(config.getDigestAlgorithm());
+		 final Properties extraParams = newConfig.getExtraParams() != null ? (Properties) newConfig.getExtraParams().clone() : new Properties();
+		 extraParams.put(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE, Boolean.TRUE);
+		 newConfig.setExtraParams(extraParams);
+	 }
+
+	 private static void setValidationInfo(final byte[] data, final SignOperationConfig newConfig) {
+		 final SignValider validator = SignValiderFactory.getSignValider(newConfig.getSigner());
+		 if (validator != null) {
+			 SignValidity validity = null;
+			 final Properties validationParams = new Properties();
+
+			 final boolean needCheckPsa = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
+			 if (!needCheckPsa) {
+				 validationParams.put(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.TRUE.toString());
+			 }
+
+			 validationParams.put(PdfExtraParams.CHECK_CERTIFICATES, Boolean.TRUE.toString());
+			 validationParams.put(PdfExtraParams.PAGES_TO_CHECK_PSA, PdfExtraParams.PAGES_TO_CHECK_PSA_VALUE_ALL);
+
+			 String errorText = null;
+			 List<SignValidity> validityList = new ArrayList<>();
+			 try {
+				validityList = validator.validate(data, validationParams);
+				validity = validityList.get(0);
+				if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.KO
+						|| validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.UNKNOWN) {
+					errorText = buildErrorText(validity.getValidity(), validity.getError());
+				}
+			} catch (final RuntimeConfigNeededException e) {
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.SUSPECTED_SIGNATURE , e));
+				errorText = e.getMessage();
+			} catch (final Exception e) {
+				final SignValidity signValidity = new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e);
+				validityList.add(signValidity);
+				errorText = buildErrorText(signValidity.getValidity(), signValidity.getError());
+			}
+
+			newConfig.setSignValidity(validityList);
+			if (errorText != null) {
+				newConfig.setInvalidSignatureText(errorText);
+			}
+		 }
+	}
+
+	private static String buildErrorText(final SIGN_DETAIL_TYPE result, final VALIDITY_ERROR error) {
 
 		 final String errorMsg;
 		 if (result == SIGN_DETAIL_TYPE.UNKNOWN) {
@@ -822,7 +921,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 					return;
 				}
 
-		    	this.loadDataListener.loadFiles(files);
+		    	this.loadDataListener.loadFiles(files, null);
 			});
 
 	        final JLabel welcomeLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.14")); //$NON-NLS-1$

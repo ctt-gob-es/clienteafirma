@@ -237,7 +237,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
     }
 
-	void initGUI(final File preSelectedFile) {
+    /**
+     * Carga la interfaz de firma.
+     * @param preSelectedFile Fichero preseleccionado o {@code null} si no debe preseleccionarse
+     * ning&uacute;n fichero.
+     * @param signConfig Configuraci&oacute;n de firma por defecto o {@code null} si debe aplicarse
+     * la configurada por defecto en la interfaz para el tipo de fichero seleccionado.
+     */
+	void initGUI(final File preSelectedFile, final SignOperationConfig signConfig) {
         // Cargamos las preferencias establecidas
 		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
 		if (defaultLocale == null || defaultLocale.isEmpty()) {
@@ -282,7 +289,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         	configureMenuBar();
 
         	if (preSelectedFile != null) {
-        		loadFileToSign(preSelectedFile);
+        		loadFileToSign(preSelectedFile, signConfig);
         	}
         }
     }
@@ -611,8 +618,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
-    	List<SignValidity> validityList = new ArrayList<SignValidity>();
-    	List<SignValidity> validityListResult = new ArrayList<SignValidity>();
+    	List<SignValidity> validityList = new ArrayList<>();
+    	List<SignValidity> validityListResult = new ArrayList<>();
     	final SignValider sv = SignValiderFactory.getSignValider(signature);
         if (sv != null) {
         	try {
@@ -802,10 +809,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 *
 	 * @param file Fichero a firmar, incluyendo su ruta completa
 	 */
-    public void loadFileToSign(final File file) {
+    public void loadFileToSign(final File file, final SignOperationConfig signConfig) {
         if (this.currentPanel instanceof SignPanel) {
             try {
-                ((SignPanel) this.currentPanel).loadFiles(new File[] { file } );
+                ((SignPanel) this.currentPanel).loadFiles(new File[] { file }, signConfig );
 			} catch (final Exception e) {
 				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.0"), //$NON-NLS-1$
                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -1031,7 +1038,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				}
 
 				LOGGER.info("Iniciando entorno grafico"); //$NON-NLS-1$
-				saf.initGUI(null);
+				saf.initGUI(null, null);
 
 				checkJavaVersion(saf.getMainFrame());
 			} else {

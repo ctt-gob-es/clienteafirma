@@ -145,7 +145,7 @@ public final class MainMenu extends JMenuBar {
 				catch(final AOCancelledOperationException e) {
 					return;
 				}
-				MainMenu.this.getSimpleAfirma().loadFileToSign(fileToLoad);
+				MainMenu.this.getSimpleAfirma().loadFileToSign(fileToLoad, null);
 			}
 		);
         menuArchivo.add(this.abrirMenuItem);
