@@ -1353,7 +1353,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // si el documento contiene una firma simple se inserta como raiz el
             // nodo AFIRMA
-            if (rootSig.getNodeName().equals((xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + XMLConstants.TAG_SIGNATURE)) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (XMLConstants.TAG_SIGNATURE.equals(rootSig.getLocalName()) && XMLConstants.DSIGNNS.equals(rootSig.getNamespaceURI())) {
                 docSig = insertarNodoAfirma(docSig);
                 rootSig = docSig.getDocumentElement();
             }
@@ -1783,7 +1783,8 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // si el nodo raiz del documento es una firma simple, se inserta como raiz el
             // nodo AFIRMA
-            if (root.getNodeName().equals((xmlSignaturePrefix == null || xmlSignaturePrefix.isEmpty() ? "" : xmlSignaturePrefix + ":") + XMLConstants.TAG_SIGNATURE)) { //$NON-NLS-1$ //$NON-NLS-2$
+
+            if (XMLConstants.TAG_SIGNATURE.equals(root.getLocalName()) && XMLConstants.DSIGNNS.equals(root.getNamespaceURI())) {
                 this.doc = insertarNodoAfirma(this.doc);
                 root = this.doc.getDocumentElement();
             }
@@ -2298,10 +2299,9 @@ public final class AOXMLDSigSigner implements AOSigner {
             final Document signDoc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
             final Element rootNode = signDoc.getDocumentElement();
 
-            final String xmlSignatureName = XML_SIGNATURE_PREFIX + ":" + XMLConstants.TAG_SIGNATURE; //$NON-NLS-1$
-
             final ArrayList<Node> signNodes = new ArrayList<>();
-            if (rootNode.getNodeName().equals(xmlSignatureName)) {
+            if (XMLConstants.TAG_SIGNATURE.equals(rootNode.getLocalName())
+            		&& XMLConstants.DSIGNNS.equals(rootNode.getNamespaceURI())) {
                 signNodes.add(rootNode);
             }
 

@@ -376,7 +376,7 @@ final class XAdESTriPhaseSignerUtil {
 		final List<Node> signatureNodes = new ArrayList<>();
 
 		// Comprobamos si el nodo principal es de firma
-		if (signDoc.getNodeName().equals("Signature") || signDoc.getNodeName().endsWith(":Signature")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (signDoc.getLocalName().equals("Signature")) { //$NON-NLS-1$
 			signatureNodes.add(signDoc);
 		}
 

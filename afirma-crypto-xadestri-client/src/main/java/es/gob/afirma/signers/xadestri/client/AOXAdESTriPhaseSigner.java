@@ -74,8 +74,6 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
     /** Etiqueta de los nodos firma de los XML firmados. */
     public static final String SIGNATURE_TAG = "Signature"; //$NON-NLS-1$
 
-    protected static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature"; //$NON-NLS-1$
-
 	/** Nombre de la propiedad de URL del servidor de firma trif&aacute;sica. */
 	private static final String PROPERTY_NAME_SIGN_SERVER_URL = "serverUrl"; //$NON-NLS-1$
 
@@ -277,7 +275,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
     		).getDocumentElement();
 
             final List<Node> signNodes = new ArrayList<>();
-            if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
+            if (SIGNATURE_TAG.equals(rootNode.getLocalName()) && DSIGNNS.equals(rootNode.getNamespaceURI())) {
                 signNodes.add(rootNode);
             }
 

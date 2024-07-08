@@ -89,6 +89,7 @@
 			      <configuration>
 			        <name>current.date</name>
 			        <pattern>yyyy-MM-dd hh:mm</pattern>
+			        <locale>es,ES</locale>
 			      </configuration>
 			    </execution>
 			  </executions>

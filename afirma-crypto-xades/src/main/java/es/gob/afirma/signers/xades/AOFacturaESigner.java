@@ -309,9 +309,8 @@ public final class AOFacturaESigner implements AOSigner {
 
         try {
             final Element rootNode = dataDocument.getDocumentElement();
-            final String rootNodePrefix = rootNode.getPrefix();
 
-            if (!((rootNodePrefix != null ? rootNodePrefix + ":" : "") + "Facturae").equals(rootNode.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (!"Facturae".equals(rootNode.getLocalName())) { //$NON-NLS-1$
                 return false;
             }
 
@@ -321,8 +320,8 @@ public final class AOFacturaESigner implements AOSigner {
             childs.add("Invoices"); //$NON-NLS-1$
 
             final NodeList nl = rootNode.getChildNodes();
-            for (int i=0;i<nl.getLength();i++) {
-                final String nodeName = nl.item(i).getNodeName();
+            for (int i = 0; i < nl.getLength(); i++) {
+                final String nodeName = nl.item(i).getLocalName();
                 if (childs.contains(nodeName)) {
                     childs.remove(nodeName);
                 }

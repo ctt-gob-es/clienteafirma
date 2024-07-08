@@ -97,9 +97,7 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 			return false;
 		}
 		try {
-			return super.isSign(
-				ASiCUtil.getASiCSXMLSignature(sign)
-			);
+			return super.isSign(sign);
 		}
 		catch (final Exception e) {
 			LOGGER.warning("Error extrayendo la firma del contenedor ASiC: " + e); //$NON-NLS-1$
