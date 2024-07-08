@@ -122,12 +122,16 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                 x509DataList.add(cert);
             }
         }
+
+        //FIXME: Cuando Afirma valide el elemento ECKeyValue generado por Apache Santuario
+        // se deberia permitir agregar este elemento
+        final PublicKey publicKey = certificates.get(0).getPublicKey();
+        final boolean ecKey = "EC".equalsIgnoreCase(publicKey.getAlgorithm()); //$NON-NLS-1$
+
         final List<XMLStructure> newList = new ArrayList<>();
         newList.add(keyInfoFactory.newX509Data(x509DataList));
-        if (addKeyValue) {
-	        newList.add(keyInfoFactory.newKeyValue(
-	    		certificates.get(0).getPublicKey())
-			);
+        if (addKeyValue && !ecKey) {
+	        newList.add(keyInfoFactory.newKeyValue(publicKey));
         }
         if (addKeyName) {
 	        newList.add(

@@ -1,6 +1,5 @@
 package es.gob.afirma.cert.signvalidation;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 import org.junit.Test;
@@ -44,21 +43,6 @@ public class TestSignatureValidation {
 		) {
 			final byte[] cades = AOUtil.getDataFromInputStream(is);
 			System.out.println(new ValidateBinarySignature().validate(cades, false));
-		}
-	}
-
-	/** Prueba de validaci&oacute;n de firma CAdES LTA-Level.
-	 * @throws Exception En cualquier error. */
-	@SuppressWarnings("static-method")
-	@Test
-	public void testExternalCadesValidation() throws Exception {
-		try (
-			final InputStream is = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\RSA_ECDSA.csig");
-			//final InputStream is = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\ECDSA_RSA.csig");
-			//final InputStream is = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\Firma_ECDSA.csig");
-		) {
-			final byte[] cades = AOUtil.getDataFromInputStream(is);
-			System.out.println(new ValidateBinarySignature().validate(cades, true));
 		}
 	}
 
