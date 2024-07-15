@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
@@ -68,7 +69,7 @@ final class JSONSingleSignPostProcessor {
 	 *	]
 	 *}
 	 *           </pre>
-	 * @param algorithm Algoritmo de firma.
+	 * @param digestAlgorithm Algoritmo de huella.
 	 * @param batchId Identificador del lote de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @param docCacheManager Gestor para la carga de datos desde cach&eacute;.
@@ -79,7 +80,7 @@ final class JSONSingleSignPostProcessor {
 	public static void doPostProcess(final JSONSingleSign sSign,
 			                  final X509Certificate[] certChain,
 			                  final TriphaseData tdata,
-			                  final SingleSignConstants.SignAlgorithm algorithm,
+			                  final SingleSignConstants.DigestAlgorithm digestAlgorithm,
 			                  final String batchId,
 			                  final DocumentManager docManager,
 			                  final DocumentCacheManager docCacheManager) throws IOException,
@@ -93,13 +94,6 @@ final class JSONSingleSignPostProcessor {
 		}
 
 		final TriphaseData td = cleanTriphaseData(tdata, sSign.getId());
-
-		try {
-			TriPhaseHelper.checkSignaturesIntegrity(td, certChain[0]);
-		}
-		catch (final Exception e) {
-			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
-		}
 
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = TriPhaseHelper.getTriPhasePreProcessor(sSign);
@@ -123,6 +117,13 @@ final class JSONSingleSignPostProcessor {
 
 		if (docBytes == null) {
 			docBytes = docManager.getDocument(sSign.getDataRef(), certChain, sSign.getExtraParams());
+		}
+
+		try {
+			TriPhaseHelper.checkSignaturesIntegrity(td, docBytes, certChain[0], digestAlgorithm);
+		}
+		catch (final Exception e) {
+			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
 		}
 
 		Properties extraParams;
@@ -154,12 +155,14 @@ final class JSONSingleSignPostProcessor {
 			}
 		}
 
+		final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm.getName(), certChain[0].getPublicKey().getAlgorithm());
+
 		final byte[] signedDoc;
 		switch(sSign.getSubOperation()) {
 			case SIGN:
 				signedDoc = prep.preProcessPostSign(
 					docBytes,
-					algorithm.toString(),
+					signAlgorithm,
 					certChain,
 					extraParams,
 					td
@@ -168,7 +171,7 @@ final class JSONSingleSignPostProcessor {
 			case COSIGN:
 				signedDoc = prep.preProcessPostCoSign(
 					docBytes,
-					algorithm.toString(),
+					signAlgorithm,
 					certChain,
 					extraParams,
 					td
@@ -185,7 +188,7 @@ final class JSONSingleSignPostProcessor {
 				}
 				signedDoc = prep.preProcessPostCounterSign(
 					docBytes,
-					algorithm.toString(),
+					signAlgorithm,
 					certChain,
 					extraParams,
 					td,

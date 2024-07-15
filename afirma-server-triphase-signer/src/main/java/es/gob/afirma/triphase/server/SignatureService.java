@@ -10,6 +10,8 @@
 package es.gob.afirma.triphase.server;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -442,6 +444,9 @@ public final class SignatureService extends HttpServlet {
 				configurePdfShadowAttackParameters(extraParams);
 			}
 
+			// Identificamos el algoritmo de firma apropiado la clave del certificado seleccionado
+	        final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, signerCertChain[0].getPublicKey().getAlgorithm());
+
 			if (PARAM_VALUE_OPERATION_PRESIGN.equalsIgnoreCase(operation)) {
 
 				LOGGER.info(" == PREFIRMA en servidor"); //$NON-NLS-1$
@@ -454,7 +459,7 @@ public final class SignatureService extends HttpServlet {
 					if (PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)) {
 						preRes = prep.preProcessPreSign(
 									docBytes,
-									algorithm,
+									signAlgorithm,
 									signerCertChain,
 									extraParams,
 									checkSignatures
@@ -463,7 +468,7 @@ public final class SignatureService extends HttpServlet {
 					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)) {
 						preRes = prep.preProcessPreCoSign(
 								docBytes,
-								algorithm,
+								signAlgorithm,
 								signerCertChain,
 								extraParams,
 								checkSignatures
@@ -480,7 +485,7 @@ public final class SignatureService extends HttpServlet {
 						}
 						preRes = prep.preProcessPreCounterSign(
 							docBytes,
-							algorithm,
+							signAlgorithm,
 							signerCertChain,
 							extraParams,
 							target,
@@ -560,7 +565,7 @@ public final class SignatureService extends HttpServlet {
 				// esten realizados con ese certificado
 				if (ConfigManager.getHMacKey() != null) {
 					try {
-						checkSignaturesIntegrity(triphaseData, prep, signerCertChain[0], algorithm);
+						checkSignaturesIntegrity(triphaseData, prep, signerCertChain[0]);
 					}
 					catch (final InvalidVerificationCodeException e) {
 						LOGGER.log(Level.SEVERE, "Las prefirmas y/o el certificado obtenido no se corresponden con los generados en la prefirma", e); //$NON-NLS-1$
@@ -581,7 +586,7 @@ public final class SignatureService extends HttpServlet {
 					if (PARAM_VALUE_SUB_OPERATION_SIGN.equals(subOperation)) {
 						signedDoc = prep.preProcessPostSign(
 							docBytes,
-							algorithm,
+							signAlgorithm,
 							signerCertChain,
 							extraParams,
 							triphaseData
@@ -590,7 +595,7 @@ public final class SignatureService extends HttpServlet {
 					else if (PARAM_VALUE_SUB_OPERATION_COSIGN.equals(subOperation)) {
 						signedDoc = prep.preProcessPostCoSign(
 							docBytes,
-							algorithm,
+							signAlgorithm,
 							signerCertChain,
 							extraParams,
 							triphaseData
@@ -608,7 +613,7 @@ public final class SignatureService extends HttpServlet {
 
 						signedDoc = prep.preProcessPostCounterSign(
 							docBytes,
-							algorithm,
+							signAlgorithm,
 							signerCertChain,
 							extraParams,
 							triphaseData,
@@ -772,13 +777,11 @@ public final class SignatureService extends HttpServlet {
 	 * @param triphaseData Informaci&oacute;n de la firma.
 	 * @param prep Procesador que compone el formato de firma.
 	 * @param cert Certificado que se declara haber usado en la prefirma.
-	 * @param signatureAlgorithm Algoritmo de firma.
 	 * @throws InvalidVerificationCodeException Cuando el PKCS#1 de la firma no se generase con el
 	 * certificado indicado o cuando no se pudiese comprobar.
 	 * @throws IOException Cuando falla la decodificaci&oacute;n Base 64 de los datos.
 	 */
-	private static void checkSignaturesIntegrity(final TriphaseData triphaseData, final TriPhasePreProcessor prep, final X509Certificate cert,
-			final String signatureAlgorithm) throws InvalidVerificationCodeException, IOException {
+	private static void checkSignaturesIntegrity(final TriphaseData triphaseData, final TriPhasePreProcessor prep, final X509Certificate cert) throws InvalidVerificationCodeException, IOException {
 
 		final SecretKeySpec key = new SecretKeySpec(ConfigManager.getHMacKey().getBytes(CHARSET), HMAC_ALGORITHM);
 		for (final TriSign triSign : triphaseData.getTriSigns()) {

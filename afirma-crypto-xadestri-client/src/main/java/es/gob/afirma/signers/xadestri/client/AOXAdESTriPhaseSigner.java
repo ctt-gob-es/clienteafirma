@@ -482,8 +482,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 				key,
 				certChain,
 				triphaseData,
-				extraParams,
-				true
+				extraParams
 			).toString().getBytes(),
 			true
 		);

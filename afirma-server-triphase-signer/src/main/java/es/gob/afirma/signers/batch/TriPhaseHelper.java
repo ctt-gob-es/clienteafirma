@@ -6,20 +6,23 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.Signature;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.signers.batch.SingleSignConstants.DigestAlgorithm;
 import es.gob.afirma.signers.batch.xml.SingleSign;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.triphase.server.ConfigManager;
@@ -102,7 +105,9 @@ public class TriPhaseHelper {
 	 * al PKCS#1. Despu&eacute;s, comprueba que con la clave privada de ese certificado se generase
 	 * ese PKCS#1.
 	 * @param triphaseData Informaci&oacute;n de la firma.
+	 * @param docBytes
 	 * @param cert Certificado que se declara haber usado en la prefirma.
+	 * @param algorithm Algoritmo de hash de la firma.
 	 * @throws SecurityException Cuando el PKCS#1 de la firma no se generase con el
 	 * certificado indicado o cuando no se pudiese comprobar.
 	 * @throws IOException Cuando falla la decodificaci&oacute;n Base 64 de los datos.
@@ -111,7 +116,7 @@ public class TriPhaseHelper {
 	// prefirma (par&aacute;metro PRE) para completar la firma, sino el parametro BASE. Habr&iacute;a
 	// que extraer la prefirma del BASE en lugar de coger la que se pasa como par&aacute;metro (que
 	// ya podr&iacute;a dejar de pasarse).
-	public static void checkSignaturesIntegrity(final TriphaseData triphaseData, final X509Certificate cert)
+	public static void checkSignaturesIntegrity(final TriphaseData triphaseData, final byte[] docBytes, final X509Certificate cert, final DigestAlgorithm algorithm)
 			throws SecurityException, IOException {
 
 		final String hmacSeed = ConfigManager.getHMacKey();
@@ -122,36 +127,47 @@ public class TriPhaseHelper {
 		final SecretKeySpec key = new SecretKeySpec(hmacSeed.getBytes(DEFAULT_CHARSET), HMAC_ALGORITHM);
 		for (final TriSign triSign : triphaseData.getTriSigns()) {
 
-			final String verificationHMac = triSign.getProperty(TRIPHASE_PROP_HMAC);
-			if (verificationHMac == null) {
-				throw new SecurityException("Alguna de las firmas no contenida el codigo de verificacion"); //$NON-NLS-1$
-			}
+			verifyIntegrity(triSign, key, hmacSeed, cert);
 
-			final String preSign = triSign.getProperty(TRIPHASE_PROP_PRESIGN);
+			verifyPkcs1(triSign, cert.getPublicKey(), docBytes, algorithm);
+		}
+	}
 
-			byte[] hmac;
-			try {
-				final Mac mac = Mac.getInstance(HMAC_ALGORITHM);
-				mac.init(key);
-				mac.update(preSign.getBytes(DEFAULT_CHARSET));
-				mac.update(hmacSeed.getBytes(DEFAULT_CHARSET));
-				mac.update(cert.getEncoded());
-				hmac = mac.doFinal();
-			}
-			catch (final Exception e) {
-				throw new SecurityException("No se pudo completar la verificacion de integridad de la firma", e); //$NON-NLS-1$
-			}
+	/**
+	 * Verificamos que la prefirma y el certificado proporcionados son los mismos que generamos
+	 * en la prefirma.
+	 */
+	private static void verifyIntegrity(final TriSign triSign, final SecretKeySpec key, final String hmacSeed, final X509Certificate cert) {
 
-			if (!Arrays.equals(hmac, Base64.decode(verificationHMac))) {
-				throw new SecurityException("Se ha detectado un error de integridad en los datos de firma"); //$NON-NLS-1$
-			}
+		final String verificationHMacB64 = triSign.getProperty(TRIPHASE_PROP_HMAC);
+		if (verificationHMacB64 == null) {
+			throw new SecurityException("Alguna de las firmas no contenida el codigo de verificacion"); //$NON-NLS-1$
+		}
 
-			final String signatureValue = triSign.getProperty(TRIPHASE_PROP_PKCS1);
-			if (signatureValue == null) {
-				throw new SecurityException("No se ha proporcionado el PKCS#1 de la firma"); //$NON-NLS-1$
-			}
+		byte[] verificationHMac;
+		try {
+			verificationHMac = Base64.decode(verificationHMacB64);
+		} catch (final IOException e) {
+			throw new SecurityException("Alguna de las firmas contenida un codigo de verificacion no valido", e); //$NON-NLS-1$
+		}
 
-			verifyPkcs1(Base64.decode(signatureValue), cert.getPublicKey());
+		final String preSign = triSign.getProperty(TRIPHASE_PROP_PRESIGN);
+
+		byte[] hmac;
+		try {
+			final Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+			mac.init(key);
+			mac.update(preSign.getBytes(DEFAULT_CHARSET));
+			mac.update(hmacSeed.getBytes(DEFAULT_CHARSET));
+			mac.update(cert.getEncoded());
+			hmac = mac.doFinal();
+		}
+		catch (final Exception e) {
+			throw new SecurityException("No se pudo completar la verificacion de integridad de la firma", e); //$NON-NLS-1$
+		}
+
+		if (!Arrays.equals(hmac, verificationHMac)) {
+			throw new SecurityException("Se ha detectado un error de integridad en los datos de firma"); //$NON-NLS-1$
 		}
 	}
 
@@ -164,18 +180,28 @@ public class TriPhaseHelper {
      * @throws SecurityException Cuando no se proporciona un par&aacute;metro v&aacute;lido o
      * el PKCS#1 se gener&oacute; con una clave privada distinta a la esperada.
      */
-    public static void verifyPkcs1(final byte[] signatureValue, final PublicKey publicKey) throws SecurityException {
+    public static void verifyPkcs1(final TriSign triSign, final PublicKey publicKey, final byte[] data, final DigestAlgorithm digestAlgorithm) throws SecurityException {
+
+		final String signatureValueB64 = triSign.getProperty(TRIPHASE_PROP_PKCS1);
+		if (signatureValueB64 == null) {
+			throw new SecurityException("No se ha proporcionado el PKCS#1 de la firma"); //$NON-NLS-1$
+		}
+
     	try {
+    		final byte[] signatureValue = Base64.decode(signatureValueB64);
+    		final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm.getName(), publicKey.getAlgorithm());
 
-    		//TODO: Probar y soportar algoritmos de cifrado de curva eliptica
-    		if (!"RSA".equalsIgnoreCase(publicKey.getAlgorithm())) { //$NON-NLS-1$
-    			LOGGER.warning("No se soporta la validacion del PKCS#1 con el algoritmo de cifrado asociado a la clave de firma utilizada"); //$NON-NLS-1$
-    			return;
-    		}
-
-    		final Cipher cipher = Cipher.getInstance(publicKey.getAlgorithm());
-    		cipher.init(Cipher.DECRYPT_MODE, publicKey);
-    		cipher.doFinal(signatureValue);
+    		try {
+				final Signature sigVerifier = Signature.getInstance(signAlgorithm);
+				sigVerifier.initVerify(publicKey);
+				sigVerifier.update(data);
+				if (!sigVerifier.verify(signatureValue)) {
+					throw new AOException("El PKCS#1 de firma obtenido no se genero con el certificado indicado"); //$NON-NLS-1$
+				}
+			}
+			catch (final Exception e) {
+				throw new AOException("Error al verificar el PKCS#1 de la firma", e); //$NON-NLS-1$
+			}
     	}
     	catch (final Exception e) {
     		throw new SecurityException("El PKCS#1 de la firma no se ha generado con el certificado indicado", e); //$NON-NLS-1$

@@ -28,6 +28,9 @@ public final class TriphaseDataSigner {
 	/** Nombre de la propiedad para almac&eacute;n de firmas PKCS#1. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
 
+	/** Nombre de la propiedad  que indica que el PKCS#1 se debe enviar decodificado. */
+	private static final String PROPERTY_NAME_PKCS1_DECODED = "PK1_DECODED"; //$NON-NLS-1$
+
 	/** Nombre de la propiedad  que indica si la postfirma requiere la prefirma. */
 	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
 
@@ -52,28 +55,6 @@ public final class TriphaseDataSigner {
 			                          final Certificate[] certChain,
 			                          final TriphaseData triphaseData,
 			                          final Properties extraParams) throws AOException {
-		return doSign(signer, algorithm, key, certChain, triphaseData, extraParams, false);
-	}
-
-	/** Realiza la operaci&oacute;n de Firma (PKCS#1) sobre una sesi&oacute;n de firma
-	 * trif&aacute;sica.
-	 * @param signer Firmador PKCS#1.
-	 * @param algorithm Algoritmo de firma.
-	 * @param key Clave privada para la firma.
-	 * @param certChain Cadena de certificados del firmante.
-	 * @param triphaseData Datos de sesi&oacute;n trif&aacute;sica.
-	 * @param extraParams Par&aacute;metros adicionales (aqu&iacute; solo aplican a la
-	 *                    firma PKCS#1.
-	 * @param decodePkcs1	Indica si se usar el PKCS#1 decodificado (solo para firma firmas ECDSA o DSA).
-	 * @return Sesi&oacute;n trif&aacute;sica con las firmas PKCS#1 incluidas.
-	 * @throws AOException Si ocurre cualquier error durante la firma. */
-	public static TriphaseData doSign(final AOPkcs1Signer signer,
-			                          final String algorithm,
-			                          final PrivateKey key,
-			                          final Certificate[] certChain,
-			                          final TriphaseData triphaseData,
-			                          final Properties extraParams,
-			                          final boolean decodePkcs1) throws AOException {
 
 		if (triphaseData.getSignsCount() < 1) {
 			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
@@ -106,7 +87,9 @@ public final class TriphaseDataSigner {
 				extraParams // Parametros para PKCS#1
 			);
 
-			if (decodePkcs1 && AOSignConstants.isDSAorECDSASignatureAlgorithm(signatureAlgorithm)) {
+			// Si desde el servidor nos indican que necesitan el PKCS#1 decodificado, pues lo decodificamos
+			final boolean decodePkcs1 = Boolean.parseBoolean(signConfig.getProperty(PROPERTY_NAME_PKCS1_DECODED));
+			if (decodePkcs1) {
 				try {
 					pkcs1sign = Pkcs1Utils.decodeSignature(pkcs1sign);
 				} catch (final SignatureException e) {

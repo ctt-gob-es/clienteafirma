@@ -17,7 +17,7 @@ import org.junit.Test;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
-import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
+import es.gob.afirma.signers.batch.SingleSignConstants.DigestAlgorithm;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.xml.SignBatch;
@@ -37,7 +37,7 @@ public final class TestSignBatch {
 		"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n" + //$NON-NLS-1$
 		"<signbatch stoponerror=\"false\" algorithm=\"SHA256withRSA\" Id=\"LOTE001\">\r\n" + //$NON-NLS-1$
 		" <singlesign Id=\"7725374e-728d-4a33-9db9-3a4efea4cead\">\r\n" + //$NON-NLS-1$
-		"  <datasource>http://google.com</datasource>\r\n" + //$NON-NLS-1$
+		"  <datasource>https://google.com</datasource>\r\n" + //$NON-NLS-1$
 		"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
 		"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
 		"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==</extraparams>\r\n" + //$NON-NLS-1$
@@ -62,7 +62,7 @@ public final class TestSignBatch {
 			"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n" + //$NON-NLS-1$
 			"<signbatch stoponerror=\"true\" algorithm=\"SHA512withRSA\">\r\n" + //$NON-NLS-1$
 			" <singlesign Id=\"7725374e-728d-4a33-9db9-3a4efea4cead\">\r\n" + //$NON-NLS-1$
-			"  <datasource>http://google.com</datasource>\r\n" + //$NON-NLS-1$
+			"  <datasource>https://google.com</datasource>\r\n" + //$NON-NLS-1$
 			"  <format>XAdES</format>\r\n" + //$NON-NLS-1$
 			"  <suboperation>sign</suboperation>\r\n" + //$NON-NLS-1$
 			"  <extraparams>Iw0KI1RodSBBdWcgMTMgMTY6Mjk6MDUgQ0VTVCAyMDE1DQpTaWduYXR1cmVJZD03NzI1Mzc0ZS03MjhkLTRhMzMtOWRiOS0zYTRlZmVhNGNlYWQNCg==</extraparams>\r\n" + //$NON-NLS-1$
@@ -113,7 +113,7 @@ public final class TestSignBatch {
 
 		final SingleSign ss1 = new SingleSign(
 			"001-XAdES", //$NON-NLS-1$
-			"http://google.com", //$NON-NLS-1$
+			"https://google.com", //$NON-NLS-1$
 			SignFormat.XADES,
 			SignSubOperation.SIGN,
 			null,
@@ -141,7 +141,7 @@ public final class TestSignBatch {
 
 		final SingleSign ss3 = new SingleSign(
 			"003-CAdES", //$NON-NLS-1$
-			"http://ibm.com", //$NON-NLS-1$
+			"https://ibm.com", //$NON-NLS-1$
 			SignFormat.CADES,
 			SignSubOperation.SIGN,
 			null,
@@ -158,7 +158,7 @@ public final class TestSignBatch {
 
 		final SingleSign ss4 = new SingleSign(
 			"004-XAdES", //$NON-NLS-1$
-			"http://atos.net", //$NON-NLS-1$
+			"https://atos.net", //$NON-NLS-1$
 			SignFormat.XADES,
 			SignSubOperation.SIGN,
 			extraParams4,
@@ -172,9 +172,9 @@ public final class TestSignBatch {
 		signs.add(ss4);
 
 		if (concurrent) {
-			return new SignBatchConcurrent(signs, SingleSignConstants.SignAlgorithm.SHA384WITHRSA, true);
+			return new SignBatchConcurrent(signs, SingleSignConstants.DigestAlgorithm.SHA384, true);
 		}
-		return new SignBatchSerial(signs, SingleSignConstants.SignAlgorithm.SHA384WITHRSA, true);
+		return new SignBatchSerial(signs, SingleSignConstants.DigestAlgorithm.SHA384, true);
 
 
 		//************ FIN CREACION DE LOTE ****************************************************
@@ -227,7 +227,7 @@ public final class TestSignBatch {
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
 		final TriphaseData td2 = TriphaseDataSigner.doSign(
 			new AOPkcs1Signer(),
-			SignAlgorithm.SHA512WITHRSA.toString(),
+			DigestAlgorithm.SHA512.getName(),
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			td1,
@@ -285,7 +285,7 @@ public final class TestSignBatch {
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
 		final TriphaseData td2 = TriphaseDataSigner.doSign(
 			new AOPkcs1Signer(),
-			SignAlgorithm.SHA512WITHRSA.toString(),
+			DigestAlgorithm.SHA512.getName(),
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			td1,
@@ -345,7 +345,7 @@ public final class TestSignBatch {
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
 		final TriphaseData td2 = TriphaseDataSigner.doSign(
 			new AOPkcs1Signer(),
-			SignAlgorithm.SHA512WITHRSA.toString(),
+			DigestAlgorithm.SHA512.getName(),
 			pke.getPrivateKey(),
 			pke.getCertificateChain(),
 			td1,

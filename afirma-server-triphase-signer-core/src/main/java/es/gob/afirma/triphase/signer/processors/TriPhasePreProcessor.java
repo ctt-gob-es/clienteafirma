@@ -25,7 +25,7 @@ public interface TriPhasePreProcessor {
 	/**
 	 * Prefirma.
 	 * @param data Datos a firmar.
-	 * @param algorithm Algoritmo de firma.
+	 * @param signAlgorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
 	 * @param checkSignatures Comprobar si la entrada es una firma v&aacute;lida firma antes de agregarle la nueva firma.
@@ -33,13 +33,13 @@ public interface TriPhasePreProcessor {
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
 	 * @throws AOException En cualquier otro tipo de error.
 	 */
-	TriphaseData preProcessPreSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, boolean checkSignatures)
+	TriphaseData preProcessPreSign(byte[] data, String signAlgorithm, X509Certificate[] cert, Properties extraParams, boolean checkSignatures)
 			throws IOException, AOException;
 
 	/**
 	 * Postfirma.
 	 * @param data Datos a firmar.
-	 * @param algorithm Algoritmo de firma.
+	 * @param signAlgorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
 	 * @param session Datos de la sesi&oacute;n (PK1, prefirma,...).
@@ -48,13 +48,13 @@ public interface TriPhasePreProcessor {
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
 	 * @throws AOException En cualquier otro tipo de error.
 	 */
-	byte[] preProcessPostSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, byte[] session)
+	byte[] preProcessPostSign(byte[] data, String signAlgorithm, X509Certificate[] cert, Properties extraParams, byte[] session)
 			throws NoSuchAlgorithmException, IOException, AOException;
 
 	/**
 	 * Postfirma.
 	 * @param data Datos a firmar.
-	 * @param algorithm Algoritmo de firma.
+	 * @param signAlgorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
 	 * @param sessionData Datos de la sesi&oacute;n (PK1, prefirma,...).
@@ -63,13 +63,13 @@ public interface TriPhasePreProcessor {
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
 	 * @throws AOException En cualquier otro tipo de error.
 	 */
-	byte[] preProcessPostSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, TriphaseData sessionData) throws NoSuchAlgorithmException, IOException, AOException;
+	byte[] preProcessPostSign(byte[] data, String signAlgorithm, X509Certificate[] cert, Properties extraParams, TriphaseData sessionData) throws NoSuchAlgorithmException, IOException, AOException;
 
 
 	/**
 	 * Precofirma.
 	 * @param data Datos a cofirmar.
-	 * @param algorithm Algoritmo de firma.
+	 * @param signAlgorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
 	 * @param checkSignatures Comprobar si la entrada es una firma v&aacute;lida firma antes de agregarle la nueva firma.
@@ -77,13 +77,13 @@ public interface TriPhasePreProcessor {
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
 	 * @throws AOException En cualquier otro tipo de error.
 	 */
-	TriphaseData preProcessPreCoSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, boolean checkSignatures)
+	TriphaseData preProcessPreCoSign(byte[] data, String signAlgorithm, X509Certificate[] cert, Properties extraParams, boolean checkSignatures)
 			throws IOException, AOException;
 
 	/**
 	 * Postcofirma.
 	 * @param data Datos a cofirmar.
-	 * @param algorithm Algoritmo de firma.
+	 * @param signAlgorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
 	 * @param session Datos de la sesi&oacute;n (PK1, prefirma,...).
@@ -92,12 +92,12 @@ public interface TriPhasePreProcessor {
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
 	 * @throws AOException En cualquier otro tipo de error.
 	 */
-	byte[] preProcessPostCoSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, byte[] session) throws NoSuchAlgorithmException, AOException, IOException;
+	byte[] preProcessPostCoSign(byte[] data, String signAlgorithm, X509Certificate[] cert, Properties extraParams, byte[] session) throws NoSuchAlgorithmException, AOException, IOException;
 
 	/**
 	 * Postcofirma.
 	 * @param data Datos a cofirmar.
-	 * @param algorithm Algoritmo de firma.
+	 * @param signAlgorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
 	 * @param sessionData Datos de la sesi&oacute;n (PK1, prefirma,...).
@@ -106,13 +106,13 @@ public interface TriPhasePreProcessor {
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
 	 * @throws AOException En cualquier otro tipo de error.
 	 */
-	byte[] preProcessPostCoSign(byte[] data, String algorithm, X509Certificate[] cert, Properties extraParams, TriphaseData sessionData) throws NoSuchAlgorithmException, AOException, IOException;
+	byte[] preProcessPostCoSign(byte[] data, String signAlgorithm, X509Certificate[] cert, Properties extraParams, TriphaseData sessionData) throws NoSuchAlgorithmException, AOException, IOException;
 
 
 	/**
 	 * Precontrafirma.
 	 * @param sign Firma a contrafirmar.
-	 * @param algorithm Algoritmo de firma.
+	 * @param signAlgorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
 	 * @param targets Objetivo de la contrafirma.
@@ -121,13 +121,13 @@ public interface TriPhasePreProcessor {
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
 	 * @throws AOException En cualquier otro tipo de error.
 	 */
-	TriphaseData preProcessPreCounterSign(byte[] sign, String algorithm, X509Certificate[] cert, Properties extraParams, CounterSignTarget targets, boolean checkSignatures)
+	TriphaseData preProcessPreCounterSign(byte[] sign, String signAlgorithm, X509Certificate[] cert, Properties extraParams, CounterSignTarget targets, boolean checkSignatures)
 			throws IOException, AOException;
 
 	/**
 	 * Postcontrafirma.
 	 * @param sign Firma a contrafirmar.
-	 * @param algorithm Algoritmo de firma.
+	 * @param signAlgorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
 	 * @param session Datos de la sesi&oacute;n (PK1, prefirma,...).
@@ -137,12 +137,12 @@ public interface TriPhasePreProcessor {
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
 	 * @throws AOException En cualquier otro tipo de error.
 	 */
-	byte[] preProcessPostCounterSign(byte[] sign, String algorithm, X509Certificate[] cert, Properties extraParams, byte[] session, CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException;
+	byte[] preProcessPostCounterSign(byte[] sign, String signAlgorithm, X509Certificate[] cert, Properties extraParams, byte[] session, CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException;
 
 	/**
 	 * Postcontrafirma.
 	 * @param sign Firma a contrafirmar.
-	 * @param algorithm Algoritmo de firma.
+	 * @param signAlgorithm Algoritmo de firma.
 	 * @param cert Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;meros adicionales de la firma.
 	 * @param sessionData Datos de la sesi&oacute;n (PK1, prefirma,...).
@@ -152,14 +152,5 @@ public interface TriPhasePreProcessor {
 	 * @throws IOException Si hay errores en el tratamiento de los datos.
 	 * @throws AOException En cualquier otro tipo de error.
 	 */
-	byte[] preProcessPostCounterSign(byte[] sign, String algorithm, X509Certificate[] cert, Properties extraParams, TriphaseData sessionData, CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException;
-
-	/**
-	 * Indica si el preprocesador genera el PKCS#1 de las firmas de curva eliptica decodificado, de
-	 * cara a que se tenga en cuenta cuando se quiera validar.
-	 * @return {@code true} si el procesador genera el PKCS#1 decodificado, {@code false} en caso
-	 * contrario.
-	 */
-	boolean isDecodedPkcs1Used();
-
+	byte[] preProcessPostCounterSign(byte[] sign, String signAlgorithm, X509Certificate[] cert, Properties extraParams, TriphaseData sessionData, CounterSignTarget targets) throws NoSuchAlgorithmException, AOException, IOException;
 }

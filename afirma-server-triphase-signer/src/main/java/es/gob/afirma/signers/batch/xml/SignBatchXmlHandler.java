@@ -10,7 +10,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.batch.SignSaver;
-import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
+import es.gob.afirma.signers.batch.SingleSignConstants.DigestAlgorithm;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 
@@ -91,7 +91,7 @@ class SignBatchXmlHandler extends DefaultHandler {
 
 			// Algoritmo de firma (Obligatorio)
 			if (attributes != null && attributes.getValue(ATTR_ALGORITHM) != null) {
-				this.batchConfig.setAlgorithm(SignAlgorithm.getAlgorithm(attributes.getValue(ATTR_ALGORITHM)));
+				this.batchConfig.setAlgorithm(DigestAlgorithm.getAlgorithm(attributes.getValue(ATTR_ALGORITHM)));
 			}
 			else {
 				throw new SAXException(String.format("El nodo %s debe contener al menos el atributo de algoritmo", NODE_NAME_SIGNBATCH)); //$NON-NLS-1$

@@ -140,7 +140,7 @@ public final class JSONSingleSign extends SingleSign {
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos. */
 	TriphaseData doPreProcess(final X509Certificate[] certChain,
-			            final SingleSignConstants.SignAlgorithm algorithm,
+			            final SingleSignConstants.DigestAlgorithm algorithm,
 			            final DocumentManager docManager,
 			            final DocumentCacheManager docCacheManager) throws IOException,
 			                                                                      AOException {
@@ -154,7 +154,7 @@ public final class JSONSingleSign extends SingleSign {
 	 * @param docCacheManager Gestor para el guardado de datos en cach&eacute;.
 	 * @return Tarea de preproceso de firma para ser ejecutada en paralelo. */
 	Callable<PreprocessResult> getPreProcessCallable(final X509Certificate[] certChain,
-                                                  final SingleSignConstants.SignAlgorithm algorithm,
+                                                  final SingleSignConstants.DigestAlgorithm algorithm,
                                                   final DocumentManager docManager,
                                                   final DocumentCacheManager docCacheManager) {
 		return new PreProcessCallable(this, certChain, algorithm, docManager, docCacheManager);
@@ -197,7 +197,7 @@ public final class JSONSingleSign extends SingleSign {
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
 	void doPostProcess(final X509Certificate[] certChain,
 			                  final TriphaseData td,
-			                  final SingleSignConstants.SignAlgorithm algorithm,
+			                  final SingleSignConstants.DigestAlgorithm algorithm,
 			                  final String batchId,
 			                  final DocumentManager docManager,
 			                  final DocumentCacheManager docCacheManager) throws IOException,
@@ -237,7 +237,7 @@ public final class JSONSingleSign extends SingleSign {
 	 * @return Tarea de postproceso de firma para ser ejecutada en paralelo. */
 	Callable<ResultSingleSign> getPostProcessCallable(final X509Certificate[] certChain,
 			                                                          final TriphaseData td,
-			                                                          final SingleSignConstants.SignAlgorithm algorithm,
+			                                                          final SingleSignConstants.DigestAlgorithm algorithm,
 			                                                          final String batchId,
 			                                                          final DocumentManager docManager,
 			                                                          final DocumentCacheManager docCacheManager) {
@@ -284,12 +284,12 @@ public final class JSONSingleSign extends SingleSign {
 	static class PreProcessCallable implements Callable<PreprocessResult> {
 		private final JSONSingleSign ss;
 		private final X509Certificate[] certChain;
-		private final SingleSignConstants.SignAlgorithm algorithm;
+		private final SingleSignConstants.DigestAlgorithm algorithm;
 		private final DocumentManager documentManager;
 		private final DocumentCacheManager docCacheManager;
 
 		public PreProcessCallable(final JSONSingleSign ss, final X509Certificate[] certChain,
-                final SingleSignConstants.SignAlgorithm algorithm,
+                final SingleSignConstants.DigestAlgorithm algorithm,
                 final DocumentManager docManager,
                 final DocumentCacheManager docCacheManager) {
 			this.ss = ss;
@@ -329,13 +329,13 @@ public final class JSONSingleSign extends SingleSign {
 		private final JSONSingleSign ss;
 		private final X509Certificate[] certChain;
 		private final TriphaseData td;
-		private final SingleSignConstants.SignAlgorithm algorithm;
+		private final SingleSignConstants.DigestAlgorithm algorithm;
 		private final String batchId;
 		private final DocumentManager documentManager;
 		private final DocumentCacheManager docCacheManager;
 
 		public PostProcessCallable(final JSONSingleSign ss, final X509Certificate[] certChain,
-                final TriphaseData td, final SingleSignConstants.SignAlgorithm algorithm,
+                final TriphaseData td, final SingleSignConstants.DigestAlgorithm algorithm,
                 final String batchId, final DocumentManager docManager,
                 final DocumentCacheManager docCacheManager) {
 			this.ss = ss;

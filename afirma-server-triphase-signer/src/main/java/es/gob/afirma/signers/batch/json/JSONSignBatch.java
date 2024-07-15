@@ -64,7 +64,7 @@ public abstract class JSONSignBatch {
 	/** Lista de firmas a procesar. */
 	protected final List<JSONSingleSign> signs;
 
-	protected SingleSignConstants.SignAlgorithm algorithm = null;
+	protected SingleSignConstants.DigestAlgorithm algorithm = null;
 
 	protected String id;
 
@@ -140,7 +140,7 @@ public abstract class JSONSignBatch {
 				jsonObject.getBoolean(JSON_ELEMENT_STOPONERROR) : false;
 
 		if (jsonObject.has(JSON_ELEMENT_ALGORITHM)) {
-			this.algorithm = SingleSignConstants.SignAlgorithm.getAlgorithm(
+			this.algorithm = SingleSignConstants.DigestAlgorithm.getAlgorithm(
 								jsonObject.getString(JSON_ELEMENT_ALGORITHM)
 								);
 		} else {
@@ -407,7 +407,7 @@ public abstract class JSONSignBatch {
 	 * Obtiene el algoritmo de firma.
 	 * @return Algoritmo de firma.
 	 * */
-	public SingleSignConstants.SignAlgorithm getSignAlgorithm() {
+	public SingleSignConstants.DigestAlgorithm getSignAlgorithm() {
 		return this.algorithm;
 	}
 
