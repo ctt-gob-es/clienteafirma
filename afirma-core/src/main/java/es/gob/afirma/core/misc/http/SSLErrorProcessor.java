@@ -52,7 +52,7 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 			try {
 				headlessEnviroment = GraphicsEnvironment.isHeadless();
 			}
-			catch (final Exception e) {
+			catch (final Throwable e) {
 				headlessEnviroment = true;
 			}
 			this.headless = headlessEnviroment;
