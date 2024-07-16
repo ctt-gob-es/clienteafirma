@@ -52,10 +52,6 @@ public final class MassiveSignatureHelper {
 
     private static final AOException SIGN_DATA_NOT_GENERATED = new AOException("No se generaron datos de firma"); //$NON-NLS-1$
 
-    /** Algoritmo de huella digital por defecto que se utilizar&aacute;, por ejemplo, para
-     * la generaci&oacute;n de las firmas expl&iacute;citas XAdES. */
-	private static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
-
 	/** Generador de huellas digitales utilizado internamente. */
     private static MessageDigest md = null;
 

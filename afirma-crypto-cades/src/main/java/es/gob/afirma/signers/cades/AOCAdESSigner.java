@@ -56,7 +56,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
  *
  *   // Realizamos la firma CAdES
  *   final AOSigner signer = new AOCAdESSigner();
- *   final byte[] firma = signer.sign("Texto a firmar".getBytes(), "SHA1withRSA", pke, extraParams);
+ *   final byte[] firma = signer.sign("Texto a firmar".getBytes(), "SHA256withRSA", pke, extraParams);
  *
  * </pre>
  * @version 0.4 */
@@ -350,7 +350,7 @@ public final class AOCAdESSigner implements AOSigner {
 		}
 
     }
-    
+
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
 			throws AOInvalidFormatException, IOException {
@@ -390,7 +390,7 @@ public final class AOCAdESSigner implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
     	return getSignersStructure(sign, null, asSimpleSignInfo);
     }
-    
+
     /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
      * @param data Datos que deseamos comprobar.
      * @param params Par&aacute;metros de firma
@@ -440,7 +440,7 @@ public final class AOCAdESSigner implements AOSigner {
 	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
         return getData(signData, null);
     }
-    
+
 	@Override
 	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
         if (sign == null) {
@@ -480,7 +480,7 @@ public final class AOCAdESSigner implements AOSigner {
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException {
         return getSignInfo(signData, null);
     }
-    
+
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOInvalidFormatException {
         if (data == null) {

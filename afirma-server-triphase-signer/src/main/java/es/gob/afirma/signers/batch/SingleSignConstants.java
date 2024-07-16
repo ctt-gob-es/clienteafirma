@@ -162,21 +162,29 @@ public final class SingleSignConstants {
 		/**
 		 * Obtiene el algoritmo de huella a partir de su nombre.
 		 * @param name Nombre del algoritmo de huella.
-		 * @return Algoritmo de huella/firma RSA.
+		 * @return Algoritmo de huella o de firma RSA/ECDSA.
 		 */
 		public static DigestAlgorithm getAlgorithm(final String name) {
 			// Ademas del algoritmo de huella, comparamos si nos pasan un algoritmo de firma RSA
 			// por retrocompatibilidad (v1.9 y anteriores)
-			if (SHA1.getName().equalsIgnoreCase(name) || "SHA1withRSA".equalsIgnoreCase(name)) { //$NON-NLS-1$
+			if (SHA1.getName().equalsIgnoreCase(name)
+					|| "SHA1withRSA".equalsIgnoreCase(name) //$NON-NLS-1$
+					|| "SHA1withECDSA".equalsIgnoreCase(name)) { //$NON-NLS-1$
 				return SHA1;
 			}
-			if (SHA256.getName().equalsIgnoreCase(name) || "SHA256withRSA".equalsIgnoreCase(name)) { //$NON-NLS-1$
+			if (SHA256.getName().equalsIgnoreCase(name)
+					|| "SHA256withRSA".equalsIgnoreCase(name) //$NON-NLS-1$
+					|| "SHA256withECDSA".equalsIgnoreCase(name)) { //$NON-NLS-1$) {
 				return SHA256;
 			}
-			if (SHA384.getName().equalsIgnoreCase(name) || "SHA384withRSA".equalsIgnoreCase(name)) { //$NON-NLS-1$
+			if (SHA384.getName().equalsIgnoreCase(name)
+					|| "SHA384withRSA".equalsIgnoreCase(name) //$NON-NLS-1$
+					|| "SHA284withECDSA".equalsIgnoreCase(name)) { //$NON-NLS-1$) {
 				return SHA384;
 			}
-			if (SHA512.getName().equalsIgnoreCase(name) || "SHA512withRSA".equalsIgnoreCase(name)) { //$NON-NLS-1$
+			if (SHA512.getName().equalsIgnoreCase(name)
+					|| "SHA512withRSA".equalsIgnoreCase(name) //$NON-NLS-1$
+					|| "SHA512withECDSA".equalsIgnoreCase(name)) { //$NON-NLS-1$) {
 				return SHA512;
 			}
 			throw new IllegalArgumentException(

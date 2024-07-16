@@ -45,6 +45,10 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     private static final String URL_SHA256_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"; //$NON-NLS-1$
     private static final String URL_SHA384_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"; //$NON-NLS-1$
     private static final String URL_SHA512_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"; //$NON-NLS-1$
+    public static final String URL_SHA1_ECDSA   = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha1"; //$NON-NLS-1$
+    private static final String URL_SHA256_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"; //$NON-NLS-1$
+    private static final String URL_SHA384_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha384"; //$NON-NLS-1$
+    private static final String URL_SHA512_ECDSA  = "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512"; //$NON-NLS-1$
 
     public static final Map<String, String> SIGN_ALGOS_URI;
     public static final Map<String, String> FACTURAE_CLAIMED_ROLES;
@@ -55,6 +59,10 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     	SIGN_ALGOS_URI.put(URL_SHA256_RSA, "SHA256withRSA"); //$NON-NLS-1$
     	SIGN_ALGOS_URI.put(URL_SHA384_RSA, "SHA384withRSA"); //$NON-NLS-1$
     	SIGN_ALGOS_URI.put(URL_SHA512_RSA, "SHA512withRSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA1_ECDSA, "SHA1withECDSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA256_ECDSA, "SHA256withECDSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA384_ECDSA, "SHA384withECDSA"); //$NON-NLS-1$
+		SIGN_ALGOS_URI.put(URL_SHA512_ECDSA, "SHA512withECDSA"); //$NON-NLS-1$
 
     	FACTURAE_CLAIMED_ROLES = new HashMap<>();
     	FACTURAE_CLAIMED_ROLES.put("emisor", "Emisor"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -79,8 +87,8 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
             signInfo = SignAnalyzer.getSignInfo(data);
 
             this.signersTree = signInfo.getSignsTree();
-    		this.signDetailsList = new ArrayList<SignDetails>();
-    		this.certDetailsList = new ArrayList<CertificateDetails>();
+    		this.signDetailsList = new ArrayList<>();
+    		this.certDetailsList = new ArrayList<>();
     		this.signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(data));
     		final NodeList signaturesList = this.signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
     		createSignDetails(signaturesList);
@@ -232,7 +240,7 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 			// METADATOS
 			final NodeList signatureProductionPlaceList = qualifyingProps.getElementsByTagNameNS(namespaceUri,
 					XAdESConstants.TAG_SIGNATURE_PRODUCTION_PLACE);
-			Map<String, String> metadata = new HashMap<String, String>();
+			Map<String, String> metadata = new HashMap<>();
 			if (signatureProductionPlaceList.getLength() > 0) {
 				metadata = getProductionPlaceMetadata(signatureProductionPlaceList, namespaceUri);
 			} else {
@@ -296,7 +304,7 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 	 * @return Mapa con datos de la localizaci&oacute;n.
 	 */
     private static Map<String, String> getProductionPlaceMetadata(final NodeList signatureProductionPlaceList, final String namespaceUri) {
-    	final Map<String, String> metadata = new HashMap<String, String>();
+    	final Map<String, String> metadata = new HashMap<>();
 		final Element signProdPlaceNode = (Element) signatureProductionPlaceList.item(0);
 		final NodeList streetAddressNode = signProdPlaceNode
 				.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_STREET_ADDRESS);
