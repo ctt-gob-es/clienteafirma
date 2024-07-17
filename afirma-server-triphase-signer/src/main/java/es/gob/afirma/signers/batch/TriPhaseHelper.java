@@ -11,12 +11,10 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -36,9 +34,6 @@ import es.gob.afirma.triphase.signer.processors.XAdESASiCSTriPhasePreProcessor;
 import es.gob.afirma.triphase.signer.processors.XAdESTriPhasePreProcessor;
 
 public class TriPhaseHelper {
-
-	private static final Logger LOGGER = Logger.getLogger(TriPhaseHelper.class.getName());
-
 
 	/** Algoritmo para el c&aacute;lculo de los valores de integridad. */
 	private static final String HMAC_ALGORITHM = "HmacSHA256"; //$NON-NLS-1$
@@ -108,6 +103,8 @@ public class TriPhaseHelper {
 	 * @param docBytes
 	 * @param cert Certificado que se declara haber usado en la prefirma.
 	 * @param algorithm Algoritmo de hash de la firma.
+	 * @param needVerifyPkcs1 Indica si debe verificarse que el PKCS#1 recibido
+	 * se corresponde con el de los datos.
 	 * @throws SecurityException Cuando el PKCS#1 de la firma no se generase con el
 	 * certificado indicado o cuando no se pudiese comprobar.
 	 * @throws IOException Cuando falla la decodificaci&oacute;n Base 64 de los datos.
@@ -116,7 +113,8 @@ public class TriPhaseHelper {
 	// prefirma (par&aacute;metro PRE) para completar la firma, sino el parametro BASE. Habr&iacute;a
 	// que extraer la prefirma del BASE en lugar de coger la que se pasa como par&aacute;metro (que
 	// ya podr&iacute;a dejar de pasarse).
-	public static void checkSignaturesIntegrity(final TriphaseData triphaseData, final byte[] docBytes, final X509Certificate cert, final DigestAlgorithm algorithm)
+	public static void checkSignaturesIntegrity(final TriphaseData triphaseData, final byte[] docBytes, final X509Certificate cert,
+			final DigestAlgorithm algorithm, final boolean needVerifyPkcs1)
 			throws SecurityException, IOException {
 
 		final String hmacSeed = ConfigManager.getHMacKey();
@@ -129,7 +127,9 @@ public class TriPhaseHelper {
 
 			verifyIntegrity(triSign, key, hmacSeed, cert);
 
-			verifyPkcs1(triSign, cert.getPublicKey(), docBytes, algorithm);
+			if (needVerifyPkcs1) {
+				verifyPkcs1(triSign, cert.getPublicKey(), docBytes, algorithm);
+			}
 		}
 	}
 
@@ -175,38 +175,58 @@ public class TriPhaseHelper {
      * Verifica que un PKCS#1 se pueda descifrar con la clave p&uacute;blica del certificado
      * asociado a la clave privada con la cual se gener&oacute;.
      * privada con la que en .
-     * @param signatureValue PKCS#1 de la firma.
+     * @param triSign Informaci&oacute;n de la firma realizada, incluyendo el PKCS#1.
      * @param publicKey Clave p&uacute;blica con la que validar la firma.
+     * @param data Datos que se firmaron.
+     * @param digestAlgorithm Algoritmo de huella usada en la firma.
      * @throws SecurityException Cuando no se proporciona un par&aacute;metro v&aacute;lido o
      * el PKCS#1 se gener&oacute; con una clave privada distinta a la esperada.
      */
-    public static void verifyPkcs1(final TriSign triSign, final PublicKey publicKey, final byte[] data, final DigestAlgorithm digestAlgorithm) throws SecurityException {
+	public static void verifyPkcs1(final TriSign triSign, final PublicKey publicKey, final byte[] data, final DigestAlgorithm digestAlgorithm) throws SecurityException {
 
 		final String signatureValueB64 = triSign.getProperty(TRIPHASE_PROP_PKCS1);
 		if (signatureValueB64 == null) {
 			throw new SecurityException("No se ha proporcionado el PKCS#1 de la firma"); //$NON-NLS-1$
 		}
 
-    	try {
-    		final byte[] signatureValue = Base64.decode(signatureValueB64);
-    		final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm.getName(), publicKey.getAlgorithm());
+System.out.println(" == PKCS1 que validar: " + signatureValueB64);
 
-    		try {
-				final Signature sigVerifier = Signature.getInstance(signAlgorithm);
-				sigVerifier.initVerify(publicKey);
-				sigVerifier.update(data);
-				if (!sigVerifier.verify(signatureValue)) {
-					throw new AOException("El PKCS#1 de firma obtenido no se genero con el certificado indicado"); //$NON-NLS-1$
-				}
-			}
-			catch (final Exception e) {
-				throw new AOException("Error al verificar el PKCS#1 de la firma", e); //$NON-NLS-1$
-			}
-    	}
-    	catch (final Exception e) {
-    		throw new SecurityException("El PKCS#1 de la firma no se ha generado con el certificado indicado", e); //$NON-NLS-1$
-    	}
-    }
+		byte[] signatureValue;
+		try {
+			signatureValue = Base64.decode(signatureValueB64);
+		}
+		catch (final Exception e) {
+			throw new SecurityException("El PKCS#1 de la firma no esta correctamente codificado", e); //$NON-NLS-1$
+		}
+
+System.out.println(" --- Tamano de los datos: " + data.length);
+	System.out.println("Datos: " + new String(data));
+
+		final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm.getName(), publicKey.getAlgorithm());
+
+		boolean valid = false;
+		try {
+			final Signature sigVerifier = Signature.getInstance(signAlgorithm);
+			sigVerifier.initVerify(publicKey);
+			sigVerifier.update(data);
+
+//			try {
+//				signatureValue = Pkcs1Utils.encodeSignature(signatureValue);
+//			} catch (final SignatureException e) {
+//				throw new AOException("No se ha podido decodificar el PKCS#1 del servicio. Puede que no sea una version compatible con ECDSA/DSA", e); //$NON-NLS-1$
+//			}
+
+			valid = sigVerifier.verify(signatureValue);
+		}
+		catch (final Exception e) {
+			throw new SecurityException("Error al verificar el PKCS#1 de la firma", e); //$NON-NLS-1$
+		}
+
+		if (!valid) {
+			throw new SecurityException("El PKCS#1 de firma obtenido no se genero con el certificado indicado"); //$NON-NLS-1$
+		}
+
+	}
 
 
 	public static TriPhasePreProcessor getTriPhasePreProcessor(final SingleSign sSign) throws AOInvalidFormatException {

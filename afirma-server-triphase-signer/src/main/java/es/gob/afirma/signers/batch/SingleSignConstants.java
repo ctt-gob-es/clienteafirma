@@ -148,7 +148,7 @@ public final class SingleSignConstants {
 
 		/**
 		 * Obtiene el nombre del algoritmo..
-		 * @return
+		 * @return Nombre del algoritmo.
 		 */
 		public String getName() {
 			return this.name;

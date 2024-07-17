@@ -119,8 +119,13 @@ final class JSONSingleSignPostProcessor {
 			docBytes = docManager.getDocument(sSign.getDataRef(), certChain, sSign.getExtraParams());
 		}
 
+		//TODO: Dado que las cofirmas y las contrafirmas no se han realizado sobre los datos aqui
+		// disponibles sino de los extraidos de la firma, indicamos que en las firmas se valide el
+		// PKCS#1. En las cofirmas y contrafirmas solo se comprobara la integridad. Habria que buscar
+		// un modo de mejorar esto
+		final boolean needVerifyPkcs1 = sSign.getSubOperation() == SignSubOperation.SIGN;
 		try {
-			TriPhaseHelper.checkSignaturesIntegrity(td, docBytes, certChain[0], digestAlgorithm);
+			TriPhaseHelper.checkSignaturesIntegrity(td, docBytes, certChain[0], digestAlgorithm, needVerifyPkcs1);
 		}
 		catch (final Exception e) {
 			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
