@@ -37,25 +37,33 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 	/** Tama&ntilde;o m&aacute;ximo de documento permitido. Cero (0) indica sin l&iacute;mite. */
 	private static final long DEFAULT_MAXDOCSIZE = 0;
 
+	private static final int MAX_REF_LENGTH = 64;
+
 	private static final String PROPERTY_FORMAT = "format"; //$NON-NLS-1$
+
+	private final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	String inDir;
 	String outDir;
 	boolean overwrite;
 	long maxDocSize;
 
-	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	@Override
 	public byte[] getDocument(final String dataRef, final X509Certificate[] certChain, final Properties prop) throws IOException, SecurityException {
+
+		if (dataRef.length() > MAX_REF_LENGTH) {
+			LOGGER.warning("El nombre Base 64 del fichero excede el tamano prefijado: " + MAX_REF_LENGTH); //$NON-NLS-1$
+		}
 
 		LOGGER.info("Recuperamos el documento con referencia: " + dataRef); //$NON-NLS-1$
 
 		final File file = new File(this.inDir, new String(Base64.decode(dataRef)));
 
 		if( !isParent(new File(this.inDir), file ) ) {
+			LOGGER.warning("Se ha pedido un fichero fuera del directorio configurado: " + file.getAbsolutePath()); //$NON-NLS-1$
 		    throw new IOException(
-	    		"Se ha pedido un fichero fuera del directorio configurado: " + file.getAbsolutePath() //$NON-NLS-1$
+	    		"Se ha pedido un fichero fuera del directorio configurado" //$NON-NLS-1$
     		);
 		}
 
