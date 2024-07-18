@@ -1,7 +1,7 @@
 package es.gob.afirma.core.misc.http;
 
-import java.awt.GraphicsEnvironment;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -32,6 +32,7 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
 
+	private boolean initialized = false;
 	private boolean cancelled = false;
 	private boolean headless;
 
@@ -50,7 +51,7 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		if (!this.headless) {
 			boolean headlessEnviroment = false;
 			try {
-				headlessEnviroment = GraphicsEnvironment.isHeadless();
+				headlessEnviroment = !hasGraphicsEnvironment();
 			}
 			catch (final Throwable e) {
 				headlessEnviroment = true;
@@ -59,9 +60,53 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		}
 	}
 
+	/**
+	 * Inicializa el objeto.
+	 */
+	private void initilize() {
+
+		// Si no esta inicializado ya, lo hacemos
+		if (!this.initialized) {
+			// Si podemos usar entornos grafico por lo indicado en la operacion,
+			// comprobamos ahora si realmente lo tenemos disponible para poder usarlo
+			if (!this.headless) {
+				boolean headlessEnviroment = false;
+				try {
+					headlessEnviroment = !hasGraphicsEnvironment();
+				}
+				catch (final Throwable e) {
+					headlessEnviroment = true;
+				}
+				this.headless = headlessEnviroment;
+			}
+			this.initialized = true;
+		}
+	}
+
+	/**
+	 * Comprueba si hay un entorno gr&aacute;fico disponible.
+	 * @return {@code true} si hay entorno gr&aacute;fico, {@code false} si no.
+	 */
+	private static boolean hasGraphicsEnvironment() {
+		boolean headless;
+		try {
+			final Class<?> graphicsEnvironmentClass = Class.forName("java.awt.GraphicsEnvironment"); //$NON-NLS-1$
+			final Method isHeadlessMethod = graphicsEnvironmentClass.getMethod("isHeadless"); //$NON-NLS-1$
+			final Object headlessBoolean = isHeadlessMethod.invoke(null);
+			headless = headlessBoolean instanceof Boolean ? ((Boolean) headlessBoolean).booleanValue() : true;
+		}
+		catch (final Throwable e) {
+			LOGGER.warning("No se pudo comprobar si hay entorno gr&aacute;fico: " + e); //$NON-NLS-1$
+			headless = true;
+		}
+		return !headless;
+	}
+
 	public SSLErrorProcessor(final boolean headless) {
 		this.headless = headless;
 	}
+
+
 
 	@Override
 	public byte[] processHttpError(final IOException cause, final UrlHttpManager urlManager,
@@ -74,6 +119,9 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 			LOGGER.info("El error no es de tipo SSLHandShake y no la tratamos"); //$NON-NLS-1$
 			throw cause;
 		}
+
+		// Inicializamos el objeto
+		initilize();
 
 		// Si se nos ha pedido no mostrar dialogos, relanzamos la excepcion
 		if (this.headless) {

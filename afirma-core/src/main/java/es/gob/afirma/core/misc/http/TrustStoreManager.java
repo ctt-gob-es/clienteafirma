@@ -1,6 +1,5 @@
 package es.gob.afirma.core.misc.http;
 
-import java.awt.Component;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,7 +51,7 @@ public class TrustStoreManager {
 	 * necesario durante la operaci&oacute;n de carga del almac&eacute;n.
 	 * @return Gestor del almac&eacute;n de confianza.
 	 */
-	public static TrustStoreManager getInstance(final Component parent) {
+	public static TrustStoreManager getInstance(final Object parent) {
 		if (instance == null) {
 			instance = new TrustStoreManager(parent);
 		}
@@ -65,7 +64,7 @@ public class TrustStoreManager {
 	 * @param parent Componente padre sobre el que mostrar cualquier di&aacute;logo que sea
 	 * necesario durante la operaci&oacute;n de carga.
 	 */
-	private TrustStoreManager(final Component parent) {
+	private TrustStoreManager(final Object parent) {
 		this.tsPath = getJKSFile();
 
 		// Si el fichero existe, lo cargamos

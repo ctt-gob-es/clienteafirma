@@ -193,6 +193,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>
@@ -295,6 +296,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>
@@ -368,6 +370,7 @@
 				<module>afirma-crypto-jarverifier</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>
@@ -453,6 +456,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>

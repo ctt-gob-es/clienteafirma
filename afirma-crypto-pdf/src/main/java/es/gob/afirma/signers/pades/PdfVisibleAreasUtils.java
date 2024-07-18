@@ -118,7 +118,7 @@ final class PdfVisibleAreasUtils {
 
 		try {
 			Class<?> colorClass;
-			if (Platform.getOS() == OS.ANDROID) {
+			if (Platform.getOS() == OS.ANDROID || Platform.getOS() == OS.OTHER) {
 				colorClass = Class.forName("harmony.java.awt.Color"); //$NON-NLS-1$
 			}
 			else {

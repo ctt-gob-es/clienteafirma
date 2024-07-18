@@ -51,5 +51,12 @@
 			<artifactId>afirma-lib-itext</artifactId>
 		</dependency>
 		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-ui-utils</artifactId>
+			<version>${clienteafirma.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		
 	</dependencies>
 </project>

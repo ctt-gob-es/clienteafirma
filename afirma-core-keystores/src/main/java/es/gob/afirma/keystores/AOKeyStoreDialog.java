@@ -9,7 +9,6 @@
 
 package es.gob.afirma.keystores;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -225,7 +224,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
-	public boolean changeKeyStoreManager(final int keyStoreId, final Component parent) {
+	public boolean changeKeyStoreManager(final int keyStoreId, final Object parent) {
 
 		AOKeyStoreManager newKsm = null;
 
@@ -319,7 +318,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
-	public boolean changeKeyStoreManagerToPKCS11(final Component parent, final String ksName, final String ksLibPath) {
+	public boolean changeKeyStoreManagerToPKCS11(final Object parent, final String ksName, final String ksLibPath) {
 
 		AOKeyStoreManager newKsm = null;
 
@@ -441,7 +440,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openMozillaKeyStore(final Component parent) throws Exception {
+	private static AOKeyStoreManager openMozillaKeyStore(final Object parent) throws Exception {
 
 		try {
 			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
@@ -471,7 +470,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	public static AOKeyStoreManager openPkcs12KeyStore(final Component parent, final String filePath) throws Exception {
+	public static AOKeyStoreManager openPkcs12KeyStore(final Object parent, final String filePath) throws Exception {
 
 		String libPath = filePath;
 
@@ -557,7 +556,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openDnieKeyStore(final Component parent) throws Exception {
+	private static AOKeyStoreManager openDnieKeyStore(final Object parent) throws Exception {
 
 		final AOKeyStoreManager ksm = new AOKeyStoreManager();
 		try {
@@ -590,7 +589,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	public static AOKeyStoreManager openPkcs11KeyStore(final Component parent, final String ksName, final String ksLibPath) throws Exception {
+	public static AOKeyStoreManager openPkcs11KeyStore(final Object parent, final String ksName, final String ksLibPath) throws Exception {
 
 		// Cargamos el almacen
 		try {
@@ -624,7 +623,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 * los soportados.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openSystemKeyStore(final Component parent) throws AOKeystoreAlternativeException,
+	private static AOKeyStoreManager openSystemKeyStore(final Object parent) throws AOKeystoreAlternativeException,
 		                                                                               Exception {
 		final AOKeyStore ks;
 		final Platform.OS currentOs = Platform.getOS();

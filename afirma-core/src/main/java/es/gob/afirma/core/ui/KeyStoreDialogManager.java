@@ -9,7 +9,6 @@
 
 package es.gob.afirma.core.ui;
 
-import java.awt.Component;
 import java.io.IOException;
 
 import es.gob.afirma.core.AOException;
@@ -60,7 +59,7 @@ public interface KeyStoreDialogManager {
 	 * @return {@code true} si se completa el cambio de almac&eacute;n, {@code false} en caso
 	 * contrario.
 	 */
-	boolean changeKeyStoreManager(int keyStoreId, Component parent);
+	boolean changeKeyStoreManager(int keyStoreId, Object parent);
 
 	/**
 	 * Cambia el almac&eacute;n cargado a uno de tipo PKCS#11
@@ -70,7 +69,7 @@ public interface KeyStoreDialogManager {
 	 * @return {@code true} si se completa el cambio de almac&eacute;n, {@code false} en caso
 	 * contrario.
 	 */
-	boolean changeKeyStoreManagerToPKCS11(Component parent, String ksName, String ksLibPath);
+	boolean changeKeyStoreManagerToPKCS11(Object parent, String ksName, String ksLibPath);
 
 	/**
 	 * Indica entre qu&eacute; tipos de almacenes se permite cambiar desde el di&aacute;logo de selecci&oacute;n.
