@@ -180,6 +180,19 @@ public final class XAdESTriPhaseSignerServerSide {
 					XMLConstants.TAG_SIGNATURE
 					);
 
+			// Si se ha solicitado una firma y detectamos que el XML ya esta
+			// firmado, devolvemos un error ya que este se puede cofirmar o
+			// contrafirmar, pero no firmar
+			if (op == Op.SIGN) {
+				final boolean rootIsSignature =
+						XMLSignature.XMLNS.equals(xml.getNamespaceURI())
+						&& XMLConstants.TAG_SIGNATURE.equals(xml.getNodeName());
+				if (rootIsSignature || signatureNodeList.getLength() > 0) {
+					LOGGER.severe("El XML ya esta firmado, por lo que no se permite volverlo a firmar (debe cofirmarse o contrafirmarse)");  //$NON-NLS-1$
+					throw new AOException("El XML ya esta firmado, por lo que no se permite volverlo a firmar (debe cofirmarse o contrafirmarse)"); //$NON-NLS-1$
+				}
+			}
+
 			for (int i = 0; i < signatureNodeList.getLength(); i++) {
 
 				final Node currentNode = signatureNodeList.item(i);
