@@ -69,7 +69,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 
 	public CAdESSignAnalyzer(final byte [] data) throws Exception {
     	try {
-    		this.signDetailsList = new ArrayList<SignDetails>();
+    		this.signDetailsList = new ArrayList<>();
             final CompleteSignInfo signInfo = SignAnalyzer.getSignInfo(data);
             this.signersTree = signInfo.getSignsTree();
     		loadOidMimetypeProperties();
@@ -310,7 +310,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
         }
         return result;
     }
-    
+
     /**
      * Comprueba que la informaci&oacute;n sobre el firmante esta correctamente formada.
      * @param details Detalles de la firma.
@@ -326,14 +326,14 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 		    	if (signer != null) {
 					final ContentVerifierProvider contentVerifierProvider =
 							new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(x509Cert);
-		
+
 					if (!signer.verify(
 							new SignerInformationVerifier(
 									new DefaultCMSSignatureAlgorithmNameGenerator(),
 									new DefaultSignatureAlgorithmIdentifierFinder(),
 									contentVerifierProvider,
 									new BcDigestCalculatorProvider()))) {
-						throw new CMSException("Firma no valida"); //$NON-NLS-1$
+						throw new CMSException("No se ha podido verificar la informacion del firmante"); //$NON-NLS-1$
 					}
 				}
 			} catch (final CMSSignerDigestMismatchException e) {
@@ -350,7 +350,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 			catch (final Exception e) {
 				validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.4"); //$NON-NLS-1$
 			}
-			
+
 			if (validationMessage != null) {
 				details.getSigner().getValidityResult().put("Validacion", validationMessage); //$NON-NLS-1$
 			}

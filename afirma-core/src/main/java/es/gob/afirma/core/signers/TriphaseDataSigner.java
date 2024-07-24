@@ -11,7 +11,6 @@ package es.gob.afirma.core.signers;
 
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.util.Properties;
 
@@ -79,23 +78,13 @@ public final class TriphaseDataSigner {
 
 			final String signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, key.getAlgorithm());
 
-			byte[] pkcs1sign = signer.sign(
+			final byte[] pkcs1sign = signer.sign(
 				preSign,
 				signatureAlgorithm,
 				key,
 				certChain,
 				extraParams // Parametros para PKCS#1
 			);
-
-			// Si desde el servidor nos indican que necesitan el PKCS#1 decodificado, pues lo decodificamos
-			final boolean decodePkcs1 = Boolean.parseBoolean(signConfig.getProperty(PROPERTY_NAME_PKCS1_DECODED));
-			if (decodePkcs1) {
-				try {
-					pkcs1sign = Pkcs1Utils.decodeSignature(pkcs1sign);
-				} catch (final SignatureException e) {
-					throw new AOException("No se ha podido decodificar el PKCS#1 del servicio. Puede que no sea una version compatible con ECDSA/DSA", e); //$NON-NLS-1$
-				}
-			}
 
 			// Configuramos la peticion de postfirma indicando las firmas PKCS#1 generadas
 			signConfig.addProperty(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1sign));
