@@ -681,24 +681,9 @@ public final class XAdESSigner {
 			canonicalizationTransform = null;
 		}
 
-		// Solo canonicalizo si es XML
-		if (!isBase64) {
-			// Las facturas electronicas no se canonicalizan
-			if (!facturaeSign && canonicalizationTransform != null) {
-				try {
-					// Transformada para la canonicalizacion inclusiva
-					transformList.add(canonicalizationTransform);
-				}
-				catch (final Exception e) {
-					throw new AOException(
-						"No se puede encontrar el algoritmo de canonicalizacion: " + e, e //$NON-NLS-1$
-					);
-				}
-			}
-		}
-		// Si no era XML y tuve que convertir a Base64 yo mismo declaro la
-		// transformacion
-		else if (wasEncodedToBase64 && !avoidBase64Transforms) {
+		// Si es Base 64 porque tuvimos que convertirlo y no se ha pedido evitar la transformacion,
+		// la declaramos
+		if (isBase64 && wasEncodedToBase64 && !avoidBase64Transforms) {
 			try {
 				transformList.add(
 					fac.newTransform(
@@ -724,6 +709,13 @@ public final class XAdESSigner {
 		XMLObject envelopingStyleObject = null;
 
 		if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING.equals(format)) {
+
+			// Si los datos son XML, y tenemos configurada la canicalizacion de los datos,
+			// agregamos la transformacion
+			if (!isBase64 && canonicalizationTransform != null) {
+				transformList.add(canonicalizationTransform);
+			}
+
 			try {
 				// crea el nuevo elemento Object que contiene el documento a firmar
 				final List<XMLStructure> structures = new ArrayList<>(1);
@@ -831,6 +823,13 @@ public final class XAdESSigner {
 		// crea una referencia al documento mediante la URI hacia el
 		// identificador del nodo CONTENT o el de datos si ya tenia Id
 		else if (AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(format)) {
+
+			// Si los datos son XML, y tenemos configurada la canicalizacion de los datos,
+			// agregamos la transformacion
+			if (!isBase64 && canonicalizationTransform != null) {
+				transformList.add(canonicalizationTransform);
+			}
+
 			try {
 				if (dataElement != null) {
 					// Inserta en el nuevo documento de firma el documento a firmar
@@ -1050,6 +1049,12 @@ public final class XAdESSigner {
 							(TransformParameterSpec) null
 						)
 					);
+				}
+
+				// Canonicalizamos el XML salvo que sea una factura o que se haya establecido que
+				// no se canonicalice
+				if (!facturaeSign && canonicalizationTransform != null) {
+					transformList.add(canonicalizationTransform);
 				}
 
 				// Establecemos que es lo que se firma

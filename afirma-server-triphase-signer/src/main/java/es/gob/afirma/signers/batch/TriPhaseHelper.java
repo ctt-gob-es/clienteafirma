@@ -189,8 +189,6 @@ public class TriPhaseHelper {
 			throw new SecurityException("No se ha proporcionado el PKCS#1 de la firma"); //$NON-NLS-1$
 		}
 
-System.out.println(" == PKCS1 que validar: " + signatureValueB64);
-
 		byte[] signatureValue;
 		try {
 			signatureValue = Base64.decode(signatureValueB64);
@@ -199,9 +197,6 @@ System.out.println(" == PKCS1 que validar: " + signatureValueB64);
 			throw new SecurityException("El PKCS#1 de la firma no esta correctamente codificado", e); //$NON-NLS-1$
 		}
 
-System.out.println(" --- Tamano de los datos: " + data.length);
-	System.out.println("Datos: " + new String(data));
-
 		final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm.getName(), publicKey.getAlgorithm());
 
 		boolean valid = false;
@@ -209,13 +204,6 @@ System.out.println(" --- Tamano de los datos: " + data.length);
 			final Signature sigVerifier = Signature.getInstance(signAlgorithm);
 			sigVerifier.initVerify(publicKey);
 			sigVerifier.update(data);
-
-//			try {
-//				signatureValue = Pkcs1Utils.encodeSignature(signatureValue);
-//			} catch (final SignatureException e) {
-//				throw new AOException("No se ha podido decodificar el PKCS#1 del servicio. Puede que no sea una version compatible con ECDSA/DSA", e); //$NON-NLS-1$
-//			}
-
 			valid = sigVerifier.verify(signatureValue);
 		}
 		catch (final Exception e) {
