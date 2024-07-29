@@ -18,9 +18,9 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;

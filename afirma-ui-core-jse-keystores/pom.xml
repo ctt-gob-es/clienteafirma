@@ -23,6 +23,11 @@
 		</dependency>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core-prefs</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-ui-core-jse</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>

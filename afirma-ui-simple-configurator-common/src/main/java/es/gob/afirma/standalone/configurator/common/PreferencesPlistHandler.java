@@ -21,9 +21,9 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;

@@ -31,6 +31,12 @@
 
 		<dependency>
 		    <groupId>es.gob.afirma</groupId>
+		    <artifactId>afirma-core-prefs</artifactId>
+		    <version>${clienteafirma.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>es.gob.afirma</groupId>
 		    <artifactId>afirma-ui-simpleafirma-plugins-manager</artifactId>
 		    <version>${clienteafirma.version}</version>
 		</dependency>

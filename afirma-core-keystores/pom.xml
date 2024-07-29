@@ -24,6 +24,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core-prefs</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard</artifactId>
 		</dependency>

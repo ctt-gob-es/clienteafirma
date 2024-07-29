@@ -1,4 +1,4 @@
-package es.gob.afirma.core.keystores;
+package es.gob.afirma.core.prefs;
 
 import java.util.HashMap;
 import java.util.Map;
