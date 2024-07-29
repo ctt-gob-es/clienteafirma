@@ -48,7 +48,7 @@ public final class KeyStorePreferencesManager {
 			}
 		}
 		catch (final Exception e) {
-			LOGGER.severe("Error al cargar las preferencias establecidas a nivel de sistema: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pueden cargar las preferencias establecidas a nivel de sistema: " + e); //$NON-NLS-1$
 			systemPreferences = null;
 		}
 		SYSTEM_PREFERENCES = systemPreferences;

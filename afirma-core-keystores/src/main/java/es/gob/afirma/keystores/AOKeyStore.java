@@ -9,14 +9,10 @@
 
 package es.gob.afirma.keystores;
 
-import java.util.Map;
-import java.util.logging.Logger;
-
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
-import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
@@ -229,39 +225,6 @@ public enum AOKeyStore {
      * @param name Nombre del almac&eacute;n de claves. */
     public void setName(final String name) {
         this.name = name;
-    }
-
-
-    /** Recupera el repositorio con el nombre indicado. Si no existe un <code>KeyStore</code> con
-     * ese nombre, se devuelve <code>null</code>.
-     * @param name Nombre del repositorio que se desea recuperar.
-     * @return KeyStore Repositorio de certificados. */
-    public static AOKeyStore getKeyStore(final String name) {
-    	if (name == null) {
-    		return null;
-    	}
-        for (final AOKeyStore tempKs : AOKeyStore.values()) {
-            if (tempKs.getName().equalsIgnoreCase(name.trim())) {
-                return tempKs;
-            }
-        }
-        // Buscamos entre los registros de los almacenes de clave PKCS#11
-        final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
-        final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
-        final boolean existSmartCard = userRegResult.containsKey(name) || systemRegResult.containsKey(name);
-        if (existSmartCard) {
-			final AOKeyStore result = AOKeyStore.PKCS11;
-			result.setName(name);
-			return result;
-		}
-
-        try {
-        	return valueOf(name);
-        }
-        catch(final Exception e) {
-        	Logger.getLogger("es.gob.afirma").warning("Almacen de claves no reconocido (" + name + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
-        return null;
     }
 
 	/** Obtiene el <i>PasswordCallback</i> necesario para usar una clave del almac&eacute;n despu&eacute;s

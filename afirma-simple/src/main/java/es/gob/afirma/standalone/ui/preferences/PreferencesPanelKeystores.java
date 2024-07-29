@@ -214,7 +214,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
             public void actionPerformed(final ActionEvent e) {
 				final AOKeyStoreManager ksm;
 				String lib = null;
-				AOKeyStore ks = AOKeyStore.getKeyStore(((RegisteredKeystore) PreferencesPanelKeystores.this.keystores.getSelectedItem()).getName());
+				AOKeyStore ks = SimpleKeyStoreManager.getKeyStore(((RegisteredKeystore) PreferencesPanelKeystores.this.keystores.getSelectedItem()).getName());
 				if (ks == null) {
 			        final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
 					for (final String key : userRegResult.keySet()) {
@@ -891,7 +891,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS, this.callsFromNavigator.isSelected());
 
 		final RegisteredKeystore rks = (RegisteredKeystore) this.keystores.getSelectedItem();
-		AOKeyStore aoks = AOKeyStore.getKeyStore(rks.getName());
+		AOKeyStore aoks = SimpleKeyStoreManager.getKeyStore(rks.getName());
 
 		if (aoks == null && AOKeyStore.PKCS11.getProviderName().equals(rks.getProviderName())) {
 			aoks = AOKeyStore.PKCS11;
@@ -933,7 +933,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 			this.keystores.setSelectedIndex(0);
 		} else {
 
-			final AOKeyStore aoks = AOKeyStore.getKeyStore(ks);
+			final AOKeyStore aoks = SimpleKeyStoreManager.getKeyStore(ks);
 			RegisteredKeystore rks = null;
 
 			if (ks != null) {

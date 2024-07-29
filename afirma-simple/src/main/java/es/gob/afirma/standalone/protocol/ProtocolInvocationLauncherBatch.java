@@ -107,12 +107,12 @@ final class ProtocolInvocationLauncherBatch {
 		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
-				aoks = AOKeyStore.getKeyStore(defaultStore);
+				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore);
 			}
 		}
 		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
 		else {
-			aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
+			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore());
 		}
 
 		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
