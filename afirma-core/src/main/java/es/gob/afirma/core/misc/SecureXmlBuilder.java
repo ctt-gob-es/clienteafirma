@@ -29,7 +29,7 @@ public class SecureXmlBuilder {
 		if (SECURE_BUILDER_FACTORY == null) {
 			SECURE_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 			try {
-				SECURE_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
+				SECURE_BUILDER_FACTORY.setFeature(SecureXmlConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
 			}
 			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").log(Level.WARNING, "No se ha podido establecer el procesado seguro en la factoria XML: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -39,9 +39,9 @@ public class SecureXmlBuilder {
 			// la biblioteca al habilitar la caracteristica anterior. Por si acaso, los establecemos
 			// expresamente
 			final String[] securityProperties = new String[] {
-					javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD,
-					javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA,
-					javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET
+					SecureXmlConstants.ACCESS_EXTERNAL_DTD,
+					SecureXmlConstants.ACCESS_EXTERNAL_SCHEMA,
+					SecureXmlConstants.ACCESS_EXTERNAL_STYLESHEET
 			};
 			for (final String securityProperty : securityProperties) {
 				try {
@@ -70,7 +70,7 @@ public class SecureXmlBuilder {
 		if (SAX_FACTORY == null) {
 			SAX_FACTORY = SAXParserFactory.newInstance();
 			try {
-				SAX_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
+				SAX_FACTORY.setFeature(SecureXmlConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
 			}
 			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$

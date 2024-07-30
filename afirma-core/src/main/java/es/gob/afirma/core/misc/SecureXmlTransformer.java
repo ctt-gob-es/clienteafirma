@@ -3,7 +3,6 @@ package es.gob.afirma.core.misc;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
@@ -24,9 +23,9 @@ public class SecureXmlTransformer {
 		if (TRANSFORMER_FACTORY == null) {
 			TRANSFORMER_FACTORY = TransformerFactory.newInstance();
 			try {
-				TRANSFORMER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
-				TRANSFORMER_FACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
-				TRANSFORMER_FACTORY.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
+				TRANSFORMER_FACTORY.setFeature(SecureXmlConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
+				TRANSFORMER_FACTORY.setAttribute(SecureXmlConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+				TRANSFORMER_FACTORY.setAttribute(SecureXmlConstants.ACCESS_EXTERNAL_STYLESHEET, ""); //$NON-NLS-1$
 			}
 			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").log(Level.WARNING, "No se ha podido establecer el procesado seguro en la factoria XML: " + e); //$NON-NLS-1$ //$NON-NLS-2$
