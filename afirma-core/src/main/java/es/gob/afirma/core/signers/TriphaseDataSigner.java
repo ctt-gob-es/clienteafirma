@@ -27,9 +27,6 @@ public final class TriphaseDataSigner {
 	/** Nombre de la propiedad para almac&eacute;n de firmas PKCS#1. */
 	private static final String PROPERTY_NAME_PKCS1_SIGN = "PK1"; //$NON-NLS-1$
 
-	/** Nombre de la propiedad  que indica que el PKCS#1 se debe enviar decodificado. */
-	private static final String PROPERTY_NAME_PKCS1_DECODED = "PK1_DECODED"; //$NON-NLS-1$
-
 	/** Nombre de la propiedad  que indica si la postfirma requiere la prefirma. */
 	private static final String PROPERTY_NAME_NEED_PRE = "NEED_PRE"; //$NON-NLS-1$
 

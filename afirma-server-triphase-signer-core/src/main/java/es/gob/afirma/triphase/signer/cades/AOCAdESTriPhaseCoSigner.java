@@ -114,18 +114,18 @@ public final class AOCAdESTriPhaseCoSigner {
 			X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
 		);
 		final SignerIdentifier identifier = new SignerIdentifier(encSid);
-		
+
 		final String keyType = signerCertificateChain[0].getPublicKey().getAlgorithm();
-		
+
 		final String digestAlgorithmName = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-		
+
 		final String algorithmName = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithmName, keyType);
 
 		// digEncryptionAlgorithm
 		final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
 		final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(algorithmName));
 
-		final ASN1Sequence contentSignedData = getContentSignedData(sign);
+		final ASN1Sequence contentSignedData = getSignedData(sign);
 		final SignedData sd = SignedData.getInstance(contentSignedData);
 
 		// CERTIFICADOS
@@ -184,7 +184,7 @@ public final class AOCAdESTriPhaseCoSigner {
 					encInfo,
 					certificates,
 					sd.getCRLs(),
-					new DERSet(signerInfos) // UnsignedAttr
+					new DERSet(signerInfos)
 			)
 		).getEncoded(ASN1Encoding.DER);
 
@@ -210,12 +210,12 @@ public final class AOCAdESTriPhaseCoSigner {
 		return new ContentInfo(contentTypeOID, null);
 	}
 
-	private static ASN1Sequence getContentSignedData(final byte[] sign) {
+	private static ASN1Sequence getSignedData(final byte[] sign) {
 		final ASN1Sequence dsq = ASN1Sequence.getInstance(sign);
 		final Enumeration<?> e = dsq.getObjects();
-		// Elementos que contienen los elementos OID SignedData
+		// Elemento con el OID SignedData
 		e.nextElement();
-		// Contenido de SignedData
+		// SignedData
 		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 		return (ASN1Sequence) doj.getObject();
 	}

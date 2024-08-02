@@ -60,7 +60,7 @@ public final class CAdESMultiUtil {
 		// No instanciable
 	}
 
-	static ASN1Set addCertificates(final SignedData sd,
+	public static ASN1Set addCertificates(final SignedData sd,
 			                       final java.security.cert.Certificate[] certChain) throws CertificateEncodingException,
 			                                                                                IOException {
 		final ASN1Set certificatesSigned = sd.getCertificates();
@@ -137,7 +137,7 @@ public final class CAdESMultiUtil {
     	}
     }
 
-    static boolean isCounterSignature(final ASN1ObjectIdentifier oid) {
+    public static boolean isCounterSignature(final ASN1ObjectIdentifier oid) {
     	return PKCSObjectIdentifiers.pkcs_9_at_counterSignature.equals(oid);
     }
 

@@ -189,7 +189,7 @@ final class CAdESCounterSigner {
 
         // Construimos y devolvemos la nueva firma (atributo identificador del signedData mas el propio signedData).
         // Esta firma sera igual a la anterior pero con el conjunto de certificados actualizados con los nuevos y la
-        // nueva estructura de SignerInfos. Tambien eliminamos las CRL ya que no estarian completas.
+        // nueva estructura de SignerInfos. Incluimos el listado de CRLs, aunque este puede no estar completo
         return new ContentInfo(
     		PKCSObjectIdentifiers.signedData,
     		new SignedData(
@@ -438,7 +438,7 @@ final class CAdESCounterSigner {
 
         // AlgorithmIdentifier
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
-        
+
         final String keyType = ((X509Certificate) certChain[0]).getPublicKey().getAlgorithm();
 
 		final String algorithmName = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm, keyType);
