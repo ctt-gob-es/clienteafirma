@@ -11,6 +11,7 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
@@ -93,10 +94,8 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 	static {
 		enhancerConfig = new Properties();
 		String enhancerClassName = null;
-		try {
-			enhancerConfig.load(
-				AOPDFSigner.class.getResourceAsStream("/enhancer.properties") //$NON-NLS-1$
-			);
+		try (InputStream configIs = AOPDFSigner.class.getResourceAsStream("/enhancer.properties")) {  //$NON-NLS-1$
+			enhancerConfig.load(configIs);
 			enhancerClassName = enhancerConfig.getProperty("enhancerClassFile"); //$NON-NLS-1$
 			if (enhancerClassName != null) {
 				enhancer = (SignEnhancer) Class.forName(enhancerClassName).getConstructor().newInstance();
@@ -186,15 +185,10 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
     	final GregorianCalendar signTime = PdfUtil.getSignTime(extraParams.getProperty(PdfExtraParams.SIGN_TIME));
 
         // Sello de tiempo
-        final byte[] data;
-		try {
-			data = PdfTimestamper.timestampPdf(inPDF, extraParams, signTime);
-		}
-		catch (final NoSuchAlgorithmException e1) {
-			throw new IOException(
-				"No se soporta el algoritmo indicado para la huella digital del sello de tiempo: " + e1, e1 //$NON-NLS-1$
-			);
-		}
+        byte[] data = inPDF;
+        if (PdfTimestamper.isAvailable()) {
+       		data = PdfTimestamper.timestampPdf(data, extraParams, signTime);
+        }
 
 		// Prefirma
         final PdfSignResult pre;

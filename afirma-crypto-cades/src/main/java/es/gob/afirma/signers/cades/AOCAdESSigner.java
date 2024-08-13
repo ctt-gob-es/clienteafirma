@@ -10,12 +10,15 @@
 package es.gob.afirma.signers.cades;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -31,8 +34,6 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 import es.gob.afirma.signers.pkcs7.SCChecker;
-import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
-import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
 /** Manejador de firmas binarias CADES.
  * Soporta CAdES-BES, CAdES-EPES, CAdES-T y CAdES B-Level. Implementa los m&eacute;todos declarados
@@ -97,7 +98,7 @@ public final class AOCAdESSigner implements AOSigner {
     	// el algoritmo y los parametros adicionales
         final CAdESParameters cadesConfig = CAdESParameters.load(data, algorithm, extraParams);
 
-        final byte[] cadesSignedData;
+        byte[] cadesSignedData;
         try {
 			cadesSignedData = GenCAdESEPESSignedData.generateSignedData(
 					algorithm,
@@ -112,32 +113,13 @@ public final class AOCAdESSigner implements AOSigner {
             throw new AOException("Error al generar la firma CAdES: " + e, e); //$NON-NLS-1$
         }
 
-        //***************** SELLO DE TIEMPO ****************
-        TsaParams tsaParams;
-        try {
-        	tsaParams = new TsaParams(extraParams);
-        }
-        catch(final Exception e) {
-        	tsaParams = null;
-        }
-        if (tsaParams != null) {
-        	try {
-				return new CMSTimestamper(tsaParams).addTimestamp(
-					cadesSignedData,
-					tsaParams.getTsaHashAlgorithm(),
-					new GregorianCalendar()
-				);
-			}
-        	catch (final Exception e) {
-        		LOGGER.severe("No se ha podido aplicar el sello de tiempo: " + e); //$NON-NLS-1$
-			}
-        }
-        //************** FIN SELLO DE TIEMPO ****************
+        // Si corresponde, aplicamos un sello de tiempo
+        cadesSignedData = applyTimeStamp(cadesSignedData, extraParams);
 
         return cadesSignedData;
     }
 
-    /** Cofirma datos en formato CAdES a&ntilde;adiendo la nueva firma a una CAdES o CMS ya existente. Para realizar la
+	/** Cofirma datos en formato CAdES a&ntilde;adiendo la nueva firma a una CAdES o CMS ya existente. Para realizar la
      * cofirma se necesitan los datos originales (que este m&eacute;todo
      * firmar&aacute; normalmente) y la firma sobre la que se realiza la cofirma
      * (a los que se agregar&aacute; el resultado de la nueva firma).
@@ -541,5 +523,59 @@ public final class AOCAdESSigner implements AOSigner {
 		   extraParams.remove(CAdESExtraParams.SIGNING_CERTIFICATE_V2);
 	   }
     }
+
+    /**
+     * Aplica un sello de tiempo a la firma si se ha configurado y si se encuentran
+     * las dependencias necesarias para ello.
+     * @param signature Firma CAdES.
+     * @param extraParams Configuraci&oacute;n de la operaci&oacute;n.
+     * @return La firma con el sello de tiempo o, si no se configur&oacute; o no se
+     * encontraron las dependencias necesarias, la misma firma que se recibi&oacute;.
+     */
+    private static byte[] applyTimeStamp(final byte[] signature, final Properties extraParams) {
+
+        // Si encontramos las clases de sello de tiempo, comprobamos si se ha solicitado y
+        // se hace en tal caso
+
+        Object tsaParams;
+        Class<?> tsaParamsClass;
+        try {
+        	tsaParamsClass = Class.forName("es.gob.afirma.signers.tsp.pkcs7.TsaParams"); //$NON-NLS-1$
+            final Constructor<?> tsaParamsConstructor = tsaParamsClass.getConstructor(Properties.class);
+        	tsaParams = tsaParamsConstructor.newInstance(extraParams);
+        }
+        catch(final ClassNotFoundException e) {
+        	LOGGER.info("No se han encontrado las bibliotecas de sello de tiempo, por lo que no se comprobara si se requeria agregar"); //$NON-NLS-1$
+        	return signature;
+        }
+        catch(final Exception e) {
+        	// No se configuro la actualizacion de la firma
+        	return signature;
+        }
+
+        byte[] upgradedSignature = null;
+        try {
+        	final Class<?> cmsTimestamperClass = Class.forName("es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper"); //$NON-NLS-1$
+        	final Constructor<?> cmsTimestamperConstructor = cmsTimestamperClass.getConstructor(tsaParamsClass);
+        	final Object cmsTimestamper = cmsTimestamperConstructor.newInstance(tsaParams);
+
+        	final Method getTsaHashAlgorithmMethod = cmsTimestamperClass.getMethod("getTsaHashAlgorithm"); //$NON-NLS-1$
+        	final String tsaHashAlgorithm = (String) getTsaHashAlgorithmMethod.invoke(tsaParams);
+
+        	final Method addTimestampMethod = cmsTimestamperClass.getMethod("addTimestamp", //$NON-NLS-1$
+        			byte[].class,
+        			String.class,
+        			GregorianCalendar.class);
+        	upgradedSignature = (byte[]) addTimestampMethod.invoke(cmsTimestamper,
+        			signature,
+        			tsaHashAlgorithm,
+        			new GregorianCalendar());
+        }
+        catch (final Exception e) {
+        	LOGGER.log(Level.SEVERE, "No se ha podido aplicar el sello de tiempo", e); //$NON-NLS-1$
+        }
+
+        return upgradedSignature != null ? upgradedSignature : signature;
+	}
 
 }

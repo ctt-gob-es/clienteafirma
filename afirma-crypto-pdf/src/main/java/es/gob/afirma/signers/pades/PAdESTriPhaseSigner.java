@@ -17,7 +17,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.util.GregorianCalendar;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
@@ -30,8 +29,6 @@ import es.gob.afirma.core.signers.SignEnhancer;
 import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
-import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
-import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
  * <p>No firma PDF cifrados.</p>
@@ -280,9 +277,8 @@ public final class PAdESTriPhaseSigner {
                                                       final GregorianCalendar signingTime,
                                                       final SignEnhancer enhancer,
                                                       final Properties enhancerConfig) throws AOException,
-                                                                                              IOException,
-                                                                                              NoSuchAlgorithmException {
-        byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(
+                                                                                              IOException {
+        byte[] cadesSignature = CAdESTriPhaseSigner.postSign(
     		signatureAlgorithm,
     		null,
     		signerCertificateChain,
@@ -296,42 +292,27 @@ public final class PAdESTriPhaseSigner {
         //***************** SELLO DE TIEMPO ****************
 
         // El sello a nivel de firma nunca se aplica si han pedido solo sello a nivel de documento
-        if (
-    		!TsaParams.TS_DOC.equals(extraParams.getProperty(PdfExtraParams.TS_TYPE)) &&
-    		extraParams.getProperty(PdfExtraParams.TSA_URL) != null
-		) {
-	        TsaParams tsaParams;
-	        try {
-	        	tsaParams = new TsaParams(extraParams);
-	        }
-	        catch(final Exception e) {
-	        	Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-        			"Se ha pedido aplicar sello de tiempo, pero falta informacion necesaria: " + e //$NON-NLS-1$
-    			);
-	        	tsaParams = null;
-	        }
-	        if (tsaParams != null) {
-	        	completeCAdESSignature = new CMSTimestamper(tsaParams).addTimestamp(
-					completeCAdESSignature,
-					tsaParams.getTsaHashAlgorithm(),
-					signingTime
-				);
-	        }
+        if (PdfTimestamper.isAvailable()
+        		&& !PdfTimestamper.TS_LEVEL_DOC.equals(extraParams.getProperty(PdfExtraParams.TS_TYPE))
+        		&& extraParams.getProperty(PdfExtraParams.TSA_URL) != null) {
+
+        	cadesSignature = PdfTimestamper.addCmsTimeStamp(cadesSignature, extraParams, signingTime);
+
         }
 
         //************** FIN SELLO DE TIEMPO ****************
         //***************************************************
 
         if (enhancer != null) {
-        	completeCAdESSignature = enhancer.enhance(
-    			completeCAdESSignature,
+        	cadesSignature = enhancer.enhance(
+    			cadesSignature,
     			enhancerConfig != null ? enhancerConfig : extraParams
 			);
         }
 
         return new PdfSignResult(
     		pdfFileId,
-    		completeCAdESSignature,
+    		cadesSignature,
     		timestamp, // Sello de tiempo
     		signingTime,
     		xParams != null ? xParams : new Properties());
