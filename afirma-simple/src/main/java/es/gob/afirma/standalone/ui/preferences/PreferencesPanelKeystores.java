@@ -305,6 +305,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
         gbc1.gridy++;
         gbc1.insets = new Insets(5, 0, 0, 0);
 
+        this.callsFromNavigator.setEnabled(!this.blocked);
 		this.callsFromNavigator.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 		);
@@ -346,6 +347,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
         c.weightx = 1.0;
         c.gridy = 0;
 
+        this.showExpiredCerts.setEnabled(!this.blocked);
 		this.showExpiredCerts.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 		);

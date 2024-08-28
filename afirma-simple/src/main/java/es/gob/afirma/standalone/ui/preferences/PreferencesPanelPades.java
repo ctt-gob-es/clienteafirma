@@ -180,6 +180,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		);
 		this.visiblePdfStamp.addItemListener(modificationListener);
     	this.visiblePdfStamp.addKeyListener(keyListener);
+    	this.checkShadowAttack.setEnabled(!this.blocked);
 		this.checkShadowAttack.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.188") //$NON-NLS-1$
 		);
@@ -526,7 +527,6 @@ final class PreferencesPanelPades extends JScrollPane {
 		PreferencesManager.remove(PREFERENCE_PADES_VISIBLE);
 		PreferencesManager.remove(PREFERENCE_PADES_OBFUSCATE_CERT_INFO);
 		PreferencesManager.remove(PREFERENCE_PADES_STAMP);
-		PreferencesManager.remove(PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
 
 		// Establecemos la configuracion (que sera la del sistema o la por defecto)
 
@@ -536,7 +536,6 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.visiblePdfSignature.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_VISIBLE));
 		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
 		this.visiblePdfStamp.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_STAMP));
-		this.checkShadowAttack.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_SHADOW_ATTACK));
 
         // No se modifican las propiedades bloqueadas
         if (!isBlocked()) {
@@ -576,6 +575,7 @@ final class PreferencesPanelPades extends JScrollPane {
         			);
 
         	this.currentPolicyValue.setText(this.padesPolicyDlg.getSelectedPolicyName());
+        	this.checkShadowAttack.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_SHADOW_ATTACK));
         }
 
         revalidate();
