@@ -299,6 +299,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		// Solo mostramos el check de buscar actualizaciones si esta habilitado
 		// su uso
 		if (SimpleAfirma.isUpdatesEnabled()) {
+			this.checkForUpdates.setEnabled(!this.blocked);
 			this.checkForUpdates.getAccessibleContext().setAccessibleName(
 					SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 			);
@@ -314,6 +315,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
 		if (Platform.getOS() == Platform.OS.WINDOWS || Platform.getOS() == Platform.OS.LINUX) {
+			this.enableJMulticard.setEnabled(!this.blocked);
 			this.enableJMulticard.getAccessibleContext().setAccessibleName(
 					SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 			);
@@ -417,6 +419,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		c.gridy++;
 
+		this.allowSignInvalidSignatures.setEnabled(!this.blocked);
 		this.allowSignInvalidSignatures.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 		);
@@ -447,6 +450,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		final JPanel netConfigInnerPanel = new JPanel(new GridBagLayout());
 		netConfigPanel.add(netConfigInnerPanel);
 
+		this.secureConnections.setEnabled(!this.blocked);
 		this.secureConnections.addItemListener(modificationListener);
 		this.secureConnections.addKeyListener(keyListener);
 		this.secureConnections.setToolTipText(
