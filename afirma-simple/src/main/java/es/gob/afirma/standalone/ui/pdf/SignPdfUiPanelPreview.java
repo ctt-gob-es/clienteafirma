@@ -327,7 +327,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.viewLabel = new JLabel();
 		this.viewLabel.setPreferredSize(new Dimension(VIEWLABEL_PREFERRED_WIDTH, VIEWLABEL_PREFERRED_HEIGHT));
 		this.viewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		
+
 		// Redimensionamos la imagen base para ajustarla al espacio de previsualizacion
 		if (this.baseImage.getHeight() > VIEWLABEL_PREFERRED_HEIGHT || this.baseImage.getWidth() > VIEWLABEL_PREFERRED_WIDTH) {
 			resizeBaseImageToPreferredSize(this.viewLabel);
@@ -335,7 +335,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		// Componemos el aspecto de firma en base a la nueva imagen base
 		compoundSignImage();
-		
+
 		this.viewLabel.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.26")); //$NON-NLS-1$
 		this.viewLabel.addMouseListener(
 			new MouseAdapter() {
@@ -358,8 +358,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 			}
 		);
 		this.viewLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		
-		GridBagConstraints c = new GridBagConstraints();
+
+		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridy = 0;
 		panel.add(this.viewLabel, c);
@@ -1690,7 +1690,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		}
 
 		@Override
-        public Component getListCellRendererComponent(final JList<?> list,
+        public Component getListCellRendererComponent(final JList list,
         		                                      final Object value,
         		                                      final int index,
         		                                      final boolean isSelected,
@@ -1772,8 +1772,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		DEGREES_180(180, "RotationModel.2"), //$NON-NLS-1$
 		DEGREES_270(270, "RotationModel.3"); //$NON-NLS-1$
 
-		private int degrees;
-		private String text;
+		private final int degrees;
+		private final String text;
 
 		RotationAngles(final int degrees, final String text) {
 			this.degrees = degrees;
@@ -1819,14 +1819,14 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	JDialog getDialogParent() {
 		return this.dialogParent;
 	}
-	
+
 	/**
 	 * Configura el comportamiento a seguir cuando se arrastre una imagen sobre un componente.
 	 * @param panel Componente al que se asocia el comportamiento.
-	 * @return Comportamiento del componente. 
+	 * @return Comportamiento del componente.
 	 */
-	private DropTarget buildDropPerformance(Component panel) {
-		
+	private DropTarget buildDropPerformance(final Component panel) {
+
 		 return new DropTarget(panel, DnDConstants.ACTION_COPY, new DropTargetListener() {
 
 	            @Override
