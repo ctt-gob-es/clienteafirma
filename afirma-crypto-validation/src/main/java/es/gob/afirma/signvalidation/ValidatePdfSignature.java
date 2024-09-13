@@ -9,6 +9,7 @@
 
 package es.gob.afirma.signvalidation;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateExpiredException;
@@ -27,6 +28,7 @@ import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.pades.PdfUtil;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pades.common.PdfFormModifiedException;
@@ -122,6 +124,7 @@ public final class ValidatePdfSignature extends SignValider {
 
 		final String allowSignModifiedFormProp = params.getProperty(PdfExtraParams.ALLOW_SIGN_MODIFIED_FORM);
 		final boolean allowSignModifiedForm = Boolean.parseBoolean(allowSignModifiedFormProp);
+		boolean formModified = false;
 
 		// Si se debe comprobar que no haya cambios en los valores de los formularios, lo hacemos
 		// si hay mas de una revision, comprobamos si ha habido cambios en campos de formularios
@@ -133,6 +136,9 @@ public final class ValidatePdfSignature extends SignValider {
 					throw new PdfFormModifiedException("Se han detectado cambios en un formulario posteriores a la primera firma"); //$NON-NLS-1$
 				}
 				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.MODIFIED_FORM));
+
+				// Identificado que el formulario se ha modificado para omitir si corresponde la
+				formModified = true;
 			}
 		}
 
@@ -143,15 +149,19 @@ public final class ValidatePdfSignature extends SignValider {
 		final String pagesToCheck =  params.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, DEFAULT_PAGES_TO_CHECK_PSA);
 
 		// La comprobacion de PDF Shadow Attack detecta tambien los cambios en los formularios PDF,
-		// asi que estos cambios impiden que se pueda hacer una comprobacion realista de esta
-		// situacion. Por tanto, si se permiten los cambios en los formularios, se ignorara la
-		// validacion de PDF Shadow Attack
+		// asi que se ignorara la comprobacion de PDF Shadow Attack en los siguientes casos:
+		//  - Cuando se permitan los cambios en los formularios.
+		//  - Cuando la comprobacion de cambios en el formulario detecte que se ha modificado.
+		boolean avoidPSACheckByModifiedFormCheck = false;
+		if (allowSignModifiedForm || formModified) {
+			avoidPSACheckByModifiedFormCheck = true;
+		}
 
 		// Por otra parte, si se debe comprobar si se ha producido un PDF Shadow Attack
 		// (modificacion de un documento tras la firma), se encuentran varias revisiones
 		// en el documento y hay al menos una posterior a la ultima firma (la de la
 		// posicion 0), se comprueba si el documento ha sufrido un PSA.
-		if (!allowSignModifiedForm && !allowPdfShadowAttack && af.getTotalRevisions() > 1 && af.getRevision(signNames.get(0)) < af.getTotalRevisions()) {
+		if (!avoidPSACheckByModifiedFormCheck && !allowPdfShadowAttack && af.getTotalRevisions() > 1 && af.getRevision(signNames.get(0)) < af.getTotalRevisions()) {
 			// La revision firmada mas reciente se encuentra en el primer lugar de la lista, por ello se accede a la posicion 0
 			try (final InputStream lastReviewStream = af.extractRevision(signNames.get(0))) {
 				SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewStream, pagesToCheck);
@@ -183,7 +193,7 @@ public final class ValidatePdfSignature extends SignValider {
 				if (!validityList.contains(sv)) {
 					if (SIGN_DETAIL_TYPE.UNKNOWN.equals(sv.getValidity())) {
 						validityList.add(0, sv);
-					} else {
+					} else if (sv.getValidity() != SIGN_DETAIL_TYPE.OK){
 						validityList.add(sv);
 					}
 				}
@@ -277,5 +287,19 @@ public final class ValidatePdfSignature extends SignValider {
 
 	}
 
+	public static void main(final String[] args) throws Exception {
+		final ValidatePdfSignature validator = new ValidatePdfSignature();
+		byte[] signature;
+		try (InputStream fis = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\Formulario_prueba_PDF_signed_mod.pdf")) {
+			signature = AOUtil.getDataFromInputStream(fis);
+		}
+
+		final Properties params = new Properties();
+
+		final List<SignValidity> checks = validator.validate(signature, params);
+		for (final SignValidity validity : checks) {
+			System.out.println(validity.toString());
+		}
+	}
 
 }
