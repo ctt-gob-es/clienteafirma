@@ -87,11 +87,9 @@
 			
 			var divFirma = document.getElementById('divfirma');
 			var content = '<br><textarea id="firmaB64" cols="76" rows="6">' + signatureB64 + '</textarea><br>';
-			if (!AutoScript.isIOS()) {
 				content += '<br><div class="botoneraCentro">' +
 					'<input class="botonM marginR15" id="botonGuardar" value="Guardar datos" onclick="javascript:guardar();" type="button">' +
 					'</div><br>';
-			}
 			
 			divFirma.innerHTML = content;
 		}
@@ -143,16 +141,16 @@
 		
 		function mostrarPantalla() {
 			document.getElementById("pantalla").style.display = "block";
+
+			document.getElementById("targetFile").style.display = "inline";
+			document.getElementById("targetFileText").style.display = "inline";
+			document.getElementById("targetFile").checked = "checked";
+			firmarFichero = true;
+			firmarDatosGenerados = false;
+			firmarPdf = false;
+			firmarFacturaE = false;
 			
 			if (AutoScript.isIOS()) {
-				document.getElementById("targetFile").style.display = "none";
-				document.getElementById("targetFileText").style.display = "none";
-				document.getElementById("targetGeneratedData").checked = "checked";
-				firmarFichero = false;
-				firmarDatosGenerados = true;
-				firmarPdf = false;
-				firmarFacturaE = false;
-				
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4";
 				storeLink.innerHTML = "Descargue el Cliente @firma iOS";
@@ -160,14 +158,6 @@
 				document.getElementById("faq_link").style.display = "none";
 			}
 			else if (AutoScript.isAndroid()) {
-				document.getElementById("targetFile").style.display = "inline";
-				document.getElementById("targetFileText").style.display = "inline";
-				document.getElementById("targetFile").checked = "checked";
-				firmarFichero = true;
-				firmarDatosGenerados = false;
-				firmarPdf = false;
-				firmarFacturaE = false;
-
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://play.google.com/store/apps/details?id=es.gob.afirma";
 				storeLink.innerHTML = "Descargue el Cliente @firma Android";
