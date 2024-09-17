@@ -45,20 +45,6 @@
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-keystores-mozilla</artifactId>
 			<version>${clienteafirma.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>es.gob.afirma.jmulticard</groupId>
-					<artifactId>jmulticard</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>es.gob.afirma.jmulticard</groupId>
-					<artifactId>jmulticard-jse</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>es.gob.afirma.jmulticard</groupId>
-					<artifactId>jmulticard-ui</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		
 		<dependency>

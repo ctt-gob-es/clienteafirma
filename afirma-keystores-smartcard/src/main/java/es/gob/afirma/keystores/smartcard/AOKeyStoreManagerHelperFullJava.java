@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.keystores;
+package es.gob.afirma.keystores.smartcard;
 
 import java.io.IOException;
 import java.security.KeyStore;
@@ -21,9 +21,12 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import es.gob.jmulticard.ui.passwordcallback.gui.DnieCacheCallbackHandler;
-import es.gob.jmulticard.ui.passwordcallback.gui.SmartcardCacheCallbackHandler;
-import es.gob.jmulticard.ui.passwordcallback.gui.SmartcardCallbackHandler;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.smartcard.gui.DnieCacheCallbackHandler;
+import es.gob.afirma.keystores.smartcard.gui.PasswordCallbackManager;
+import es.gob.afirma.keystores.smartcard.gui.SmartcardCacheCallbackHandler;
+import es.gob.afirma.keystores.smartcard.gui.SmartcardCallbackHandler;
 
 final class AOKeyStoreManagerHelperFullJava {
 
@@ -45,22 +48,6 @@ final class AOKeyStoreManagerHelperFullJava {
 			AOKeyStore.CERES,
 			buildLoadStoreParameter(new SmartcardCacheCallbackHandler()),
 			new es.gob.jmulticard.jse.provider.ceres.CeresProvider(),
-			parentComponent
-		);
-	}
-
-	/** Inicializa el almac&eacute;n 100% Java para tarjetas CERES 4.30 y superiores.
-	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
-	 *                        de PIN.
-	 * @return <code>KeyStore</code> inicializado.
-	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
-	 * @throws IOException Si hay problemas en la lectura de datos. */
-	static KeyStore initCeres430Java(final Object parentComponent) throws AOKeyStoreManagerException,
-                                                                       IOException {
-		return init(
-			AOKeyStore.CERES_430,
-			buildLoadStoreParameter(new SmartcardCacheCallbackHandler()),
-			new es.gob.jmulticard.jse.provider.ceres.Ceres430Provider(),
 			parentComponent
 		);
 	}
@@ -106,7 +93,7 @@ final class AOKeyStoreManagerHelperFullJava {
     	if (Security.getProvider(provider.getName()) == null) {
     		Security.addProvider(provider);
     	}
-    	es.gob.jmulticard.ui.passwordcallback.PasswordCallbackManager.setDialogOwner(parentComponent);
+    	PasswordCallbackManager.setDialogOwner(parentComponent);
 
         // Inicializamos
     	final KeyStore ks;

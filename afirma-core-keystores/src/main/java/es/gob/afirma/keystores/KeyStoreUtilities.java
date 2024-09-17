@@ -213,18 +213,6 @@ public final class KeyStoreUtilities {
         		) {
                 	throw e;
                 }
-                catch (final RuntimeException e) {
-                	// Comprobaciones especifica para la compatibilidad con el proveedor de DNIe
-                	if (
-            			e instanceof es.gob.jmulticard.CancelledOperationException ||
-                		e instanceof es.gob.jmulticard.card.AuthenticationModeLockedException ||
-                		e instanceof es.gob.jmulticard.jse.provider.BadPasswordProviderException
-            		) {
-            			throw e;
-                	}
-                    LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
-                    continue;
-                }
 
                 if (tmpCert == null) {
                     LOGGER.warning("El KeyStore no permite extraer el certificado publico para el alias especificado"); //$NON-NLS-1$

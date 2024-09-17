@@ -51,7 +51,7 @@
 	
 	<properties>
 		<clienteafirma.version>1.9-SNAPSHOT</clienteafirma.version>
-		<jmulticard.version>1.9</jmulticard.version>
+		<jmulticard.version>3.0.3</jmulticard.version>
 		<afirma.lib.itext.version>1.0.6</afirma.lib.itext.version>
 		<spongycastle.version>1.58.0.0</spongycastle.version>
 		<afirma.legible.version>1_8_0</afirma.legible.version>
@@ -194,6 +194,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-smartcard</module>
 				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
@@ -298,6 +299,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-smartcard</module>
 				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
@@ -373,6 +375,7 @@
 				<module>afirma-crypto-jarverifier</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-smartcard</module>
 				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
@@ -460,6 +463,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-smartcard</module>
 				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>

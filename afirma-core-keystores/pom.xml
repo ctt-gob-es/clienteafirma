@@ -28,20 +28,10 @@
 			<artifactId>afirma-core-prefs</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>es.gob.afirma.jmulticard</groupId>
-			<artifactId>jmulticard</artifactId>
-		</dependency>
 		
 		<dependency>
-			<groupId>es.gob.afirma.jmulticard</groupId>
-			<artifactId>jmulticard-jse</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>es.gob.afirma.jmulticard</groupId>
-			<artifactId>jmulticard-ui</artifactId>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 		
 	</dependencies>

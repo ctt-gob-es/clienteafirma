@@ -93,6 +93,12 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-keystores-smartcard</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-pkcs7</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
@@ -215,7 +221,7 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
-			<artifactId>jmulticard-ui</artifactId>
+			<artifactId>jmulticard</artifactId>
 		</dependency>
 
 		<dependency>

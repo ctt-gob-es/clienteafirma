@@ -146,21 +146,21 @@ public final class AOKeyStoreManagerFactory {
 
         // Driver Java para DNIe
         if (AOKeyStore.DNIEJAVA.equals(store)) {
-        	return new AggregatedKeyStoreManager(getDnieJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
+        	return new AggregatedKeyStoreManager(getSmartCardKeyStoreManager(AOKeyStore.DNIEJAVA, pssCallback, forceReset, parentComponent));
         }
 
         // Driver Java para tarjetas CERES 4.30 y superiores
         if (AOKeyStore.CERES_430.equals(store)) {
-        	return new AggregatedKeyStoreManager(getCeres430JavaKeyStoreManager(pssCallback, forceReset, parentComponent));
+        	return new AggregatedKeyStoreManager(getSmartCardKeyStoreManager(AOKeyStore.CERES_430, pssCallback, forceReset, parentComponent));
         }
 
     	// Driver Java para CERES
         if (AOKeyStore.CERES.equals(store)) {
-        	return new AggregatedKeyStoreManager(getCeresJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
+        	return new AggregatedKeyStoreManager(getSmartCardKeyStoreManager(AOKeyStore.CERES, pssCallback, forceReset, parentComponent));
         }
 
         if (AOKeyStore.SMARTCAFE.equals(store)) {
-        	return new AggregatedKeyStoreManager(getSmartCafeJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
+        	return new AggregatedKeyStoreManager(getSmartCardKeyStoreManager(AOKeyStore.SMARTCAFE, pssCallback, forceReset, parentComponent));
         }
 
         throw new AOKeystoreAlternativeException(
@@ -258,74 +258,34 @@ public final class AOKeyStoreManagerFactory {
 		);
     }
 
-	private static AOKeyStoreManager getSmartCafeJavaKeyStoreManager(final PasswordCallback pssCallback,
-			                                                     final boolean forceReset,
-			                                                     final Object parentComponent) throws AOKeystoreAlternativeException,
-	                                                                                                  IOException {
-		final AOKeyStoreManager ksm = new AOKeyStoreManager();
-		try {
-			ksm.init(AOKeyStore.SMARTCAFE, null, pssCallback, new Object[] { parentComponent }, forceReset);
-		}
-		catch (final AOKeyStoreManagerException e) {
-			throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(AOKeyStore.PKCS12),
-				"Error al inicializar el modulo G&D SmartCafe 100% Java: " + e, e //$NON-NLS-1$
-			);
-		}
-		ksm.setPreferred(true);
-		return ksm;
-	}
-
-	private static AOKeyStoreManager getCeresJavaKeyStoreManager(final PasswordCallback pssCallback,
-																	final boolean forceReset,
-																	final Object parentComponent) throws AOKeystoreAlternativeException,
-	IOException {
-		final AOKeyStoreManager ksm = new AOKeyStoreManager();
-		try {
-			ksm.init(AOKeyStore.CERES, null, pssCallback, new Object[] { parentComponent }, forceReset);
-		}
-		catch (final AOKeyStoreManagerException e) {
-			throw new AOKeystoreAlternativeException(
-					getAlternateKeyStoreType(AOKeyStore.PKCS12),
-					"Error al inicializar el modulo CERES 100% Java: " + e, //$NON-NLS-1$
-					e
-					);
-		}
-		ksm.setPreferred(true);
-		return ksm;
-	}
-
-	private static AOKeyStoreManager getCeres430JavaKeyStoreManager(final PasswordCallback pssCallback,
-																	final boolean forceReset,
-																	final Object parentComponent) throws AOKeystoreAlternativeException,
-																										IOException {
-		final AOKeyStoreManager ksm = new AOKeyStoreManager();
-		try {
-			ksm.init(AOKeyStore.CERES_430, null, pssCallback, new Object[] { parentComponent }, forceReset);
-		}
-		catch (final AOKeyStoreManagerException e) {
-			throw new AOKeystoreAlternativeException(
-					getAlternateKeyStoreType(AOKeyStore.PKCS12),
-					"Error al inicializar el modulo CERES 430 100% Java: " + e, //$NON-NLS-1$
-					e
-					);
-		}
-		ksm.setPreferred(true);
-		return ksm;
-	}
-
-	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final PasswordCallback pssCallback,
+	private static AOKeyStoreManager getSmartCardKeyStoreManager(final AOKeyStore ksType,
+																final PasswordCallback pssCallback,
 																final boolean forceReset,
     	                                                        final Object parentComponent) throws AOKeystoreAlternativeException,
     																							     IOException {
-    	final AOKeyStoreManager ksm = new AOKeyStoreManager();
+
+		AOKeyStoreManager ksm;
+		try {
+			ksm = (AOKeyStoreManager) Class
+					.forName("es.gob.afirma.keystores.smartcard.JMulticardKeyStoreManager") //$NON-NLS-1$
+					.getConstructor().newInstance();
+		}
+		catch (final Exception e) {
+    		throw new AOKeystoreAlternativeException(
+				getAlternateKeyStoreType(ksType),
+				"Error al cargar dinamicamente JMulticard: " + e, //$NON-NLS-1$
+				e
+			);
+		}
+
     	try {
     		// Proporcionamos el componente padre como parametro
-    		ksm.init(AOKeyStore.DNIEJAVA, null, pssCallback, new Object[] { parentComponent }, forceReset);
+    		ksm.init(ksType, null, pssCallback, new Object[] { parentComponent }, forceReset);
     	}
     	catch (final AOKeyStoreManagerException e) {
     	   throw new AOKeystoreAlternativeException(
-                getAlternateKeyStoreType(AOKeyStore.PKCS12),
-                "Error al inicializar el modulo DNIe 100% Java: " + e, //$NON-NLS-1$
+                getAlternateKeyStoreType(ksType),
+                "Error al inicializar el la tarjeta inteligente " + ksType + ": " + e, //$NON-NLS-1$ //$NON-NLS-2$
                 e
            );
 		}

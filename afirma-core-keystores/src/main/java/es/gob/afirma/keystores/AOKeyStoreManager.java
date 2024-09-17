@@ -29,10 +29,8 @@ import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.jmulticard.card.AuthenticationModeLockedException;
 
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
  * crear KeyStores de distintos tipos, utilizando el proveedor JCA apropiado para cada caso
@@ -93,7 +91,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
     private AOKeyStore ksType;
 
     /** Almacenes de claves. */
-    private KeyStore ks;
+    protected KeyStore ks;
 
 
     /** Establece el almac&eacute;n de claves principal.
@@ -148,8 +146,8 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	return getType();
     }
 
-    private InputStream storeIs;
-    private PasswordCallback storePasswordCallBack;
+    protected InputStream storeIs;
+    protected PasswordCallback storePasswordCallBack;
 
     private PasswordCallback entryPasswordCallBack = null;
 
@@ -164,7 +162,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	return this.entryPasswordCallBack;
     }
 
-    private Object[] storeParams;
+    protected Object[] storeParams;
 
     /** Inicializa el almac&eacute;n. Se encarga tambi&eacute;n de a&ntilde;adir o
      * retirar los <i>Provider</i> necesarios para operar con dicho almac&eacute;n
@@ -211,38 +209,6 @@ public class AOKeyStoreManager implements KeyStoreManager {
         	case SINGLE:
         		this.ks =  AOKeyStoreManagerHelperSingle.initSingle(store, pssCallBack);
         		break;
-        	case SMARTCAFE:
-                // En el "params" debemos traer los parametros:
-                // [0] -parent: Componente padre para la modalidad
-        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
-        		this.ks = AOKeyStoreManagerHelperFullJava.initSmartCafeJava(
-    				getParentComponent()
-				);
-            	break;
-        	case CERES:
-                // En el "params" debemos traer los parametros:
-                // [0] -parent: Componente padre para la modalidad
-        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
-        		this.ks = AOKeyStoreManagerHelperFullJava.initCeresJava(
-    				getParentComponent()
-				);
-            	break;
-        	case CERES_430:
-                // En el "params" debemos traer los parametros:
-                // [0] -parent: Componente padre para la modalidad
-        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
-        		this.ks = AOKeyStoreManagerHelperFullJava.initCeres430Java(
-    				getParentComponent()
-				);
-            	break;
-        	case DNIEJAVA:
-                // En el "params" debemos traer los parametros:
-                // [0] -parent: Componente padre para la modalidad
-        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
-            	this.ks = AOKeyStoreManagerHelperFullJava.initDnieJava(
-        			getParentComponent()
-    			);
-            	break;
         	case JAVACE:
         	case JCEKS:
         		this.ks = AOKeyStoreManagerHelperJava.initJava(store, pssCallBack, this.ksType);
@@ -320,12 +286,6 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     	try {
     		return (X509Certificate) this.ks.getCertificate(alias);
-    	}
-    	catch(final AuthenticationModeLockedException e) {
-			throw new SmartCardLockedException("Tarjeta inteligente bloqueada: " + e, e); //$NON-NLS-1$
-    	}
-    	catch(final es.gob.jmulticard.CancelledOperationException e) {
-    		throw new AOCancelledOperationException("Se cancelo uso de la tarjeta a traves del driver Java: " + e, e); //$NON-NLS-1$
     	}
     	catch(final Exception e) {
     		LOGGER.severe(

@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>afirma-keystores-mozilla</artifactId>
+	<artifactId>afirma-keystores-smartcard</artifactId>
 	<packaging>jar</packaging>
 
-	<name>afirma-keystores-mozilla</name>
-	<description>Modulo para el acceso al almacen de claves de Firefox</description>
+	<name>afirma-keystores-smartcard</name>
+	<description>Modulo con los componentes necesarios para usar JMulticard desde gestor de almacenes del cliente</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -21,11 +21,21 @@
 			<artifactId>afirma-core</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core-keystores</artifactId>
 			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma.jmulticard</groupId>
+			<artifactId>jmulticard</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma.jmulticard</groupId>
+			<artifactId>jmulticard-jse</artifactId>
 		</dependency>
 		
 		<dependency>
