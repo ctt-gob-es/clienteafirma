@@ -558,15 +558,13 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 */
 	private static AOKeyStoreManager openDnieKeyStore(final Object parent) throws Exception {
 
-		final AOKeyStoreManager ksm = new AOKeyStoreManager();
 		try {
-			// Proporcionamos el componente padre como parametro
-			ksm.init(
+			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
 				AOKeyStore.DNIEJAVA,
 				null,
 				null,
-				new Object[] { parent },
-				true
+				null,
+				parent
 			);
 		}
 		catch (final AOCancelledOperationException e) {
@@ -576,7 +574,6 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			LOGGER.log(Level.WARNING,"No se ha podido cargar el DNIe: " + e, e); //$NON-NLS-1$
 			throw e;
 		}
-		return ksm;
 	}
 
 	/**

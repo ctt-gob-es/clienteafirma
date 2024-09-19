@@ -215,16 +215,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>es.gob.afirma.jmulticard</groupId>
-			<artifactId>jmulticard-jse</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>es.gob.afirma.jmulticard</groupId>
-			<artifactId>jmulticard</artifactId>
-		</dependency>
-
-		<dependency>
 		    <groupId>org.java-websocket</groupId>
 			<artifactId>Java-WebSocket</artifactId>
  			<version>1.5.3</version>

@@ -28,6 +28,7 @@ import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
+import es.gob.afirma.core.signers.AOSignatureAuthException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
@@ -106,7 +107,7 @@ public final class AOCAdESSigner implements AOSigner {
 					certChain,
 					cadesConfig);
         }
-        catch (final AOCancelledOperationException e) {
+        catch (final AOCancelledOperationException | AOSignatureAuthException e) {
         	throw e;
         }
         catch (final Exception e) {

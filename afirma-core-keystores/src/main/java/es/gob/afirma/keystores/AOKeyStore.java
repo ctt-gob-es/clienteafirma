@@ -132,7 +132,7 @@ public enum AOKeyStore {
 		"Tarjeta FNMT-RCM CERES", //$NON-NLS-1$
 		14,
 		"CERES", //$NON-NLS-1$
-		null, // Al igual que en el DNIe el PIN se pide al firmar
+		null, // El PIN se pide al firmar
 		null  // Sin password para el almacen en si
 	),
     /** DNIe con controlador nativo Java. */
@@ -140,8 +140,8 @@ public enum AOKeyStore {
 		"DNIe y tarjetas FNMT-TIF", //$NON-NLS-1$
 		15,
 		"DNI", //$NON-NLS-1$
-		null,
-		null
+		null, // El PIN se pide al firmar
+		null  // Sin password para el almacen en si
 	),
     /** Conjunto de tarjetas conocidas, accedidas v&iacute;a PKCS#11. */
     KNOWN_SMARTCARDS(
@@ -164,7 +164,7 @@ public enum AOKeyStore {
 		"Tarjeta FNMT-RCM CERES 4.30 o superior", //$NON-NLS-1$
 		18,
 		"CERES430", //$NON-NLS-1$
-		null, // Al igual que en el DNIe el PIN se pide al firmar
+		null, // El PIN se pide al firmar
 		null  // Sin password para el almacen en si
 	),
 	/** Otro tipo de almac&eacute;n (deber&aacute;n inicializarse manualmente sus par&aacute;metros operativos). */

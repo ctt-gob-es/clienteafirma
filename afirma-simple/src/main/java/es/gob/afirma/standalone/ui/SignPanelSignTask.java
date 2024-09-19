@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
+import es.gob.afirma.core.AOCancelledAuthOperationException;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
@@ -40,6 +41,7 @@ import es.gob.afirma.core.RuntimePasswordNeededException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSignatureAuthException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -325,7 +327,21 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             		this.parent
         		);
             }
+            // Cancelacion de la operacion (probablemente se cancele desde el dialogo de seleccion de certificados)
             catch(final AOCancelledOperationException e) {
+                return;
+            }
+            // Cancelacion de la autorizacion de la operacion (probablemente se cancele el dialogo de PIN de uno de los
+            // almacenes de certificados, como el de JMulticard)
+            catch(final AOCancelledAuthOperationException e) {
+        		// Deseleccionamos la clave para que no se vuelva a usar automaticamente
+        		this.selectedPke = null;
+        		// Reiniciamos el almacen
+        		try {
+        			this.ksm.refresh();
+        		} catch (final IOException ioe) {
+        			LOGGER.log(Level.SEVERE, "No se pudo refrescar el almacen, pero se continua con la operacion", ioe); //$NON-NLS-1$
+        		}
                 return;
             }
             catch(final AOFormatFileException e) {
@@ -385,8 +401,44 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	LOGGER.warning("Error en una firma del lote, se continua con la siguiente: " + e); //$NON-NLS-1$
             	continue;
             }
+        	catch(final AOSignatureAuthException e) {
+        		LOGGER.log(Level.SEVERE, "Error de autenticacion de la clave de firma. Se aborta todo el proceso", e); //$NON-NLS-1$
+
+        		// Deseleccionamos la clave para que no se vuelva a usar
+        		this.selectedPke = null;
+
+        		// Identificamos si el error lo lanzo JMulticard debido a un problema de autorizacion de la firma
+        		Throwable jmulticardException = null;
+        		if (e.getCause() != null && "es.gob.jmulticard.jse.provider.SignatureAuthException".equals(e.getCause().getClass().getName())) { //$NON-NLS-1$
+        			jmulticardException = e.getCause().getCause();
+        		}
+
+        		// Preguntamos si se desea reintentar el proceso mostrando un error relevante si el error
+        		// fue uno conocido de JMulticard o un mensaje generico en otro caso
+        		boolean retry = false;
+        		if (jmulticardException != null && "es.gob.jmulticard.card.AuthenticationModeLockedException".equals(jmulticardException.getClass().getName())) { //$NON-NLS-1$
+        			retry = showConfirmRequest(this.parent, SimpleAfirmaMessages.getString("SignPanel.158"));	// Tarjeta bloqueada //$NON-NLS-1$
+        		} else if (jmulticardException != null && "es.gob.jmulticard.card.BadPinException".equals(jmulticardException.getClass().getName())) { //$NON-NLS-1$
+        			retry = showConfirmRequest(this.parent, SimpleAfirmaMessages.getString("SignPanel.159"));	// PIN incorrecto //$NON-NLS-1$
+        		} else {
+        			retry = showConfirmRequest(this.parent, SimpleAfirmaMessages.getString("SignPanel.160")); //$NON-NLS-1$ // Error desconocido
+        		}
+
+        		// Reiniciamos el almacen
+        		try {
+        			this.ksm.refresh();
+        		} catch (final IOException ioe) {
+        			LOGGER.log(Level.SEVERE, "No se pudo refrescar el almacen, pero se continua con la operacion", ioe); //$NON-NLS-1$
+        		}
+
+        		// Reintentamos la operacion si se pidio
+        		if (retry) {
+        			doSignature();
+        		}
+        		return;
+            }
             catch(final Exception e) {
-                LOGGER.log(Level.SEVERE, "Error durante el proceso de firma: " + e, e); //$NON-NLS-1$
+                LOGGER.log(Level.SEVERE, "Error durante el proceso de firma", e); //$NON-NLS-1$
             	if (onlyOneFile) {
             		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.65"), e); //$NON-NLS-1$
             		return;

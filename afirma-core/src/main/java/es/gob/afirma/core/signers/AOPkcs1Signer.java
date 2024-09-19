@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOCancelledAuthOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
@@ -77,9 +77,9 @@ public final class AOPkcs1Signer implements AOSigner {
 		final String algorithmName;
 		try {
 			final String keyType = key.getAlgorithm();
-			
+
 			algorithmName = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
-			
+
 			sig = p != null ? Signature.getInstance(algorithmName, p) : Signature.getInstance(algorithmName);
 		}
 		catch (final NoSuchAlgorithmException e) {
@@ -107,7 +107,10 @@ public final class AOPkcs1Signer implements AOSigner {
 		catch (final Exception e) {
 
 			if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
-        		throw new AOCancelledOperationException("Cancelacion del dialogo de JMulticard"); //$NON-NLS-1$
+        		throw new AOCancelledAuthOperationException("Cancelacion del dialogo de JMulticard"); //$NON-NLS-1$
+        	}
+			else if ("es.gob.jmulticard.jse.provider.SignatureAuthException".equals(e.getClass().getName())) { //$NON-NLS-1$
+        		throw new AOSignatureAuthException("Error de autenticacion en el almacen de claves externo", e); //$NON-NLS-1$
         	}
 
 			throw new AOException("Error durante el proceso de firma PKCS#1: " + e, e); //$NON-NLS-1$
@@ -155,12 +158,12 @@ public final class AOPkcs1Signer implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se puede obtener la estructura de firmantes en PKCS#1"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se puede obtener la estructura de firmantes en PKCS#1"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public boolean isSign(final byte[] signData, final Properties params) {
 		return isSign(signData);
@@ -192,7 +195,7 @@ public final class AOPkcs1Signer implements AOSigner {
 	public byte[] getData(final byte[] signData) {
 		throw new UnsupportedOperationException("No se pueden obtener los datos firmados en PKCS#1"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public byte[] getData(final byte[] sign, final Properties params){
 		throw new UnsupportedOperationException("No se pueden obtener los datos firmados en PKCS#1"); //$NON-NLS-1$
@@ -202,7 +205,7 @@ public final class AOPkcs1Signer implements AOSigner {
 	public AOSignInfo getSignInfo(final byte[] signData) {
 		throw new UnsupportedOperationException("No se puede obtener informacion de las firmas PKCS#1"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
 		throw new UnsupportedOperationException("No se puede obtener informacion de las firmas PKCS#1"); //$NON-NLS-1$

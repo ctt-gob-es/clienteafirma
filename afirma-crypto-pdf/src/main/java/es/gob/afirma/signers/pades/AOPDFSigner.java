@@ -39,6 +39,7 @@ import es.gob.afirma.core.signers.AOConfigurableContext;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
+import es.gob.afirma.core.signers.AOSignatureAuthException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -217,7 +218,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 	    		extraParams
 			);
         }
-        catch (final AOCancelledOperationException e) {
+        catch (final AOCancelledOperationException | AOSignatureAuthException e) {
         	throw e;
         }
         catch (final Exception e) {
