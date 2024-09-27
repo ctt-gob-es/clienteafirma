@@ -22,6 +22,7 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -50,6 +51,7 @@ import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.CertificateFilter;
+import es.gob.afirma.keystores.PrivateKeyContext;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
@@ -84,6 +86,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	private final List<SignOperationConfig> signConfigs;
 	private final AOKeyStoreManager ksm;
 	private final List<? extends CertificateFilter> certFilters;
+	private PrivateKeyContext selectedPkc;
 	private PrivateKeyEntry selectedPke;
 	private final CommonWaitDialog waitDialog;
 	private final SignatureExecutor signExecutor;
@@ -105,6 +108,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         this.signConfigs = signConfigs;
         this.ksm = ksm;
         this.certFilters = certificateFilters != null ? new ArrayList<>(certificateFilters) : null;
+        this.selectedPkc = null;
         this.selectedPke = null;
         this.waitDialog = signWaitDialog;
         this.signExecutor = signExecutor;
@@ -121,6 +125,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 		this.signConfigs = signConfigs;
 		this.ksm = null;
 		this.certFilters = null;
+		this.selectedPkc = null;
 		this.selectedPke = pke;
 		this.waitDialog = signWaitDialog;
 		this.signExecutor = signExecutor;
@@ -133,7 +138,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         // Para cualquier otro formato de firma o PAdES no visible, firmaremos
     	// directamente
-		doSignature();
+		doSignature(null);
 
         return null;
     }
@@ -149,12 +154,19 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 				this.signExecutor.relaunchTask(this.selectedPke, this.signConfigs);
 			}
 			else {
-				this.signExecutor.finishTask();
+				AOKeyStoreManager selectecKsm;
+				if (this.selectedPkc.getKeyStoreManager() != null
+						&& this.selectedPkc.getKeyStoreManager() instanceof AOKeyStoreManager) {
+					selectecKsm = (AOKeyStoreManager) this.selectedPkc.getKeyStoreManager();
+				} else {
+					selectecKsm = this.ksm;
+				}
+				this.signExecutor.finishTask(selectecKsm);
 			}
 		}
 	}
 
-    void doSignature() {
+    void doSignature(final Certificate cert) {
 
     	this.needRelaunch = false;
 
@@ -164,7 +176,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         if (this.selectedPke == null) {
         	try {
-        		this.selectedPke = getPrivateKeyEntry();
+        		this.selectedPkc = getPrivateKeyContext(cert);
+        		this.selectedPke = this.selectedPkc.getPrivateKeyEntry();
         	}
         	catch (final AOCancelledOperationException e) {
         		return;
@@ -317,31 +330,75 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         	// Ejecutamos la operacion de firma apropiada
             try {
-                signResult = signData(
-            		dataToSign,
-            		currentSigner,
-            		signConfig,
-            		signatureAlgorithm,
-            		this.selectedPke,
-            		onlyOneFile,
-            		this.parent
-        		);
-            }
-            // Cancelacion de la operacion (probablemente se cancele desde el dialogo de seleccion de certificados)
-            catch(final AOCancelledOperationException e) {
-                return;
+    			signResult = signData(
+    					dataToSign,
+    					currentSigner,
+    					signConfig,
+    					signatureAlgorithm,
+    					this.selectedPke,
+    					onlyOneFile,
+    					this.parent
+    					);
             }
             // Cancelacion de la autorizacion de la operacion (probablemente se cancele el dialogo de PIN de uno de los
             // almacenes de certificados, como el de JMulticard)
             catch(final AOCancelledAuthOperationException e) {
+
+            	LOGGER.severe(" ==== CANCELAMOS LA AUTORIZACION DE FIRMA: " + e); //$NON-NLS-1$
+
         		// Deseleccionamos la clave para que no se vuelva a usar automaticamente
         		this.selectedPke = null;
+
         		// Reiniciamos el almacen
         		try {
         			this.ksm.refresh();
         		} catch (final IOException ioe) {
         			LOGGER.log(Level.SEVERE, "No se pudo refrescar el almacen, pero se continua con la operacion", ioe); //$NON-NLS-1$
         		}
+                return;
+            }
+            // Error durante ka autorizacion de la firma. Mostramos un error adecuado, reiniciamos el almacen y
+    		// reintentamos si se solicita
+    		catch(final AOSignatureAuthException e) {
+    			LOGGER.log(Level.SEVERE, "Error de autenticacion de la clave de firma. Se aborta todo el proceso", e); //$NON-NLS-1$
+
+    			final Certificate selectedCert = this.selectedPke.getCertificate();
+
+    			// Deseleccionamos la clave para que no se vuelva a usar
+    			this.selectedPke = null;
+
+    			// Identificamos si el error lo lanzo JMulticard debido a un problema de autorizacion de la firma
+    			Throwable jmulticardException = null;
+    			if (e.getCause() != null && "es.gob.jmulticard.jse.provider.SignatureAuthException".equals(e.getCause().getClass().getName())) { //$NON-NLS-1$
+    				jmulticardException = e.getCause().getCause();
+    			}
+
+    			// Preguntamos si se desea reintentar el proceso mostrando un error relevante si el error
+    			// fue uno conocido de JMulticard o un mensaje generico en otro caso
+    			boolean retry;
+    			if (jmulticardException != null && "es.gob.jmulticard.card.AuthenticationModeLockedException".equals(jmulticardException.getClass().getName())) { //$NON-NLS-1$
+    				retry = showConfirmRequest(this.parent, SimpleAfirmaMessages.getString("SignPanel.158"));	// Tarjeta bloqueada //$NON-NLS-1$
+    			} else if (jmulticardException != null && "es.gob.jmulticard.card.BadPinException".equals(jmulticardException.getClass().getName())) { //$NON-NLS-1$
+    				retry = showConfirmRequest(this.parent, SimpleAfirmaMessages.getString("SignPanel.159"));	// PIN incorrecto //$NON-NLS-1$
+    			} else {
+    				retry = showConfirmRequest(this.parent, SimpleAfirmaMessages.getString("SignPanel.160")); //$NON-NLS-1$ // Error desconocido
+    			}
+
+    			// Reiniciamos el almacen
+    			try {
+    				this.ksm.refresh();
+    			} catch (final IOException ioe) {
+    				LOGGER.log(Level.SEVERE, "No se pudo refrescar el almacen, pero se continua con la operacion", ioe); //$NON-NLS-1$
+    			}
+
+    			// Reintentamos la operacion si se pidio
+    			if (retry) {
+    				doSignature(selectedCert);
+    			}
+    			return;
+    		}
+            // Cancelacion de la operacion (probablemente se cancele desde el dialogo de seleccion de certificados)
+            catch(final AOCancelledOperationException e) {
                 return;
             }
             catch(final AOFormatFileException e) {
@@ -400,42 +457,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             catch(final SingleSignatureException e) {
             	LOGGER.warning("Error en una firma del lote, se continua con la siguiente: " + e); //$NON-NLS-1$
             	continue;
-            }
-        	catch(final AOSignatureAuthException e) {
-        		LOGGER.log(Level.SEVERE, "Error de autenticacion de la clave de firma. Se aborta todo el proceso", e); //$NON-NLS-1$
-
-        		// Deseleccionamos la clave para que no se vuelva a usar
-        		this.selectedPke = null;
-
-        		// Identificamos si el error lo lanzo JMulticard debido a un problema de autorizacion de la firma
-        		Throwable jmulticardException = null;
-        		if (e.getCause() != null && "es.gob.jmulticard.jse.provider.SignatureAuthException".equals(e.getCause().getClass().getName())) { //$NON-NLS-1$
-        			jmulticardException = e.getCause().getCause();
-        		}
-
-        		// Preguntamos si se desea reintentar el proceso mostrando un error relevante si el error
-        		// fue uno conocido de JMulticard o un mensaje generico en otro caso
-        		boolean retry = false;
-        		if (jmulticardException != null && "es.gob.jmulticard.card.AuthenticationModeLockedException".equals(jmulticardException.getClass().getName())) { //$NON-NLS-1$
-        			retry = showConfirmRequest(this.parent, SimpleAfirmaMessages.getString("SignPanel.158"));	// Tarjeta bloqueada //$NON-NLS-1$
-        		} else if (jmulticardException != null && "es.gob.jmulticard.card.BadPinException".equals(jmulticardException.getClass().getName())) { //$NON-NLS-1$
-        			retry = showConfirmRequest(this.parent, SimpleAfirmaMessages.getString("SignPanel.159"));	// PIN incorrecto //$NON-NLS-1$
-        		} else {
-        			retry = showConfirmRequest(this.parent, SimpleAfirmaMessages.getString("SignPanel.160")); //$NON-NLS-1$ // Error desconocido
-        		}
-
-        		// Reiniciamos el almacen
-        		try {
-        			this.ksm.refresh();
-        		} catch (final IOException ioe) {
-        			LOGGER.log(Level.SEVERE, "No se pudo refrescar el almacen, pero se continua con la operacion", ioe); //$NON-NLS-1$
-        		}
-
-        		// Reintentamos la operacion si se pidio
-        		if (retry) {
-        			doSignature();
-        		}
-        		return;
             }
             catch(final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error durante el proceso de firma", e); //$NON-NLS-1$
@@ -723,19 +744,26 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     				);
     }
 
-	private PrivateKeyEntry getPrivateKeyEntry() throws AOCertificatesNotFoundException,
+	private PrivateKeyContext getPrivateKeyContext(final Certificate cert) throws AOCertificatesNotFoundException,
 	                                                    KeyStoreException,
 	                                                    NoSuchAlgorithmException,
 	                                                    UnrecoverableEntryException {
 
+		List<? extends CertificateFilter> filters;
+		if (cert != null) {
+			filters = Arrays.asList(new SameCertificateFilter(cert));
+		} else {
+			filters = this.certFilters;
+		}
+
     	final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 			this.ksm,
 			this.parent,
-			true,             // Comprobar claves privadas
+			true,			// Comprobar claves privadas
 			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS), // Mostrar certificados caducados
-			true,             // Comprobar validez temporal del certificado
-			this.certFilters, // Filtros
-			false            // mandatoryCertificate
+			true,			// Comprobar validez temporal del certificado
+			filters,		// Filtros
+			cert != null	// mandatoryCertificate
 			);
     	dialog.show();
 
@@ -746,7 +774,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     	final KeyStoreManager currentKsm = context.getKeyStoreManager();
     	currentKsm.setParentComponent(this.parent);
 
-    	return currentKsm.getKeyEntry(context.getAlias());
+    	return new PrivateKeyContext(currentKsm, currentKsm.getKeyEntry(context.getAlias()));
 	}
 
 	/**
@@ -997,6 +1025,27 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 					e
 				);
     		}
+    	}
+    }
+
+    /**
+     * Filtro de certificados para seleccionar un certificado concreto.
+     */
+    private class SameCertificateFilter extends CertificateFilter {
+
+    	private final Certificate selectedCert;
+
+    	/**
+    	 * Construye el filtro.
+    	 * @param cert Certificado que se debe seleccionar.
+    	 */
+    	public SameCertificateFilter(final Certificate cert) {
+    		this.selectedCert = cert;
+		}
+
+    	@Override
+    	public boolean matches(final X509Certificate cert) {
+    		return this.selectedCert.equals(cert);
     	}
     }
 }

@@ -770,7 +770,6 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     			if (regDeleted) {
     				for (int i = 0 ; i < this.smartCards.getItemCount() ; i++) {
-    					System.out.println(this.smartCards.getItemAt(i).getName());
     					if (this.smartCards.getItemAt(i).getName().equals(oldCardName)) {
     						this.smartCards.removeItemAt(i);
     					}

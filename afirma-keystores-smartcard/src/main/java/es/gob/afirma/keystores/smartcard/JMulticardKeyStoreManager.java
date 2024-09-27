@@ -3,18 +3,19 @@ package es.gob.afirma.keystores.smartcard;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.X509Certificate;
-import java.util.logging.Logger;
 
+import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.smartcard.gui.CacheElement;
 
 public class JMulticardKeyStoreManager extends AOKeyStoreManager {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private CallbackHandler callbackHandler = null;
 
 	@Override
     public void init(final AOKeyStore type,
@@ -49,16 +50,20 @@ public class JMulticardKeyStoreManager extends AOKeyStoreManager {
                 // En el "params" debemos traer los parametros:
                 // [0] -parent: Componente padre para la modalidad
         		setParentComponent(params != null && params.length > 0 ? params[0] : null);
+        		this.callbackHandler = AOKeyStoreManagerHelperFullJava.getSmartcardCallbackHandler();
         		this.ks = AOKeyStoreManagerHelperFullJava.initSmartCafeJava(
-    				getParentComponent()
+    				getParentComponent(),
+    				this.callbackHandler
 				);
             	break;
         	case CERES:
                 // En el "params" debemos traer los parametros:
                 // [0] -parent: Componente padre para la modalidad
         		setParentComponent(params != null && params.length > 0 ? params[0] : null);
+        		this.callbackHandler = AOKeyStoreManagerHelperFullJava.getSmartcardCallbackHandler();
         		this.ks = AOKeyStoreManagerHelperFullJava.initCeresJava(
-    				getParentComponent()
+    				getParentComponent(),
+    				this.callbackHandler
 				);
             	break;
            	 /**
@@ -70,8 +75,10 @@ public class JMulticardKeyStoreManager extends AOKeyStoreManager {
                 // En el "params" debemos traer los parametros:
                 // [0] -parent: Componente padre para la modalidad
         		setParentComponent(params != null && params.length > 0 ? params[0] : null);
+        		this.callbackHandler = AOKeyStoreManagerHelperFullJava.getDniCallbackHandler();
             	this.ks = AOKeyStoreManagerHelperFullJava.initDnieJava(
-        			getParentComponent()
+            		getParentComponent(),
+            		this.callbackHandler
     			);
             	break;
             default:
@@ -104,6 +111,32 @@ public class JMulticardKeyStoreManager extends AOKeyStoreManager {
 				"Error intentando recuperar el certificado, se devolvera null: " + e //$NON-NLS-1$
 			);
     		return null;
+    	}
+    }
+
+    @Override
+	public void refresh() throws IOException {
+    	clear();
+    	super.refresh();
+    }
+
+    /**
+     * Eliminamos todos los datos guardados (alias, contrase&ntilde;as, ...).
+     */
+    public void clear() {
+    	resetCachedAliases();
+
+    	this.storeParams = null;
+
+    	if (this.callbackHandler != null && this.callbackHandler instanceof CacheElement) {
+    		((CacheElement) this.callbackHandler).reset();
+    	}
+
+    	if (this.storePasswordCallBack != null) {
+    		this.storePasswordCallBack.clearPassword();
+    	}
+    	if (getEntryPasswordCallBack() != null) {
+    		getEntryPasswordCallBack().clearPassword();
     	}
     }
 }

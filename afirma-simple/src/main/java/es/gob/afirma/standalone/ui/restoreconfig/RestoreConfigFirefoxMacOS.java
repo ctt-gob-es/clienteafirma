@@ -223,9 +223,6 @@ final class RestoreConfigFirefoxMacOS {
 		// Si nos han pedido desinstalar el certificado actual, introducimos un script para eliminarlo
 		if (uninstall) {
 			final String command = getRemoveCertCommand(certUtilFile, profileDir);
-
-			System.out.println(command);
-
 			RestoreConfigMacOSX.writeScriptFile(command, true);
 		}
 

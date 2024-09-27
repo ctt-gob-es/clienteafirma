@@ -2,6 +2,7 @@ package es.gob.afirma.keystores.smartcard.gui;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
@@ -24,6 +25,16 @@ public final class DnieCacheCallbackHandler extends CacheElement implements Call
 	private static final String PREFERENCE_KEY_USE_CACHE = "useCacheDni"; //$NON-NLS-1$
 
 	private transient boolean confirmed = false;
+
+
+	private final long id;
+	public DnieCacheCallbackHandler() {
+		this.id = new Date().getTime();
+	}
+
+	public long getId() {
+		return this.id;
+	}
 
 	@Override
 	public void handle(final Callback[] callbacks) throws UnsupportedCallbackException {

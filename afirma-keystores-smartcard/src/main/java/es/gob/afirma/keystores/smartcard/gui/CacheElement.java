@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-class CacheElement {
+public class CacheElement {
 
 	private static final long CACHE_TIMEOUT = 3600 * 1000;	// 1 hora
 
@@ -36,7 +36,7 @@ class CacheElement {
 		return this.cacheEnabled;
 	}
 
-	void reset() {
+	public void reset() {
 		if (this.password != null) {
 			Arrays.fill(this.password, '\0');
 			this.password = null;

@@ -3,6 +3,8 @@ package es.gob.afirma.standalone.ui;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
 
+import es.gob.afirma.keystores.AOKeyStoreManager;
+
 /**
  * Clase para la ejecuci&oacute;n de una operaci&oacute;n de firma.
  */
@@ -25,6 +27,8 @@ public interface SignatureExecutor {
 
 	/**
 	 * Finaliza la tarea de firma.
+	 * @param ksm Almac&eacute;n de claves usado para completar la firma,
+	 * que podr&iacute;a ser distinto al configurado inicialmente.
 	 */
-	void finishTask();
+	void finishTask(AOKeyStoreManager ksm);
 }

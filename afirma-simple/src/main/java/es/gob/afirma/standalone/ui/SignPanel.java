@@ -63,6 +63,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.keystores.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
@@ -301,6 +302,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	}
     }
 
+
+
     /**
      * Inicia el proceso de firma.
      * @param signConfigs Operaciones de firma a ejecutar.
@@ -342,10 +345,13 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     }
 
     @Override
-    public void finishTask() {
+    public void finishTask(final AOKeyStoreManager ksm) {
 
-    	// Marcamos la tarea como termiada para evitar mostrar el dialogo espera despues de su fin
+    	// Marcamos la tarea como terminada para evitar mostrar el dialogo espera despues de su fin
 		this.taskIsRunning = false;
+		// Establecemos el almacen activo (que puede haber cambiado si el usuario lo modifico)
+		this.saf.setKeyStoreManager(ksm);
+		// Ocultamos el dialogo de espera
    		this.signWaitDialog.dispose();
     	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }

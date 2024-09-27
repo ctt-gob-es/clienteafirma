@@ -82,22 +82,22 @@ public final class UIPasswordCallback extends PasswordCallback {
     		                  final String dialogMessage,
     		                  final String dialogTitle) {
         super(prompt, false);
-        parent = parentComponent instanceof Component ? (Component) parentComponent : null;
+        this.parent = parentComponent instanceof Component ? (Component) parentComponent : null;
         if (prompt != null) {
-            message = prompt;
+            this.message = prompt;
         }
         else {
-            message = dialogMessage;
+            this.message = dialogMessage;
         }
-        title = dialogTitle;
+        this.title = dialogTitle;
     }
 
     @Override
     public char[] getPassword() {
 
     	final JPasswordField pwd = new JPasswordField(10);
-        final JLabel lbText = new JLabel(message);
-        lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(message), lbText.getSize().height));
+        final JLabel lbText = new JLabel(this.message);
+        lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(this.message), lbText.getSize().height));
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -116,7 +116,7 @@ public final class UIPasswordCallback extends PasswordCallback {
                 pwd.requestFocusInWindow();
             }
         };
-        pane.createDialog(parent, title).setVisible(true);
+        pane.createDialog(this.parent, this.title).setVisible(true);
 
         final Object selectedValue = pane.getValue();
         if (selectedValue == null) {

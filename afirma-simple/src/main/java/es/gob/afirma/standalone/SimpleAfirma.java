@@ -222,7 +222,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         return this.ksManager != null;
     }
 
-    synchronized void setKeyStoreManager(final AOKeyStoreManager ksm) {
+    /**
+     * Establece el almac&eacute;n de claves configurado
+     * @param ksm
+     */
+    public synchronized void setKeyStoreManager(final AOKeyStoreManager ksm) {
         if (ksm != null) {
             LOGGER.info("Establecido KeyStoreManager: " + ksm); //$NON-NLS-1$
             this.ksManager = ksm;
@@ -230,7 +234,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
                 ((SignPanel) this.currentPanel).notifyStoreReady();
             }
 		} else {
-        	LOGGER.info("No se ha podido inicializar el almacen por defecto"); //$NON-NLS-1$
+        	LOGGER.info("No se ha indicado el almacen"); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.6"), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE, null);

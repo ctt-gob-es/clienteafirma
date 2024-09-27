@@ -25,7 +25,6 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.smartcard.gui.DnieCacheCallbackHandler;
 import es.gob.afirma.keystores.smartcard.gui.PasswordCallbackManager;
-import es.gob.afirma.keystores.smartcard.gui.SmartcardCacheCallbackHandler;
 import es.gob.afirma.keystores.smartcard.gui.SmartcardCallbackHandler;
 
 final class AOKeyStoreManagerHelperFullJava {
@@ -39,14 +38,15 @@ final class AOKeyStoreManagerHelperFullJava {
 	/** Inicializa el almac&eacute;n 100% Java para tarjeta CERES.
 	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
 	 *                        de PIN.
+	 * @param callbackHandler Manejador para la solicitud de credenciales de seguridad.
 	 * @return <code>KeyStore</code> inicializado.
 	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
 	 * @throws IOException Si hay problemas en la lectura de datos. */
-	static KeyStore initCeresJava(final Object parentComponent) throws AOKeyStoreManagerException,
+	static KeyStore initCeresJava(final Object parentComponent, final CallbackHandler callbackHandler) throws AOKeyStoreManagerException,
                                                                        IOException {
 		return init(
 			AOKeyStore.CERES,
-			buildLoadStoreParameter(new SmartcardCacheCallbackHandler()),
+			buildLoadStoreParameter(callbackHandler != null ? callbackHandler : getSmartcardCallbackHandler()),
 			new es.gob.jmulticard.jse.provider.ceres.CeresProvider(),
 			parentComponent
 		);
@@ -55,33 +55,43 @@ final class AOKeyStoreManagerHelperFullJava {
 	/** Inicializa el almac&eacute;n 100% Java para tarjeta G&amp;D SmartCafe.
 	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
 	 *                        de PIN.
+	 * @param callbackHandler Manejador para la solicitud de credenciales de seguridad.
 	 * @return <code>KeyStore</code> inicializado.
 	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
 	 * @throws IOException Si hay problemas en la lectura de datos. */
-	static KeyStore initSmartCafeJava(final Object parentComponent) throws AOKeyStoreManagerException,
+	static KeyStore initSmartCafeJava(final Object parentComponent, final CallbackHandler callbackHandler) throws AOKeyStoreManagerException,
                                                                        IOException {
 		return init(
 			AOKeyStore.SMARTCAFE,
-			buildLoadStoreParameter(new SmartcardCallbackHandler()),
+			buildLoadStoreParameter(callbackHandler != null ? callbackHandler : getSmartcardCallbackHandler()),
 			new es.gob.jmulticard.jse.provider.gide.SmartCafeProvider(),
 			parentComponent
 		);
 	}
 
+	public static CallbackHandler getSmartcardCallbackHandler() {
+    	return new SmartcardCallbackHandler();
+    }
+
 	/** Inicializa el almac&eacute;n 100% Java para DNIe.
 	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
 	 *                        de PIN.
+	 * @param callbackHandler Manejador para la solicitud de credenciales de seguridad.
 	 * @return <code>KeyStore</code> inicializado.
 	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
 	 * @throws IOException Si hay problemas en la lectura de datos. */
-    static KeyStore initDnieJava(final Object parentComponent) throws AOKeyStoreManagerException,
+    static KeyStore initDnieJava(final Object parentComponent, final CallbackHandler callbackHandler) throws AOKeyStoreManagerException,
     		                                                          IOException {
     	return init(
 			AOKeyStore.DNIEJAVA,
-			buildLoadStoreParameter(new DnieCacheCallbackHandler()),
+			buildLoadStoreParameter(callbackHandler != null ? callbackHandler : getDniCallbackHandler()),
 			new es.gob.jmulticard.jse.provider.DnieProvider(),
 			parentComponent
 		);
+    }
+
+    public static CallbackHandler getDniCallbackHandler() {
+    	return new DnieCacheCallbackHandler();
     }
 
 
