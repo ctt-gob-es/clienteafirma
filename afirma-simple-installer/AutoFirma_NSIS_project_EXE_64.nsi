@@ -45,11 +45,13 @@ VIAddVersionKey "FileDescription" "AutoFirma (64 bits)"
   !insertmacro MUI_PAGE_DIRECTORY
   ;Pagina personalizada con las opciones de configuracion
   Page custom createConfigPage leaveConfigPage
+  ;Pagina con las opciones de instalacion
+  !insertmacro MUI_PAGE_COMPONENTS
+  SpaceTexts none
   ;Pagina de instalacion de ficheros
   !insertmacro MUI_PAGE_INSTFILES
   ;Pagina final
   !insertmacro MUI_PAGE_FINISH
-  
   ;Paginas referentes al desinstalador
   !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_CONFIRM
@@ -68,12 +70,12 @@ Var Shorcut_Integration_Checkbox_State
 Var Firefox_Integration_Checkbox
 Var Firefox_Integration_Checkbox_State
 
-Function .onInit
+;Parametro que indica si se debe utilizar el JRE instalada junto a Autofirma o no.
+Var USE_SYSTEM_JRE
+;Parametro que indica si se encuentra alguna versión de JRE instalada en el sistema.
+Var JRE_INSTALLED
 
-	StrCpy $StartMenu_Integration_Checkbox_State ${BST_CHECKED}
-	StrCpy $Shorcut_Integration_Checkbox_State ${BST_CHECKED}
-
-FunctionEnd
+!define SECTION_ON ${SF_SELECTED} # 0x1
 
 Function createConfigPage
   !insertmacro MUI_HEADER_TEXT "Opciones de integración avanzadas" "Seleccione las opciones de integración que desee que configure AutoFirma"
@@ -111,7 +113,7 @@ Function createConfigPage
 
 nsDialogs::Show
   
-FunctionEnd  
+FunctionEnd
 
 Function leaveConfigPage
 
@@ -193,7 +195,7 @@ UninstallText "Desinstalador de AutoFirma."
 ; Instalacion de la aplicacion y configuracion de la misma            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-Section "Programa" sPrograma
+Section "AutoFirma" sPrograma 
 
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
@@ -207,6 +209,9 @@ Section "Programa" sPrograma
 		MessageBox MB_OK "No se puede instalar AutoFirma 64 bits en un entorno 32 bits." 
 		Quit
 	${EndIf}
+	
+	;Establecemos la vista del registro acorde a la arquitectura del instalador
+	SetRegView 64
 
 	;Comprobamos si ya existe una versión de AutoFirma instalada. Si existe, se devolvera
 	;su numero de version y se dejara configurado el registro a 32 o 64 bits segun corresponda
@@ -224,9 +229,6 @@ Section "Programa" sPrograma
 		${EndIf}
 		Call RemoveOldVersions
 	${EndIf}
-	
-	;Establecemos la vista del registro acorde a la arquitectura del instalador
-	SetRegView 64
 
 	;Limpiamos el directorio al que se van a copiar los ficheros y bloqueamos la ejecucion
 	;hasta que este listo
@@ -244,9 +246,11 @@ Section "Programa" sPrograma
 	File  AutoFirma64\AutoFirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
-
-	;Copiamos la JRE
-	File /r java64\jre
+	
+	;Copiamos la JRE en caso de que no se vaya usar el JRE instalado en el sistema
+	${If} $USE_SYSTEM_JRE == "false" 
+		File /r java64\jre
+    ${EndIf}
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
     SetShellVarContext all
@@ -346,6 +350,47 @@ Section "Programa" sPrograma
 
 SectionEnd
 
+Section "Java Runtime Environment" SEC01
+SectionEnd
+
+	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+	!insertmacro MUI_DESCRIPTION_TEXT ${sPrograma} "Archivos necesarios para la ejecución del programa"
+	!insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Entorno de ejecución de Java"
+	!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+Function .onInit
+
+	StrCpy $StartMenu_Integration_Checkbox_State ${BST_CHECKED}
+	StrCpy $Shorcut_Integration_Checkbox_State ${BST_CHECKED}
+
+FunctionEnd
+
+Function .onSelChange
+
+	Push $0
+	Push $2
+	StrCpy $2 $1
+ 
+	SectionGetFlags ${SEC01} $0
+	IntOp $0 $0 & ${SECTION_ON}
+	${If} $0 == 1 
+		StrCpy $USE_SYSTEM_JRE "false"
+    ${Else}
+		Call CheckJREInstallation
+		${If} $JRE_INSTALLED == "false"
+			;Si no se encuentra ningun JRE en el sistema, se obligara a instalar el programa con el JRE de AutoFirma
+			SectionSetFlags ${SEC01} 1
+			MessageBox MB_OK "No se encuentra ningún JRE instalado en el sistema, por lo que se deberá instalar el JRE para su correcto funcionamiento." 
+		${Else}
+			StrCpy $USE_SYSTEM_JRE "true"
+		${EndIf}
+    ${EndIf}
+	
+	Pop $2
+	Pop $0
+	
+FunctionEnd
+
 
 !define CERT_STORE_CERTIFICATE_CONTEXT  1
 !define CERT_NAME_ISSUER_FLAG           1
@@ -396,6 +441,28 @@ Function AddCertificateToStore
   Pop $1
   Exch $0
  
+FunctionEnd
+
+Function CheckJREInstallation
+
+	SetRegView 64
+
+	Push $0
+ 
+    ReadRegStr $0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
+    StrCmp "" "$0" JavaNotPresent JavaPresent
+ 
+    JavaNotPresent:
+		StrCpy $JRE_INSTALLED "false" 
+        Goto Done
+ 
+    JavaPresent:
+		StrCpy $JRE_INSTALLED "true"
+        Goto Done
+ 
+    Done:
+		Pop $0
+		
 FunctionEnd
 
 ;Identifica la version instalada de AutoFirma.
@@ -1054,19 +1121,20 @@ Function AddToPath
   Push $2
   Push $3
   Push $4
+
   ; NSIS ReadRegStr returns empty string on string overflow
   ; Native calls are used here to check actual length of PATH
   ; $4 = RegOpenKey(HKEY_CURRENT_USER, "Environment", &$3)
   ;System::Call "advapi32::RegOpenKey(i 0x80000001, t'Environment', *i.r3) i.r4"
   System::Call "advapi32::RegOpenKey(i 0x80000002, t'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', *i.r3) i.r4"
   
-    IntCmp $4 0 0 done done
+  IntCmp $4 0 0 done done
   ; $4 = RegQueryValueEx($3, "PATH", (DWORD*)0, (DWORD*)0, &$1, ($2=NSIS_MAX_STRLEN, &$2))
   ; RegCloseKey($3)
   System::Call "advapi32::RegQueryValueEx(i $3, t'PATH', i 0, i 0, t.r1, *i ${NSIS_MAX_STRLEN} r2) i.r4"
   System::Call "advapi32::RegCloseKey(i $3)"
   IntCmp $4 234 0 +3 +3 ; $4 == ERROR_MORE_DATA
-    DetailPrint "El PATH es demasiado largo. No se le agregará la ruta de AutoAfirma."
+    DetailPrint "El PATH es demasiado largo. No se le agregará la ruta de AutoFirma."
     Goto done
   IntCmp $4 0 +5 ; $4 != NO_ERROR
     IntCmp $4 2 +3 ; $4 != ERROR_FILE_NOT_FOUND
@@ -1188,6 +1256,7 @@ done:
   Pop $1
   Pop $0
 FunctionEnd
+
 
 ; StrStr - find substring in a string
 ;

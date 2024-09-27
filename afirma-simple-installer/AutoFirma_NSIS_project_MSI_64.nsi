@@ -109,6 +109,10 @@ Var KEYSTORE_PATH
 Var CONFIG_PATH
 ;Parametro que indica la ruta del fichero de actualizacion de preferencias del sistema.
 Var UPDATE_CONFIG
+;Parametro que indica si se debe utilizar el JRE instalada junto a Autofirma o no.
+Var USE_SYSTEM_JRE
+;Parametro que indica si se encuentra alguna versión de JRE instalada en el sistema.
+Var JRE_INSTALLED
 
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
@@ -146,6 +150,7 @@ Function .onInit
 	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH
 	${GetOptions} $R0 "/CONFIG_PATH=" $CONFIG_PATH
 	${GetOptions} $R0 "/UPDATE_CONFIG=" $UPDATE_CONFIG
+	${GetOptions} $R0 "/USE_SYSTEM_JRE=" $USE_SYSTEM_JRE
 	
 	; Comprobamos que no solo se informe de un parametro, sino de
 	; los dos o de ninguno
@@ -213,6 +218,17 @@ Section "Programa" sPrograma
 
 	;Establecemos la vista del registro acorde a la arquitectura del instalador
 	SetRegView 64
+	
+	;Copiamos la JRE en caso de que no se vaya usar el JRE instalado en el sistema
+	${If} $USE_SYSTEM_JRE == "true" 
+		Call CheckJREInstallation
+		${If} $JRE_INSTALLED == "false"
+		;Si se ha solicitado usar el JRE instalado en el sistema pero no se encuentra instalado, saldremos del instalador
+		Quit
+		${EndIf}
+    ${Else}
+        File /r java64\jre
+    ${EndIf}
 
 	;Eliminamos el directorio de instalacion si existia
 	RMDir /r '$INSTDIR\$PATH'
@@ -235,9 +251,6 @@ Section "Programa" sPrograma
 	File  AutoFirma64\AutoFirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
-
-	;Copiamos la JRE
-	File /r java64\jre
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
     SetShellVarContext all
@@ -382,6 +395,27 @@ Function AddCertificateToStore
   Pop $1
   Exch $0
  
+FunctionEnd
+
+Function CheckJREInstallation
+
+	Push $0
+ 
+    ReadRegStr $0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
+    StrCmp "" "$0" JavaNotPresent JavaPresent
+ 
+    JavaNotPresent:
+	
+		StrCpy $JRE_INSTALLED "false"
+        Goto Done
+ 
+    JavaPresent:
+		StrCpy $JRE_INSTALLED "true"
+        Goto Done
+ 
+    Done:
+		Pop $0
+		
 FunctionEnd
 
 Function DeleteCertificateOnInstall
