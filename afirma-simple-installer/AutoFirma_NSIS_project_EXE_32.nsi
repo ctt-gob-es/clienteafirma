@@ -241,7 +241,7 @@ Section "AutoFirma" sPrograma
 
 	;Copiamos la JRE en caso de que no se vaya usar el JRE instalado en el sistema
 	${If} $USE_SYSTEM_JRE == "false" 
-		File /r java64\jre
+		File /r java32\jre
     ${EndIf}
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema

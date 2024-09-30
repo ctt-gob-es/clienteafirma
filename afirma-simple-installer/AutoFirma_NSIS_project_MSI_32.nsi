@@ -224,7 +224,7 @@ Section "Programa" sPrograma
 		Quit
 		${EndIf}
     ${Else}
-        File /r java64\jre
+        File /r java32\jre
     ${EndIf}
 
 	;Eliminamos el directorio de instalacion si existia
