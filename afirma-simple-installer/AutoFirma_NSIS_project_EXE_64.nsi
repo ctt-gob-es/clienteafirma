@@ -362,6 +362,12 @@ Function .onInit
 
 	StrCpy $StartMenu_Integration_Checkbox_State ${BST_CHECKED}
 	StrCpy $Shorcut_Integration_Checkbox_State ${BST_CHECKED}
+	
+	Call CheckJREInstallation
+	${If} $JRE_INSTALLED == "false"
+		 SectionSetFlags ${SEC01} 17
+		 StrCpy $USE_SYSTEM_JRE "false"
+	${EndIf}
 
 FunctionEnd
 

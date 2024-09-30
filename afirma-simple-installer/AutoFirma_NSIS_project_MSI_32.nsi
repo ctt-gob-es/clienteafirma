@@ -249,9 +249,6 @@ Section "Programa" sPrograma
 	File  licencia.txt
 	File  ic_firmar.ico
 
-	;Copiamos la JRE
-	File /r java32\jre
-
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
    SetShellVarContext all
 

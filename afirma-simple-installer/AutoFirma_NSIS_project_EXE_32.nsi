@@ -139,7 +139,7 @@ FunctionEnd
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma32/AutoFirma_32_v1_8_2_installer.exe
+OutFile AutoFirma32/AutoFirma_32_v1_9_0_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -354,6 +354,12 @@ Function .onInit
 
 	StrCpy $StartMenu_Integration_Checkbox_State ${BST_CHECKED}
 	StrCpy $Shorcut_Integration_Checkbox_State ${BST_CHECKED}
+	
+	Call CheckJREInstallation
+	${If} $JRE_INSTALLED == "false"
+		 SectionSetFlags ${SEC01} 17
+		 StrCpy $USE_SYSTEM_JRE "false"
+	${EndIf}
 
 FunctionEnd
 
