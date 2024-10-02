@@ -70,11 +70,6 @@ Var Shorcut_Integration_Checkbox_State
 Var Firefox_Integration_Checkbox
 Var Firefox_Integration_Checkbox_State
 
-;Parametro que indica si se debe utilizar el JRE instalada junto a Autofirma o no.
-Var USE_SYSTEM_JRE
-;Parametro que indica si se encuentra alguna versión de JRE instalada en el sistema.
-Var JRE_INSTALLED
-
 !define SECTION_ON ${SF_SELECTED} # 0x1
 
 Function createConfigPage
@@ -200,7 +195,7 @@ Section "AutoFirma" sPrograma
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
 	StrCpy $PATH "AutoFirma"
-	
+
 	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
 	System::Call 'kernel32::GetCurrentProcess()i.r0'
 	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
@@ -209,9 +204,6 @@ Section "AutoFirma" sPrograma
 		MessageBox MB_OK "No se puede instalar AutoFirma 64 bits en un entorno 32 bits." 
 		Quit
 	${EndIf}
-	
-	;Establecemos la vista del registro acorde a la arquitectura del instalador
-	SetRegView 64
 
 	;Comprobamos si ya existe una versión de AutoFirma instalada. Si existe, se devolvera
 	;su numero de version y se dejara configurado el registro a 32 o 64 bits segun corresponda
@@ -230,6 +222,9 @@ Section "AutoFirma" sPrograma
 		Call RemoveOldVersions
 	${EndIf}
 
+	;Volvemos a establecer la vista del registro acorde a la arquitectura del instalador
+	SetRegView 64
+
 	;Limpiamos el directorio al que se van a copiar los ficheros y bloqueamos la ejecucion
 	;hasta que este listo
 	IfFileExists $INSTDIR\$PATH 0 +4
@@ -246,11 +241,6 @@ Section "AutoFirma" sPrograma
 	File  AutoFirma64\AutoFirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
-	
-	;Copiamos la JRE en caso de que no se vaya usar el JRE instalado en el sistema
-	${If} $USE_SYSTEM_JRE == "false" 
-		File /r java64\jre
-    ${EndIf}
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
     SetShellVarContext all
@@ -350,53 +340,30 @@ Section "AutoFirma" sPrograma
 
 SectionEnd
 
-Section "Java Runtime Environment" SEC01
+Section "Java Runtime Environment" sJRE
+	File /r java64\jre
 SectionEnd
 
 	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 	!insertmacro MUI_DESCRIPTION_TEXT ${sPrograma} "Archivos necesarios para la ejecución del programa"
-	!insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Entorno de ejecución de Java"
+	!insertmacro MUI_DESCRIPTION_TEXT ${sJRE} "Entorno de ejecución de Java. Obligatorio cuando no se encuentra Java en el equipo"
 	!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Function .onInit
 
 	StrCpy $StartMenu_Integration_Checkbox_State ${BST_CHECKED}
 	StrCpy $Shorcut_Integration_Checkbox_State ${BST_CHECKED}
-	
-	Call CheckJREInstallation
-	${If} $JRE_INSTALLED == "false"
-		 SectionSetFlags ${SEC01} 17
-		 StrCpy $USE_SYSTEM_JRE "false"
-	${EndIf}
 
-FunctionEnd
-
-Function .onSelChange
-
-	Push $0
-	Push $2
-	StrCpy $2 $1
- 
-	SectionGetFlags ${SEC01} $0
-	IntOp $0 $0 & ${SECTION_ON}
-	${If} $0 == 1 
-		StrCpy $USE_SYSTEM_JRE "false"
-    ${Else}
-		Call CheckJREInstallation
-		${If} $JRE_INSTALLED == "false"
-			;Si no se encuentra ningun JRE en el sistema, se obligara a instalar el programa con el JRE de AutoFirma
-			SectionSetFlags ${SEC01} 1
-			MessageBox MB_OK "No se encuentra ningún JRE instalado en el sistema, por lo que se deberá instalar el JRE para su correcto funcionamiento." 
-		${Else}
-			StrCpy $USE_SYSTEM_JRE "true"
-		${EndIf}
-    ${EndIf}
-	
-	Pop $2
+	; Identificamos si hay una version de Java compatible accesible en el PATH
+	Call isValidJavaVersionAvailable
 	Pop $0
 	
+	; Si no hay una version compatible de Java, desactivamos el que se pueda omitir la
+	; instalacion de la JRE
+	StrCmp $0 "false" 0 +2		
+		SectionSetFlags ${sJRE} 17
+		
 FunctionEnd
-
 
 !define CERT_STORE_CERTIFICATE_CONTEXT  1
 !define CERT_NAME_ISSUER_FLAG           1
@@ -409,6 +376,157 @@ FunctionEnd
 !define CERT_STORE_OPEN_EXISTING_FLAG 0x4000
 !define CERT_SYSTEM_STORE_LOCAL_MACHINE 0x20000
 !define CERT_STORE_ADD_ALWAYS 4
+
+;Function isValidJavaVersionAvailable
+; Check if its available by PATH a compatible Java version (8+).
+; Usage:
+;   Call isValidJavaVersionAvailable
+;   Pop $R0
+;		 - $R0 is "true" if a valid Java version is found, "false" otherwise.
+Function isValidJavaVersionAvailable
+
+	Push $0
+	Push $1
+	
+	StrCpy $0 "true"
+	
+	; Comprobamos la version de Java y, si no es compatible, devolvemos false
+	Call GetJavaVersion
+	Pop $1
+	IntCmp $1 8 +2 0 +2		; Si la version de Java no es la 8 o superior, se establece $0 a false
+	  Goto invalidjava
+	
+	; Comprobamos que la arquitectura sea de 64 bits y, si lo es, devolvemos true
+	Call IsJava64Arch
+	Pop $1
+	StrCmp $1 "true" return	; Si Java es de 64 bits, vamos a la salida de Java correcto
+	
+	invalidjava:
+	  StrCpy $0 "false"
+	
+	return:
+	  Push $1
+	  Exch $0
+	
+FunctionEnd
+
+;Function GetJavaVersion
+; Check Java version avaible by PATH.
+; Usage:
+;   Call GetJavaVersion
+;   Pop $R0
+;		 - $R0 is the Java version (without "1." prefix) o -1 is it not available.
+Function GetJavaVersion
+ 
+  ; Reservamos variables introduciendo variables en la pila
+  Push $0
+  Push $1
+  Push $2
+  Push $3
+  Push $4
+
+  ; Ejecutamos "java -version", que devolvera un resultado valido si java esta en el PATH
+  nsExec::ExecToStack 'java -version'
+  Pop $0 ; Codigo de salida
+  StrCmp $0 "error" novalidjava
+  StrCmp $0 "timeout" novalidjava
+  Pop $0 ; Texto de salida
+
+  StrLen $1 $0	; Por aprovechamiento de variables se usa offset en negativo
+  IntOp $1 $1 + 1	; Aumentamos el offset para que encaje bien en la logica del bucle
+  
+  ; Recorremos la cadena buscando las comillas
+  buscarcomillas:
+	IntOp $1 $1 - 1	; Reducimos el offset
+    StrCmp $1 0 novalidjava  ; Cuando el offset llega a 0, se nos acabo la cadena
+	; StrCpy VARIABLE TEXTO NUM_CARACT OFFSET (que al ser negativo cuenta desde atras)
+	StrCpy $2 $0 1 -$1	; Tomamos el caracter del offset (contamos desde atras)
+    StrCmp $2 "$\"" 0 buscarcomillas ; Comprobamos si ese caracter son las comillas:
+									  ; - salimos del bucle si eran comillas
+									  ; - seguimos buscando si no
+
+  StrCpy $3 -1	; Numero de caracteres que componen la cadena de numero de version
+  
+  ; Seguimos recorriendo la cadena buscando un . y almacenando el texto
+  buscarprimeraversion:
+    IntOp $3 $3 + 1	; Incrementamos el numero de caracteres que componen la version
+	IntOp $1 $1 - 1	; Reducimos el offset
+    StrCmp $1 0 novalidjava  ; Cuando el offset llega a 0, se nos acabo la cadena
+	StrCpy $2 $0 1 -$1	; Tomamos el caracter del offset (contamos desde atras)
+	StrCmp $2 "." +2						; Comprobamos si ese caracter era un punto o unas comillas:
+	StrCmp $2 "$\"" +1 buscarprimeraversion	; - salimos del bucle si era un punto
+											; - seguimos buscando si no
+
+  ; Comprobamos si esa primera version que hemos encontrado es valida
+  IntOp $4 $3 + $1	; Contamos desde donde tenemos que tomar el texto
+  StrCpy $2 $0 $3 -$4	; Tomamos el texto que va desde las comillas al punto (sin incluir)
+  StrCpy $3 -1	; Reiniciamos el contador de version
+  StrCmp $2 "1" buscarsegundaversion ; Si la version es "1", es que es una "1.x" y debemos buscar el segundo numero
+  StrCpy $0 $2	; Si no, esa version es la salida
+  Goto return
+  
+  ; Seguimos recorriendo la cadena mientras no encontremos un caracter que sea . o "
+  buscarsegundaversion:
+    IntOp $3 $3 + 1	; Incrementamos el numero de caracteres que componen la version
+	IntOp $1 $1 - 1	; Reducimos el offset
+    StrCmp $1 0 novalidjava  ; Cuando el offset llega a 0, se nos acabo la cadena
+	StrCpy $2 $0 1 -$1	; Tomamos el caracter del offset (contamos desde atras)
+    StrCmp $2 "." +3 	; Comprobamos si ese caracter es un punto y salimos del bucle en ese caso
+	StrCmp $2 "$\"" +2	; Comprobamos si ese caracter son comillas y salimos del bucle en ese caso
+  Goto buscarsegundaversion
+  
+  ; Esa cadena que hemos identificado, debe ser la version
+  IntOp $4 $3 + $1	; Contamos desde donde tenemos que tomar el texto
+  StrCpy $0 $0 $3 -$4	; Tomamos el texto desde la posicion calculada a la actual y esa es la salida
+  Goto return
+  
+  novalidjava:
+	StrCpy $0 -1
+  
+  ; Extraemos los valores reservados de la pila, salvo por el ultimo que sera la salida
+  return:
+    Pop $4
+    Pop $3
+    Pop $2
+    Pop $1
+	Exch $0
+
+FunctionEnd
+
+;Function isJava64Arch
+; Check that the Java architecture is 64-bit.
+; Usage:
+;   Call isJava64Arch
+;   Pop $R0
+;		 - $R0 is "true" if the Java architecture is 64-bit o "false" otherwise.
+Function isJava64Arch
+
+  Push $0
+  Push $1
+
+  ; Ejecutamos "java -version", que devolvera un resultado valido si java esta en el PATH
+  nsExec::ExecToStack 'java -Xinternalversion'
+  Pop $0 ; Codigo de salida
+  StrCmp $0 "error" novalidjava
+  StrCmp $0 "timeout" novalidjava
+  Pop $0 ; Texto de salida
+
+  ; Consideraremos que es un Java de 64 bits si la cadena de salida contiene la subcadena "64-Bit"
+  Push $0
+  Push "64-Bit"
+  Call StrContains
+  Pop $1
+  StrCpy $0 "true"
+  StrCmp $1 "" novalidjava return
+
+  novalidjava:
+    StrCpy $0 "false"
+  
+  return:
+    Pop $1
+    Exch $0
+
+FunctionEnd
 
 ;Function AddCertificateToStore
 
@@ -447,28 +565,6 @@ Function AddCertificateToStore
   Pop $1
   Exch $0
  
-FunctionEnd
-
-Function CheckJREInstallation
-
-	SetRegView 64
-
-	Push $0
- 
-    ReadRegStr $0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
-    StrCmp "" "$0" JavaNotPresent JavaPresent
- 
-    JavaNotPresent:
-		StrCpy $JRE_INSTALLED "false" 
-        Goto Done
- 
-    JavaPresent:
-		StrCpy $JRE_INSTALLED "true"
-        Goto Done
- 
-    Done:
-		Pop $0
-		
 FunctionEnd
 
 ;Identifica la version instalada de AutoFirma.
@@ -1262,7 +1358,6 @@ done:
   Pop $1
   Pop $0
 FunctionEnd
-
 
 ; StrStr - find substring in a string
 ;

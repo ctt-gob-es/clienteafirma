@@ -18,13 +18,11 @@
     <mainClass>es.gob.afirma.standalone.configurator.AutoFirmaConfiguratorSilent</mainClass>
   </classPath>
   <jre>
-    <path>./jre</path>
-    <bundledJre64Bit>true</bundledJre64Bit>
-    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <path>./jre;%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>true</requires64Bit>
     <minVersion>1.8.0</minVersion>
     <maxVersion></maxVersion>
-    <jdkPreference>preferJre</jdkPreference>
-    <runtimeBits>64/32</runtimeBits>
     <opt>-Xms512m -Xmx1g</opt>
   </jre>
   <versionInfo>
@@ -43,7 +41,7 @@
   </versionInfo>
   <messages>
     <startupErr>Ocurrió un error mientras arrancaba la aplicación.</startupErr>
-    <bundledJreErr>Esta aplicación fue configurada para utilizar una versión embebida de Java Runtime Environment (JRE) pero el runtime no se encuentra o está corrupto.</bundledJreErr>
+    <jreNotFoundErr>No se ha encontrado el Java Runtime Environment (JRE) de AutoFirma ni ningún otro en el PATH del sistema.</jreNotFoundErr>
     <jreVersionErr>La aplicación requiere un Java Runtime Environment (JRE)</jreVersionErr>
     <launcherErr>El registro hace referencia a una instalación de Java Runtime Environment (JRE) que no existe o está corrupta.</launcherErr>
     <instanceAlreadyExistsMsg>Ya se encuentra corriendo una instancia de esta aplicación.</instanceAlreadyExistsMsg>

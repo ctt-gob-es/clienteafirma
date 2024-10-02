@@ -111,21 +111,16 @@ Var CONFIG_PATH
 Var UPDATE_CONFIG
 ;Parametro que indica si se debe utilizar el JRE instalada junto a Autofirma o no.
 Var USE_SYSTEM_JRE
-;Parametro que indica si se encuentra alguna versión de JRE instalada en el sistema.
-Var JRE_INSTALLED
-
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
 InstallDir "$PROGRAMFILES64\AutoFirma"
-
 
 ; check if the program has already been installed, if so, take this dir
 ; as install dir
 InstallDirRegKey HKLM SOFTWARE\AutoFirmacon@firma "Install_Dir"
 ;Mensaje que mostraremos para indicarle al usuario que seleccione un directorio
 DirText "Elija un directorio donde instalar la aplicación:"
-
 
 ;Indicamos que cuando la instalacion se complete no se cierre el instalador automaticamente
 AutoCloseWindow false
@@ -138,47 +133,11 @@ SetDatablockOptimize on
 ;Habilitamos la compresion de nuestro instalador
 SetCompress auto
 
-Function .onInit
-
-	${GetParameters} $R0
-		ClearErrors
-	;Para que el metodo GetOptions no de problemas, se deben proporcionar los parametros con un delimitador inicial como '/'
-	;Este delimitador se agrega en el .wxs del instalador MSI
-	${GetOptions} $R0 "/CREATE_ICON=" $CREATE_ICON
-	${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS
-	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH
-	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH
-	${GetOptions} $R0 "/CONFIG_PATH=" $CONFIG_PATH
-	${GetOptions} $R0 "/UPDATE_CONFIG=" $UPDATE_CONFIG
-	${GetOptions} $R0 "/USE_SYSTEM_JRE=" $USE_SYSTEM_JRE
-	
-	; Comprobamos que no solo se informe de un parametro, sino de
-	; los dos o de ninguno
-	${If} $KEYSTORE_PATH != "false"
-	${AndIf} $CERTIFICATE_PATH == "false" 
-		Abort
-	${EndIf}
-
-	${If} $CERTIFICATE_PATH != "false" 
-	${AndIf} $KEYSTORE_PATH == "false" 
-		Abort
-	${EndIf}
-
-	; En caso de haber indicado los archivos, comprobamos que existan
-	${If} $CERTIFICATE_PATH != "false" 
-	${AndIf} $KEYSTORE_PATH != "false" 
-		IfFileExists "$CERTIFICATE_PATH" 0 +2
-		IfFileExists "$KEYSTORE_PATH" +2 0
-			Abort
-	${EndIf}
-
-FunctionEnd
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Instalacion de la aplicacion y configuracion de la misma            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-Section "Programa" sPrograma
+Section "AutoFirma" sPrograma
 
 	; En caso de haber recibido los archivos, comprobamos que existan
 	${If} $CERTIFICATE_PATH != "false" 
@@ -199,6 +158,16 @@ Section "Programa" sPrograma
 	IntCmp $1 1 +2 0 0
 		Quit
 	
+	;Si se ha solicitado usar el JRE instalado en el sistema pero no se encuentra instalado, saldremos del instalador
+	${If} $USE_SYSTEM_JRE == "true" 
+		Call isValidJavaVersionAvailable
+		Pop $0
+		${If} $0 == "false"
+			;Si se ha solicitado usar el JRE instalado en el sistema pero no se encuentra instalado, saldremos del instalador
+			Quit
+		${EndIf}
+    ${EndIf}
+
 	;Se cierra Firefox si esta abierto
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +1
@@ -216,19 +185,8 @@ Section "Programa" sPrograma
 	SetRegView 32
 	Call RemoveOldVersions
 
-	;Establecemos la vista del registro acorde a la arquitectura del instalador
+	;Volvemos a establecer la vista del registro acorde a la arquitectura del instalador
 	SetRegView 64
-	
-	;Copiamos la JRE en caso de que no se vaya usar el JRE instalado en el sistema
-	${If} $USE_SYSTEM_JRE == "true" 
-		Call CheckJREInstallation
-		${If} $JRE_INSTALLED == "false"
-		;Si se ha solicitado usar el JRE instalado en el sistema pero no se encuentra instalado, saldremos del instalador
-		Quit
-		${EndIf}
-    ${Else}
-        File /r java64\jre
-    ${EndIf}
 
 	;Eliminamos el directorio de instalacion si existia
 	RMDir /r '$INSTDIR\$PATH'
@@ -252,6 +210,11 @@ Section "Programa" sPrograma
 	File  licencia.txt
 	File  ic_firmar.ico
 
+	;Si no se ha solicitado usar el JRE instalado en el sistema, copiamos el JRE del instalador
+	${If} $USE_SYSTEM_JRE != "true" 
+		File /r java64\jre
+	${EndIf}
+	
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
     SetShellVarContext all
 	
@@ -335,9 +298,6 @@ Section "Programa" sPrograma
 	Sleep 2000
 	Call AddCertificateToStore
 	Pop $0
-	;${If} $0 != success
-	  ;MessageBox MB_OK "Error en la importación: $0"
-	;${EndIf}
 
 	;Se actualiza la variable PATH con la ruta de instalacion
 	Push "$INSTDIR\$PATH"
@@ -345,6 +305,42 @@ Section "Programa" sPrograma
 
 SectionEnd
 
+
+Function .onInit
+
+	${GetParameters} $R0
+	ClearErrors
+	;Para que el metodo GetOptions no de problemas, se deben proporcionar los parametros con un delimitador inicial como '/'
+	;Este delimitador se agrega en el .wxs del instalador MSI
+	${GetOptions} $R0 "/CREATE_ICON=" $CREATE_ICON
+	${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS
+	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH
+	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH
+	${GetOptions} $R0 "/CONFIG_PATH=" $CONFIG_PATH
+	${GetOptions} $R0 "/UPDATE_CONFIG=" $UPDATE_CONFIG
+	${GetOptions} $R0 "/USE_SYSTEM_JRE=" $USE_SYSTEM_JRE
+	
+	; Comprobamos que no solo se informe de un parametro, sino de
+	; los dos o de ninguno
+	${If} $KEYSTORE_PATH != "false"
+	${AndIf} $CERTIFICATE_PATH == "false" 
+		Abort
+	${EndIf}
+
+	${If} $CERTIFICATE_PATH != "false" 
+	${AndIf} $KEYSTORE_PATH == "false" 
+		Abort
+	${EndIf}
+
+	; En caso de haber indicado los archivos, comprobamos que existan
+	${If} $CERTIFICATE_PATH != "false" 
+	${AndIf} $KEYSTORE_PATH != "false" 
+		IfFileExists "$CERTIFICATE_PATH" 0 +2
+		IfFileExists "$KEYSTORE_PATH" +2 0
+			Abort
+	${EndIf}
+
+FunctionEnd
 
 !define CERT_STORE_CERTIFICATE_CONTEXT  1
 !define CERT_NAME_ISSUER_FLAG           1
@@ -357,6 +353,194 @@ SectionEnd
 !define CERT_STORE_OPEN_EXISTING_FLAG 0x4000
 !define CERT_SYSTEM_STORE_LOCAL_MACHINE 0x20000
 !define CERT_STORE_ADD_ALWAYS 4
+
+;Function isValidJavaVersionAvailable
+; Check if its available by PATH a compatible Java version (8+).
+; Usage:
+;   Call isValidJavaVersionAvailable
+;   Pop $R0
+;		 - $R0 is "true" if a valid Java version is found, "false" otherwise.
+Function isValidJavaVersionAvailable
+
+	Push $0
+	Push $1
+	
+	StrCpy $0 "true"
+	
+	; Comprobamos la version de Java y, si no es compatible, devolvemos false
+	Call GetJavaVersion
+	Pop $1
+	IntCmp $1 8 +2 0 +2		; Si la version de Java no es la 8 o superior, se establece $0 a false
+	  Goto invalidjava
+	
+	; Comprobamos que la arquitectura sea de 64 bits y, si lo es, devolvemos true
+	Call IsJava64Arch
+	Pop $1
+	StrCmp $1 "true" return	; Si Java es de 64 bits, vamos a la salida de Java correcto
+	
+	invalidjava:
+	  StrCpy $0 "false"
+	
+	return:
+	  Push $1
+	  Exch $0
+	
+FunctionEnd
+
+;Function GetJavaVersion
+; Check Java version avaible by PATH.
+; Usage:
+;   Call GetJavaVersion
+;   Pop $R0
+;		 - $R0 is the Java version (without "1." prefix) o -1 is it not available.
+Function GetJavaVersion
+ 
+  ; Reservamos variables introduciendo variables en la pila
+  Push $0
+  Push $1
+  Push $2
+  Push $3
+  Push $4
+
+  ; Ejecutamos "java -version", que devolvera un resultado valido si java esta en el PATH
+  nsExec::ExecToStack 'java -version'
+  Pop $0 ; Codigo de salida
+  StrCmp $0 "error" novalidjava
+  StrCmp $0 "timeout" novalidjava
+  Pop $0 ; Texto de salida
+
+  StrLen $1 $0	; Por aprovechamiento de variables se usa offset en negativo
+  IntOp $1 $1 + 1	; Aumentamos el offset para que encaje bien en la logica del bucle
+  
+  ; Recorremos la cadena buscando las comillas
+  buscarcomillas:
+	IntOp $1 $1 - 1	; Reducimos el offset
+    StrCmp $1 0 novalidjava  ; Cuando el offset llega a 0, se nos acabo la cadena
+	; StrCpy VARIABLE TEXTO NUM_CARACT OFFSET (que al ser negativo cuenta desde atras)
+	StrCpy $2 $0 1 -$1	; Tomamos el caracter del offset (contamos desde atras)
+    StrCmp $2 "$\"" 0 buscarcomillas ; Comprobamos si ese caracter son las comillas:
+									  ; - salimos del bucle si eran comillas
+									  ; - seguimos buscando si no
+
+  StrCpy $3 -1	; Numero de caracteres que componen la cadena de numero de version
+  
+  ; Seguimos recorriendo la cadena buscando un . y almacenando el texto
+  buscarprimeraversion:
+    IntOp $3 $3 + 1	; Incrementamos el numero de caracteres que componen la version
+	IntOp $1 $1 - 1	; Reducimos el offset
+    StrCmp $1 0 novalidjava  ; Cuando el offset llega a 0, se nos acabo la cadena
+	StrCpy $2 $0 1 -$1	; Tomamos el caracter del offset (contamos desde atras)
+	StrCmp $2 "." +2						; Comprobamos si ese caracter era un punto o unas comillas:
+	StrCmp $2 "$\"" +1 buscarprimeraversion	; - salimos del bucle si era un punto
+											; - seguimos buscando si no
+
+  ; Comprobamos si esa primera version que hemos encontrado es valida
+  IntOp $4 $3 + $1	; Contamos desde donde tenemos que tomar el texto
+  StrCpy $2 $0 $3 -$4	; Tomamos el texto que va desde las comillas al punto (sin incluir)
+  StrCpy $3 -1	; Reiniciamos el contador de version
+  StrCmp $2 "1" buscarsegundaversion ; Si la version es "1", es que es una "1.x" y debemos buscar el segundo numero
+  StrCpy $0 $2	; Si no, esa version es la salida
+  Goto return
+  
+  ; Seguimos recorriendo la cadena mientras no encontremos un caracter que sea . o "
+  buscarsegundaversion:
+    IntOp $3 $3 + 1	; Incrementamos el numero de caracteres que componen la version
+	IntOp $1 $1 - 1	; Reducimos el offset
+    StrCmp $1 0 novalidjava  ; Cuando el offset llega a 0, se nos acabo la cadena
+	StrCpy $2 $0 1 -$1	; Tomamos el caracter del offset (contamos desde atras)
+    StrCmp $2 "." +3 	; Comprobamos si ese caracter es un punto y salimos del bucle en ese caso
+	StrCmp $2 "$\"" +2	; Comprobamos si ese caracter son comillas y salimos del bucle en ese caso
+  Goto buscarsegundaversion
+  
+  ; Esa cadena que hemos identificado, debe ser la version
+  IntOp $4 $3 + $1	; Contamos desde donde tenemos que tomar el texto
+  StrCpy $0 $0 $3 -$4	; Tomamos el texto desde la posicion calculada a la actual y esa es la salida
+  Goto return
+  
+  novalidjava:
+	StrCpy $0 -1
+  
+  ; Extraemos los valores reservados de la pila, salvo por el ultimo que sera la salida
+  return:
+    Pop $4
+    Pop $3
+    Pop $2
+    Pop $1
+	Exch $0
+
+FunctionEnd
+
+;Function isJava64Arch
+; Check that the Java architecture is 64-bit.
+; Usage:
+;   Call isJava64Arch
+;   Pop $R0
+;		 - $R0 is "true" if the Java architecture is 64-bit o "false" otherwise.
+Function isJava64Arch
+
+  Push $0
+  Push $1
+
+  ; Ejecutamos "java -version", que devolvera un resultado valido si java esta en el PATH
+  nsExec::ExecToStack 'java -Xinternalversion'
+  Pop $0 ; Codigo de salida
+  StrCmp $0 "error" novalidjava
+  StrCmp $0 "timeout" novalidjava
+  Pop $0 ; Texto de salida
+
+  ; Consideraremos que es un Java de 64 bits si la cadena de salida contiene la subcadena "64-Bit"
+  Push $0
+  Push "64-Bit"
+  Call StrContains
+  Pop $1
+  StrCpy $0 "true"
+  StrCmp $1 "" novalidjava return
+
+  novalidjava:
+    StrCpy $0 "false"
+  
+  return:
+    Pop $1
+    Exch $0
+
+FunctionEnd
+
+; StrContains
+;
+; This function does a case sensitive searches for an occurrence of a substring in a string. 
+; It returns the substring if it is found. 
+; Otherwise it returns null(""). 
+; Written by kenglish_hi
+; Adapted from StrReplace written by dandaman32
+Var STR_HAYSTACK
+Var STR_NEEDLE
+Var STR_CONTAINS_VAR_1
+Var STR_CONTAINS_VAR_2
+Var STR_CONTAINS_VAR_3
+Var STR_CONTAINS_VAR_4
+Var STR_RETURN_VAR
+
+Function StrContains
+  Exch $STR_NEEDLE
+  Exch 1
+  Exch $STR_HAYSTACK
+    StrCpy $STR_RETURN_VAR ""
+    StrCpy $STR_CONTAINS_VAR_1 -1
+    StrLen $STR_CONTAINS_VAR_2 $STR_NEEDLE
+    StrLen $STR_CONTAINS_VAR_4 $STR_HAYSTACK
+    loop:
+      IntOp $STR_CONTAINS_VAR_1 $STR_CONTAINS_VAR_1 + 1
+      StrCpy $STR_CONTAINS_VAR_3 $STR_HAYSTACK $STR_CONTAINS_VAR_2 $STR_CONTAINS_VAR_1
+      StrCmp $STR_CONTAINS_VAR_3 $STR_NEEDLE found
+      StrCmp $STR_CONTAINS_VAR_1 $STR_CONTAINS_VAR_4 done
+      Goto loop
+    found:
+      StrCpy $STR_RETURN_VAR $STR_NEEDLE
+      Goto done
+    done:
+   Pop $STR_NEEDLE ;Prevent "invalid opcode" errors and keep the
+   Exch $STR_RETURN_VAR  
+FunctionEnd
 
 ;Function AddCertificateToStore
  
@@ -395,27 +579,6 @@ Function AddCertificateToStore
   Pop $1
   Exch $0
  
-FunctionEnd
-
-Function CheckJREInstallation
-
-	Push $0
- 
-    ReadRegStr $0 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
-    StrCmp "" "$0" JavaNotPresent JavaPresent
- 
-    JavaNotPresent:
-	
-		StrCpy $JRE_INSTALLED "false"
-        Goto Done
- 
-    JavaPresent:
-		StrCpy $JRE_INSTALLED "true"
-        Goto Done
- 
-    Done:
-		Pop $0
-		
 FunctionEnd
 
 Function DeleteCertificateOnInstall
