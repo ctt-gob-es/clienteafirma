@@ -448,7 +448,9 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		/** Establece el nombre de aplicacion o dominio desde el que se realiza la llamada. */
 		var setAppName = function (appName) {
-			clienteFirma.setAppName(appName);
+			if (!!clienteFirma.setAppName) {
+			    clienteFirma.setAppName(appName);
+			}
 		}
 		
 		var selectCertificate = function (params, successCallback, errorCallback) {
