@@ -71,6 +71,9 @@ public abstract class UrlParameters {
 
 	/** Versi&oacute;n m&iacute;nima de cliente requetida. */
 	protected static final String MINIMUM_CLIENT_VERSION_PARAM = "mcv"; //$NON-NLS-1$
+	
+	/** Nombre de aplicaci&oacute;n o dominio desde el que se realiza la llamada. */
+	protected static final String APP_NAME_PARAM = "appname"; //$NON-NLS-1$
 
 	/** Codificaci&oacute;n por defecto. */
 	private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();

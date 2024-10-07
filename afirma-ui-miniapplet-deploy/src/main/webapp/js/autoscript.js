@@ -446,6 +446,11 @@ var AutoScript = ( function ( window, undefined ) {
 			
 		}
 		
+		/** Establece el nombre de aplicacion o dominio desde el que se realiza la llamada. */
+		var setAppName = function (appName) {
+			clienteFirma.setAppName(appName);
+		}
+		
 		var selectCertificate = function (params, successCallback, errorCallback) {
 			clienteFirma.selectCertificate(params, successCallback, errorCallback);
 			resetStickySignatory = false;
@@ -3914,6 +3919,7 @@ var AutoScript = ( function ( window, undefined ) {
 			var defaultKeyStore = null;
 			var retrieverServletAddress = null;
 			var storageServletAddress = null;
+			var appName = null;
 
 			if (clientAddress != undefined && clientAddress != null) {
 				if (clientAddress.indexOf("://") != -1 && clientAddress.indexOf("/", clientAddress.indexOf("://") + 3) != -1) {
@@ -3927,6 +3933,13 @@ var AutoScript = ( function ( window, undefined ) {
 			} else {
 				retrieverServletAddress = window.location.origin + "/afirma-signature-retriever/RetrieveService";
 				storageServletAddress = window.location.origin + "/afirma-signature-storage/StorageService";
+			}
+			
+			/**
+			 * Establece el nombre de la aplicacion o dominio desde el que se realiza la llamada.
+			 */
+			function setAppName (appNameParam) {
+				appName = appNameParam;
 			}
 
 			/**
@@ -4045,7 +4058,12 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
-
+				
+				if (appName == null && storageServletAddress != null && storageServletAddress != undefined) {
+					var url = new URL(storageServletAddress);
+					appName = url.hostname;
+				}
+				
 				var i = 0;
 				var params = new Array();
 				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
@@ -4061,6 +4079,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (algorithm != null && algorithm != undefined) {		params[i++] = {key:"algorithm", value:algorithm}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
+				if (appName != null && appName != undefined) {			params[i++] = {key:"appname", value:appName}; }
 				if (dataB64 != null) {									params[i++] = {key:"dat", value:dataB64}; }
 			
 				var url = buildUrl(signId, params);
@@ -4111,6 +4130,11 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
+				
+				if (appName == null && storageServletAddress != null && storageServletAddress != undefined) {
+					var url = new URL(storageServletAddress);
+					appName = url.hostname;
+				}
 
 				var i = 0;
 				var opId = "signandsave";
@@ -4132,6 +4156,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (outputFileName != null &&
 						outputFileName != undefined) {					params[i++] = {key:"filename", value:outputFileName}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
+				if (appName != null && appName != undefined) {			params[i++] = {key:"appname", value:appName}; }
 				if (dataB64 != null) {									params[i++] = {key:"dat", value:dataB64}; }
 			
 				var url = buildUrl(opId, params);
@@ -4175,6 +4200,11 @@ var AutoScript = ( function ( window, undefined ) {
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
 				
+				if (appName == null && storageServletAddress != null && storageServletAddress != undefined) {
+					var url = new URL(storageServletAddress);
+					appName = url.hostname;
+				}
+				
 				var opId = "batch";
 				
 				var i = 0;
@@ -4194,6 +4224,7 @@ var AutoScript = ( function ( window, undefined ) {
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
+				if (appName != null && appName != undefined) {			params[i++] = {key:"appname", value:appName}; }
 				params[i++] = {key:"needcert", value:"true"}; 
 				if (batchB64 != null) {									params[i++] = {key:"dat", value:batchB64}; }
 
@@ -4229,6 +4260,11 @@ var AutoScript = ( function ( window, undefined ) {
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
 				
+				if (appName == null && storageServletAddress != null && storageServletAddress != undefined) {
+					var url = new URL(storageServletAddress);
+					appName = url.hostname;
+				}
+				
 				var opId = "batch";
 				
 				var i = 0;
@@ -4248,6 +4284,7 @@ var AutoScript = ( function ( window, undefined ) {
 						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
 				if (certFilters != null && certFilters != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(certFilters)}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:true}; } // Espera activa
+				if (appName != null && appName != undefined) {			params[i++] = {key:"appname", value:appName}; }
 				if (localBatchProcess) {								params[i++] = {key:"localBatchProcess", value:true}; }
 				
 				params[i++] = {key:"needcert", value:true};
@@ -5037,6 +5074,7 @@ var AutoScript = ( function ( window, undefined ) {
 			return {
 				echo : echo,
 				setKeyStore : setKeyStore,
+				setAppName : setAppName,
 				sign : sign,
 				coSign : coSign,
 				counterSign : counterSign,
@@ -5121,6 +5159,7 @@ var AutoScript = ( function ( window, undefined ) {
 			setStickySignatory : setStickySignatory,
 			setLocale : setLocale,
 			setMinimumClientVersion : setMinimumClientVersion,
+			setAppName : setAppName,
 
 			/* Gestion de errores */
 			getErrorMessage : getErrorMessage,

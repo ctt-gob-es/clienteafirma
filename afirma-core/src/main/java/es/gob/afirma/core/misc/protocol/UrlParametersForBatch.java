@@ -75,6 +75,9 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	/** Indica si la peticion de firma por lotes es monof&aacute;sica o trif&aacute;sica */
 	private boolean localBatchProcess;
+	
+	/** Nombre de aplicaci&oacute;n o dominio desde que se realiza la llamada. */
+	private String appName;
 
 	/**
 	 * Crea el conjunto de par&aacute;metros necesario para el uso de la operaci&acute;n
@@ -178,6 +181,14 @@ public final class UrlParametersForBatch extends UrlParameters {
 	void setBatchPostsignerUrl(final String url) {
 		this.batchPostSignerUrl = url;
 	}
+	
+	public String getAppName() {
+		return this.appName;
+	}
+
+	void setAppName(final String appName) {
+		this.appName = appName;
+	}
 
 	public void setBatchParameters(final Map<String, String> params) throws ParameterException {
 
@@ -205,6 +216,10 @@ public final class UrlParametersForBatch extends UrlParameters {
 		}
 		else {
 			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
+		}
+		
+		if (params.containsKey(APP_NAME_PARAM)) {
+			this.appName = params.get(APP_NAME_PARAM);
 		}
 
 		// Si hemos recibido el identificador para la descarga de la configuracion,
