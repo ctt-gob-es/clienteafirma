@@ -647,7 +647,7 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				var callOrder = ++counterCallService;
 				
-				httpStorageRequest.open("GET", storageAddress, true);
+				httpStorageRequest.open("GET", storageAddress + "&op=check", true);
 				httpStorageRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				
 				httpStorageRequest.onreadystatechange = function() {
@@ -700,7 +700,7 @@ var AutoScript = ( function ( window, undefined ) {
 					
 				// Comprobamos la conexion con el servicio de recuperacion
 				var httpRetrieveRequest = getHttpRequest();
-				httpRetrieveRequest.open("GET", retrieverAddress, true);
+				httpRetrieveRequest.open("GET", retrieverAddress + "&op=check", true);
 				httpRetrieveRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		
 				httpRetrieveRequest.onreadystatechange = function() {

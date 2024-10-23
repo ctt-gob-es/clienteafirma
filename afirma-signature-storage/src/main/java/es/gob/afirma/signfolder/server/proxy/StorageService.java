@@ -52,6 +52,7 @@ public final class StorageService extends HttpServlet {
 	private static final String PARAMETER_NAME_DATA = "dat"; //$NON-NLS-1$
 
 	private static final String OPERATION_STORE = "put"; //$NON-NLS-1$
+	private static final String OPERATION_CHECK = "check"; //$NON-NLS-1$
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
 	@Override
@@ -110,6 +111,13 @@ public final class StorageService extends HttpServlet {
 			out.flush();
 			return;
 		}
+		// Si solo se queria identificar la operatividad del servicio, respondemos directamente
+		if (OPERATION_CHECK.equals(operation)) {
+			out.println(SUCCESS);
+			out.flush();
+			return;
+		}
+
 		if (syntaxVersion == null) {
 			LOGGER.warning("No se ha indicado la version del formato de llamada"); //$NON-NLS-1$
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));

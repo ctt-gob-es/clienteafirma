@@ -39,8 +39,9 @@ public class ActiveWaitingThread extends Thread {
 			try {
 				Thread.sleep(SLEEP_PERIOD);
 			} catch (final InterruptedException e) {
-				LOGGER.warning("No se ha podido esperar para el envio de la senal de espera activa para el JavaScript. " //$NON-NLS-1$
-						+ "No se envia la peticion: " + e); //$NON-NLS-1$
+				if (!this.cancelled) {
+					LOGGER.warning("No se ha podido esperar para el envio de la senal de espera activa para el JavaScript: " + e); //$NON-NLS-1$
+				}
 			}
 			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
 				if (!this.cancelled) {
