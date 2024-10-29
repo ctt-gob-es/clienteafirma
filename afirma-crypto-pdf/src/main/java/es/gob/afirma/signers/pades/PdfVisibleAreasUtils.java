@@ -272,11 +272,8 @@ final class PdfVisibleAreasUtils {
 			// Se mapea el principal del subject del certificado
 			String subjectPrincipal = cert.getSubjectX500Principal().toString();
 			
-			String pseudonym = AOUtil.getRDNvalueFromLdapName("OID.2.5.4.65", subjectPrincipal); //$NON-NLS-1$
+			final String pseudonym = AOUtil.getRDNvalueFromLdapName("OID.2.5.4.65", subjectPrincipal); //$NON-NLS-1$
 			if (pseudonym != null) {
-				if (mask != null) {
-					pseudonym = obfuscate(pseudonym, mask);
-				}
 				ret = ret.replace(LAYERTEXT_TAG_PSEUDONYM, pseudonym);
 			}
 			
