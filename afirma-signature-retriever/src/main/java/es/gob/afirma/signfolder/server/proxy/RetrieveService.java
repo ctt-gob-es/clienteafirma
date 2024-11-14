@@ -48,8 +48,6 @@ public final class RetrieveService extends HttpServlet {
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
-		LOGGER.info(" == INICIO RECUPERACION"); //$NON-NLS-1$
-
 		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
@@ -70,6 +68,8 @@ public final class RetrieveService extends HttpServlet {
 			out.flush();
 			return;
 		}
+
+		LOGGER.info(" == INICIO RECUPERACION"); //$NON-NLS-1$
 
 		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
 		if (syntaxVersion == null) {

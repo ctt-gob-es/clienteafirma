@@ -58,6 +58,20 @@ public final class StorageService extends HttpServlet {
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
+		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
+		response.setContentType("text/plain"); //$NON-NLS-1$
+		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
+
+		final PrintWriter out = response.getWriter();
+
+		// Si solo se queria identificar la operatividad del servicio, respondemos directamente
+		if (request.getMethod().equalsIgnoreCase("GET") //$NON-NLS-1$
+				&& OPERATION_CHECK.equals(request.getParameter(PARAMETER_NAME_OPERATION))) {
+			out.println(SUCCESS);
+			out.flush();
+			return;
+		}
+
 		LOGGER.info(" == INICIO GUARDADO"); //$NON-NLS-1$
 
 		final String operation;
@@ -100,20 +114,9 @@ public final class StorageService extends HttpServlet {
 			data          = params.get(PARAMETER_NAME_DATA);
 		}
 
-		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
-		response.setContentType("text/plain"); //$NON-NLS-1$
-		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
-
-		final PrintWriter out = response.getWriter();
 		if (operation == null) {
 			LOGGER.warning("No se ha indicado codigo de operacion"); //$NON-NLS-1$
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
-			out.flush();
-			return;
-		}
-		// Si solo se queria identificar la operatividad del servicio, respondemos directamente
-		if (OPERATION_CHECK.equals(operation)) {
-			out.println(SUCCESS);
 			out.flush();
 			return;
 		}

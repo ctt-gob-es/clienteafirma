@@ -244,7 +244,7 @@ public class TriPhaseHelper {
 
 	private static void configurePdfShadowAttackParameters(final Properties extraParams) {
 		if (!Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK))) {
-			// Evitamos explicitamente que se efirmen documentos susceptibles de haber sufrido PDF
+			// Evitamos explicitamente que se firmen documentos susceptibles de haber sufrido PDF
 			// Shadow Attack en caso de que la aplicacion no indicase que hacer con ellos
 			extraParams.setProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK, Boolean.FALSE.toString());
 

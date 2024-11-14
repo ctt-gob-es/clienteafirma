@@ -116,7 +116,7 @@ public final class XAdESUtil {
 
     /**
      * Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES soportadas. Se
-     * considerar&aacute; que no est&aacute;n soportadas si no hay mezcla de versiones de firmas
+     * considerar&aacute; que est&aacute;n soportadas si no hay mezcla de versiones de firmas
      * XAdES y si la versi&oacute;n declarada est&aacute; soportada. Tambi&eacute;n se comprobara
      * si es una firma de tipo Baseline EN para indicarlo mediante el valor de retorno.
      * @param signNodes Listado de nodos de firma.
