@@ -20,6 +20,7 @@ Spanish.lproj/gfx/menufirmasfacturae_mini.png
 Spanish.lproj/gfx/menufirmaspadesvisible1_mini.png
 Spanish.lproj/gfx/menufirmaspadesvisible2_mini.png
 Spanish.lproj/gfx/menufirmaspadesvisible3_mini.png
+Spanish.lproj/gfx/menufirmaspadesvisible4_mini.png
 Spanish.lproj/gfx/menufirmaspades_mini.png
 Spanish.lproj/gfx/menufirmasxades_mini.png
 Spanish.lproj/gfx/menugeneral_mini.png
