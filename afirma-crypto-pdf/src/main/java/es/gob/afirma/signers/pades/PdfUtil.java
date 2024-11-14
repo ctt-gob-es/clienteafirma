@@ -201,11 +201,17 @@ public final class PdfUtil {
 		// multifirmar este tipo de documentos. Si no se permite, se lanza una excepcion
 		if (pdfCertificationLevel != PdfSignatureAppearance.NOT_CERTIFIED) {
 			final String allow = extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS);
-			if (allow == null || allow.trim().isEmpty()) {
+			if(pdfCertificationLevel == PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED){
 				throw new PdfIsCertifiedException("El PDF esta certificado"); //$NON-NLS-1$
 			}
-			if (!Boolean.parseBoolean(allow)) {
-				throw new AOException("El PDF esta certificado y se configuro que no se admitia su firma"); //$NON-NLS-1$
+			else if(pdfCertificationLevel == PdfSignatureAppearance.CERTIFIED_FORM_FILLING || pdfCertificationLevel == PdfSignatureAppearance.CERTIFIED_FORM_FILLING_AND_ANNOTATIONS){
+				
+				if (allow == null || allow.trim().isEmpty()) {
+					throw new PdfIsCertifiedException("El PDF esta certificado"); //$NON-NLS-1$
+				}
+				if (!Boolean.parseBoolean(allow)) {
+					throw new AOException("El PDF esta certificado y se configuro que no se admitia su firma"); //$NON-NLS-1$
+				}
 			}
 		}
 	}
