@@ -85,7 +85,7 @@ public class SignDetailsFormatter {
 				if (MIMETYPE_MAPPER.containsKey(type)) {
 					type = MIMETYPE_MAPPER.get(type);
 				}
-				result += "<li>Tipo: " + type + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+				result += "<li>Tipo de certificado: " + type + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			result += "</ul></div>"; //$NON-NLS-1$
 		}
@@ -171,6 +171,19 @@ public class SignDetailsFormatter {
 			result += "<div style=\"border:5px outset black;padding-left: 25px;padding-bottom: 10px;\">"; //$NON-NLS-1$
 			if (!FacturaESignAnalyzer.FACTURAE.equals(signFormat)) {
 				result += "<p><b>Perfil de firma</b>: " + detail.getSignProfile() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (detail.getCertificationLevel() != -1 && detail.getCertificationSign() == true) {
+				switch (detail.getCertificationLevel()) {
+				  case 1:
+					  result += "<p><b>PDF certificado</b>: " + SimpleAfirmaMessages.getString("ValidationInfoDialog.41") + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+				    break;
+				  case 2:
+					  result += "<p><b>PDF certificado</b>: " + SimpleAfirmaMessages.getString("ValidationInfoDialog.42") + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+				    break;
+				  case 3:
+					  result += "<p><b>PDF certificado</b>: " + SimpleAfirmaMessages.getString("ValidationInfoDialog.43") + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+				  break;
+				}
 			}
 			if (detail.getAlgorithm() != null && !detail.getAlgorithm().isEmpty()) {
 				result += "<p><b>Algoritmo de firma</b>: " + detail.getAlgorithm() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$

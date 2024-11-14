@@ -22,8 +22,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.aowagie.text.pdf.AcroFields;
+import com.aowagie.text.pdf.PdfArray;
 import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfObject;
 import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 
@@ -199,6 +201,41 @@ public final class ValidatePdfSignature extends SignValider {
 				}
 			}
 		}
+		
+		int certRevision = 0;
+		
+		if(reader.getCertificationLevel() == 1 && validityList.size() == 0){
+			for (final String nameS : signNames) {
+				final PdfDictionary pdfDictionary = af.getSignatureDictionary(nameS);
+				//Comprobamos si la firma es la que certifica el documento
+				if(pdfDictionary.get(PdfName.REFERENCE) != null){
+					PdfArray reference = (PdfArray) pdfDictionary.get(PdfName.REFERENCE);
+					ArrayList<PdfObject> p = reference.getArrayList();
+					PdfDictionary dictionaryReference = (PdfDictionary) p.get(0);
+					if(dictionaryReference.get(PdfName.TRANSFORMMETHOD) != null){
+						certRevision = af.getRevision(nameS);
+					}
+				}
+			}
+		}
+		
+		// Cuando la firma sea certificada de tipo 1, sólo la última firma será válida.
+		if(reader.getCertificationLevel() == 1 && validityList.size() == 0){
+			for (final String name : signNames) {
+				
+				final int rev = af.getRevision(name);
+				
+				if((rev == af.getTotalRevisions()) && rev <= certRevision){
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+				}
+				else if((rev < af.getTotalRevisions()) && rev <= certRevision){
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+				}
+				else{
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFIED_SIGN_REVISION));
+				}
+			}
+		}
 
 		validityList = checkValidityKOPriority(validityList);
 
@@ -231,6 +268,7 @@ public final class ValidatePdfSignature extends SignValider {
 			throws RuntimeConfigNeededException, IOException {
 
 		final List<SignValidity> validityList = new ArrayList<>();
+
 		// Valimamos la firma
 		final PdfPKCS7 pk = signAcrofields.verifySignature(signName);
 
@@ -243,7 +281,7 @@ public final class ValidatePdfSignature extends SignValider {
 
 		// Comprobamos si es una firma o un sello
 		final PdfDictionary pdfDictionary = signAcrofields.getSignatureDictionary(signName);
-
+		
 		// Si no es un sello, comprobamos el PKCS#1
 		if (!PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER))
 				&& !PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {

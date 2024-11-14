@@ -343,6 +343,20 @@ public final class PreferencesManager {
 
 	//************************* FIN PREFERENCIAS DE FIRMAS XAdES ***************************************************************
 	//**************************************************************************************************************************
+	
+	//************************* PREFERENCIAS DE TIPO PDF CERTIFICADOS **********************************************************
+	//**************************************************************************************************************************
+	
+	/** Tipos de firma pdf certificados
+	 * Esta preferencia debe tener uno de estos valores:
+	 * <ul>
+	 *  <li>Firma sin certificar</li>
+	 *  <li>Firma certificada de autor</li>
+	 *  <li>Firma certificada de autor para formularios</li>
+	 *  <li>Firma certificada común</li>
+	 * </ul>*/
+	
+	public static final String PREFERENCE_PDF_CERTIFIED_TYPE = "pdfCertifiedTpe"; //$NON-NLS-1$
 
 	//**************************************************************************************************************************
 	//************************* PREFERENCIAS DE FIRMAS PAdES *******************************************************************
@@ -388,9 +402,13 @@ public final class PreferencesManager {
 	 * documento. */
 	public static final String PREFERENCE_PADES_STAMP = "padesVisibleStamp"; //$NON-NLS-1$
 
+	/** Si est&aacute; establecido a <code>true</code> se permite generar pdfs certificados
+	 * si se establece a <code>false</code>, no se permite generar pdfs certificados */
+	public static final String PREFERENCE_PADES_CHECK_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
+	
 	/** Si est&aacute; establecido a <code>true</code> se comprobar&aacute;n posibles PDF Shadow Attacks
 	 * si se establece a <code>false</code>, no se realizar&aacute; la comprobaci&oacute;n */
-	public static final String PREFERENCE_PADES_CHECK_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
+	public static final String PREFERENCE_PADES_CHECK_CERTIFIED_PDF = "certifiedPDFOption"; //$NON-NLS-1$
 
 	/** Motivo de la firma en firmas PAdES. */
 	public static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$

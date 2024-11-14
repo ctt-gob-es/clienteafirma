@@ -60,6 +60,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -632,7 +633,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 newConfig.setCryptoOperation(config.getCryptoOperation());
 		 newConfig.setDigestAlgorithm(config.getDigestAlgorithm());
 		 final Properties extraParams = newConfig.getExtraParams() != null ? (Properties) newConfig.getExtraParams().clone() : new Properties();
+		 
 		 extraParams.put(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE, Boolean.TRUE);
+		 
 		 newConfig.setExtraParams(extraParams);
 	 }
 
@@ -718,6 +721,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				return SimpleAfirmaMessages.getString("SignPanel.151"); //$NON-NLS-1$
 			case OVERLAPPING_SIGNATURE:
 				return SimpleAfirmaMessages.getString("SignPanel.152"); //$NON-NLS-1$
+			case CERTIFIED_SIGN_REVISION:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.158"); //$NON-NLS-1$ //$NON-NLS-2$
 			default:
 				return errorMsg;
 		}

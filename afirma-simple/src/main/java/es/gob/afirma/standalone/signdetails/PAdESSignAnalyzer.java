@@ -18,8 +18,10 @@ import org.spongycastle.cms.SignerInformationStore;
 
 import com.aowagie.text.exceptions.BadPasswordException;
 import com.aowagie.text.pdf.AcroFields;
+import com.aowagie.text.pdf.PdfArray;
 import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfObject;
 import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfString;
@@ -33,6 +35,8 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignatureFormatDetectorPadesCades;
 import es.gob.afirma.signvalidation.ValidatePdfSignature;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 public class PAdESSignAnalyzer implements SignAnalyzer {
@@ -107,6 +111,15 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
         		throw e;
         	}
 
+        	int certLevel = -1;
+        	try {
+        		certLevel = pdfReader.getCertificationLevel();
+        	}
+        	catch (final Exception e) {
+        		LOGGER.severe("El pdf no es certificado, se devolvera valor -1: " + e); //$NON-NLS-1$
+        		throw e;
+        	}
+        	
 			final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(data);
 
 			for (final String signatureName : af.getSignatureNames()) {
@@ -119,7 +132,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 					continue;
 				}
 
-				final SignDetails signDetails = buildSignDetails(signatureName, pdfDictionary, af, signProfile);
+				final SignDetails signDetails = buildSignDetails(signatureName, pdfDictionary, af, signProfile,certLevel);
 
 				//Se obtiene la politica en caso de que exista
 				final PdfString contents = pdfDictionary.getAsString(PdfName.CONTENTS);
@@ -160,11 +173,31 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 	 * @return Detalles de la firma.
 	 * @throws Exception Error transformando los datos.
 	 */
-	private SignDetails buildSignDetails(final String signName, final PdfDictionary signPdfDictionary, final AcroFields af, final String signProfile) throws Exception {
+	private SignDetails buildSignDetails(final String signName, final PdfDictionary signPdfDictionary, final AcroFields af, final String signProfile, final int certLevel) throws Exception {
 
 		final SignDetails padesSignDetails = new SignDetails();
 
 		padesSignDetails.setSignProfile(signProfile);
+		
+		padesSignDetails.setCertificationLevel(certLevel);
+		
+		//Comprobamos si la firma es la que certifica el documento
+		if(signPdfDictionary.get(PdfName.REFERENCE) != null){
+			PdfArray reference = (PdfArray) signPdfDictionary.get(PdfName.REFERENCE);
+			ArrayList<PdfObject> p = reference.getArrayList();
+			PdfDictionary dictionaryReference = (PdfDictionary) p.get(0);
+			if(dictionaryReference.get(PdfName.TRANSFORMMETHOD) != null){
+				padesSignDetails.setCertificationSign(true);
+			}
+			else
+			{
+				padesSignDetails.setCertificationSign(false);
+			}
+		}
+		else
+		{
+			padesSignDetails.setCertificationSign(false);
+		}
 
 		PdfPKCS7 pkcs7 = null;
 		try {
@@ -213,6 +246,25 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		// Validamos la firma
 		final List<SignValidity> listValidity = ValidatePdfSignature.validateSign(signName, af, signProfile, false);
 		padesSignDetails.setValidityResult(listValidity);
+		
+		// Cuando la firma sea certificada de tipo 1, sólo la última firma será válida.
+		if(certLevel == 1 && padesSignDetails.getValidityResult().get(0).getValidity().equals(SIGN_DETAIL_TYPE.OK)){
+			final int rev = af.getRevision(signName);
+			
+			if(!(rev == af.getTotalRevisions())){
+			    List<SignValidity> listValidityCertifiedSign = padesSignDetails.getValidityResult();
+				listValidityCertifiedSign.clear();
+				listValidityCertifiedSign.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFIED_SIGN_REVISION));
+				padesSignDetails.setValidityResult(listValidityCertifiedSign);
+				padesSignDetails.setLastRevisionSign(false);
+			}
+			else{
+				padesSignDetails.setLastRevisionSign(true);
+			}
+			
+			System.out.println("La firma " + signName + " esta en la revision " + rev);
+			System.out.println("Total de revisiones " + af.getTotalRevisions());
+		}
 
 		return padesSignDetails;
 	}

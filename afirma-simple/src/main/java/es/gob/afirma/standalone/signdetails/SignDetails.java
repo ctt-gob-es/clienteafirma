@@ -30,6 +30,9 @@ public class SignDetails {
 	protected List<SignValidity> validityResult;
 	protected List<DataObjectFormat> dataObjectFormats;
 	protected CertificateDetails signer;
+	protected int certificationLevel;
+	protected Boolean certificationSign;
+	protected Boolean lastRevisionSign;
 
 	public SignDetails() {
 		this.metadata = new HashMap<String, String>();
@@ -132,5 +135,22 @@ public class SignDetails {
 	public void setSigningTime(final Date signingTime) {
 		this.signingTime = signingTime;
 	}
-
+	public int getCertificationLevel() {
+		return certificationLevel;
+	}
+	public void setCertificationLevel(int certificationLevel) {
+		this.certificationLevel = certificationLevel;
+	}
+	public Boolean getCertificationSign() {
+		return certificationSign;
+	}
+	public void setCertificationSign(Boolean certificationSign) {
+		this.certificationSign = certificationSign;
+	}
+	public Boolean getLastRevisionSign() {
+		return lastRevisionSign;
+	}
+	public void setLastRevisionSign(Boolean lastRevisionSign) {
+		this.lastRevisionSign = lastRevisionSign;
+	}
 }
