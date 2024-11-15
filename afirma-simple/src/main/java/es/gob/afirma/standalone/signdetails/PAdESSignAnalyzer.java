@@ -1,5 +1,8 @@
 package es.gob.afirma.standalone.signdetails;
 
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_VISIBLE;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_IS_CERTIFIED_PDF;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +41,7 @@ import es.gob.afirma.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 public class PAdESSignAnalyzer implements SignAnalyzer {
 
@@ -114,6 +118,12 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
         	int certLevel = -1;
         	try {
         		certLevel = pdfReader.getCertificationLevel();
+        		if(certLevel != -1){
+        			PreferencesManager.put(PREFERENCE_IS_CERTIFIED_PDF, Boolean.toString(true));
+        		}
+        		else{
+        			PreferencesManager.put(PREFERENCE_IS_CERTIFIED_PDF, Boolean.toString(false));
+        		}
         	}
         	catch (final Exception e) {
         		LOGGER.severe("El pdf no es certificado, se devolvera valor -1: " + e); //$NON-NLS-1$

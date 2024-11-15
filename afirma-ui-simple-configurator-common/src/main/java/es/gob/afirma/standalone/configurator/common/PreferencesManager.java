@@ -357,6 +357,17 @@ public final class PreferencesManager {
 	 * </ul>*/
 	
 	public static final String PREFERENCE_PDF_CERTIFIED_TYPE = "pdfCertifiedTpe"; //$NON-NLS-1$
+	
+	/** Tipos de firma pdf certificados
+	 * Esta preferencia debe tener uno de estos valores:
+	 * <ul>
+	 *  <li>Sin certificar</li>
+	 *  <li>Certificada de autor</li>
+	 *  <li>Certificada de autor para formularios</li>
+	 *  <li>Certificada común</li>
+	 * </ul>*/
+	
+	public static final String PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL = "pdfCertifiedTpeInfoPanel"; //$NON-NLS-1$
 
 	//**************************************************************************************************************************
 	//************************* PREFERENCIAS DE FIRMAS PAdES *******************************************************************
@@ -409,6 +420,10 @@ public final class PreferencesManager {
 	/** Si est&aacute; establecido a <code>true</code> se comprobar&aacute;n posibles PDF Shadow Attacks
 	 * si se establece a <code>false</code>, no se realizar&aacute; la comprobaci&oacute;n */
 	public static final String PREFERENCE_PADES_CHECK_CERTIFIED_PDF = "certifiedPDFOption"; //$NON-NLS-1$
+	
+	/** Si est&aacute; establecido a <code>true</code> se comprobar&aacute;n posibles PDF Shadow Attacks
+	 * si se establece a <code>false</code>, no se realizar&aacute; la comprobaci&oacute;n */
+	public static final String PREFERENCE_PADES_CHECK_CERTIFIED_PDF_SIGCONFIGINFOPANEL = "certifiedPDFOptionInfoPanel"; //$NON-NLS-1$
 
 	/** Motivo de la firma en firmas PAdES. */
 	public static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$
@@ -711,6 +726,8 @@ public final class PreferencesManager {
 
 
 	private static final String CONFIGURATION_DATE_FORMAT = "YYYYMMdd"; //$NON-NLS-1$
+
+	public static final String PREFERENCE_IS_CERTIFIED_PDF = "isCertifiedPDF";
 
 	/** Recupera la cadena con el valor de una propiedad de configuraci&oacute;n. La propiedad se
 	 * buscar&aacute;, por orden, en las preferencia del usuario, del sistema o en la configuraci&oacute;n

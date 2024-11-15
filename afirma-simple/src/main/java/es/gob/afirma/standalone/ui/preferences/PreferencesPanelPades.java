@@ -23,6 +23,8 @@ import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PR
 import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_VISIBLE;
 import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF;
 import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PDF_CERTIFIED_TYPE;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF_SIGCONFIGINFOPANEL;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -517,6 +519,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		PreferencesManager.put(PREFERENCE_PADES_STAMP, Boolean.toString(this.visiblePdfStamp.isSelected()));
 		PreferencesManager.put(PREFERENCE_PADES_CHECK_SHADOW_ATTACK, Boolean.toString(this.checkShadowAttack.isSelected()));
 		PreferencesManager.put(PREFERENCE_PADES_CHECK_CERTIFIED_PDF, Boolean.toString(this.checkAllowCertifiedPdf.isSelected()));
+		PreferencesManager.put(PREFERENCE_PADES_CHECK_CERTIFIED_PDF_SIGCONFIGINFOPANEL, Boolean.toString(this.checkAllowCertifiedPdf.isSelected()));
 
 		PreferencesManager.put(PREFERENCE_PADES_SIGNER_CONTACT, this.padesSignerContact.getText());
 		PreferencesManager.put(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, this.padesSignProductionCity.getText());
@@ -529,6 +532,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		final ComboBoxModel<Object> mdl = this.pdfSignCertified.getModel();
 		final Object obj = mdl.getElementAt(this.pdfSignCertified.getSelectedIndex());
 		PreferencesManager.put(PREFERENCE_PDF_CERTIFIED_TYPE, ((ValueTextPair) obj).getValue());
+		PreferencesManager.put(PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL, ((ValueTextPair) obj).getValue());
 
 		final AdESPolicy padesPolicy = this.padesPolicyDlg.getSelectedPolicy();
 		if (padesPolicy != null) {

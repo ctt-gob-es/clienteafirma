@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.ui;
 
 import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PDF_CERTIFIED_TYPE;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL;
 
 import java.awt.Component;
 import java.io.ByteArrayOutputStream;
@@ -232,13 +233,12 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         	signConfig.addExtraParams(System.getProperties());
         	
     		//extraParams "certificationLevel"
-   		 	final boolean needCheckCertifiedSign = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF);
+   		 	final boolean needCheckCertifiedSign = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF_SIGCONFIGINFOPANEL);
 	   		if (needCheckCertifiedSign) {
 	   			//si el documento esta firmado, no se permite crear pdf certificado
 	   			if(signConfig.getSignValidity() != null && signConfig.getFileType().equals(FileType.PDF)){
 	   				final RuntimeConfigNeededException e = (RuntimeConfigNeededException) signConfig.getSignValidity().get(0).getErrorException();
-	        		LOGGER.severe("El documento "+ signConfig.getDataFile().getName() +" está firmado, no se permite crear pdf certificado"); //$NON-NLS-1$
-	        		showErrorMessage("El documento "+ signConfig.getDataFile().getName() +" está firmado, no se permite crear pdf certificado",e); //$NON-NLS-2$
+	        		LOGGER.severe("El documento se encuentra firmado, no se permite crear pdf certificado"); //$NON-NLS-1$
 	        		if(onlyOneFile){
 	        			return;
 	        		}
@@ -246,7 +246,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 	   			}
 	   			else if(signConfig.getFileType().equals(FileType.PDF))
 	   			{
-		   			final String selectedValuePDF = PreferencesManager.get(PREFERENCE_PDF_CERTIFIED_TYPE);
+		   			final String selectedValuePDF = PreferencesManager.get(PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL);
 		   		    if(selectedValuePDF.equalsIgnoreCase(PDF_CERT_TIPO_0)){
 		   		    	signConfig.addExtraParam(PdfExtraParams.CERTIFICATION_LEVEL, "0");
 		   		    }

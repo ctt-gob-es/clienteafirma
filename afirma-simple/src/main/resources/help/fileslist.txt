@@ -36,6 +36,7 @@ Spanish.lproj/gfx/pantallaespera_mini.png
 Spanish.lproj/gfx/pantallafirma1_mini.png
 Spanish.lproj/gfx/pantallafirma2_mini.png
 Spanish.lproj/gfx/pantallafirma3_mini.png
+Spanish.lproj/gfx/pantallafirma4_mini.png
 Spanish.lproj/gfx/pluginhash_calculo_directorio_mini.png
 Spanish.lproj/gfx/pluginhash_calculo_fichero_mini.png
 Spanish.lproj/gfx/pluginhash_comprobacion_directorio_mini.png
