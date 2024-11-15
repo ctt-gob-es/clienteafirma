@@ -173,13 +173,13 @@ final class PreferencesPanelPades extends JScrollPane {
 		);
 		
 		final DefaultComboBoxModel<Object> pdfCertifiedFormatModel = new DefaultComboBoxModel<>(
-				new Object[] {
-					new ValueTextPair(AOSignConstants.PDF_CERT_0, PDF_CERT_TIPO_0),
-					new ValueTextPair(AOSignConstants.PDF_CERT_1, PDF_CERT_TIPO_1),
-					new ValueTextPair(AOSignConstants.PDF_CERT_2, PDF_CERT_TIPO_2),
-					new ValueTextPair(AOSignConstants.PDF_CERT_3, PDF_CERT_TIPO_3)
-				}
-			);
+			new Object[] {
+				new ValueTextPair(AOSignConstants.PDF_CERT_0, PDF_CERT_TIPO_0),
+				new ValueTextPair(AOSignConstants.PDF_CERT_1, PDF_CERT_TIPO_1),
+				new ValueTextPair(AOSignConstants.PDF_CERT_2, PDF_CERT_TIPO_2),
+				new ValueTextPair(AOSignConstants.PDF_CERT_3, PDF_CERT_TIPO_3)
+			}
+		);
 
 		this.padesBasicFormat.setModel(padesFormatModel);
 		this.padesBasicFormat.addItemListener(modificationListener);
@@ -483,8 +483,9 @@ final class PreferencesPanelPades extends JScrollPane {
 		c.gridx = 0;
 		innerPanel.add(certifiedOptionsPanel,c);
 		c.gridx = 1;
+		c.insets = new Insets(-4, 55, 2, 0);
 		innerPanel.add(certifiedFormatLabel, c);
-		c.insets = new Insets(0, 40, 2, 0);
+		c.insets = new Insets(-4, 95, 2, 0);
 		innerPanel.add(pdfSignCertified, c);
 
 		final JPanel signatureOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));

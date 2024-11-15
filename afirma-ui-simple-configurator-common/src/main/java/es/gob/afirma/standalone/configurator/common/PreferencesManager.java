@@ -350,10 +350,10 @@ public final class PreferencesManager {
 	/** Tipos de firma pdf certificados
 	 * Esta preferencia debe tener uno de estos valores:
 	 * <ul>
-	 *  <li>Firma sin certificar</li>
-	 *  <li>Firma certificada de autor</li>
-	 *  <li>Firma certificada de autor para formularios</li>
-	 *  <li>Firma certificada común</li>
+	 *  <li>Sin certificar</li>
+	 *  <li>Certificada de autor</li>
+	 *  <li>Certificada de autor para formularios</li>
+	 *  <li>Certificada común</li>
 	 * </ul>*/
 	
 	public static final String PREFERENCE_PDF_CERTIFIED_TYPE = "pdfCertifiedTpe"; //$NON-NLS-1$

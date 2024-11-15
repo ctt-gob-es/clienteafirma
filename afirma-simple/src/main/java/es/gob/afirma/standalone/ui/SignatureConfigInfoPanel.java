@@ -70,7 +70,10 @@ public class SignatureConfigInfoPanel extends JPanel {
 
     private SignPanelFilePanel signPanelFile;
     
-    private JComboBox<Object> pdfSignCertified = null;
+    private final JComboBox<Object> pdfSignCertified = new JComboBox<>();
+	JComboBox<Object> padesBasicFormatCertified() {
+		return this.pdfSignCertified;
+	}
 
 	public SignatureConfigInfoPanel(final SignOperationConfig signConfig, final Color bgColor, final SignPanelFilePanel signPanel) {
 		this.signPanelFile = signPanel;
@@ -322,7 +325,7 @@ public class SignatureConfigInfoPanel extends JPanel {
             if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             	this.pdfVisible.setBackground(bgColor);
             }
-            this.pdfVisible.setMnemonic('H');
+            //this.pdfVisible.setMnemonic('H');
             this.pdfVisible.setAlignmentX(Component.LEFT_ALIGNMENT);
             panel.add(this.pdfVisible);
             panel.add(Box.createRigidArea(new Dimension(0, 4)));
@@ -336,7 +339,7 @@ public class SignatureConfigInfoPanel extends JPanel {
             if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             	this.pdfStamp.setBackground(bgColor);
             }
-            this.pdfStamp.setMnemonic('S');
+            //this.pdfStamp.setMnemonic('S');
             
             panel.add(this.pdfStamp);
             panel.add(Box.createRigidArea(new Dimension(0, 4)));
@@ -351,9 +354,9 @@ public class SignatureConfigInfoPanel extends JPanel {
             
             // Check para crear PDF certificados
             this.certifiedPDF = new JCheckBox(
-            		SimpleAfirmaMessages.getString("PreferencesPanel.204"), //$NON-NLS-1$
-            		PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF)  //AQUI
-            	);
+        		SimpleAfirmaMessages.getString("PreferencesPanel.210") //$NON-NLS-1$
+        		//PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF)  //AQUI
+        	);
             this.accesibleDescription += SimpleAfirmaMessages.getString("PreferencesPanel.205"); //$NON-NLS-1$
             if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
             	this.certifiedPDF.setBackground(bgColor);
@@ -370,18 +373,26 @@ public class SignatureConfigInfoPanel extends JPanel {
             
             final boolean statusCheckCertifiedPFDPadesPanel = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF);
             if(statusCheckCertifiedPFDPadesPanel){
-            	this.certifiedPDF.setVisible(statusCheckCertifiedPFDPadesPanel);
+            	if(PreferencesManager.get(PREFERENCE_PDF_CERTIFIED_TYPE).equals(AOSignConstants.PDF_CERT_0)){
+            		this.certifiedPDF.setVisible(statusCheckCertifiedPFDPadesPanel);
+            		this.certifiedPDF.setSelected(false);
+            		this.pdfSignCertified.setEnabled(false);
+            	}
+            	else{
+            		this.certifiedPDF.setVisible(statusCheckCertifiedPFDPadesPanel);
+            		this.certifiedPDF.setSelected(true);
+            		this.pdfSignCertified.setEnabled(true);
+            	}
             }
             else{
             	this.certifiedPDF.setVisible(statusCheckCertifiedPFDPadesPanel);
             }
-            this.certifiedPDF.setMnemonic('C');
+            //this.certifiedPDF.setMnemonic('G');
             panel.add(this.certifiedPDF);
             panel.add(Box.createRigidArea(new Dimension(0, 4)));
-            
-            this.pdfSignCertified = new JComboBox<>();
+
             this.pdfSignCertified.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.183"));
-            this.pdfSignCertified.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.204"));
+            this.pdfSignCertified.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.210"));
     		this.pdfSignCertified.setModel(pdfCertifiedFormatModel);
     		
     		if(statusCheckCertifiedPFDPadesPanel){
@@ -413,7 +424,6 @@ public class SignatureConfigInfoPanel extends JPanel {
 				}
     		});
             
-            this.pdfSignCertified.setMaximumSize( this.pdfSignCertified.getPreferredSize() );
             this.pdfSignCertified.setAlignmentX(Component.LEFT_ALIGNMENT);
             panel.add(this.pdfSignCertified);
             panel.add(Box.createRigidArea(new Dimension(0, 4)));
