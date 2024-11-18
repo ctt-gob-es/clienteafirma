@@ -382,6 +382,9 @@ public class SignatureConfigInfoPanel extends JPanel {
     				final JCheckBox checkCertifiedCheckBox = (JCheckBox) e.getSource();
 	            	PreferencesManager.put(PREFERENCE_PADES_CHECK_CERTIFIED_PDF_SIGCONFIGINFOPANEL, Boolean.toString(checkCertifiedCheckBox.isSelected()));
 	            	pdfSignCertified.setEnabled(checkCertifiedCheckBox.isSelected());
+	            	if(checkCertifiedCheckBox.isSelected()){
+	            		PreferencesManager.put(PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL, AOSignConstants.PDF_CERT_1);
+	            	}
     			}
     		});
             
@@ -389,7 +392,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 
             if(statusCheckCertifiedPFDPadesPanel){
             	
-                if(isCertifiedPDF){
+                if(isCertifiedPDF || config.getSignValidity() != null){
             		this.certifiedPDF.setSelected(false);
             		this.certifiedPDF.setEnabled(false);
             		this.pdfSignCertified.setEnabled(false);
@@ -433,7 +436,7 @@ public class SignatureConfigInfoPanel extends JPanel {
             else{
             	this.pdfSignCertified.setVisible(statusCheckCertifiedPFDPadesPanel);
             }
-            
+
             this.pdfSignCertified.addActionListener(new ActionListener() {
 
 				@Override

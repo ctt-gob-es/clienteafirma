@@ -632,6 +632,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
 		this.visiblePdfStamp.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_STAMP));
 		this.checkAllowCertifiedPdf.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_CERTIFIED_PDF));
+		this.pdfSignCertified.setEnabled(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_CERTIFIED_PDF));
 
         // No se modifican las propiedades bloqueadas
         if (!isBlocked()) {
