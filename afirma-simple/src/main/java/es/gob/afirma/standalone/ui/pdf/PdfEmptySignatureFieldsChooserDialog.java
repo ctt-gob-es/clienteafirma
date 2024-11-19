@@ -30,11 +30,8 @@ import javax.swing.SwingUtilities;
 
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 
-import com.aowagie.text.pdf.PdfReader;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.signers.pades.PdfUtil;
 import es.gob.afirma.signers.pades.PdfUtil.SignatureField;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -256,34 +253,16 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		dispose();
 	}
 
-	/** Muestra un di&aacute;logo gr&aacute;fico para la selecci&oacute;n de un campo de firma en un PDF.
+	/**
+	 * Muestra un di&aacute;logo gr&aacute;fico para la selecci&oacute;n de un campo de firma en un PDF.
 	 * @param emptySignatureFields Listado de campos de firma del PDF.
 	 * @return Campo de firma seleccionado o {@code null} si debe crearse uno nuevo.
-	 * @throws AOCancelledOperationException Se cancela por completo la operaci&oacute;n de firma. 
-	 * @throws IOException */
-	public static SignatureField selectField(final List<SignatureField> emptySignatureFields, byte[] data) throws AOCancelledOperationException, IOException {
+	 * @throws AOCancelledOperationException Se cancela por completo la operaci&oacute;n de firma.
+	 */
+	public static SignatureField selectField(final List<SignatureField> emptySignatureFields) throws AOCancelledOperationException {
 
-		PdfReader pdf = new PdfReader(data);
-		int certLevel = pdf.getCertificationLevel();
-		
-	    String fieldsMessage = null;
-		
-		if(certLevel == 1 || certLevel == 2){
-			if(emptySignatureFields.size() >= 1){
-				fieldsMessage = SignPdfUiMessages.getString("SignPdfFieldChooser.7")+SignPdfUiMessages.getString("SignPdfFieldChooser.8");
-			}
-			else
-			{
-				fieldsMessage = SignPdfUiMessages.getString("SignPdfFieldChooser.8");
-			}
-		}
-		else
-		{
-			if(emptySignatureFields.size() >= 1){
-				fieldsMessage = SignPdfUiMessages.getString("SignPdfFieldChooser.7");
-			}
-		}
-		
+	    final String fieldsMessage = SignPdfUiMessages.getString("SignPdfFieldChooser.7"); //$NON-NLS-1$
+
 		final JComboBox<Object> combo = new JComboBox<>(emptySignatureFields.toArray());
 		final JLabel label = new JLabel(fieldsMessage);
 

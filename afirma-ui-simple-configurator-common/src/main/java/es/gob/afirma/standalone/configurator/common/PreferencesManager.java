@@ -343,31 +343,6 @@ public final class PreferencesManager {
 
 	//************************* FIN PREFERENCIAS DE FIRMAS XAdES ***************************************************************
 	//**************************************************************************************************************************
-	
-	//************************* PREFERENCIAS DE TIPO PDF CERTIFICADOS **********************************************************
-	//**************************************************************************************************************************
-	
-	/** Tipos de firma pdf certificados
-	 * Esta preferencia debe tener uno de estos valores:
-	 * <ul>
-	 *  <li>Sin certificar</li>
-	 *  <li>Certificada de autor</li>
-	 *  <li>Certificada de autor para formularios</li>
-	 *  <li>Certificada común</li>
-	 * </ul>*/
-	
-	public static final String PREFERENCE_PDF_CERTIFIED_TYPE = "pdfCertifiedTpe"; //$NON-NLS-1$
-	
-	/** Tipos de firma pdf certificados
-	 * Esta preferencia debe tener uno de estos valores:
-	 * <ul>
-	 *  <li>Sin certificar</li>
-	 *  <li>Certificada de autor</li>
-	 *  <li>Certificada de autor para formularios</li>
-	 *  <li>Certificada común</li>
-	 * </ul>*/
-	
-	public static final String PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL = "pdfCertifiedTpeInfoPanel"; //$NON-NLS-1$
 
 	//**************************************************************************************************************************
 	//************************* PREFERENCIAS DE FIRMAS PAdES *******************************************************************
@@ -413,17 +388,30 @@ public final class PreferencesManager {
 	 * documento. */
 	public static final String PREFERENCE_PADES_STAMP = "padesVisibleStamp"; //$NON-NLS-1$
 
-	/** Si est&aacute; establecido a <code>true</code> se permite generar pdfs certificados
-	 * si se establece a <code>false</code>, no se permite generar pdfs certificados */
+	/**
+	 * Si est&aacute; establecido a <code>true</code> se comprobar&aacute;n posibles PDF Shadow Attacks
+	 * si se establece a <code>false</code>, no se realizar&aacute; la comprobaci&oacute;n.
+	 */
 	public static final String PREFERENCE_PADES_CHECK_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
-	
-	/** Si est&aacute; establecido a <code>true</code> se comprobar&aacute;n posibles PDF Shadow Attacks
-	 * si se establece a <code>false</code>, no se realizar&aacute; la comprobaci&oacute;n */
-	public static final String PREFERENCE_PADES_CHECK_CERTIFIED_PDF = "certifiedPDFOption"; //$NON-NLS-1$
-	
-	/** Si est&aacute; establecido a <code>true</code> se comprobar&aacute;n posibles PDF Shadow Attacks
-	 * si se establece a <code>false</code>, no se realizar&aacute; la comprobaci&oacute;n */
-	public static final String PREFERENCE_PADES_CHECK_CERTIFIED_PDF_SIGCONFIGINFOPANEL = "certifiedPDFOptionInfoPanel"; //$NON-NLS-1$
+
+	/**
+	 * Si est&aacute; establecido a <code>true</code> se permite generar PDF certificados
+	 * si se establece a <code>false</code>, no se permite generar pdfs certificados.
+	 */
+	public static final String PREFERENCE_PADES_CHECK_ALLOW_CERTIFIED_PDF = "allowCertifiedPDF"; //$NON-NLS-1$
+
+	/**
+	 * Tipos de firma pdf certificadas.
+	 * Esta preferencia debe tener uno de estos valores:
+	 * <ul>
+	 *  <li>0: Sin certificar</li>
+	 *  <li>1: Certificada de autor</li>
+	 *  <li>2: Certificada de autor para formularios</li>
+	 *  <li>3: Certificada com&uacute;n</li>
+	 * </ul>
+	 */
+	public static final String PREFERENCE_PADES_DEFAULT_CERTIFICATION_LEVEL = "padesCertificationLevel"; //$NON-NLS-1$
+
 
 	/** Motivo de la firma en firmas PAdES. */
 	public static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$
@@ -726,8 +714,6 @@ public final class PreferencesManager {
 
 
 	private static final String CONFIGURATION_DATE_FORMAT = "YYYYMMdd"; //$NON-NLS-1$
-
-	public static final String PREFERENCE_IS_CERTIFIED_PDF = "isCertifiedPDF";
 
 	/** Recupera la cadena con el valor de una propiedad de configuraci&oacute;n. La propiedad se
 	 * buscar&aacute;, por orden, en las preferencia del usuario, del sistema o en la configuraci&oacute;n

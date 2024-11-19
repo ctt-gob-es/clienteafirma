@@ -9,9 +9,6 @@
 
 package es.gob.afirma.standalone.ui;
 
-import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PDF_CERTIFIED_TYPE;
-import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL;
-
 import java.awt.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -80,11 +77,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
 	/** ExtraParam que configura que no aparezcan di&aacute;logos gr&aacute;ficos durante la firma. */
 	private static final String EXTRAPARAM_HEADLESS = "headless"; //$NON-NLS-1$
-	
-	private static final String PDF_CERT_TIPO_0 = AOSignConstants.PDF_CERT_0; //$NON-NLS-1$
-	private static final String PDF_CERT_TIPO_1 = AOSignConstants.PDF_CERT_1; //$NON-NLS-1$
-	private static final String PDF_CERT_TIPO_2 = AOSignConstants.PDF_CERT_2; //$NON-NLS-1$
-	private static final String PDF_CERT_TIPO_3 = AOSignConstants.PDF_CERT_3; //$NON-NLS-1$
 
 	private final Component parent;
 	private final List<SignOperationConfig> signConfigs;
@@ -223,7 +215,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		continue;
         	}
 
-
         	final AOSigner currentSigner = signConfig.getSigner();
 
             // Anadimos las propiedades del sistema, habilitando asi que se puedan indicar
@@ -231,36 +222,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         	// mas de un fichero, se indica que no se muestren dialogos que puedan bloquear
         	// el proceso
         	signConfig.addExtraParams(System.getProperties());
-        	
-    		//extraParams "certificationLevel"
-   		 	final boolean needCheckCertifiedSign = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF_SIGCONFIGINFOPANEL);
-	   		if (needCheckCertifiedSign) {
-	   			//si el documento esta firmado, no se permite crear pdf certificado
-	   			if(signConfig.getSignValidity() != null && signConfig.getFileType().equals(FileType.PDF)){
-	   				final RuntimeConfigNeededException e = (RuntimeConfigNeededException) signConfig.getSignValidity().get(0).getErrorException();
-	        		LOGGER.severe("El documento se encuentra firmado, no se permite crear pdf certificado"); //$NON-NLS-1$
-	        		if(onlyOneFile){
-	        			return;
-	        		}
-	        		continue;	
-	   			}
-	   			else if(signConfig.getFileType().equals(FileType.PDF))
-	   			{
-		   			final String selectedValuePDF = PreferencesManager.get(PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL);
-		   		    if(selectedValuePDF.equalsIgnoreCase(PDF_CERT_TIPO_0)){
-		   		    	signConfig.addExtraParam(PdfExtraParams.CERTIFICATION_LEVEL, "0");
-		   		    }
-		   		    else if(selectedValuePDF.equalsIgnoreCase(PDF_CERT_TIPO_1)){
-			   		    signConfig.addExtraParam(PdfExtraParams.CERTIFICATION_LEVEL, "1");
-		   		    }
-		   		    else if(selectedValuePDF.equalsIgnoreCase(PDF_CERT_TIPO_2)){
-		   		    	signConfig.addExtraParam(PdfExtraParams.CERTIFICATION_LEVEL, "2");
-		   		    }
-		   		    else if(selectedValuePDF.equalsIgnoreCase(PDF_CERT_TIPO_3)){
-		   		    	signConfig.addExtraParam(PdfExtraParams.CERTIFICATION_LEVEL, "3");
-		   		    }
-	   			}
-	   		}
 
         	// Si se esta firmando mas de un documento, evitamos que se muestren dialogos,
         	// mientras que si es solo uno y requiere la intervencion del usuario, se le

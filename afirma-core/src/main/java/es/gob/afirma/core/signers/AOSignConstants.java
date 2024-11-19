@@ -209,23 +209,6 @@ public final class AOSignConstants {
 
 	/** Filtro para firma PAdES-BES. */
 	public static final String PADES_SUBFILTER_BES = "ETSI.CAdES.detached"; //$NON-NLS-1$
-	
-	// ************************************************************
-	// ***************** SUBFILTROS CERTIFICADO PDF ***************
-	// ************************************************************
-
-	/** Filtro para firma PDF certificado tipo 0. */
-	public static final String PDF_CERT_0 = "pdf_cert_0"; //$NON-NLS-1$
-
-	/** Filtro para firma PDF certificado tipo 1. */
-	public static final String PDF_CERT_1 = "pdf_cert_1"; //$NON-NLS-1$
-	
-	/** Filtro para firma PDF certificado tipo 2. */
-	public static final String PDF_CERT_2 = "pdf_cert_2"; //$NON-NLS-1$
-
-	/** Filtro para firma PDF certificado tipo 3. */
-	public static final String PDF_CERT_3 = "pdf_cert_3"; //$NON-NLS-1$
-
 
 	// ************************************************************
 	// ************* ALGORITMOS DE FIRMA **************************

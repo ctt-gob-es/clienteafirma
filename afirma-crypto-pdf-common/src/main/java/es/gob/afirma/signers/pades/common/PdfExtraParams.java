@@ -248,6 +248,19 @@ public final class PdfExtraParams {
 	 */
 	public static final String CERTIFICATION_LEVEL = "certificationLevel";//$NON-NLS-1$
 
+
+	/** Valor para indicar el nivel 0 de firma certificada de PDF (sin certificar). */
+	public static final String CERTIFICATION_LEVEL_VALUE_TYPE_0 = "0"; //$NON-NLS-1$
+
+	/** Valor para indicar el nivel 1 de firma certificada de PDF (certificada de autor). */
+	public static final String CERTIFICATION_LEVEL_VALUE_TYPE_1 = "1"; //$NON-NLS-1$
+
+	/** Valor para indicar el nivel 2 de firma certificada de PDF (certificada de autor para formularios). */
+	public static final String CERTIFICATION_LEVEL_VALUE_TYPE_2 = "2"; //$NON-NLS-1$
+
+	/** Valor para indicar el nivel 3 de firma certificada de PDF (certificada com&uacute;n). */
+	public static final String CERTIFICATION_LEVEL_VALUE_TYPE_3 = "3"; //$NON-NLS-1$
+
 	/**
 	 * Versi&oacute;n del PDF de salida:
 	 * <ul>

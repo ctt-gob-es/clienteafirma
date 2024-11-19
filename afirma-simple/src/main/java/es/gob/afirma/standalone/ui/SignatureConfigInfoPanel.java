@@ -1,11 +1,5 @@
 package es.gob.afirma.standalone.ui;
 
-import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF;
-import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PDF_CERTIFIED_TYPE;
-import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF_SIGCONFIGINFOPANEL;
-import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL;
-import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_IS_CERTIFIED_PDF;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -39,7 +33,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -61,8 +54,8 @@ public class SignatureConfigInfoPanel extends JPanel {
 	private JCheckBox pdfVisible = null;
 
     private JCheckBox pdfStamp = null;
-    
-    private JCheckBox certifiedPDF = null;
+
+    private JCheckBox pdfCertifiedSignature = null;
 
     private String accesibleDescription;
 
@@ -73,12 +66,9 @@ public class SignatureConfigInfoPanel extends JPanel {
     private JPanel signOptionsPanel;
 
     private SignPanelFilePanel signPanelFile;
-    
-    private final JComboBox<Object> pdfSignCertified = new JComboBox<>();
-	JComboBox<Object> padesBasicFormatCertified() {
-		return this.pdfSignCertified;
-	}
-	
+
+    private final JComboBox<Object> pdfCertifiedSignatureLevel = new JComboBox<>();
+
 	private JLabel noCertPDFAllowLabel;
 
 	public SignatureConfigInfoPanel(final SignOperationConfig signConfig, final Color bgColor, final SignPanelFilePanel signPanel) {
@@ -89,7 +79,7 @@ public class SignatureConfigInfoPanel extends JPanel {
 	public SignatureConfigInfoPanel() {
 
 	}
-	
+
 	/** Par de cadenas para su uso en ComboBox. Una cadena es el valor del elemento seleccionado y
 	 * la otra el texto que se debe mostrar. */
 	static final class ValueTextPair {
@@ -133,11 +123,10 @@ public class SignatureConfigInfoPanel extends JPanel {
 			return 5 * this.text.length() + 7 * this.value.length();
 		}
 	}
-	
-	private static final String PDF_CERT_TIPO_0 = SimpleAfirmaMessages.getString("PreferencesPanel.206"); //$NON-NLS-1$
-	private static final String PDF_CERT_TIPO_1 = SimpleAfirmaMessages.getString("PreferencesPanel.207"); //$NON-NLS-1$
-	private static final String PDF_CERT_TIPO_2 = SimpleAfirmaMessages.getString("PreferencesPanel.208"); //$NON-NLS-1$
-	private static final String PDF_CERT_TIPO_3 = SimpleAfirmaMessages.getString("PreferencesPanel.209"); //$NON-NLS-1$
+
+	private static final String PADES_CERT_TIPE_1 = SimpleAfirmaMessages.getString("PreferencesPanel.207"); //$NON-NLS-1$
+	private static final String PADES_CERT_TIPE_2 = SimpleAfirmaMessages.getString("PreferencesPanel.208"); //$NON-NLS-1$
+	private static final String PADES_CERT_TIPE_3 = SimpleAfirmaMessages.getString("PreferencesPanel.209"); //$NON-NLS-1$
 
 	private SignatureConfigInfoPanel createUI(final SignOperationConfig signConfig, final Color bgColor) {
 
@@ -310,21 +299,12 @@ public class SignatureConfigInfoPanel extends JPanel {
 		final AOSigner signer = config.getSigner();
 		final CryptoOperation cop = config.getCryptoOperation();
 		final FileType fileType = config.getFileType();
-		
-		boolean isCertifiedPDF;
-		
-		if(config.getSignValidity() != null){
-			isCertifiedPDF = PreferencesManager.getBoolean(PREFERENCE_IS_CERTIFIED_PDF);
-		}
-		else{
-			isCertifiedPDF = false;
-		}
-		
+
 		final DefaultComboBoxModel<Object> pdfCertifiedFormatModel = new DefaultComboBoxModel<>(
 				new Object[] {
-					new ValueTextPair(AOSignConstants.PDF_CERT_1, PDF_CERT_TIPO_1),
-					new ValueTextPair(AOSignConstants.PDF_CERT_2, PDF_CERT_TIPO_2),
-					new ValueTextPair(AOSignConstants.PDF_CERT_3, PDF_CERT_TIPO_3)
+					new ValueTextPair(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_1, PADES_CERT_TIPE_1),
+					new ValueTextPair(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_2, PADES_CERT_TIPE_2),
+					new ValueTextPair(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_3, PADES_CERT_TIPE_3)
 				}
 			);
 
@@ -355,7 +335,7 @@ public class SignatureConfigInfoPanel extends JPanel {
             	this.pdfStamp.setBackground(bgColor);
             }
             //this.pdfStamp.setMnemonic('S');
-            
+
             panel.add(this.pdfStamp);
             panel.add(Box.createRigidArea(new Dimension(0, 4)));
 
@@ -366,99 +346,81 @@ public class SignatureConfigInfoPanel extends JPanel {
             	this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.121"); //$NON-NLS-1$
             	panel.add(Box.createRigidArea(new Dimension(0, 4)));
             }
-            
+
             // Check para crear PDF certificados
-            this.certifiedPDF = new JCheckBox(
+            this.pdfCertifiedSignature = new JCheckBox(
         		SimpleAfirmaMessages.getString("PreferencesPanel.210") //$NON-NLS-1$
         	);
             this.accesibleDescription += SimpleAfirmaMessages.getString("PreferencesPanel.205"); //$NON-NLS-1$
             if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
-            	this.certifiedPDF.setBackground(bgColor);
+            	this.pdfCertifiedSignature.setBackground(bgColor);
             }
-    		
-    		this.certifiedPDF.addActionListener(new ActionListener() {
+
+    		this.pdfCertifiedSignature.addActionListener(new ActionListener() {
     			@Override
     			public void actionPerformed(final ActionEvent e) {
     				final JCheckBox checkCertifiedCheckBox = (JCheckBox) e.getSource();
-	            	PreferencesManager.put(PREFERENCE_PADES_CHECK_CERTIFIED_PDF_SIGCONFIGINFOPANEL, Boolean.toString(checkCertifiedCheckBox.isSelected()));
-	            	pdfSignCertified.setEnabled(checkCertifiedCheckBox.isSelected());
-	            	if(checkCertifiedCheckBox.isSelected()){
-	            		PreferencesManager.put(PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL, AOSignConstants.PDF_CERT_1);
-	            	}
+	            	SignatureConfigInfoPanel.this.pdfCertifiedSignatureLevel.setEnabled(checkCertifiedCheckBox.isSelected());
     			}
     		});
-            
-            final boolean statusCheckCertifiedPFDPadesPanel = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_CERTIFIED_PDF);
 
-            if(statusCheckCertifiedPFDPadesPanel){
-            	
-                if(isCertifiedPDF || config.getSignValidity() != null){
-            		this.certifiedPDF.setSelected(false);
-            		this.certifiedPDF.setEnabled(false);
-            		this.pdfSignCertified.setEnabled(false);
+            this.pdfCertifiedSignatureLevel.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.183")); //$NON-NLS-1$
+            this.pdfCertifiedSignatureLevel.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.210")); //$NON-NLS-1$
+    		this.pdfCertifiedSignatureLevel.setModel(pdfCertifiedFormatModel);
+
+            this.pdfCertifiedSignatureLevel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            final boolean certifiedSignatureAllowed = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_CHECK_ALLOW_CERTIFIED_PDF);
+            final boolean signed = config.getSignValidity() != null;
+
+            this.pdfCertifiedSignature.setVisible(certifiedSignatureAllowed);
+            this.pdfCertifiedSignatureLevel.setVisible(certifiedSignatureAllowed);
+
+            if (certifiedSignatureAllowed){
+
+            	final String defaultCertLevel = PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_DEFAULT_CERTIFICATION_LEVEL);
+
+                if (signed){
+            		this.pdfCertifiedSignature.setSelected(false);
+            		this.pdfCertifiedSignature.setEnabled(false);
+            		this.pdfCertifiedSignatureLevel.setEnabled(false);
                 }
-                else if(PreferencesManager.get(PREFERENCE_PDF_CERTIFIED_TYPE).equals(AOSignConstants.PDF_CERT_0)){
-            		this.certifiedPDF.setVisible(statusCheckCertifiedPFDPadesPanel);
-            		this.certifiedPDF.setSelected(false);
-            		this.pdfSignCertified.setEnabled(false);
-            	}
-            	else{
-            		this.certifiedPDF.setVisible(statusCheckCertifiedPFDPadesPanel);
-            		this.certifiedPDF.setSelected(true);
-            		this.pdfSignCertified.setEnabled(true);
-            	}
-            }
-            else{
-            	this.certifiedPDF.setVisible(statusCheckCertifiedPFDPadesPanel);
-            }
-            //this.certifiedPDF.setMnemonic('G');
-            panel.add(this.certifiedPDF);
-            panel.add(Box.createRigidArea(new Dimension(0, 4)));
+                else {
+                	if(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_0.equals(defaultCertLevel)){
+                		this.pdfCertifiedSignature.setSelected(false);
+                		this.pdfCertifiedSignatureLevel.setEnabled(false);
+                	}
+                	else{
+                		this.pdfCertifiedSignature.setSelected(true);
+                		this.pdfCertifiedSignatureLevel.setEnabled(true);
+                	}
+                }
 
-            this.pdfSignCertified.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("PreferencesPanel.183"));
-            this.pdfSignCertified.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("PreferencesPanel.210"));
-    		this.pdfSignCertified.setModel(pdfCertifiedFormatModel);
-    		
-    		if(statusCheckCertifiedPFDPadesPanel){
-    	        final ComboBoxModel<Object> pdfCertifiedModel = this.pdfSignCertified.getModel();
-    	        final String selectedValuePDF = PreferencesManager.get(PREFERENCE_PDF_CERTIFIED_TYPE);
-    			for (int i = 0; i < pdfCertifiedModel.getSize(); i++) {
-    				if (pdfCertifiedModel.getElementAt(i).equals(selectedValuePDF)) {
-    					this.pdfSignCertified.setSelectedIndex(i);
+    	        final ComboBoxModel<Object> pdfCertifiedModel = this.pdfCertifiedSignatureLevel.getModel();
+    	        for (int i = 0; i < pdfCertifiedModel.getSize(); i++) {
+    				if (pdfCertifiedModel.getElementAt(i).equals(defaultCertLevel)) {
+    					this.pdfCertifiedSignatureLevel.setSelectedIndex(i);
     					break;
     				}
     			}
-    		}
-    		
-            if(statusCheckCertifiedPFDPadesPanel){
-            	this.pdfSignCertified.setVisible(statusCheckCertifiedPFDPadesPanel);
-            }
-            else{
-            	this.pdfSignCertified.setVisible(statusCheckCertifiedPFDPadesPanel);
-            }
 
-            this.pdfSignCertified.addActionListener(new ActionListener() {
+    	        if (this.pdfCertifiedSignatureLevel.getSelectedIndex() == -1) {
+    	        	this.pdfCertifiedSignatureLevel.setSelectedIndex(0);
+    	        }
 
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final JComboBox tipeCertifiedSignComboBox = (JComboBox) e.getSource();
-					final ComboBoxModel<Object> mdl = tipeCertifiedSignComboBox.getModel();
-					final Object obj = mdl.getElementAt(tipeCertifiedSignComboBox.getSelectedIndex());
-					PreferencesManager.put(PREFERENCE_PDF_CERTIFIED_TYPE_SIGCONFIGINFOPANEL, ((ValueTextPair) obj).getValue());
-				}
-    		});
-            
-            this.pdfSignCertified.setAlignmentX(Component.LEFT_ALIGNMENT);
-            panel.add(this.pdfSignCertified);
-            panel.add(Box.createRigidArea(new Dimension(0, 4)));
-            
-            if(isCertifiedPDF){
-        		this.noCertPDFAllowLabel = new JLabel(
-        				SimpleAfirmaMessages.getString("SignPanel.158")); //$NON-NLS-1$
-        		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.158"); //$NON-NLS-1$
-        		
-                panel.add(this.noCertPDFAllowLabel);
+                panel.add(this.pdfCertifiedSignature);
                 panel.add(Box.createRigidArea(new Dimension(0, 4)));
+                panel.add(this.pdfCertifiedSignatureLevel);
+                panel.add(Box.createRigidArea(new Dimension(0, 4)));
+
+                if (signed){
+            		this.noCertPDFAllowLabel = new JLabel(
+            				SimpleAfirmaMessages.getString("SignPanel.158")); //$NON-NLS-1$
+            		this.accesibleDescription += SimpleAfirmaMessages.getString("SignPanel.158"); //$NON-NLS-1$
+
+                    panel.add(this.noCertPDFAllowLabel);
+                    panel.add(Box.createRigidArea(new Dimension(0, 4)));
+                }
             }
         }
 
@@ -510,6 +472,18 @@ public class SignatureConfigInfoPanel extends JPanel {
 
 	public boolean isPdfStampSignatureSelected() {
 		return this.pdfStamp != null && this.pdfStamp.isSelected();
+	}
+
+	public String getPdfSignatureCertificationLevel() {
+		String certificationLevel = null;
+		if (this.pdfCertifiedSignature != null && this.pdfCertifiedSignature.isSelected()
+				&& this.pdfCertifiedSignatureLevel != null) {
+			final ValueTextPair selectedItem = (ValueTextPair) this.pdfCertifiedSignatureLevel.getSelectedItem();
+			if (selectedItem != null) {
+				certificationLevel = selectedItem.getValue();
+			}
+		}
+		return certificationLevel;
 	}
 
 	public String getAccesibleDescription() {
