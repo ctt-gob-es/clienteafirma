@@ -70,6 +70,8 @@ public final class SignValidity {
 				return ret + ": no se permite la validaci&oacute;n de firmas con referencias externas"; //$NON-NLS-1$
 			case BAD_BUILD_SIGN:
 				return ret + ": la firma no est&aacute; correctamente formada"; //$NON-NLS-1$
+			case CERTIFIED_SIGN_REVISION:
+				return ret + ": El documento certificado no permit&iacute;a nuevas firmas"; //$NON-NLS-1$
 			default:
 				return ret;
 		}
@@ -137,6 +139,8 @@ public final class SignValidity {
         CANT_VALIDATE_EXTERNALLY_DETACHED,
         /** Cuando la firma es inv&aacute;lida porque no est&aacute; formada correctamente */
         BAD_BUILD_SIGN,
+        /** Cuando la firma es inv&aacute;lida porque no es la &uacute;ltima firma*/
+        CERTIFIED_SIGN_REVISION,
     }
 
     /** Validez de la firma. */

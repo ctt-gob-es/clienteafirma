@@ -108,14 +108,15 @@ final class ProtocolInvocationLauncherSave {
 		}
 
 		if (options.getStorageServletUrl() != null) {
-			// Enviamos los datos cifrados al servicio remoto de intercambio y detenemos la espera
-			// activa si se encontraba vigente
+			// Detenemos la espera activa
+			final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
+			if (waitingThread != null) {
+				waitingThread.interrupt();
+			}
+			// Esperamos a que termine cualquier otro envio al servidor para que no se pisen
 			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
-				final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
-				if (waitingThread != null) {
-					waitingThread.interrupt();
-				}
 				try {
+					LOGGER.info("Enviamos el resultado de la operacion de guardado al servidor intermedio"); //$NON-NLS-1$
 					IntermediateServerUtil.sendData(RESULT_OK, options.getStorageServletUrl().toString(), options.getId());
 				}
 				catch (final Exception e) {

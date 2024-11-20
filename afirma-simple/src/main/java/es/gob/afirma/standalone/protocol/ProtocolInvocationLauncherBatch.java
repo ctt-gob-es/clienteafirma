@@ -361,14 +361,15 @@ final class ProtocolInvocationLauncherBatch {
 
 		// Si hay servidor intermedio, se envia
 		if (options.getStorageServletUrl() != null) {
-			// Enviamos la firma cifrada al servicio remoto de intercambio y detenemos la espera
-			// activa si se encontraba vigente
+			// Detenemos la espera activa
+			final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
+			if (waitingThread != null) {
+				waitingThread.interrupt();
+			}
+			// Esperamos a que termine cualquier otro envio al servidor para que no se pisen
 			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
-				final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
-				if (waitingThread != null) {
-					waitingThread.interrupt();
-				}
 				try {
+					LOGGER.info("Enviamos el resultado de la operacion de firma de lote al servidor intermedio"); //$NON-NLS-1$
 					IntermediateServerUtil.sendData(result.toString(), options.getStorageServletUrl().toString(), options.getId());
 				}
 				catch (final Exception e) {

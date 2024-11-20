@@ -215,7 +215,6 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		continue;
         	}
 
-
         	final AOSigner currentSigner = signConfig.getSigner();
 
             // Anadimos las propiedades del sistema, habilitando asi que se puedan indicar

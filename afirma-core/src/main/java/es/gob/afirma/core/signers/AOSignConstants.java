@@ -210,7 +210,6 @@ public final class AOSignConstants {
 	/** Filtro para firma PAdES-BES. */
 	public static final String PADES_SUBFILTER_BES = "ETSI.CAdES.detached"; //$NON-NLS-1$
 
-
 	// ************************************************************
 	// ************* ALGORITMOS DE FIRMA **************************
 	// ************************************************************

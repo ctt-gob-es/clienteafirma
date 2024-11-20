@@ -47,7 +47,6 @@ public final class VisiblePdfSignatureManager {
 				break;
 			}
 		}
-
 		byte[] data = null;
 
 		if (pdfSignConf != null) {
@@ -90,9 +89,7 @@ public final class VisiblePdfSignatureManager {
 			                                      final Frame parent) throws AOCancelledOperationException,
 	                                                                         IOException {
 		// Selecionamos uno de los campos de firma vacios del PDF
-		final SignatureField field = PdfEmptySignatureFieldsChooserDialog.selectField(
-			emptySignatureFields
-		);
+		final SignatureField field = PdfEmptySignatureFieldsChooserDialog.selectField(emptySignatureFields);
 
 		// Si no se selecciono un campo de firma, se permitira crearlo
 		if (field == null) {
