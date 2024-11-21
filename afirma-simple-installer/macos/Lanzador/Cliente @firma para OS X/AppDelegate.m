@@ -24,7 +24,7 @@
     @catch (NSException *exception)
     {
         NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert setAlertStyle:NSAlertStyleCritical];
         [alert setMessageText:[exception reason]];
         [alert runModal];
     }
@@ -58,7 +58,7 @@
     @catch (NSException *exception)
     {
         NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert setAlertStyle:NSAlertStyleCritical];
         [alert setMessageText:[exception reason]];
         [alert runModal];
         
@@ -86,7 +86,7 @@ int launch(const char *commandName)
     [task setLaunchPath:[NSString stringWithFormat:@"%@/Contents/Resources/Home/bin/java", mainBundlePath]];
     
     NSString *protocolUrl;
-    @try
+    @try	
     {
         protocolUrl = [[NSString alloc] initWithUTF8String:commandName];
     }

@@ -1,0 +1,4 @@
+#!/bin/sh
+# se ejecuta el configurador
+sudo /Applications/AutoFirma.app/Contents/Resources/Home/bin/java -jar /Applications/AutoFirma.app/Contents/Resources/JAR/AutoFirmaConfigurador.jar
+exit 0
