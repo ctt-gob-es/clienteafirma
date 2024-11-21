@@ -433,7 +433,9 @@ public class SingleSign {
 	}
 
 	public ProcessResult getProcessResult() {
-		this.processResult.setId(getId());
+		if (this.processResult != null) {
+			this.processResult.setId(getId());
+		}
 		return this.processResult;
 	}
 

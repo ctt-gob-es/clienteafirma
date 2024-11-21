@@ -253,18 +253,18 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		dispose();
 	}
 
-	/** Muestra un di&aacute;logo gr&aacute;fico para la selecci&oacute;n de un campo de firma en un PDF.
+	/**
+	 * Muestra un di&aacute;logo gr&aacute;fico para la selecci&oacute;n de un campo de firma en un PDF.
 	 * @param emptySignatureFields Listado de campos de firma del PDF.
 	 * @return Campo de firma seleccionado o {@code null} si debe crearse uno nuevo.
-	 * @throws AOCancelledOperationException Se cancela por completo la operaci&oacute;n de firma. */
+	 * @throws AOCancelledOperationException Se cancela por completo la operaci&oacute;n de firma.
+	 */
 	public static SignatureField selectField(final List<SignatureField> emptySignatureFields) throws AOCancelledOperationException {
 
+	    final String fieldsMessage = SignPdfUiMessages.getString("SignPdfFieldChooser.7"); //$NON-NLS-1$
+
 		final JComboBox<Object> combo = new JComboBox<>(emptySignatureFields.toArray());
-		final JLabel label = new JLabel(
-			emptySignatureFields.size() > 1 ?
-				SignPdfUiMessages.getString("SignPdfFieldChooser.7") : //$NON-NLS-1$
-					SignPdfUiMessages.getString("SignPdfFieldChooser.8") //$NON-NLS-1$
-		);
+		final JLabel label = new JLabel(fieldsMessage);
 
 		final JPanel panel = new JPanel(new GridBagLayout());
 		final GridBagConstraints c = new GridBagConstraints();

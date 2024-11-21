@@ -267,17 +267,29 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
     		boolean visibleSignature;
     		boolean visibleStamp;
+    		String certificationLevel = null;
 
     		// Si se muestra el panel de configuracion de la firma PDF (caso de las firmas
     		// simples), se tomara la configuracion del panel
     		if (this.lowerPanel.getFilePanel() instanceof SignPanelFilePanel) {
     			visibleSignature = ((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleSignature();
     			visibleStamp = ((SignPanelFilePanel)this.lowerPanel.getFilePanel()).isVisibleStamp();
+    			certificationLevel = ((SignPanelFilePanel)this.lowerPanel.getFilePanel()).getCertificationLevel();
     		}
     		// Si no, se tomara de las preferencias
     		else {
     			visibleSignature = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_VISIBLE);
     			visibleStamp = false;
+    			final boolean allowCertifiedPdf = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_PADES_VISIBLE);
+    			if (allowCertifiedPdf) {
+    				certificationLevel = PreferencesManager.get(PreferencesManager.PREFERENCE_PADES_DEFAULT_CERTIFICATION_LEVEL);
+    			}
+    		}
+
+    		if (certificationLevel != null && !certificationLevel.equals(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_0)) {
+    			for (final SignOperationConfig config : this.signOperationConfigs) {
+    				config.addExtraParam(PdfExtraParams.CERTIFICATION_LEVEL, certificationLevel);
+    			}
     		}
 
     		try {
@@ -632,7 +644,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 		 newConfig.setCryptoOperation(config.getCryptoOperation());
 		 newConfig.setDigestAlgorithm(config.getDigestAlgorithm());
 		 final Properties extraParams = newConfig.getExtraParams() != null ? (Properties) newConfig.getExtraParams().clone() : new Properties();
+
 		 extraParams.put(XAdESExtraParams.CONFIRM_DIFFERENT_PROFILE, Boolean.TRUE);
+
 		 newConfig.setExtraParams(extraParams);
 	 }
 
@@ -718,6 +732,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 				return SimpleAfirmaMessages.getString("SignPanel.151"); //$NON-NLS-1$
 			case OVERLAPPING_SIGNATURE:
 				return SimpleAfirmaMessages.getString("SignPanel.152"); //$NON-NLS-1$
+			case CERTIFIED_SIGN_REVISION:
+				return errorMsg + ": " + SimpleAfirmaMessages.getString("SignPanel.159"); //$NON-NLS-1$ //$NON-NLS-2$
 			default:
 				return errorMsg;
 		}

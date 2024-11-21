@@ -10,8 +10,6 @@
 package es.gob.afirma.triphase.server;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -264,7 +262,7 @@ public final class SignatureService extends HttpServlet {
 			if (subOperation == null || !PARAM_VALUE_SUB_OPERATION_SIGN.equalsIgnoreCase(subOperation)
 					&& !PARAM_VALUE_SUB_OPERATION_COSIGN.equalsIgnoreCase(subOperation)
 					&& !PARAM_VALUE_SUB_OPERATION_COUNTERSIGN.equalsIgnoreCase(subOperation)) {
-				out.print(ErrorManager.getErrorMessage(13));
+				out.print(ErrorManager.getErrorMessage(ErrorManager.INVALID_SUBOPERATION));
 				out.flush();
 				return;
 			}

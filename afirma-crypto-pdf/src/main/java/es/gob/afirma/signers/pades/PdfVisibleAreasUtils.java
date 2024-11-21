@@ -52,6 +52,10 @@ final class PdfVisibleAreasUtils {
 	static final String LAYERTEXT_TAG_DATE_PREFIX = LAYERTEXT_TAG_DELIMITER + "SIGNDATE"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_DATE_DELIMITER = "="; //$NON-NLS-1$
 	static final String LAYERTEXT_TAG_SUBJECTCN = "$$SUBJECTCN$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_PSEUDONYM = "$$PSEUDONYM$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_OU = "$$OU$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_OUS = "$$OUS$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_TITLE = "$$TITLE$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_SUBJECTDN = "$$SUBJECTDN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_ISSUERCN = "$$ISSUERCN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_CERTSERIAL = "$$CERTSERIAL$$"; //$NON-NLS-1$
@@ -257,6 +261,7 @@ final class PdfVisibleAreasUtils {
 
 			final PdfTextMask mask = prepareMask(obfuscate, maskConfig);
 			String cn = AOUtil.getCN(cert);
+			
 			if (cn != null && mask != null) {
 				cn = obfuscate(cn, mask);
 			}
@@ -266,9 +271,31 @@ final class PdfVisibleAreasUtils {
 
 			// Se mapea el principal del subject del certificado
 			String subjectPrincipal = cert.getSubjectX500Principal().toString();
+			
+			final String pseudonym = AOUtil.getRDNvalueFromLdapName("OID.2.5.4.65", subjectPrincipal); //$NON-NLS-1$
+			if (pseudonym != null) {
+				ret = ret.replace(LAYERTEXT_TAG_PSEUDONYM, pseudonym);
+			}
+			
+			final String [] ous = AOUtil.getOUS(subjectPrincipal);
+			if (ous.length > 0) {
+				ret = ret.replace(LAYERTEXT_TAG_OU, ous[0]);
+				String ousResult = ous[0];
+				for (int i = 1 ; i < ous.length ; i++) {
+					ousResult += ", " + ous[i]; //$NON-NLS-1$
+				}
+				ret = ret.replace(LAYERTEXT_TAG_OUS, ousResult);
+			}
+			
+			final String title = AOUtil.getRDNvalueFromLdapName("t", subjectPrincipal); //$NON-NLS-1$
+			if (title != null) {
+				ret = ret.replace(LAYERTEXT_TAG_TITLE, title);
+			}
+			
 			if (subjectPrincipal != null && mask != null) {
 				subjectPrincipal = obfuscate(subjectPrincipal, mask);
-			}
+			}	
+			
 			ret = ret.replace(LAYERTEXT_TAG_SUBJECTDN, subjectPrincipal);
 
 			// Se mapea el nombre declarado en el subject del certificado

@@ -42,25 +42,36 @@ public final class RetrieveService extends HttpServlet {
 	private static final String PARAMETER_NAME_SYNTAX_VERSION = "v"; //$NON-NLS-1$
 
 	private static final String OPERATION_RETRIEVE = "get"; //$NON-NLS-1$
+	private static final String OPERATION_CHECK = "check"; //$NON-NLS-1$
+	private static final String SUCCESS = "OK"; //$NON-NLS-1$
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
-		LOGGER.info(" == INICIO RECUPERACION"); //$NON-NLS-1$
-
-		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
-		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
 		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
 		response.setContentType("text/plain"); //$NON-NLS-1$
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
 		final PrintWriter out = response.getWriter();
+
+		final String operation = request.getParameter(PARAMETER_NAME_OPERATION);
 		if (operation == null) {
 			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_OPERATION_NAME));
 			out.flush();
 			return;
 		}
+
+		// Si solo se queria identificar la operatividad del servicio, respondemos directamente
+		if (OPERATION_CHECK.equals(operation)) {
+			out.println(SUCCESS);
+			out.flush();
+			return;
+		}
+
+		LOGGER.info(" == INICIO RECUPERACION"); //$NON-NLS-1$
+
+		final String syntaxVersion = request.getParameter(PARAMETER_NAME_SYNTAX_VERSION);
 		if (syntaxVersion == null) {
 			LOGGER.warning(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));
 			out.println(ErrorManager.genError(ErrorManager.ERROR_MISSING_SYNTAX_VERSION));

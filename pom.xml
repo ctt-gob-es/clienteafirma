@@ -51,8 +51,9 @@
 	
 	<properties>
 		<clienteafirma.version>1.9-SNAPSHOT</clienteafirma.version>
+		<triphase.service.version>2.8.0</triphase.service.version>
 		<jmulticard.version>1.9</jmulticard.version>
-		<afirma.lib.itext.version>1.0.6</afirma.lib.itext.version>
+		<afirma.lib.itext.version>1.6</afirma.lib.itext.version>
 		<spongycastle.version>1.58.0.0</spongycastle.version>
 		<afirma.legible.version>1_8_0</afirma.legible.version>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>

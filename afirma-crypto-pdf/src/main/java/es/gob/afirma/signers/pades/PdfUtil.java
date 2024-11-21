@@ -197,16 +197,24 @@ public final class PdfUtil {
 	 */
 	static void checkPdfCertification(final int pdfCertificationLevel, final Properties extraParams) throws PdfIsCertifiedException, AOException {
 
-		// Si el PDF esta certificado, se comprobara si se ha indicado expresamente que se permite
-		// multifirmar este tipo de documentos. Si no se permite, se lanza una excepcion
-		if (pdfCertificationLevel != PdfSignatureAppearance.NOT_CERTIFIED) {
-			final String allow = extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS);
-			if (allow == null || allow.trim().isEmpty()) {
+		// Si se ha configurado que se firme en cualquier caso, no hacemos mas comprobaciones
+		final String forceSignature = extraParams.getProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS);
+		if (forceSignature != null && Boolean.parseBoolean(forceSignature)) {
+			return;
+		}
+
+		// Identificamos si el PDF permite firmas
+		final boolean signAllowed = pdfCertificationLevel != PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED;
+
+		// Si no se permiten firmas y no se establecio ningun comportamiento, usamos una excepcion
+		// que permita a la aplicacion identificar el problema y dar la opcion de firmar la firma
+		// (PdfIsCertifiedException). Si no se permiten y se establecio un comportamiento (que ya
+		// sabemos que no fue forzar las firmas), lanzamos un error definitivo (AOException).
+		if (!signAllowed) {
+			if (forceSignature == null) {
 				throw new PdfIsCertifiedException("El PDF esta certificado"); //$NON-NLS-1$
 			}
-			if (!Boolean.parseBoolean(allow)) {
-				throw new AOException("El PDF esta certificado y se configuro que no se admitia su firma"); //$NON-NLS-1$
-			}
+			throw new AOException("El PDF esta certificado y se configuro que no se admitia su firma"); //$NON-NLS-1$
 		}
 	}
 

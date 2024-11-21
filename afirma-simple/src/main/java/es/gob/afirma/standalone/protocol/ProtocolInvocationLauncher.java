@@ -609,6 +609,7 @@ public final class ProtocolInvocationLauncher {
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
                 // espera activa si se encontraba vigente
                 if (!bySocket) {
+                	LOGGER.info("Enviamos el resultado de la operacion de firma y guardado al servidor intermedio"); //$NON-NLS-1$
                 	sendDataToServer(dataToSend.toString(), params.getStorageServletUrl().toString(), params.getId());
                 }
 
@@ -717,6 +718,7 @@ public final class ProtocolInvocationLauncher {
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
                 // espera activa si se encontraba vigente
                 if (!bySocket) {
+                	LOGGER.info("Enviamos el resultado de la operacion de firma al servidor intermedio"); //$NON-NLS-1$
                 	sendDataToServer(dataToSend.toString(), params.getStorageServletUrl().toString(), params.getId());
                 }
 
@@ -917,11 +919,13 @@ public final class ProtocolInvocationLauncher {
 	 * @param id         Identificador del mensaje en el servidor.
 	 */
 	private static void sendDataToServer(final String data, final String serviceUrl, final String id) {
+		// Detenemos la espera activa
+		final Thread waitingThread = getActiveWaitingThread();
+		if (waitingThread != null) {
+			waitingThread.interrupt();
+		}
+		// Esperamos a que termine cualquier otro envio al servidor para que no se pisen
 		synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
-			final Thread waitingThread = getActiveWaitingThread();
-			if (waitingThread != null) {
-				waitingThread.interrupt();
-			}
 			try {
 				IntermediateServerUtil.sendData(data, serviceUrl, id);
 			} catch (final IOException e) {

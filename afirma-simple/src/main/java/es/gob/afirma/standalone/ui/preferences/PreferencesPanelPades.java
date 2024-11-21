@@ -9,7 +9,9 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_CHECK_ALLOW_CERTIFIED_PDF;
 import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_CHECK_SHADOW_ATTACK;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_DEFAULT_CERTIFICATION_LEVEL;
 import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_FORMAT;
 import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_OBFUSCATE_CERT_INFO;
 import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_PADES_POLICY_HASH;
@@ -59,6 +61,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.ui.preferences.PreferencesPanel.ValueTextPair;
@@ -100,9 +103,8 @@ final class PreferencesPanelPades extends JScrollPane {
 	private boolean blocked = true;
 
 	private final JComboBox<Object> padesBasicFormat = new JComboBox<>();
-	JComboBox<Object> getBasicPadesFormat() {
-		return this.padesBasicFormat;
-	}
+
+	private final JComboBox<Object> pdfSignCertified = new JComboBox<>();
 
 	private final JTextField padesSignReason = new JTextField();
 
@@ -114,9 +116,15 @@ final class PreferencesPanelPades extends JScrollPane {
 	private final JCheckBox obfuscateCertificateInfo = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.175")); //$NON-NLS-1$
 	private final JCheckBox visiblePdfStamp = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.172")); //$NON-NLS-1$
 	private final JCheckBox checkShadowAttack = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.187")); //$NON-NLS-1$
+	private final JCheckBox checkAllowCertifiedPdf = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.204")); //$NON-NLS-1$
 
 	private static final String PADES_FORMAT_BASIC_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.71"); //$NON-NLS-1$
 	private static final String PADES_FORMAT_BES_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.72"); //$NON-NLS-1$
+
+	private static final String PDF_CERT_TYPE_0_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.206"); //$NON-NLS-1$
+	private static final String PDF_CERT_TYPE_1_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.207"); //$NON-NLS-1$
+	private static final String PDF_CERT_TYPE_2_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.208"); //$NON-NLS-1$
+	private static final String PDF_CERT_TYPE_3_TEXT = SimpleAfirmaMessages.getString("PreferencesPanel.209"); //$NON-NLS-1$
 
 	private static final String SIGN_FORMAT_PADES = "PAdES"; //$NON-NLS-1$
 
@@ -144,6 +152,14 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.padesBasicFormat.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.70") //$NON-NLS-1$
 		);
+
+		this.pdfSignCertified.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.183") //$NON-NLS-1$
+		);
+		this.pdfSignCertified.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.204") //$NON-NLS-1$
+		);
+
 		final DefaultComboBoxModel<Object> padesFormatModel = new DefaultComboBoxModel<>(
 			new Object[] {
 				new ValueTextPair(AOSignConstants.PADES_SUBFILTER_BES, PADES_FORMAT_BES_TEXT),
@@ -151,10 +167,24 @@ final class PreferencesPanelPades extends JScrollPane {
 			}
 		);
 
+		final DefaultComboBoxModel<Object> pdfCertifiedFormatModel = new DefaultComboBoxModel<>(
+			new Object[] {
+				new ValueTextPair(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_0, PDF_CERT_TYPE_0_TEXT),
+				new ValueTextPair(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_1, PDF_CERT_TYPE_1_TEXT),
+				new ValueTextPair(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_2, PDF_CERT_TYPE_2_TEXT),
+				new ValueTextPair(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_3, PDF_CERT_TYPE_3_TEXT)
+			}
+		);
+
 		this.padesBasicFormat.setModel(padesFormatModel);
 		this.padesBasicFormat.addItemListener(modificationListener);
 		this.padesBasicFormat.addKeyListener(keyListener);
 		this.padesBasicFormat.setEnabled(!isBlocked());
+
+		this.pdfSignCertified.setModel(pdfCertifiedFormatModel);
+		this.pdfSignCertified.addItemListener(modificationListener);
+		this.pdfSignCertified.addKeyListener(keyListener);
+		this.pdfSignCertified.setEnabled(isBlocked());
 
 		this.visiblePdfSignature.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
@@ -199,6 +229,22 @@ final class PreferencesPanelPades extends JScrollPane {
 		});
 		this.checkShadowAttack.addItemListener(modificationListener);
     	this.checkShadowAttack.addKeyListener(keyListener);
+
+    	this.checkAllowCertifiedPdf.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("PreferencesPanel.204") //$NON-NLS-1$
+		);
+		this.checkAllowCertifiedPdf.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("PreferencesPanel.205") //$NON-NLS-1$
+		);
+		this.checkAllowCertifiedPdf.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final JCheckBox checkPSACheckBox = (JCheckBox) e.getSource();
+               	PreferencesPanelPades.this.pdfSignCertified.setEnabled(checkPSACheckBox.isSelected());
+			}
+		});
+		this.checkAllowCertifiedPdf.addItemListener(modificationListener);
+    	this.checkAllowCertifiedPdf.addKeyListener(keyListener);
 
 		// Una vez creados todos los componentes, cargamos la configuracion
 		loadPreferences();
@@ -396,6 +442,11 @@ final class PreferencesPanelPades extends JScrollPane {
 		);
 		fileFormatLabel.setLabelFor(this.padesBasicFormat);
 
+		final JLabel certifiedFormatLabel = new JLabel(
+				SimpleAfirmaMessages.getString("PreferencesPanel.203") //$NON-NLS-1$
+		);
+		certifiedFormatLabel.setLabelFor(this.pdfSignCertified);
+
 		// Colocamos los elementos
 		final GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.LINE_START;
@@ -415,6 +466,15 @@ final class PreferencesPanelPades extends JScrollPane {
 		innerPanel.add(this.visiblePdfStamp, c);
 		c.gridy++;
 		innerPanel.add(this.checkShadowAttack, c);
+		c.gridy++;
+		final JPanel certifiedOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		certifiedOptionsPanel.add(this.checkAllowCertifiedPdf);
+		certifiedOptionsPanel.add(certifiedFormatLabel);
+		certifiedOptionsPanel.add(this.pdfSignCertified);
+		c.insets = new Insets(-5, 2, 0, 0);
+		c.gridx = 0;
+		innerPanel.add(certifiedOptionsPanel,c);
+
 
 		final JPanel signatureOptionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		signatureOptionsPanel.add(innerPanel);
@@ -444,6 +504,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		PreferencesManager.put(PREFERENCE_PADES_OBFUSCATE_CERT_INFO, Boolean.toString(this.obfuscateCertificateInfo.isSelected()));
 		PreferencesManager.put(PREFERENCE_PADES_STAMP, Boolean.toString(this.visiblePdfStamp.isSelected()));
 		PreferencesManager.put(PREFERENCE_PADES_CHECK_SHADOW_ATTACK, Boolean.toString(this.checkShadowAttack.isSelected()));
+		PreferencesManager.put(PREFERENCE_PADES_CHECK_ALLOW_CERTIFIED_PDF, Boolean.toString(this.checkAllowCertifiedPdf.isSelected()));
 
 		PreferencesManager.put(PREFERENCE_PADES_SIGNER_CONTACT, this.padesSignerContact.getText());
 		PreferencesManager.put(PREFERENCE_PADES_SIGN_PRODUCTION_CITY, this.padesSignProductionCity.getText());
@@ -452,6 +513,10 @@ final class PreferencesPanelPades extends JScrollPane {
 		final ComboBoxModel<Object> m = this.padesBasicFormat.getModel();
 		final Object o = m.getElementAt(this.padesBasicFormat.getSelectedIndex());
 		PreferencesManager.put(PREFERENCE_PADES_FORMAT, ((ValueTextPair) o).getValue());
+
+		final ComboBoxModel<Object> mdl = this.pdfSignCertified.getModel();
+		final Object obj = mdl.getElementAt(this.pdfSignCertified.getSelectedIndex());
+		PreferencesManager.put(PreferencesManager.PREFERENCE_PADES_DEFAULT_CERTIFICATION_LEVEL, ((ValueTextPair) obj).getValue());
 
 		final AdESPolicy padesPolicy = this.padesPolicyDlg.getSelectedPolicy();
 		if (padesPolicy != null) {
@@ -482,6 +547,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.obfuscateCertificateInfo.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_OBFUSCATE_CERT_INFO));
 		this.visiblePdfStamp.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_STAMP));
 		this.checkShadowAttack.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_SHADOW_ATTACK));
+		this.checkAllowCertifiedPdf.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_ALLOW_CERTIFIED_PDF));
 
         final ComboBoxModel<Object> padesFormatModel = this.padesBasicFormat.getModel();
         final String selectedValue = PreferencesManager.get(PREFERENCE_PADES_FORMAT);
@@ -492,6 +558,23 @@ final class PreferencesPanelPades extends JScrollPane {
 			}
 		}
 
+		if (this.checkAllowCertifiedPdf.isSelected()) {
+			this.pdfSignCertified.setEnabled(true);
+	        final ComboBoxModel<Object> pdfSignCertifiedModel = this.pdfSignCertified.getModel();
+	        final String selectedCertificationLevel = PreferencesManager.get(PREFERENCE_PADES_DEFAULT_CERTIFICATION_LEVEL);
+			for (int i = 0; i < pdfSignCertifiedModel.getSize(); i++) {
+				if (pdfSignCertifiedModel.getElementAt(i).equals(selectedCertificationLevel)) {
+					this.pdfSignCertified.setSelectedIndex(i);
+					break;
+				}
+			}
+		}
+
+
+    	if (this.pdfSignCertified.getSelectedIndex() == -1 && this.pdfSignCertified.getItemCount() > 0) {
+    		this.pdfSignCertified.setSelectedIndex(0);
+    	}
+
 		final List<PolicyItem> padesPolicies = new ArrayList<>();
         padesPolicies.add(
     		new PolicyItem(
@@ -499,7 +582,7 @@ final class PreferencesPanelPades extends JScrollPane {
         		POLICY_PADES_AGE_1_9
     		)
 		);
-//        this.panelPolicies.removeAll();
+
         this.padesPolicyDlg = new PolicyPanel(
     		SIGN_FORMAT_PADES,
     		padesPolicies,
@@ -507,11 +590,6 @@ final class PreferencesPanelPades extends JScrollPane {
     		isBlocked()
 		);
 
-//        final GridBagConstraints c = new GridBagConstraints();
-//        c.fill = GridBagConstraints.BOTH;
-//        c.weightx = 1.0;
-//        c.gridy = 0;
-//        this.panelPolicies.add(this.padesPolicyDlg, c);
         revalidate();
         repaint();
 	}
@@ -550,9 +628,9 @@ final class PreferencesPanelPades extends JScrollPane {
         		}
         	}
 
-            if (this.padesBasicFormat.getItemCount() > 0) {
-    			this.padesBasicFormat.setSelectedIndex(0);
-    		}
+        	if (this.padesBasicFormat.getSelectedIndex() == -1 && this.padesBasicFormat.getItemCount() > 0) {
+        		this.padesBasicFormat.setSelectedIndex(0);
+        	}
 
     		PreferencesManager.remove(PREFERENCE_PADES_POLICY_IDENTIFIER);
     		PreferencesManager.remove(PREFERENCE_PADES_POLICY_HASH);
@@ -575,7 +653,30 @@ final class PreferencesPanelPades extends JScrollPane {
         			);
 
         	this.currentPolicyValue.setText(this.padesPolicyDlg.getSelectedPolicyName());
+
+        	PreferencesManager.remove(PREFERENCE_PADES_CHECK_SHADOW_ATTACK);
         	this.checkShadowAttack.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_SHADOW_ATTACK));
+
+
+    		PreferencesManager.remove(PREFERENCE_PADES_CHECK_ALLOW_CERTIFIED_PDF);
+    		PreferencesManager.remove(PREFERENCE_PADES_DEFAULT_CERTIFICATION_LEVEL);
+
+    		this.checkAllowCertifiedPdf.setSelected(PreferencesManager.getBoolean(PREFERENCE_PADES_CHECK_ALLOW_CERTIFIED_PDF));
+        	this.pdfSignCertified.setEnabled(this.checkAllowCertifiedPdf.isSelected());
+
+        	final String certificationLevel = PreferencesManager.get(PREFERENCE_PADES_DEFAULT_CERTIFICATION_LEVEL);
+        	final ComboBoxModel<Object> pdfSignCertifiedModel = this.pdfSignCertified.getModel();
+        	for (int i = 0; i < pdfSignCertifiedModel.getSize(); i++) {
+        		if (pdfSignCertifiedModel.getElementAt(i).equals(certificationLevel)) {
+        			this.pdfSignCertified.setSelectedIndex(i);
+        			break;
+        		}
+        	}
+
+        	if (this.pdfSignCertified.getSelectedIndex() == -1 && this.pdfSignCertified.getItemCount() > 0) {
+        		this.pdfSignCertified.setSelectedIndex(0);
+        	}
+
         }
 
         revalidate();
