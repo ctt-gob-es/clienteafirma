@@ -37,7 +37,6 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.AutoFirmaUtil;
@@ -332,21 +331,34 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 
 
-	/** Restaura la configuraci&oacute;n de los certificados SSL para la comunicaci&oacute;n
+	/**
+	 * Restaura la configuraci&oacute;n de los certificados SSL para la comunicaci&oacute;n
 	 * por <i>sockets</i> en el llavero del sistema.
 	 * @param appDir Directorio en donde se crearan los ficheros necesarios para
 	 *                   llevar a cabo la restauraci&oacute;n.
 	 * @param certFiles Referencias a los certificados SSL para la importaci&oacute;n.
 	 * @param configPanel Panel de configuraci&oacute;n sobre el que se ir&aacute;n
-	 *                    imprimiendo los mensajes con el estado de la operaci&oacute;n. */
+	 *                    imprimiendo los mensajes con el estado de la operaci&oacute;n.
+	 */
 	private static void restoreSslCertificatesInKeyChain(final File appDir, final CertFilesInfo certFiles, final RestoreConfigPanel configPanel) {
 
 		// Obtenemos del usuario y probamos la contrasena del Llavero
-		final byte[] keyChainPhrase = getKeyChainPhrase(configPanel);
+		byte[] keyChainPhrase = getKeyChainPhrase(configPanel, false);
 
 		// Desinstalamos del llavero los certificados anteriores
 		LOGGER.info("Desinstalacion de versiones anteriores del certificado raiz del Llavero del sistema"); //$NON-NLS-1$
-		uninstallRootCAMacOSXKeyStore(keyChainPhrase);
+
+		boolean passwordValidated;
+		do {
+			passwordValidated = true;
+			try {
+				uninstallRootCAMacOSXKeyStore(keyChainPhrase);
+			}
+			catch (final InvalidPasswordException e) {
+				keyChainPhrase = getKeyChainPhrase(configPanel, true);
+				passwordValidated = false;
+			}
+		} while (!passwordValidated);
 
 		// Se instalan los certificados en el llavero del sistema operativo
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.6")); //$NON-NLS-1$
@@ -370,9 +382,10 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	/**
 	 * Obtiene la contrase&ntilde;a del llavero y lo desbloquea para comprobarla.
 	 * @param console Consola en la que mostrar los mensajes al usuario.
+	 * @param force Indica si se debe forzar que se introduzca una contrase&ntilde;a.
 	 * @return Contrase&ntilde;a del llavero.
 	 */
-	private static byte[] getKeyChainPhrase(final RestoreConfigPanel console) {
+	private static byte[] getKeyChainPhrase(final RestoreConfigPanel console, final boolean force) {
 
 		byte[] phrase = null;
 		boolean passwordError = false;
@@ -380,7 +393,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		do {
 
 			// La contrasena solo hace falta si no estamos ya en modo administrador, asi que la primera vez probaremos con una generica
-			if (phrase == null) {
+			if (!force && phrase == null) {
 				phrase = DUMMY;
 			}
 			else {
@@ -447,8 +460,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static void unlockAppleKeyChain(final byte[] phrase)
 			throws SecurityException, IOException, InterruptedException {
 		final List<String> params = new ArrayList<>();
-		params.add("sudo"); //$NON-NLS-1$
-		params.add("-S"); //$NON-NLS-1$
 		params.add("security"); //$NON-NLS-1$
 		params.add("unlock-keychain"); //$NON-NLS-1$
 		params.add("-p"); //$NON-NLS-1$
@@ -456,12 +467,6 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		final ProcessBuilder builder = new ProcessBuilder(params);
 		final Process process = builder.start();
-
-		// Se proporciona la contrasena de administrador
-		try (OutputStream os = process.getOutputStream()) {
-			os.write(phrase);
-			os.flush();
-		}
 
 		final int exitValue = process.waitFor();
 		if (exitValue != 0) {
@@ -671,14 +676,18 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	/**
 	 * Desinstala del Llavero de macOS los certificados de confianza de la aplicaci&oacute;n.
 	 * @param keyChainPhrase Contrase&ntilde;a del Llavero.
+	 * @throws InvalidPasswordException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
 	 */
-	private static void uninstallRootCAMacOSXKeyStore(final byte[] keyChainPhrase) {
+	private static void uninstallRootCAMacOSXKeyStore(final byte[] keyChainPhrase) throws InvalidPasswordException {
 
 		LOGGER.info("Desinstalamos los anteriores certificados del almacen"); //$NON-NLS-1$
 
 		// Eliminamos el certificados SSL
 		try {
 			uninstallTrustedCertFromAppleKeyChain(CERT_CN, keyChainPhrase);
+		}
+		catch (final InvalidPasswordException e) {
+			throw e;
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se pudo eliminar el anterior certificado " +  CERT_CN + " del Llavero", e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -687,6 +696,9 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		// Eliminamos el certificado raiz
 		try {
 			uninstallTrustedCertFromAppleKeyChain(CERT_CN_ROOT, keyChainPhrase);
+		}
+		catch (final InvalidPasswordException e) {
+			throw e;
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se pudo eliminar el anterior certificado " +  CERT_CN_ROOT + " del Llavero", e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -700,10 +712,11 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	 * @throws IOException Cuando ocurre un error al leer el fichero
 	 * @throws InterruptedException Si se interrumpe el proceso de instalaci&oacute;n.
 	 * @throws KeyChainException Cuando ocurra un error al insertar el certificado en el almac&eacute;n.
-	 * @throws SecurityException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
+	 * @throws SecurityException Cuando no se pueda identificar el resultado de la operaci&oacute;n.
+	 * @throws InvalidPasswordException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
 	 */
 	private static void uninstallTrustedCertFromAppleKeyChain(final String commonName, final byte[] phrase)
-			throws IOException, InterruptedException, KeyChainException, SecurityException {
+			throws IOException, InterruptedException, KeyChainException, SecurityException, InvalidPasswordException {
 
 		// El comando para la eliminacion de certificados exige que se identifique univocamente
 		// el certificado a eliminar. Como puede que haya mas de un certificado con el mismo CN,
@@ -773,14 +786,21 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 				}
 				if (errorOutput != null) {
 					String errorMsg = new String(errorOutput);
-					// El texto de solicitud de contrasena inicial puede haberse agregado a la salida de error,
-					// asi que lo omitimos
-					if (errorMsg.startsWith("Password:")) { //$NON-NLS-1$
-						errorMsg = errorMsg.substring("Password:".length()); //$NON-NLS-1$
+
+					// No se encontraron mas instanceias del certificado en el almacen
+					if (errorMsg.contains("SecKeychainSearchCopyNext")) { //$NON-NLS-1$
+						certFound = false;
 					}
-					LOGGER.severe("Salida de error: " + errorMsg); //$NON-NLS-1$
-					if (errorMsg.toLowerCase().contains("password")) { //$NON-NLS-1$
-						throw new SecurityException("Contrasena incorrecta"); //$NON-NLS-1$
+					else {
+						// El texto de solicitud de contrasena inicial puede haberse agregado a la salida de error,
+						// asi que lo omitimos
+						if (errorMsg.startsWith("Password:")) { //$NON-NLS-1$
+							errorMsg = errorMsg.substring("Password:".length()); //$NON-NLS-1$
+						}
+						if (errorMsg.toLowerCase().contains("password")) { //$NON-NLS-1$
+							throw new InvalidPasswordException();
+						}
+						LOGGER.severe("Salida de error: " + errorMsg); //$NON-NLS-1$
 					}
 				}
 			}
@@ -919,7 +939,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 			return checkProcess("Firefox.app", "FirefoxNightly.app", "FirefoxDeveloperEdition.app"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		catch (final IOException e) {
-			LOGGER.warning("No se pudo completar la deteccion del proceso de Chrome. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pudo completar la deteccion del proceso de Firefox. Se considerara que no esta en ejecucion: " + e); //$NON-NLS-1$
 		}
 		return false;
 	}
@@ -932,11 +952,8 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		try (
 				final InputStream resIs = ps.getInputStream();
-				final BufferedReader resReader = new BoundedBufferedReader(
-						new InputStreamReader(resIs),
-						256, // Maximo 256 lineas de salida
-						1024 // Maximo 1024 caracteres por linea
-						);
+				final BufferedReader resReader = new BufferedReader(
+						new InputStreamReader(resIs));
 				) {
 			String line;
 			while ((line = resReader.readLine()) != null) {
@@ -974,4 +991,12 @@ final class RestoreConfigMacOSX implements RestoreConfig {
         }
         return destinationPath + resourceName;
     }
+
+	static class InvalidPasswordException extends SecurityException {
+
+		/** Serial Id. */
+		private static final long serialVersionUID = -8210913902255499160L;
+
+		// Unicamente usaremos el constructor por defecto
+	}
 }

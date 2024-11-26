@@ -242,6 +242,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	/**
 	 * Obtiene la contrase&ntilde;a del llavero y lo desbloquea para comprobarla.
 	 * @param console Consola en la que mostrar los mensajes al usuario.
+	 * @param force Indica si se debe forzar que se introduzca una contrase&ntilde;a.
 	 * @return Contrase&ntilde;a del llavero.
 	 */
 	private static byte[] getKeyChainPhrase(final Console console, final boolean force) {
@@ -325,7 +326,6 @@ final class ConfiguratorMacOSX implements Configurator {
 		params.add("-p"); //$NON-NLS-1$
 		params.add(new String(phrase, StandardCharsets.UTF_8));
 
-
 		final ProcessBuilder builder = new ProcessBuilder(params);
 		final Process process = builder.start();
 
@@ -353,7 +353,6 @@ final class ConfiguratorMacOSX implements Configurator {
 				throw new IOException("Error al desbloquear el llavero"); //$NON-NLS-1$
 			}
 		}
-
 	}
 
 	/**
@@ -534,6 +533,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * Ejecuta el proceso de desinstalaci&oacute;n. Durante el mismo se desinstalan los certificados
 	 * de confianza SSL de los almacenes del sistema.
 	 * @param appDir Directorio de instalaci&oacute;n.
+	 * @throws InvalidPasswordException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
 	 */
 	private static void uninstallProcess(final File appDir, final byte[] keyChainPhrase) throws InvalidPasswordException {
 
@@ -566,6 +566,7 @@ final class ConfiguratorMacOSX implements Configurator {
 	/**
 	 * Desinstala del Llavero de macOS los certificados de confianza de la aplicaci&oacute;n.
 	 * @param keyChainPhrase Contrase&ntilde;a del Llavero.
+	 * @throws InvalidPasswordException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
 	 */
 	private static void uninstallRootCAMacOSXKeyStore(final byte[] keyChainPhrase) throws InvalidPasswordException {
 
@@ -601,7 +602,8 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @throws IOException Cuando ocurre un error al leer el fichero
 	 * @throws InterruptedException Si se interrumpe el proceso de instalaci&oacute;n.
 	 * @throws KeyChainException Cuando ocurra un error al insertar el certificado en el almac&eacute;n.
-	 * @throws SecurityException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
+	 * @throws SecurityException Cuando no se pueda identificar el resultado de la operaci&oacute;n.
+	 * @throws InvalidPasswordException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
 	 */
 	private static void uninstallTrustedCertFromAppleKeyChain(final String commonName, final byte[] phrase)
 			throws IOException, InterruptedException, KeyChainException, SecurityException, InvalidPasswordException {
