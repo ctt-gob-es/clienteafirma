@@ -74,7 +74,7 @@ final class ConfiguratorFirefoxMac {
 			certutilFile = prepareCertUtil(appDir, scriptFile);
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo preparar CertUtil para la instalacion del certificado SSL en Mozilla Firefox. Se aborta la operacion: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo preparar CertUtil para la instalacion del certificado SSL en Mozilla Firefox. Se aborta la operacion", e); //$NON-NLS-1$
 			return;
 		}
 
