@@ -48,7 +48,7 @@ public class TestPAdES {
     private static final String[] TEST_FILES = { "TEST_PDF.pdf", "TEST_PDF_Signed.pdf", "pades_basic.pdf", "firma_CM.pdf" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     //private static final String TEST_FILE_CTF = "TEST_PDF_Certified.pdf"; //$NON-NLS-1$
-    private static final String TEST_FILE_CTF2 = "pruebafirma_certificado.pdf"; //$NON-NLS-1$
+    private static final String TEST_FILE_CTF2 = "PDF_certificado_tipo_1.pdf"; //$NON-NLS-1$
 
     private static final String TEST_FILE_PDFA1B = "PDF-A1B.pdf"; //$NON-NLS-1$
 
