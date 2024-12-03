@@ -43,12 +43,15 @@ public class ActiveWaitingThread extends Thread {
 					LOGGER.warning("No se ha podido esperar para el envio de la senal de espera activa para el JavaScript: " + e); //$NON-NLS-1$
 				}
 			}
-			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
-				if (!this.cancelled) {
-					try {
-						IntermediateServerUtil.sendData(WAIT_CONSTANT, this.storageServiceUrl, this.transactionId);
-					} catch (final IOException e) {
-						LOGGER.warning("No se ha podido enviar la peticion de espera: " + e); //$NON-NLS-1$
+
+			if (!this.cancelled) {
+				synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
+					if (!this.cancelled) {
+						try {
+							IntermediateServerUtil.sendData(WAIT_CONSTANT, this.storageServiceUrl, this.transactionId);
+						} catch (final IOException e) {
+							LOGGER.warning("No se ha podido enviar la peticion de espera: " + e); //$NON-NLS-1$
+						}
 					}
 				}
 			}
