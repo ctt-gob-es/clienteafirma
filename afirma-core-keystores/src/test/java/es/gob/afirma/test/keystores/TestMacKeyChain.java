@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -34,6 +35,7 @@ public class TestMacKeyChain {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore // Requieren contrasena del almacen
     public void testStandaloneKeyChain() throws Exception {
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             return;
@@ -63,22 +65,15 @@ public class TestMacKeyChain {
         Assert.assertNotNull(ksm);
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);
+        Assert.assertTrue(aliases.length > 0);
 
-        final PrivateKeyEntry pke = ksm.getKeyEntry(
-    		"anf usuario activo" //$NON-NLS-1$
-		);
+        final PrivateKeyEntry pke = ksm.getKeyEntry(aliases[0]);
         Assert.assertNotNull(pke);
 
         final X509Certificate cert = (X509Certificate) pke.getCertificate();
         Assert.assertNotNull(cert);
 
-        Assert.assertEquals(
-            "C=ES, OU=Clase 2 persona fisica, EMAILADDRESS=test@prueba.com, SERIALNUMBER=12345678Z, SURNAME=Usuario Activo, GIVENNAME=ANF, CN=ANF Usuario Activo",  //$NON-NLS-1$
-            cert.getSubjectX500Principal().toString()
-        );
-
         Assert.assertNotNull(pke.getPrivateKey());
-        System.out.println(pke.getPrivateKey());
 
     }
 
@@ -87,6 +82,7 @@ public class TestMacKeyChain {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
+	@Ignore // Requieren contrasena del almacen
     public void testSystemKeyChain() throws Exception {
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             return;
@@ -97,8 +93,9 @@ public class TestMacKeyChain {
         Assert.assertNotNull(ksm);
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);
+        Assert.assertTrue(aliases.length > 0);
 
-        final PrivateKeyEntry pke = ksm.getKeyEntry("anf usuario activo"); //$NON-NLS-1$
+        final PrivateKeyEntry pke = ksm.getKeyEntry(aliases[0]);
         Assert.assertNotNull(pke);
 
         final X509Certificate cert = (X509Certificate) pke.getCertificate();
