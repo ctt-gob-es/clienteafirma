@@ -100,7 +100,7 @@ public class TriPhaseHelper {
 	 * al PKCS#1. Despu&eacute;s, comprueba que con la clave privada de ese certificado se generase
 	 * ese PKCS#1.
 	 * @param triphaseData Informaci&oacute;n de la firma.
-	 * @param docBytes
+	 * @param docBytes Documento firmado.
 	 * @param cert Certificado que se declara haber usado en la prefirma.
 	 * @param algorithm Algoritmo de hash de la firma.
 	 * @param needVerifyPkcs1 Indica si debe verificarse que el PKCS#1 recibido

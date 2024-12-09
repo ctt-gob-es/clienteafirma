@@ -13,7 +13,7 @@ public class ImageUtils {
 
 	/**
 	 * Normaliza la imagen para hacerla compatible con el PDF.
-	 * @param bi Imagen que se desea codificar.
+	 * @param image Imagen que se desea codificar.
 	 * @return Base 64 de la imagen JPEG.
 	 * @throws IOException Cuando ocurre un error en la codificaci&oacute;n o
 	 * transformaci&oacute;n de la imagen.

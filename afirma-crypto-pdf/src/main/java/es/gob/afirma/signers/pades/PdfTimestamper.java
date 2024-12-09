@@ -48,11 +48,11 @@ public final class PdfTimestamper {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
-    /** Sello a nivel de firma. Equivale a {@link TsaParams.TS_SIGN}. */
+    /** Sello a nivel de firma. No permite mas cambios. */
     public static final String TS_LEVEL_SIGN = "1"; //$NON-NLS-1$
-    /** Sello a nivel de firma. Equivale a {@link TsaParams.TS_DOC}. */
+    /** Sello a nivel de documento. Permite cambios de formulario. */
     public static final String TS_LEVEL_DOC = "2"; //$NON-NLS-1$
-    /** Sello a nivel de firma. Equivale a {@link TsaParams.TS_SIGN_DOC}. */
+    /** Sello a nivel de firma y a nivel de documento. Permite cambios de anotaciones y formularios. */
     public static final String TS_LEVEL_SIGN_DOC = "3"; //$NON-NLS-1$
 
     private static final int PDF_MAX_VERSION = 7;

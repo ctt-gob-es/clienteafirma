@@ -808,6 +808,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * permitir su acceso desde la barra de men&uacute;
 	 *
 	 * @param file Fichero a firmar, incluyendo su ruta completa
+	 * @param signConfig Configuraci&oacute;n de firma.
 	 */
     public void loadFileToSign(final File file, final SignOperationConfig signConfig) {
         if (this.currentPanel instanceof SignPanel) {
