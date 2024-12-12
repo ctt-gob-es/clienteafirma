@@ -123,13 +123,18 @@ public final class PdfSessionManager {
 			inPDF = XmpHelper.addSignHistoryToXmp(pdfBytes, signTime, extraParams);
 		}
 		catch (final BadPasswordException e) {
-			throw new PdfIsPasswordProtectedException("El PDF esta protegido por contrasena para lectura", e); //$NON-NLS-1$
+			// Devolvemos una excepcion u otra segun si se nos proporciono
+			// contrasena o no
+			if (extraParams.containsKey(PdfExtraParams.OWNER_PASSWORD_STRING) || extraParams.containsKey(PdfExtraParams.USER_PASSWORD_STRING)) {
+				throw new BadPdfPasswordException("La contrasena del PDF es incorrecta", e); //$NON-NLS-1$
+			}
+			throw new PdfIsPasswordProtectedException("El PDF esta protegido contra lectura", e); //$NON-NLS-1$
 		}
 		catch (final Exception e1) {
 			LOGGER.warning("No ha podido registrarse la firma en el historico XMP: " + e1); //$NON-NLS-1$
 			inPDF = pdfBytes;
 		}
-		
+
 		final PdfReader pdfReader = PdfUtil.getPdfReader(inPDF, extraParams,
 				Boolean.parseBoolean(extraParams.getProperty(PdfExtraParams.HEADLESS)));
 
