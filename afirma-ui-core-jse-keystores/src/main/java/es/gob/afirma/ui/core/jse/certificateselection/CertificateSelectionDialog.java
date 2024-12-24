@@ -285,18 +285,22 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		}
 	}
 
-	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = (o1, o2) -> {
-		if (o1 == null && o2 == null) {
-			return 0;
-		}
-		if (o1 == null) {
-			return 1;
-		}
-		else if (o2 == null) {
-			return -1;
-		}
-		else{
-			return o1.getName().compareToIgnoreCase(o2.getName());
+	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = new Comparator<NameCertificateBean>() {
+
+		@Override
+		public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
+			if (o1 == null && o2 == null) {
+				return 0;
+			}
+			if (o1 == null) {
+				return 1;
+			}
+			else if (o2 == null) {
+				return -1;
+			}
+			else{
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
 		}
 	};
 
