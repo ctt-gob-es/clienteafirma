@@ -50,7 +50,6 @@ public class PermissionsDialog extends JDialog implements KeyListener {
 		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
 		final Dimension preferedFrameSize = new Dimension(400, (int) Math.min(500, screenHeight * 0.8));
 		setSize(preferedFrameSize);
-		setResizable(false);
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 

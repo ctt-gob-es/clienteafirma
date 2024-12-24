@@ -67,11 +67,9 @@ final class ImportCertificatesDialog extends JDialog {
 
 		setTitle(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.6")); //$NON-NLS-1$
 		setIconImages(AutoFirmaUtil.getIconImages());
-		setResizable(false);
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLayout(new GridBagLayout());
-		//setMinimumSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;

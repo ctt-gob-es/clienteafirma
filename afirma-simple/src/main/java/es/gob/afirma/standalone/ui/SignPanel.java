@@ -170,7 +170,6 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
         this.lowerPanel = new LowerPanel(this);
         c.weighty = 1.0;
         c.gridy++;
-
         this.add(this.lowerPanel, c);
 
         // Panel adicional en el que se mostraran los botones de los plugins.
@@ -292,9 +291,18 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     			}
     		}
 
+    		// Si corresponde, se muestran los dialogos necesarios para que el usuario seleccione la
+    		// configuracion de firma visible PDF. Hacemos una copia de los datos para que, si se
+    		// cancela, no quede establecida esa configuracion
+
+    		final List<SignOperationConfig> configs = new ArrayList<>(this.signOperationConfigs.size());
+    		for (final SignOperationConfig config : this.signOperationConfigs) {
+    			configs.add(config.clone());
+    		}
+
     		try {
     			VisiblePdfSignatureManager.getVisibleSignatureParams(
-    					this.signOperationConfigs,
+    					configs,
     					this,
     					visibleSignature,
     					visibleStamp,
@@ -305,7 +313,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 			}
     		catch (final Exception e) {
     			LOGGER.log(Level.WARNING, "No se pudo crear la firma visible PDF, se creara una firma invisible", e); //$NON-NLS-1$
-    			initSignTask(this.signOperationConfigs);
+    			initSignTask(configs);
 			}
     	}
     	else {
@@ -1033,6 +1041,9 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        	this.filePanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 	        	this.filePanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	        }
+	        this.filePanel.getVerticalScrollBar().setUnitIncrement(16);
+        	this.filePanel.getHorizontalScrollBar().setUnitIncrement(16);
+
 	        //this.filePanel.setDropTarget(this.dropTarget);
 	        this.filePanel.getViewport().setDropTarget(this.dropTarget);
 

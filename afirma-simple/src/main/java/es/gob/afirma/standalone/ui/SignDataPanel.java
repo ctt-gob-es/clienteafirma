@@ -320,6 +320,8 @@ final class SignDataPanel extends JPanel {
         else {
         	detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         }
+        detailPanel.getVerticalScrollBar().setUnitIncrement(16);
+    	detailPanel.getHorizontalScrollBar().setUnitIncrement(16);
 
         final JLabel detailPanelText = new JLabel(SimpleAfirmaMessages.getString("SignDataPanel.22")); //$NON-NLS-1$
         detailPanelText.setLabelFor(detailPanel);
@@ -402,17 +404,17 @@ final class SignDataPanel extends JPanel {
             	signInfo.setSignInfo(((AOPDFSigner)signer).getSignInfo(signData, params));
         	} else {
         		signInfo.setSignInfo(signer.getSignInfo(signData));
-        	}  
+        	}
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al leer la informacion de la firma", e); //$NON-NLS-1$
-        } 
+        }
         try {
         	if (signer instanceof AOPDFSigner) {
         		signInfo.setSignsTree(((AOPDFSigner)signer).getSignersStructure(signData, params, true));
         	} else {
         		signInfo.setSignsTree(signer.getSignersStructure(signData, true));
-        	}       	
+        	}
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al extraer el arbol de firmantes", e);  //$NON-NLS-1$
@@ -423,7 +425,7 @@ final class SignDataPanel extends JPanel {
         		signInfo.setData(((AOPDFSigner)signer).getData(signData, params));
         	} else {
         		signInfo.setData(signer.getData(signData));
-        	}           
+        	}
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al extraer los datos firmados", e);  //$NON-NLS-1$
@@ -437,7 +439,7 @@ final class SignDataPanel extends JPanel {
         		signInfo.setTimestampsInfo(
             			TimestampsAnalyzer.getTimestamps(signData)
         			);
-        	}      	
+        	}
         }
         catch (final Exception e) {
         	LOGGER.log(Level.WARNING, "Error al extraer los sellos de tiempo", e);  //$NON-NLS-1$

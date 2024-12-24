@@ -106,6 +106,8 @@ final class PreferencesPanelCades extends JScrollPane {
 	void createUI(final KeyListener keyListener,
 				  final ModificationListener modificationListener) {
 
+		getVerticalScrollBar().setUnitIncrement(16);
+
 		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();

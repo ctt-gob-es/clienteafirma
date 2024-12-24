@@ -129,6 +129,7 @@ final class PreferencesPanel extends JPanel implements KeyListener, DisposableIn
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
+		c.weighty = 1.0;
 		c.gridy = 0;
 
 		add(this.tabbedPane, c);

@@ -31,7 +31,6 @@ public final class PreferencesDialog extends JDialog{
 		setTitle(SimpleAfirmaMessages.getString("MainMenu.24")); //$NON-NLS-1$
 		setIconImages(AutoFirmaUtil.getIconImages());
 		add(new PreferencesPanel(this, selectedPreferencesTabIndex));
-		setResizable(false);
 		pack();
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);

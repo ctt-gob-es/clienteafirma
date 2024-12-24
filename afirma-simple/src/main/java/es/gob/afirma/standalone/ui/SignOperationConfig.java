@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone.ui;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -186,6 +187,26 @@ public final class SignOperationConfig {
 	 */
 	public void setDigestAlgorithm(final String signatureAlgorithm) {
 		this.digestAlgorithm = signatureAlgorithm;
+	}
+
+	@Override
+	protected SignOperationConfig clone() {
+
+		// La copia contendra los mismos elementos, ha excepcion de
+		// los extraParams, que sera una copia de ellos
+		final SignOperationConfig config = new SignOperationConfig();
+		config.setFileType(this.fileType);
+		config.setDataFile(this.dataFile);
+		config.setSignatureFile(this.signatureFile);
+		config.setCryptoOperation(this.cryptoOperation);
+		config.setSigner(this.signer);
+		config.setExtraParams(this.extraParams != null ? (Properties) this.extraParams.clone() : null);
+		config.setSignatureFormatName(this.signatureFormatName);
+		config.setSignValidity(this.signValidity != null ? Collections.unmodifiableList(this.signValidity) : null);
+		config.setInvalidSignatureText(this.invalidSignatureText);
+		config.setDigestAlgorithm(this.digestAlgorithm);
+
+		return config;
 	}
 
 	/** Operaci&oacute;n criptogr&aacute;fica que debe aplicarse durante

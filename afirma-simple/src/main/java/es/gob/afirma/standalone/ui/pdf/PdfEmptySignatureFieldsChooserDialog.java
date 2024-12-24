@@ -93,7 +93,6 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 			stampVisible
 		);
 		tsd.setSize(PREFERRED_WIDTH, PREFERRED_HEIGHT);
-		tsd.setResizable(false);
 		tsd.setLocationRelativeTo(parent);
 	}
 

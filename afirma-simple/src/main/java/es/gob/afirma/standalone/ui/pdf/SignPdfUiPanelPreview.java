@@ -293,8 +293,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		gbc.gridy++;
 		add(createConfigurationPanel(), gbc);
 		gbc.gridy++;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weighty = 0.0;
 		add(this.saveConfig, gbc);
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
@@ -302,7 +300,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		gbc.gridy++;
 		add(new JPanel(), gbc);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weighty = 0.0;
 		gbc.gridy++;
 		add(createButtonsPanel(), gbc);
 		showPreview();

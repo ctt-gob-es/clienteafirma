@@ -214,6 +214,7 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 	}
 
 	void createUI() {
+
 		addKeyListener(this);
 
 		getAccessibleContext().setAccessibleDescription(

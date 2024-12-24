@@ -106,8 +106,10 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		setLocationRelativeTo(this.parent);
 
 		this.scrollPanel = new JScrollPane();
-		this.scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		this.scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.scrollPanel.getHorizontalScrollBar().setUnitIncrement(16);
 		this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		this.scrollPanel.getVerticalScrollBar().setUnitIncrement(16);
 		add(this.scrollPanel);
 
 		addWindowListener(new java.awt.event.WindowAdapter() {
@@ -153,7 +155,6 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 		dialog.setLocation(cp.x - (int) dialog.getPreferredSize().getWidth() / 2,
 				cp.y - (int) dialog.getPreferredSize().getHeight() / 2);
-		dialog.setResizable(false);
 
 		PdfLoader.loadPdf(isSign, isMassiveSign, pdf, (PdfLoaderListener) dialog);
 	}
@@ -194,7 +195,6 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 		dialog.setLocation(cp.x - (int) dialog.getPreferredSize().getWidth() / 2,
 				cp.y - (int) dialog.getPreferredSize().getHeight() / 2);
-		dialog.setResizable(false);
 
 		PdfLoader.loadPdf(isSign, isMassiveSign, pdf, (PdfLoaderListener) dialog);
 		return dialog;
