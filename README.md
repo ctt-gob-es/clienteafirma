@@ -1,10 +1,15 @@
-# Cliente @firma
+# Cliente @firma (Autofirma)
 
-El Cliente @firma es uno de los productos de la Suite @firma de soluciones de identificación y firma electrónica. Se proporciona de a las Administraciones Públicas para que dispongan de los instrumentos necesarios para implementar la autenticación y firma electrónica avanzada de una forma rápida y efectiva.
+El Cliente @firma es un subconjunto de productos de la Suite @firma, dentro del que se encuentra Autofirma, los clientes de firma móvil, AutoScript y algunos servicios auxiliares para su funcionamiento. El Cliente @firma se proporciona a las Administraciones Públicas para que dispongan de los instrumentos necesarios para implementar la autenticación y firma electrónica avanzada de una forma rápida y efectiva.
 
-El cliente de firma es una herramienta de firma electrónica en entornos de escritorio y dispositivos móviles, que funciona en forma de Applet de Java integrado en una página Web mediante JavaScript, como aplicación de escritorio, o como aplicación móvil, dependiendo del entorno del usuario.
+En este repositorio se encuentran todos los módulos comunes usados de forma general por los proyectos del Cliente @firma, además de los proyectos de los siguientes artefactos principales:
+* **Autofirma** (`afirma-ui-simple`): Herramienta para la firma electrónica en entornos PC y componente de firma dentro de un flujo de firma web.
+* **AutoScript** (`afirma-ui-miniapplet-deploy`): JavaScript para la integración de la operación de firma con Autofirma en un proceso de firma web.
+* **Servicio de firma trifásica**(`afirma-server-triphase-signer`): WAR con el servicio para la generación de firmas trifásicas.
+* **Servicio de recuperación** (`afirma-signature-retriever`): WAR con el servicio de recuperación de datos del servidor intermedio.
+* **Servicio de guardado** (`afirma-signature-storage`): WAR con el servicio de guardado de datos en el servidor intermedio.
 
-Es software libre con licencia GPL 2+ y EUPL 1.1. Puede consular más información y el código del producto en la forja del CTT.
+El contenido de este repositorio es software libre con licencia GPL 2+ y EUPL 1.1. Puede consular más información y el código del producto en la forja del CTT.
 
 ## Construcción del Cliente @firma
 
