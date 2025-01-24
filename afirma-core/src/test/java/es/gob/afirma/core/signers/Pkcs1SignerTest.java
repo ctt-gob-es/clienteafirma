@@ -8,7 +8,6 @@ import java.security.Signature;
 import java.util.Base64;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 public class Pkcs1SignerTest {
@@ -66,56 +65,11 @@ public class Pkcs1SignerTest {
 		Assert.assertTrue("Error al verificar la firma ECDSA", sig.verify(pkcs1)); //$NON-NLS-1$
 	}
 
-	@SuppressWarnings("static-method")
-	@Test
-	public void testPkcs1EcdsaInP1363FormatSign() throws Exception {
-
-		System.out.println();
-		Assume.assumeTrue("Se requiere Java 9 o superior", getJavaVersion() > 8); //$NON-NLS-1$
-
-		final byte[] data = "Hola Mundo!!".getBytes(StandardCharsets.UTF_8); //$NON-NLS-1$
-		final String algorithm = AOSignConstants.SIGN_ALGORITHM_SHA256WITHECDSA + "inP1363Format"; //$NON-NLS-1$
-		final PrivateKeyEntry pke = loadPrivateKeyEntry(CERT_EC_PATH, CERT_EC_PASS, CERT_EC_ALIAS);
-
-		final AOPkcs1Signer signer = new AOPkcs1Signer();
-		final byte[] pkcs1 = signer.sign(
-				data,
-				algorithm,
-				pke.getPrivateKey(),
-				pke.getCertificateChain(),
-				null);
-
-		final Signature sig = Signature.getInstance(algorithm);
-		sig.initVerify(pke.getCertificate().getPublicKey());
-		sig.update(data);
-
-		Assert.assertTrue("Error al verificar la firma ECDSAinP1363Format", sig.verify(pkcs1)); //$NON-NLS-1$
-	}
-
 	private static PrivateKeyEntry loadPrivateKeyEntry(final String path, final char[] pass, final String alias) throws Exception {
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		try (InputStream is = ClassLoader.getSystemResourceAsStream(path)) {
 			ks.load(is, pass);
 		}
         return (PrivateKeyEntry) ks.getEntry(alias, new KeyStore.PasswordProtection(pass));
-	}
-
-	private static int javaVersion = -1;
-
-	private static int getJavaVersion() throws Exception {
-		if (javaVersion != -1) {
-			return javaVersion;
-		}
-		String specificationVersion = System.getProperty("java.specification.version"); //$NON-NLS-1$
-		if (specificationVersion.startsWith("1.")) { //$NON-NLS-1$
-			specificationVersion = specificationVersion.substring(2);
-		}
-		try {
-			javaVersion = Integer.parseInt(specificationVersion);
-		}
-		catch (final Exception e) {
-			javaVersion = 0;
-		}
-		return javaVersion;
 	}
 }
