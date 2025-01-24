@@ -52,6 +52,8 @@ public class BatchConfigManager {
 
 	private static File tempDir = null;
 
+	private static boolean initialized = false;
+
 	static {
 
 		String configDir;
@@ -68,18 +70,31 @@ public class BatchConfigManager {
 		// Cargamos la configuracion del servicio
 		final Properties configProperties = loadConfigFile(configDir, CONFIG_FILE);
 
-		if (configProperties == null) {
-			throw new RuntimeException("No se ha encontrado el fichero de configuracion del servicio"); //$NON-NLS-1$
-		}
+		// Si se carga el fichero, se establece la configuracion de los servicios
+		if (configProperties != null) {
+			for (final String k : configProperties.keySet().toArray(new String[0])) {
+				CONFIG.setProperty(k, mapSystemProperties(configProperties.getProperty(k)));
+			}
 
-		for (final String k : configProperties.keySet().toArray(new String[0])) {
-			CONFIG.setProperty(k, mapSystemProperties(configProperties.getProperty(k)));
+			// Establecemos si se deben comprobar los certificados SSL de las conexiones remotas
+			final boolean checkSslCerts = Boolean.parseBoolean(
+					CONFIG.getProperty("checksslcerts", "true")); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty(SYS_PROP_DISABLE_SSL, Boolean.toString(!checkSslCerts));
+			initialized = true;
 		}
+		// Si no, identificamos los servivios de firma de lotes XML como no inicializamos
+		else {
+			LOGGER.warning("No se ha encontrado el fichero de configuracion del servicio de lotes XML y no se inicializara"); //$NON-NLS-1$
+			initialized = false;
+		}
+	}
 
-		// Establecemos si se deben comprobar los certificados SSL de las conexiones remotas
-		final boolean checkSslCerts = Boolean.parseBoolean(
-				CONFIG.getProperty("checksslcerts", "true")); //$NON-NLS-1$ //$NON-NLS-2$
-		System.setProperty(SYS_PROP_DISABLE_SSL, Boolean.toString(!checkSslCerts));
+	/**
+	 * Indica si los servicios de firma de lotes XML est&aacute;n inicializados o no.
+	 * @return
+	 */
+	public static boolean isInitialized() {
+		return initialized;
 	}
 
 	/**
