@@ -115,14 +115,22 @@ public final class PdfExtraParams {
 	public static final String IMAGE = "image";//$NON-NLS-1$
 
 	/**
-	 * P&aacute;gina donde desea insertarse la imagen indicada mediante el
+	 * P&aacute;ginas donde desea insertarse la imagen indicada mediante el
 	 * par&aacute;metro <code>image</code>. La numeraci&oacute;n de las
 	 * p&aacute;ginas comienza en uno.<br>
-	 * Si se indica <i>-1</i> como n&uacute;mero de p&aacute;gina se inserta la
-	 * imagen en la &uacute;ltima p&aacute;gina del documento. Si se indica <i>0</i>
-	 * como n&uacute;mero de p&aacute;gina se inserta la imagen en todas las
-	 * p&aacute;ginas del documento. Este par&aacute;metro es obligatorio, si no se
-	 * indica una p&aacute;gina v&aacute;lida no se insertar&aacute; la imagen.
+	 * Se podr&aacute;n seleccionar todas las p&aacute;ginas usando la palabra clave {@code all} o
+	 * indicando <i>0</i> como n&uacute;mero de p&aacute;gina.
+	 * Se podr&aacute;n seleccionar p&aacute;ginas individuales list&aacute;ndolas separadas por comas (,).
+	 * Por ejemplo, para insertar la imagen en las p&aacute;ginas 1, 2, 5 y 7, se usar&aacute;: 1,2,5,7
+	 * Se podr&aacute;n seleccionar rangos de p&aacute;ginas separadas por guion (-), en donde en las dos p&aacute;ginas
+	 * que limitan el rango tambi&eacute;n se insertar&aacute; la imagen.
+	 * Por ejemplo, para insertar la imagen en las p&aacute;ginas 2, 3, 4 y 5, se usar&aacute;: 2-5
+	 * Se podr&aacute;n seleccionar p&aacute;ginas contando desde el final del documento utilizando valores negativos.
+	 * Por ejemplo, para insertar la imagen en la pen&uacute;ltima p&aacute;gina, se usar&aacute;: -2
+	 * Estos mecanismos podr&aacute;n usarse de forma conjunta, a excepci&oacute;n de la palabra clave {@code all}
+	 * o el <i>0</i> que ya implica la imagen en todas las p&aacute;ginas.
+	 * Por ejemplo, para insertar la imagen en las tres primeras p&aacute;ginas y en las tres &uacute;ltimas, se usar&aacute;: 1-3,-3--1
+	 * Este par&aacute;metro es obligatorio, si no se indica una p&aacute;gina v&aacute;lida no se insertar&aacute; la imagen.
 	 */
 	public static final String IMAGE_PAGE = "imagePage";//$NON-NLS-1$
 

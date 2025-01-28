@@ -731,4 +731,45 @@ public final class PdfUtil {
 
 		return pages;
 	}
+
+    /**
+     * Obtiene el listado de p&aacute;ginas del documento donde se ha pedido insertar la imagen.
+     * @param extraParams Propiedades con la configuracion de firma de las que extraer
+     * las p&aacute;ginas.
+     * @param totalPages N&oacute;mero la &uacute;ltima p&aacute;gina del documento.
+     * @return P&aacute;ginas del documento.
+     */
+	public static List<Integer> getImagePages(final Properties extraParams, final int totalPages) {
+
+		final String[] pagesStr = extraParams.containsKey(PdfExtraParams.IMAGE_PAGE)
+				? extraParams.getProperty(PdfExtraParams.IMAGE_PAGE).split(RANGE_SEPARATOR)
+				: new String[0];
+
+		final List<Integer> pages = new ArrayList<>();
+
+		if (pagesStr.length != 0) {
+
+			// El valor ALL_PAGES o 0 pide que se inserte la imagen en todas las paginas
+			if ("0".equals(pagesStr[0].trim()) || ALL_PAGES.equalsIgnoreCase(pagesStr[0].trim())) { //$NON-NLS-1$
+				for (int page = 1; page <= totalPages; page++) {
+					pages.add(page);
+				}
+			// Rellenamos con las paginas y rangos indicados, evitando que se indiquen
+			// paginas posteriores a la ultima
+			} else {
+				for (final String pageStr : pagesStr) {
+					try {
+						getPagesRange(pageStr, totalPages, pages);
+					} catch (final IncorrectPageException e) {
+						LOGGER.log(Level.WARNING, "Se ha indicado un numero o rango de paginas para imagen invalido. Se ignorara.", e); //$NON-NLS-1$
+					}
+				}
+				// Ordenamos el listado de paginas
+				Collections.sort(pages);
+			}
+
+		}
+
+		return pages;
+	}
 }
