@@ -139,8 +139,10 @@ public final class ElfParser {
 			return false;
 		}
 		return "64".equals(Platform.getJavaArch()) && //$NON-NLS-1$
-					Platform.MACHINE.AMD64.equals(Platform.getMachineType()) &&
+					(Platform.MACHINE.AMD64.equals(Platform.getMachineType()) &&
 						ElfMachineType.AMD64.equals(a) ||
+					Platform.MACHINE.ARM64.equals(Platform.getMachineType()) &&
+						ElfMachineType.ARM64.equals(a)) ||
 			   "32".equals(Platform.getJavaArch()) && //$NON-NLS-1$
 			   		(Platform.MACHINE.X86.equals(Platform.getMachineType()) || Platform.MACHINE.AMD64.equals(Platform.getMachineType())) && // 32 puede estar en maquina de 32 o de 64 bits
 		   				ElfMachineType.X86.equals(a);
