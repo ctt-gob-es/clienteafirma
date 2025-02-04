@@ -67,7 +67,7 @@ public final class TimestampsAnalyzer {
 		}
 		return new ArrayList<>(0);
 	}
-	
+
 	/** Obtiene informaci&oacute;n de los sellos de tiempo de una firma.
 	 * @param sign Firma.
 	 * @param params Par&aacute;metros de firma.
@@ -192,7 +192,7 @@ public final class TimestampsAnalyzer {
     			return new ArrayList<>(0);
     		}
     		catch (final Exception e3) {
-    			LOGGER.severe("No se ha podido leer el PDF, se devolvera una lista de sellos vacia: " + e3); //$NON-NLS-1$
+    			LOGGER.severe("No se ha podido leer el PDF con contrasena, se devolvera una lista de sellos vacia: " + e3); //$NON-NLS-1$
     			return new ArrayList<>(0);
     		}
     	}
@@ -272,12 +272,14 @@ public final class TimestampsAnalyzer {
 
     	return ret;
 	}
-	
+
 	private static List<AOTimestampInfo> getPdfTimestamps(final byte[] sign, final Properties params) {
     	PdfReader pdfReader;
     	try {
-    		pdfReader = PdfUtil.getPdfReader(sign, params,
-					Boolean.parseBoolean(params.getProperty(PdfExtraParams.HEADLESS))); 		
+    		final boolean headless = params != null
+    				? Boolean.parseBoolean(params.getProperty(PdfExtraParams.HEADLESS))
+    				: false;
+    		pdfReader = PdfUtil.getPdfReader(sign, params, headless);
     	}
     	catch (final BadPasswordException e) {
     		try {

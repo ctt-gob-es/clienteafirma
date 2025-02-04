@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.configurator;
 
+import java.awt.HeadlessException;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -62,7 +63,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 
 	private final ConfigArgs config;
 
-	private Console mainScreen;
+	private Console console;
 
 	static {
 		// Instalamos el registro a disco
@@ -157,11 +158,11 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			return;
 		}
 
-		this.mainScreen = ConsoleManager.getConsole(this);
+		this.console = ConsoleManager.getConsole(this);
 
 		// Creamos el almacen para la configuracion del SSL
 		try {
-			this.configurator.configure(this.mainScreen);
+			this.configurator.configure(this.console);
 		}
 		catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Error al copiar o leer alguno de los ficheros de configuracion. El configurador se detendra", e); //$NON-NLS-1$
@@ -189,7 +190,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		// Creamos el almacen para la configuracion del SSL
 		final File pluginsDir = getPluginsDir(this.configurator);
 		final PluginsManager pluginsManager = new PluginsManager(pluginsDir);
-		this.configurator.uninstall(this.mainScreen, pluginsManager);
+		this.configurator.uninstall(this.console, pluginsManager);
 
 		// Borramos las preferencias del sistema, que es algo comun a todos los sistemas operativos
 		try {
@@ -221,8 +222,8 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
      * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
      *                 indica error y cero indica salida normal. */
     public void closeApplication(final int exitCode) {
-        if (this.mainScreen != null) {
-            this.mainScreen.dispose();
+        if (this.console != null) {
+            this.console.dispose();
         }
         System.exit(exitCode);
     }
@@ -247,6 +248,10 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		else {
 			try {
 				configurator.configure();
+			}
+			catch (final HeadlessException e) {
+				ConsoleManager.showErrorMessage(Messages.getString("AutoFirmaConfigurator.7"), e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "La JVM utilizada no soporta interfaces graficos. No se podra ejecutar la interfaz grafica de AutoFirma con ella", e); //$NON-NLS-1$
 			}
 			catch (final Exception | Error e) {
 				ConsoleManager.showErrorMessage(

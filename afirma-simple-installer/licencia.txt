@@ -1,6 +1,6 @@
  
  AutoFirma 1.9
- Copyright 2011, 2024 Gobierno de España
+ Copyright 2011, 2025 Gobierno de España
  
  AutoFirma es Software Libre; puedes redistribuirlo y/o modificarlo
  bajo los términos de al menos una de estas dos licencias;

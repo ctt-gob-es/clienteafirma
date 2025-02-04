@@ -9,12 +9,13 @@
 
 package es.gob.afirma.standalone.configurator;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,7 +55,7 @@ final class ConfiguratorLinux implements Configurator {
 	}
 
     @Override
-    public void configure(final Console window) throws IOException, GeneralSecurityException {
+    public void configure(final Console window) throws IOException, GeneralSecurityException, HeadlessException {
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.2")); //$NON-NLS-1$
 
@@ -112,6 +113,11 @@ final class ConfiguratorLinux implements Configurator {
         }
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.8")); //$NON-NLS-1$
+
+        // Si se necesita interfaz grafica, comprobamos que la JRE lo soporte
+        if (isHeadlessJre()) {
+        	LOGGER.warning("La JVM con la que se ha ejecutado el instalador no soporta interfaces graficas (headless). Esta JVM no es compatible con la interfaz grafica de AutoFirma. Instale una JRE completa para poder ejecutarla."); //$NON-NLS-1$
+        }
     }
 
     /** Comprueba si ya existe un almac&eacute;n de certificados generado.
@@ -243,7 +249,7 @@ final class ConfiguratorLinux implements Configurator {
     		try {
     			Files.walkFileTree(
     					alternativeDir.toPath(),
-    					new HashSet<FileVisitOption>(),
+    					new HashSet<>(),
     					Integer.MAX_VALUE,
     					new SimpleFileVisitor<Path>() {
     						@Override
@@ -272,4 +278,20 @@ final class ConfiguratorLinux implements Configurator {
     		}
     	}
     }
+
+	/**
+	 * Identifica si la JRE carece de las bibliotecas necesarias para la ejecuci&oacute;n de las
+	 * interfaces gr&aacute;ficas de Autofirma.
+	 * @return {@code true} si la JRE es headless, {@code false} en caso contrario.
+	 */
+	private static boolean isHeadlessJre() {
+		boolean headless = false;
+		try {
+			GraphicsEnvironment.getLocalGraphicsEnvironment();
+		}
+		catch (final UnsatisfiedLinkError e) {
+			headless = true;
+		}
+		return headless;
+	}
 }

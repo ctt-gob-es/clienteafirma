@@ -9,7 +9,6 @@
 
 package es.gob.afirma.signvalidation;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.CertificateExpiredException;
@@ -30,7 +29,6 @@ import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.pades.PdfUtil;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pades.common.PdfFormModifiedException;
@@ -102,12 +100,14 @@ public final class ValidatePdfSignature extends SignValider {
 	@Override
 	public List<SignValidity> validate(final byte[] sign, final Properties params) throws RuntimeConfigNeededException, IOException {
 
+		final Properties xParams = params != null ? params : new Properties();
+
 		List<SignValidity> validityList = new ArrayList<>();
 		AcroFields af;
 		PdfReader reader;
 		try {
-			reader = PdfUtil.getPdfReader(sign, params,
-					Boolean.parseBoolean(params.getProperty(PdfExtraParams.HEADLESS)));
+    		final boolean headless = Boolean.parseBoolean(xParams.getProperty(PdfExtraParams.HEADLESS));
+			reader = PdfUtil.getPdfReader(sign, xParams, headless);
 			af = reader.getAcroFields();
 		}
 		catch (final Exception e) {
@@ -124,7 +124,7 @@ public final class ValidatePdfSignature extends SignValider {
 
 		// COMPROBACION DE CAMBIOS EN LOS FORMULARIOS PDF
 
-		final String allowSignModifiedFormProp = params.getProperty(PdfExtraParams.ALLOW_SIGN_MODIFIED_FORM);
+		final String allowSignModifiedFormProp = xParams.getProperty(PdfExtraParams.ALLOW_SIGN_MODIFIED_FORM);
 		final boolean allowSignModifiedForm = Boolean.parseBoolean(allowSignModifiedFormProp);
 		boolean formModified = false;
 
@@ -146,9 +146,9 @@ public final class ValidatePdfSignature extends SignValider {
 
 		// COMPROBACION DE PDF SHADOW ATTACK
 
-		final String allowShadowAttackProp = params.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
+		final String allowShadowAttackProp = xParams.getProperty(PdfExtraParams.ALLOW_SHADOW_ATTACK);
 		final boolean allowPdfShadowAttack = Boolean.parseBoolean(allowShadowAttackProp);
-		final String pagesToCheck =  params.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, DEFAULT_PAGES_TO_CHECK_PSA);
+		final String pagesToCheck =  xParams.getProperty(PdfExtraParams.PAGES_TO_CHECK_PSA, DEFAULT_PAGES_TO_CHECK_PSA);
 
 		// La comprobacion de PDF Shadow Attack detecta tambien los cambios en los formularios PDF,
 		// asi que se ignorara la comprobacion de PDF Shadow Attack en los siguientes casos:
@@ -189,49 +189,49 @@ public final class ValidatePdfSignature extends SignValider {
 		final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(sign);
 
 		for (final String name : signNames) {
-			final boolean checkCert = Boolean.parseBoolean(params.getProperty(PdfExtraParams.CHECK_CERTIFICATES));
+			final boolean checkCert = Boolean.parseBoolean(xParams.getProperty(PdfExtraParams.CHECK_CERTIFICATES));
 			final List<SignValidity> validityListSign = validateSign(name, af, signProfile, checkCert);
 			for (final SignValidity sv : validityListSign) {
 				if (!validityList.contains(sv)) {
 					if (SIGN_DETAIL_TYPE.UNKNOWN.equals(sv.getValidity())) {
 						validityList.add(0, sv);
-					} else if (sv.getValidity() != SIGN_DETAIL_TYPE.OK){
+					} else if (sv.getValidity() != SIGN_DETAIL_TYPE.OK) {
 						validityList.add(sv);
 					}
 				}
 			}
 		}
-		
+
 		int certRevision = 0;
-		
-		if(reader.getCertificationLevel() == 1 && validityList.size() == 0){
+
+		if (reader.getCertificationLevel() == 1 && validityList.size() == 0) {
 			for (final String nameS : signNames) {
 				final PdfDictionary pdfDictionary = af.getSignatureDictionary(nameS);
-				//Comprobamos si la firma es la que certifica el documento
-				if(pdfDictionary.get(PdfName.REFERENCE) != null){
-					PdfArray reference = (PdfArray) pdfDictionary.get(PdfName.REFERENCE);
-					ArrayList<PdfObject> p = reference.getArrayList();
-					PdfDictionary dictionaryReference = (PdfDictionary) p.get(0);
-					if(dictionaryReference.get(PdfName.TRANSFORMMETHOD) != null){
+				// Comprobamos si la firma es la que certifica el documento
+				if (pdfDictionary.get(PdfName.REFERENCE) != null) {
+					final PdfArray reference = (PdfArray) pdfDictionary.get(PdfName.REFERENCE);
+					final ArrayList<PdfObject> p = reference.getArrayList();
+					final PdfDictionary dictionaryReference = (PdfDictionary) p.get(0);
+					if (dictionaryReference.get(PdfName.TRANSFORMMETHOD) != null) {
 						certRevision = af.getRevision(nameS);
 					}
 				}
 			}
 		}
-		
+
 		// Cuando la firma sea certificada de tipo 1, sólo la última firma será válida.
-		if(reader.getCertificationLevel() == 1 && validityList.size() == 0){
+		if (reader.getCertificationLevel() == 1 && validityList.size() == 0) {
 			for (final String name : signNames) {
-				
+
 				final int rev = af.getRevision(name);
-				
-				if((rev == af.getTotalRevisions()) && rev <= certRevision){
+
+				if (rev == af.getTotalRevisions() && rev <= certRevision) {
 					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
 				}
-				else if((rev < af.getTotalRevisions()) && rev <= certRevision){
+				else if(rev < af.getTotalRevisions() && rev <= certRevision) {
 					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
 				}
-				else{
+				else {
 					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFIED_SIGN_REVISION));
 				}
 			}
@@ -281,7 +281,7 @@ public final class ValidatePdfSignature extends SignValider {
 
 		// Comprobamos si es una firma o un sello
 		final PdfDictionary pdfDictionary = signAcrofields.getSignatureDictionary(signName);
-		
+
 		// Si no es un sello, comprobamos el PKCS#1
 		if (!PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER))
 				&& !PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
@@ -324,20 +324,4 @@ public final class ValidatePdfSignature extends SignValider {
 		return validityList;
 
 	}
-
-	public static void main(final String[] args) throws Exception {
-		final ValidatePdfSignature validator = new ValidatePdfSignature();
-		byte[] signature;
-		try (InputStream fis = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\Formulario_prueba_PDF_signed_mod.pdf")) {
-			signature = AOUtil.getDataFromInputStream(fis);
-		}
-
-		final Properties params = new Properties();
-
-		final List<SignValidity> checks = validator.validate(signature, params);
-		for (final SignValidity validity : checks) {
-			System.out.println(validity.toString());
-		}
-	}
-
 }

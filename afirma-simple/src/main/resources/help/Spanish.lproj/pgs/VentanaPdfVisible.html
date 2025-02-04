@@ -87,7 +87,7 @@
 	<ul>
 	  <li><b>Imagen de firma:</b> Ruta de la imagen con la r&uacute;brica de firma. Puede seleccionarse
 	  mediante el bot&oacute;n <b>Examinar</b> y eliminarse mediante el bot&oacute;n <b>Limpiar</b>. No
-	  se admiten transparencias en la imagen y se omitir√°n en caso de encontrarse.</li>
+	  se admiten transparencias en la imagen y se omitir&aacute;n en caso de encontrarse.</li>
 	  <li><b>Texto de firma: </b> Texto a mostrar en la firma del PDF.   Para la configuraci&oacute;n del
 	  texto que se desea mostrar en la firma es posible utilizar una serie de palabras clave que ser&aacute;n
 	  sustituidas por los textos apropiados del titular o emisor del certificado de firma en el momento de
@@ -100,23 +100,23 @@
 	  	<p><li><b>$$GIVENNAME$$</b><ul><li>Nombre del titular (G, Given Name) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
 		<p><li><b>$$SURNAME$$</b><ul><li>Apellidos del titular (SN, Surname) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
 		<p><li><b>$$ORGANIZATION$$</b><ul><li>Organizaci&oacute;n (O, Organization) del titular declarada en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-		<p><li><b>$$REASON$$</b><ul><li>Raz&oacute;n por la que se firma el PDF. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-		<p><li><b>$$LOCATION$$</b><ul><li>Ciudad en la que se firma el PDF. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-		<p><li><b>$$CONTACT$$</b><ul><li>Informaci&oacute;n de contacto del firmante del PDF. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-	  	<p><li><b>$$PSEUDONYM$$</b><ul><li>Seud&oacute;nimo del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
+		<p><li><b>$$PSEUDONYM$$</b><ul><li>Seud&oacute;nimo del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
 	 	<p><li><b>$$OU$$</b><ul><li>Unidad Organizativa (OU, Organization Unit) del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-	 	<p><li><b>$$OUS$$</b><ul><li>Unidades Organizativas del certificado, en el caso de que el certificado tenga informaci&oacute;n sobre una o m&aacute;s unidades organizativas. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
+	 	<p><li><b>$$OUS$$</b><ul><li>Listado de Unidades Organizativas del certificado. En caso de que hubiese m&aacute;s de una, se presentar&iacute;an todas separadas por ", ". El certificado podr&iacute;a no tener definidas Unidades Organizativas, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
 	 	<p><li><b>$$TITLE$$</b><ul><li>Informaci&oacute;n sobre el puesto o rol del titular del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
+	 	<p><li><b>$$REASON$$</b><ul><li>Raz&oacute;n por la que se firma el PDF, configurada la operaci&oacute;n de firma mediante la propiedad ìsignatureReasonî. El patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a si no se hubiese establecido este valor.</li></ul></li></p>
+		<p><li><b>$$LOCATION$$</b><ul><li>Ciudad en la que se firma el PDF, configurada la operaci&oacute;n de firma mediante la propiedad ìsignatureProductionCityî. El patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a si no se hubiese establecido este valor.</li></ul></li></p>
+		<p><li><b>$$CONTACT$$</b><ul><li>Informaci&oacute;n de contacto del firmante del PDF, configurada la operaci&oacute;n de firma mediante la propiedad ìsignatureContactî. El patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a si no se hubiese establecido este valor.</li></ul></li></p>
 	  </ul>
 	  <li>Al texto se le pueden aplicar las siguientes opciones de formato:</li>
 	  <ul>
 		<li>Fuente de letra.</li>
-		<li>Tama√±o de letra.</li>
+		<li>Tama&ntilde;o de letra.</li>
 		<li>Rotaci&oacute;n del texto.</li>
 		<li>Estilo de fuente (Negrita, Cursiva, Subrayado o Tachado).</li>
 		<li>Color del texto.</li>
 	  </ul>
-	  <p>La casilla "Recordar configuraci&oacute;n" permite guardar la configuraci√≥n establecida (texto, imagen y estilos) para utilizarla en las siguientes firmas. El bot√≥n "Restaurar configuraci&oacute;n por defecto" devolver√° la configuraci√≥n del panel a los valores por defecto.</p>
+	  <p>La casilla "Recordar configuraci&oacute;n" permite guardar la configuraci&oacute;n establecida (texto, imagen y estilos) para utilizarla en las siguientes firmas. El bot&oacute;n "Restaurar configuraci&oacute;n por defecto" devolver&aacute; la configuraci&oacute;n del panel a los valores por defecto.</p>
 	</ul>
   <p>
   Si no se desea agregar una firma visible al PDF, antes de pulsar el bot&oacute;n firmar en la pantalla de firma, aseg&uacute;rese
@@ -134,14 +134,14 @@
   PDF.
   </p>
   <ul>
-  	<li><b>Seleccionar imagen:</b> Al pulsar este bot√≥n se abrir&aacute; una ventana en la que podr&aacute; seleccionar 
-  	la imagen de marca. No se admiten transparencias en la imagen y se omitir√°n en caso de encontrarse</li>
+  	<li><b>Seleccionar imagen:</b> Al pulsar este bot&oacute;n se abrir&aacute; una ventana en la que podr&aacute; seleccionar 
+  	la imagen de marca. No se admiten transparencias en la imagen y se omitir&aacute;n en caso de encontrarse</li>
   	<li><b>X</b>: N&uacute;mero de p&iacute;xeles en el eje X en el que situar la marca.</li>
   	<li><b>Y</b>: N&uacute;mero de p&iacute;xeles en el eje Y en el que situar la marca.</li>
   	<li><b>Anchura</b>: N&uacute;mero de p&iacute;xeles que se debe extender en horizontal la marca.</li>
   	<li><b>Altura</b>: N&uacute;mero de p&iacute;xeles que se debe extender en vertical la marca.</li>
   	<li><b>(Previsualizaci&oacute;n de la p&aacute;gina del PDF):</b> El usuario debe hacer clic sostenido y arrastrar
-  	el rat&oacute;n sobre este &aacute;rea para seleccionar el &aacute;rea en el que se colocar√° la marca.</li>
+  	el rat&oacute;n sobre este &aacute;rea para seleccionar el &aacute;rea en el que se colocar&aacute; la marca.</li>
   	<li><b>&lt;&lt;:</b> Bot&oacute;n para desplazar la visualizaci&oacute;n a la primera p&aacute;gina del PDF.</li>
   	<li><b>&lt;:</b> Bot&oacute;n para desplazar la visualizaci&oacute;n a la p&aacute;gina anterior del PDF. Puede
   	reproducirse este comportamiento pulsando la tecla "cursor izquierdo" de su teclado.</li>
@@ -152,7 +152,7 @@
   	las p&aacute;ginas del PDF.</li>
   </ul>
   <p>
-  El &aacute;rea de marca desaparecera al cambiar de p&aacute;gina del PDF. Seleccione la p√°gina, imagen y &aacute;rea para la marca visible
+  El &aacute;rea de marca desaparecera al cambiar de p&aacute;gina del PDF. Seleccione la p&aacute;gina, imagen y &aacute;rea para la marca visible
   en el PDF y a continuaci&oacute;n, pulse el bot&oacute;n <b>Aceptar</b>. 
   </p>
   

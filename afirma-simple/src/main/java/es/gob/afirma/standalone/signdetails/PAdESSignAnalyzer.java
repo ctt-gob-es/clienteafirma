@@ -145,7 +145,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 							}
 						}
 					} catch (final Exception e) {
-						LOGGER.severe("No se ha podido obtener la informacion de la politica correctamente: " + e); //$NON-NLS-1$
+						LOGGER.log(Level.SEVERE, "No se ha podido obtener la informacion de la politica correctamente", e); //$NON-NLS-1$
 					}
 				}
 
@@ -260,7 +260,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
      */
     private static SignaturePolicy analyzePolicy(final SignerInformation si) {
     	final AttributeTable signedAttrs = si.getSignedAttributes();
-    	final Attribute policyAttr = signedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId);
+    	final Attribute policyAttr = signedAttrs != null ? signedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId): null;
 		if (policyAttr != null && policyAttr.getAttrValues() != null && policyAttr.getAttrValues().size() > 0) {
 			final SignaturePolicyId sigPolId = SignaturePolicyId.getInstance(policyAttr.getAttrValues().getObjectAt(0));
 			final String polId = sigPolId.getSigPolicyId().toString();
