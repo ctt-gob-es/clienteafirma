@@ -261,9 +261,9 @@ final class PdfVisibleAreasUtils {
 
 			final PdfTextMask mask = prepareMask(obfuscate, maskConfig);
 			String cn = AOUtil.getCN(cert);
-			
+
 			if (cn != null && mask != null) {
-				cn = obfuscate(cn, mask);
+				cn = obfuscateIds(cn, mask);
 			}
 			ret = ret.replace(LAYERTEXT_TAG_SUBJECTCN, cn)
 					.replace(LAYERTEXT_TAG_ISSUERCN, AOUtil.getCN(cert.getIssuerX500Principal().getName()))
@@ -271,12 +271,12 @@ final class PdfVisibleAreasUtils {
 
 			// Se mapea el principal del subject del certificado
 			String subjectPrincipal = cert.getSubjectX500Principal().toString();
-			
+
 			final String pseudonym = AOUtil.getRDNvalueFromLdapName("OID.2.5.4.65", subjectPrincipal); //$NON-NLS-1$
 			if (pseudonym != null) {
 				ret = ret.replace(LAYERTEXT_TAG_PSEUDONYM, pseudonym);
 			}
-			
+
 			final String [] ous = AOUtil.getOUS(subjectPrincipal);
 			if (ous.length > 0) {
 				ret = ret.replace(LAYERTEXT_TAG_OU, ous[0]);
@@ -286,16 +286,18 @@ final class PdfVisibleAreasUtils {
 				}
 				ret = ret.replace(LAYERTEXT_TAG_OUS, ousResult);
 			}
-			
-			final String title = AOUtil.getRDNvalueFromLdapName("t", subjectPrincipal); //$NON-NLS-1$
-			if (title != null) {
-				ret = ret.replace(LAYERTEXT_TAG_TITLE, title);
+			else {
+				ret = ret.replace(LAYERTEXT_TAG_OU, ""); //$NON-NLS-1$
+				ret = ret.replace(LAYERTEXT_TAG_OUS, ""); //$NON-NLS-1$
 			}
-			
+
+			final String title = AOUtil.getRDNvalueFromLdapName("t", subjectPrincipal); //$NON-NLS-1$
+			ret = ret.replace(LAYERTEXT_TAG_TITLE, title != null ? title : ""); //$NON-NLS-1$
+
 			if (subjectPrincipal != null && mask != null) {
-				subjectPrincipal = obfuscate(subjectPrincipal, mask);
-			}	
-			
+				subjectPrincipal = obfuscateIds(subjectPrincipal, mask);
+			}
+
 			ret = ret.replace(LAYERTEXT_TAG_SUBJECTDN, subjectPrincipal);
 
 			// Se mapea el nombre declarado en el subject del certificado
@@ -304,9 +306,6 @@ final class PdfVisibleAreasUtils {
 
 			// Se mapea el apellido declarado en el subject del certificado
 			final String surname = AOUtil.getRDNvalueFromLdapName("SURNAME", subjectPrincipal); //$NON-NLS-1$
-			if (subjectPrincipal != null && obfuscate) {
-				subjectPrincipal = obfuscate(subjectPrincipal, mask);
-			}
 			ret = ret.replace(LAYERTEXT_TAG_SURNAME, surname != null ? surname : ""); //$NON-NLS-1$
 
 			// Se mapea la organizacion declarada en el subject del certificado
@@ -359,7 +358,7 @@ final class PdfVisibleAreasUtils {
 	 * @param obfuscate Indica si se debe ofuscar texto o no.
 	 * @param maskConfig Configuraci&oacute;n de la mascara a aplicar o {@code null}
 	 * si se quiere usar la por defecto.
-	 * @return M&aacute;scara de ofuscaci&oacute;n.
+	 * @return M&aacute;scara de ofuscaci&oacute;n o {@code null} si no se desea ofuscar.
 	 */
 	private static PdfTextMask prepareMask(final boolean obfuscate, final String maskConfig) {
 
@@ -658,7 +657,7 @@ final class PdfVisibleAreasUtils {
      * @param mask Configuraci&oacute;n con la m&aacute;scara a aplicar.
      * @return Texto ofuscado.
      */
-    static String obfuscate(final String text, final PdfTextMask mask) {
+    static String obfuscateIds(final String text, final PdfTextMask mask) {
 
     	final char[] chars = text.toCharArray();
 
