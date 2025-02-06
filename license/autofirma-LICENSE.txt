@@ -1,22 +1,22 @@
 ﻿
-El Applet Cliente @firma, MiniApplet, Standalone y Autofirma, en adelante todos ellos referidos como "CLIENTe @firma", son productos de firma electrónica y criptografía de libre distribución, cuyo código fuente puede ser consultado y descargado desde https://github.com/ctt-gob-es/clienteafirma. Las presentes condiciones de uso establecen las cláusulas y condiciones de uso del CLIENTe @firma:
+Autofirma es un producto de firma electrónica y criptografía de libre distribución, cuyo código fuente puede ser consultado y descargado desde https://github.com/ctt-gob-es/clienteafirma. Las presentes condiciones de uso establecen las cláusulas y condiciones de uso de Autofirma:
 
 1. Licencia
-El CLIENTe @firma se encuentra bajo las licencias GNU GPL versión 2.0 y EUPL versión 1.1. Puede consultar los textos
+Autofirma se encuentra bajo las licencias GNU GPL versión 2.0 y EUPL versión 1.1. Puede consultar los textos
 completos de estas licencias en los ficheros adjuntos ("gpl-2.0.txt" y "EUPL v.1.1.pdf").
 
-2. Usted declara y garantiza que está autorizado a aceptar y cumplir las cláusulas y condiciones del CLIENTe @firma.
+2. Usted declara y garantiza que está autorizado a aceptar y cumplir las cláusulas y condiciones del Autofirma.
 
-3. Usted reconoce y acepta que correrá con todos los riesgos que surjan del uso que usted haga del CLIENTe @firma. 
+3. Usted reconoce y acepta que correrá con todos los riesgos que surjan del uso que usted haga del Autofirma. 
 
 4. Derechos de Propiedad Intelectual
-El Gobierno de España retiene los Derechos de Propiedad Intelectual sobre el CLIENTe @firma.
+El Gobierno de España retiene los Derechos de Propiedad Intelectual sobre el Autofirma.
 
 5. Renuncia a garantías y descargo de responsabilidad
-5.1 Ausencia de garantías. EL CLIENTE @FIRMA SE PROVEE EN SU ESTADO ACTUAL Y SIN GARANTÍAS DE NINGÚN TIPO.  NO SE OFRECE DE MANERA EXPLÍCITA, IMPLÍCITA, NI JURADA GARANTÍAS, AFIRMACIONES NI DECLARACIONES DE NINGÚN TIPO CON RESPECTO AL CLIENTE @FIRMA.
-5.2 Descargo de responsabilidad. Usted recibe el CLIENTe @firma de forma gratuita. POR CONSIGUIENTE, USTED RECONOCE Y ACEPTA QUE EL GOBIERNO DE ESPAÑA Y SU PERSONAL NO TENDRÁ RESPONSABILIDAD ALGUNA QUE SURJA DEL USO DEL CLIENTE @FIRMA O SE RELACIONE CON DICHO USO. SU ÚNICO DERECHO O RECURSO LEGAL ANTE CUALQUIER PROBLEMA O DISCONFORMIDAD CON EL CLIENTE @FIRMA ES DEJAR DE USARLO DE INMEDIATO.
+5.1 Ausencia de garantías. AUTOFIRMA SE PROVEE EN SU ESTADO ACTUAL Y SIN GARANTÍAS DE NINGÚN TIPO.  NO SE OFRECE DE MANERA EXPLÍCITA, IMPLÍCITA, NI JURADA GARANTÍAS, AFIRMACIONES NI DECLARACIONES DE NINGÚN TIPO CON RESPECTO A AUTOFIRMA.
+5.2 Descargo de responsabilidad. Usted recibe Autofirma de forma gratuita. POR CONSIGUIENTE, USTED RECONOCE Y ACEPTA QUE EL GOBIERNO DE ESPAÑA Y SU PERSONAL NO TENDRÁ RESPONSABILIDAD ALGUNA QUE SURJA DEL USO DE AUTOFIRMA O SE RELACIONE CON DICHO USO. SU ÚNICO DERECHO O RECURSO LEGAL ANTE CUALQUIER PROBLEMA O DISCONFORMIDAD CON AUTOFIRMA ES DEJAR DE USARLO DE INMEDIATO.
 
-6. El CLIENTe @firma incluye o puede incluir porciones o componentes de software de los siguientes productos, cubiertos por las siguientes licencias:
+6. Autofirma incluye o puede incluir porciones o componentes de software de los siguientes productos, cubiertos por las siguientes licencias:
 
 Java - http://java.net/
   Java Research License - http://www.java.net/jrl.csp
@@ -51,4 +51,4 @@ Se declina toda responsabilidad por cualquier daño pérdida provocada por este 
 
 
 
-USTED RECONOCE EXPRESAMENTE QUE HA LEÍDO ESTAS CONDICIONES DEL CLIENTE @FIRMA Y QUE COMPRENDE Y ACEPTA LOS DERECHOS, LAS OBLIGACIONES, LAS CLÁUSULAS Y LAS CONDICIONES AQUÍ ESTIPULADAS. 
+USTED RECONOCE EXPRESAMENTE QUE HA LEÍDO ESTAS CONDICIONES DE AUTOFIRMA Y QUE COMPRENDE Y ACEPTA LOS DERECHOS, LAS OBLIGACIONES, LAS CLÁUSULAS Y LAS CONDICIONES AQUÍ ESTIPULADAS. 
