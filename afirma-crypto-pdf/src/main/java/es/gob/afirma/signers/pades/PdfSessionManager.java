@@ -437,7 +437,7 @@ public final class PdfSessionManager {
 		// Establecemos el render segun iText antiguo, varia en versiones modernas
 		//TODO: Se podria configurar PdfSignatureAppearance.SignatureRenderGraphicAndDescription
 		// para que se muestre la imagen y el texto uno al lado del otro, pero eso obligaria a
-		// tener que retocar la previsualizacion en AutoFirma. Tambien se deberia establecer el
+		// tener que retocar la previsualizacion en Autofirma. Tambien se deberia establecer el
 		// campo SignatureGraphic en lugar de Image.
 		sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
 

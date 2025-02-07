@@ -1,2 +1,2 @@
-signtool sign /f AutoFirma_sign.pfx /p afirma AutoFirma_64_installer.msi
+signtool sign /f Autofirma_sign.pfx /p afirma Autofirma_64_installer.msi
 @pause

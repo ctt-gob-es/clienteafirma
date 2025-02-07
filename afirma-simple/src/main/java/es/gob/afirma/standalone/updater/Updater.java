@@ -235,7 +235,7 @@ public final class Updater {
 						catch (final Exception e) {
 							LOGGER.log(
 								Level.SEVERE,
-								"No se ha podido abrir el sitio Web de actualizaciones del Cliente @firma: " + e, //$NON-NLS-1$
+								"No se ha podido abrir el sitio Web de actualizaciones de Autofirma: " + e, //$NON-NLS-1$
 								e
 							);
 							AOUIFactory.showErrorMessage(
@@ -248,7 +248,7 @@ public final class Updater {
 					}
 				}
 				else {
-					LOGGER.info("Se ha encontrado instalada la ultima version disponible de AutoFirma"); //$NON-NLS-1$
+					LOGGER.info("Se ha encontrado instalada la ultima version disponible de Autofirma"); //$NON-NLS-1$
 				}
 			}).start();
 		}

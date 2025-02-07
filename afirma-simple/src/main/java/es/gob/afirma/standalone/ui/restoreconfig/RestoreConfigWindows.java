@@ -301,7 +301,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		return option == JOptionPane.OK_OPTION;
 	}
 
-	/** Instala el certificado ra&iacute;z CA de AutoFirma
+	/** Instala el certificado ra&iacute;z CA de Autofirma
 	 * en el almac&eacute;n ra&iacute;z de Windows.
 	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @param certFile El certificado a instalar. */
@@ -374,7 +374,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		while (!installed);
 	}
 
-	/** Instala el certificado ra&iacute;z CA de AutoFirma
+	/** Instala el certificado ra&iacute;z CA de Autofirma
 	 * en el almac&eacute;n ra&iacute;z de Mozilla.
 	 *  @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 *  @param certFile El certificado a instalar.

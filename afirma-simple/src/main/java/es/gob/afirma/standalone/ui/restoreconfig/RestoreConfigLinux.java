@@ -314,11 +314,11 @@ final class RestoreConfigLinux implements RestoreConfig {
 	private static void deleteInstalledCertificates(final File certsDir) {
 
 		if (checkSSLKeyStoreGenerated(certsDir) && !new File(certsDir, KS_FILENAME).delete()) {
-			LOGGER.warning("No se ha podido eliminar de disco el almacen de claves SSL de AutoFirma"); //$NON-NLS-1$
+			LOGGER.warning("No se ha podido eliminar de disco el almacen de claves SSL de Autofirma"); //$NON-NLS-1$
 		}
 
 		if (checkSSLRootCertificateGenerated(certsDir) && !new File(certsDir, FILE_AUTOFIRMA_CERTIFICATE).delete()) {
-			LOGGER.warning("No se ha podido eliminar el certificado de disco raiz SSL de AutoFirma"); //$NON-NLS-1$
+			LOGGER.warning("No se ha podido eliminar el certificado de disco raiz SSL de Autofirma"); //$NON-NLS-1$
 		}
 
 	}

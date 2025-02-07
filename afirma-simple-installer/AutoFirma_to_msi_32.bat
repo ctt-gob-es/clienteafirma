@@ -1,5 +1,5 @@
-candle AutoFirma_32_installer.wxs
-light -ext WixUtilExtension AutoFirma_32_installer.wixobj
-move AutoFirma_32_installer.msi AutoFirma32
-rename AutoFirma32\AutoFirma_32_installer.msi AutoFirma_32_v1_9_installer.msi
+candle Autofirma_32_installer.wxs
+light -ext WixUtilExtension Autofirma_32_installer.wixobj
+move Autofirma_32_installer.msi Autofirma32
+rename Autofirma32\Autofirma_32_installer.msi Autofirma_32_v1_9_installer.msi
 @pause

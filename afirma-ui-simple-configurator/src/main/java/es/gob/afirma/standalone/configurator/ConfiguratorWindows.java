@@ -40,7 +40,7 @@ import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 
-/** Configura la instalaci&oacute;n en Windows para la correcta ejecuci&oacute;n de AutoFirma. */
+/** Configura la instalaci&oacute;n en Windows para la correcta ejecuci&oacute;n de Autofirma. */
 final class ConfiguratorWindows implements Configurator {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -166,7 +166,7 @@ final class ConfiguratorWindows implements Configurator {
 		// se puedan crear los ficheros sin permisos especiales
 		if (jnlpDeployment) {
 			final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-			final File appDir = new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+			final File appDir = new File (commonDir, "Autofirma"); //$NON-NLS-1$
 			if (appDir.isDirectory() || appDir.mkdirs()) {
 				return appDir;
 			}
@@ -184,7 +184,7 @@ final class ConfiguratorWindows implements Configurator {
 	@Override
 	public File getAlternativeApplicationDirectory() {
 		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+		return new File (commonDir, "Autofirma"); //$NON-NLS-1$
 	}
 
 	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
@@ -211,7 +211,7 @@ final class ConfiguratorWindows implements Configurator {
 			plugins = pluginsManager.getPluginsLoadedList();
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de AutoFirma", e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de Autofirma", e); //$NON-NLS-1$
 		}
 
 		// Desinstalamos los plugins instalados si los hubiese

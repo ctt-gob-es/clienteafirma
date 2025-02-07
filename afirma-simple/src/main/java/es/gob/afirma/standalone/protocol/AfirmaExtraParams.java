@@ -1,7 +1,7 @@
 package es.gob.afirma.standalone.protocol;
 
 /**
- * ExtraParams directamente utilizados por AutoFirma para configurar su comportamiento.
+ * ExtraParams directamente utilizados por Autofirma para configurar su comportamiento.
  */
 class AfirmaExtraParams {
 

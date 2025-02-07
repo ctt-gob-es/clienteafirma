@@ -220,7 +220,7 @@ public final class SslSecurityManager {
 	}
 
 	/**
-	 * Configura los almacenes de confianza de Java y AutoFirma para la validaci&oacute;n de las
+	 * Configura los almacenes de confianza de Java y Autofirma para la validaci&oacute;n de las
 	 * conexiones SSL.
 	 * @throws IOException Cuando falla la lectura del almac&eacute;n del cliente.
 	 * @throws GeneralSecurityException Cuando falla la carga del almac&eacute;n.
@@ -268,7 +268,7 @@ public final class SslSecurityManager {
 
 		final MultiX509TrustManager trustManager = new MultiX509TrustManager(trustManagers);
 
-		LOGGER.info("Se configura el almacen de confianza de AutoFirma"); //$NON-NLS-1$
+		LOGGER.info("Se configura el almacen de confianza de Autofirma"); //$NON-NLS-1$
 
 		final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
 		sslContext.init(null, new TrustManager[] { trustManager }, secureRandom);

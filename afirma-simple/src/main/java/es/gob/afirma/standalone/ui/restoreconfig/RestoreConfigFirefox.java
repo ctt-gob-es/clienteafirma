@@ -131,7 +131,7 @@ final class RestoreConfigFirefox {
 		// No instanciable
 	}
 
-	/** Genera el script que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
+	/** Genera el script que elimina el warning al ejecutar Autofirma desde Chrome para LINUX.
 	 * En linux genera el script que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
 	 * @param targetDir Directorio de instalaci&oacute;n del sistema
 	 * @param userDir Directorio de usuario dentro del sistema operativo.
@@ -218,7 +218,7 @@ final class RestoreConfigFirefox {
 
 	}
 
-	/** Genera el <i>script</i> que elimina el warning al ejecutar AutoFirma desde Chrome para LINUX.
+	/** Genera el <i>script</i> que elimina el warning al ejecutar Autofirma desde Chrome para LINUX.
 	 * En Linux genera el <i>script</i> que hay que ejecutar para realizar la instalaci&oacute;n pero no lo ejecuta, de eso se encarga el instalador Debian.
 	 * @param targetDir Directorio de instalaci&oacute;n del sistema.
 	 * @param usersDirs Directorio donde estan las carpetas de los usuarios. */
@@ -596,7 +596,7 @@ final class RestoreConfigFirefox {
 			executeCertUtilToImport(workingDir, certFile, profilesDir);
 
 		} catch (final Exception e) {
-			LOGGER.warning("No se pudo instalar la CA del certificado SSL para el socket en todos los perfiles de Firefox. Probablemente alguno de los perfiles nunca haya sido iniciado o no se este ejecutando AutoFirma como administrador: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pudo instalar la CA del certificado SSL para el socket en todos los perfiles de Firefox. Probablemente alguno de los perfiles nunca haya sido iniciado o no se este ejecutando Autofirma como administrador: " + e); //$NON-NLS-1$
 			throw new KeyStoreException("Error al instalar la CA de confianza en el almacen de Firefox", e); //$NON-NLS-1$
 		}
 

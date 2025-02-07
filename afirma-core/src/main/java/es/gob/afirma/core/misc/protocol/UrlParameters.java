@@ -58,7 +58,7 @@ public abstract class UrlParameters {
 	/** Par&aacute;metro de entrada con el identificador del fichero remoto de datos. */
 	protected static final String FILE_ID_PARAM = "fileid"; //$NON-NLS-1$
 
-	//TODO: Eliminar para terminar la compatibilidad con AutoFirma 1.4.X
+	//TODO: Eliminar para terminar la compatibilidad con Autofirma 1.4.X
 	/** Viejo par&aacute;metro de entrada con la configuraci&oacute;n del almac&eacute;n de claves. */
 	protected static final String KEYSTORE_OLD_PARAM = "keystore"; //$NON-NLS-1$
 

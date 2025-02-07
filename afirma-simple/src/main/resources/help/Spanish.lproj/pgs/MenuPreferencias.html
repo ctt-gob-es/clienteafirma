@@ -29,8 +29,8 @@
      <li><b>Restaurar configuraci&oacute;n general de la aplicaci&oacute;n:</b> Opci&oacute;n para restaurar la configuraci&oacute;n por defecto de la aplicaci&oacute;n.</li>
      <li><b>No pedir confirmaci&oacute;n al cerrar la aplicaci&oacute;n:</b> Permite salir de la aplicaci&oacute;n sin confirmaci&oacute;n del usuario.</li>
      <li><b>Buscar actualizaciones al inicio:</b> Permite configurar si se deben b&uacute;scar si hay actualizaciones disponibles al iniciar la aplicacion.</li>
-     <li><b>Habilitar JMulticard para el uso de las tarjetas de la FNMT y DNIe:</b> S&oacute;lo en Windows y Linux. Configura si debe utilizarse el controlador integrado en AutoFirma para el uso de las tarjetas de FNMT y DNIe. En caso de desactivarse, se utilizar&aacute;n los controladores encontrados en el sistema. El uso de esta funci&oacute;n permite usar las tarjetas compatibles cuando el usuario no tiene instalado su controlador o existe alguna incompatibilidad con &eacute;l. Esta funci&oacute;n puede ocasionar que se solicite al usuario m&uacute;ltiples veces la inserci&oacute;n del PIN de la tarjeta en procesos de firma masiva. Esta configuraci&oacute;n no tendr&aacute; efecto hasta la pr&oacute;xima vez que se abra la aplicaci&oacute;n.</li>
-     <li><b>Funcionamiento optimizado para VDI:</b> S&oacute;lo en Windows. Configura la comunicaci&oacute;n por WebScokets con el navegador de tal modo que se evitar&aacute;n bloqueos cuando se utilice AutoFirma en un entorno VDI. Sin embargo, esta configuraci&oacute;n ralentiza la comunicaci&oacute;n cuando la cantidad de datos a transmitir es grande, por lo que no se recomienda en otros entornos.</li>
+     <li><b>Habilitar JMulticard para el uso de las tarjetas de la FNMT y DNIe:</b> S&oacute;lo en Windows y Linux. Configura si debe utilizarse el controlador integrado en Autofirma para el uso de las tarjetas de FNMT y DNIe. En caso de desactivarse, se utilizar&aacute;n los controladores encontrados en el sistema. El uso de esta funci&oacute;n permite usar las tarjetas compatibles cuando el usuario no tiene instalado su controlador o existe alguna incompatibilidad con &eacute;l. Esta funci&oacute;n puede ocasionar que se solicite al usuario m&uacute;ltiples veces la inserci&oacute;n del PIN de la tarjeta en procesos de firma masiva. Esta configuraci&oacute;n no tendr&aacute; efecto hasta la pr&oacute;xima vez que se abra la aplicaci&oacute;n.</li>
+     <li><b>Funcionamiento optimizado para VDI:</b> S&oacute;lo en Windows. Configura la comunicaci&oacute;n por WebScokets con el navegador de tal modo que se evitar&aacute;n bloqueos cuando se utilice Autofirma en un entorno VDI. Sin embargo, esta configuraci&oacute;n ralentiza la comunicaci&oacute;n cuando la cantidad de datos a transmitir es grande, por lo que no se recomienda en otros entornos.</li>
     </ul>
    </li>
    <li><b>Opciones de firma:</b>
@@ -57,7 +57,7 @@
       </p>
 	 <li><b>Solicitar confirmaci&oacute;n para firmar:</b>
 	   Cuando est&aacute; habilitada esta opci&oacute;n se solicita confirmaci&oacute;n al usuario antes de firmar.</li>
-	 <li><b>Permitir agregar nuevas firmas a documentos con firmas no v&aacute;lidas:</b> Al habilitar esta opci&oacute;n, AutoFirma no impedir&aacute; agregar nuevas firmas (cofirma o contrafirma) a documentos en los que se encuentre que ya hay firmas y estas no sean v&aacute;lidas (est&eacute;n corruptas o con certificados caducados).</li>
+	 <li><b>Permitir agregar nuevas firmas a documentos con firmas no v&aacute;lidas:</b> Al habilitar esta opci&oacute;n, Autofirma no impedir&aacute; agregar nuevas firmas (cofirma o contrafirma) a documentos en los que se encuentre que ya hay firmas y estas no sean v&aacute;lidas (est&eacute;n corruptas o con certificados caducados).</li>
      <li><b>Sobreescribir ficheros en el directorio de salida:</b> Opci&oacute;n para configurar si se desea
        que, al generar la estructura de directorios de firmas resultante de un proceso de firma masiva, y en caso
        de encontrar un fichero con el mismo nombre con el que se va a guardar una firma, se sobreescriba el
@@ -71,12 +71,12 @@
      trabaja en sitios web con un certificado SSL no reconocido, es probable que deba deshabilitar esta opci&oacute;n.</li>
     </ul>
 	<ul>
-     <li><b>Dominios seguros:</b> Opci&oacute;n para configurar una lista de dominios que AutoFirma tratar&aacute; como seguros al conectar a traves de SSL.
+     <li><b>Dominios seguros:</b> Opci&oacute;n para configurar una lista de dominios que Autofirma tratar&aacute; como seguros al conectar a traves de SSL.
      Para saber m&aacute;s, consulte la p&aacute;gina <a href="VentanaListaBlancaDominios.html">Configuraci&oacute;n de lista blanca de dominios</a>.</li>
     </ul>
     <ul>
      <li><b>Configurar proxy:</b> Opci&oacute;n para configurar el proxy para todas las conexiones de red de
-     AutoFirma. Para saber m&aacute;s, consulte la p&aacute;gina <a href="VentanaConfigurarProxy.html">Configuraci&oacute;n del proxy de red</a>.</li>
+     Autofirma. Para saber m&aacute;s, consulte la p&aacute;gina <a href="VentanaConfigurarProxy.html">Configuraci&oacute;n del proxy de red</a>.</li>
     </ul>
 	<ul>
      <li><b>Certificados de confianza:</b> Opci&oacute;n para configurar certificados de confianza en conexiones de red. Para saber m&aacute;s, consulte la p&aacute;gina <a href="VentanaCertificadosConfianza.html">Certificados de confianza</a>.</li>
@@ -106,7 +106,7 @@
      <ul>
       <li>Formato b&aacute;sico de firma: Permite configurar el formato b&aacute;sico de las firmas PAdES:
        <ul>
-        <li>PAdES B&aacute;sico: Es el formato de firma PAdES generado por Adobe Acrobat y el utilizado por defecto por el Cliente @firma.</li>
+        <li>PAdES B&aacute;sico: Es el formato de firma PAdES generado por Adobe Acrobat y el utilizado por defecto por Autofirma.</li>
         <li>PAdES-BES: Es el formato que m&aacute;s se ajusta al est&aacute;ndar PAdES, pero Adobe Reader/Acrobat no valida correctamente las multifirmas generadas a partir de &eacute;l.</li>
        </ul>
       </li>
@@ -241,7 +241,7 @@
      <ul>
       <li>Permite seleccionar el almac&eacute;n de claves que se cargará por defecto en la interfaz de escritorio.</li>
       <li><b>Ver contenido:</b> Permite ver los certificados que contiene el almac&eacute;n seleccionado.</li>
-      <li><b>Usar tambi&eacute;n en las llamadas de AutoFirma desde el navegador:</b> Indica si se desea que el almac&eacute;n configurado sea el que se cargue por defecto también cuando se llame a AutoFirma desde el navegador.</li>
+      <li><b>Usar tambi&eacute;n en las llamadas de Autofirma desde el navegador:</b> Indica si se desea que el almac&eacute;n configurado sea el que se cargue por defecto también cuando se llame a Autofirma desde el navegador.</li>
 	 </ul>
 	</li>
     <li><b>Filtros de certificados:</b>

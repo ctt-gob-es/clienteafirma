@@ -48,7 +48,7 @@ public class RestoreConfigManager {
 		}
 	}
 
-	/** Repara la configuraci&oacute;n de navegadores para permitir la correcta ejecuci&oacute;n de AutoFirma.
+	/** Repara la configuraci&oacute;n de navegadores para permitir la correcta ejecuci&oacute;n de Autofirma.
 	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n. */
 	public void restoreConfigAutoFirma(final RestoreConfigPanel configPanel) {
 

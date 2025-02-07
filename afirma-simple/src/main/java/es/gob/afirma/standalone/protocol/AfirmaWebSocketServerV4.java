@@ -16,7 +16,7 @@ import org.java_websocket.WebSocket;
 
 /**
  * Servidor para la comunicaci&oacute;n por <i>WebSocket</i> acorde a la versi&oacute;n 4
- * del protocolo de AutoFirma.
+ * del protocolo de Autofirma.
  */
 public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 
@@ -38,7 +38,7 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 	private static final String LOCALHOST_ADDRESS = "127.0.0.1"; //$NON-NLS-1$
 
 	/**
-	 * Genera un servidor websocket que atiende las peticiones del Cliente @firma.
+	 * Genera un servidor websocket que atiende las peticiones de Autofirma.
 	 * @param port Puerto a trav&eacute;s del que realizar la comunicaci&oacute;n.
 	 * @param sessionId Identificador de sesi&oacute;n con la que deben autenticarse
 	 * las llamadas.

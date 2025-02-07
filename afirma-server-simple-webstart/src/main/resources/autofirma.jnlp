@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <jnlp spec="1.0+" codebase="%CODEBASE%">
 	<information> 
-		<title>AutoFirma</title> 
+		<title>Autofirma</title> 
 		<vendor>Gobierno de Espana</vendor>
-		<description>Desplegable JNLP de AutoFirma</description> 
-		<description kind="short">AutoFirma</description>
+		<description>Desplegable JNLP de Autofirma</description> 
+		<description kind="short">Autofirma</description>
 		<icon href="%CODEBASE%logo64.png" width="64" height="64"/>
 	</information> 
 	<security>

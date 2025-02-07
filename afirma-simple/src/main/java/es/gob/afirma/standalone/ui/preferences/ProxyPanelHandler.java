@@ -128,7 +128,7 @@ public class ProxyPanelHandler {
 			proxyType = ConfigType.NONE;
 		}
 
-		// XXX: Comprobacion por compatibilidad entre AutoFirma 1.7 y anteriores. Si se encuentra configurada
+		// XXX: Comprobacion por compatibilidad entre Autofirma 1.7 y anteriores. Si se encuentra configurada
 		// la propiedad antigua, ajustamos la configuracion
 		if (PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED, PreferencesSource.USER) != null) {
 			final boolean selected = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_PROXY_SELECTED);
@@ -336,7 +336,7 @@ public class ProxyPanelHandler {
 		new CheckConnectionThread(this.view, host, port).start();
 	}
 
-	private class CheckConnectionThread extends Thread {
+	private static class CheckConnectionThread extends Thread {
 
 		private final Logger SUBLOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 

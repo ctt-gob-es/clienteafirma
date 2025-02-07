@@ -279,7 +279,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		try {
 			executeScript(mac_script_path, true, false);
 		} catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se ha podido cambiar la propiedad del directorio de AutoFirma", e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se ha podido cambiar la propiedad del directorio de Autofirma", e); //$NON-NLS-1$
 		}
 	}
 

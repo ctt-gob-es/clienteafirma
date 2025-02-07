@@ -49,7 +49,7 @@ import es.gob.afirma.standalone.ui.AboutDialog;
 import es.gob.afirma.standalone.ui.OSXHandler;
 
 /**
- * Gestiona la ejecuci&oacute;n de AutoFirma en una invocaci&oacute;n por
+ * Gestiona la ejecuci&oacute;n de Autofirma en una invocaci&oacute;n por
  * protocolo y bajo un entorno compatible <code>Swing</code>.
  *
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
@@ -503,7 +503,7 @@ public final class ProtocolInvocationLauncher {
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
 			} catch (final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                LOGGER.severe("Se necesita una version mas moderna de Autofirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
 						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
@@ -615,7 +615,7 @@ public final class ProtocolInvocationLauncher {
 
                 return dataToSend.toString();
 			} catch (final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                LOGGER.severe("Se necesita una version mas moderna de Autofirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
 						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
@@ -725,7 +725,7 @@ public final class ProtocolInvocationLauncher {
                 return dataToSend.toString();
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                LOGGER.severe("Se necesita una version mas moderna de Autofirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
 						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
@@ -810,7 +810,7 @@ public final class ProtocolInvocationLauncher {
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
 			} catch (final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                LOGGER.severe("Se necesita una version mas moderna de Autofirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
 						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
@@ -860,7 +860,7 @@ public final class ProtocolInvocationLauncher {
 						bySocket);
 
 			} catch (final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                LOGGER.severe("Se necesita una version mas moderna de Autofirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
 						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager

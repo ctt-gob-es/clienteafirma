@@ -28,11 +28,11 @@ SetCompressor lzma
 
 VIProductVersion "${FILE_VERSION}"
 VIFileVersion "${FILE_VERSION}"
-VIAddVersionKey "ProductName" "AutoFirma"
+VIAddVersionKey "ProductName" "Autofirma"
 VIAddVersionKey "ProductVersion" "${VERSION}"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "LegalCopyright" "(C) Gobierno de España"
-VIAddVersionKey "FileDescription" "AutoFirma (32 bits)"
+VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
 
 ;--------------------------------
 ;Macros para el tratamiento de los parametros de entrada del instalador
@@ -75,7 +75,7 @@ VIAddVersionKey "FileDescription" "AutoFirma (32 bits)"
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma32\AutoFirmaGenerator.exe
+OutFile Autofirma32\AutofirmaGenerator.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -83,8 +83,8 @@ OutFile AutoFirma32\AutoFirmaGenerator.exe
 ;la frase en espanol mas larga:
 ; Bienvenido al Asistente de Instalacion de Aplicacion $Name
 ; no se ve el contenido de la variable $Name si el tamano es muy grande
-Name "AutoFirma"
-Caption "Instalador de AutoFirma (Cliente @firma)"
+Name "Autofirma"
+Caption "Instalador de Autofirma"
 Icon ic_launcher.ico
 
 ;Comprobacion de integridad del fichero activada
@@ -114,7 +114,7 @@ Var USE_SYSTEM_JRE
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
-InstallDir "$PROGRAMFILES\AutoFirma"
+InstallDir "$PROGRAMFILES\Autofirma"
 
 ; check if the program has already been installed, if so, take this dir
 ; as install dir
@@ -137,7 +137,7 @@ SetCompress auto
 ; Instalacion de la aplicacion y configuracion de la misma            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-Section "AutoFirma" sPrograma
+Section "Autofirma" sPrograma
 
 	; En caso de haber recibido los archivos, comprobamos que existan
 	${If} $CERTIFICATE_PATH != "false" 
@@ -149,7 +149,7 @@ Section "AutoFirma" sPrograma
 
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
-	StrCpy $PATH "AutoFirma"
+	StrCpy $PATH "Autofirma"
 
 	;Si se ha solicitado usar el JRE instalado en el sistema pero no se encuentra instalado, saldremos del instalador
 	${If} $USE_SYSTEM_JRE == "true" 
@@ -201,9 +201,9 @@ Section "AutoFirma" sPrograma
 	SetOutPath $INSTDIR\$PATH
 
 	;Copiamos todos los ficheros que componen nuestra aplicacion
-	File  AutoFirma32\AutoFirma.exe
-	File  AutoFirma32\AutoFirmaConfigurador.exe
-	File  AutoFirma32\AutoFirmaCommandLine.exe
+	File  Autofirma32\Autofirma.exe
+	File  Autofirma32\AutofirmaConfigurador.exe
+	File  Autofirma32\AutofirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -217,40 +217,40 @@ Section "AutoFirma" sPrograma
 
 	;Creamos un acceso directo en el escitorio salvo que se haya configurado lo contrario
 	StrCmp $CREATE_ICON "false" +2
-		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
+		CreateShortCut "$DESKTOP\Autofirma.lnk" "$INSTDIR\$PATH\Autofirma.exe"
 
 	;Menu items
-	CreateDirectory "$SMPROGRAMS\AutoFirma"
-	CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
+	CreateDirectory "$SMPROGRAMS\Autofirma"
+	CreateShortCut "$SMPROGRAMS\Autofirma\Autofirma.lnk" "$INSTDIR\$PATH\Autofirma.exe"
 
 	WriteRegStr HKLM "SOFTWARE\$PATH" "InstallDir" $INSTDIR
 	WriteRegStr HKLM "SOFTWARE\$PATH" "Version" "${VERSION}"
 
 	;Registro
 	;CascadeAfirma.reg
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\AutoFirma.exe sign -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\Autofirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\Autofirma.exe sign -gui -i "%1"'
 	
 	;Verify
 	; .csig
 	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" "Firma binaria CMS/CAdES"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
 
 	;Verify
 	; .xsig
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" "Firma XMLDSig/XAdES"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
 	
 	;Protocolo afirma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "" "URL:Afirma Protocol"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\Autofirma.exe "%1"'
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +2
@@ -283,7 +283,7 @@ Section "AutoFirma" sPrograma
 	StrCmp $UPDATE_CONFIG "true" 0 +2
 		StrCpy $R8 "-update_config"
 
-	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R4 $R5 $R6 $R7 $R8 /passive'
+	ExecWait '"$INSTDIR\$PATH\AutofirmaConfigurador.exe" $R4 $R5 $R6 $R7 $R8 /passive'
 
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
@@ -550,7 +550,7 @@ Function DeleteCertificateOnInstall
   Pop $0
 FunctionEnd 
 
-; Funcion para eliminar versiones anteriores de AutoFirma. Las versiones se
+; Funcion para eliminar versiones anteriores de Autofirma. Las versiones se
 ; buscan a traves del registro, para lo cual afecta si se tiene configurada la
 ; vista de 32 o 64 bits
 ; Uso:
@@ -583,8 +583,8 @@ Function RemoveOldVersions
 	IfFileExists "$R0\no_ejecutar_x86.exe" 0 +2
 		StrCpy $R1 "no_ejecutar_x86.exe"
 
-	; Comprobamos si existe configuracion de usuario de AutoFirma. Si no existe, vamos directamente a la
-	; desinstalacion de la version anterior de AutoFirma y, si existe, hacemos copia para restaurarla una
+	; Comprobamos si existe configuracion de usuario de Autofirma. Si no existe, vamos directamente a la
+	; desinstalacion de la version anterior de Autofirma y, si existe, hacemos copia para restaurarla una
 	; vez que desinstalemos esa version (el desinstalar una version elimina la configuracion).
 	StrCpy $6 "0"
 	ClearErrors
@@ -620,7 +620,7 @@ Function RemoveOldVersions
 	StrCmp $INSTDIR $R0 +2 0
 		RMDir /r /REBOOTOK $R0
 
-	; Si habia una configuracion anterior de AutoFirma, la restauramos
+	; Si habia una configuracion anterior de Autofirma, la restauramos
 	StrCmp $6 "0" End 
 		StrCpy $0 $6
 		Push $0
@@ -729,7 +729,7 @@ Function AddToPath
   IntOp $2 $2 + $3
   IntOp $2 $2 + 2 ; $2 = strlen(dir) + strlen(PATH) + sizeof(";")
   IntCmp $2 ${NSIS_MAX_STRLEN} +3 +3 0
-    DetailPrint "La ruta de AutoFirma hace que el PATH sea demasiado largo. No se agregará"
+    DetailPrint "La ruta de Autofirma hace que el PATH sea demasiado largo. No se agregará"
     Goto done
   ; Append dir to PATH
   DetailPrint "Agregamos al PATH: $0"

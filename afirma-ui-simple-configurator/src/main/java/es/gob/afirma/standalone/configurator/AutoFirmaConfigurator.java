@@ -131,14 +131,14 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		}
 	}
 
-	/** Configurador de AutoFirma.
+	/** Configurador de Autofirma.
 	* @param args Argumentos para configurar la ejecuci&oacute;n del proceso. */
 	public AutoFirmaConfigurator(final String[] args) {
 		this(new ConfigArgs(args));
 	}
 
 	/**
-	 * Configurador de AutoFirma.
+	 * Configurador de Autofirma.
 	 * @param config Argumentos para configurar la ejecuci&oacute;n del proceso.
 	 */
 	public AutoFirmaConfigurator(final ConfigArgs config) {
@@ -171,7 +171,7 @@ public class AutoFirmaConfigurator implements ConsoleListener {
 		}
 	}
 
-	/** Configura el entorno para permitir la correcta ejecuci&oacute;n de AutoFirma.
+	/** Configura el entorno para permitir la correcta ejecuci&oacute;n de Autofirma.
 	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados.
 	 * @throws ConfigurationException Cuando falla la generacion del certificados SSL.
 	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos. */

@@ -24,7 +24,7 @@ public class HashPlugin extends AfirmaPlugin {
 
 	private static final String EXECUTOR_BAT_FILENAME = "execute.bat"; //$NON-NLS-1$
 
-	private static final String APP_EXE_FILENAME = "AutoFirma.exe"; //$NON-NLS-1$
+	private static final String APP_EXE_FILENAME = "Autofirma.exe"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger(HashPlugin.class.getName());
 

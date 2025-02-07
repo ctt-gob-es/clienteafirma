@@ -8,6 +8,6 @@
  */
 
 /**
- * Clases principales de la aplicaci&oacute;n "AutoFirma".
+ * Clases principales de la aplicaci&oacute;n "Autofirma".
  */
 package es.gob.afirma.standalone;

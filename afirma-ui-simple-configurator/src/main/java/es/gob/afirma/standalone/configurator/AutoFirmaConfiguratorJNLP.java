@@ -9,7 +9,7 @@
 
 package es.gob.afirma.standalone.configurator;
 
-/** Clase para la configuraci&oacute;n de la instalaci&oacute;n de AutoFirma desde un despliegue JNLP. */
+/** Clase para la configuraci&oacute;n de la instalaci&oacute;n de Autofirma desde un despliegue JNLP. */
 public class AutoFirmaConfiguratorJNLP {
 
 //    /** Inicia el proceso de configuraci&oacute;n.

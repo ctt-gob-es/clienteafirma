@@ -69,7 +69,7 @@ public class PluginsUiComponentsBuilder {
 	}
 
 	/**
-	 * Recupera la lista de menus de los plugins cargados por AutoFirma.
+	 * Recupera la lista de menus de los plugins cargados por Autofirma.
 	 * @return Listado de menus encontrados.
 	 */
 	public static List<GenericMenuOption> getPluginsMenus() {

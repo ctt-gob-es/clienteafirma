@@ -28,11 +28,11 @@ SetCompressor lzma
 
 VIProductVersion "${FILE_VERSION}"
 VIFileVersion "${FILE_VERSION}"
-VIAddVersionKey "ProductName" "AutoFirma"
+VIAddVersionKey "ProductName" "Autofirma"
 VIAddVersionKey "ProductVersion" "${VERSION}"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "LegalCopyright" "(C) Gobierno de España"
-VIAddVersionKey "FileDescription" "AutoFirma (64 bits)"
+VIAddVersionKey "FileDescription" "Autofirma (64 bits)"
 
 ;--------------------------------
 ;Paginas del instalador
@@ -73,7 +73,7 @@ Var Firefox_Integration_Checkbox_State
 !define SECTION_ON ${SF_SELECTED} # 0x1
 
 Function createConfigPage
-  !insertmacro MUI_HEADER_TEXT "Opciones de integración avanzadas" "Seleccione las opciones de integración que desee que configure AutoFirma"
+  !insertmacro MUI_HEADER_TEXT "Opciones de integración avanzadas" "Seleccione las opciones de integración que desee que configure Autofirma"
   
   nsDialogs::Create 1018
   Pop $0
@@ -133,7 +133,7 @@ FunctionEnd
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile AutoFirma64/AutoFirma_64_v1_9_0_installer.exe
+OutFile Autofirma64/Autofirma_64_v1_9_0_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -141,8 +141,8 @@ OutFile AutoFirma64/AutoFirma_64_v1_9_0_installer.exe
 ;la frase en espanol mas larga:
 ; Bienvenido al Asistente de Instalacion de Aplicacion $Name
 ; no se ve el contenido de la variable $Name si el tamano es muy grande
-Name "AutoFirma"
-Caption "Instalador de AutoFirma (Cliente @firma)"
+Name "Autofirma"
+Caption "Instalador de Autofirma"
 Icon ic_launcher.ico
 
 ;Comprobacion de integridad del fichero activada
@@ -158,7 +158,7 @@ Var PATH
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
-InstallDir "$PROGRAMFILES64\AutoFirma"
+InstallDir "$PROGRAMFILES64\Autofirma"
 
 ; check if the program has already been installed, if so, take this dir
 ; as install dir
@@ -177,7 +177,7 @@ SetDatablockOptimize on
 ;Habilitamos la compresion de nuestro instalador
 SetCompress auto
 ;Personalizamos el mensaje de desinstalacion
-UninstallText "Desinstalador de AutoFirma."
+UninstallText "Desinstalador de Autofirma."
 
 !macro MVersionCheck Ver1 Ver2 OutVar
  Push "${Ver1}"
@@ -190,22 +190,22 @@ UninstallText "Desinstalador de AutoFirma."
 ; Instalacion de la aplicacion y configuracion de la misma            ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-Section "AutoFirma" sPrograma 
+Section "Autofirma" sPrograma
 
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
-	StrCpy $PATH "AutoFirma"
+	StrCpy $PATH "Autofirma"
 
 	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
 	System::Call 'kernel32::GetCurrentProcess()i.r0'
 	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
 	pop $3
 	${If} $1 != 1
-		MessageBox MB_OK "No se puede instalar AutoFirma 64 bits en un entorno 32 bits." 
+		MessageBox MB_OK "No se puede instalar Autofirma 64 bits en un entorno 32 bits." 
 		Quit
 	${EndIf}
 
-	;Comprobamos si ya existe una versión de AutoFirma instalada. Si existe, se devolvera
+	;Comprobamos si ya existe una versión de Autofirma instalada. Si existe, se devolvera
 	;su numero de version y se dejara configurado el registro a 32 o 64 bits segun corresponda
 	Call CheckVersionInstalled
 	Pop $R1
@@ -213,10 +213,10 @@ Section "AutoFirma" sPrograma
 		; Si es la misma version o superior, detenemos el proceso. Si no, se elimina.
 		${VersionCheckNew} $R1 ${VERSION} "$R2"
 		${If} $R2 = 0
-		  MessageBox MB_OK "Esta versión de AutoFirma ya está instalada." 
+		  MessageBox MB_OK "Esta versión de Autofirma ya está instalada." 
 		  Quit
 		${ElseIf} $R2 <> 2
-		  MessageBox MB_OK "La versión actual de AutoFirma es más nueva que la que se quiere instalar."
+		  MessageBox MB_OK "La versión actual de Autofirma es más nueva que la que se quiere instalar."
 		  Quit
 		${EndIf}
 		Call RemoveOldVersions
@@ -236,9 +236,9 @@ Section "AutoFirma" sPrograma
 	SetOutPath $INSTDIR\$PATH
 	
 	;Copiamos todos los ficheros que componen nuestra aplicacion
-	File  AutoFirma64\AutoFirma.exe
-	File  AutoFirma64\AutoFirmaConfigurador.exe
-	File  AutoFirma64\AutoFirmaCommandLine.exe
+	File  Autofirma64\Autofirma.exe
+	File  Autofirma64\AutofirmaConfigurador.exe
+	File  Autofirma64\AutofirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
 
@@ -250,7 +250,7 @@ Section "AutoFirma" sPrograma
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de AutoFirma.' IDOK loopFirefox
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de Autofirma.' IDOK loopFirefox
 
 	${nsProcess::Unload}
 	
@@ -258,20 +258,20 @@ Section "AutoFirma" sPrograma
 
 	;Si se ha configurado, creamos un acceso directo en el escritorio
 	${If} $Shorcut_Integration_Checkbox_State == 1
-		CreateShortCut "$DESKTOP\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
+		CreateShortCut "$DESKTOP\Autofirma.lnk" "$INSTDIR\$PATH\Autofirma.exe"
 	${Endif}
 
 	;Si se ha configurado, creamos el grupo de accesos en el menu inicio
 	${If} $StartMenu_Integration_Checkbox_State == 1
-		CreateDirectory "$SMPROGRAMS\AutoFirma"
-		CreateShortCut "$SMPROGRAMS\AutoFirma\AutoFirma.lnk" "$INSTDIR\$PATH\AutoFirma.exe"
-		CreateShortCut "$SMPROGRAMS\AutoFirma\Desinstalar.lnk" "$INSTDIR\uninstall.exe"
+		CreateDirectory "$SMPROGRAMS\Autofirma"
+		CreateShortCut "$SMPROGRAMS\Autofirma\Autofirma.lnk" "$INSTDIR\$PATH\Autofirma.exe"
+		CreateShortCut "$SMPROGRAMS\Autofirma\Desinstalar.lnk" "$INSTDIR\uninstall.exe"
 	${Endif}
 
 	;Anade una entrada en la lista de "Program and Features"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayName" "AutoFirma"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayName" "Autofirma"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "UninstallString" "$INSTDIR\uninstall.exe"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayIcon" "$INSTDIR\$PATH\AutoFirma.exe"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayIcon" "$INSTDIR\$PATH\Autofirma.exe"
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "NoModify" "1"
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "NoRepair" "1"
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "EstimatedSize" "100000"
@@ -285,29 +285,29 @@ Section "AutoFirma" sPrograma
 
 	;Registro
 	;CascadeAfirma.reg
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\AutoFirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\AutoFirma.exe sign -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\Autofirma.exe"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\Autofirma.exe sign -gui -i "%1"'
 
 	;Verify
 	; .csig
 	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" "Firma binaria CMS/CAdES"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
 
 	;Verify
 	; .xsig
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" "Firma XMLDSig/XAdES"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con AutoFirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\AutoFirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
 	
 	;Protocolo afirma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "" "URL:Afirma Protocol"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\AutoFirma.exe "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\Autofirma.exe "%1"'
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +2
@@ -320,7 +320,7 @@ Section "AutoFirma" sPrograma
 	${If} $Firefox_Integration_Checkbox_State == ${BST_CHECKED}
 		StrCpy $R0 "-firefox_roots"
 	${Endif}
-	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" $R0 /passive'
+	ExecWait '"$INSTDIR\$PATH\AutofirmaConfigurador.exe" $R0 /passive'
 	
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
@@ -567,7 +567,7 @@ Function AddCertificateToStore
  
 FunctionEnd
 
-;Identifica la version instalada de AutoFirma.
+;Identifica la version instalada de Autofirma.
 ;Devuelve la cadena con el numero de version y deja el registro configurado
 ;para la arquitectura correspondiente a la version identificada
 Function CheckVersionInstalled
@@ -805,7 +805,7 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Section "uninstall"
-	StrCpy $PATH "AutoFirma"
+	StrCpy $PATH "Autofirma"
 	SetShellVarContext all
 
 	; ==== Desinstalador EXE - INICIO ====
@@ -814,7 +814,7 @@ Section "uninstall"
 	loopFirefox:
 		${nsProcess::FindProcess} "firefox.exe" $R2
 		StrCmp $R2 0 0 +2
-			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de AutoFirma.' IDOK loopFirefox
+			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de Autofirma.' IDOK loopFirefox
 	
 	; ==== Desinstalador EXE - FIN ====
 	
@@ -840,7 +840,7 @@ Section "uninstall"
 	Call un.DeleteCertificate
 	
 	; Ejecutamos el proceso de desinstalacion del Configurador java
-	ExecWait '"$INSTDIR\$PATH\AutoFirmaConfigurador.exe" -uninstall /passive'
+	ExecWait '"$INSTDIR\$PATH\AutofirmaConfigurador.exe" -uninstall /passive'
 
 	;Borramos el subdirectorio con todos los recursos salvo el desinstalador
 	;y bloqueamos la ejecucion hasta que este listo
@@ -849,7 +849,7 @@ Section "uninstall"
 		Sleep 3000
 		Goto -3
 
-	;Borrar directorio de instalacion si es un directorio valido (contiene "AutoFirma" o es una subcarpeta de Program Files)
+	;Borrar directorio de instalacion si es un directorio valido (contiene "Autofirma" o es una subcarpeta de Program Files)
 	Push $INSTDIR
 	Push "Program Files (x86)\"
 	Call un.StrContains
@@ -871,7 +871,7 @@ Section "uninstall"
 
 	PostValidacion:
 	;Borrar accesos directos del escritorio y menu inicio
-	Delete "$DESKTOP\AutoFirma.lnk"
+	Delete "$DESKTOP\Autofirma.lnk"
 	RMDir /r $SMPROGRAMS\$PATH
 	
 	;Eliminamos las entradas de registro en la vista de 64 bits
@@ -928,7 +928,7 @@ FunctionEnd
 !insertmacro StrContains ""
 !insertmacro StrContains "un."
 
-; Funcion para eliminar versiones anteriores de AutoFirma. Las versiones se
+; Funcion para eliminar versiones anteriores de Autofirma. Las versiones se
 ; buscan a traves del registro, para lo cual afecta si se tiene configurada la
 ; vista de 32 o 64 bits
 ; Uso:
@@ -943,20 +943,20 @@ Function RemoveOldVersions
 		Goto CheckAutoFirmaVersion
 	${EndIf}
 	
-	; Se ha encontrado AutoFirma instalado
+	; Se ha encontrado Autofirma instalado
 	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
 	${VersionCheckNew} $R1 ${VERSION} "$R2"
 	${If} $R2 = 2
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "La instalación de AutoFirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO "La instalación de Autofirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 	${EndIf}
 
 	; Si no se encuentra o no va a eliminar la version instalada, finalizamos el proceso
 	Goto End
 	
-	; No se encontro AutoFirma instalado por el primer metodo, lo comprobamos de otra forma
+	; No se encontro Autofirma instalado por el primer metodo, lo comprobamos de otra forma
 	CheckAutoFirmaVersion:
 		${registry::Open} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" "/K=0 /V=1 /S=0 /B=1 /N='DisplayName'" $0
 		StrCmp $0 0 0 searchAutoFirmaLoop
@@ -977,14 +977,14 @@ Function RemoveOldVersions
 		${registry::Close} "$0"
 		${registry::Unload}
 
-		; Si se encontro AutoFirma, se pide desinstalar
+		; Si se encontro Autofirma, se pide desinstalar
 		StrCmp $3 "AutoFirma" 0 End
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "La instalación de AutoFirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO "La instalación de Autofirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 	
-	; No se encontro AutoFirma instalado, asi que finalizamos el proceso
+	; No se encontro Autofirma instalado, asi que finalizamos el proceso
 	Goto End
 
 	Exit:
@@ -993,8 +993,8 @@ Function RemoveOldVersions
 	; Iniciamos el proceso de desinstalacion de la version antigua
 	UninstallOlderVersion:
 
-		; Comprobamos si existe configuracion de usuario de AutoFirma. Si no existe, vamos directamente a la
-		; desinstalacion de la version anterior de AutoFirma y, si existe, hacemos copia para restaurarla una
+		; Comprobamos si existe configuracion de usuario de Autofirma. Si no existe, vamos directamente a la
+		; desinstalacion de la version anterior de Autofirma y, si existe, hacemos copia para restaurarla una
 		; vez que desinstalemos esa version (el desinstalar una version elimina la configuracion).
 		StrCpy $6 "0"
 		ClearErrors
@@ -1061,7 +1061,7 @@ Function RemoveOldVersions
 		; Si se indico que se eliminase el desinstalador de la version anterior, lo hacemos
 		; Si no, terminamos el proceso
 		StrCmp $R3 "Uninstall" 0 EndUninstall
-			;Borrar directorio de instalacion si es un directorio valido (es una subcarpeta de Program Files o contiene "AutoFirma")
+			;Borrar directorio de instalacion si es un directorio valido (es una subcarpeta de Program Files o contiene "Autofirma")
 			Push $R1
 			Push "Program Files (x86)\"
 			Call StrContains
@@ -1082,7 +1082,7 @@ Function RemoveOldVersions
 				
 	EndUninstall:
 
-	; Si habia una configuracion anterior de AutoFirma, la restauramos
+	; Si habia una configuracion anterior de Autofirma, la restauramos
 	StrCmp $6 "0" End 
 		StrCpy $0 $6
 		Push $0
@@ -1236,7 +1236,7 @@ Function AddToPath
   System::Call "advapi32::RegQueryValueEx(i $3, t'PATH', i 0, i 0, t.r1, *i ${NSIS_MAX_STRLEN} r2) i.r4"
   System::Call "advapi32::RegCloseKey(i $3)"
   IntCmp $4 234 0 +3 +3 ; $4 == ERROR_MORE_DATA
-    DetailPrint "El PATH es demasiado largo. No se le agregará la ruta de AutoFirma."
+    DetailPrint "El PATH es demasiado largo. No se le agregará la ruta de Autofirma."
     Goto done
   IntCmp $4 0 +5 ; $4 != NO_ERROR
     IntCmp $4 2 +3 ; $4 != ERROR_FILE_NOT_FOUND
@@ -1260,7 +1260,7 @@ Function AddToPath
   IntOp $2 $2 + $3
   IntOp $2 $2 + 2 ; $2 = strlen(dir) + strlen(PATH) + sizeof(";")
   IntCmp $2 ${NSIS_MAX_STRLEN} +3 +3 0
-    DetailPrint "La ruta de AutoFirma hace que el PATH sea demasiado largo. No se agregará"
+    DetailPrint "La ruta de Autofirma hace que el PATH sea demasiado largo. No se agregará"
     Goto done
   ; Append dir to PATH
   DetailPrint "Agregamos al PATH: $0"

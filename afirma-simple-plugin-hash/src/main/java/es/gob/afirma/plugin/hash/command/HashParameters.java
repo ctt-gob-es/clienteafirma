@@ -311,8 +311,8 @@ final class HashParameters {
 		}
 		// Sintaxis
 		sb.append(Messages.getString("CommandLine.7")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  AutoFirma ").append(op).append(" [FICHERO] [opciones...]\t\t- ").append(Messages.getString("CommandLine.108")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  AutoFirma ").append(op).append(" [DIRECTORIO] [opciones...]\t- ").append(Messages.getString("CommandLine.109")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  Autofirma ").append(op).append(" [FICHERO] [opciones...]\t\t- ").append(Messages.getString("CommandLine.108")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  Autofirma ").append(op).append(" [DIRECTORIO] [opciones...]\t- ").append(Messages.getString("CommandLine.109")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		// Parametros
 		.append(Messages.getString("CommandLine.114")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		.append("  ").append("FICHERO").append("\t\t(").append(Messages.getString("CommandLine.106")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
@@ -342,8 +342,8 @@ final class HashParameters {
 		}
 		// Sintaxis
 		sb.append(Messages.getString("CommandLine.7")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		.append("  AutoFirma ").append(op).append(" FICHERO [opciones...]\t\t- ").append(Messages.getString("CommandLine.110")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		.append("  AutoFirma ").append(op).append(" DIRECTORIO [opciones...]\t- ").append(Messages.getString("CommandLine.111")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  Autofirma ").append(op).append(" FICHERO [opciones...]\t\t- ").append(Messages.getString("CommandLine.110")).append("\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  Autofirma ").append(op).append(" DIRECTORIO [opciones...]\t- ").append(Messages.getString("CommandLine.111")).append("\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		// Parametros
 		.append(Messages.getString("CommandLine.114")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
 		.append("  ").append("FICHERO").append("\t\t(").append(Messages.getString("CommandLine.112")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$

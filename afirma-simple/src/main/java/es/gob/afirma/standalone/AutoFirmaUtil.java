@@ -31,7 +31,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 
-/** Utilidades generales y de control del autoarranque de AutoFirma en el inicio de Windows.
+/** Utilidades generales y de control del autoarranque de Autofirma en el inicio de Windows.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class AutoFirmaUtil {
 
@@ -39,7 +39,7 @@ public final class AutoFirmaUtil {
 
 	private static final String REG_CMD = "reg"; //$NON-NLS-1$
 	private static final String REG_KEY = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"; //$NON-NLS-1$
-	private static final String REG_VALUE = "AutoFirma"; //$NON-NLS-1$
+	private static final String REG_VALUE = "Autofirma"; //$NON-NLS-1$
 	private static final String REG_VALUE_OPT = "/v"; //$NON-NLS-1$
 
 	private static final Image ICON = Toolkit.getDefaultToolkit().getImage(
@@ -80,8 +80,8 @@ public final class AutoFirmaUtil {
 		return ICONS;
 	}
 
-	/** Indica si AutoFirma est&aacute; instalado para ejecutarse al inicio de Windows o no.
-	 * @return <code>true</code> si AutoFirma est&aacute; instalado para ejecutarse al inicio de Windows,
+	/** Indica si Autofirma est&aacute; instalado para ejecutarse al inicio de Windows o no.
+	 * @return <code>true</code> si Autofirma est&aacute; instalado para ejecutarse al inicio de Windows,
 	 *         <code>false</code> en caso contrario, si el sistema no es Windows o si no se puede determinar. */
 	public static boolean getAutoStartEnabled() {
 		if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
@@ -94,22 +94,22 @@ public final class AutoFirmaUtil {
 			final String res = new String(AOUtil.getDataFromInputStream(p.getInputStream())).trim();
 			final String[] tokens = res.split(" "); //$NON-NLS-1$
 			for (final String token : tokens) {
-				if ("AutoFirma".equals(token)) { //$NON-NLS-1$
+				if ("Autofirma".equals(token)) { //$NON-NLS-1$
 					return true;
 				}
 			}
 		}
 		catch(final IOException e) {
 			LOGGER.severe(
-				"No se ha podido leer el registro de Windows para determinar el autoarranque de AutoFirma: " + e //$NON-NLS-1$
+				"No se ha podido leer el registro de Windows para determinar el autoarranque de Autofirma: " + e //$NON-NLS-1$
 			);
 		}
 		return false;
 	}
 
-	/** Establece si AutoFirma debe instalarse para ejecutarse al inicio de Windows o no.
+	/** Establece si Autofirma debe instalarse para ejecutarse al inicio de Windows o no.
 	 * No tiene efecto en sistemas no Windows.
-	 * @param enable <code>true</code> para instalar AutoFirma para ejecutarse al inicio de Windows,
+	 * @param enable <code>true</code> para instalar Autofirma para ejecutarse al inicio de Windows,
 	 *         <code>false</code> para desinstalarlo (no tiene efecto si no lo estaba).
 	 * @throws IOException En caso de fallo en el proceso. */
 	public static void setAutoStartEnabled(final boolean enable) throws IOException {
@@ -134,7 +134,7 @@ public final class AutoFirmaUtil {
 		).start();
 		if (!getAutoStartEnabled()) {
 			throw new IOException(
-				"No se ha podido habilitar el autoarranque de AutoFirma: " + new String(AOUtil.getDataFromInputStream(p.getErrorStream())) //$NON-NLS-1$
+				"No se ha podido habilitar el autoarranque de Autofirma: " + new String(AOUtil.getDataFromInputStream(p.getErrorStream())) //$NON-NLS-1$
 			);
 		}
 	}
@@ -148,7 +148,7 @@ public final class AutoFirmaUtil {
 		).start();
 		if (getAutoStartEnabled()) {
 			throw new IOException(
-				"No se ha podido deshabilitar el autoarranque de AutoFirma: " + new String(AOUtil.getDataFromInputStream(p.getErrorStream())) //$NON-NLS-1$
+				"No se ha podido deshabilitar el autoarranque de Autofirma: " + new String(AOUtil.getDataFromInputStream(p.getErrorStream())) //$NON-NLS-1$
 			);
 		}
 	}
@@ -195,7 +195,7 @@ public final class AutoFirmaUtil {
 			filename = new File(decodedPath).getName();
 		}
 		else {
-			filename = "AutoFirma"; //$NON-NLS-1$
+			filename = "Autofirma"; //$NON-NLS-1$
 		}
 		return filename;
 	}
@@ -227,7 +227,7 @@ public final class AutoFirmaUtil {
 	 */
 	public static File getWindowsAlternativeAppDir() {
 		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+		return new File (commonDir, "Autofirma"); //$NON-NLS-1$
 	}
 
 	/**
@@ -236,7 +236,7 @@ public final class AutoFirmaUtil {
 	 */
 	public static File getLinuxAlternativeAppDir() {
 		final String userHome = System.getProperty("user.home"); //$NON-NLS-1$
-		return new File(userHome, ".afirma/AutoFirma"); //$NON-NLS-1$
+		return new File(userHome, ".afirma/Autofirma"); //$NON-NLS-1$
 	}
 
 	/**
@@ -245,7 +245,7 @@ public final class AutoFirmaUtil {
 	 */
 	public static File getMacOsXAlternativeAppDir() {
 		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
-		return new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
+		return new File (userDir, "Library/Application Support/Autofirma"); //$NON-NLS-1$
 	}
 
 	/**

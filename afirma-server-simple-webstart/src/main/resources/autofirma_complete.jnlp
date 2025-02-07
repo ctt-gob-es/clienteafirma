@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <jnlp spec="1.0+" codebase="%CODEBASE%">
 	<information> 
-		<title>AutoFirma</title> 
+		<title>Autofirma</title> 
 		<vendor>Gobierno de Espana</vendor>
-		<description>Desplegable JNLP de AutoFirma</description> 
-		<description kind="short">AutoFirma</description> 
+		<description>Desplegable JNLP de Autofirma</description> 
+		<description kind="short">Autofirma</description> 
 		<offline-allowed/> 
 		<icon href="logo64.png" width="64" height="64"/>
 		<icon kind="shortcut" href="logo16.png" width="16" height="16"/>
@@ -13,7 +13,7 @@
 		<icon kind="splash" href="splash.gif" width="506" height="289"/>
 		<shortcut>
             <desktop/>
-            <menu submenu="AutoFirma"/>
+            <menu submenu="Autofirma"/>
         </shortcut>
         <association mime-type="application/cms" extensions="csig sig"/>
         <association mime-type="application/xmlsignature" extensions="xsig"/>

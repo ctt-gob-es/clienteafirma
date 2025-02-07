@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 	
 	<name>afirma-ui-simpleafirma-configurator-common</name>
-	<description>Clases de configuracion compartidas por AutoFirma y su configurador</description>
+	<description>Clases de configuracion compartidas por Autofirma y su configurador</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>

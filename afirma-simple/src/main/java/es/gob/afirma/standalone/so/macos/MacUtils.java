@@ -71,7 +71,7 @@ public class MacUtils {
 		}
 	}
 
-	/** Mata el proceso intermedio de AutoFirma cuando estamos en macOS. El proceso intermedio
+	/** Mata el proceso intermedio de Autofirma cuando estamos en macOS. El proceso intermedio
 	 * no es la aplicaci&oacute;n Java, sino el ejecutable que traslada los par&aacute;metros
 	 * proporcionados por el navegador Web a la aplicaci&oacute;n Java.
 	 * @param sessionIdText Texto contenido en la llamada al proceso y que permite identificarlo. */

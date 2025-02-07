@@ -344,7 +344,7 @@ final class CommandLineLauncher {
  	}
 
 	/** Mostramos el panel de firmas. Se usara la configuraci&oacute;n de firma establecida
-	 * en la interfaz de AutoFirma.
+	 * en la interfaz de Autofirma.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
 	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario. */
 	private static void signByGui(final CommandLineCommand command, final CommandLineParameters params) throws CommandLineException {

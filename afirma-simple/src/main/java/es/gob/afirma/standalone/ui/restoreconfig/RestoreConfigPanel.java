@@ -32,7 +32,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
  * Clase que gestiona los componentes gr&aacute;ficos de las ventanas de restauraci&oacute;n de la
- * configuraci&oacute;n de navegadores de AutoFirma.
+ * configuraci&oacute;n de navegadores de Autofirma.
  *
  */
 public final class RestoreConfigPanel extends JPanel implements KeyListener, DisposableInterface {

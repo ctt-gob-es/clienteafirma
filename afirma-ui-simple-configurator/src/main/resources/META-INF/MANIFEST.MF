@@ -3,7 +3,7 @@ Implementation-Vendor: Gobierno de España
 Implementation-Title: es.gob.afirma.standalone.configurator
 Implementation-Version: build01
 Specification-Vendor: Gobierno de España
-Specification-Title: Configurador AutoFirma
+Specification-Title: Configurador Autofirma
 Specification-Version: 1.1
 Main-Class: es.gob.afirma.standalone.configurator.AutoFirmaConfigurator
-Application-Name: Configurador AutoFirma
+Application-Name: Configurador Autofirma

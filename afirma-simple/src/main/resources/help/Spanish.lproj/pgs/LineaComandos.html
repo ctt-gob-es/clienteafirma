@@ -2,18 +2,18 @@
 <html>
  <head>
   <title>Uso por l&iacute;nea de comandos</title>
-  <meta name="AppleTitle" content="Ayuda de AutoFirma">
+  <meta name="AppleTitle" content="Ayuda de Autofirma">
   <meta name="AppleIcon" content="AutoFirmaHelpIcon.png">
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
  </head>
  <body>
   <h2>Uso por l&iacute;nea de comandos</h2>
-  <p>AutoFirma permite su uso a trav&eacute;s de l&iacute;nea de comandos, proporcionando funcionalidades de firma, firma de lotes y creaci&oacute;n y verificaci&oacute;n de hashes.
-  <p>El ejecutable o script a utilizar para la ejecuci&oacute;n de AutoFirma por l&iacute;nea de comandos var&iacute;a en funci&oacute;n del sistema:
+  <p>Autofirma permite su uso a trav&eacute;s de l&iacute;nea de comandos, proporcionando funcionalidades de firma, firma de lotes y creaci&oacute;n y verificaci&oacute;n de hashes.
+  <p>El ejecutable o script a utilizar para la ejecuci&oacute;n de Autofirma por l&iacute;nea de comandos var&iacute;a en funci&oacute;n del sistema:
   <ul>
     <li>Windows</li>
 	  <ul>
-	    <li>El proceso de instalaci&oacute;n copia en el directorio de AutoFirma el ejecutable "AutoFirmaCommandLine"" y, si le es posible, incluye el directorio en el <i>path</i>. Utilice este ejecutable desde l&iacute;nea de comandos para realizar las distintas operaciones que se soportan.</li>
+	    <li>El proceso de instalaci&oacute;n copia en el directorio de Autofirma el ejecutable "AutofirmaCommandLine"" y, si le es posible, incluye el directorio en el <i>path</i>. Utilice este ejecutable desde l&iacute;nea de comandos para realizar las distintas operaciones que se soportan.</li>
 	  </ul>
 	<li>Linux</li>
 	  <ul>
@@ -21,22 +21,22 @@
 	  </ul>
 	<li>macOS</li>
 	  <ul>
-	    <li>Para el uso de la aplicaci&oacute;n por l&iacute;nea de comandos se crea dentro de la aplicación un script "AutoFirmaCommandLine" en el directorio de la aplicación. Se puede ejecutar este script accediendo al directorio interno "Resources" de la aplicaci&oacute;n (com&uacute;nmente, "/Applications/AutoFirma.app/Contents/MacOS"). Es importante que <b>los parámetros que puedan contener espacios se pasen en el comando entre comillas simples</b>.</li>
+	    <li>Para el uso de la aplicaci&oacute;n por l&iacute;nea de comandos se crea dentro de la aplicación un script "AutofirmaCommandLine" en el directorio de la aplicación. Se puede ejecutar este script accediendo al directorio interno "Resources" de la aplicaci&oacute;n (com&uacute;nmente, "/Applications/AutoFirma.app/Contents/MacOS"). Es importante que <b>los parámetros que puedan contener espacios se pasen en el comando entre comillas simples</b>.</li>
 	  </ul>
   </ul>
-  <p>Por ejemplo, se puede ejecutar AutoFirma y listar las distintas operaciones disponibles a trav&eacute;s de la l&iacute;nea de comandos con el comando "-help" de la siguiente manera:</p>
+  <p>Por ejemplo, se puede ejecutar Autofirma y listar las distintas operaciones disponibles a trav&eacute;s de la l&iacute;nea de comandos con el comando "-help" de la siguiente manera:</p>
   <span>En Windows:</span>
-  <ul><li><code>AutoFirmaCommandLine –help</code></li></ul>
+  <ul><li><code>AutofirmaCommandLine –help</code></li></ul>
   <span>En Linux:</span>
-  <ul><li><code>/usr/bin/AutoFirma –help</code></li></ul>
+  <ul><li><code>/usr/bin/Autofirma –help</code></li></ul>
   <span>En Mac:</span>
-  <ul><li><code>/Applications/AutoFirma.app/Contents/MacOS/AutoFirmaCommandLine –help</code></li></ul>
+  <ul><li><code>/Applications/Autofirma.app/Contents/MacOS/AutofirmaCommandLine –help</code></li></ul>
   <p>Esto dar&iacute;a como resultado:</p>
   <div style="background-color: black; color: white; width: 50%">
     <code><pre>
 Herramienta de firma de documentos.
 
-Sintaxis: AutoFirma cmd [options...]
+Sintaxis: Autofirma cmd [options...]
 
 Comandos cmd:
 
@@ -49,17 +49,17 @@ Comandos cmd:
   createdigest   (creacion de huella digitales con interfaz grafica)
   checkdigest    (comprobacion de huella digitales con interfaz grafica)
 
-Utilice "AutoFirma cmd -help" para ver la sintaxis del comando "cmd"
+Utilice "Autofirma cmd -help" para ver la sintaxis del comando "cmd"
     </pre></code>
   </div>
 
   <p>Para listar las opciones de configuraci&oacute;n de alguna de las operaciones, puede utilizar el comando "-help" sobre cualquiera de ellas. Por ejemplo:</p>
-  <ul><li><code>AutoFirmaCommandLine sign –help</code></li></ul>
+  <ul><li><code>AutofirmaCommandLine sign –help</code></li></ul>
 
   <p>Esto dar&iacute;a como resultado:</p>
   <div style="background-color: black; color: white; width: 50%">
     <code><pre>
-Sintaxis: AutoFirma sign [opciones...]
+Sintaxis: Autofirma sign [opciones...]
 
 Opciones:
   -gui                   (Realiza la operacion con entorno grafico. Tiene prioridad sobre -certgui)

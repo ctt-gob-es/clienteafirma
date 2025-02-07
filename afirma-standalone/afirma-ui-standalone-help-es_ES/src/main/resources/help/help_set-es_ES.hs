@@ -3,7 +3,7 @@
   PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 1.0//EN"
          "http://java.sun.com/products/javahelp/helpset_1_0.dtd">
 <helpset version="1.0">
-          <title>Ayuda Cliente @firma</title>
+          <title>Ayuda Autofirma</title>
           <maps>
                 <!-- Pagina por defecto al mostrar la ayuda -->
                 <homeID>aplicacion</homeID>

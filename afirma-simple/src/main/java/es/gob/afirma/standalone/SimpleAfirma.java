@@ -96,7 +96,7 @@ import es.gob.afirma.standalone.ui.SignatureResultViewer;
 import es.gob.afirma.standalone.updater.Updater;
 
 /**
- * Aplicaci&oacute;n gr&aacute;fica de AutoFirma.
+ * Aplicaci&oacute;n gr&aacute;fica de Autofirma.
  *
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
@@ -129,7 +129,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	/** Directorio de datos de la aplicaci&oacute;n. */
 	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator //$NON-NLS-1$
-			+ "AutoFirma"; //$NON-NLS-1$
+			+ "Autofirma"; //$NON-NLS-1$
 
 	private static final String PLUGINS_DIRNAME = "plugins"; //$NON-NLS-1$
 
@@ -344,7 +344,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             loadMainApp();
     	}
     	else if (DNIeWaitPanel.PROP_HELP_REQUESTED.equals(evt.getPropertyName())) {
-    		showHelp("AutoFirma.html"); //$NON-NLS-1$
+    		showHelp("Autofirma.html"); //$NON-NLS-1$
     	}
     	else if (DNIeWaitPanel.PROP_DNIE_REQUESTED.equals(evt.getPropertyName())) {
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -865,7 +865,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		HttpManager.setSecureDomains(
 				PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST));
 
-		// Establecemos los almacenes de claves de Java y de AutoFirma como de confianza para las
+		// Establecemos los almacenes de claves de Java y de Autofirma como de confianza para las
 		// conexiones remotas
 		if (secureConnections) {
 			try {
@@ -923,7 +923,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK)
 					&& !Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
        		if (!updatesEnabled) {
-				LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma" //$NON-NLS-1$
+				LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de Autofirma" //$NON-NLS-1$
        					);
        		}
        	}
@@ -1022,7 +1022,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						final java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass()
 								.getDeclaredField("awtAppClassName"); //$NON-NLS-1$
 						awtAppClassNameField.setAccessible(true);
-						awtAppClassNameField.set(xToolkit, "AutoFirma"); //$NON-NLS-1$
+						awtAppClassNameField.set(xToolkit, "Autofirma"); //$NON-NLS-1$
 					} catch (final Exception e) {
 						LOGGER.warning("No ha sido posible renombrar la ventana AWT para X11: " + e); //$NON-NLS-1$
 					}
@@ -1230,7 +1230,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	private static void printSystemInfo() {
 
     	// Logs de informacion basica
-		final StringBuilder info = new StringBuilder(390).append("AutoFirma ").append(getVersion()) //$NON-NLS-1$
+		final StringBuilder info = new StringBuilder(390).append("Autofirma ").append(getVersion()) //$NON-NLS-1$
 		.append("\nResolucion DPI de pantalla: ").append(AutoFirmaUtil.getDPI()) //$NON-NLS-1$
 		.append("\nSistema operativo: ").append(System.getProperty("os.name")) //$NON-NLS-1$ //$NON-NLS-2$
 		.append("\nVersion del SO: ").append(System.getProperty("os.version")) //$NON-NLS-1$ //$NON-NLS-2$
@@ -1249,7 +1249,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	}
 
 	/**
-	 * Indica si la llamada a AutoFirma se considera llamada por l&iacute;nea de
+	 * Indica si la llamada a Autofirma se considera llamada por l&iacute;nea de
 	 * comandos.
 	 *
 	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
@@ -1261,7 +1261,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	}
 
 	/**
-	 * Indica si la ejecuci&oacute;n de AutoFirma se est&aacute; haciendo en modo
+	 * Indica si la ejecuci&oacute;n de Autofirma se est&aacute; haciendo en modo
 	 * escritorio.
 	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
 	 * @return {@code true} si se considera que la aplicaci&oacute;n se ejecuta

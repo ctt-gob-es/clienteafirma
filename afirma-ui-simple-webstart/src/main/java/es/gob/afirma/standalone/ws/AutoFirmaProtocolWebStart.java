@@ -16,12 +16,12 @@ import es.gob.afirma.standalone.configurator.AutoFirmaConfiguratorJNLP;
 
 /**
  * Aplicacion WebStart encargada de gestionar la instalaci&oacute;n
- * de AutoFirma y su ejecuci&oacute;n.
+ * de Autofirma y su ejecuci&oacute;n.
  */
 public class AutoFirmaProtocolWebStart {
 
 	/**
-	 * Inicia la carga JNLP de AutoFirma en modo invocaci&oacute;n por protocolo.
+	 * Inicia la carga JNLP de Autofirma en modo invocaci&oacute;n por protocolo.
 	 * @param args Argumentos de la operaci&oacute;n que se debe ejecutar.
 	 */
 	public static void main(final String[] args) {

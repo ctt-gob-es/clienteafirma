@@ -1,2 +1,2 @@
-signtool sign /f AutoFirma_sign.pfx /p afirma AutoFirmaGenerator.exe
+signtool sign /f Autofirma_sign.pfx /p afirma AutofirmaGenerator.exe
 @pause

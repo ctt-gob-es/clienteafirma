@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 	
 	<name>afirma-ui-simpleafirma-configurator</name>
-	<description>Aplicacion auxiliar de instalacion de AutoFirma</description>
+	<description>Aplicacion auxiliar de instalacion de Autofirma</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -129,7 +129,7 @@
 			</activation>
 		  
 			<build>
-				<finalName>AutoFirmaConfigurador</finalName>
+				<finalName>AutofirmaConfigurador</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>

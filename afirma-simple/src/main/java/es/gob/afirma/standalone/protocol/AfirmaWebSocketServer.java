@@ -37,7 +37,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 	protected String sessionId;
 
 	/**
-	 * Genera un servidor websocket que atiende las peticiones del Cliente @firma.
+	 * Genera un servidor websocket que atiende las peticiones de Autofirma.
 	 * @param port Puerto a trav&eacute;s del que realizar la comunicaci&oacute;n.
 	 * @param sessionId Identificador con el que se deber&aacute; autenticar la web
 	 * para usar el servicio.

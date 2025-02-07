@@ -108,11 +108,11 @@ var MiniApplet = ( function ( window, undefined ) {
 		// Tiempo de espera entre los intentos de conexion con autofirma.
 		var AUTOFIRMA_LAUNCHING_TIME = 2000;
 		
-		// Reintentos de conexion totales para detectar que esta instalado AutoFirma
+		// Reintentos de conexion totales para detectar que esta instalado Autofirma
 		var AUTOFIRMA_CONNECTION_RETRIES = 20;
 		
 		// Variable que se puede configurar para forzar el uso del modo de comunicacion por servidor intermedio
-		// entre la página web y AutoFirma
+		// entre la página web y Autofirma
 		var forceWSMode = false;
 		
 		// Variable que se puede configurar para forzar el uso del modo o afirma://
@@ -294,13 +294,13 @@ var MiniApplet = ( function ( window, undefined ) {
             return xmlHttp;
 		}
 
-		/** Permite establecer que la comunicacion con AutoFirma sea a traves
+		/** Permite establecer que la comunicacion con Autofirma sea a traves
 		 * del servidor intermedio. */
 		var setForceWSMode = function (force) {
 			forceWSMode = force;
 		}
 		
-		/** Permite establecer que la invocación con AutoFirma sea a traves
+		/** Permite establecer que la invocación con Autofirma sea a traves
 		 * del protocolo afirma:// */
 		var setForceAFirma = function (force) {
 			forceAFirma = force;
@@ -1585,7 +1585,7 @@ var MiniApplet = ( function ( window, undefined ) {
 								if (semaphore) {
 									semaphore.locked = true;
 								}
-								errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
+								errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con Autofirma.");
 							}
 							return;
 						}
@@ -2817,7 +2817,7 @@ var MiniApplet = ( function ( window, undefined ) {
 								},
 								function() {
 									if (errorCallback != null && errorCallback != undefined) {
-										errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
+										errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con Autofirma.");
 										throw new Error();
 									}
 								}

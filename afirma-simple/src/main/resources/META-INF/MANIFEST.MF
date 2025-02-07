@@ -1,11 +1,11 @@
 Manifest-Version: 1.0
 Main-Class: es.gob.afirma.standalone.SimpleAfirma
-Specification-Title: AutoFirma
+Specification-Title: Autofirma
 Specification-Version: 1.8
 Specification-Vendor: Gobierno de España
 Implementation-Title: es.gob.afirma
 Implementation-Version: build01
 Implementation-Vendor: Gobierno de España
-Application-Name: AutoFirma
+Application-Name: Autofirma
 Permissions: all-permissions
 

@@ -69,7 +69,7 @@ public final class Main {
         }
     }
 
-    /** Arranca la interfaz de escritorio del Cliente @firma.
+    /** Arranca la interfaz de escritorio de Autofirma.
      * @param args Par&aacute;metros de entrada. */
     public static void main(final String[] args) {
 

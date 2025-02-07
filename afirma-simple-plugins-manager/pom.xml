@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 	
 	<name>afirma-ui-simpleafirma-plugins-manager</name>
-	<description>Módulo para la gestión de plugins de AutoFirma</description>
+	<description>Módulo para la gestión de plugins de Autofirma</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>

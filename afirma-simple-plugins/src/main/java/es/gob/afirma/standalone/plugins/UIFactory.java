@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import javax.swing.JDialog;
 
 /**
- * Clase para la construcci&oacute;n de di&aacute;logos y recursos gr&aacute;ficos para su uso en AutoFirma.
+ * Clase para la construcci&oacute;n de di&aacute;logos y recursos gr&aacute;ficos para su uso en Autofirma.
  */
 public class UIFactory {
 

@@ -26,7 +26,7 @@ import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
-/** Configurador de la instalaci&oacute;n de AutoFirma.
+/** Configurador de la instalaci&oacute;n de Autofirma.
  * Identifica el entorno, genera un certificado de firma y lo instala en los almacenes pertinentes.
  * @author Sergio Mart&iacute;nez Rico. */
 public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
@@ -251,7 +251,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			}
 			catch (final HeadlessException e) {
 				ConsoleManager.showErrorMessage(Messages.getString("AutoFirmaConfigurator.7"), e); //$NON-NLS-1$
-				LOGGER.log(Level.WARNING, "La JVM utilizada no soporta interfaces graficos. No se podra ejecutar la interfaz grafica de AutoFirma con ella", e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "La JVM utilizada no soporta interfaces graficos. No se podra ejecutar la interfaz grafica de Autofirma con ella", e); //$NON-NLS-1$
 			}
 			catch (final Exception | Error e) {
 				ConsoleManager.showErrorMessage(
