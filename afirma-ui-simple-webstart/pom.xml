@@ -173,7 +173,7 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
-										<Application-Name>Autofirma</Application-Name>
+										<Application-Name>AutoFirma</Application-Name>
 										<Main-Class>es.gob.afirma.standalone.ws.AutoFirmaWebStart</Main-Class>
 										<Permissions>all-permissions</Permissions>
 									</manifestEntries>
@@ -371,7 +371,7 @@
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<manifestEntries>
-										<Application-Name>Autofirma</Application-Name>
+										<Application-Name>AutoFirma</Application-Name>
 										<Main-Class>es.gob.afirma.standalone.ws.AutoFirmaWebStart</Main-Class>
 										<Permissions>all-permissions</Permissions>
 									</manifestEntries>

@@ -28,7 +28,7 @@ final class TreeModelManager {
     }
 
     /** Recupera un &aacute;rbol Swing a partir de un TreeModel con los certificados
-     * de Autofirma.
+     * del Cliente @firma.
      * @return &Aacute;rbol Swing. */
     public DefaultMutableTreeNode getSwingTree() {
         final DefaultMutableTreeNode swingTreeRoot = new DefaultMutableTreeNode();

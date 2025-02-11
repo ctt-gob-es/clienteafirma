@@ -83,7 +83,7 @@ class ConfigManager {
 	}
 
 	/**
-	 * Recupera el CodeBase en el que se encuentra el fichero JAR de Autofirma WebStart.
+	 * Recupera el CodeBase en el que se encuentra el fichero JAR de AutoFirma WebStart.
 	 * @return CodeBase configurado o {@code null} si no est&aacute; definido.
 	 */
 	public static String getCodeBase() {

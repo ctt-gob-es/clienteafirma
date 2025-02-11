@@ -108,11 +108,11 @@ var MiniApplet = ( function ( window, undefined ) {
 		// Tiempo de espera entre los intentos de conexion con autofirma.
 		var AUTOFIRMA_LAUNCHING_TIME = 2000;
 		
-		// Reintentos de conexion totales para detectar que esta instalado Autofirma
+		// Reintentos de conexion totales para detectar que esta instalado AutoFirma
 		var AUTOFIRMA_CONNECTION_RETRIES = 20;
 		
 		// Variable que se puede configurar para forzar el uso del modo de comunicacion por servidor intermedio
-		// entre la página web y Autofirma
+		// entre la página web y AutoFirma
 		var forceWSMode = false;
 		
 		// Variable que se puede configurar para forzar el uso del modo o afirma://
@@ -294,7 +294,7 @@ var MiniApplet = ( function ( window, undefined ) {
             return xmlHttp;
 		}
 
-		/** Permite establecer que la comunicacion con Autofirma sea a traves
+		/** Permite establecer que la comunicacion con AutoFirma sea a traves
 		 * del servidor intermedio. */
 		var setForceWSMode = function (force) {
 			forceWSMode = force;
@@ -311,7 +311,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			tryMiniapplet = tryLoad;
 		}
 		
-		/** Devuelve true si el applet de firma está cargado, si no devuelve false y se usará Autofirma */
+		/** Devuelve true si el applet de firma está cargado, si no devuelve false y se usará AutoFirma */
 		var isAppletLoaded = function (useForceLoad) {
 			if(useForceLoad) {
 				forceLoad();
@@ -736,7 +736,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		}
 		
 		/** JUNTA DE ANDALUCIA **/
-		/** Método centralizado para la firma simple y masiva, utilizando Autofirma o Miniapplet según si se ha cargado o no el Applet de firma **/
+		/** Método centralizado para la firma simple y masiva, utilizando AutoFirma o Miniapplet según si se ha cargado o no el Applet de firma **/
 		/** Parámetros: **/
 		/** operationArray: Define la operación a realizar ('sign, 'cosign' o 'countersign') **/
 		/** dataArray: Define los datos a firmar, pudiendo ser datos o hashes ('sign'), o firmas ('cosign' y 'countersign') **/
@@ -824,7 +824,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		
 		var multiModeErrorFunction = function (type, message, errorCallback) {
 			try {
-				// Informar de error Autofirma
+				// Informar de error AutoFirma
 				clienteFirma.setErrorType(type);
 				clienteFirma.setErrorMessage(message);
 			} catch (e) {
@@ -1585,7 +1585,7 @@ var MiniApplet = ( function ( window, undefined ) {
 								if (semaphore) {
 									semaphore.locked = true;
 								}
-								errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con Autofirma.");
+								errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
 							}
 							return;
 						}
@@ -2817,7 +2817,7 @@ var MiniApplet = ( function ( window, undefined ) {
 								},
 								function() {
 									if (errorCallback != null && errorCallback != undefined) {
-										errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con Autofirma.");
+										errorCallback("es.gob.afirma.standalone.ApplicationNotFoundException", "No se ha podido conectar con AutoFirma.");
 										throw new Error();
 									}
 								}
