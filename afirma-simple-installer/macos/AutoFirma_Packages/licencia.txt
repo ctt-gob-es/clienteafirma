@@ -1,8 +1,8 @@
  
- AutoFirma 1.8.4
- Copyright 2011, 2024 Gobierno de España
+ Autofirma 1.9
+ Copyright 2011, 2025 Gobierno de España
  
- AutoFirma es Software Libre; puedes redistribuirlo y/o modificarlo bajo los términos de al menos una de estas dos licencias;
+ Autofirma es Software Libre; puedes redistribuirlo y/o modificarlo bajo los términos de al menos una de estas dos licencias;
 
    - La "GNU General Public License" tal como es publicada por la Free Software Foundation; version 2 de la Licencia, o (a su elección) cualquier versión posterior.
 

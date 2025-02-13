@@ -1,4 +1,4 @@
 #!/bin/sh
 # se ejecuta el configurador
-sudo /Applications/AutoFirma.app/Contents/Resources/Home/bin/java -jar /Applications/AutoFirma.app/Contents/Resources/JAR/AutoFirmaConfigurador.jar
+sudo /Applications/Autofirma.app/Contents/Resources/Home/bin/java -jar /Applications/Autofirma.app/Contents/Resources/JAR/autofirmaConfigurador.jar
 exit 0

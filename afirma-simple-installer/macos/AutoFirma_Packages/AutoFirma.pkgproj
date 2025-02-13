@@ -19,7 +19,7 @@
 			<key>PACKAGE_FILES</key>
 			<dict>
 				<key>DEFAULT_INSTALL_LOCATION</key>
-				<string>/Applications</string>
+				<string>/</string>
 				<key>HIERARCHY</key>
 				<dict>
 					<key>CHILDREN</key>
@@ -28,12 +28,24 @@
 							<key>CHILDREN</key>
 							<array>
 								<dict>
+									<key>BUNDLE_CAN_DOWNGRADE</key>
+									<false/>
+									<key>BUNDLE_POSTINSTALL_PATH</key>
+									<dict>
+										<key>PATH_TYPE</key>
+										<integer>0</integer>
+									</dict>
+									<key>BUNDLE_PREINSTALL_PATH</key>
+									<dict>
+										<key>PATH_TYPE</key>
+										<integer>0</integer>
+									</dict>
 									<key>CHILDREN</key>
 									<array/>
 									<key>GID</key>
 									<integer>80</integer>
 									<key>PATH</key>
-									<string>AutoFirma.app</string>
+									<string>Autofirma.app</string>
 									<key>PATH_TYPE</key>
 									<integer>1</integer>
 									<key>PERMISSIONS</key>
@@ -179,6 +191,22 @@
 									<integer>0</integer>
 									<key>PATH</key>
 									<string>Internet Plug-Ins</string>
+									<key>PATH_TYPE</key>
+									<integer>0</integer>
+									<key>PERMISSIONS</key>
+									<integer>493</integer>
+									<key>TYPE</key>
+									<integer>1</integer>
+									<key>UID</key>
+									<integer>0</integer>
+								</dict>
+								<dict>
+									<key>CHILDREN</key>
+									<array/>
+									<key>GID</key>
+									<integer>0</integer>
+									<key>PATH</key>
+									<string>Keyboard Layouts</string>
 									<key>PATH_TYPE</key>
 									<integer>0</integer>
 									<key>PERMISSIONS</key>
@@ -484,7 +512,7 @@
 				<key>LOCATION</key>
 				<integer>0</integer>
 				<key>NAME</key>
-				<string>AutoFirma</string>
+				<string>Autofirma</string>
 				<key>OVERWRITE_PERMISSIONS</key>
 				<false/>
 				<key>PAYLOAD_SIZE</key>
@@ -496,12 +524,12 @@
 				<key>USE_HFS+_COMPRESSION</key>
 				<false/>
 				<key>VERSION</key>
-				<string>1.8.4</string>
+				<string>1.9</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
 			<key>UUID</key>
-			<string>DA51E0F7-E63F-4289-A4A7-B106A5B986B6</string>
+			<string>4A3F3472-3366-4003-873D-B991C23EB55B</string>
 		</dict>
 	</array>
 	<key>PROJECT</key>
@@ -510,17 +538,6 @@
 		<dict>
 			<key>NOTES</key>
 			<data>
-			PCFET0NUWVBFIGh0bWwgUFVCTElDICItLy9XM0MvL0RURCBIVE1M
-			IDQuMDEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvVFIvaHRtbDQv
-			c3RyaWN0LmR0ZCI+CjxodG1sPgo8aGVhZD4KPG1ldGEgaHR0cC1l
-			cXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7
-			IGNoYXJzZXQ9VVRGLTgiPgo8bWV0YSBodHRwLWVxdWl2PSJDb250
-			ZW50LVN0eWxlLVR5cGUiIGNvbnRlbnQ9InRleHQvY3NzIj4KPHRp
-			dGxlPjwvdGl0bGU+CjxtZXRhIG5hbWU9IkdlbmVyYXRvciIgY29u
-			dGVudD0iQ29jb2EgSFRNTCBXcml0ZXIiPgo8bWV0YSBuYW1lPSJD
-			b2NvYVZlcnNpb24iIGNvbnRlbnQ9IjE2NzEuNCI+CjxzdHlsZSB0
-			eXBlPSJ0ZXh0L2NzcyI+Cjwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+
-			CjwvYm9keT4KPC9odG1sPgo=
 			</data>
 		</dict>
 		<key>PROJECT_PRESENTATION</key>
@@ -536,43 +553,6 @@
 				</dict>
 				<key>SHARED_SETTINGS_FOR_ALL_APPAREANCES</key>
 				<true/>
-			</dict>
-			<key>INSTALLATION TYPE</key>
-			<dict>
-				<key>HIERARCHIES</key>
-				<dict>
-					<key>INSTALLER</key>
-					<dict>
-						<key>LIST</key>
-						<array>
-							<dict>
-								<key>CHILDREN</key>
-								<array/>
-								<key>DESCRIPTION</key>
-								<array/>
-								<key>OPTIONS</key>
-								<dict>
-									<key>HIDDEN</key>
-									<false/>
-									<key>STATE</key>
-									<integer>1</integer>
-								</dict>
-								<key>PACKAGE_UUID</key>
-								<string>DA51E0F7-E63F-4289-A4A7-B106A5B986B6</string>
-								<key>TITLE</key>
-								<array/>
-								<key>TYPE</key>
-								<integer>0</integer>
-								<key>UUID</key>
-								<string>7767B020-CA0D-4E32-987C-F89B94FEFD1C</string>
-							</dict>
-						</array>
-						<key>REMOVED</key>
-						<dict/>
-					</dict>
-				</dict>
-				<key>MODE</key>
-				<integer>0</integer>
 			</dict>
 			<key>INSTALLATION_STEPS</key>
 			<array>
@@ -638,35 +618,6 @@
 				<key>LOCALIZATIONS</key>
 				<array/>
 			</dict>
-			<key>LICENSE</key>
-			<dict>
-				<key>LOCALIZATIONS</key>
-				<array>
-					<dict>
-						<key>LANGUAGE</key>
-						<string>Spanish</string>
-						<key>VALUE</key>
-						<dict>
-							<key>PATH</key>
-							<string>licencia.txt</string>
-							<key>PATH_TYPE</key>
-							<integer>1</integer>
-						</dict>
-					</dict>
-				</array>
-				<key>MODE</key>
-				<integer>0</integer>
-			</dict>
-			<key>README</key>
-			<dict>
-				<key>LOCALIZATIONS</key>
-				<array/>
-			</dict>
-			<key>SUMMARY</key>
-			<dict>
-				<key>LOCALIZATIONS</key>
-				<array/>
-			</dict>
 			<key>TITLE</key>
 			<dict>
 				<key>LOCALIZATIONS</key>
@@ -675,7 +626,7 @@
 						<key>LANGUAGE</key>
 						<string>English</string>
 						<key>VALUE</key>
-						<string>AutoFirma</string>
+						<string>Autofirma</string>
 					</dict>
 				</array>
 			</dict>
@@ -869,11 +820,9 @@
 				</dict>
 			</array>
 			<key>NAME</key>
-			<string>AutoFirma</string>
+			<string>Autofirma</string>
 			<key>PAYLOAD_ONLY</key>
 			<false/>
-			<key>REFERENCE_FOLDER_PATH</key>
-			<string>/Users/macbookair/AutoFirma_Packages</string>
 			<key>TREAT_MISSING_PRESENTATION_DOCUMENTS_AS_WARNING</key>
 			<false/>
 		</dict>
