@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Restaurar instalaci&oacute;n</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="Restaurar, Intalacion">
+  <meta name="description" content="Restaurar instalaci&oacute;n.">
+ </head>
+ <body>
+  <h2>Panel de restaurar instalaci&oacute;n</h2>
+  <p>
+  Desde este panel es posible restaurar la instalaci&oacute;n de Autofirma para corregir problemas
+  que afecten a la comunicaci&oacute;n entre los navegadores web y la aplicaci&oacute;n. Los casos
+  m&aacute;s comunes son: se ha instalado un nuevo navegador web después de la instalaci&oacute;n
+  de Autofirma, se han creado m&aacute;s usuarios en el equipo o  m&aacute;s perfiles de usuario
+  para un navegador, se ha reseteado el perfil de un usuario, etc.   
+  </p>
+  <p align="center">
+  	<img src="../gfx/menurestaurar_mini.png" alt="Pantalla para la restaurar la instalaci&oacute;n">
+  </p>
+  <h3>Opciones disponibles en el panel:</h3>
+  <ul>
+   <li><b>Configurar Firefox para que conf&iacute;e en los certificados ra&iacute;z del sistema:</b>
+    <p>Al activar esta opci&oacute;n (sólo disponible en Windows y macOS) se permite que el proceso
+      de restauraci&oacute;n configure Firefox de tal forma que el navegador confiar&aacute; en
+      los certificados instalados en el almac&eacute;n de certificados ra&iacute;z del sistema
+      (Autoridades de confianza). De esta forma Autofirma seguir&aacute; funcionando en este
+      navegador aunque se configuren nuevos perfiles, se limpie el perfil o si se elimina el
+      certificado de confianza del almac&eacute;n del navegador. Si se deja esta casilla
+      desactivada se eliminar&aacute; esta configuraci&oacute;n en caso de que ya estuviese
+      establecida.
+    </p>
+   </li>
+  </ul>
+  <p>Al pulsar el bot&oacute;n "Iniciar restauraci&oacute;n" se iniciar&aacute; el proceso de
+  restauraci&oacute;n.
+  </p>
+  <p><b>ADVERTENCIA PARA USUARIOS DE MICROSOFT WINDOWS:</b> Si al ejecutar el proceso de
+  instalaci&oacute;n apareciese un mensaje indicando "La ejecuci&oacute;n del c&oacute;digo no
+  puede continuar porque no se encontr&oacute; VCRUNTIME140.dll. Este problema se puede solucionar
+  reinstalando el programa", deber&aacute; instalar el
+  <a target="_blank" href="https://www.microsoft.com/es-es/download/details.aspx?id=48145">entorno de
+  ejecuci&oacute;n redistribuible de Microsoft Visual C++ 2015</a> y volver a ejecutar la
+  operaci&oacute;n para poder completar la restauraci&oacute;n.
+  </p>
+ </body>
+</html>

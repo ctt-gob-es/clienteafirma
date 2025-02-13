@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Plugins</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="plugin, hash">
+  <meta name="description" content="Plugins.">
+ </head>
+ <body>
+  <h2>Plugins</h2>
+  <p>
+  Junto a Autofirma se distribuyen una serie de plugins que permiten agregar a la aplicaci&oacute;n funciones
+  adicionales. 
+  </p>
+  <h3>C&aacute;lculo y comprobaci&oacute;n de huellas digitales</h3>
+  <p>
+  Este plugin agrega a Autofirma opciones para calcular la huella digital (hash) de un fichero
+  o de todos los ficheros de un directorio y comprobar esas mismas huellas que se han generado.
+  </p>
+  <p>
+  Una vez se instala el plugin, aparecer&aacute; en la barra de men&uacute;s de Autofirma la opci&oacute;n "Huellas
+  digitales" con las distintas operaciones que se pueden realizar. 
+  </p>
+  <ul>
+  	<li><b>Calcular huella digital:</b> Permite calcular el hash de un fichero y guardarlo a disco.
+  	El formato y la extensi&oacute;n del fichero de hash variar&aacute; seg&uacute;n el formato seleccionado.</li>
+  	<p align="center">
+  		<img src="../gfx/pluginhash_calculo_fichero_mini.png" alt="Pantalla de c&aacute;lculo de ficheros">
+  	</p>
+  	<ul>
+  		<li><b>Fichero sobre el que calcular la huella digital:</b> Fichero del que deseamos calcular el hash.</li>
+  		<li><b>Algoritmo de huella digital:</b> Algoritmo de hash.</li>
+  		<li><b>Formato de la huella digital:</b> Codificaci&oacute;n empleada para guardar el hash:
+  			<ul>
+  				<li>Hexadecimal en ASCII (Base16): La huella se almacenar&aacute; como cadena hexadecimal termiada en 'h'.</li>
+  				<li>Base64: La huella se almacenar&aacute; en Base 64.</li>
+  				<li>Binario: La huella se almacenar&aacute; sin codificar.</li>
+  			</ul>
+  		</li>
+  		<li><b>Copiar huella digital al portapapeles:</b> Al activar esta opci&oacute;n, adem&aacute;s de guardar el hash en
+  		fichero, se copiar&aacute; al portapapeles. El hash se copiar&aacute; con la codificaci&oacute;n del formato seleccionado o,
+  		si se seleccion&oacute; el formato binario, en hexadecimal.</li>
+  	</ul>
+  	<br>
+  	<li><b>Comprobar huella digital:</b> Permite comprobar el hash de un fichero.</li>
+  	<p align="center">
+  		<img src="../gfx/pluginhash_comprobacion_fichero_mini.png" alt="Pantalla de comprobaci&oacute;n de ficheros">
+  	</p>
+  	<ul>
+  		<li><b>Fichero de datos:</b> Fichero al que corresponde la huella digital que se desea comprobar.</li>
+  		<li><b>Fichero que contiene la huella digital:</b> Fichero con la huella digital.</li>
+  	</ul>
+  	<br>
+  	<li><b>Calcular huella digital en directorio:</b> Permite calcular el hash de los ficheros de un directorio.</li>
+  	<p align="center">
+  		<img src="../gfx/pluginhash_calculo_directorio_mini.png" alt="Pantalla de c&aacute;lculo de hash de directorio">
+  	</p>
+  	<ul>
+  		<li><b>Directorio sobre el que calcular las huellas digitales:</b> Directorio con los ficheros de los que queremos calcular la huella digital.</li>
+  		<li><b>Algoritmo de huella digital:</b> Algoritmo de hash.</li>
+  		<li><b>Recursivo:</b> Al activarla se calcular&aacute; tambi&eacute;n el hash de los ficheros localizados en los subdirectorios del directorio seleccionado.</li>
+  	</ul>
+  	<br>
+  	<li><b>Comprobar huella digital en directorio:</b> Permite comprobar el hash de los ficheros de un directorio.</li>
+  	<p align="center">
+  		<img src="../gfx/pluginhash_comprobacion_directorio_mini.png" alt="Pantalla de comprobaci&oacute;n de hash de directorio">
+  	</p>
+  	<ul>
+  		<li><b>Directorio:</b> Directorio con los ficheros a los que corresponden las huellas digitales que se desean comprobar.</li>
+  		<li><b>Fichero de huellas digitales:</b> Fichero con las huellas digitales que se van a comprobar.</li>
+  	</ul>
+  </ul>
+  
+  <p>
+  Al instalar el plugin de huellas digitales en sistemas Windows, tambi&eacute;n se agregan las opciones de
+  generar y comprobar huellas digitales en el men&uacute; contextual de ficheros y directorios del sistema.
+  </p>
+  <p>Las opciones que aparecen son:</p>
+  <ul>
+  	<li><b>Generar huella digital:</b> Esta opci&oacute;n aparece en el men&uacute; contextual de todos
+  	los ficheros y directorios y permite generar el hash del fichero o de los ficheros del directorio.</li>
+  	<li><b>Comprobar huella digital:</b> Esta opci&oacute;n aparece en el men&uacute; contextual de los ficheros de
+  	hashes (.hash, .hashb64, .hashfiles y .hexhash) y permite seleccionar el fichero o directorio del
+  	que se desea comprobar el hash.</li>
+  </ul>
+ </body>
+</html>

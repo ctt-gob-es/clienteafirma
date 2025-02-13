@@ -82,7 +82,7 @@ public class TestMacKeyChain {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore // Requieren contrasena del almacen
+	//@Ignore // Requieren contrasena del almacen
     public void testSystemKeyChain() throws Exception {
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             return;
@@ -94,10 +94,8 @@ public class TestMacKeyChain {
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);
         Assert.assertTrue(aliases.length > 0);
-
         final PrivateKeyEntry pke = ksm.getKeyEntry(aliases[0]);
         Assert.assertNotNull(pke);
-
         final X509Certificate cert = (X509Certificate) pke.getCertificate();
         Assert.assertNotNull(cert);
 

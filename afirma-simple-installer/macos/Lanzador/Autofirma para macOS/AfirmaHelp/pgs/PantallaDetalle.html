@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Autofirma</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="certificado, OCSP, contrafirma, cofirma, mancomunada">
+  <meta name="description" content="Mostrar los detalles de una firma realizada.">
+ </head>
+ <body>
+  <h3>Pantalla de detalle de la firma o firmas realizadas</h3>
+  <p>
+   Tras finalizar una operaci&oacute;n de firma, se muestra una pantalla con informaci&oacute;n sobre el resultado de la 
+   operaci&oacute;n. 
+  </p>
+  <p align="center">
+   <img src="../gfx/pantalladetalle_mini.png" alt="Pantalla con informaci&oacute;n de la firma realizada cuando se firma un &uacute;nico documento">
+   <img src="../gfx/pantalladetalle2_mini.png" alt="Pantalla con el listado de firmas realizadas cuando se firman m&uacute;ltiples documentos">
+  </p>
+  <p>
+   Si se desea obtener m&aacute;s informaci&oacute;n acerca de la firma, se puede pulsar en el enlace <u>Detalles de la firma</u> y se mostrar&aacute; un di&aacute;logo con informaci&oacute;n acerca de la misma:
+  </p>
+  <p align="center">
+   <img src="../gfx/pantalladetallesfirma.png" alt="Pantalla con informaci&oacute;n extendida sobre la firma">
+  </p>
+  <p>
+   Esta pantalla se divide en tres secciones:
+  </p>
+  <p>
+   <b>Informaci&oacute;n sobre el fichero firmado o el directorio de salida</b><br/>
+   Se muestra la ruta completa del fichero firmado (puede copiar esta ruta pulsando sobre ella con el bot&oacute;n 
+   derecho del rat&oacute;n) o la del directorio de salida. Si se realiz&oacute; la firma PAdES de un documento PDF,
+   se mostrar&aacute; un bot&oacute;n para abrir el documento firmado con la aplicaci&oacute;n predeterminada en el
+   sistema.
+  </p>
+  <p>
+   <b>Informaci&oacute;n sobre el certificado utilizado para realizar las firmas</b><br/>
+   Es posible ver el certificado (mediante la aplicaci&oacute;n predeterminada del sistema operativo) pulsando en los
+   hiperenlaces.
+  </p>
+  <p>
+   <b>Informaci&oacute;n detallada sobre la firma o conjunto de firmas realizas</b><br/>
+   En el caso de firmar un documento, se muestran al menos los siguientes puntos mediante una estructura de &aacute;rbol:
+  </p>
+  <ul>
+   <li>Formato de firma: CAdES, PAdES, XAdES, Factura-e, OOXML u ODF.</li>
+   <li>Datos firmados: Indica si los datos se encuentran empotrados en la propia firma y permite acceder a ellos en caso 
+   de que lo est&eacute;n.</li>
+   <li>
+    &Aacute;rbol de firmas: Estructura jer&aacute;rquica de las firmas encontradas en el documento. Se puede ver el
+    certificado usado para cada una de ellas pulsando en el correspondiente enlace.
+   </li>
+  </ul>
+  <p>
+   Para desplazarse entre los elementos del &aacute;rbol se pueden usar los cursores del teclado.
+  </p>
+  <p>
+   En caso de haber firmado m&uacute;ltiples ficheros, se mostrar&aacute; un listado con los ficheros generados, su tama&ntilde;o
+   y resultado. En el caso de las firmas que no se hayan podido generar, se mostrará la ruta del fichero de entrada. Puede hacer
+   doble clic sobre una de las firmas del listado para acceder a su información detallada.  
+  </p>
+ </body>
+</html>
