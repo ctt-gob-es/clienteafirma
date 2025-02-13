@@ -22,7 +22,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 
@@ -99,7 +99,7 @@ final class ProtocolInvocationLauncherLoad {
 					options.getDescription(),
 					false,
 					options.getMultiload(),
-					AutoFirmaUtil.getDefaultDialogsIcon(),
+					DesktopUtil.getDefaultDialogsIcon(),
 					null);
 
 		} catch (final AOCancelledOperationException e) {

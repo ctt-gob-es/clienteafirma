@@ -160,9 +160,10 @@ final class TrustedCertificatesPanel extends JPanel  {
 			TrustedCertificatesPanel.this.deleteCertButton.setEnabled(true);
 		  });
 		  this.table.addMouseListener(new java.awt.event.MouseAdapter() {
-		      public void mouseClicked(java.awt.event.MouseEvent e) {
+		      @Override
+			public void mouseClicked(final java.awt.event.MouseEvent e) {
 		          if(e.getClickCount()==2){
-		        	  CertificateUtils.openCert(table, savedCerts.get(table.getSelectedRow()));
+		        	  CertificateUtils.openCert(TrustedCertificatesPanel.this.table, TrustedCertificatesPanel.this.savedCerts.get(TrustedCertificatesPanel.this.table.getSelectedRow()));
 		          }
 		      }
 		  });
@@ -182,7 +183,7 @@ final class TrustedCertificatesPanel extends JPanel  {
     }
 
     /**
-     * Obtiene los certificados que se encuentran en el almac&eacute;n de confianza de AutoFirma.
+     * Obtiene los certificados que se encuentran en el almac&eacute;n de confianza de Autofirma.
      * @param parent Contenedor padre.
      * @return Array con la informaci&oacute;n de los certificados o {@code null} si no se
      * pudieron cargar los certitifcados.
@@ -225,13 +226,13 @@ final class TrustedCertificatesPanel extends JPanel  {
     }
 
     /**
-     * Elimina el certificado indicado por par&aacute;metro del almac&eacute;n de confianza de AutoFirma
+     * Elimina el certificado indicado por par&aacute;metro del almac&eacute;n de confianza de Autofirma
      * @param x509Certificate Certificado a eliminar
      */
     private void deleteCert(final int certIdx) {
-    	
+
     	final X509Certificate cert = this.savedCerts.get(certIdx);
-    	
+
     	if (AOUIFactory.showConfirmDialog(this, SimpleAfirmaMessages.getString("TrustedCertificatesDialog.29", AOUtil.getCN(cert.getSubjectX500Principal().toString())), //$NON-NLS-1$
     			SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
     			JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {

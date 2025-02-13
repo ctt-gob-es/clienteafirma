@@ -982,7 +982,7 @@ final class CommandLineLauncher {
 			sb.append(CommandLineMessages.getString("CommandLineLauncher.34")).append("\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final String appName = AutoFirmaUtil.getApplicationFilename();
+		final String appName = DesktopUtil.getApplicationFilename();
 
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")).append(": ").append(appName).append(" cmd [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		.append(CommandLineMessages.getString("CommandLineLauncher.33")) .append(" cmd:\n\n") //$NON-NLS-1$ //$NON-NLS-2$

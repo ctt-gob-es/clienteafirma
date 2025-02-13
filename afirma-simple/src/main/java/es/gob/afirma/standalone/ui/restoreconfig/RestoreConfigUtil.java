@@ -32,9 +32,7 @@ final class RestoreConfigUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	static final String CERT_ALIAS = "SocketAutoFirma"; //$NON-NLS-1$
-
-	static final String CERT_ALIAS_BROWSER = "AutoFirma ROOT"; //$NON-NLS-1$
+	static final String CERT_ALIAS_BROWSER = "Autofirma ROOT"; //$NON-NLS-1$
 
 	private RestoreConfigUtil() {
 		// No instanciable

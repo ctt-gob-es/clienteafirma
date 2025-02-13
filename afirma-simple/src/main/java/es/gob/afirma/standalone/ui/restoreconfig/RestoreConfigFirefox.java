@@ -40,6 +40,7 @@ import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.so.macos.UnixUtils;
 
 
@@ -53,7 +54,7 @@ final class RestoreConfigFirefox {
 
 	private static final int WITHOUT_TIMEOUT = 0;
 
-	private static final String SSL_ROOT_CERTIFICATE_FILENAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String SSL_ROOT_CERTIFICATE_FILENAME = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 	static final String DIR_CERTUTIL = "certutil"; //$NON-NLS-1$
 	private static final String LINUX_UNINSTALLSCRIPT_NAME = "uninstallRestore-"; //$NON-NLS-1$
 	private static final String LINUX_SCRIPT_NAME = "installRestore-"; //$NON-NLS-1$
@@ -267,7 +268,7 @@ final class RestoreConfigFirefox {
 							"sql:" + escapePath(userDir) + nssDirSubpath, //$NON-NLS-1$ // 2
 							"-A", //$NON-NLS-1$ // 3
 							"-n", //$NON-NLS-1$ // 4
-							"\"" + RestoreConfigUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$ // 5
+							"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$ // 5
 							"-i", //$NON-NLS-1$ // 6
 							escapePath(rootCertFile.getAbsolutePath()), // 7
 							"-t", //$NON-NLS-1$ // 8
@@ -443,7 +444,7 @@ final class RestoreConfigFirefox {
 					"-i", //$NON-NLS-1$
 					escapePath(certificateFile.getAbsolutePath()),
 					"-n", //$NON-NLS-1$
-					"\"" + RestoreConfigUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+					"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 					"-t", //$NON-NLS-1$
 					"\"C,,\"" //$NON-NLS-1$
 			};
@@ -653,7 +654,7 @@ final class RestoreConfigFirefox {
 							"-d", //$NON-NLS-1$
 							"\"sql:" + profileDir.getAbsolutePath() + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 							"-n", //$NON-NLS-1$
-							"\"" + RestoreConfigUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+							"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 					};
 
 					boolean detectedError;

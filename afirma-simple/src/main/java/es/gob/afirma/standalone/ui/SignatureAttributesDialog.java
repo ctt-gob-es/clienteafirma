@@ -13,7 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 public class SignatureAttributesDialog {
@@ -63,7 +63,7 @@ public class SignatureAttributesDialog {
 		final JDialog dialog = optionPane.createDialog(
 				getParentComponent(parent),
 				SimpleAfirmaMessages.getString("SignatureAttributesDialog.0")); //$NON-NLS-1$
-		dialog.setIconImages(AutoFirmaUtil.getIconImages());
+		dialog.setIconImages(DesktopUtil.getIconImages());
 
 		return dialog;
 	}

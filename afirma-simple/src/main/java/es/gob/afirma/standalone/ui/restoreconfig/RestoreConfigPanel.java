@@ -166,7 +166,7 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 			RestoreConfigPanel.this.taskOutput.setText(null);
 			// Deshabilito el boton mientras el proceso se esta ejecutando
 			restoreButton.setEnabled(false);
-			new Thread(() -> new RestoreConfigManager().restoreConfigAutoFirma(RestoreConfigPanel.this)).start();
+			new Thread(() -> new RestoreConfigManager().restoreConfig(RestoreConfigPanel.this)).start();
 
 			restoreButton.setEnabled(true);
 

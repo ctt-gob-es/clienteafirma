@@ -30,7 +30,7 @@ import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
@@ -99,7 +99,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 
 	private void createUI() {
 		setTitle(SignPdfUiMessages.getString("SignPdfDialog.3")); //$NON-NLS-1$
-		setIconImages(AutoFirmaUtil.getIconImages());
+		setIconImages(DesktopUtil.getIconImages());
 		getAccessibleContext().setAccessibleDescription(SignPdfUiMessages.getString("SignPdfDialog.2") //$NON-NLS-1$
 		);
 		setModalityType(ModalityType.TOOLKIT_MODAL);

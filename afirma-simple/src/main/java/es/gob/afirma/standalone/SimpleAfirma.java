@@ -1231,7 +1231,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	// Logs de informacion basica
 		final StringBuilder info = new StringBuilder(390).append("Autofirma ").append(getVersion()) //$NON-NLS-1$
-		.append("\nResolucion DPI de pantalla: ").append(AutoFirmaUtil.getDPI()) //$NON-NLS-1$
+		.append("\nResolucion DPI de pantalla: ").append(DesktopUtil.getDPI()) //$NON-NLS-1$
 		.append("\nSistema operativo: ").append(System.getProperty("os.name")) //$NON-NLS-1$ //$NON-NLS-2$
 		.append("\nVersion del SO: ").append(System.getProperty("os.version")) //$NON-NLS-1$ //$NON-NLS-2$
 		.append("\nVersion de Java: ").append(System.getProperty("java.version")) //$NON-NLS-1$ //$NON-NLS-2$
@@ -1372,9 +1372,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * @return Directorio de plugins.
      */
     private static File getPluginsDir() {
-		File appDir = AutoFirmaUtil.getAlternativeDirectory();
+		File appDir = DesktopUtil.getAlternativeDirectory();
 		if (appDir == null) {
-			appDir = AutoFirmaUtil.getApplicationDirectory();
+			appDir = DesktopUtil.getApplicationDirectory();
 		}
 		return new File(appDir, PLUGINS_DIRNAME);
 	}

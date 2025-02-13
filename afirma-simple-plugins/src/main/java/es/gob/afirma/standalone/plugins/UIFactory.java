@@ -40,7 +40,7 @@ public class UIFactory {
 
 	public static Image getDefaultDialogIcon() throws IOException {
 		try {
-			final Class<?> autoFirmaUtilClass = Class.forName("es.gob.afirma.standalone.AutoFirmaUtil"); //$NON-NLS-1$
+			final Class<?> autoFirmaUtilClass = Class.forName("es.gob.afirma.standalone.DesktopUtil"); //$NON-NLS-1$
 
 			final Method getDefaultDialogIconMethod =
 					autoFirmaUtilClass.getMethod("getDefaultDialogsIcon"); //$NON-NLS-1$

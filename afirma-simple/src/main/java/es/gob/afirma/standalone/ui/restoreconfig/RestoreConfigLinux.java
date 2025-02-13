@@ -33,6 +33,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 
 /**
@@ -44,9 +45,9 @@ final class RestoreConfigLinux implements RestoreConfig {
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
-    private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+    private static final String FILE_AUTOFIRMA_CERTIFICATE = "Autofirma_ROOT.cer"; //$NON-NLS-1$
     private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
-    private static final String PROTOCOL_HANDLER_CONFIG_FILE = "AutoFirma.js"; //$NON-NLS-1$
+    private static final String PROTOCOL_HANDLER_CONFIG_FILE = "autofirma.js"; //$NON-NLS-1$
     private static final String DEFAULT_PROTOCOL_HANDLER_CONFIG_DIR = "/etc/firefox/pref"; //$NON-NLS-1$
     static final String EXPORT_PATH = "export PATH=$PATH:"; //$NON-NLS-1$
     static final String EXPORT_LD_LIBRARY ="export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"; //$NON-NLS-1$
@@ -119,7 +120,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 			CertPack certPack;
 			try {
-				certPack = CertUtil.getCertPackForLocalhostSsl(RestoreConfigUtil.CERT_ALIAS, KS_PASSWORD);
+				certPack = CertUtil.getCertPackForLocalhostSsl(ConfiguratorUtil.CERT_ALIAS, KS_PASSWORD);
 			} catch (final Exception e) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.2")); //$NON-NLS-1$
 				LOGGER.log(Level.SEVERE, "Error al generar los certificados SSL", e); //$NON-NLS-1$
@@ -333,8 +334,8 @@ final class RestoreConfigLinux implements RestoreConfig {
 		if (isProcessRunningLinux("/usr/lib/firefox/firefox").booleanValue()) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
 					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.7"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.7"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
 		}
 
@@ -344,8 +345,8 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 			option = JOptionPane.showConfirmDialog(
 					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.12"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.12"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE);
 		}
@@ -362,8 +363,8 @@ final class RestoreConfigLinux implements RestoreConfig {
 		if (isProcessRunningLinux("/opt/google/chrome/chrome").booleanValue()) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
 					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.8"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.8"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
 		}
 
@@ -372,8 +373,8 @@ final class RestoreConfigLinux implements RestoreConfig {
 				&& isProcessRunningLinux("/opt/google/chrome/chrome").booleanValue()) { //$NON-NLS-1$
 			option = JOptionPane.showConfirmDialog(
 					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.11"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.11"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
 					JOptionPane.OK_CANCEL_OPTION);
 		}
 	}
@@ -512,7 +513,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			throw new IOException("No se encuentra definido el directorio del usuario"); //$NON-NLS-1$
 		}
 
-		final File appDir = new File(userHome, ".afirma/AutoFirma"); //$NON-NLS-1$
+		final File appDir = new File(userHome, ".afirma/Autofirma"); //$NON-NLS-1$
 		if (!appDir.isDirectory() && !appDir.mkdirs()) {
 			throw new IOException("No ha podido crearse el directorio para los ficheros de aplicacion"); //$NON-NLS-1$
 		}

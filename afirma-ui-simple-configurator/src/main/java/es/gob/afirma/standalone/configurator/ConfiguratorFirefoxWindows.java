@@ -35,13 +35,14 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
  * @author Carlos Gamuci. */
 final class ConfiguratorFirefoxWindows {
 
-	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String FILE_AUTOFIRMA_CERTIFICATE = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String CERTUTIL_DIR = "certutil"; //$NON-NLS-1$
 	private static final String CERTUTIL_EXE = "certutil.exe"; //$NON-NLS-1$
 	private static final String CERTUTIL_RESOURCE = "/windows/certutil.windows.zip"; //$NON-NLS-1$
@@ -70,7 +71,7 @@ final class ConfiguratorFirefoxWindows {
 	 * en Windows con el alias con el que se instalaba (CertUtil.CERT_ALIAS) y lo reconocio por
 	 * su
 	 */
-	private static final String CERT_ALIAS = "AutoFirma ROOT"; //$NON-NLS-1$
+	private static final String CERT_ALIAS = "Autofirma ROOT"; //$NON-NLS-1$
 
 	private static String PROFILES_INI_RELATIVE_PATH;
 	private static String USERS_PATH;

@@ -73,7 +73,7 @@ import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
@@ -342,7 +342,7 @@ final class ProtocolInvocationLauncherSign {
 										fileDesc,
 										false, // Select dir
 										false, // Multiselect
-										AutoFirmaUtil.getDefaultDialogsIcon(),
+										DesktopUtil.getDefaultDialogsIcon(),
 										null //Parent
 								)[0];
 					} catch (final AOCancelledOperationException e) {

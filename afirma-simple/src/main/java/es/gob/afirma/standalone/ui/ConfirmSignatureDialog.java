@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 public class ConfirmSignatureDialog {
@@ -36,7 +36,7 @@ public class ConfirmSignatureDialog {
 		this.dialog = this.optionPane.createDialog(
 				getParentComponent(parent),
 				SimpleAfirmaMessages.getString("ConfirmSignatureDialog.0")); //$NON-NLS-1$
-		this.dialog.setIconImages(AutoFirmaUtil.getIconImages());
+		this.dialog.setIconImages(DesktopUtil.getIconImages());
 
 		this.optionPane.addPropertyChangeListener(
 			    e -> {

@@ -9,7 +9,7 @@ shrd/icon_xml.png
 shrd/logo.png
 shrd/logo_cliente.png
 Spanish.lproj/Autofirma.html
-Spanish.lproj/AutoFirmaHelpIcon.png
+Spanish.lproj/AutofirmaHelpIcon.png
 Spanish.lproj/index.html
 Spanish.lproj/gfx/dialogocambioformato.png
 Spanish.lproj/gfx/dialogocertificadoscargados.png

@@ -554,7 +554,7 @@ final class CommandLineParameters {
 	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
 	private static String buildOperationSignSyntaxError(final String op, final String errorMessage) {
 
-		final String appName = AutoFirmaUtil.getApplicationFilename();
+		final String appName = DesktopUtil.getApplicationFilename();
 
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {
@@ -604,7 +604,7 @@ final class CommandLineParameters {
 	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
 	private static String buildOperationBatchSignSyntaxError(final String op, final String errorMessage) {
 
-		final String appName = AutoFirmaUtil.getApplicationFilename();
+		final String appName = DesktopUtil.getApplicationFilename();
 
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {
@@ -640,7 +640,7 @@ final class CommandLineParameters {
 	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
 	private static String buildOperationVerifySyntaxError(final String op, final String errorMessage) {
 
-		final String appName = AutoFirmaUtil.getApplicationFilename();
+		final String appName = DesktopUtil.getApplicationFilename();
 
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {
@@ -662,7 +662,7 @@ final class CommandLineParameters {
 	 * @return Texto con el error de sintaxis y la explicaci&oacute;n de la sintaxis correcta. */
 	private static String buildOperationListSyntaxError(final String op, final String errorMessage) {
 
-		final String appName = AutoFirmaUtil.getApplicationFilename();
+		final String appName = DesktopUtil.getApplicationFilename();
 
 		final StringBuilder sb = new StringBuilder();
 		if (errorMessage != null) {

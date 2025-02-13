@@ -15,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +35,7 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
@@ -47,7 +47,7 @@ final class ConfiguratorWindows implements Configurator {
 
 	private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
-	private static final String CA_CERT_FILENAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String CA_CERT_FILENAME = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 
 	private final boolean jnlpInstance;
 	private final boolean firefoxSecurityRoots;
@@ -233,7 +233,7 @@ final class ConfiguratorWindows implements Configurator {
 			try {
 				Files.walkFileTree(
 						alternativeDir.toPath(),
-						new HashSet<FileVisitOption>(),
+						new HashSet<>(),
 						Integer.MAX_VALUE,
 						new SimpleFileVisitor<Path>() {
 							@Override

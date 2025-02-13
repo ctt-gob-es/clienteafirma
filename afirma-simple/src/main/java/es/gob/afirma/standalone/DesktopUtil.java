@@ -33,7 +33,7 @@ import es.gob.afirma.core.misc.Platform;
 
 /** Utilidades generales y de control del autoarranque de Autofirma en el inicio de Windows.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
-public final class AutoFirmaUtil {
+public final class DesktopUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -43,7 +43,7 @@ public final class AutoFirmaUtil {
 	private static final String REG_VALUE_OPT = "/v"; //$NON-NLS-1$
 
 	private static final Image ICON = Toolkit.getDefaultToolkit().getImage(
-		AutoFirmaUtil.class.getResource("/resources/logo_cliente_24.png") //$NON-NLS-1$
+		DesktopUtil.class.getResource("/resources/logo_cliente_24.png") //$NON-NLS-1$
 	);
 
 	private static List<Image> ICONS = null;
@@ -63,19 +63,19 @@ public final class AutoFirmaUtil {
 		if (ICONS == null) {
 			ICONS = new ArrayList<>();
 			ICONS.add(Toolkit.getDefaultToolkit().getImage(
-					AutoFirmaUtil.class.getResource("/resources/logo_cliente_16.png"))); //$NON-NLS-1$
+					DesktopUtil.class.getResource("/resources/logo_cliente_16.png"))); //$NON-NLS-1$
 			ICONS.add(Toolkit.getDefaultToolkit().getImage(
-					AutoFirmaUtil.class.getResource("/resources/logo_cliente_24.png"))); //$NON-NLS-1$
+					DesktopUtil.class.getResource("/resources/logo_cliente_24.png"))); //$NON-NLS-1$
 			ICONS.add(Toolkit.getDefaultToolkit().getImage(
-					AutoFirmaUtil.class.getResource("/resources/logo_cliente_32.png"))); //$NON-NLS-1$
+					DesktopUtil.class.getResource("/resources/logo_cliente_32.png"))); //$NON-NLS-1$
 			ICONS.add(Toolkit.getDefaultToolkit().getImage(
-					AutoFirmaUtil.class.getResource("/resources/logo_cliente_48.png"))); //$NON-NLS-1$
+					DesktopUtil.class.getResource("/resources/logo_cliente_48.png"))); //$NON-NLS-1$
 			ICONS.add(Toolkit.getDefaultToolkit().getImage(
-					AutoFirmaUtil.class.getResource("/resources/logo_cliente_128.png"))); //$NON-NLS-1$
+					DesktopUtil.class.getResource("/resources/logo_cliente_128.png"))); //$NON-NLS-1$
 			ICONS.add(Toolkit.getDefaultToolkit().getImage(
-					AutoFirmaUtil.class.getResource("/resources/logo_cliente_256.png"))); //$NON-NLS-1$
+					DesktopUtil.class.getResource("/resources/logo_cliente_256.png"))); //$NON-NLS-1$
 			ICONS.add(Toolkit.getDefaultToolkit().getImage(
-					AutoFirmaUtil.class.getResource("/resources/logo_cliente_512.png"))); //$NON-NLS-1$
+					DesktopUtil.class.getResource("/resources/logo_cliente_512.png"))); //$NON-NLS-1$
 		}
 		return ICONS;
 	}
@@ -166,7 +166,7 @@ public final class AutoFirmaUtil {
 		// Identificamos el directorio de instalacion
 		try {
 			return new File(
-				AutoFirmaUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
+				DesktopUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
 			).getParentFile();
 		}
 		catch (final URISyntaxException e) {

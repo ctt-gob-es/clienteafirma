@@ -75,8 +75,8 @@ public class TrustStoreManager {
 			catch (final Exception e) {
 				final int result = AOUIFactory.showConfirmDialog(
 						parent,
-						CoreMessages.getString("AutoFirmaTrustStore.0"), //$NON-NLS-1$
-						CoreMessages.getString("AutoFirmaTrustStore.1"), //$NON-NLS-1$
+						CoreMessages.getString("AutofirmaTrustStore.0"), //$NON-NLS-1$
+						CoreMessages.getString("AutofirmaTrustStore.1"), //$NON-NLS-1$
 						AOUIFactory.YES_NO_OPTION,
 						AOUIFactory.WARNING_MESSAGE);
 				if (result == AOUIFactory.OK_OPTION) {

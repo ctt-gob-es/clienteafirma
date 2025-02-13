@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.standalone.ui.restoreconfig;
+package es.gob.afirma.standalone.configurator.common;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -20,14 +20,16 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import es.gob.afirma.core.misc.LoggerUtil;
 
-final class ConfiguratorUtil {
+public final class ConfiguratorUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	static final String CERT_ALIAS = "SocketAutoFirma"; //$NON-NLS-1$
+	public static final String CERT_ALIAS = "SocketAutofirma"; //$NON-NLS-1$
 
 	private ConfiguratorUtil() {
 		// No instanciable
@@ -35,20 +37,83 @@ final class ConfiguratorUtil {
 
 	/** Guarda datos en disco.
 	 * @param data Datos a guardar.
-	 * @param outDir Directorio local.
+	 * @param outFile Fichero de salida.
 	 * @throws IOException Cuando ocurre un error durante el guardado. */
-	static void installFile(final byte[] data, final File outDir) throws IOException {
+	public static void installFile(final byte[] data, final File outFile) throws IOException {
 		try (
-			final OutputStream configScriptOs = new FileOutputStream(outDir);
+			final OutputStream configScriptOs = new FileOutputStream(outFile);
 			final BufferedOutputStream bos = new BufferedOutputStream(configScriptOs);
 		) {
 			bos.write(data);
 		}
 	}
 
+	/** Descomprime un fichero ZIP de recurso al disco.
+	 * @param resource Ruta del recurso ZIP.
+	 * @param outDir Directorio local en el que descomprimir.
+	 * @throws IOException Cuando ocurre un error al descomprimir.
+	 **/
+	public static void uncompressResource(final String resource, final File outDir) throws IOException {
+		int n;
+		final byte[] buffer = new byte[1024];
+		try (final ZipInputStream zipIs = new ZipInputStream(ConfiguratorUtil.class.getResourceAsStream(resource));) {
+			ZipEntry entry;
+			while ((entry = zipIs.getNextEntry()) != null) {
+				final File outFile = new File(outDir, entry.getName()).getCanonicalFile();
+
+				if (!isParent(outDir, outFile)) {
+					zipIs.closeEntry();
+					throw new IOException("Se ha encontrado en el archivo comprimido una ruta que apuntaba fuera del directorio de destino"); //$NON-NLS-1$
+				}
+
+				// Si es un directorio y no existe en local, lo creamos
+				if (entry.isDirectory()) {
+					if (!outFile.exists()) {
+						outFile.mkdirs();
+					}
+				}
+				else {
+
+					// Si no existe en local el directorio padre del fichero, lo creamos
+					if (!outFile.getParentFile().exists()) {
+						outFile.getParentFile().mkdirs();
+					}
+
+					try (final OutputStream outFis = new FileOutputStream(outFile)) {
+						while ((n = zipIs.read(buffer)) > 0) {
+							outFis.write(buffer, 0, n);
+						}
+						outFis.flush();
+					}
+				}
+				zipIs.closeEntry();
+			}
+
+		}
+	}
+
+	/**
+	 * Comprueba que el fichero {@code parentFile} es un directorio padre de la
+	 * ruta de {@code childFile}.
+	 * @param parentDir Directorio padre.
+	 * @param childFile Fichero/directorio hijo.
+	 * @return {@code true} cuando el directorio forma parte de la ruta de directorio,
+	 * {@code false} en caso contrario.
+	 * @throws IOException Cuando no se pueda canonizar el nombre de fichero hijo.
+	 */
+	private static boolean isParent(final File parentDir, final File childFile) throws IOException {
+
+		final File parent = parentDir.getCanonicalFile();
+		File intermediateDir = childFile.getCanonicalFile();
+		while (intermediateDir != null && !intermediateDir.equals(parent)) {
+			intermediateDir = intermediateDir.getParentFile();
+		}
+		return intermediateDir != null;
+	}
+
 	/** Elimina un directorio con todo su contenido.
 	 * @param targetDir Directorio a eliminar. */
-	static void deleteDir(final File targetDir) {
+	public static void deleteDir(final File targetDir) {
 		try {
 			Files.walkFileTree(
 				targetDir.toPath(),
@@ -79,7 +144,7 @@ final class ConfiguratorUtil {
 	 * @param comands Listado de comandos que almacenar.
 	 * @param buffer Buffer de datos en el que se almacen el script.
 	 */
-	static void printScript(final String[] comands, final StringBuilder buffer) {
+	public static void printScript(final String[] comands, final StringBuilder buffer) {
 		for (final String s : comands) {
 			buffer.append(s);
 			buffer.append(' ');
@@ -94,15 +159,15 @@ final class ConfiguratorUtil {
 	 * @param outFile Fichero en el que guardar el script.
 	 * @throws IOException Cuando el fichero no se puede crear o escribir.
 	 */
-	static void writeScript(final StringBuilder buffer, final File outFile) throws IOException {
-		try (final FileOutputStream fout = new FileOutputStream(outFile, true);) {
-			fout.write(buffer.toString().getBytes());
+	public static void writeScript(final StringBuilder buffer, final File outFile) throws IOException {
+		try (final FileOutputStream os = new FileOutputStream(outFile, true);) {
+			os.write(buffer.toString().getBytes());
 		}
 	}
 
 	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n actual.
 	 * @return Directorio de ejecuci&oacute;n. */
-	static File getApplicationDirectory() {
+	public static File getApplicationDirectory() {
 		try {
 			return new File(ConfiguratorUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
 		}

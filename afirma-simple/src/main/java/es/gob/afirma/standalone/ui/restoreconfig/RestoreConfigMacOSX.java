@@ -39,8 +39,9 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.so.macos.ShellScript;
 import es.gob.afirma.standalone.so.macos.UnixUtils;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
@@ -55,11 +56,11 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String KS_FILENAME = "/autofirma.pfx"; //$NON-NLS-1$
-	private static final String SSL_CA_CER_FILENAME = "/AutoFirma_ROOT.cer";//$NON-NLS-1$
+	private static final String SSL_CA_CER_FILENAME = "/Autofirma_ROOT.cer";//$NON-NLS-1$
 	private static final String SSL_CER_FILENAME = "/autofirma.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 	private static final String CERT_CN = "127.0.0.1"; //$NON-NLS-1$
-	private static final String CERT_CN_ROOT = "AutoFirma ROOT"; //$NON-NLS-1$
+	private static final String CERT_CN_ROOT = "Autofirma ROOT"; //$NON-NLS-1$
 
 	private static final String FIND_CERT_HASH_PREFIX = "hash:";  //$NON-NLS-1$
 
@@ -88,7 +89,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		// Tomamos como directorio de aplicacion aquel en el que podemos generar
 		// los certificados SSL para despues usarlos
-		final File appDir = AutoFirmaUtil.getMacOsXAlternativeAppDir();
+		final File appDir = DesktopUtil.getMacOsXAlternativeAppDir();
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
 		// Nos aseguramos de que el directorio de instalacion tiene permisos para escribir en el directorio de instalacion
@@ -509,9 +510,8 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 		// Generamos los certificados de CA y SSL
 		final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
-			RestoreConfigUtil.CERT_ALIAS,
-			KS_PASSWORD
-		);
+				ConfiguratorUtil.CERT_ALIAS,
+				KS_PASSWORD);
 
 		// Eliminamos anteriores copias de los ficheros y los volvemos a generar
 		deleteFile(certFiles.getSslRootFile());
@@ -910,8 +910,8 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 		if (isFirefoxOpen()) {
 			JOptionPane.showMessageDialog(
 					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.7"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.7"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
 		}
 
@@ -920,8 +920,8 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 
 			option = JOptionPane.showConfirmDialog(
 					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.12"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.12"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE);
 		}

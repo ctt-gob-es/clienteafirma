@@ -26,7 +26,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 
 /** Di&aacute;logo de espera indeterminada.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -80,7 +80,7 @@ public final class CommonWaitDialog extends JDialog {
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         try {
-            setIconImages(AutoFirmaUtil.getIconImages());
+            setIconImages(DesktopUtil.getIconImages());
         }
         catch (final Exception e) {
             LOGGER.warning(

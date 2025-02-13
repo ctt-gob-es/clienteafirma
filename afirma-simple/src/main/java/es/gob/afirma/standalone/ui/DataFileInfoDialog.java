@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
@@ -85,7 +85,7 @@ public class DataFileInfoDialog {
 		// Mostramos el dialogo
 		final JDialog dialog = this.optionPane.createDialog(this.parent, SimpleAfirmaMessages.getString("DataFileInfoDialog.3")); //$NON-NLS-1$
 		dialog.getAccessibleContext().setAccessibleDescription(accessibleDescription);
-		dialog.setIconImages(AutoFirmaUtil.getIconImages());
+		dialog.setIconImages(DesktopUtil.getIconImages());
 		dialog.setVisible(true);
 
 		return (Options) this.optionPane.getValue();

@@ -9,27 +9,27 @@
 
 package es.gob.afirma.standalone.configurator;
 
-import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.GeneralSecurityException;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
-import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
-/** Configurador de la instalaci&oacute;n de Autofirma.
- * Identifica el entorno, genera un certificado de firma y lo instala en los almacenes pertinentes.
- * @author Sergio Mart&iacute;nez Rico. */
-public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
+/** Configurador de la instalaci&oacute;n de Autofirma. Identifica el entorno, genera un
+ * certificado de firma y lo instala en los almacenes pertinentes. */
+public class AutofirmaConfigurator implements ConsoleListener {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -42,6 +42,17 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	/** Indica que la operacion que se debe realizar es la de desinstalaci&oacute;n. */
 	public static final String PARAMETER_UNINSTALL = "-uninstall"; //$NON-NLS-1$
 
+	/** Indica que se debe mantener abierta la aplicaci&oacute;n despu&eacute;s de
+	 * finalizar la operaci&oacute;n. */
+	public static final String PARAMETER_KEEP_OPEN = "-keep_open"; //$NON-NLS-1$
+
+	/** Indica que no se debe mostrar el di&aacute;logo gr&aacute;fico con las trazas
+	 * del proceso de instalaci&oacute;n. */
+	public static final String PARAMETER_HEADLESS = "-headless"; //$NON-NLS-1$
+
+	/** Indica que se realiza una carga mediante JNLP. */
+	public static final String PARAMETER_JNLP_INSTANCE = "-jnlp"; //$NON-NLS-1$
+
 	/** Indica que debe habilitarse el que Firefox utilice los certificados de confianza del sistema. */
 	public static final String PARAMETER_FIREFOX_SECURITY_ROOTS = "-firefox_roots"; //$NON-NLS-1$
 
@@ -51,7 +62,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	/** Indica la ruta del certificado pasado por el administrador. */
 	public static final String PARAMETER_KEYSTORE_PATH = "-keystore_path"; //$NON-NLS-1$
 
-	/** Indica la ruta del fichero de configuraci&oacute;n PList con preferencias para el sistema. */
+	/** Indica la ruta del fichero de configuraci&oacute;nn PList con preferencias para el sistema. */
 	public static final String CONFIG_PATH = "-config_path"; //$NON-NLS-1$
 
 	/** Indica la ruta del fichero de actualizaci&oacute;n de preferencias del sistema. */
@@ -63,38 +74,43 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 
 	private final ConfigArgs config;
 
-	private Console console;
+	private Console mainScreen;
 
 	static {
 		// Instalamos el registro a disco
 		try {
-			if (Platform.getOS().equals(Platform.OS.MACOSX)) {
-				final File appDir = new File (System.getenv("HOME"), "Library/Application Support/AutoFirma"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (appDir.isDirectory() && appDir.canWrite() || appDir.mkdirs()) {
+			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+				final File appDir = new File (System.getenv("HOME"), "Library/Application Support/Autofirma"); //$NON-NLS-1$ //$NON-NLS-2$
+
+				if (appDir.mkdirs()) {
+					ConfiguratorMacUtils.addExexPermissionsToFile(appDir);
+				}
+
+				if (appDir.isDirectory() && appDir.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, appDir.getAbsolutePath());
 				}
-				else if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
+				else if (TMP.isDirectory() && TMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
 				}
-				else if (TEMP.exists() && TEMP.isDirectory() && TEMP.canWrite()) {
+				else if (TEMP.isDirectory() && TEMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TEMP.getAbsolutePath());
 				}
 				else {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 				}
 			}
-			else if (Platform.getOS().equals(Platform.OS.LINUX)) {
-				if (TMP.exists() && TMP.isDirectory() && TMP.canWrite()) {
+			else if (Platform.OS.LINUX.equals(Platform.getOS())) {
+				if (TMP.isDirectory() && TMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TMP.getAbsolutePath());
 				}
-				else if (TEMP.exists() && TEMP.isDirectory() && TEMP.canWrite()) {
+				else if (TEMP.isDirectory() && TEMP.canWrite()) {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, TEMP.getAbsolutePath());
 				}
 				else {
 					LogManager.install(App.AUTOFIRMA_CONFIGURATOR, System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 				}
 			}
-			else if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+			else if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 				// En Windows se ejecutara en modo administrador y el directorio de usuario apuntara al del administrador,
 				// asi que componemos el directorio de usuario real
 				final String drive = System.getenv("HOMEDRIVE"); //$NON-NLS-1$
@@ -115,29 +131,37 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		}
 	}
 
-	/** Configurador de AutoFirma.
+	/** Configurador de Autofirma.
 	* @param args Argumentos para configurar la ejecuci&oacute;n del proceso. */
-	public AutoFirmaConfiguratorSilent(final String[] args) {
+	public AutofirmaConfigurator(final String[] args) {
 		this(new ConfigArgs(args));
 	}
 
 	/**
-	 * Configurador de AutoFirma.
+	 * Configurador de Autofirma.
 	 * @param config Argumentos para configurar la ejecuci&oacute;n del proceso.
 	 */
-	public AutoFirmaConfiguratorSilent(final ConfigArgs config) {
+	public AutofirmaConfigurator(final ConfigArgs config) {
 
 		this.config = config;
 
+		final boolean jnlpDeployment = this.config.isJnlpInstance();
+		if (jnlpDeployment) {
+			LOGGER.info("Se configurara la aplicacion en modo JNLP"); //$NON-NLS-1$
+		}
+		else {
+			LOGGER.info("Se configurara la aplicacion en modo nativo"); //$NON-NLS-1$
+		}
+
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(false, this.config.isFirefoxSecurityRoots(),
+			this.configurator = new ConfiguratorWindows(jnlpDeployment, this.config.isFirefoxSecurityRoots(),
 					this.config.getCertificatePath(), this.config.getKeystorePath());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
-		    this.configurator = new ConfiguratorLinux(false);
+		    this.configurator = new ConfiguratorLinux(jnlpDeployment);
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
-            this.configurator = new ConfiguratorMacOSX(true, this.config.isFirefoxSecurityRoots());
+            this.configurator = new ConfiguratorMacOSX(this.config.isHeadless(), this.config.isFirefoxSecurityRoots());
         }
 		else {
 			LOGGER.warning(
@@ -147,7 +171,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		}
 	}
 
-	/** Configura el entorno para permitir la correcta ejecuci&oacute;n de AutoFirma.
+	/** Configura el entorno para permitir la correcta ejecuci&oacute;n de Autofirma.
 	 * @throws GeneralSecurityException Cuando se produce un error al manipular los almacenes de certificados.
 	 * @throws ConfigurationException Cuando falla la generacion del certificados SSL.
 	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos. */
@@ -158,22 +182,27 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			return;
 		}
 
-		this.console = ConsoleManager.getConsole(this);
+		// Preparamos la consola para las trazas
+		this.mainScreen = ConsoleManager.getConsole(this.config.isHeadless() ? null : this);
+		this.mainScreen.showConsole();
 
 		// Creamos el almacen para la configuracion del SSL
 		try {
-			this.configurator.configure(this.console);
+			this.configurator.configure(this.mainScreen);
 		}
 		catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Error al copiar o leer alguno de los ficheros de configuracion. El configurador se detendra", e); //$NON-NLS-1$
+			this.mainScreen.print(Messages.getString("AutofirmaConfigurator.3")); //$NON-NLS-1$
 			throw e;
 		}
 		catch (final ConfigurationException e) {
 			LOGGER.log(Level.SEVERE, "Error al generar las claves de cifrado SSL. El configurador se detendra", e); //$NON-NLS-1$
+			this.mainScreen.print(Messages.getString("AutofirmaConfigurator.4")); //$NON-NLS-1$
 			throw e;
 		}
 		catch (final GeneralSecurityException e) {
 			LOGGER.log(Level.SEVERE, "Error en la importacion de la CA de confianza o la limpieza del almacen", e); //$NON-NLS-1$
+			this.mainScreen.print(Messages.getString("AutofirmaConfigurator.5")); //$NON-NLS-1$
 			throw e;
 		}
 	}
@@ -190,7 +219,7 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		// Creamos el almacen para la configuracion del SSL
 		final File pluginsDir = getPluginsDir(this.configurator);
 		final PluginsManager pluginsManager = new PluginsManager(pluginsDir);
-		this.configurator.uninstall(this.console, pluginsManager);
+		this.configurator.uninstall(this.mainScreen, pluginsManager);
 
 		// Borramos las preferencias del sistema, que es algo comun a todos los sistemas operativos
 		try {
@@ -222,10 +251,21 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
      * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
      *                 indica error y cero indica salida normal. */
     public void closeApplication(final int exitCode) {
-        if (this.console != null) {
-            this.console.dispose();
+    	this.closeApplication(exitCode, false);
+    }
+
+    /** Cierra la aplicaci&oacute;n.
+     * @param exitCode C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
+     *                 indica error y cero indica salida normal.
+     * @param keepOpen Indica si hay que salir de la aplicaci&oacute;n. */
+    public void closeApplication(final int exitCode, final boolean keepOpen) {
+        if (this.mainScreen != null) {
+            this.mainScreen.dispose();
         }
-        System.exit(exitCode);
+
+        if (!keepOpen) {
+			System.exit(exitCode);
+		}
     }
 
 	@Override
@@ -238,7 +278,22 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	public static void main(final String[] args) {
 
 		final ConfigArgs config = new ConfigArgs(args);
-		final AutoFirmaConfiguratorSilent configurator = new AutoFirmaConfiguratorSilent(config);
+		final AutofirmaConfigurator configurator = new AutofirmaConfigurator(config);
+
+       	// Propiedades especificas para Mac OS X
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			final Image icon = Toolkit.getDefaultToolkit()
+					.getImage(AutofirmaConfigurator.class.getResource("/logo_cliente_256.png")); //$NON-NLS-1$
+        	try {
+        		settingDockMacIconWithJava8(icon);
+			} catch (final Exception | Error e) {
+        		try {
+        			settingDockMacIconWithJava9(icon);
+				} catch (Exception | Error e2) {
+        			LOGGER.warning("No ha sido posible establecer el icono del Dock de macOS: " + e); //$NON-NLS-1$
+				}
+        	}
+        }
 
 		// Si se indico por parametro que se trata de una desinstalacion, desinstalamos
 		if (config.isUninstallation()) {
@@ -249,29 +304,41 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 			try {
 				configurator.configure();
 			}
-			catch (final HeadlessException e) {
-				ConsoleManager.showErrorMessage(Messages.getString("AutoFirmaConfigurator.7"), e); //$NON-NLS-1$
-				LOGGER.log(Level.WARNING, "La JVM utilizada no soporta interfaces graficos. No se podra ejecutar la interfaz grafica de Autofirma con ella", e); //$NON-NLS-1$
-			}
 			catch (final Exception | Error e) {
-				ConsoleManager.showErrorMessage(
-						Messages.getString("AutoFirmaConfigurator.0"), //$NON-NLS-1$
-						e
-						);
 				LOGGER.log(Level.SEVERE, "Error grave durante el proceso de configuracion", e); //$NON-NLS-1$
-				configurator.closeApplication(-1);
+				configurator.closeApplication(-1, config.isNeedKeep());
 			}
 		}
 
 		// Si se ha indicado un archivo de configuracion,
 		// se estableceran las nuevas propiedades del sistema indicadas en el mismo
 		if (!config.getConfigPath().isEmpty()) {
-			LOGGER.info("Se importa la configuracion desde: " + LoggerUtil.getTrimStr(LoggerUtil.getCleanUserHomePath(config.getConfigPath()))); //$NON-NLS-1$
 			ConfigUpdaterManager.savePrefsConfigFile(config.getConfigPath(), config.getUpdateConfig());
 		}
 
-		configurator.closeApplication(0);
+		configurator.closeApplication(0, config.isNeedKeep());
 	}
+
+	private static void settingDockMacIconWithJava8(final Image icon)
+			throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
+		final Class<?> applicationClass = Class.forName("com.apple.eawt.Application"); //$NON-NLS-1$
+		final Method getApplicationMethod = applicationClass.getMethod("getApplication"); //$NON-NLS-1$
+		final Object applicationObject = getApplicationMethod.invoke(null);
+		final Method setDockIconImageMethod = applicationClass.getMethod("setDockIconImage", Image.class); //$NON-NLS-1$
+		setDockIconImageMethod.invoke(applicationObject, icon);
+    }
+
+	private static void settingDockMacIconWithJava9(final Image icon)
+			throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
+
+    	final Class<?> taskbarClass = Class.forName("java.awt.Taskbar"); //$NON-NLS-1$
+    	final Method getTaskbarMethod = taskbarClass.getMethod("getTaskbar"); //$NON-NLS-1$
+    	final Object taskbarObject = getTaskbarMethod.invoke(null);
+    	final Method setIconImageMethod = taskbarClass.getMethod("setIconImage", Image.class); //$NON-NLS-1$
+    	setIconImageMethod.invoke(taskbarObject, icon);
+    }
 
 	/** Operaciones admitidas. */
 	private enum Operation {
@@ -283,6 +350,9 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 	private static class ConfigArgs {
 
 		private Operation op = Operation.INSTALLATION;
+		private boolean needKeep = false;
+		private boolean headless = false;
+		private boolean jnlpInstance = false;
 		private boolean firefoxSecurityRoots = false;
 		private String certificatePath = ""; //$NON-NLS-1$
 		private String keystorePath = ""; //$NON-NLS-1$
@@ -297,6 +367,12 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 						this.op = Operation.INSTALLATION;
 					} else if (PARAMETER_UNINSTALL.equalsIgnoreCase(arg)) {
 						this.op = Operation.UNINSTALLATION;
+					} else if (PARAMETER_KEEP_OPEN.equalsIgnoreCase(arg)) {
+						this.needKeep = true;
+					} else if (PARAMETER_HEADLESS.equalsIgnoreCase(arg)) {
+						this.headless = true;
+					} else if (PARAMETER_JNLP_INSTANCE.equalsIgnoreCase(arg)) {
+						this.jnlpInstance = true;
 					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
 						this.firefoxSecurityRoots = true;
 					} else if (PARAMETER_CERTIFICATE_PATH.equalsIgnoreCase(arg)) {
@@ -307,12 +383,6 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 						this.keystorePath = args[++i];
 					} else if (CONFIG_PATH.equalsIgnoreCase(arg) && i < args.length - 1) {
 						this.configPath = args[++i];
-						// En el paso de parametros del MSI es necesario indicar la barra invertida ya que la
-						// barra simple trunca el parametro. Por si este fuese el caso, aqui la corregimos
-						// para evitar errores
-						if (this.configPath.toLowerCase(Locale.US).startsWith("https:")) { //$NON-NLS-1$
-							this.configPath = this.configPath.replace('\\', '/');
-						}
 					} else if (UPDATE_CONFIG.equalsIgnoreCase(arg)) {
 						this.updateConfig = true;
 					}
@@ -322,6 +392,18 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 
 		public boolean isUninstallation() {
 			return this.op == Operation.UNINSTALLATION;
+		}
+
+		public boolean isNeedKeep() {
+			return this.needKeep;
+		}
+
+		public boolean isHeadless() {
+			return this.headless;
+		}
+
+		public boolean isJnlpInstance() {
+			return this.jnlpInstance;
 		}
 
 		public boolean isFirefoxSecurityRoots() {
@@ -343,5 +425,6 @@ public final class AutoFirmaConfiguratorSilent implements ConsoleListener {
 		public boolean getUpdateConfig() {
 			return this.updateConfig;
 		}
+
 	}
 }

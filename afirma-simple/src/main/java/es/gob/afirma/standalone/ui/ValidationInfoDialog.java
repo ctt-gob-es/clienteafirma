@@ -27,7 +27,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signvalidation.SignValidity;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.signdetails.CAdESSignAnalyzer;
@@ -59,7 +59,7 @@ public class ValidationInfoDialog extends JDialog {
 	void createUI(final byte [] signData) {
 
 		setTitle(SimpleAfirmaMessages.getString("ValidationInfoDialog.0")); //$NON-NLS-1$
-		setIconImages(AutoFirmaUtil.getIconImages());
+		setIconImages(DesktopUtil.getIconImages());
 		setResizable(true);
 		setPreferredSize(new Dimension(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT));
 

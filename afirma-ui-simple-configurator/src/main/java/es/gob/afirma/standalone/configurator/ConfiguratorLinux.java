@@ -31,21 +31,22 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
-/** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de AutoFirma. */
+/** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de la aplicaci&oacute;n. */
 final class ConfiguratorLinux implements Configurator {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String ALTERNATIVE_APP_SUBDIR = ".afirma/AutoFirma"; //$NON-NLS-1$
+	private static final String ALTERNATIVE_APP_SUBDIR = ".afirma/Autofirma"; //$NON-NLS-1$
 
 	private static final String UNINSTALL_SCRIPT_NAME = "uninstall.sh"; //$NON-NLS-1$
 	private static final String INSTALL_SCRIPT_NAME = "script.sh"; //$NON-NLS-1$
 
     private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
-    private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+    private static final String FILE_AUTOFIRMA_CERTIFICATE = "Autofirma_ROOT.cer"; //$NON-NLS-1$
     private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
 	private final boolean jnlpInstance;
@@ -116,7 +117,7 @@ final class ConfiguratorLinux implements Configurator {
 
         // Si se necesita interfaz grafica, comprobamos que la JRE lo soporte
         if (isHeadlessJre()) {
-        	LOGGER.warning("La JVM con la que se ha ejecutado el instalador no soporta interfaces graficas (headless). Esta JVM no es compatible con la interfaz grafica de AutoFirma. Instale una JRE completa para poder ejecutarla."); //$NON-NLS-1$
+        	LOGGER.warning("La JVM con la que se ha ejecutado el instalador no soporta interfaces graficas (headless). Esta JVM no es compatible con la interfaz grafica de Autofirma. Instale una JRE completa para poder ejecutarla."); //$NON-NLS-1$
         }
     }
 
@@ -171,7 +172,7 @@ final class ConfiguratorLinux implements Configurator {
 	@Override
 	public File getAlternativeApplicationDirectory() {
 		final String userHome = System.getProperty("user.home"); //$NON-NLS-1$
-		return new File(userHome, ".afirma/AutoFirma"); //$NON-NLS-1$
+		return new File(userHome, ".afirma/Autofirma"); //$NON-NLS-1$
 	}
 
     /** Obtiene los directorios de usuarios del sistema.
@@ -227,7 +228,7 @@ final class ConfiguratorLinux implements Configurator {
     		plugins = pluginsManager.getPluginsLoadedList();
     	}
     	catch (final Exception e) {
-    		LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de AutoFirma", e); //$NON-NLS-1$
+    		LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de Autofirma", e); //$NON-NLS-1$
     	}
 
     	// Desinstalamos los plugins instalados si los hubiese

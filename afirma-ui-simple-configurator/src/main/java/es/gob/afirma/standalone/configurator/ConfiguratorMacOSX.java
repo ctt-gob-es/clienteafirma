@@ -18,7 +18,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,11 +44,11 @@ import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.keystores.mozilla.apple.ShellScript;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
-/** Configura la instalaci&oacute;n en Mac para la correcta ejecuci&oacute;n de
- * AutoFirma. */
+/** Configura la instalaci&oacute;n en Mac para la correcta ejecuci&oacute;n de la aplicaci&oacute;n. */
 final class ConfiguratorMacOSX implements Configurator {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -58,8 +57,8 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static final String SSL_CER_FILENAME = "/autofirma.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 	private static final String CERT_CN = "127.0.0.1"; //$NON-NLS-1$
-	private static final String CERT_CN_ROOT = "AutoFirma ROOT"; //$NON-NLS-1$
-	private static final String MACOSX_CERTIFICATE = "/AutoFirma_ROOT.cer";//$NON-NLS-1$
+	private static final String CERT_CN_ROOT = "Autofirma ROOT"; //$NON-NLS-1$
+	private static final String MACOSX_CERTIFICATE = "/Autofirma_ROOT.cer";//$NON-NLS-1$
 	private static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
 	private static final String USER_DIR_LINE_HEADER = "dir: "; //$NON-NLS-1$
 	private static final String USER_DIR_LINE_PREFIX = USER_DIR_LINE_HEADER + "/Users/"; //$NON-NLS-1$
@@ -477,7 +476,7 @@ final class ConfiguratorMacOSX implements Configurator {
 			plugins = pluginsManager.getPluginsLoadedList();
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de AutoFirma", e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de Autofirma", e); //$NON-NLS-1$
 		}
 
 		// Desinstalamos los plugins instalados si los hubiese
@@ -499,7 +498,7 @@ final class ConfiguratorMacOSX implements Configurator {
 			try {
 				Files.walkFileTree(
 						alternativeDir.toPath(),
-						new HashSet<FileVisitOption>(),
+						new HashSet<>(),
 						Integer.MAX_VALUE,
 						new SimpleFileVisitor<Path>() {
 							@Override
@@ -756,7 +755,7 @@ final class ConfiguratorMacOSX implements Configurator {
 
 	private static File getResourcesDirectory() {
 		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
-		return new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
+		return new File (userDir, "Library/Application Support/Autofirma"); //$NON-NLS-1$
 	}
 
 	private static File getResourcesDirectory(final boolean create) throws IOException {

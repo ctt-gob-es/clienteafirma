@@ -133,7 +133,7 @@ FunctionEnd
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile Autofirma32/Autofirma_32_v1_9_0_installer.exe
+OutFile Autofirma32/Autofirma_32_v1_9_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -160,9 +160,6 @@ Var PATH
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
 InstallDir "$PROGRAMFILES\Autofirma"
 
-; check if the program has already been installed, if so, take this dir
-; as install dir
-InstallDirRegKey HKLM SOFTWARE\AutoFirmacon@firma "Install_Dir"
 ;Mensaje que mostraremos para indicarle al usuario que seleccione un directorio
 DirText "Elija un directorio donde instalar la aplicación:"
 
@@ -301,8 +298,8 @@ Section "Autofirma" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\Autofirma.exe "%1"'
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
-	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +2
-	Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	IfFileExists "$INSTDIR\$PATH\Autofirma_ROOT.cer" 0 +2
+	Delete "$INSTDIR\$PATH\Autofirma_ROOT.cer"
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
 	Delete "$INSTDIR\$PATH\autofirma.pfx"
 
@@ -318,7 +315,7 @@ Section "Autofirma" sPrograma
 
 	; Importamos el certificado en el sistema
 	Sleep 2000
-	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	Push "$INSTDIR\$PATH\Autofirma_ROOT.cer"
 	Call AddCertificateToStore
 	Pop $0
 	;${If} $0 != success
@@ -680,7 +677,7 @@ Function un.DeleteCertificate
     i 0, i 0, i 0, i 0, i 0, i 0, *i .R0) i .r9"
  
   ; Si hemos podido cargar el certificado, buscaremos su nombre y emisor.
-  ; Si no, se usara el nombre y emisor por defecto ("AutoFirma ROOT")
+  ; Si no, se usara el nombre y emisor por defecto ("Autofirma ROOT")
   ${If} $9 <> 0
 	  ; Leemos el nombre del certificado
 	  System::Call "crypt32::CertGetNameString(i R0, \\
@@ -694,9 +691,9 @@ Function un.DeleteCertificate
 		  i ${CERT_NAME_ISSUER_FLAG}, i 0, \\
 		  t .r8, i ${NSIS_MAX_STRLEN}) i.r6"
   ${Else}
-    ; Usamos el nombre y emisor por defecto ("AutoFirma ROOT")
-	StrCpy $7 "AutoFirma ROOT"
-	StrCpy $8 "AutoFirma ROOT"
+    ; Usamos el nombre y emisor por defecto ("Autofirma ROOT")
+	StrCpy $7 "Autofirma ROOT"
+	StrCpy $8 "Autofirma ROOT"
   ${EndIf}
 
   ; Abre el almacen de CA del sistema
@@ -787,7 +784,7 @@ Section "uninstall"
 
 	; Eliminamos del almacen el certificado de CA que tenemos en el
 	; directorio de instalacion. Si no esta ese, se eliminara el por defecto
-	Push "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	Push "$INSTDIR\$PATH\Autofirma_ROOT.cer"
 	Call un.DeleteCertificate
 	
 	; Ejecutamos el proceso de desinstalacion del Configurador java
@@ -895,7 +892,7 @@ Function RemoveOldVersions
 	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
 
 	${If} ${Errors}
-		Goto CheckAutoFirmaVersion
+		Goto CheckAutofirmaVersion
 	${EndIf}
 	
 	; Se ha encontrado Autofirma instalado
@@ -912,28 +909,30 @@ Function RemoveOldVersions
 	Goto End
 	
 	; No se encontro Autofirma instalado por el primer metodo, lo comprobamos de otra forma
-	CheckAutoFirmaVersion:
+	CheckAutofirmaVersion:
 		${registry::Open} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" "/K=0 /V=1 /S=0 /B=1 /N='DisplayName'" $0
-		StrCmp $0 0 0 searchAutoFirmaLoop
+		StrCmp $0 0 0 searchAutofirmaLoop
 		Goto End
 
-		searchAutoFirmaLoop:
+		searchAutofirmaLoop:
 		${registry::Find} "$0" $1 $2 $3 $4
 
 		; Si hemos terminado la busqueda, salimos del bucle
 		StrCmp $4 '' close
 
 		; Si hemos encontrado el registro, obtenemos la cadena de desinstalacion, preparamos las variables y dejamos de repetir el bucle
-		StrCmp $4 "REG_SZ" 0 searchAutoFirmaLoop
-		StrCmp $3 "AutoFirma" 0 searchAutoFirmaLoop
+		StrCmp $4 "REG_SZ" 0 searchAutofirmaLoop
+		StrCmp $3 "AutoFirma" +2 0
+		StrCmp $3 "Autofirma" 0 searchAutofirmaLoop
 		ReadRegStr $R0 HKLM $1 "UninstallString"
 
 		close:
 		${registry::Close} "$0"
 		${registry::Unload}
 
-		; Si se encontro AutoFirma, se pide desinstalar
-		StrCmp $3 "AutoFirma" 0 End
+		; Si se encontro Autofirma, se pide desinstalar
+		StrCmp $3 "AutoFirma" +2 0
+		StrCmp $3 "Autofirma" 0 End
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
 		MessageBox MB_YESNO "La instalación de Autofirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
@@ -980,7 +979,7 @@ Function RemoveOldVersions
 		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
 		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
 		StrCmp $R1 "" +3 0
-			Push "$R1\Autofirma"
+			Push "$R1\AutoFirma"
 			Call RemoveFromPath
 
 		; Preparamos una variable para indicar en ella si tras la desinstalacion deberemos borrar el directorio de
@@ -1016,7 +1015,7 @@ Function RemoveOldVersions
 		; Si se indico que se eliminase el desinstalador de la version anterior, lo hacemos
 		; Si no, terminamos el proceso
 		StrCmp $R3 "Uninstall" 0 EndUninstall
-			;Borrar directorio de instalacion si es un directorio valido (es una subcarpeta de Program Files o contiene "AutoFirma")
+			;Borrar directorio de instalacion si es un directorio valido (es una subcarpeta de Program Files o contiene "Autofirma")
 			Push $R1
 			Push "Program Files (x86)\"
 			Call StrContains

@@ -210,7 +210,7 @@ public class VisorFirma extends JApplet implements WindowListener {
 				null,
 				false,
 				false,
-				AutoFirmaUtil.getDefaultDialogsIcon(),
+				DesktopUtil.getDefaultDialogsIcon(),
 				VisorFirma.this.window
 			)[0];
     	}

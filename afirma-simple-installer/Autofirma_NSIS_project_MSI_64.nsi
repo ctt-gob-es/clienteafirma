@@ -3,11 +3,11 @@
   !include "nsProcess.nsh"
   !include "Registry.nsh"
   !include "Sections.nsh"
-  !include "FileFunc.nsh"	 
+  !include "FileFunc.nsh"
   
 ;Incluimos la libreria que permite obtener todas las rutas de los usuarios en el sistema
   !include "NTProfiles.nsh"
-  
+
 ;Seleccionamos el algoritmo de compresion utilizado para comprimir nuestra aplicacion
 SetCompressor lzma
 
@@ -32,7 +32,7 @@ VIAddVersionKey "ProductName" "Autofirma"
 VIAddVersionKey "ProductVersion" "${VERSION}"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "LegalCopyright" "(C) Gobierno de España"
-VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
+VIAddVersionKey "FileDescription" "Autofirma (64 bits)"
 
 ;--------------------------------
 ;Macros para el tratamiento de los parametros de entrada del instalador
@@ -53,7 +53,7 @@ VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
   !insertmacro MUI_PAGE_INSTFILES
   ;Pagina final
   !insertmacro MUI_PAGE_FINISH
-  
+
 ;Paginas referentes al desinstalador
   !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_CONFIRM
@@ -75,7 +75,7 @@ VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile Autofirma32\AutofirmaGenerator.exe
+OutFile Autofirma64\AutofirmaGenerator.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -100,11 +100,11 @@ Var PATH
 ;Parametro que indica si se debe crear el acceso directo en el escritorio
 Var CREATE_ICON
 ;Parametro que indica si se debe activar el uso del almacen del sistema en Firefox
-Var FIREFOX_SECURITY_ROOTS			
+Var FIREFOX_SECURITY_ROOTS
 ;Parametro que indica la ruta del certificado a pasar por el administrador
 Var CERTIFICATE_PATH
 ;Parametro que indica la ruta del almacen de claves a pasar por el administrador
-Var KEYSTORE_PATH		  
+Var KEYSTORE_PATH
 ;Parametro que indica la ruta del fichero de configuracion PList con las preferencias para el sistema.
 Var CONFIG_PATH
 ;Parametro que indica la ruta del fichero de actualizacion de preferencias del sistema.
@@ -114,11 +114,8 @@ Var USE_SYSTEM_JRE
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
-InstallDir "$PROGRAMFILES\Autofirma"
+InstallDir "$PROGRAMFILES64\Autofirma"
 
-; check if the program has already been installed, if so, take this dir
-; as install dir
-InstallDirRegKey HKLM SOFTWARE\AutoFirmacon@firma "Install_Dir"
 ;Mensaje que mostraremos para indicarle al usuario que seleccione un directorio
 DirText "Elija un directorio donde instalar la aplicación:"
 
@@ -150,7 +147,14 @@ Section "Autofirma" sPrograma
 	; Hacemos esta seccion de solo lectura para que no la desactiven
 	SectionIn RO
 	StrCpy $PATH "Autofirma"
-
+	
+	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
+	System::Call 'kernel32::GetCurrentProcess()i.r0'
+	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
+	pop $3
+	IntCmp $1 1 +2 0 0
+		Quit
+	
 	;Si se ha solicitado usar el JRE instalado en el sistema pero no se encuentra instalado, saldremos del instalador
 	${If} $USE_SYSTEM_JRE == "true" 
 		Call isValidJavaVersionAvailable
@@ -170,20 +174,16 @@ Section "Autofirma" sPrograma
 
 	Sleep 2000
 
-	;Eliminamos posibles versiones antiguas de 64 bits (Solo en Windows 64)
-	System::Call 'kernel32::GetCurrentProcess()i.r0'
-	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
-	pop $3
-	IntCmp $1 1 0 +3 0
-		SetRegView 64
-		Call RemoveOldVersions
+	;Eliminamos posibles versiones antiguas de 64 bits
+	SetRegView 64
+	Call RemoveOldVersions
 
 	;Eliminamos posibles versiones antiguas de 32 bits
 	SetRegView 32
 	Call RemoveOldVersions
 
 	;Volvemos a establecer la vista del registro acorde a la arquitectura del instalador
-	SetRegView 32
+	SetRegView 64
 
 	;Eliminamos el directorio de instalacion si existia
 	RMDir /r '$INSTDIR\$PATH'
@@ -195,26 +195,26 @@ Section "Autofirma" sPrograma
 	;instalacion con EXE, al ejecutar el proceso de desinstalacion del EXE se elimina este
 	;recurso. Por eso lo volvemos a crear una vez terminada la desinstalacion
 	SetOutPath $INSTDIR
-	File  no_ejecutar_x86.exe
+	File  no_ejecutar_x64.exe
 	
 	;Dejamos los ficheros de la aplicacion en un subdirectorio
 	SetOutPath $INSTDIR\$PATH
 
 	;Copiamos todos los ficheros que componen nuestra aplicacion
-	File  Autofirma32\Autofirma.exe
-	File  Autofirma32\AutofirmaConfigurador.exe
-	File  Autofirma32\AutofirmaCommandLine.exe
+	File  Autofirma64\Autofirma.exe
+	File  Autofirma64\AutofirmaConfigurador.exe
+	File  Autofirma64\AutofirmaCommandLine.exe
 	File  licencia.txt
 	File  ic_firmar.ico
 
 	;Si no se ha solicitado usar el JRE instalado en el sistema, copiamos el JRE del instalador
 	${If} $USE_SYSTEM_JRE != "true" 
-		File /r java32\jre
+		File /r java64\jre
 	${EndIf}
-
+	
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
-   SetShellVarContext all
-
+    SetShellVarContext all
+	
 	;Creamos un acceso directo en el escitorio salvo que se haya configurado lo contrario
 	StrCmp $CREATE_ICON "false" +2
 		CreateShortCut "$DESKTOP\Autofirma.lnk" "$INSTDIR\$PATH\Autofirma.exe"
@@ -251,10 +251,10 @@ Section "Autofirma" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\Autofirma.exe "%1"'
-
+	
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
-	IfFileExists "$INSTDIR\$PATH\AutoFirma_ROOT.cer" 0 +2
-		Delete "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	IfFileExists "$INSTDIR\$PATH\Autofirma_ROOT.cer" 0 +2
+		Delete "$INSTDIR\$PATH\Autofirma_ROOT.cer"
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
 		Delete "$INSTDIR\$PATH\autofirma.pfx"
 
@@ -262,17 +262,17 @@ Section "Autofirma" sPrograma
 	StrCpy $R4 ""
 	StrCmp $FIREFOX_SECURITY_ROOTS "true" 0 +2
 		StrCpy $R4 "-firefox_roots"
-	
+
 	; Comprobamos si el administrador le ha pasado el parametro con el certificado
 	StrCpy $R5 ""
 	StrCmp $CERTIFICATE_PATH "false" +2
 		StrCpy $R5 '-certificate_path "$CERTIFICATE_PATH"'
-	
+
 	; Comprobamos si el administrador le ha pasado el parametro con el almacen
 	StrCpy $R6 ""
 	StrCmp $KEYSTORE_PATH "false" +2
 		StrCpy $R6 '-keystore_path "$KEYSTORE_PATH"'
-		
+	
 	; Comprobamos si el administrador le ha pasado el parametro con el fichero de configuracion PList
 	StrCpy $R7 ""
 	StrCmp $CONFIG_PATH "false" +2
@@ -289,7 +289,7 @@ Section "Autofirma" sPrograma
 	Call DeleteCertificateOnInstall
 	
 	; Importamos el certificado en el sistema
-	StrCpy $R7 "$INSTDIR\$PATH\AutoFirma_ROOT.cer"
+	StrCpy $R7 "$INSTDIR\$PATH\Autofirma_ROOT.cer"
 	Push $R7
 	
 	Sleep 2000
@@ -310,9 +310,9 @@ Function .onInit
 	;Para que el metodo GetOptions no de problemas, se deben proporcionar los parametros con un delimitador inicial como '/'
 	;Este delimitador se agrega en el .wxs del instalador MSI
 	${GetOptions} $R0 "/CREATE_ICON=" $CREATE_ICON
-	${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS  
-	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH  
-	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH 
+	${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS
+	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH
+	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH
 	${GetOptions} $R0 "/CONFIG_PATH=" $CONFIG_PATH
 	${GetOptions} $R0 "/UPDATE_CONFIG=" $UPDATE_CONFIG
 	${GetOptions} $R0 "/USE_SYSTEM_JRE=" $USE_SYSTEM_JRE
@@ -336,7 +336,7 @@ Function .onInit
 		IfFileExists "$KEYSTORE_PATH" +2 0
 			Abort
 	${EndIf}
-	
+
 FunctionEnd
 
 !define CERT_STORE_CERTIFICATE_CONTEXT  1
@@ -368,10 +368,19 @@ Function isValidJavaVersionAvailable
 	Call GetJavaVersion
 	Pop $1
 	IntCmp $1 8 +2 0 +2		; Si la version de Java no es la 8 o superior, se establece $0 a false
+	  Goto invalidjava
+	
+	; Comprobamos que la arquitectura sea de 64 bits y, si lo es, devolvemos true
+	Call IsJava64Arch
+	Pop $1
+	StrCmp $1 "true" return	; Si Java es de 64 bits, vamos a la salida de Java correcto
+	
+	invalidjava:
 	  StrCpy $0 "false"
-	  
-    Push $1
-    Exch $0
+	
+	return:
+	  Push $1
+	  Exch $0
 	
 FunctionEnd
 
@@ -458,6 +467,78 @@ Function GetJavaVersion
 
 FunctionEnd
 
+;Function isJava64Arch
+; Check that the Java architecture is 64-bit.
+; Usage:
+;   Call isJava64Arch
+;   Pop $R0
+;		 - $R0 is "true" if the Java architecture is 64-bit o "false" otherwise.
+Function isJava64Arch
+
+  Push $0
+  Push $1
+
+  ; Ejecutamos "java -version", que devolvera un resultado valido si java esta en el PATH
+  nsExec::ExecToStack 'java -Xinternalversion'
+  Pop $0 ; Codigo de salida
+  StrCmp $0 "error" novalidjava
+  StrCmp $0 "timeout" novalidjava
+  Pop $0 ; Texto de salida
+
+  ; Consideraremos que es un Java de 64 bits si la cadena de salida contiene la subcadena "64-Bit"
+  Push $0
+  Push "64-Bit"
+  Call StrContains
+  Pop $1
+  StrCpy $0 "true"
+  StrCmp $1 "" novalidjava return
+
+  novalidjava:
+    StrCpy $0 "false"
+  
+  return:
+    Pop $1
+    Exch $0
+
+FunctionEnd
+
+; StrContains
+;
+; This function does a case sensitive searches for an occurrence of a substring in a string. 
+; It returns the substring if it is found. 
+; Otherwise it returns null(""). 
+; Written by kenglish_hi
+; Adapted from StrReplace written by dandaman32
+Var STR_HAYSTACK
+Var STR_NEEDLE
+Var STR_CONTAINS_VAR_1
+Var STR_CONTAINS_VAR_2
+Var STR_CONTAINS_VAR_3
+Var STR_CONTAINS_VAR_4
+Var STR_RETURN_VAR
+
+Function StrContains
+  Exch $STR_NEEDLE
+  Exch 1
+  Exch $STR_HAYSTACK
+    StrCpy $STR_RETURN_VAR ""
+    StrCpy $STR_CONTAINS_VAR_1 -1
+    StrLen $STR_CONTAINS_VAR_2 $STR_NEEDLE
+    StrLen $STR_CONTAINS_VAR_4 $STR_HAYSTACK
+    loop:
+      IntOp $STR_CONTAINS_VAR_1 $STR_CONTAINS_VAR_1 + 1
+      StrCpy $STR_CONTAINS_VAR_3 $STR_HAYSTACK $STR_CONTAINS_VAR_2 $STR_CONTAINS_VAR_1
+      StrCmp $STR_CONTAINS_VAR_3 $STR_NEEDLE found
+      StrCmp $STR_CONTAINS_VAR_1 $STR_CONTAINS_VAR_4 done
+      Goto loop
+    found:
+      StrCpy $STR_RETURN_VAR $STR_NEEDLE
+      Goto done
+    done:
+   Pop $STR_NEEDLE ;Prevent "invalid opcode" errors and keep the
+   Exch $STR_RETURN_VAR  
+FunctionEnd
+
 ;Function AddCertificateToStore
  
 Function AddCertificateToStore
@@ -465,7 +546,7 @@ Function AddCertificateToStore
   Exch $0
   Push $1
   Push $R0
-
+ 
   System::Call "crypt32::CryptQueryObject(i ${CERT_QUERY_OBJECT_FILE}, w r0, \
     i ${CERT_QUERY_CONTENT_FLAG_ALL}, i ${CERT_QUERY_FORMAT_FLAG_ALL}, \
     i 0, i 0, i 0, i 0, i 0, i 0, *i .r0) i .R0"
@@ -526,8 +607,8 @@ Function DeleteCertificateOnInstall
                   i ${CERT_NAME_ISSUER_FLAG}, i 0, \\
                   t .r4, i ${NSIS_MAX_STRLEN}) i.r3"
                ${If} $3 != 0
-				  ;Si el emisor es el AutoFirma ROOT
-                  ${If} $4 == "AutoFirma ROOT"
+				  ;Si el emisor es el Autofirma ROOT
+                  ${If} $4 == "Autofirma ROOT"
                     System::Call "crypt32::CertDuplicateCertificateContext(i r2) i.r5"
 				    System::Call "crypt32::CertDeleteCertificateFromStore(i r5)"
 				  ${EndIf}
@@ -667,7 +748,7 @@ Function CopyRegValues
 	Pop $1
 	Pop $0
 
-FunctionEnd
+FunctionEnd																  
 
 ;--------------------------------------------------------------------
 ; Path functions

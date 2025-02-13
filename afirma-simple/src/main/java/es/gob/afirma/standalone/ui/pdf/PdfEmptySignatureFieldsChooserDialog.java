@@ -34,7 +34,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.PdfUtil.SignatureField;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
@@ -132,7 +132,7 @@ public final class PdfEmptySignatureFieldsChooserDialog extends JDialog implemen
 		gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
 
-        setIconImages(AutoFirmaUtil.getIconImages());
+        setIconImages(DesktopUtil.getIconImages());
 		getAccessibleContext().setAccessibleDescription(
 			SignPdfUiMessages.getString("SignPdfFieldChooser.1") //$NON-NLS-1$
 		);

@@ -40,7 +40,7 @@ import es.gob.afirma.core.misc.http.DataDownloader;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.HttpManager;
 import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.ProxyUtil;
@@ -177,7 +177,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 							SimpleAfirmaMessages.getString("PreferencesPanel.111"), //$NON-NLS-1$
 							false,
 							false,
-							AutoFirmaUtil.getDefaultDialogsIcon(),
+							DesktopUtil.getDefaultDialogsIcon(),
 							PreferencesPanelGeneral.this
 						)[0].getAbsolutePath();
 					}

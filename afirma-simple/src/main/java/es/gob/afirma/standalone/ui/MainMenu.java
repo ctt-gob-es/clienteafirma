@@ -31,7 +31,7 @@ import javax.swing.KeyStroke;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
@@ -138,7 +138,7 @@ public final class MainMenu extends JMenuBar {
 						null,
 						false,
 						true,
-						AutoFirmaUtil.getDefaultDialogsIcon(),
+						DesktopUtil.getDefaultDialogsIcon(),
 						MainMenu.this
 					)[0];
 				}

@@ -310,7 +310,7 @@
 	      </activation>
 
 	      <build>
-	      	<finalName>Autofirma</finalName>
+	      	<finalName>autofirma</finalName>
        		<plugins>
      			<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

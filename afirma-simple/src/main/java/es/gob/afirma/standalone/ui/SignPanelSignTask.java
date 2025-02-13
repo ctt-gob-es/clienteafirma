@@ -58,7 +58,7 @@ import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
@@ -733,7 +733,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 				null,
 				true,
 				false,
-				AutoFirmaUtil.getDefaultDialogsIcon(),
+				DesktopUtil.getDefaultDialogsIcon(),
 				this.parent
 			);
     	}

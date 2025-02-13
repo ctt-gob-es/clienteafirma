@@ -24,7 +24,7 @@ import javax.swing.event.ListSelectionListener;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.Permission;
@@ -266,7 +266,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 				SimpleAfirmaMessages.getString("PluginsManagementHandler.4"), //$NON-NLS-1$
 				false,
 				false,
-				AutoFirmaUtil.getDefaultDialogsIcon(),
+				DesktopUtil.getDefaultDialogsIcon(),
 				this.view);
 
 		return files[0];

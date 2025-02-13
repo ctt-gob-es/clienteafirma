@@ -21,7 +21,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.Permission;
@@ -68,7 +68,7 @@ public class PermissionsDialog extends JDialog implements KeyListener {
 
 	@SuppressWarnings("serial")
 	void createUI() {
-		setIconImages(AutoFirmaUtil.getIconImages());
+		setIconImages(DesktopUtil.getIconImages());
 		getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PermissionsDialog.1") //$NON-NLS-1$
 		);
