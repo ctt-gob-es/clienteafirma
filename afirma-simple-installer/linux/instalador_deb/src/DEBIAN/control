@@ -4,11 +4,11 @@ Section: utils
 Priority: optional
 Depends: libnss3-tools
 Recomends: openjdk-17-jre 
-Description: AutoFirma - Cliente @firma
-Version: 1.8.2
+Version: 1.9.0
 License: GPL-2+ | EUPL-1.1
 Maintainer: Gobierno de Espana <soporte.afirma@correo.gob.es>
 Installed-Size: 56115
 Homepage: https://administracionelectronica.gob.es/ctt/clienteafirma
-
+Summary: Aplicación de firma electrónica.
+Description: Autofirma proporciona una interfaz gráfica para la firma electrónica de documentos y puede ser ejecutada desde el navegador para la firma de procedimientos administrativos web de Administración Electrónica.
 
