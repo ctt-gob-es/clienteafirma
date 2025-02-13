@@ -84,19 +84,6 @@ public final class ProtocolInvocationUriParserUtil {
 		return ret;
 	}
 
-	/** Recupera los par&aacute;metros necesarios para la configuraci&oacute;n de una
-	 * operaci&oacute;n de obtenci&oacute;n del log actual de la aplicaci&oacute;n
-	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
-	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersToGetCurrentLog getParametersToGetCurrentLog(final Map<String, String> params) throws ParameterException {
-		final UrlParametersToGetCurrentLog ret = new UrlParametersToGetCurrentLog();
-		ret.setCommonParameters(params);
-		ret.setGetCurrentLogParameters(params);
-
-		return ret;
-	}
-
 	/** Analiza un XML de entrada para obtener la lista de par&aacute;metros asociados
 	 * @param xml XML con el listado de par&aacute;metros.
 	 * @return Devuelve una tabla <i>hash</i> con cada par&aacute;metro asociado a un valor

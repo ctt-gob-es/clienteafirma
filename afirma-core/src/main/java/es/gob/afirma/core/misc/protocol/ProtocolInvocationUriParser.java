@@ -267,26 +267,6 @@ public final class ProtocolInvocationUriParser {
 		return ProtocolInvocationUriParserUtil.getParametersToLoad(ProtocolInvocationUriParserUtil.parseXml(xml));
 	}
 
-	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
-	 * operaci&oacute;n de carga de datos.Si falta alg&uacute;n par&aacute;metro o
-	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
-	 * @param uri Url de llamada
-	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersToGetCurrentLog getParametersToGetCurrentLog(final String uri) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToGetCurrentLog(parserUri(uri));
-	}
-
-	/** Recupera de una URI todos los par&aacute;metros necesarios para la configuraci&oacute;n de una
-	 * operaci&oacute;n de carga de datos.Si falta alg&uacute;n par&aacute;metro o
-	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
-	 * @param xml XML de entrada
-	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersToGetCurrentLog getParametersToGetCurrentLog(final byte[] xml) throws ParameterException {
-		return ProtocolInvocationUriParserUtil.getParametersToGetCurrentLog(ProtocolInvocationUriParserUtil.parseXml(xml));
-	}
-
 	/** Analiza la URL de entrada para obtener la lista de par&aacute;metros asociados.
 	 * @param uri URL de llamada.
 	 * @return Devuelve una tabla <i>hash</i> con cada par&aacute;metro asociado a un valor. */

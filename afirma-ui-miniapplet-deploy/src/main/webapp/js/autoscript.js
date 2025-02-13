@@ -568,7 +568,10 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 		
 		var getCurrentLog = function (successCallback, errorCallback) {
-			clienteFirma.getCurrentLog(successCallback, errorCallback)
+			if (!!errorCallback) {
+				errorCallback("java.lang.NoSuchMethodException", "El metodo getCurrentLog no se encuentra operativo");
+				return;
+			}
 		}
 
 		var echo = function () {
@@ -1909,17 +1912,6 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			/**
-			 * Inicia el proceso de obtencion del log actual de la aplicacion.
-			 * @param successCallbackFunction Funcion de callback tras exito
-			 * @param errorCallbackFunction Funcion de callback tras error
-			 */
-			var getCurrentLog = function (successCallbackFunction, errorCallbackFunction) {
-				currentOperation = OPERATION_LOG;
-				var requestData = createLoadDataRequest("getLog");
-				execAppIntent(buildUrl(requestData), successCallbackFunction, errorCallbackFunction);
-			}
-			
-			/**
 			 * Inicia el proceso de guardado de datos en disco.
 			 */
 			var saveDataToFile = function (dataB64, title, filename, extension, description, successCallbackFunction, errorCallbackFunction) {
@@ -2631,8 +2623,7 @@ var AutoScript = ( function ( window, undefined ) {
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType,
-				getCurrentLog : getCurrentLog				
+				getErrorType : getErrorType	
 			}
 		});
 
@@ -3458,23 +3449,7 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 					return;
 				}
-				
-				// Vengo de getCurrentLog
-				if (data.length > 150 && data.substr(0, 150).indexOf("<log>") != -1) {
-					var log = " === JAVASCRIPT INFORMATION === " +
-					"\nnavigator.appCodeName: " + navigator.appCodeName +
-					"\nnavigator.appName: " +  navigator.appName +
-					"\nnavigator.appVersion: " + navigator.appVersion +
-					"\nnavigator.platform: " + navigator.platform +
-					"\nnavigator.userAgent: " + navigator.userAgent+
-					"\nnavigator.javaEnabled(): " + navigator.javaEnabled() +
-					"\nscreen.width: " + (window.screen ? screen.width : 0) +
-					"\nscreen.height: " + (window.screen ? screen.height : 0) +
-					"\n\n   === CLIENTE LOG === \n" + data;
-					successCallback(log);
-					return;
-				}
-				
+								
 				// Compruebo si se trata de una operacion de carga/multicarga (load).
 				// El separador "|"  distingue los pares "filename-1:dataBase64-1|filename-2:dataBase64-2...", uno por cada archivo cargado.
 				// Devolveremos un array en el que cada posicion sera uno de estos pares: "filename-n:dataBase64-n".
@@ -3684,18 +3659,6 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			/**
-			 * Inicia el proceso de obtencion del log actual de la aplicacion.
-			 * Implementada tambien en el applet Java de firma
-			 * @param successCallbackFunction Funcion de callback tras exito
-			 * @param errorCallbackFunction Funcion de callback tras error
-			 */
-			function getCurrentLog (successCallbackFunction, errorCallbackFunction) {
-				successCallback = successCallbackFunction;
-				errorCallback = errorCallbackFunction;
-				getCurrentLogByService("getLog");
-			}
-			
-			/**
 			 * Realiza una operacion de carga de fichero comunicandose con la
 			 * aplicacion nativa por socket.
 			 * @param loadId Identificador de la operacion a realizar (load).
@@ -3713,16 +3676,6 @@ var AutoScript = ( function ( window, undefined ) {
 				execAppIntent(buildUrl(data));
 			}
 			
-			/**
-			 * Realiza una operacion de obtencion de log actual de la aplicacion
-			 */
-			function getCurrentLogByService() {
-				
-				var data = generateDataToLoad("getLog");
-				
-				execAppIntent(buildUrl(data));
-			} 
-
 			/** 
 			 * Funcion para la comprobacion de existencia del objeto. No hace nada.
 			 * Implementada en el applet Java de firma.
@@ -3768,8 +3721,7 @@ var AutoScript = ( function ( window, undefined ) {
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType,
-				getCurrentLog : getCurrentLog				
+				getErrorType : getErrorType			
 			}
 		});
 
@@ -4294,20 +4246,6 @@ var AutoScript = ( function ( window, undefined ) {
 			 */
 			function getErrorType () {
 				return errorType;
-			}
-
-			/**
-			 * Recupera la cadena "Applet no cargado".
-			 */
-			function getCurrentLog (successCallbackFunction, errorCallbackFunction) {
-				var errorType = "java.lang.UnsupportedOperationException";
-				var errorMessage = "La operacion de obtencion del log no esta disponible por servidor intermedio";
-				if (!errorCallbackFunction) {
-					throwException(errorType, errorMessage);
-				}
-				else {
-					errorCallbackFunction(errorType, errorMessage);
-				}
 			}
 
 			/**
@@ -4982,8 +4920,7 @@ var AutoScript = ( function ( window, undefined ) {
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType,
-				getCurrentLog : getCurrentLog
+				getErrorType : getErrorType
 			}
 		});
 		
