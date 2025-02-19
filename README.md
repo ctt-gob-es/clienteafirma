@@ -11,7 +11,7 @@ En este repositorio se encuentran todos los módulos comunes usados de forma gen
 
 El contenido de este repositorio es software libre con licencia GPL 2+ y EUPL 1.1. Puede consular más información y el código del producto en la forja del CTT.
 
-## Construcción del Cliente @firma
+## Construcción de Autofirma y otros artefactos
 
 Los módulos del Cliente @firma se encuentran preparados para su compilación y empaquetado mediante Apache Maven. A continuación se indican los distintos parámetros a utilizar para construir sus artefactos según el uso que se desee dar.
 
@@ -33,11 +33,11 @@ Para la construcción de Autofirma (JAR) y los servicios que utiliza será neces
 
 Con esto, se podrán construir los artefactos:
 
+* `afirma-simple`: JAR autoejecutable de Autofirma (`autofirma.jar`).
+* `afirma-ui-simple-configurator`: JAR autoejecutable del configurador necesario para la instalación de Autofirma (`autofirmaConfigurador.jar`).
 * `afirma-server-triphase-signer`: WAR con el servicio para la generación de firmas trifásicas.
 * `afirma-signature-retriever`: WAR con el servicio de recuperación de datos del servidor intermedio.
 * `afirma-signature-storage`: WAR con el servicio de guardado de datos en el servidor intermedio.
-* `afirma-simple`: JAR autoejecutable de Autofirma (`autofirma.jar`).
-* `afirma-ui-simple-configurator`: JAR autoejecutable del configurador necesario para la instalación de Autofirma (`autofirmaConfigurador.jar`).
 
 ### Despliegue en repositorio de artefactos
 
