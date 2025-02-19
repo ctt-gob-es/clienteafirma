@@ -27,7 +27,7 @@ Este comando generará todos los módulos básicos del proyecto.
 
 ### Artefactos desplegables y aplicaciones
 
-Para la construcción de AutoFirma (JAR) y los servicios que utiliza será necesario usar el perfil `env-install`. Este se puede activar mediante el comando:
+Para la construcción de Autofirma (JAR) y los servicios que utiliza será necesario usar el perfil `env-install`. Este se puede activar mediante el comando:
 
 `mvn clean install -Denv=install`
 
@@ -36,8 +36,8 @@ Con esto, se podrán construir los artefactos:
 * `afirma-server-triphase-signer`: WAR con el servicio para la generación de firmas trifásicas.
 * `afirma-signature-retriever`: WAR con el servicio de recuperación de datos del servidor intermedio.
 * `afirma-signature-storage`: WAR con el servicio de guardado de datos en el servidor intermedio.
-* `afirma-simple`: JAR autoejecutable de AutoFirma (`AutoFirma.jar`).
-* `afirma-ui-simple-configurator`: JAR autoejecutable del configurador necesario para la instalación de AutoFirma (`AutoFirmaConfigurador.jar`).
+* `afirma-simple`: JAR autoejecutable de Autofirma (`autofirma.jar`).
+* `afirma-ui-simple-configurator`: JAR autoejecutable del configurador necesario para la instalación de Autofirma (`autofirmaConfigurador.jar`).
 
 ### Despliegue en repositorio de artefactos
 
@@ -72,7 +72,7 @@ A continuación, se muestra un listado de los distintos módulos actualmente en 
 * `afirma-crypto-xades`: Módulo con la lógica de generación de las firmas XAdES, ASiC-XAdES y FacturaE.
 * `afirma-crypto-xadestri-client`: Módulo con lógica de invocación para la generación de firmas trifásicas XAdES y de FacturaE en servidor.
 * `afirma-crypto-xmlsignature`: Módulo con la lógica de generación de las firmas XMLdSig.
-* `afirma-keystores-filters`: Módulo con los filtros de certificados utilizados por AutoFirma.
+* `afirma-keystores-filters`: Módulo con los filtros de certificados utilizados por Autofirma.
 * `afirma-keystores-mozilla`: Módulo para la gestión del almacén de claves de Mozilla Firefox.
 * `afirma-server-triphase-signer`: Módulo principal del servicio de firma trifásica y de lotes.
 * `afirma-server-triphase-signer-cache`: Módulo con la interfaz que define las operaciones de guardado y recuperación de datos de caché del servidor trifásico.
@@ -80,16 +80,16 @@ A continuación, se muestra un listado de los distintos módulos actualmente en 
 * `afirma-server-triphase-signer-document`: Módulo con la interfaz que define las operaciones de guardado y recuperación de documentos para firmar del servidor trifásico.
 * `afirma-signature-retriever`: Módulo principal del servicio de recuperación del servidor intermedio.
 * `afirma-signature-storage`: Módulo principal del servicio de guardado del servidor intermedio.
-* `afirma-simple`: Módulo principal de la aplicación AutoFirma.
-* `afirma-simple-installer`: Módulo con los componentes para la generación de los instaladores de AutoFirma.
-* `afirma-simple-plugin-hash`: Módulo con el plugin de AutoFirma para generación y validación de hashes.
+* `afirma-simple`: Módulo principal de la aplicación Autofirma.
+* `afirma-simple-installer`: Módulo con los componentes para la generación de los instaladores de Autofirma.
+* `afirma-simple-plugin-hash`: Módulo con el plugin de Autofirma para generación y validación de hashes.
 * `afirma-simple-plugin-hash-exe`: Módulo de la aplicación EXE para el registro de las entradas de generación y validación de hashes en el menú contextual de Windows.
-* `afirma-simple-plugin-validatecerts`: Módulo con el plugin de AutoFirma para validación de firmas.
-* `afirma-simple-plugins`: Módulo con los recursos base para la implementación de plugins de AutoFirma.
+* `afirma-simple-plugin-validatecerts`: Módulo con el plugin de Autofirma para validación de firmas.
+* `afirma-simple-plugins`: Módulo con los recursos base para la implementación de plugins de Autofirma.
 * `afirma-ui-core-jse`: Módulo con las interfaces gráficas genéricas usadas por las distintas aplicaciones del Cliente @firma.
 * `afirma-ui-core-jse-keystores`: Módulo con la interfaz gráfica del diálogo de selección de certificados.
 * `afirma-ui-miniapplet-deploy`: Módulo principal para el desarrollo de AutoScript.
-* `afirma-ui-simple-configurator`: Módulo principal de la aplicación de configuración ejecutada durante la instalación de AutoFirma.
+* `afirma-ui-simple-configurator`: Módulo principal de la aplicación de configuración ejecutada durante la instalación de Autofirma.
 
 ### Módulos sin mantenimiento
 
@@ -105,13 +105,13 @@ La lista de módulos obsoletos y/o sin soporte que se conservan en el repositori
 * `afirma-miniapplet-report`: __Obsoleto.__ Módulo para la generación de informes de las pruebas del antiguo MiniApplet.
 * `afirma-miniapplet-store-testdata`: __Obsoleto.__ Módulo para el guardado de los datos de los informes de las pruebas del antiguo MiniApplet.
 * `afirma-report-fail-tests`: __Obsoleto.__ Módulo para la notificación de errores de las pruebas del antiguo MiniApplet.
-* `afirma-server-simple-webstart`: __Obsoleto.__ Módulo principal del servicio para la generación del JNLP para la ejecución de AutoFirma WebStart.
+* `afirma-server-simple-webstart`: __Obsoleto.__ Módulo principal del servicio para la generación del JNLP para la ejecución de Autofirma WebStart.
 * `afirma-standalone`: __Obsoleto.__ Módulo principal de la antigua herramienta de escritorio StandAlone.
 * `afirma-standalone-installer`: __Obsoleto.__ Módulo con los componentes para la generación del instalador de la antigua herramienta de escritorio StandAlone.
 * `afirma-ui-applet`: __Obsoleto.__ Módulo principal del antiguo Applet de @firma.
 * `afirma-ui-applet-deploy`: __Obsoleto.__ Módulo con el JavaScript de despliegue del antiguo Applet de @firma.
 * `afirma-ui-miniapplet`: __Obsoleto.__ Módulo principal del antiguo MiniApplet.
-* `afirma-ui-simple-webstart`: __Obsoleto.__ Módulo principal del antiguo empaquetado de AutoFirma como aplicación WebStart,
+* `afirma-ui-simple-webstart`: __Obsoleto.__ Módulo principal del antiguo empaquetado de Autofirma como aplicación WebStart.
 * `afirma-windows-store`: __Obsoleto.__ Módulo principal del antiguo cliente de firma para Windows 8.
 
 No se ofrece ningún tipo de mantenimiento ni soporte sobre estos módulos.
