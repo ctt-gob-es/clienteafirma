@@ -42,6 +42,16 @@ var AutoScript = ( function ( window, undefined ) {
 		var stickySignatory = false;
 		
 		var resetStickySignatory = false;
+		
+		var appName = null;
+		
+		var DOMAIN_NAME;
+		try {
+			DOMAIN_NAME = window.location.hostname; 
+		}
+		catch (e) {
+			DOMAIN_NAME = null;
+		}
 
 		var LOCALIZED_STRINGS = new Array();
 		LOCALIZED_STRINGS["es_ES"] = {
@@ -443,10 +453,8 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 		
 		/** Establece el nombre de aplicacion o dominio desde el que se realiza la llamada. */
-		var setAppName = function (appName) {
-			if (!!clienteFirma.setAppName) {
-			    clienteFirma.setAppName(appName);
-			}
+		var setAppName = function (name) {
+			appName = name;
 		}
 		
 		var selectCertificate = function (params, successCallback, errorCallback) {
@@ -1750,8 +1758,6 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			var OPERATION_BATCH = "batch";
 			
-			var OPERATION_LOG = "log";
-			
 			var OPERATION_SELECT_CERTIFICATE = "certificate";
 
 			var OPERATION_SIGN = "sign";
@@ -1959,6 +1965,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (resetStickySignatory) {
 					data.resetSticky = createKeyValuePair ("resetsticky", resetStickySignatory);
 				}
+				data.appname = createKeyValuePair ("appname", !appName ? appName : DOMAIN_NAME);
 				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64, true);
 				
 				return data;
@@ -1988,6 +1995,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (resetStickySignatory) {
 					data.resetSticky = createKeyValuePair ("resetsticky", resetStickySignatory);
 				}
+				data.appname = createKeyValuePair ("appname", !appName ? appName : DOMAIN_NAME);
 				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64, true);
 				
 				return data;
@@ -2008,6 +2016,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (resetStickySignatory) {
 					data.resetSticky = createKeyValuePair ("resetsticky", resetStickySignatory);
 				}
+				data.appname = createKeyValuePair ("appname", !appName ? appName : DOMAIN_NAME);
 				data.needcert = createKeyValuePair ("needcert", true);
 				data.dat = createKeyValuePair ("dat",  batchB64 == "" ? null : batchB64, true);
 				if (isJson){
@@ -2333,9 +2342,6 @@ var AutoScript = ( function ( window, undefined ) {
 				else if (currentOperation == OPERATION_BATCH) {
 					processBatchResponse(data);
 				}
-				else if (currentOperation == OPERATION_LOG) {
-					processLogResponse(data);
-				}
 				else if (currentOperation == OPERATION_SIGN) {
 					processSignResponse(data);
 				}
@@ -2500,38 +2506,6 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 			}
 			
-			/**
-			 * Procesa la respuesta de una operacion de solicitud de logs.
-			 */
-			function processLogResponse(data) {
-
-				// Si no se proporciona funcion de exito, no se procesa la respuesta
-				if (!successCallback) {
-					console.log("No se ha proporcionado funcion callback para procesar el log");
-					return;
-				}
-				
-				var log = " === JAVASCRIPT INFORMATION === " +
-				"\nnavigator.appCodeName: " + navigator.appCodeName +
-				"\nnavigator.appName: " +  navigator.appName +
-				"\nnavigator.appVersion: " + navigator.appVersion +
-				"\nnavigator.platform: " + navigator.platform +
-				"\nnavigator.userAgent: " + navigator.userAgent+
-				"\nnavigator.javaEnabled(): " + navigator.javaEnabled() +
-				"\nscreen.width: " + (window.screen ? screen.width : 0) +
-				"\nscreen.height: " + (window.screen ? screen.height : 0) +
-				"\n\n   === CLIENTE LOG === \n" + data;
-				
-				if (!!successCallback) {
-					var responseSuccessCallback = successCallback;
-					setCallbacks(null, null);
-					responseSuccessCallback(log);
-				}
-				else {
-					console.log("No se ha proporcionado funcion callback a la que devolver el log");
-				}
-			}
-
 			/**
 			 * Procesa la respuesta de una operacion de firma.
 			 */
@@ -2869,6 +2843,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (resetStickySignatory) {
 					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
 				}
+				data.appname = generateDataKeyValue ("appname", !appName ? appName : DOMAIN_NAME);
 				
 				if (isJson) {
 					data.jsonbatch = generateDataKeyValue ("jsonbatch", true);	
@@ -2977,6 +2952,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (resetStickySignatory) {
 					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
 				}
+				data.appname = generateDataKeyValue ("appname", !appName ? appName : DOMAIN_NAME);
 
 				return data;
 			}
@@ -3000,6 +2976,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (resetStickySignatory) {
 					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
 				}
+				data.appname = generateDataKeyValue ("appname", !appName ? appName : DOMAIN_NAME);
 
 				return data;
 			}
@@ -3764,7 +3741,6 @@ var AutoScript = ( function ( window, undefined ) {
 			var defaultKeyStore = null;
 			var retrieverServletAddress = null;
 			var storageServletAddress = null;
-			var appName = null;
 
 			if (clientAddress != undefined && clientAddress != null) {
 				if (clientAddress.indexOf("://") != -1 && clientAddress.indexOf("/", clientAddress.indexOf("://") + 3) != -1) {
@@ -3780,13 +3756,6 @@ var AutoScript = ( function ( window, undefined ) {
 				storageServletAddress = window.location.origin + "/afirma-signature-storage/StorageService";
 			}
 			
-			/**
-			 * Establece el nombre de la aplicacion o dominio desde el que se realiza la llamada.
-			 */
-			function setAppName (appNameParam) {
-				appName = appNameParam;
-			}
-
 			/**
 			 * Establece el almacen de certificados de que se debe utilizar por defecto.
 			 */
@@ -3812,26 +3781,21 @@ var AutoScript = ( function ( window, undefined ) {
 
 				var opId = "selectcert";
 				
-				// Si hay un certificado prefijado, lo agregamos a los parametros extra
-				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
-					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
-				}
-				
-				var i = 0;
 				var params = new Array();
-				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
-				params[i++] = {key:"op", value:opId};
+				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
+				params[params.length] = {key:"op", value:opId};
 				
-				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
+				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
+				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
 				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore};
-																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
+																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
-				if (extraParams != null && extraParams != undefined) {	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
-			
+						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
+
+				configureExtraParams(params, extraParams);
+				
 				var url = buildUrl(opId, params);
 
 				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
@@ -3895,37 +3859,33 @@ var AutoScript = ( function ( window, undefined ) {
 					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
 					dataB64 = dataB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en Autofirma
 				}
-
-				// Si hay un certificado prefijado, lo agregamos a los parametros extra
-				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
-					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
-				}
 				
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
-				
-				if (appName == null && storageServletAddress != null && storageServletAddress != undefined) {
-					var url = new URL(storageServletAddress);
-					appName = url.hostname;
+
+				if (!appName) {
+					appName = DOMAIN_NAME;
 				}
-				
-				var i = 0;
+												
 				var params = new Array();
-				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
-				if (signId != null && signId != undefined) {			params[i++] = {key:"op", value:signId}; }
-				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
+				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
+				if (signId != null && signId != undefined) {			params[params.length] = {key:"op", value:signId}; }
+				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
+				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
 				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore};
-																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
+																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
-				if (format != null && format != undefined) {			params[i++] = {key:"format", value:format}; }
-				if (algorithm != null && algorithm != undefined) {		params[i++] = {key:"algorithm", value:algorithm}; }
-				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
-				if (appName != null && appName != undefined) {			params[i++] = {key:"appname", value:appName}; }
-				if (dataB64 != null) {									params[i++] = {key:"dat", value:dataB64}; }
+						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
+				if (format != null && format != undefined) {			params[params.length] = {key:"format", value:format}; }
+				if (algorithm != null && algorithm != undefined) {		params[params.length] = {key:"algorithm", value:algorithm}; }
+				if (extraParams != null && extraParams != undefined) { 	params[params.length] = {key:"properties", value:Base64.encode(extraParams)}; }
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
+				if (appName != null && appName != undefined) {			params[params.length] = {key:"appname", value:appName}; }
+
+				configureExtraParams(params, extraParams);
+
+				if (dataB64 != null) {									params[params.length] = {key:"dat", value:dataB64}; }
 			
 				var url = buildUrl(signId, params);
 
@@ -3967,42 +3927,37 @@ var AutoScript = ( function ( window, undefined ) {
 					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
 					dataB64 = dataB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en Autofirma
 				}
-
-				// Si hay un certificado prefijado, lo agregamos a los parametros extra
-				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
-					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
-				}
 				
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
-				
-				if (appName == null && storageServletAddress != null && storageServletAddress != undefined) {
-					var url = new URL(storageServletAddress);
-					appName = url.hostname;
+
+				if (!appName) {
+					appName = DOMAIN_NAME;
 				}
 
-				var i = 0;
 				var opId = "signandsave";
 				var params = new Array();
 				
-				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
-				params[i++] = {key:"op", value:opId};
-				if (signId != null && signId != undefined) {			params[i++] = {key:"cop", value:signId}; }
-				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
+				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
+				params[params.length] = {key:"op", value:opId};
+				if (signId != null && signId != undefined) {			params[params.length] = {key:"cop", value:signId}; }
+				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
+				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
 				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore};
-																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
+																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
-				if (format != null && format != undefined) {			params[i++] = {key:"format", value:format}; }
-				if (algorithm != null && algorithm != undefined) {		params[i++] = {key:"algorithm", value:algorithm}; }
-				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
+						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
+				if (format != null && format != undefined) {			params[params.length] = {key:"format", value:format}; }
+				if (algorithm != null && algorithm != undefined) {		params[params.length] = {key:"algorithm", value:algorithm}; }
 				if (outputFileName != null &&
-						outputFileName != undefined) {					params[i++] = {key:"filename", value:outputFileName}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
-				if (appName != null && appName != undefined) {			params[i++] = {key:"appname", value:appName}; }
-				if (dataB64 != null) {									params[i++] = {key:"dat", value:dataB64}; }
+						outputFileName != undefined) {					params[params.length] = {key:"filename", value:outputFileName}; }
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
+				if (appName != null && appName != undefined) {			params[params.length] = {key:"appname", value:appName}; }
+
+				configureExtraParams(params, extraParams);
+				
+				if (dataB64 != null) {									params[params.length] = {key:"dat", value:dataB64}; }
 			
 				var url = buildUrl(opId, params);
 
@@ -4037,41 +3992,36 @@ var AutoScript = ( function ( window, undefined ) {
 					batchB64 = batchB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en Autofirma
 				}
 
-				// Si hay un certificado prefijado, lo agregamos a los parametros extra
-				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
-					extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
-				}
-				
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
-				
-				if (appName == null && storageServletAddress != null && storageServletAddress != undefined) {
-					var url = new URL(storageServletAddress);
-					appName = url.hostname;
+
+				if (!appName) {
+					appName = DOMAIN_NAME;
 				}
-				
+
 				var opId = "batch";
 				
-				var i = 0;
 				var params = new Array();
-				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
-				params[i++] = {key:"op", value:opId};
-				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
+				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
+				params[params.length] = {key:"op", value:opId};
+				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
+				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
 				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore};
-																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
+																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
+						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
 				if (batchPreSignerUrl != null &&
-						batchPreSignerUrl != undefined) {				params[i++] = {key:"batchpresignerurl", value:batchPreSignerUrl}; }				
+						batchPreSignerUrl != undefined) {				params[params.length] = {key:"batchpresignerurl", value:batchPreSignerUrl}; }				
 				if (batchPostSignerUrl != null &&
-						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
-				if (extraParams != null && extraParams != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(extraParams)}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
-				if (appName != null && appName != undefined) {			params[i++] = {key:"appname", value:appName}; }
-				params[i++] = {key:"needcert", value:"true"}; 
-				if (batchB64 != null) {									params[i++] = {key:"dat", value:batchB64}; }
+						batchPostSignerUrl != undefined) {				params[params.length] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
+				if (appName != null && appName != undefined) {			params[params.length] = {key:"appname", value:appName}; }
+				params[params.length] = {key:"needcert", value:"true"}; 
+
+				configureExtraParams(params, extraParams);
+				
+				if (batchB64 != null) {									params[params.length] = {key:"dat", value:batchB64}; }
 
 				var url = buildUrl(opId, params);
 
@@ -4096,45 +4046,39 @@ var AutoScript = ( function ( window, undefined ) {
 			function signBatchJSON (jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, certFilters, successCallback, errorCallback) {
 				
 				currentOperation = OPERATION_BATCH;
-
-				// Si hay un certificado prefijado, lo agregamos a los filtros de certificado
-				if (stickySignatory && !resetStickySignatory && !!stickyCertificate) {
-					certFilters = addSignatoryCertificateToExtraParams(stickyCertificate, certFilters);
-				}
 				
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
-				
-				if (appName == null && storageServletAddress != null && storageServletAddress != undefined) {
-					var url = new URL(storageServletAddress);
-					appName = url.hostname;
+
+				if (!appName) {
+					appName = DOMAIN_NAME;
 				}
-				
+
 				var opId = "batch";
 				
-				var i = 0;
 				var params = new Array();
-				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
-				params[i++] = {key:"op", value:opId};
-				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
+				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
+				params[params.length] = {key:"op", value:opId};
+				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
+				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
 				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[i++] = {key:"keystore", value:defaultKeyStore};
-																		params[i++] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
+																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
+						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
 				if (batchPreSignerUrl != null &&
-						batchPreSignerUrl != undefined) {				params[i++] = {key:"batchpresignerurl", value:batchPreSignerUrl}; }				
+						batchPreSignerUrl != undefined) {				params[params.length] = {key:"batchpresignerurl", value:batchPreSignerUrl}; }				
 				if (batchPostSignerUrl != null &&
-						batchPostSignerUrl != undefined) {				params[i++] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
-				if (certFilters != null && certFilters != undefined) { 	params[i++] = {key:"properties", value:Base64.encode(certFilters)}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:true}; } // Espera activa
-				if (appName != null && appName != undefined) {			params[i++] = {key:"appname", value:appName}; }
-				if (localBatchProcess) {								params[i++] = {key:"localBatchProcess", value:true}; }
-				
-				params[i++] = {key:"needcert", value:true};
-				params[i++] = {key:"jsonbatch", value:true}; 
-				params[i++] = {key:"dat", value:jsonRequestB64}; 
+						batchPostSignerUrl != undefined) {				params[params.length] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:true}; } // Espera activa
+				if (appName != null && appName != undefined) {			params[params.length] = {key:"appname", value:appName}; }
+				if (localBatchProcess) {								params[params.length] = {key:"localBatchProcess", value:true}; }
+
+				configureExtraParams(params, certFilters);
+								
+				params[params.length] = {key:"needcert", value:true};
+				params[params.length] = {key:"jsonbatch", value:true}; 
+				params[params.length] = {key:"dat", value:jsonRequestB64}; 
 				 
 				var url = buildUrl(opId, params);
 
@@ -4165,20 +4109,19 @@ var AutoScript = ( function ( window, undefined ) {
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var cipherKey = generateCipherKey();
 
-				var i = 0;
 				var opId = "save";
 				var params = new Array();
-				params[i++] = {key:"ver", value:PROTOCOL_VERSION};
-				params[i++] = {key:"op", value:opId};
-				if (idSession != null && idSession != undefined) {		params[i++] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[i++] = {key:"key", value:cipherKey}; }
+				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
+				params[params.length] = {key:"op", value:opId};
+				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
+				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
 				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[i++] = {key:"stservlet", value:storageServletAddress}; }
-				if (title != null && title != undefined) {				params[i++] = {key:"title", value:title}; }
-				if (filename != null && filename != undefined) {		params[i++] = {key:"filename", value:filename}; }
-				if (extension != null && extension != undefined) {		params[i++] = {key:"extension", value:extension}; }
-				if (description != null && description != undefined) {	params[i++] = {key:"description", value:description}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[i++] = {key:"aw", value:"true"}; } // Espera activa
+						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
+				if (title != null && title != undefined) {				params[params.length] = {key:"title", value:title}; }
+				if (filename != null && filename != undefined) {		params[params.length] = {key:"filename", value:filename}; }
+				if (extension != null && extension != undefined) {		params[params.length] = {key:"extension", value:extension}; }
+				if (description != null && description != undefined) {	params[params.length] = {key:"description", value:description}; }
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
 				if (dataB64 != null && dataB64 != undefined && dataB64 != "") {			params[i++] = {key:"dat", value:dataB64}; }
 				
 				
@@ -4693,6 +4636,27 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 			}
 			
+			/**
+			 * Establece en los parametros de la operacion las claves y valores necesarios para permitir/simular el
+			 * cacheo del certificado.
+			 */
+			function configureExtraParams(params, extraParams) {
+				if (stickySignatory) {
+					// Movil: Se cachea el PIN dentro de la instancia de Autofirma App
+					if (Platform.isIOS() || Platform.isAndroid()) {
+						params[params.length] = {key:"sticky", value:stickySignatory};
+						if (resetStickySignatory) {
+							params[params.length] = {key:"resetsticky", value:resetStickySignatory};
+						}
+					}
+					// PC: Se crea un filtro que selecciona el certificado
+					else if (!resetStickySignatory && !!stickyCertificate) {
+						extraParams = addSignatoryCertificateToExtraParams(stickyCertificate, extraParams);
+					}
+				}
+				if (!!extraParams) {	params[params.length] = {key:"properties", value:Base64.encode(extraParams)}; }
+			}
+			
 			/** Agrega a los extraParams un filtro de seleccion de certificado concreto. */
 			function addSignatoryCertificateToExtraParams(certificate, params) {
 
@@ -4905,7 +4869,6 @@ var AutoScript = ( function ( window, undefined ) {
 			return {
 				echo : echo,
 				setKeyStore : setKeyStore,
-				setAppName : setAppName,
 				sign : sign,
 				coSign : coSign,
 				counterSign : counterSign,
