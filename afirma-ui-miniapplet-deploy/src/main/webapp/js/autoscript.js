@@ -4122,7 +4122,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (extension != null && extension != undefined) {		params[params.length] = {key:"extension", value:extension}; }
 				if (description != null && description != undefined) {	params[params.length] = {key:"description", value:description}; }
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
-				if (dataB64 != null && dataB64 != undefined && dataB64 != "") {			params[i++] = {key:"dat", value:dataB64}; }
+				if (dataB64 != null && dataB64 != undefined && dataB64 != "") {			params[params.length] = {key:"dat", value:dataB64}; }
 				
 				
 				var url = buildUrl(opId, params);
