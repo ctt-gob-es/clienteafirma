@@ -599,8 +599,7 @@ public final class PdfExtraParams {
 
 	/**
 	 * Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si
-	 * este estaba cifrado. No se soporta la firma de documentos PDF cifrados con
-	 * certificados o con algoritmo AES256.
+	 * este estaba cifrado.
 	 */
 	public static final String OWNER_PASSWORD_STRING = "ownerPassword";//$NON-NLS-1$
 

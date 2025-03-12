@@ -22,7 +22,6 @@ class SecureSocketUtils {
 	private static final String KSPASS = "654321"; //$NON-NLS-1$
 	private static final String CTPASS = "654321"; //$NON-NLS-1$
 	private static final String KEYSTORE_NAME = "autofirma.pfx"; //$NON-NLS-1$
-	private static final String CA_ROOT_NAME = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String PKCS12 = "PKCS12"; //$NON-NLS-1$
 	private static final String SSLCONTEXT = "TLSv1"; //$NON-NLS-1$
 
@@ -67,8 +66,7 @@ class SecureSocketUtils {
 
 		File appDir = DesktopUtil.getApplicationDirectory();
 
-		if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()
-				&& new File(appDir, CA_ROOT_NAME).exists()) {
+		if (appDir != null && new File(appDir, KEYSTORE_NAME).exists()) {
 			return new File(appDir, KEYSTORE_NAME);
 		}
 

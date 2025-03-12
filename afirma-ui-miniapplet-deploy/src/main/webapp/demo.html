@@ -32,8 +32,8 @@
 		function firmar() {
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='';
-			var divFirma = document.getElementById('divfirma');
-			divFirma.innerHTML='';
+			var divguardar = document.getElementById('divguardar');
+			divguardar.innerHTML='';
 			mostrarDialogoEspera();
 			
 			var params = 	"mode=explicit\n" +
@@ -85,13 +85,14 @@
 			var divMensaje = document.getElementById('divmensaje');
 			divMensaje.innerHTML='<br><div class="iconOKFirma">La firma se ha realizado correctamente</div>';
 			
-			var divFirma = document.getElementById('divfirma');
-			var content = '<br><textarea id="firmaB64" cols="76" rows="6">' + signatureB64 + '</textarea><br>';
-				content += '<br><div class="botoneraCentro">' +
-					'<input class="botonM marginR15" id="botonGuardar" value="Guardar datos" onclick="javascript:guardar();" type="button">' +
+			document.getElementById('firmaB64').value = signatureB64;
+			
+			var divguardar = document.getElementById('divguardar');
+			var content = '<br><div class="botoneraCentro">' +
+					'<input class="botonM marginR15" id="botonGuardar" value="Guardar firma" onclick="javascript:guardar();" type="button">' +
 					'</div><br>';
 			
-			divFirma.innerHTML = content;
+			divguardar.innerHTML = content;
 		}
 		
 		function errorCallback(errorType, errorMessage) {
@@ -122,12 +123,15 @@
 				ext = "sig";
 			}
 			
-			AutoScript.saveDataToFile(document.getElementById("firmaB64").innerHTML, "Guardar firma", !!ext ? "firma." + ext : "firma", ext, "Firma electronica", guardarSuccessCallback, guardarErrorCallback);
+			AutoScript.saveDataToFile(document.getElementById("firmaB64").value, "Guardar firma", !!ext ? "firma." + ext : "firma", ext, "Firma electronica", guardarSuccessCallback, guardarErrorCallback);
 		}
 		
 		function guardarSuccessCallback() {
 			
 			ocultarDialogoEspera();
+			
+			var divMensaje = document.getElementById('divmensaje');
+			divMensaje.innerHTML='<br><div class="iconOKFirma">La firma se ha guardado correctamente</div>';
 		}
 		
 		function guardarErrorCallback(errorType, errorMessage) {
@@ -199,6 +203,37 @@
 			}
 		}
 		
+		function actualizarFuenteDatos(value) {
+
+			// Identificamos si debemos ocultar o mostrar los tipos de datos no PDF
+			var pdfSignatureFormat = value == "PAdES" || value == "PAdEStri";
+			var displayNoPdf = pdfSignatureFormat ? "none" : "inline";
+
+			// Si la firma es PDF, aseguramos de que se seleccione un tipo de datos compatible si
+			// estaba seleccionado uno que no lo era
+			if (pdfSignatureFormat) {
+				if (document.getElementById("targetGeneratedData").checked
+						|| document.getElementById("targetFacturaEDocument").checked
+						|| document.getElementById("targetFormData").checked) {
+					document.getElementById("targetFile").checked = "checked";
+					firmarFichero = true;
+					firmarDatosGenerados = false;
+					firmarPdf = false;
+					firmarFacturaE = false;
+				}
+			}
+			
+			// Establecemos la visibilidad de los tipos de datos que no soportan la firma PDF
+			document.getElementById("targetGeneratedData").style.display = displayNoPdf;
+			document.getElementById("targetGeneratedDataText").style.display = displayNoPdf;
+			document.getElementById("targetFacturaEDocument").style.display = displayNoPdf;
+			document.getElementById("targetFacturaEDocumentText").style.display = displayNoPdf;
+			document.getElementById("targetFormData").style.display = displayNoPdf;
+			document.getElementById("targetFormDataText").style.display = displayNoPdf;
+			
+
+		}
+		
 		function mostrarDialogoEspera() {
 			document.getElementById("dialogoEspera").style.display = "block";
 		}
@@ -248,6 +283,7 @@
 	<div class="separadorSeccion"></div>
 	<fieldset style="background-color: rgb(252,252,252)">
 	<div id="divmensaje"></div>
+	<div id="divguardar"></div>
 	<p>Esta p&aacute;gina le permitir&aacute; probar la operaci&oacute;n de firma del cliente m&oacute;vil al firmar un fichero localizado en su dispositivo m&oacute;vil, datos de ejemplo o un formulario web simple:</p><br/>
 
 	<div class="lblAnchoMaxMB">
@@ -258,7 +294,7 @@
 			<span>2. Seleccione el formato de firma que desea utilizar</span>
 	</div>
 	<div>
-			<select id="fFormat">
+			<select id="fFormat" onchange="javascript:actualizarFuenteDatos(this.value);">
 				<option value="CAdES" selected>CAdES</option>
 				<option value="CAdEStri">CAdEStri</option>
 				<option value="PAdES">PAdES</option>
@@ -277,11 +313,11 @@
 	<br/>
 	<div style="margin-left:20px;">
 		<div id="seleccionTarget" >
-			<input name="formTarget" value="fileData" id="targetFile" onclick="javascript:mostrarFormulario(this.value);" type="radio" checked="checked" /><span id="targetFileText">Fichero</span><br>
-			<input name="formTarget" value="generatedData" id="targetGeneratedData" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Datos generados (No PDF)<br>
-			<input name="formTarget" value="facturaEDocument" id="targetFacturaEDocument" onclick="javascript:mostrarFormulario(this.value);" type="radio" />FacturaE<br>
+			<span><input name="formTarget" value="fileData" id="targetFile" onclick="javascript:mostrarFormulario(this.value);" type="radio" checked="checked" /><span id="targetFileText">Fichero</span><br></span>
+			<input name="formTarget" value="generatedData" id="targetGeneratedData" onclick="javascript:mostrarFormulario(this.value);" type="radio" /><span id="targetGeneratedDataText">Datos generados (No PDF)<br></span>
+			<input name="formTarget" value="facturaEDocument" id="targetFacturaEDocument" onclick="javascript:mostrarFormulario(this.value);" type="radio" /><span id="targetFacturaEDocumentText">FacturaE<br></span>
 			<input name="formTarget" value="pdfDocument" id="targetPdfDocument" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Documento PDF<br>
-			<input name="formTarget" value="formData" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Formulario<br>
+			<input name="formTarget" value="formData" id="targetFormData" onclick="javascript:mostrarFormulario(this.value);" type="radio" /><span id="targetFormDataText">Formulario<br></span>
 		</div><br/>
 		<div id="formulario" style="display:none">
 			<label for="fNif">NIF:</label><br/>
@@ -291,10 +327,10 @@
 		</div>
 	</div>
 	<div class="botoneraCentro">
+		<input id="firmaB64" type="hidden" />
 		<input class="botonP marginR15" id="botonFirmar" value="Firmar" onclick="firmar();" type="button"><br>
 	</div>
 	<br>
-	<div id="divfirma"></div>
 	</fieldset>
 </form>
 

@@ -29,7 +29,7 @@ public final class ConfiguratorUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	public static final String CERT_ALIAS = "SocketAutofirma"; //$NON-NLS-1$
+	public static final String CERT_ALIAS = "SocketAutoFirma"; //$NON-NLS-1$
 
 	private ConfiguratorUtil() {
 		// No instanciable

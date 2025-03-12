@@ -1,4 +1,4 @@
-;Incluimos el Modern UI
+ï»¿;Incluimos el Modern UI
   !include "MUI.nsh"
   !include "nsProcess.nsh"
   !include "Registry.nsh"
@@ -31,7 +31,7 @@ VIFileVersion "${FILE_VERSION}"
 VIAddVersionKey "ProductName" "Autofirma"
 VIAddVersionKey "ProductVersion" "${VERSION}"
 VIAddVersionKey "FileVersion" "${VERSION}"
-VIAddVersionKey "LegalCopyright" "(C) Gobierno de España"
+VIAddVersionKey "LegalCopyright" "(C) Gobierno de EspaÃ±a"
 VIAddVersionKey "FileDescription" "Autofirma (64 bits)"
 
 ;--------------------------------
@@ -70,10 +70,13 @@ Var Shorcut_Integration_Checkbox_State
 Var Firefox_Integration_Checkbox
 Var Firefox_Integration_Checkbox_State
 
+;Parametro que indica si se encuentra alguna versiÃ³n de JRE instalada en el sistema.
+Var INSTALL_JRE 
+
 !define SECTION_ON ${SF_SELECTED} # 0x1
 
 Function createConfigPage
-  !insertmacro MUI_HEADER_TEXT "Opciones de integración avanzadas" "Seleccione las opciones de integración que desee que configure Autofirma"
+  !insertmacro MUI_HEADER_TEXT "Opciones de integraciÃ³n avanzadas" "Seleccione las opciones de integraciÃ³n que desee que configure Autofirma"
   
   nsDialogs::Create 1018
   Pop $0
@@ -83,13 +86,13 @@ Function createConfigPage
   ${EndIf}
 
   ; Creamos los elementos de interfaz
-  ${NSD_CreateCheckbox} 0 0 100% 10u "Agregar al menú inicio."
+  ${NSD_CreateCheckbox} 0 0 100% 10u "Agregar al menÃº inicio."
   Pop $StartMenu_Integration_Checkbox
   
   ${NSD_CreateCheckbox} 0 17u 100% 10u "Crear acceso directo en el escritorio."
   Pop $Shorcut_Integration_Checkbox
 
-  ${NSD_CreateCheckbox} 0 34u 100% 10u "Configurar Firefox para que confíe en los certificados raíz del sistema."
+  ${NSD_CreateCheckbox} 0 34u 100% 10u "Configurar Firefox para que confÃ­e en los certificados raÃ­z del sistema."
   Pop $Firefox_Integration_Checkbox
   
   ; Restablecemos el valor por si hubiese cambio de pantalla
@@ -161,7 +164,7 @@ Var PATH
 InstallDir "$PROGRAMFILES64\Autofirma"
 
 ;Mensaje que mostraremos para indicarle al usuario que seleccione un directorio
-DirText "Elija un directorio donde instalar la aplicación:"
+DirText "Elija un directorio donde instalar la aplicaciÃ³n:"
 
 ;Indicamos que cuando la instalacion se complete no se cierre el instalador automaticamente
 AutoCloseWindow false
@@ -202,7 +205,7 @@ Section "Autofirma" sPrograma
 		Quit
 	${EndIf}
 
-	;Comprobamos si ya existe una versión de Autofirma instalada. Si existe, se devolvera
+	;Comprobamos si ya existe una version de Autofirma instalada. Si existe, se devolvera
 	;su numero de version y se dejara configurado el registro a 32 o 64 bits segun corresponda
 	Call CheckVersionInstalled
 	Pop $R1
@@ -210,10 +213,10 @@ Section "Autofirma" sPrograma
 		; Si es la misma version o superior, detenemos el proceso. Si no, se elimina.
 		${VersionCheckNew} $R1 ${VERSION} "$R2"
 		${If} $R2 = 0
-		  MessageBox MB_OK "Esta versión de Autofirma ya está instalada." 
+		  MessageBox MB_OK "Esta versiÃ³n de Autofirma ya estÃ¡ instalada." 
 		  Quit
 		${ElseIf} $R2 <> 2
-		  MessageBox MB_OK "La versión actual de Autofirma es más nueva que la que se quiere instalar."
+		  MessageBox MB_OK "La versiÃ³n actual de Autofirma es mÃ¡s nueva que la que se quiere instalar."
 		  Quit
 		${EndIf}
 		Call RemoveOldVersions
@@ -239,6 +242,11 @@ Section "Autofirma" sPrograma
 	File  licencia.txt
 	File  ic_firmar.ico
 
+	;Copiamos la JRE en caso de que no se vaya usar el JRE instalado en el sistema
+	${If} $INSTALL_JRE == "true" 
+		File /r java64\jre
+    ${EndIf}
+
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
     SetShellVarContext all
    
@@ -247,7 +255,7 @@ Section "Autofirma" sPrograma
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de Autofirma.' IDOK loopFirefox
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalaciÃ³n de Autofirma.' IDOK loopFirefox
 
 	${nsProcess::Unload}
 	
@@ -272,7 +280,7 @@ Section "Autofirma" sPrograma
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "NoModify" "1"
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "NoRepair" "1"
 	WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "EstimatedSize" "100000"
-	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "Publisher" "Gobierno de España"
+	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "Publisher" "Gobierno de EspaÃ±a"
 	WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH" "DisplayVersion" "${VERSION}"
 
 	WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -328,7 +336,7 @@ Section "Autofirma" sPrograma
 	Call AddCertificateToStore
 	Pop $0
 	;${If} $0 != success
-	  ;MessageBox MB_OK "Error en la importación: $0"
+	  ;MessageBox MB_OK "Error en la importaciÃ³n: $0"
 	;${EndIf}
 
 	;Se actualiza la variable PATH con la ruta de instalacion
@@ -338,19 +346,23 @@ Section "Autofirma" sPrograma
 SectionEnd
 
 Section "Java Runtime Environment" sJRE
-	File /r java64\jre
+	; No se instala aqui la JRE, ya que el propio Autofirma depende de ella. Si se pide instalar,
+	; se instalara desde la seccion de Autofirma para asegurar que ya estar disponible cuando sea necesario
 SectionEnd
 
 	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-	!insertmacro MUI_DESCRIPTION_TEXT ${sPrograma} "Archivos necesarios para la ejecución del programa"
-	!insertmacro MUI_DESCRIPTION_TEXT ${sJRE} "Entorno de ejecución de Java. Obligatorio cuando no se encuentra Java en el equipo"
+	!insertmacro MUI_DESCRIPTION_TEXT ${sPrograma} "Archivos necesarios para la ejecuciÃ³n del programa"
+	!insertmacro MUI_DESCRIPTION_TEXT ${sJRE} "Entorno de ejecuciÃ³n de Java. Obligatorio cuando no se encuentra Java en el equipo"
 	!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Function .onInit
 
 	StrCpy $StartMenu_Integration_Checkbox_State ${BST_CHECKED}
 	StrCpy $Shorcut_Integration_Checkbox_State ${BST_CHECKED}
-
+	
+	; Por defecto, se instalara la JRE
+	StrCpy $INSTALL_JRE "true"
+	
 	; Identificamos si hay una version de Java compatible accesible en el PATH
 	Call isValidJavaVersionAvailable
 	Pop $0
@@ -360,6 +372,24 @@ Function .onInit
 	StrCmp $0 "false" 0 +2		
 		SectionSetFlags ${sJRE} 17
 		
+FunctionEnd
+
+; Desactivamos la instalacion de la JRE si el usuario deselecciona
+; esta opcion
+Function .onSelChange
+
+	Push $0
+ 
+	SectionGetFlags ${sJRE} $0
+	IntOp $0 $0 & ${SECTION_ON}
+	${If} $0 == 1 
+		StrCpy $INSTALL_JRE "true"
+    ${Else}
+		StrCpy $INSTALL_JRE "false"
+    ${EndIf}
+	
+	Pop $0
+	
 FunctionEnd
 
 !define CERT_STORE_CERTIFICATE_CONTEXT  1
@@ -552,7 +582,7 @@ Function AddCertificateToStore
       System::Call "crypt32::CertCloseStore(i r1, i 0)"
     ${Else}
       System::Call "crypt32::CertFreeCertificateContext(i r0)"
-      StrCpy $0 "No fue posible abrir el almacén de certificados"
+      StrCpy $0 "No fue posible abrir el almacÃ©n de certificados"
     ${EndIf}
   ${Else}
     StrCpy $0 "No fue posible abrir el fichero de certificados"
@@ -811,7 +841,7 @@ Section "uninstall"
 	loopFirefox:
 		${nsProcess::FindProcess} "firefox.exe" $R2
 		StrCmp $R2 0 0 +2
-			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de Autofirma.' IDOK loopFirefox
+			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalaciÃ³n de Autofirma.' IDOK loopFirefox
 	
 	; ==== Desinstalador EXE - FIN ====
 	
@@ -932,7 +962,7 @@ FunctionEnd
 ;   Call RemoveOldVersions
 Function RemoveOldVersions
   
-	; Comprueba que no este ya instalada
+	; Comprueba que este ya instalada
 	ClearErrors
 	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
 
@@ -946,7 +976,7 @@ Function RemoveOldVersions
 	${If} $R2 = 2
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "La instalación de Autofirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO "La instalaciÃ³n de Autofirma requiere desinstalar la versiÃ³n anterior encontrada en el equipo. No se realizarÃ¡ la nueva instalaciÃ³n sin desinstalar la anterior. Â¿Desea continuar?" /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 	${EndIf}
 
@@ -980,7 +1010,7 @@ Function RemoveOldVersions
 		StrCmp $3 "Autofirma" 0 End
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "La instalación de Autofirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO "La instalaciÃ³n de Autofirma requiere desinstalar la versiÃ³n anterior encontrada en el equipo. No se realizarÃ¡ la nueva instalaciÃ³n sin desinstalar la anterior. Â¿Desea continuar?" /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 	
 	; No se encontro Autofirma instalado, asi que finalizamos el proceso
@@ -1235,7 +1265,7 @@ Function AddToPath
   System::Call "advapi32::RegQueryValueEx(i $3, t'PATH', i 0, i 0, t.r1, *i ${NSIS_MAX_STRLEN} r2) i.r4"
   System::Call "advapi32::RegCloseKey(i $3)"
   IntCmp $4 234 0 +3 +3 ; $4 == ERROR_MORE_DATA
-    DetailPrint "El PATH es demasiado largo. No se le agregará la ruta de Autofirma."
+    DetailPrint "El PATH es demasiado largo. No se le agregarÃ¡ la ruta de Autofirma."
     Goto done
   IntCmp $4 0 +5 ; $4 != NO_ERROR
     IntCmp $4 2 +3 ; $4 != ERROR_FILE_NOT_FOUND
@@ -1259,7 +1289,7 @@ Function AddToPath
   IntOp $2 $2 + $3
   IntOp $2 $2 + 2 ; $2 = strlen(dir) + strlen(PATH) + sizeof(";")
   IntCmp $2 ${NSIS_MAX_STRLEN} +3 +3 0
-    DetailPrint "La ruta de Autofirma hace que el PATH sea demasiado largo. No se agregará"
+    DetailPrint "La ruta de Autofirma hace que el PATH sea demasiado largo. No se agregarÃ¡"
     Goto done
   ; Append dir to PATH
   DetailPrint "Agregamos al PATH: $0"

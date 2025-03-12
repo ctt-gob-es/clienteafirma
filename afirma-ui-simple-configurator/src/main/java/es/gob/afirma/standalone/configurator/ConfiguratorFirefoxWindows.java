@@ -159,8 +159,13 @@ final class ConfiguratorFirefoxWindows {
 	 * de Firefox de todos los perfiles de todos los usuarios del sistema.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
+	 * @param iterations N&uacute;mero de veces que se debe repetir el proceso.
 	 */
-	static void uninstallRootCAMozillaKeyStore(final File appDir, final Console console) {
+	static void uninstallRootCAMozillaKeyStore(final File appDir, final Console console, final int iterations) {
+
+		if (iterations <= 0) {
+			return;
+		}
 
 		final File[] mozillaProfileDirs = getAllMozillaProfileDirs();
 		if (mozillaProfileDirs == null || mozillaProfileDirs.length == 0) {
@@ -183,15 +188,27 @@ final class ConfiguratorFirefoxWindows {
 		}
 
 		for (final File profileDir : mozillaProfileDirs) {
-			try {
-				uninstallCACertFromMozillaKeyStore(appDir, profileDir, console);
-			}
-			catch (final Exception e) {
-				LOGGER.log(Level.WARNING, "No se pudo desinstalar o no se encontro el certificado SSL raiz del almacen de Mozilla Firefox", e); //$NON-NLS-1$
+			for (int i = 0; i < iterations; i++) {
+				try {
+					uninstallCACertFromMozillaKeyStore(appDir, profileDir, console);
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "No se pudo desinstalar o no se encontro el certificado SSL raiz del almacen de Mozilla Firefox", e); //$NON-NLS-1$
+				}
 			}
 		}
 
 		//removeCertUtilFromDisk(appDir);
+	}
+
+	/**
+	 * Desinstala un certificado de los almacenes de autoridades de confianza
+	 * de Firefox de todos los perfiles de todos los usuarios del sistema.
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
+	 */
+	static void uninstallRootCAMozillaKeyStore(final File appDir, final Console console) {
+		uninstallRootCAMozillaKeyStore(appDir, console, 1);
 	}
 
 	/** Comprueba si certutil existe y si puede ejecutarse.

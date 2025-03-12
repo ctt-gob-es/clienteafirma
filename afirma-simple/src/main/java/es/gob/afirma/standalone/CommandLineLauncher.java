@@ -63,6 +63,11 @@ import es.gob.afirma.signers.pades.InvalidSignaturePositionException;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signvalidation.SignValider;
+import es.gob.afirma.signvalidation.SignValiderFactory;
+import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.Permission;
 import es.gob.afirma.standalone.plugins.PluginCommand;
@@ -145,7 +150,7 @@ final class CommandLineLauncher {
 				}
 			}
 			catch (final CommandLineParameterException e) {
-				if (e.isUsingGui() || command == CommandLineCommand.VERIFY) {
+				if (e.isUsingGui()) {
 					showErrorDialog(e.getMessage(), e);
 				}
 
@@ -154,7 +159,7 @@ final class CommandLineLauncher {
 				return;
 			}
 			catch (final CommandLineException e) {
-				if (e.isUsingGui() || command == CommandLineCommand.VERIFY) {
+				if (e.isUsingGui()) {
 					showErrorDialog(e.getMessage(), e);
 				}
 
@@ -227,7 +232,12 @@ final class CommandLineLauncher {
 			result = listAliasesByCommandLine(params);
 			break;
 		case VERIFY:
-			verifyByGui(params);
+			if (params.isGui()) {
+				verifyByGui(params);
+			}
+			else {
+				result = verifyByCommandLine(params);
+			}
 			break;
 		case SIGN:
 			if (params.isGui()) {
@@ -530,6 +540,57 @@ final class CommandLineLauncher {
 					return e.getMessage();
 		}
 
+	}
+
+	/** Verifica por l&iacute;nea de comandos.
+	 * @param params Par&aacute;metros de configuraci&oacute;n.
+	 * @return Mensaje con el resultado de la operaci&oacute;n.
+	 * @throws CommandLineException Cuando falta algun par&aacute;metro necesario
+	 * o se produce un error en la operaci&oacute;n. */
+	private static String verifyByCommandLine(final CommandLineParameters params)
+			throws CommandLineException {
+
+		if (params.getInputFile() == null) {
+			throw new CommandLineParameterException(CommandLineMessages.getString("CommandLineLauncher.5")); //$NON-NLS-1$
+		}
+
+		// Leemos el fichero de entrada
+		final byte[] sign;
+		try {
+			sign = loadFile(params.getInputFile());
+		}
+		catch(final Exception e) {
+			throw new CommandLineException(
+					"No se ha podido leer el fichero de entrada: " + params.getInputFile().getAbsolutePath(), e); //$NON-NLS-1$
+		}
+
+		List<SignValidity> validityList = new ArrayList<>();
+		try {
+			final SignValider sv = SignValiderFactory.getSignValider(sign);
+			if (sv != null) {
+				validityList = sv.validate(sign);
+			}
+			else if(DataAnalizerUtil.isSignedODF(sign)) {
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.ODF_UNKOWN_VALIDITY));
+			}
+			else if(DataAnalizerUtil.isSignedOOXML(sign)) {
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.OOXML_UNKOWN_VALIDITY));
+			}
+
+			if (validityList.size() == 0) {
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.UNKOWN_SIGNATURE_FORMAT));
+			}
+		}
+		catch (final Exception e) {
+			throw new CommandLineException("Error en la validacion de la firma", e); //$NON-NLS-1$
+		}
+
+		final StringBuilder buffer = new StringBuilder();
+		for (final SignValidity validity : validityList) {
+			buffer.append(validity.toString()).append("\n"); //$NON-NLS-1$
+		}
+
+		return buffer.toString();
 	}
 
 	/** Firma por l&iacute;nea de comandos.

@@ -563,7 +563,7 @@ final class CommandLineParameters {
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
 			.append(": ").append(appName).append(" ").append(op).append(" [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-			.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			.append("  ").append(PARAM_GUI).append("\t\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23")).append(" ").append(CommandLineMessages.getString("CommandLineLauncher.146", PARAM_CERT_GUI)).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 			.append("  ").append(PARAM_CERT_GUI).append("\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.76")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_INPUT).append(" inputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")\n")  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			.append("  ").append(PARAM_OUTPUT).append(" outputfile\t\t (").append(CommandLineMessages.getString("CommandLineLauncher.14")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -649,7 +649,7 @@ final class CommandLineParameters {
 		sb.append(CommandLineMessages.getString("CommandLineLauncher.7")) //$NON-NLS-1$
 		.append(": ").append(appName).append(" ").append(op).append(" [").append(CommandLineMessages.getString("CommandLineLauncher.140")).append("...]\n\n")  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		.append(CommandLineMessages.getString("CommandLineLauncher.115")).append(":\n") //$NON-NLS-1$ //$NON-NLS-2$
-		//.append("  ").append(PARAM_GUI).append(" \t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		.append("  ").append(PARAM_GUI).append(" \t\t (").append(CommandLineMessages.getString("CommandLineLauncher.23")).append(")\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		.append("  ").append(PARAM_INPUT).append(" inputfile\t (").append(CommandLineMessages.getString("CommandLineLauncher.13")).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		return sb.toString();

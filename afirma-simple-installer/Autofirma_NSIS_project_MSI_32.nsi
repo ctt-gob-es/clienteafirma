@@ -1,4 +1,4 @@
-;Incluimos el Modern UI
+Ôªø;Incluimos el Modern UI
   !include "MUI.nsh"
   !include "nsProcess.nsh"
   !include "Registry.nsh"
@@ -31,7 +31,7 @@ VIFileVersion "${FILE_VERSION}"
 VIAddVersionKey "ProductName" "Autofirma"
 VIAddVersionKey "ProductVersion" "${VERSION}"
 VIAddVersionKey "FileVersion" "${VERSION}"
-VIAddVersionKey "LegalCopyright" "(C) Gobierno de EspaÒa"
+VIAddVersionKey "LegalCopyright" "(C) Gobierno de Espa√±a"
 VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
 
 ;--------------------------------
@@ -117,7 +117,7 @@ Var USE_SYSTEM_JRE
 InstallDir "$PROGRAMFILES\Autofirma"
 
 ;Mensaje que mostraremos para indicarle al usuario que seleccione un directorio
-DirText "Elija un directorio donde instalar la aplicaciÛn:"
+DirText "Elija un directorio donde instalar la aplicaci√≥n:"
 
 ;Indicamos que cuando la instalacion se complete no se cierre el instalador automaticamente
 AutoCloseWindow false
@@ -482,7 +482,7 @@ Function AddCertificateToStore
       System::Call "crypt32::CertCloseStore(i r1, i 0)"
     ${Else}
       System::Call "crypt32::CertFreeCertificateContext(i r0)"
-      StrCpy $0 "No fue posible abrir el almacÈn de certificados"
+      StrCpy $0 "No fue posible abrir el almac√©n de certificados"
     ${EndIf}
   ${Else}
     StrCpy $0 "No fue posible abrir el fichero de certificados"
@@ -523,8 +523,8 @@ Function DeleteCertificateOnInstall
                   i ${CERT_NAME_ISSUER_FLAG}, i 0, \\
                   t .r4, i ${NSIS_MAX_STRLEN}) i.r3"
                ${If} $3 != 0
-				  ;Si el emisor es el Autofirma ROOT
-                  ${If} $4 == "Autofirma ROOT"
+				  ;Si el emisor es el AutoFirma ROOT
+                  ${If} $4 == "AutoFirma ROOT"
                     System::Call "crypt32::CertDuplicateCertificateContext(i r2) i.r5"
 				    System::Call "crypt32::CertDeleteCertificateFromStore(i r5)"
 				  ${EndIf}
@@ -702,7 +702,7 @@ Function AddToPath
   System::Call "advapi32::RegQueryValueEx(i $3, t'PATH', i 0, i 0, t.r1, *i ${NSIS_MAX_STRLEN} r2) i.r4"
   System::Call "advapi32::RegCloseKey(i $3)"
   IntCmp $4 234 0 +3 +3 ; $4 == ERROR_MORE_DATA
-    DetailPrint "El PATH es demasiado largo. No se le agregar· la ruta de AutoAfirma."
+    DetailPrint "El PATH es demasiado largo. No se le agregar√° la ruta de AutoAfirma."
     Goto done
   IntCmp $4 0 +5 ; $4 != NO_ERROR
     IntCmp $4 2 +3 ; $4 != ERROR_FILE_NOT_FOUND
@@ -726,7 +726,7 @@ Function AddToPath
   IntOp $2 $2 + $3
   IntOp $2 $2 + 2 ; $2 = strlen(dir) + strlen(PATH) + sizeof(";")
   IntCmp $2 ${NSIS_MAX_STRLEN} +3 +3 0
-    DetailPrint "La ruta de Autofirma hace que el PATH sea demasiado largo. No se agregar·"
+    DetailPrint "La ruta de Autofirma hace que el PATH sea demasiado largo. No se agregar√°"
     Goto done
   ; Append dir to PATH
   DetailPrint "Agregamos al PATH: $0"

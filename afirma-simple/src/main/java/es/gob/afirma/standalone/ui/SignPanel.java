@@ -78,8 +78,8 @@ import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
-import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.DataAnalizerUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -410,6 +410,12 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
      	final File[] dataFiles = filterFiles(files);
      	if (dataFiles == null || dataFiles.length == 0) {
      		LOGGER.warning("No se ha cargado ningun fichero valido"); //$NON-NLS-1$
+    		AOUIFactory.showErrorMessage(
+    				SimpleAfirmaMessages.getString("SimpleAfirma.12"), //$NON-NLS-1$,
+    				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+    				JOptionPane.ERROR_MESSAGE,
+    				null
+    			);
      	}
      	else {
      		final List<SignOperationConfig> configs = new ArrayList<>();
@@ -929,6 +935,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        getSelectButton().addActionListener(arg0 -> {
 				final File[] files;
 				try {
+
 			        files = AOUIFactory.getLoadFiles(
 			    		SimpleAfirmaMessages.getString("SignPanel.35"), //$NON-NLS-1$
 			    		null,

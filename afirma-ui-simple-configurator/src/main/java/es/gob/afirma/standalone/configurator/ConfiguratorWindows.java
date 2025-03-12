@@ -49,6 +49,12 @@ final class ConfiguratorWindows implements Configurator {
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 	private static final String CA_CERT_FILENAME = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 
+	/**
+	 * N&uacute;mero de veces que se intentar&aacute; desinstalar el certificado del almac&eacute;n
+	 * de Firefox cuando sea necesario hacerlo.
+	 */
+	private static final int UNINSTALL_CERT_RETRIES = 3;
+
 	private final boolean jnlpInstance;
 	private final boolean firefoxSecurityRoots;
 	private final String certificatePath;
@@ -130,6 +136,11 @@ final class ConfiguratorWindows implements Configurator {
 					}
 				}
 
+				// Intentamos desinstalar cualquier certificado nuestro que pueda haber antes de instalar el nuevo
+				window.print(Messages.getString("ConfiguratorWindows.26")); //$NON-NLS-1$
+				ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(appDir, window, UNINSTALL_CERT_RETRIES);
+
+				// Instalamos el certificado de CA en el almacen de confianza de Firefox
 				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
 				try {
 					ConfiguratorFirefoxWindows.installCACertOnMozillaKeyStores(appDir, window);
@@ -203,7 +214,8 @@ final class ConfiguratorWindows implements Configurator {
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(
 				getApplicationDirectory(this.jnlpInstance),
-				console);
+				console,
+				UNINSTALL_CERT_RETRIES);
 
 		// Listamos los plugins instalados
 		List<AfirmaPlugin> plugins = null;
