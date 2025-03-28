@@ -12,18 +12,13 @@
 	<meta http-equiv="Cache-Control" content="no-cache,no-store">
 	<meta name="lang" content="es">
 	<meta name="author" content="Dirección General para el impulso de la Administración Electrónica">
-	<meta name="organization" content="Ministerio de Hacienda y Administraciones Públicas">
+	<meta name="organization" content="Ministerio para la Transformación Digital y de la Función Pública">
 	<meta name="locality" content="Madrid, España">
-	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, cliente firma, firma electrónica, certificado electrónico, CMS, CAdES, XAdES, XMLDSig">
-	<meta name="description" content="Firma móvil. Web de pruebas del Cliente @firma móvil ">
+	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, autofirma, firma electrónica, certificado electrónico, PAdES, CAdES, XAdES">
+	<meta name="description" content="Firma móvil. Web de pruebas de Autofirma App">
 
 	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript" defer="defer">
-		/* Indica si debe firmarse un fichero (true) o el formulario de la pagina (false) */ 
-		var firmarFichero;
-		var firmarDatosGenerados;
-		var firmarPdf;
-		var firmarFacturaE;
 		
 		var servletsBase = window.location.href.indexOf("/firmaMovil/") > 0
 				? window.location.href.substring(0, window.location.href.indexOf("/firmaMovil/") + "/firmaMovil/".length - 1)
@@ -40,8 +35,10 @@
 							"serverUrl=" + servletsBase + "/afirma-server-triphase-signer/SignatureService"
 							+ "\nfilters=nonexpired:";
 
+			var selectedTarget = getSelectedTarget().value;
+			
 			var dataB64 = null;
-			if (firmarDatosGenerados) {
+			if (selectedTarget === "generatedData") {
 				// Generamos una cadena de mas de 100.000 caracteres
 				var data = "1234567890";
 				for (var i = 0; i < 13; i++) {
@@ -49,15 +46,14 @@
 				}
 				
 				dataB64 = AutoScript.getBase64FromText(data.substring(0, data.length - 2));
-
 			}
-			else if (firmarPdf) {
+			else if (selectedTarget === "pdfDocument") {
 				dataB64 = "JVBERi0xLjQKJcfsj6IKNSAwIG9iago8PC9MZW5ndGggNiAwIFIvRmlsdGVyIC9GbGF0ZURlY29kZT4+CnN0cmVhbQp4nE2MTQuCQBCGSVNzDKt/MEc7OK2zsR/XIDoXe/RmFAQr2P8/tGsEzcvAC88zM6GgjlHE/MrgQeAl7BMmMCTjzOC/Dx5PDg43jZasQvcAQdZaadSMO2Qt6WhQK0ls0HloFkm6TLO82LsXtNwpslpi+z2/Q7Mqs36s1v07Kcq6jhIzB0djq4yYnwRr04/bvNpFfHZwDfkAAGkkGGVuZHN0cmVhbQplbmRvYmoKNiAwIG9iagoxNTUKZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9QYWdlL01lZGlhQm94IFswIDAgNTk1IDg0Ml0KL1JvdGF0ZSAwL1BhcmVudCAzIDAgUgovUmVzb3VyY2VzPDwvUHJvY1NldFsvUERGIC9UZXh0XQovRm9udCA5IDAgUgo+PgovQ29udGVudHMgNSAwIFIKPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFsKNCAwIFIKXSAvQ291bnQgMQo+PgplbmRvYmoKMSAwIG9iago8PC9UeXBlIC9DYXRhbG9nIC9QYWdlcyAzIDAgUgovTWV0YWRhdGEgMTIgMCBSCj4+CmVuZG9iago5IDAgb2JqCjw8L1I3CjcgMCBSPj4KZW5kb2JqCjcgMCBvYmoKPDwvQmFzZUZvbnQvVFdQV0FWK0x1Y2lkYUNvbnNvbGUvRm9udERlc2NyaXB0b3IgOCAwIFIvVHlwZS9Gb250Ci9GaXJzdENoYXIgMS9MYXN0Q2hhciAxNy9XaWR0aHNbIDYwMyA2MDMgNjAzIDYwMyA2MDMgNjAzIDYwMyA2MDMgNjAzIDYwMyA2MDMgNjAzIDYwMyA2MDMgNjAzCjYwMyA2MDNdCi9FbmNvZGluZyAxMSAwIFIvU3VidHlwZS9UcnVlVHlwZT4+CmVuZG9iagoxMSAwIG9iago8PC9UeXBlL0VuY29kaW5nL0Jhc2VFbmNvZGluZy9XaW5BbnNpRW5jb2RpbmcvRGlmZmVyZW5jZXNbCjEvVS9uL3QvaS9sL2UvZC9IL28vYS9zcGFjZS9NL3UvZXhjbGFtL1AvZwovb25lXT4+CmVuZG9iago4IDAgb2JqCjw8L1R5cGUvRm9udERlc2NyaXB0b3IvRm9udE5hbWUvVFdQV0FWK0x1Y2lkYUNvbnNvbGUvRm9udEJCb3hbMCAtMjA1IDU3NiA3NzBdL0ZsYWdzIDQKL0FzY2VudCA3NzAKL0NhcEhlaWdodCA2MjYKL0Rlc2NlbnQgLTIwNQovSXRhbGljQW5nbGUgMAovU3RlbVYgODYKL01pc3NpbmdXaWR0aCA2MDIKL1hIZWlnaHQgNTQxCi9Gb250RmlsZTIgMTAgMCBSPj4KZW5kb2JqCjEwIDAgb2JqCjw8L0ZpbHRlci9GbGF0ZURlY29kZQovTGVuZ3RoMSA1MDQ0L0xlbmd0aCAyNjExPj5zdHJlYW0KeJztWH9wVMUd/+7ue+9+5+17ubvchYS7SwjERgzmcgkJZ3JAAk4IJESJRDkkIEhGgWggEwgjAaWloEjrgUI7GmuLPxCB1lFiZxxkEmppLBp+jCNpgGksHZyU4FRTgffS77vEZGhr1b/6R9nP7b7bfXvf/eznu/t9bw8IADigBRhUVtyVnQPxpFZiUb1kRW39UJ2fAiALljSu9k8/NXsrNnRj/vuy+gdX3Db3OMN7H2I99cGH1y4b6s9yAczLly+tfeDdVYnTARLXY2Oe0WAbJ76L/fuxPm75itVNw+O9gsWbD69aUjtUt/0cQMxbUdtULxSSAQDqxEb/ytoVS4f7TzLq9asaVg/VExfE648urXefLnsQ++P4oAMMXsB8EfNZkYlpQpFQLb4v9klZUom+Rl8AHdAFMWiTKuHA4HAS34ceqYRMG/yOCX4MLw5/Ow4DYi7sh9fht/AKvCNkgJe8BD2QAwPUB7tIPTTDErqX9uofwxaSSaZi66+gEPbCfloHb0IW/naB3gbroRxWwWPQBj+CXtgHG+geqQQGSKbQSjdCGf2EMbQ8lWTCAGyBV6ikV+IMPoA62AlNh3zyren+rVtLK+cHAmNKS2om3jqran5pyZhAoGaiIRX6W6rU0b/CSaMqdBktNyRitNA90ARjoRREoMDBDbvwzkmcJQMSmZFsfcB3b3m6r9ic7pMT0n0Oe7rPZs32WSWHTxQyfIxm+yzmsI9Ats8kZfuWLL5Xjt53Xl7YdF5uuu9uebbaKt+hHib+yBQ5rPbLUwrPy3epib653Osr4a3yo64ueTFfJN/Pz8vz8VqN17sxF2Eu5G/K+XjNCRq/l+Ug3yS7sJ6IWeGHSSQyRlb58zJXVZ+cUp9Sn9qSKvikVdILEsshbWQQzLPumn+QHCTbazY/ZXxtSa1paCBZ/57gP7RloQ7UkIx1iViACSCgBJQMLAjQLm0lrdLeEOEaRIQWo2cfFr24qkSwQDCSFIGpLaZpElCrCIxaIoxLEeq2coPHjMaaM55erVdRCwqguLgvWUu+fRJhSlCxkVDQRcd6OrwdA+QlqpFM/WON6dGeHvRVG3oxJvah/dxI0jyRCEyUTEQFQbJZTJwK8LX9UsN+d5hr3WhdC/MjHx6J3j4pGAooYihDCbjayDZ9Da0k22LChpp1bVdfjqH1GFovEhnYIBRJYqrVSkAkkhnAxAUzMBuuDfsoe7TaHdagOFwcxllka2ge6Qcwp2MZ66C+Y8e0CyLTTtDbr2q0SDtqrLeFOEYDjiHDssjUeWwNow5mZTZiswEZGkykVuamXpZhC9ma2JN2s8Nus1ImmsyyKWiWc3ZAKxyED0EANx9lE+3r1hQ1qSAKxe3F7QaheC1OiiCQVDpBKAv7SDIlroEXqX5ur36eiuz6Jea+qgmzrx9lE64dxz3Qixw3x3VIhGmRDFHISyhNqOF1fC3fxk32uDCqSiTcXooMdkMXZ5zJ9Lgu7bxbM1QfViWKouQkuV1OIZDuJUG/kjs+i/SSF8/df1T/nd63o5nsePZgu8gy7+4//hfdS5uJp3EZKrV78IJQgCxUyI4kzRCrRWoBSVRlYuNmyrlKVHfijfOHYq24HaecGFSc7mBOXgh94TRJgTSq7O7YuOO5H75esFa/dOUiTvmLzrff/ohJWtKVunPEjCuIwpbBPuF5oRp8kAnVkXzm5M5M2e+cLE9yRpzr5K3ybtlqLktLo6pDVS1edewElbI6ca1IU9zcAv5xiizOvIU3nvG093Ufade60RV9p64P6dD4Jw8Sy5DS08aHcsdNIaHc8elpplBeMMftipPNT8J7TEn3u4wam/6bX+98j9z65bpljfve7jp8Yt8PChOz1CXBn1ZN0R9aXr3x8V2vbXr1j9GGxYtenfXL3+sFi2daG/3ETdSzFYtwLhsGLwohKQsSwANTI7d4SYqnxMY8BOx2RbVYcJvcwVgCJzZPqXOekzoVkLhEJS8/E+2LdofDcSnxw+PbJhBCbjTE1WBOEkrKkLrk4siZ1e84dfj09c4D6zo6tj6x6elPX36m81My9kuSQGbHaN1Xp9ltsd4T+kZ8ZFJ4CjmVob4KcpoTydqlEFV1zHRQs1s1W2TUMsOR5yh1zHOsc7ZYJDXRAXYl0aGIHu+ol9HJxtqOGvQMXRuzPcYKQ139oORCMEdVXAE1kJNPAiGOLIWyD/bpf9VPksC5C6e1FDdpeuFdbQy1f9H4TFYJ8RO7Rmbon+t/LtafLidtKWT8awbTZn2BkCfcA14Yh0xDuwjxSinJpZylqgkWxZx+h5ky1SOXC6X++cI8/1J3g1tK5KLEk/0KPtC5jdoyUMnOvu729iPaEFlUE5WMJua7cQfkj+oZwiUqGWuUKHFZDe+fch16joQt6z9756z+hxf2tE2e3axf3UPObt6+ccdjjxzQd+6dRSa2XyBj+jFkzNy5/vrPTp6uepxlkH27zh/f9x7OYD+Gazf634jE4yMu02SpgKrMDFSabBE5NQKRlfdEO7VT8Z1ajCJiUMfoyIzgO9kIjT0D7LXYtaNi7sCA0X3UYmqEoy070LghjqNJvBtNGYa+NkMr9SitE5+NfXUaf/sWxpM09DyHmZGM1ewJRuUIWyQSsyMsGovRzC1lwDjncALjGgOPMhrDoxhOGrs9mhHWcD0mf5z8/lBQc+UF/V6MZ/GNpLzVseUSCXVURGO/EIo6e/WfaF56aMNDp7VC5FeHK68Ox7dBEkQiE6tMVTYasheqpfYyNUqrBElVJYtdBWZRQCayS+FsEqtkrUxgHmNHdEfj+8FwIImKaaBwXGlGOQFjTO6w22jdZf0yUf92mSj65cvbW1u3Y/aSbGLB+JKtf6T/Qx/QP4r1HOvo6ek41mNougl5zRFlZFUU8cuCT8gWigVBNql2c7FVcuGWSADRzrnFJHo8o5J0ho1HT3t8i+LXkbhiKI/uC7gCGFGSjJgizIltvfKGfoXIx8gF3Zc0vmRT81qSvP8KtccuXYppp6IzkiemIJODyCRFKEIP3RmZ8CQjQ/6h6B/GzWbCmSwTn1whH5CZbOUnTMR0g49QoUeGHoWjLiJKOoYNdNFQMM5XhJSOLZ/pnR1zFho+unYUI0U9vahVtDx0hh7DlwzXMGZ8C9Z8L7w8gq8MkPAIVn8DPjFAx9G1iE+MN9B4CiBq2f4RfC7k3sRN3MRN/O8QP8PS4VOtE5+cxpE2GTO+msPkufeUV9w5M6uqhE2aLwTLnPD/lQSYFi8FQ59+Bc/z0E+MEusClpNhLtwD5VABd8JMyIIqKEEFJ8F8vBuEMnDGexonA3zNAQnfpaF8zZK6B2r901etbFj18FLDLtmBb0Tm78joX/r1Q//gDQ3D/04IXWTojwkgff8deB7+PoiNYGEcvSPY/Q3YEscGeArRjNg/gregbgSb8DzKvmXu8blF4NDBA+/cL4e/ANuQGK8q61KN66GV8mYAvVLokoz/4+xfa/FPZDAv1QplbmRzdHJlYW0KZW5kb2JqCjEyIDAgb2JqCjw8L1R5cGUvTWV0YWRhdGEKL1N1YnR5cGUvWE1ML0xlbmd0aCAxNzQ3Pj5zdHJlYW0KPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4KPD9hZG9iZS14YXAtZmlsdGVycyBlc2M9IkNSTEYiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSdhZG9iZTpuczptZXRhLycgeDp4bXB0az0nWE1QIHRvb2xraXQgMi45LjEtMTMsIGZyYW1ld29yayAxLjYnPgo8cmRmOlJERiB4bWxuczpyZGY9J2h0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMnIHhtbG5zOmlYPSdodHRwOi8vbnMuYWRvYmUuY29tL2lYLzEuMC8nPgo8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0nNjYwZDVlMmEtN2NlMS0xMWRlLTAwMDAtZmQxNDgyNmJhZDIxJyB4bWxuczpwZGY9J2h0dHA6Ly9ucy5hZG9iZS5jb20vcGRmLzEuMy8nPjxwZGY6UHJvZHVjZXI+R1BMIEdob3N0c2NyaXB0IDguNjQ8L3BkZjpQcm9kdWNlcj4KPHBkZjpLZXl3b3Jkcz4oKTwvcGRmOktleXdvcmRzPgo8L3JkZjpEZXNjcmlwdGlvbj4KPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9JzY2MGQ1ZTJhLTdjZTEtMTFkZS0wMDAwLWZkMTQ4MjZiYWQyMScgeG1sbnM6eG1wPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvJz48eG1wOk1vZGlmeURhdGU+MjAwOS0wNy0yN1QxMDoxNjo0NSswMjowMDwveG1wOk1vZGlmeURhdGU+Cjx4bXA6Q3JlYXRlRGF0ZT4yMDA5LTA3LTI3VDEwOjE2OjQ1KzAyOjAwPC94bXA6Q3JlYXRlRGF0ZT4KPHhtcDpDcmVhdG9yVG9vbD5cMzc2XDM3N1wwMDBQXDAwMERcMDAwRlwwMDBDXDAwMHJcMDAwZVwwMDBhXDAwMHRcMDAwb1wwMDByXDAwMCBcMDAwVlwwMDBlXDAwMHJcMDAwc1wwMDBpXDAwMG9cMDAwblwwMDAgXDAwMDBcMDAwLlwwMDA5XDAwMC5cMDAwODwveG1wOkNyZWF0b3JUb29sPjwvcmRmOkRlc2NyaXB0aW9uPgo8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0nNjYwZDVlMmEtN2NlMS0xMWRlLTAwMDAtZmQxNDgyNmJhZDIxJyB4bWxuczp4YXBNTT0naHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLycgeGFwTU06RG9jdW1lbnRJRD0nNjYwZDVlMmEtN2NlMS0xMWRlLTAwMDAtZmQxNDgyNmJhZDIxJy8+CjxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSc2NjBkNWUyYS03Y2UxLTExZGUtMDAwMC1mZDE0ODI2YmFkMjEnIHhtbG5zOmRjPSdodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLycgZGM6Zm9ybWF0PSdhcHBsaWNhdGlvbi9wZGYnPjxkYzp0aXRsZT48cmRmOkFsdD48cmRmOmxpIHhtbDpsYW5nPSd4LWRlZmF1bHQnPlwzNzZcMzc3XDAwMEhcMDAwb1wwMDBtXDAwMGFcMDAwIFwwMDBNXDAwMHVcMDAwblwwMDBkXDAwMG88L3JkZjpsaT48L3JkZjpBbHQ+PC9kYzp0aXRsZT48ZGM6Y3JlYXRvcj48cmRmOlNlcT48cmRmOmxpPlwzNzZcMzc3XDAwMEFcMDAwZFwwMDBtXDAwMGlcMDAwblwwMDBpXDAwMHNcMDAwdFwwMDByXDAwMGFcMDAwdFwwMDBvXDAwMHI8L3JkZjpsaT48L3JkZjpTZXE+PC9kYzpjcmVhdG9yPjxkYzpkZXNjcmlwdGlvbj48cmRmOlNlcT48cmRmOmxpPigpPC9yZGY6bGk+PC9yZGY6U2VxPjwvZGM6ZGVzY3JpcHRpb24+PC9yZGY6RGVzY3JpcHRpb24+CjwvcmRmOlJERj4KPC94OnhtcG1ldGE+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKPD94cGFja2V0IGVuZD0ndyc/PgplbmRzdHJlYW0KZW5kb2JqCjIgMCBvYmoKPDwvUHJvZHVjZXIoR1BMIEdob3N0c2NyaXB0IDguNjQpCi9DcmVhdGlvbkRhdGUoRDoyMDA5MDcyNzEwMTY0NSswMicwMCcpCi9Nb2REYXRlKEQ6MjAwOTA3MjcxMDE2NDUrMDInMDAnKQovVGl0bGUoXDM3NlwzNzdcMDAwSFwwMDBvXDAwMG1cMDAwYVwwMDAgXDAwME1cMDAwdVwwMDBuXDAwMGRcMDAwbykKL0NyZWF0b3IoXDM3NlwzNzdcMDAwUFwwMDBEXDAwMEZcMDAwQ1wwMDByXDAwMGVcMDAwYVwwMDB0XDAwMG9cMDAwclwwMDAgXDAwMFZcMDAwZVwwMDByXDAwMHNcMDAwaVwwMDBvXDAwMG5cMDAwIFwwMDAwXDAwMC5cMDAwOVwwMDAuXDAwMDgpCi9BdXRob3IoXDM3NlwzNzdcMDAwQVwwMDBkXDAwMG1cMDAwaVwwMDBuXDAwMGlcMDAwc1wwMDB0XDAwMHJcMDAwYVwwMDB0XDAwMG9cMDAwcikKL0tleXdvcmRzKCkKL1N1YmplY3QoKT4+ZW5kb2JqCnhyZWYKMCAxMwowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDA0NTkgMDAwMDAgbiAKMDAwMDAwNTYzMiAwMDAwMCBuIAowMDAwMDAwNDAwIDAwMDAwIG4gCjAwMDAwMDAyNTkgMDAwMDAgbiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMjQwIDAwMDAwIG4gCjAwMDAwMDA1NTMgMDAwMDAgbiAKMDAwMDAwMDg5NiAwMDAwMCBuIAowMDAwMDAwNTI0IDAwMDAwIG4gCjAwMDAwMDExMTQgMDAwMDAgbiAKMDAwMDAwMDc3MCAwMDAwMCBuIAowMDAwMDAzODA4IDAwMDAwIG4gCnRyYWlsZXIKPDwgL1NpemUgMTMgL1Jvb3QgMSAwIFIgL0luZm8gMiAwIFIKL0lEIFs8Nzk1MkQ0QjRFN0JGQTI0Mjc1OEM3RDdDM0U0MEE5Mjk+PDc5NTJENEI0RTdCRkEyNDI3NThDN0Q3QzNFNDBBOTI5Pl0KPj4Kc3RhcnR4cmVmCjYwNjcKJSVFT0YK";
 			}
-			else if (firmarFacturaE) {
+			else if (selectedTarget === "facturaEDocument") {
 				dataB64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI_PjxmZTpGYWN0dXJhZSB4bWxuczpkcz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC8wOS94bWxkc2lnIyIgeG1sbnM6ZmU9Imh0dHA6Ly93d3cuZmFjdHVyYWUuZXMvRmFjdHVyYWUvMjAwNy92My4xL0ZhY3R1cmFlIj48RmlsZUhlYWRlcj48U2NoZW1hVmVyc2lvbj4zLjE8L1NjaGVtYVZlcnNpb24-PE1vZGFsaXR5Pkk8L01vZGFsaXR5PjxJbnZvaWNlSXNzdWVyVHlwZT5SRTwvSW52b2ljZUlzc3VlclR5cGU-PEJhdGNoPjxCYXRjaElkZW50aWZpZXI-QTEwMDAwMDAwMDAwPC9CYXRjaElkZW50aWZpZXI-PEludm9pY2VzQ291bnQ-MTwvSW52b2ljZXNDb3VudD48VG90YWxJbnZvaWNlc0Ftb3VudD48VG90YWxBbW91bnQ-NDcyMC4wMDwvVG90YWxBbW91bnQ-PC9Ub3RhbEludm9pY2VzQW1vdW50PjxUb3RhbE91dHN0YW5kaW5nQW1vdW50PjxUb3RhbEFtb3VudD40NzIwLjAwPC9Ub3RhbEFtb3VudD48L1RvdGFsT3V0c3RhbmRpbmdBbW91bnQ-PFRvdGFsRXhlY3V0YWJsZUFtb3VudD48VG90YWxBbW91bnQ-NDcyMC4wMDwvVG90YWxBbW91bnQ-PC9Ub3RhbEV4ZWN1dGFibGVBbW91bnQ-PEludm9pY2VDdXJyZW5jeUNvZGU-RVVSPC9JbnZvaWNlQ3VycmVuY3lDb2RlPjwvQmF0Y2g-PC9GaWxlSGVhZGVyPjxQYXJ0aWVzPjxTZWxsZXJQYXJ0eT48VGF4SWRlbnRpZmljYXRpb24-PFBlcnNvblR5cGVDb2RlPko8L1BlcnNvblR5cGVDb2RlPjxSZXNpZGVuY2VUeXBlQ29kZT5SPC9SZXNpZGVuY2VUeXBlQ29kZT48VGF4SWRlbnRpZmljYXRpb25OdW1iZXI-QTAwMDAwMDAxPC9UYXhJZGVudGlmaWNhdGlvbk51bWJlcj48L1RheElkZW50aWZpY2F0aW9uPjxMZWdhbEVudGl0eT48Q29ycG9yYXRlTmFtZT50ZXN0PC9Db3Jwb3JhdGVOYW1lPjxBZGRyZXNzSW5TcGFpbj48QWRkcmVzcz5DLyB0ZXN0IHN0cmVldCBuwroxMTQ8L0FkZHJlc3M-PFBvc3RDb2RlPjI4MDAxPC9Qb3N0Q29kZT48VG93bj5NYWRyaWQ8L1Rvd24-PFByb3ZpbmNlPk1hZHJpZDwvUHJvdmluY2U-PENvdW50cnlDb2RlPkVTUDwvQ291bnRyeUNvZGU-PC9BZGRyZXNzSW5TcGFpbj48L0xlZ2FsRW50aXR5PjwvU2VsbGVyUGFydHk-PEJ1eWVyUGFydHk-PFRheElkZW50aWZpY2F0aW9uPjxQZXJzb25UeXBlQ29kZT5KPC9QZXJzb25UeXBlQ29kZT48UmVzaWRlbmNlVHlwZUNvZGU-UjwvUmVzaWRlbmNlVHlwZUNvZGU-PFRheElkZW50aWZpY2F0aW9uTnVtYmVyPlMxMDAwMDAxQTwvVGF4SWRlbnRpZmljYXRpb25OdW1iZXI-PC9UYXhJZGVudGlmaWNhdGlvbj48TGVnYWxFbnRpdHk-PENvcnBvcmF0ZU5hbWU-RW1wcmVzYTwvQ29ycG9yYXRlTmFtZT48QWRkcmVzc0luU3BhaW4-PEFkZHJlc3M-RGlyZWNjacOzbjwvQWRkcmVzcz48UG9zdENvZGU-MjgwMDI8L1Bvc3RDb2RlPjxUb3duPk1hZHJpZDwvVG93bj48UHJvdmluY2U-TWFkcmlkPC9Qcm92aW5jZT48Q291bnRyeUNvZGU-RVNQPC9Db3VudHJ5Q29kZT48L0FkZHJlc3NJblNwYWluPjwvTGVnYWxFbnRpdHk-PC9CdXllclBhcnR5PjwvUGFydGllcz48SW52b2ljZXM-PEludm9pY2U-PEludm9pY2VIZWFkZXI-PEludm9pY2VOdW1iZXI-MTAwPC9JbnZvaWNlTnVtYmVyPjxJbnZvaWNlU2VyaWVzQ29kZT5BMTAwMDwvSW52b2ljZVNlcmllc0NvZGU-PEludm9pY2VEb2N1bWVudFR5cGU-RkM8L0ludm9pY2VEb2N1bWVudFR5cGU-PEludm9pY2VDbGFzcz5PTzwvSW52b2ljZUNsYXNzPjwvSW52b2ljZUhlYWRlcj48SW52b2ljZUlzc3VlRGF0YT48SXNzdWVEYXRlPjIwMTItMDItMjA8L0lzc3VlRGF0ZT48SW52b2ljZUN1cnJlbmN5Q29kZT5FVVI8L0ludm9pY2VDdXJyZW5jeUNvZGU-PFRheEN1cnJlbmN5Q29kZT5FVVI8L1RheEN1cnJlbmN5Q29kZT48TGFuZ3VhZ2VOYW1lPmVzPC9MYW5ndWFnZU5hbWU-PC9JbnZvaWNlSXNzdWVEYXRhPjxUYXhlc091dHB1dHM-PFRheD48VGF4VHlwZUNvZGU-MDE8L1RheFR5cGVDb2RlPjxUYXhSYXRlPjE4LjAwPC9UYXhSYXRlPjxUYXhhYmxlQmFzZT48VG90YWxBbW91bnQ-NDAwMC4wMDwvVG90YWxBbW91bnQ-PC9UYXhhYmxlQmFzZT48VGF4QW1vdW50PjxUb3RhbEFtb3VudD43MjAuMDA8L1RvdGFsQW1vdW50PjwvVGF4QW1vdW50PjwvVGF4PjwvVGF4ZXNPdXRwdXRzPjxJbnZvaWNlVG90YWxzPjxUb3RhbEdyb3NzQW1vdW50PjQwMDAuMDA8L1RvdGFsR3Jvc3NBbW91bnQ-PFRvdGFsR3Jvc3NBbW91bnRCZWZvcmVUYXhlcz40MDAwLjAwPC9Ub3RhbEdyb3NzQW1vdW50QmVmb3JlVGF4ZXM-PFRvdGFsVGF4T3V0cHV0cz43MjAuMDA8L1RvdGFsVGF4T3V0cHV0cz48VG90YWxUYXhlc1dpdGhoZWxkPjAuMDA8L1RvdGFsVGF4ZXNXaXRoaGVsZD48SW52b2ljZVRvdGFsPjQ3MjAuMDA8L0ludm9pY2VUb3RhbD48VG90YWxPdXRzdGFuZGluZ0Ftb3VudD40NzIwLjAwPC9Ub3RhbE91dHN0YW5kaW5nQW1vdW50PjxUb3RhbEV4ZWN1dGFibGVBbW91bnQ-NDcyMC4wMDwvVG90YWxFeGVjdXRhYmxlQW1vdW50PjwvSW52b2ljZVRvdGFscz48SXRlbXM-PEludm9pY2VMaW5lPjxJdGVtRGVzY3JpcHRpb24-bMOtbmVhIDEgZGVsIGNvbmNlcHRvICA8L0l0ZW1EZXNjcmlwdGlvbj48UXVhbnRpdHk-MS4wPC9RdWFudGl0eT48VW5pdE9mTWVhc3VyZT4wMTwvVW5pdE9mTWVhc3VyZT48VW5pdFByaWNlV2l0aG91dFRheD4xMDAwLjAwMDAwMDwvVW5pdFByaWNlV2l0aG91dFRheD48VG90YWxDb3N0PjEwMDAuMDA8L1RvdGFsQ29zdD48R3Jvc3NBbW91bnQ-MTAwMC4wMDwvR3Jvc3NBbW91bnQ-PFRheGVzT3V0cHV0cz48VGF4PjxUYXhUeXBlQ29kZT4wMTwvVGF4VHlwZUNvZGU-PFRheFJhdGU-MTguMDA8L1RheFJhdGU-PFRheGFibGVCYXNlPjxUb3RhbEFtb3VudD4xMDAwLjAwPC9Ub3RhbEFtb3VudD48L1RheGFibGVCYXNlPjxUYXhBbW91bnQ-PFRvdGFsQW1vdW50PjE4MC4wMDwvVG90YWxBbW91bnQ-PC9UYXhBbW91bnQ-PC9UYXg-PC9UYXhlc091dHB1dHM-PC9JbnZvaWNlTGluZT48SW52b2ljZUxpbmU-PEl0ZW1EZXNjcmlwdGlvbj5sw61uZWEgMiBkZWwgY29uY2VwdG8gPC9JdGVtRGVzY3JpcHRpb24-PFF1YW50aXR5PjIuMDwvUXVhbnRpdHk-PFVuaXRPZk1lYXN1cmU-MDE8L1VuaXRPZk1lYXN1cmU-PFVuaXRQcmljZVdpdGhvdXRUYXg-MTUwMC4wMDAwMDA8L1VuaXRQcmljZVdpdGhvdXRUYXg-PFRvdGFsQ29zdD4zMDAwLjAwPC9Ub3RhbENvc3Q-PEdyb3NzQW1vdW50PjMwMDAuMDA8L0dyb3NzQW1vdW50PjxUYXhlc091dHB1dHM-PFRheD48VGF4VHlwZUNvZGU-MDE8L1RheFR5cGVDb2RlPjxUYXhSYXRlPjE4LjAwPC9UYXhSYXRlPjxUYXhhYmxlQmFzZT48VG90YWxBbW91bnQ-MzAwMC4wMDwvVG90YWxBbW91bnQ-PC9UYXhhYmxlQmFzZT48VGF4QW1vdW50PjxUb3RhbEFtb3VudD41NDAuMDA8L1RvdGFsQW1vdW50PjwvVGF4QW1vdW50PjwvVGF4PjwvVGF4ZXNPdXRwdXRzPjwvSW52b2ljZUxpbmU-PC9JdGVtcz48L0ludm9pY2U-PC9JbnZvaWNlcz48L2ZlOkZhY3R1cmFlPg==";
 			}
-			else if (!firmarFichero) {
+			else if (selectedTarget === "formData") {
 				var serializedForm = "fNif=" + encodeURIComponent(document.getElementById("fNif").value) + "&" +
 					"fNombre=" + encodeURIComponent(document.getElementById("fNombre").value);
 				dataB64 = AutoScript.getBase64FromText(serializedForm);
@@ -149,89 +145,64 @@
 			document.getElementById("targetFile").style.display = "inline";
 			document.getElementById("targetFileText").style.display = "inline";
 			document.getElementById("targetFile").checked = "checked";
-			firmarFichero = true;
-			firmarDatosGenerados = false;
-			firmarPdf = false;
-			firmarFacturaE = false;
 			
 			if (AutoScript.isIOS()) {
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4";
-				storeLink.innerHTML = "Descargue el Cliente @firma iOS";
+				storeLink.innerHTML = "Descargue Autofirma App iOS";
 				
 				document.getElementById("faq_link").style.display = "none";
 			}
 			else if (AutoScript.isAndroid()) {
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://play.google.com/store/apps/details?id=es.gob.afirma";
-				storeLink.innerHTML = "Descargue el Cliente @firma Android";
+				storeLink.innerHTML = "Descargue Autofirma App Android";
 
 				document.getElementById("faq_link").style.display = "none";
 			}
 		}
 		
 		function mostrarFormulario(form) {
-			if (form == "fileData") {
-				firmarFichero = true;
-				firmarDatosGenerados = false;
-				firmarPdf = false;
-				firmarFacturaE = false;
-				document.getElementById("formulario").style.display = "none";
-			} else if (form == "generatedData") {
-				firmarFichero = false;
-				firmarDatosGenerados = true;
-				firmarPdf = false;
-				firmarFacturaE = false;
-				document.getElementById("formulario").style.display = "none";
-			} else if (form == "pdfDocument") {
-				firmarFichero = false;
-				firmarDatosGenerados = false;
-				firmarPdf = true;
-				firmarFacturaE = false;
-				document.getElementById("formulario").style.display = "none";
-			} else if (form == "facturaEDocument") {
-				firmarFichero = false;
-				firmarDatosGenerados = false;
-				firmarPdf = false;
-				firmarFacturaE = true;
-				document.getElementById("formulario").style.display = "none";
-			} else {
-				firmarFichero = false;
-				firmarDatosGenerados = false;
-				firmarPdf = false;
-				document.getElementById("formulario").style.display = "block";
-			}
+			document.getElementById("formulario").style.display = form === "formData" ? "block" : "none";
 		}
 		
 		function actualizarFuenteDatos(value) {
 
 			// Identificamos si debemos ocultar o mostrar los tipos de datos no PDF
 			var pdfSignatureFormat = value == "PAdES" || value == "PAdEStri";
-			var displayNoPdf = pdfSignatureFormat ? "none" : "inline";
+			var facturaeSignatureFormat = value == "FacturaE" || value == "FacturaEtri";
 
-			// Si la firma es PDF, aseguramos de que se seleccione un tipo de datos compatible si
-			// estaba seleccionado uno que no lo era
-			if (pdfSignatureFormat) {
-				if (document.getElementById("targetGeneratedData").checked
-						|| document.getElementById("targetFacturaEDocument").checked
-						|| document.getElementById("targetFormData").checked) {
-					document.getElementById("targetFile").checked = "checked";
-					firmarFichero = true;
-					firmarDatosGenerados = false;
-					firmarPdf = false;
-					firmarFacturaE = false;
-				}
+			// Establecemos la visibilidad de los tipos de datos que no soportan la firma PDF
+			document.getElementById("targetGeneratedData").style.display = pdfSignatureFormat || facturaeSignatureFormat ? "none" : "inline";
+			document.getElementById("targetGeneratedDataText").style.display = pdfSignatureFormat || facturaeSignatureFormat ? "none" : "inline";
+			document.getElementById("targetFacturaEDocument").style.display = pdfSignatureFormat  ? "none" : "inline";
+			document.getElementById("targetFacturaEDocumentText").style.display = pdfSignatureFormat  ? "none" : "inline";
+			document.getElementById("targetPdfDocument").style.display = facturaeSignatureFormat ? "none" : "inline";
+			document.getElementById("targetPdfDocumentText").style.display = facturaeSignatureFormat ? "none" : "inline";
+			document.getElementById("targetFormData").style.display = pdfSignatureFormat || facturaeSignatureFormat ? "none" : "inline";
+			document.getElementById("targetFormDataText").style.display = pdfSignatureFormat || facturaeSignatureFormat ? "none" : "inline";
+			if (pdfSignatureFormat || facturaeSignatureFormat) {
+				document.getElementById("formulario").style.display = "none";
 			}
 			
-			// Establecemos la visibilidad de los tipos de datos que no soportan la firma PDF
-			document.getElementById("targetGeneratedData").style.display = displayNoPdf;
-			document.getElementById("targetGeneratedDataText").style.display = displayNoPdf;
-			document.getElementById("targetFacturaEDocument").style.display = displayNoPdf;
-			document.getElementById("targetFacturaEDocumentText").style.display = displayNoPdf;
-			document.getElementById("targetFormData").style.display = displayNoPdf;
-			document.getElementById("targetFormDataText").style.display = displayNoPdf;
-			
+			// Si el tipo de datos seleccionado ha quedado oculto, seleccionamos el tipo fichero
+			var selectedTarget = getSelectedTarget();
+			if (!selectedTarget || selectedTarget.style.display == "none") {
+				document.getElementById("targetFile").checked = "checked";
+			}
 
+		}
+		
+		function getSelectedTarget() {
+
+			var selectedTarget = null; 
+			var targets = document.getElementsByName('formTarget');
+			for (var i = 0; i < targets.length && !selectedTarget; ++i){
+			      if (targets[i].checked){
+			    	  selectedTarget = targets[i];
+			      }
+			}
+			return selectedTarget;
 		}
 		
 		function mostrarDialogoEspera() {
@@ -252,8 +223,8 @@
 			
 
 <div class="cabecera">
-	<a title="Cliente Afirma" class="floatLeft">
-		<img src="img/logo_cliente.png" alt="Cliente @firma" title="Ciente @firma" style="width: 180px; height: 57px; margin-left: 26px; margin-top: 10px;">
+	<a title="Autofirma" class="floatLeft">
+		<img src="img/logo_autofirma.png" alt="Logo Autofirma" title="Ciente @firma" style="width: 211px; height: 50px; margin-left: 26px; margin-top: 10px;">
 	</a>
 	<a href="https://www.lamoncloa.gob.es/" title="Gobierno de España">
 		<img src="img/logoGobEsp.PNG" alt="www.lamoncloa.gob.es" title="Gobierno de España" class="logoGobEsp">
@@ -276,7 +247,7 @@
 <form id="sede">
 	<h2>
 		<img src="img/icon_realizarFirma.png" alt="validar sede" class="VASub VANormalIE7">
-		<span>Realizar Firma Electr&oacute;nica (Firm@Movil)</span>
+		<span>Realizar Firma Electr&oacute;nica (Autofirma App)</span>
 	</h2>
 	<p>Una firma electr&oacute;nica es un conjunto de datos asociados a un mensaje que
  permite asegurar la identidad del firmante y la integridad del mensaje.</p>
@@ -284,7 +255,7 @@
 	<fieldset style="background-color: rgb(252,252,252)">
 	<div id="divmensaje"></div>
 	<div id="divguardar"></div>
-	<p>Esta p&aacute;gina le permitir&aacute; probar la operaci&oacute;n de firma del cliente m&oacute;vil al firmar un fichero localizado en su dispositivo m&oacute;vil, datos de ejemplo o un formulario web simple:</p><br/>
+	<p>Esta p&aacute;gina le permitir&aacute; probar la operaci&oacute;n de firma de Autofirma App al firmar un fichero localizado en su dispositivo m&oacute;vil, datos de ejemplo o un formulario web simple:</p><br/>
 
 	<div class="lblAnchoMaxMB">
 			<span>1. <a id="afirmaStoreLink" href="http://firmaelectronica.gob.es/Home/Descargas.html">Descargue Autofirma</a></span>
@@ -316,7 +287,7 @@
 			<span><input name="formTarget" value="fileData" id="targetFile" onclick="javascript:mostrarFormulario(this.value);" type="radio" checked="checked" /><span id="targetFileText">Fichero</span><br></span>
 			<input name="formTarget" value="generatedData" id="targetGeneratedData" onclick="javascript:mostrarFormulario(this.value);" type="radio" /><span id="targetGeneratedDataText">Datos generados (No PDF)<br></span>
 			<input name="formTarget" value="facturaEDocument" id="targetFacturaEDocument" onclick="javascript:mostrarFormulario(this.value);" type="radio" /><span id="targetFacturaEDocumentText">FacturaE<br></span>
-			<input name="formTarget" value="pdfDocument" id="targetPdfDocument" onclick="javascript:mostrarFormulario(this.value);" type="radio" />Documento PDF<br>
+			<input name="formTarget" value="pdfDocument" id="targetPdfDocument" onclick="javascript:mostrarFormulario(this.value);" type="radio" /><span id="targetPdfDocumentText">Documento PDF</span><br>
 			<input name="formTarget" value="formData" id="targetFormData" onclick="javascript:mostrarFormulario(this.value);" type="radio" /><span id="targetFormDataText">Formulario<br></span>
 		</div><br/>
 		<div id="formulario" style="display:none">
@@ -333,15 +304,6 @@
 	<br>
 	</fieldset>
 </form>
-
-	<div class="nota"><p>
-	Nota: La firma electrónica se realiza mediante una aplicaci&oacute;n firmada por la D.G. para Impulso de 
-la Administración Electrónica por su seguridad.
-	<a href="https://valide.redsara.es/valide/requisitos.html" class="enlace">
-		Pulsa aquí para ver los requisitos de funcionamiento
-	</a>
-	</p>
-	</div>
 
 </div>
 				</div>

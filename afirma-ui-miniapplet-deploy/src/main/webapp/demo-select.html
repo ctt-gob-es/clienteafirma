@@ -14,8 +14,8 @@
 	<meta name="author" content="Dirección General para el impulso de la Administración Electrónica">
 	<meta name="organization" content="Ministerio de Hacienda y Administraciones Públicas">
 	<meta name="locality" content="Madrid, España">
-	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, cliente firma, firma electrónica, certificado electrónico, CMS, CAdES, XAdES, XMLDSig">
-	<meta name="description" content="Firma móvil. Web de pruebas del Cliente @firma móvil ">
+	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, autofirma, firma electrónica, certificado electrónico, CMS, CAdES, XAdES, XMLDSig">
+	<meta name="description" content="Firma móvil. Web de pruebas de Autofirma">
 	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
@@ -71,14 +71,14 @@
 			if (AutoScript.isIOS()) {				
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4";
-				storeLink.innerHTML = "Descargue el Cliente @firma iOS";
+				storeLink.innerHTML = "Descargue Autofirma App iOS";
 				
 				document.getElementById("faq_link").style.display = "none";
 			}
 			else if (AutoScript.isAndroid()) {
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://play.google.com/store/apps/details?id=es.gob.afirma";
-				storeLink.innerHTML = "Descargue el Cliente @firma Android";
+				storeLink.innerHTML = "Descargue Autofirma App Android";
 
 				document.getElementById("faq_link").style.display = "none";
 			}
@@ -102,8 +102,8 @@
 			
 
 <div class="cabecera">
-	<a title="Cliente Afirma" class="floatLeft">
-		<img src="img/logo_cliente.png" alt="Cliente @firma" title="Ciente @firma" style="width: 180px; height: 57px; margin-left: 26px; margin-top: 10px;">
+	<a title="Autofirma" class="floatLeft">
+		<img src="img/logo_autofirma.png" alt="Logo Autofirma" title="Ciente @firma" style="width: 211px; height: 50px; margin-left: 26px; margin-top: 10px;">
 	</a>
 	<a href="https://www.lamoncloa.gob.es/" title="Gobierno de España">
 		<img src="img/logoGobEsp.PNG" alt="www.lamoncloa.gob.es" title="Gobierno de España" class="logoGobEsp">
@@ -152,15 +152,6 @@
 	<div id="divcert"></div>
 	</fieldset>
 </form>
-
-	<div class="nota"><p>
-	Nota: La selecci&oacute;n del certificado se realiza mediante una aplicaci&oacute;n firmada por la D.G. para Impulso de 
-la Administración Electrónica por su seguridad.
-	<a href="https://valide.redsara.es/valide/requisitos.html" class="enlace">
-		Pulsa aquí para ver los requisitos de funcionamiento
-	</a>
-	</p>
-	</div>
 
 </div>
 				</div>
