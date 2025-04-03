@@ -1,7 +1,10 @@
 package test.es.gob.afirma.signers.batch.server;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivateKey;
@@ -13,15 +16,17 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 
 public class TestBatchJson {
 
-	private static final String CERT_PATH = "PFActivoFirSHA1.pfx"; //$NON-NLS-1$
-	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
-	private static final String CERT_ALIAS = "fisico activo prueba"; //$NON-NLS-1$
+	private static final String CERT_PATH = "00_colegiado-hsm_revoked.p12"; //$NON-NLS-1$
+	private static final String CERT_PASS = "1234"; //$NON-NLS-1$
+	private static final String CERT_ALIAS = "nombre apellido1 apellido2  / num:1111"; //$NON-NLS-1$
 
-	private static final String BASE_URL = "http://appprueba:8080/afirma-server-triphase-signer/"; //$NON-NLS-1$
+	private static final String BASE_URL = "https://appprueba:8443/afirma-server-triphase-signer/"; //$NON-NLS-1$
 
 	private Certificate[] certChain;
 	private PrivateKey pk;
@@ -52,5 +57,38 @@ public class TestBatchJson {
 		final String result = BatchSigner.signJSON(batchB64, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
 
 		System.out.println("Resultado:\n" + result); //$NON-NLS-1$
+	}
+
+	@Test
+	@Ignore
+	public void testBatchWithCounterSigns() throws CertificateEncodingException, IOException, AOException {
+
+		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$
+		final String batchPostSignerUrl = BASE_URL + "postsign"; //$NON-NLS-1$
+
+
+		//final byte[] dataRef = readFile(new File("C:\\Users\\carlos.gamuci\\Desktop\\Entrada\\cofirma.csig"));
+		final byte[] dataRef = "cofirma.csig".getBytes();
+		final String dataRefB64 = Base64.encode(dataRef);
+
+		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"suboperation\":\"countersign\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"" + dataRefB64 + "\"}, "
+				+ "{\"id\":\"2\", \"datareference\":\"" + dataRefB64 + "\", \"format\":\"XAdES\", \"suboperation\":\"sign\", \"extraParams\":\"format=XAdES Detached\"}]}";
+		final String batchB64 = Base64.encode(batch.getBytes(StandardCharsets.UTF_8));
+
+		final String result = BatchSigner.signJSON(batchB64, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
+
+		System.out.println("Resultado:\n" + result); //$NON-NLS-1$
+	}
+
+	private static final byte[] readFile(final File dataFile) {
+		byte[] data;
+		try (InputStream is = new FileInputStream(dataFile)) {
+			data = AOUtil.getDataFromInputStream(is);
+		}
+		catch (final Exception e) {
+			e.printStackTrace();
+			data = null;
+		}
+		return data;
 	}
 }

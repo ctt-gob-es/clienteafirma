@@ -62,6 +62,7 @@ import es.gob.afirma.signers.cades.CAdESUtils;
 import es.gob.afirma.signers.multi.cades.CAdESMultiUtil;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
+import es.gob.afirma.triphase.signer.processors.TriPhaseUtil;
 
 /** Contrafirmador CAdES trif&aacute;sico.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -125,6 +126,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 
         for (final SignerInfo signerInfo : selectedSignerInfos) {
         	final String id = buildSignerInfoId(signerInfo);
+        	final String signatureId = TriPhaseUtil.getSignatureId(xParams);
         	final byte[] preSignature = generateSignedAttributes(signerInfo, algorithm, certChain[0], xParams, date);
 
         	// Componemos la operacion de firma trifasica individual
@@ -132,7 +134,7 @@ public final class AOCAdESTriPhaseCounterSigner {
         	triParams.put(TRIPHASE_PARAM_NEED_PRE, Boolean.TRUE.toString());
         	triParams.put(TRIPHASE_PARAM_PRE, Base64.encode(preSignature, false));
 
-        	triphaseData.addSignOperation(new TriSign(triParams, id));
+        	triphaseData.addSignOperation(new TriSign(triParams, id, signatureId));
         }
 
         // Devolvemos el conjunto de contrafirmas
