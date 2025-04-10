@@ -177,8 +177,8 @@ final class XAdESTriPhaseSignerUtil {
 					: new String(xml));
 
 		final List<NodeDelimiter> delits = cleanContentDelimiters(
-			XAdESTriPhaseSignerUtil.getCommonContentDelimiters(
-				XAdESTriPhaseSignerUtil.getInmutableReferences(doc),
+			getCommonContentDelimiters(
+				getInmutableReferences(doc),
 				doc
 			),
 			ret
@@ -222,7 +222,7 @@ final class XAdESTriPhaseSignerUtil {
 					orDel.indexOf(' ')
 				);
 
-				// Obtenemos todo los indices de ocurrencias del texto de inicio del nodo, por
+				// Obtenemos todos los indices de ocurrencias del texto de inicio del nodo, por
 				// si hay varias ocurrencias
 				final List<Integer> indexes = new ArrayList<>();
 				for (int index = orXml.indexOf(nodeStart); index >= 0; index = orXml.indexOf(nodeStart, index + 1)) {
@@ -320,13 +320,47 @@ final class XAdESTriPhaseSignerUtil {
 	private static ContentDelimited getContent(final StringBuilder text, final NodeDelimiter delimiter) {
 		final String openTag = delimiter.getOpenTag();
 		final String closeTag = delimiter.getCloseTag();
+		final String nodeName = delimiter.getNodeName();
 
 		final int openTagIdx = text.indexOf(openTag);
-		final String content = text.substring(
-				openTagIdx + openTag.length(),
-				text.indexOf(closeTag, openTagIdx + openTag.length()));
+		final int contentIdx = openTagIdx + openTag.length();
+		int closeTagIdx = text.indexOf(closeTag, contentIdx);
+
+		// Nos aseguramos de que no hay ningun nodo intermedio que nos lleve
+		// a tomar el tag de cierre equivocado
+		int intElementIdx = findOpenTag(text, nodeName, contentIdx);
+		while (intElementIdx > -1 && intElementIdx < closeTagIdx) {
+			// Buscamos el siguiente nodo de cierre
+			closeTagIdx = text.indexOf(closeTag, closeTagIdx + closeTag.length());
+			// Buscamos nuevos nodos de inicio antes de ese nodo de cierre
+			intElementIdx = findOpenTag(text, nodeName, intElementIdx + nodeName.length());
+		}
+
+		final String content = text.substring(contentIdx, closeTagIdx);
 
 		return new ContentDelimited(content, openTagIdx + openTag.length());
+	}
+
+	/**
+	 * Obtiene la posici&oacute;n en un texto de un nodo.
+	 * @param text Texto en el que buscar.
+	 * @param nodeName Nombre del nodo.
+	 * @param startIdx Posicion desde la que empezar la busqueda.
+	 * @return Posici&oacute;n del nodo o -1 si no se encuentra.
+	 */
+	private static int findOpenTag(final StringBuilder text, final String nodeName, final int startIdx) {
+
+		int offsetIdx = startIdx;
+		char c;
+		int idx;
+		do {
+			idx = text.indexOf("<" + nodeName, offsetIdx); //$NON-NLS-1$
+			offsetIdx = idx + nodeName.length() + 1;
+			c = idx != -1 ? text.charAt(offsetIdx) : ' ';
+		}
+		while (idx != -1 && !Character.isSpaceChar(c) && c != '>');
+
+		return idx;
 	}
 
 	/**
@@ -351,8 +385,18 @@ final class XAdESTriPhaseSignerUtil {
 		}
 
 		final String openTag = xml.substring(0, xml.indexOf(">") + 1).trim(); //$NON-NLS-1$
+
+
+		int idx = 0;
+		char c;
+		do {
+			c = openTag.charAt(++idx);
+		}
+		while (c != '>' && !Character.isSpaceChar(c));
+		final String nodeName = openTag.substring(1, idx);
+
 		final String closeTag = xml.substring(xml.lastIndexOf("<")).trim(); //$NON-NLS-1$
-		return new NodeDelimiter(openTag, closeTag);
+		return new NodeDelimiter(nodeName, openTag, closeTag);
 	}
 
 	private static Document getDocumentFromBytes(final byte[] data) throws SAXException,

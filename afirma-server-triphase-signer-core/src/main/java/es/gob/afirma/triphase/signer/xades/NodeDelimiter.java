@@ -5,6 +5,9 @@ package es.gob.afirma.triphase.signer.xades;
  */
 public class NodeDelimiter {
 
+	/** Nombre del nodo. */
+	private String nodeName;
+
 	/** Cadena de apertura. */
 	private String openTag;
 
@@ -13,12 +16,30 @@ public class NodeDelimiter {
 
 	/**
 	 * Construye el delimitador con las etiquetas de apertura y cierre.
+	 * @param nodeName Nombre del nodo.
 	 * @param openTag Etiqueta de apertura.
 	 * @param closeTag Etiqueta de cierre.
 	 */
-	public NodeDelimiter(final String openTag, final String closeTag) {
+	public NodeDelimiter(final String nodeName, final String openTag, final String closeTag) {
+		this.nodeName = nodeName;
 		this.openTag = openTag;
 		this.closeTag = closeTag;
+	}
+
+	/**
+	 * Establece el nombre del nodo.
+	 * @param nodeName Nombre del nodo.
+	 */
+	public void setNodeName(final String nodeName) {
+		this.nodeName = nodeName;
+	}
+
+	/**
+	 * Recupera el nombre del nodo.
+	 * @return Nombre del nodo.
+	 */
+	public String getNodeName() {
+		return this.nodeName;
 	}
 
 	/**

@@ -19,7 +19,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -229,7 +228,7 @@ public final class XAdESTriPhaseSignerServerSide {
 		extraParams.setProperty(XAdESExtraParams.INTERNAL_VALIDATE_PKCS1, Boolean.FALSE.toString());
 
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
-		final PublicKey publicKey = ((X509Certificate)certChain[0]).getPublicKey();
+		final PublicKey publicKey = certChain[0].getPublicKey();
 		final PrivateKey privateKey = KeyHelperFactory.getKeyHelper(publicKey).getPrivateKey(publicKey);
 
 		final byte[] result;
@@ -276,7 +275,6 @@ public final class XAdESTriPhaseSignerServerSide {
 		// Cargamos el XML firmado en un String
 		String xmlResult = new String(result, xmlEncoding);
 
-
 		// Recuperamos los signed info que se han firmado
 		final List<SignatureData> signatureDatas = XAdESTriPhaseSignerServerSide.getSignatureData(
 			result,
@@ -302,12 +300,10 @@ public final class XAdESTriPhaseSignerServerSide {
 			}
 			final int signValueStart = xmlResult.indexOf(signValuePrefix) + 1;
 
-
 			if (signValueStart > 0) {
 				final int signValueEnd = xmlResult.indexOf('<', signValueStart);
 				final String signatureValue = xmlResult.substring(signValueStart, signValueEnd);
 				xmlResult = xmlResult.replace(signatureValue, REPLACEMENT_STRING.replace(REPLACEMENT_CODE, Integer.toString(i)));
-
 				signedInfos.add(signatureData.getSignedInfo());
 			}
 			else {
