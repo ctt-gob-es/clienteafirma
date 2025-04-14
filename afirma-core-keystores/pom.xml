@@ -30,6 +30,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-keystores-jmulticard-ui</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard</artifactId>
 		</dependency>
@@ -39,9 +45,11 @@
 			<artifactId>jmulticard-jse</artifactId>
 		</dependency>
 		
+		<!--  Dependencias para pruebas -->
 		<dependency>
-			<groupId>es.gob.afirma.jmulticard</groupId>
-			<artifactId>jmulticard-ui</artifactId>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 		
 	</dependencies>

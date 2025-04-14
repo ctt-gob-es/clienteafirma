@@ -51,8 +51,8 @@
 	
 	<properties>
 		<clienteafirma.version>1.9</clienteafirma.version>
-		<triphase.service.version>2.8.0</triphase.service.version>
-		<jmulticard.version>1.9</jmulticard.version>
+		<triphase.service.version>2.8.1</triphase.service.version>
+		<jmulticard.version>2.0</jmulticard.version>
 		<afirma.lib.itext.version>1.6</afirma.lib.itext.version>
 		<spongycastle.version>1.58.0.0</spongycastle.version>
 		<afirma.legible.version>1_8_0</afirma.legible.version>
@@ -76,10 +76,10 @@
 				<artifactId>jmulticard-jse</artifactId>
 				<version>${jmulticard.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>es.gob.afirma.jmulticard</groupId>
-				<artifactId>jmulticard-ui</artifactId>
+				<artifactId>jmulticard-jsr268</artifactId>
 				<version>${jmulticard.version}</version>
 			</dependency>
 			
@@ -195,6 +195,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-jmulticard-ui</module>
 				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
@@ -299,6 +300,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-jmulticard-ui</module>
 				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
@@ -374,6 +376,7 @@
 				<module>afirma-crypto-jarverifier</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-jmulticard-ui</module>
 				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
@@ -461,6 +464,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-jmulticard-ui</module>
 				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>

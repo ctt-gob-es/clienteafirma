@@ -607,7 +607,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			throw e;
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves PKCS#12 seleccionado: " + e, e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves PKCS#11 con nombre: " + ksName); //$NON-NLS-1$
 			throw e;
 		}
 	}

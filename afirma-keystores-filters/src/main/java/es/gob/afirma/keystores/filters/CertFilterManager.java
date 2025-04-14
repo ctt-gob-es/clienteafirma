@@ -86,6 +86,21 @@ public final class CertFilterManager {
 
 	private boolean allowExternalStores = true;
 
+	/**
+	 * Identifica los filtros que deben aplicarse sobre una serie de certificados para
+	 * comprobar cuales de ellos se ajustan a nuestra necesidades.
+	 * @param propertyFilters Listado de propiedades entre las que identificar las que
+	 * establecen los criterios de filtrado.
+	 */
+	public CertFilterManager(final List<CertificateFilter> filters, final boolean mandatoryCertificate, final boolean allowExternalStores) {
+
+		if (filters != null) {
+			this.filters.addAll(filters);
+		}
+		this.mandatoryCertificate = mandatoryCertificate;
+		this.allowExternalStores = allowExternalStores;
+	}
+
 	/** Identifica los filtros que deben aplicarse sobre una serie de certificados para
 	 * comprobar cuales de ellos se ajustan a nuestra necesidades.
 	 * @param propertyFilters Listado de propiedades entre las que identificar las que
@@ -297,14 +312,5 @@ public final class CertFilterManager {
 	 * que supera el filtrado, {@code false} en caso contrario. */
 	public boolean isMandatoryCertificate() {
 		return this.mandatoryCertificate;
-	}
-
-	public static void main(final String[] args) {
-
-		final Properties config = new Properties();
-		//config.setProperty(HEADLESS_PROPERTY, "true");
-		config.setProperty(MANDATORY_CERT_SELECTION_PROPERTY, "true");
-
-		System.out.println(CertFilterManager.isMandatoryCertificate(config));
 	}
 }

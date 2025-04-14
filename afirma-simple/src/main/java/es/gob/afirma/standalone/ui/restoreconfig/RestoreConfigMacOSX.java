@@ -45,7 +45,6 @@ import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.so.macos.ShellScript;
 import es.gob.afirma.standalone.so.macos.UnixUtils;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
-import es.gob.jmulticard.ui.passwordcallback.Messages;
 
 /**
  * Clase que contiene la l&oacute;gica para realizar las tareas de restauraci&oacute;n
@@ -415,7 +414,7 @@ final class RestoreConfigMacOSX implements RestoreConfig {
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.WARNING_MESSAGE);
 					if (option == JOptionPane.YES_OPTION) {
-						console.appendMessage(Messages.getString("ConfiguratorMacOSX.31")); //$NON-NLS-1$
+						console.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigMacOSX.33")); //$NON-NLS-1$
 						throw new AOCancelledOperationException("El usuario cancelo la insercion de la contrasena del llavero"); //$NON-NLS-1$
 					}
 					continue;

@@ -217,7 +217,6 @@ public final class KeyStoreUtilities {
                 	// Comprobaciones especifica para la compatibilidad con el proveedor de DNIe
                 	if (
             			e instanceof es.gob.jmulticard.CancelledOperationException ||
-                		e instanceof es.gob.jmulticard.card.AuthenticationModeLockedException ||
                 		e instanceof es.gob.jmulticard.jse.provider.BadPasswordProviderException
             		) {
             			throw e;

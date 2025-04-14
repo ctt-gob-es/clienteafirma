@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -419,10 +418,10 @@ public final class AOOOXMLSigner implements AOSigner {
         		OOXMLXAdESSigner.getSignedXML(ooxmlDocument, algorithm, key, certChain, xParams)
     		);
         }
+        catch (final AOException e) {
+        	throw e;
+        }
         catch (final Exception e) {
-        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
-        		throw new AOCancelledOperationException();
-        	}
             throw new AOException("Error durante la firma OOXML: " + e, e); //$NON-NLS-1$
         }
     }

@@ -10,6 +10,7 @@
 package es.gob.afirma.keystores;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.security.KeyStore;
 import java.security.KeyStore.LoadStoreParameter;
 import java.security.KeyStore.ProtectionParameter;
@@ -17,13 +18,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.CertificateException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.CallbackHandler;
 
-import es.gob.jmulticard.ui.passwordcallback.gui.DnieCacheCallbackHandler;
-import es.gob.jmulticard.ui.passwordcallback.gui.SmartcardCacheCallbackHandler;
-import es.gob.jmulticard.ui.passwordcallback.gui.SmartcardCallbackHandler;
+import es.gob.afirma.keystores.jmulticard.ui.DnieCacheCallbackHandler;
+import es.gob.afirma.keystores.jmulticard.ui.PasswordCallbackManager;
+import es.gob.afirma.keystores.jmulticard.ui.SmartcardCacheCallbackHandler;
+import es.gob.afirma.keystores.jmulticard.ui.SmartcardCallbackHandler;
+
 
 final class AOKeyStoreManagerHelperFullJava {
 
@@ -49,21 +53,6 @@ final class AOKeyStoreManagerHelperFullJava {
 		);
 	}
 
-	/** Inicializa el almac&eacute;n 100% Java para tarjetas CERES 4.30 y superiores.
-	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
-	 *                        de PIN.
-	 * @return <code>KeyStore</code> inicializado.
-	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
-	 * @throws IOException Si hay problemas en la lectura de datos. */
-	static KeyStore initCeres430Java(final Object parentComponent) throws AOKeyStoreManagerException,
-                                                                       IOException {
-		return init(
-			AOKeyStore.CERES_430,
-			buildLoadStoreParameter(new SmartcardCacheCallbackHandler()),
-			new es.gob.jmulticard.jse.provider.ceres.Ceres430Provider(),
-			parentComponent
-		);
-	}
 
 	/** Inicializa el almac&eacute;n 100% Java para tarjeta G&amp;D SmartCafe.
 	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
@@ -97,16 +86,44 @@ final class AOKeyStoreManagerHelperFullJava {
 		);
     }
 
+	/** Inicializa el almac&eacute;n 100% Java para DNIe.
+	 * @param parentComponent Componente padre para la modalidad del di&aacute;logo de solicitud
+	 *                        de PIN.
+	 * @return <code>KeyStore</code> inicializado.
+	 * @throws AOKeyStoreManagerException Si no se puede inicializar el almac&eacute;n.
+	 * @throws IOException Si hay problemas en la lectura de datos. */
+    static KeyStore initJMulticard(final Object parentComponent) throws AOKeyStoreManagerException,
+    		                                                          IOException {
+
+    	Provider provider;
+		try {
+			final Method method = es.gob.jmulticard.jse.provider.DnieProvider.class.getMethod("configure", String.class); //$NON-NLS-1$
+    		final String config = "name=JMulticard\nallowAnotherCards=true"; //$NON-NLS-1$
+    		provider = (Provider) method.invoke(new es.gob.jmulticard.jse.provider.DnieProvider(), config);
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se ha podido configurar el proveedor de DNIe con la configuracion indicada", e); //$NON-NLS-1$
+			provider = new es.gob.jmulticard.jse.provider.DnieProvider();
+		}
+
+    	return init(
+			AOKeyStore.CERES_430,
+			buildLoadStoreParameter(new SmartcardCacheCallbackHandler()),
+			provider,
+			parentComponent
+		);
+    }
 
     private static KeyStore init(final AOKeyStore store,
     							 final LoadStoreParameter loadStoreParameter,
     							 final Provider provider,
     		                     final Object parentComponent) throws AOKeyStoreManagerException,
     		                                                            IOException {
+
     	if (Security.getProvider(provider.getName()) == null) {
     		Security.addProvider(provider);
     	}
-    	es.gob.jmulticard.ui.passwordcallback.PasswordCallbackManager.setDialogOwner(parentComponent);
+
+    	PasswordCallbackManager.setDialogOwner(parentComponent);
 
         // Inicializamos
     	final KeyStore ks;

@@ -47,6 +47,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.smartcardio.CardTerminal;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -259,7 +260,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				&& !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN);
         if (showDNIeScreen) {
 	        try {
-	        	if (javax.smartcardio.TerminalFactory.getDefault().terminals().list().isEmpty()) {
+	        	// Si no hay lectores de tarjetas o el unico es el de Windows Hello
+	        	final List<CardTerminal> terminals = javax.smartcardio.TerminalFactory.getDefault().terminals().list();
+
+	        	System.out.println("Terminales encontrados: " + terminals.size());
+
+	        	if (terminals.isEmpty()) {
+	        		showDNIeScreen = false;
+	        	}
+	        	else if (Platform.getOS() == Platform.OS.WINDOWS && terminals.size() == 1 && terminals.get(0).getName().startsWith("Windows Hello")) {
 	        		showDNIeScreen = false;
 	        	}
 			} catch (final Exception e) {

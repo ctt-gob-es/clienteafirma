@@ -19,6 +19,7 @@ import java.security.MessageDigest;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -38,7 +39,10 @@ import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.RuntimePasswordNeededException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.keystores.LockedKeyStoreException;
+import es.gob.afirma.core.keystores.PinException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
@@ -58,6 +62,7 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.keystores.filters.CertFilterManager;
+import es.gob.afirma.keystores.filters.EncodedCertificateFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.InvalidPdfException;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
@@ -169,7 +174,7 @@ final class ProtocolInvocationLauncherSign {
 		for (int i = 0; i < operations.size(); i++) {
 			final SignOperation op = operations.get(i);
 			try {
-				results.add(signOperation(op, options, isMassiveSign, pkeSelected));
+				results.add(sign(op, options, isMassiveSign, pkeSelected));
 			}
 			catch (final VisibleSignatureMandatoryException e) {
 				LOGGER.log(Level.SEVERE, "No se cumplieron los requisitos para firma visible PDF: " + e); //$NON-NLS-1$
@@ -241,8 +246,9 @@ final class ProtocolInvocationLauncherSign {
 		return new NativeSignDataProcessor(protocolVersion);
 	}
 
-	private static SignResult signOperation(final SignOperation signOperation, final UrlParametersToSign options,
-			final boolean isMassiveSign, final PrivateKeyEntry pkeSelected)			throws SocketOperationException, VisibleSignatureMandatoryException {
+	private static SignResult sign(final SignOperation signOperation, final UrlParametersToSign options,
+			final boolean isMassiveSign, final PrivateKeyEntry pkeSelected)
+					throws SocketOperationException, VisibleSignatureMandatoryException {
 
 		byte[] data = signOperation.getData();
 		String format = signOperation.getFormat();
@@ -490,9 +496,6 @@ final class ProtocolInvocationLauncherSign {
 		}
 
 		final CertFilterManager filterManager = new CertFilterManager(extraParams);
-		final List<CertificateFilter> filters = filterManager.getFilters();
-		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
-		final PrivateKeyEntry pke;
 
 		// Comprobamos si se necesita que el usuario seleccione el area de firma
 		// visible.
@@ -507,22 +510,71 @@ final class ProtocolInvocationLauncherSign {
 					"Es obligatorio mostrar la firma en el documento PDF", e); //$NON-NLS-1$
 		}
 
+		PrivateKeyEntry pke = null;
+		String keyStoreLib = null;
+
+		// Identificamos si hay una clave preseleccionada que debemos usar. Si no, identificamos
+		// la biblioteca por defecto que se usara si el almacen lo requiere
 		if (options.getSticky() && !options.getResetSticky()
 				&& ProtocolInvocationLauncher.getStickyKeyEntry() != null
 				&& pkeSelected == null) {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 		} else {
-			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
-			final String aoksLib;
 			if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
-				aoksLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+				keyStoreLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
 			} else {
-				aoksLib = options.getDefaultKeyStoreLib();
+				keyStoreLib = options.getDefaultKeyStoreLib();
 			}
+		}
+
+		final boolean stickySignatory = options.getSticky();
+
+		final SignOperationResult operationResult = selectCertAndSign(pke, aoks, keyStoreLib, filterManager, stickySignatory,
+				data, algorithm, signer, cryptoOperation, extraParams);
+
+		pke = operationResult.getPke();
+		final byte[] signature = operationResult.getResult();
+
+		// Concatenamos el certificado utilizado para firmar y la firma con un separador
+		// para que la pagina pueda recuperar ambos
+		final byte[] certEncoded;
+		try {
+			certEncoded = pke.getCertificateChain()[0].getEncoded();
+		} catch (final CertificateEncodingException e) {
+			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
+			throw new SocketOperationException(errorCode, e);
+		}
+
+		final SignResult result = new SignResult();
+		result.setSignature(signature);
+		result.setCertificate(certEncoded);
+		Properties extraData = null;
+		if (inputFilename != null) {
+			extraData = new Properties();
+			extraData.setProperty("filename", inputFilename); //$NON-NLS-1$
+		}
+		result.setDataFilename(extraData);
+
+		return result;
+	}
+
+	private static SignOperationResult selectCertAndSign(final PrivateKeyEntry pkeSelected, final AOKeyStore aoks,
+			final String keyStoreLib, final CertFilterManager filterManager, final boolean stickySignatory,
+			final byte[] data, final String algorithm, final AOSigner signer,
+			final SignOperation.Operation cryptoOperation, final Properties extraParams)
+					throws SocketOperationException {
+
+		PrivateKeyEntry pke = pkeSelected;
+
+		if (pkeSelected == null) {
+			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
+
+			LOGGER.info("Obtenido gestor de almacenes de claves: " + aoks); //$NON-NLS-1$
 			final AOKeyStoreManager ksm;
 			try {
 				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(aoks, // Store
-						aoksLib, // Lib
+						keyStoreLib, // Lib
 						null, // Description
 						pwc, // PasswordCallback
 						null // Parent
@@ -533,44 +585,32 @@ final class ProtocolInvocationLauncherSign {
 				throw new SocketOperationException(errorCode, e);
 			}
 
-			LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
 			LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
-
 			try {
-				if (pkeSelected == null) {
-					MacUtils.focusApplication();
-					String libName = null;
-					if (aoksLib != null) {
-						final File file = new File(aoksLib);
-						libName = file.getName();
-					}
-					final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
-							ksm,
-							null,
-							true,
-							true, // showExpiredCertificates
-							true, // checkValidity
-							filters,
-							mandatoryCertificate,
-							libName);
-					dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
-					dialog.show();
-
-					// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
-					// que se indico originalmente por haberlo cambiado desde el dialogo de
-					// seleccion)
-					final CertificateContext context = dialog.getSelectedCertificateContext();
-					final KeyStoreManager currentKsm = context.getKeyStoreManager();
-					pke = currentKsm.getKeyEntry(context.getAlias());
-				} else {
-					pke = pkeSelected;
+				MacUtils.focusApplication();
+				String libName = null;
+				if (keyStoreLib != null) {
+					final File file = new File(keyStoreLib);
+					libName = file.getName();
 				}
+				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
+						ksm,
+						null,
+						true,
+						true, // showExpiredCertificates
+						true, // checkValidity
+						filterManager.getFilters(),
+						filterManager.isMandatoryCertificate(),
+						libName);
+				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
+				dialog.show();
 
-				if (options.getSticky()) {
-					ProtocolInvocationLauncher.setStickyKeyEntry(pke);
-				} else {
-					ProtocolInvocationLauncher.setStickyKeyEntry(null);
-				}
+				// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
+				// que se indico originalmente por haberlo cambiado desde el dialogo de
+				// seleccion)
+				final CertificateContext context = dialog.getSelectedCertificateContext();
+				final KeyStoreManager currentKsm = context.getKeyStoreManager();
+				pke = currentKsm.getKeyEntry(context.getAlias());
 			}
 			catch (final AOCancelledOperationException e) {
 				LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
@@ -599,29 +639,43 @@ final class ProtocolInvocationLauncherSign {
 			throw new SocketOperationException(errorCode, e);
 		}
 
-		final byte[] sign = executeSign(signer, cryptoOperation, data, signatureAlgorithm, pke, extraParams);
+		// Si se pidio cachear la referencia a clave, se hace. Si no, se libera la que hubiese
+		ProtocolInvocationLauncher.setStickyKeyEntry(stickySignatory ? pke : null);
 
-		// Concatenamos el certificado utilizado para firmar y la firma con un separador
-		// para que la pagina pueda recuperar ambos
-		final byte[] certEncoded;		try {
-			certEncoded = pke.getCertificateChain()[0].getEncoded();
-		} catch (final CertificateEncodingException e) {
-			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
+		// Ejecutamos la firma
+		byte[] sign;
+		try {
+			sign = executeSign(signer, cryptoOperation, data, signatureAlgorithm, pke, extraParams);
+		}
+		catch (final LockedKeyStoreException e) {
+			LOGGER.log(Level.SEVERE, "El almacen de claves esta bloqueado", e); //$NON-NLS-1$
+
+			// En este caso no dejamos prefijado el certificado
+			ProtocolInvocationLauncher.setStickyKeyEntry(null);
+
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_LOCKED_KEYSTORE;
 			throw new SocketOperationException(errorCode, e);
 		}
+		catch (final PinException e) {
+			LOGGER.warning("PIN invalido. Reintentamos la operacion: " + e); //$NON-NLS-1$
+			// Forzando el reinicio del almacen y la seleccion automatica de ese certificado
+			List<CertificateFilter> filters = null;
+			try {
+				final byte[] certEncoded = pke.getCertificate().getEncoded();
+				final CertificateFilter filter = new EncodedCertificateFilter(Base64.encode(certEncoded));
+				filters = Collections.singletonList(filter);
+			}
+			catch (final Exception ex) {
+				filters = null;
+			}
 
-		final SignResult result = new SignResult();
-		result.setSignature(sign);
-		result.setCertificate(certEncoded);
-		Properties extraData = null;
-		if (inputFilename != null) {
-			extraData = new Properties();
-			extraData.setProperty("filename", inputFilename); //$NON-NLS-1$
+			final CertFilterManager newFilterManager = new CertFilterManager(
+					filters, filters != null, true);
+			return selectCertAndSign(null, aoks, keyStoreLib, newFilterManager, stickySignatory,
+					data, signatureAlgorithm, signer, cryptoOperation, extraParams);
 		}
-		result.setDataFilename(extraData);
 
-		return result;
+		return new SignOperationResult(sign, pke);
 	}
 
 	/**
@@ -634,9 +688,11 @@ final class ProtocolInvocationLauncherSign {
 	 * @param extraParams Par&aacute;metros adicionales para la configuraci&oacute;m del formato de firma.
 	 * @return Firma generada.
 	 * @throws SocketOperationException Cuando ocurre alg&uacute;n error durante la operaci&oacute;n.
+	 * @throws PinException Cuando se usa un PIN incorrecto para el almac&eacute;n de claves.
+	 * @throws LockedKeyStoreException Cuando el almac&eacute;n de claves est&aacute; bloqueado.
 	 */
 	private static byte[] executeSign(final AOSigner signer, final Operation cryptoOperation, final byte[] data, final String algorithm,
-			final PrivateKeyEntry pke, final Properties extraParams) throws SocketOperationException {
+			final PrivateKeyEntry pke, final Properties extraParams) throws SocketOperationException, PinException, LockedKeyStoreException {
 
 		byte[] signature;
 		try {
@@ -681,9 +737,11 @@ final class ProtocolInvocationLauncherSign {
 			catch (final AOTriphaseException tex) {
 				throw ProtocolInvocationLauncherUtil.getInternalException(tex);
 			}
-		} catch (final SocketOperationException e) {
+		}
+		catch (final SocketOperationException | PinException | LockedKeyStoreException e) {
 			throw e;
-		} catch (final IllegalArgumentException e) {
+		}
+		catch (final IllegalArgumentException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
 			throw new SocketOperationException(errorCode, e);

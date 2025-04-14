@@ -47,7 +47,6 @@ import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
@@ -1290,10 +1289,10 @@ public final class XAdESSigner {
 				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "':" + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
+		catch (final AOException e) {
+			throw e;
+		}
 		catch (final Exception e) {
-        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
-        		throw new AOCancelledOperationException();
-        	}
 			throw new AOException("Error al generar la firma XAdES: " + e, e); //$NON-NLS-1$
 		}
 
@@ -1414,7 +1413,7 @@ public final class XAdESSigner {
 					"OIDAsURN", //$NON-NLS-1$
 					dataOid,
 					null,
-					new ArrayList<String>(0));
+					new ArrayList<>(0));
 		}
 
 		return new DataObjectFormatImpl(

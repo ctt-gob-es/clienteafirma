@@ -43,6 +43,11 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.w3c.dom.Element;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.keystores.AOCancelledSMOperationException;
+import es.gob.afirma.core.keystores.AuthenticationException;
+import es.gob.afirma.core.keystores.LockedKeyStoreException;
+import es.gob.afirma.core.keystores.PinException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.Pkcs1Utils;
@@ -166,7 +171,8 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
               final boolean keepKeyInfoUnsigned,
               final boolean verify) throws MarshalException,
                                                         GeneralSecurityException,
-                                                        XMLSignatureException {
+                                                        XMLSignatureException,
+                                                        AOException {
 
         final List<?> referencesIdList = new ArrayList<>(refsIdList);
 
@@ -268,7 +274,35 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         }
 
         // Generamos la firma
-        this.signature.sign(this.signContext);
+        try {
+        	this.signature.sign(this.signContext);
+        }
+        catch (final XMLSignatureException e) {
+        	final Throwable cause = e.getCause() != null ? e.getCause() : null;
+        	if (cause != null) {
+        		String causeName = cause.getClass().getName();
+            	// Si JMulticard informa de un problema de autenticacion durante la firma
+        		if ("es.gob.jmulticard.jse.provider.SignatureAuthException".equals(causeName)) { //$NON-NLS-1$
+        			causeName = cause.getCause() != null ? cause.getCause().getClass().getName() : null;
+        			// Si la tarjeta esta bloqueada
+        			if ("es.gob.jmulticard.card.AuthenticationModeLockedException".equals(causeName)) { //$NON-NLS-1$
+        				throw new LockedKeyStoreException("El almacen de claves esta bloqueado", e); //$NON-NLS-1$
+        			}
+        			// Si se ha insertado un PIN incorrecto
+        			if ("es.gob.jmulticard.card.BadPinException".equals(causeName)) { //$NON-NLS-1$
+        				throw new PinException("La contrasena del almacen o certificado es incorrecta", e); //$NON-NLS-1$
+        			}
+        			throw new AuthenticationException("Ocurrio un error de autenticacion al utilizar la clave de firma", cause); //$NON-NLS-1$
+        		}
+        	}
+			throw e;
+		}
+        catch (final Exception e) {
+        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+    			throw new AOCancelledSMOperationException("Cancelacion del dialogo de JMulticard"); //$NON-NLS-1$
+    		}
+			throw e;
+		}
 
 		// Siguiendo la recomendacion de la ETSI TS 119 102-1, verificamos que el dispositivo de
         // creacion de firma realmente ha generado el PKCS#1 usando la clave privada del

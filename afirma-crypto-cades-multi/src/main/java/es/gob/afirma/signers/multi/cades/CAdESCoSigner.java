@@ -125,7 +125,8 @@ final class CAdESCoSigner {
 	 *                                  digital
 	 * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de
 	 *                              firma.
-	 * @throws ContainsNoDataException Cuando no se encuentran los datos dentro de la firma. */
+     * @throws AOException Cuando ocurre un error durante la generacion de PKCS#1 de la firma.
+     */
 	static byte[] coSigner(
 			final byte[] signature,
 			final String signatureAlgorithm,
@@ -135,13 +136,14 @@ final class CAdESCoSigner {
                     ) throws IOException,
 			                                                  NoSuchAlgorithmException,
 			                                                  CertificateException,
-			                                                  ContainsNoDataException {
+			                                                  AOException {
 		// Leemos la firma de entrada
 		final SignedData sd = CAdESMultiUtil.readData(signature);
 		return coSigner(sd, signatureAlgorithm, key, certChain, config);
 	}
 
-	/** Se crea una cofirma a partir de los datos del firmante, el archivo
+	/**
+	 * Se crea una cofirma a partir de los datos del firmante, el archivo
 	 * que se firma y el archivo que contiene las firmas.
 	 * @param signedData Datos firmados.
 	 * @param signatureAlgorithm Algoritmo de firma.
@@ -154,7 +156,8 @@ final class CAdESCoSigner {
 	 *                                  digital
 	 * @throws CertificateException Si se produce alguna excepci&oacute;n con los certificados de
 	 *                              firma.
-	 * @throws ContainsNoDataException Cuando no se encuentran los datos dentro de la firma. */
+     * @throws AOException Cuando ocurre un error durante la generacion de PKCS#1 de la firma.
+     */
 	static byte[] coSigner(
 			final SignedData signedData,
 			final String signatureAlgorithm,
@@ -164,7 +167,7 @@ final class CAdESCoSigner {
                     ) throws IOException,
 			                                                  NoSuchAlgorithmException,
 			                                                  CertificateException,
-			                                                  ContainsNoDataException {
+			                                                  AOException {
 
 		// 3. CONTENTINFO
 		// si se introduce el contenido o no
@@ -218,9 +221,9 @@ final class CAdESCoSigner {
 			X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue()
 		);
 		final SignerIdentifier identifier = new SignerIdentifier(encSid);
-		
-		final String keyType = ((X509Certificate) certChain[0]).getPublicKey().getAlgorithm();
-		
+
+		final String keyType = certChain[0].getPublicKey().getAlgorithm();
+
 		final String algorithmName = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm, keyType);
 
 		// digEncryptionAlgorithm
@@ -273,19 +276,13 @@ final class CAdESCoSigner {
 
 		// === FIRMA ===
 
-		final ASN1OctetString signValue;
-		try {
-			signValue = generateSignValue(
+		final ASN1OctetString signValue = generateSignValue(
 				signedAttr,
 				signatureAlgorithm,
 				key,
 				certChain,
 				config.getExtraParams()
-			);
-		}
-		catch (final AOException ex) {
-			throw new IOException("Error al realizar la firma: " + ex, ex); //$NON-NLS-1$
-		}
+				);
 
 		// === POSTFIRMA ===
 
@@ -313,7 +310,8 @@ final class CAdESCoSigner {
 		).getEncoded(ASN1Encoding.DER);
 	}
 
-	/** Genera el PKCS#1 de los atributos de firma.
+	/**
+	 * Genera el PKCS#1 de los atributos de firma.
 	 * @param signedAttr Atributos a firmar.
 	 * @param signatureAlgorithm
 	 *        Algoritmo para la firma
@@ -321,7 +319,8 @@ final class CAdESCoSigner {
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param extraParams Par&aacute;metros adicionales para el PKCS#1.
 	 * @return Firma de los atributos.
-	 * @throws AOException Cuando ocurre cualquier tipo de error */
+	 * @throws AOException Cuando ocurre cualquier tipo de error
+	 */
 	private static ASN1OctetString generateSignValue(
 			final ASN1Set signedAttr,
 			final String signatureAlgorithm,

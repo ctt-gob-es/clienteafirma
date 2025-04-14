@@ -112,11 +112,17 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 					config
         	);
         }
+        catch (final AOException e) {
+			throw e;
+		}
         catch (final NoSuchAlgorithmException e) {
         	throw new AOException("Algoritmo de firma o huella digital no soportado", e); //$NON-NLS-1$
 		}
         catch (final CertificateException e) {
         	throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new AOException("Error generando la contrafirma CAdES: " + e, e); //$NON-NLS-1$
 		}
 
     	return dataSigned;

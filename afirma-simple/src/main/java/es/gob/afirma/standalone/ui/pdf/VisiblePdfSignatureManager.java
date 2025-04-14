@@ -65,6 +65,9 @@ public final class VisiblePdfSignatureManager {
 		}
 		// Si no, procedemos inmediatamente con la firma
 		else {
+
+			LOGGER.info(" =========----- Iniciamos el proceso de firma visible del PDF, pero sin haber iniciado el dialogo");
+
 			signExecutor.initSignTask(signConfigs);
 		}
 	}
@@ -99,6 +102,9 @@ public final class VisiblePdfSignatureManager {
 			}
 			// Si no es una firma visible, se firma directamente
 			else {
+
+				LOGGER.info(" =========----- Iniciamos el proceso de firma en un campo de firma prexistente");
+
 				executor.initSignTask(signConfigs);
 			}
 		}
@@ -181,6 +187,8 @@ public final class VisiblePdfSignatureManager {
 					}
 				}
 			}
+
+			LOGGER.info(" =========----- Iniciamos el proceso de firma visible PDF con los parametros ya establecidos");
 
 			this.executor.initSignTask(this.signConfigs);
 		}

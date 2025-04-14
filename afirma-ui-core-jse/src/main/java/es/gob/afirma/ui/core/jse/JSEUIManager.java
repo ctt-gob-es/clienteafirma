@@ -852,29 +852,36 @@ public class JSEUIManager implements AOUIManager {
     	// El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
         // se indica el nombre de fichero
     	try {
-        if (filename != null && defaultDir != null) {
-        	jfc.setSelectedFile(new File(defaultDir, filename));
-        }
-        else {
-        	final String newDir = defaultDir != null ? defaultDir : get(PREFERENCE_DIRECTORY, null);
-        	if (filename != null) {
-        		if (newDir != null) {
-        			jfc.setSelectedFile(new File(newDir, filename));
-        		}
-        		else {
-        			jfc.setSelectedFile(new File(filename));
-        		}
-        	}
-        	else if (newDir != null) {
-        		jfc.setCurrentDirectory(new File(newDir));
-        	}
-        }
+    		if (filename != null && defaultDir != null) {
+    			jfc.setSelectedFile(new File(defaultDir, filename));
+    		}
+    		else {
+    			final String newDir = defaultDir != null ? defaultDir : get(PREFERENCE_DIRECTORY, null);
+    			if (filename != null) {
+    				if (newDir != null) {
+    					jfc.setSelectedFile(new File(newDir, filename));
+    				}
+    				else {
+    					jfc.setSelectedFile(new File(filename));
+    				}
+    			}
+    			else if (newDir != null) {
+    				jfc.setCurrentDirectory(new File(newDir));
+    			}
+    		}
     	}
     	// Hay extranos casos en los que el mostrar el dialogo de guardado falla con
-    	// un ArrayIndexOutOfBoundsException al intentar prefijar el directorio y
+    	// un IndexOutOfBoundsException al intentar prefijar el directorio y
     	// nombre por defecto del fichero. En esos casos, ignoramos estos parametros
-    	catch (final ArrayIndexOutOfBoundsException e) {
-    		LOGGER.warning("No se pudo seleccionar el directorio/nombre de fichero por defecto para el guardado: " + e); //$NON-NLS-1$
+    	catch (final IndexOutOfBoundsException e) {
+    		LOGGER.warning("No se pudo seleccionar el directorio por defecto para el guardado: " + e); //$NON-NLS-1$
+    		if (filename != null) {
+    			try {
+    				jfc.setSelectedFile(new File(filename));
+    			} catch (final IndexOutOfBoundsException ex) {
+    					LOGGER.warning("No se pudo seleccionar nombre de fichero a secas en el dialogo de guardado: " + ex); //$NON-NLS-1$
+    			}
+    		}
     	}
     }
 

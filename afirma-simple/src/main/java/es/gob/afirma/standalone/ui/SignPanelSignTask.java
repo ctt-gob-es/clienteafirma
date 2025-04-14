@@ -20,8 +20,10 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -37,8 +39,13 @@ import es.gob.afirma.core.CustomRuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.RuntimePasswordNeededException;
+import es.gob.afirma.core.keystores.AOCancelledSMOperationException;
+import es.gob.afirma.core.keystores.AuthenticationException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.keystores.LockedKeyStoreException;
+import es.gob.afirma.core.keystores.PinException;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -48,6 +55,7 @@ import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.CertificateFilter;
+import es.gob.afirma.keystores.filters.EncodedCertificateFilter;
 import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
@@ -162,7 +170,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
         if (this.selectedPke == null) {
         	try {
-        		this.selectedPke = getPrivateKeyEntry();
+        		this.selectedPke = getPrivateKeyEntry(this.certFilters, false);
         	}
         	catch (final AOCancelledOperationException e) {
         		return;
@@ -324,16 +332,54 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             		this.parent
         		);
             }
-            catch(final AOCancelledOperationException e) {
+            catch (final AOCancelledOperationException e) {
                 return;
             }
-            catch(final AOFormatFileException e) {
-            	LOGGER.warning("La firma o el documento no son aptos para firmar: " + e); //$NON-NLS-1$
-            	if (onlyOneFile) {
-            		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.154", e.getMessage()), e); //$NON-NLS-1$
-            		return;
-            	}
-            	continue;
+        	// Si la operacion que se cancelo fue con una tarjeta, refrescamos el almacen
+        	// para restablecer el estado inicial
+            catch (final AOCancelledSMOperationException e) {
+           		refreshKeyStore();
+           		return;
+			}
+            catch (final PinException e) {
+            	LOGGER.log(Level.WARNING, "El PIN utilizado es incorrecto", e); //$NON-NLS-1$
+            	// Identificamos el certificado que se utilizo
+            	final Certificate selectedCert = this.selectedPke.getCertificate();
+            	// Recargamos el almacen para evitar que el driver JMulticard quede en mal estado
+        		refreshKeyStore();
+            	// Preparamos un filtro para utilizar el mismo certificado
+            	List<? extends CertificateFilter> filters;
+				try {
+					final String certEncoded = Base64.encode(selectedCert.getEncoded());
+					filters = Collections.singletonList(new EncodedCertificateFilter(certEncoded));
+				} catch (final CertificateEncodingException e1) {
+					LOGGER.log(Level.SEVERE, "Error en la codificacion del certificado. No se selecionara automaticamente", e); //$NON-NLS-1$
+					filters = null;
+				}
+				// Seleccionamos el certificado
+				try {
+					this.selectedPke = getPrivateKeyEntry(filters, true);
+				}
+				catch (final Exception e2) {
+					LOGGER.log(Level.SEVERE, "Ocurrio un error al extraer la clave privada del certificiado seleccionado", e2); //$NON-NLS-1$
+					showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.56"), e); //$NON-NLS-1$
+					return;
+				}
+				// Volvemos a ejecutar la firma
+            	doSignature();
+            	return;
+            }
+            catch (final LockedKeyStoreException e) {
+            	LOGGER.log(Level.SEVERE, "El almacen de claves o o el certificado esta bloqueado", e); //$NON-NLS-1$
+            	// Recargamos el almacen para evitar que el driver JMulticard quede en mal estado
+            	refreshKeyStore();
+            	showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.161"), e); //$NON-NLS-1$
+            	return;
+            }
+            catch (final AuthenticationException e) {
+            	LOGGER.log(Level.SEVERE, "Error al firmar por un problema de acceso al almacen o la clave del certificado", e); //$NON-NLS-1$
+            	showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.162"), e); //$NON-NLS-1$
+            	return;
             }
             catch (final RuntimeConfigNeededException e) {
             	LOGGER.warning("No se puede completar la firma sin intervencion del usuario: " + e); //$NON-NLS-1$
@@ -379,7 +425,14 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             	}
             	continue;
 			}
-
+            catch (final AOFormatFileException e) {
+            	LOGGER.warning("La firma o el documento no son aptos para firmar: " + e); //$NON-NLS-1$
+            	if (onlyOneFile) {
+            		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.154", e.getMessage()), e); //$NON-NLS-1$
+            		return;
+            	}
+            	continue;
+            }
             catch(final SingleSignatureException e) {
             	LOGGER.warning("Error en una firma del lote, se continua con la siguiente: " + e); //$NON-NLS-1$
             	continue;
@@ -455,7 +508,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         	catch(final AOCancelledOperationException e) {
         		return;
         	}
-        	catch(final IOException e) {
+        	catch(final Exception e) {
         		LOGGER.severe("No se ha podido guardar el resultado de la firma: " + e); //$NON-NLS-1$
         		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.88"), e); //$NON-NLS-1$
         		return;
@@ -492,10 +545,21 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
 			invalidPageNumberFilesList.clear();
     	}
-
     }
 
     /**
+     * Actualiza el almac&eacute;n de claves cargado.
+     */
+    private void refreshKeyStore() {
+    	this.selectedPke = null;
+    	try {
+			this.ksm.refresh();
+		} catch (final IOException e) {
+			LOGGER.log(Level.WARNING, "Error al actualizar el almacen de claves", e); //$NON-NLS-1$
+		}
+	}
+
+	/**
      * Ejecuta una operaci&oacute;n de firma.
      * @param data Datos a firmar.
      * @param signer Manejador de firma con el que realizar la operaci&oacute;n.
@@ -670,7 +734,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
     				);
     }
 
-	private PrivateKeyEntry getPrivateKeyEntry() throws AOCertificatesNotFoundException,
+	private PrivateKeyEntry getPrivateKeyEntry(final List<? extends CertificateFilter> filters,
+			final boolean mandatoryCertificate) throws AOCertificatesNotFoundException,
 	                                                    KeyStoreException,
 	                                                    NoSuchAlgorithmException,
 	                                                    UnrecoverableEntryException {
@@ -681,8 +746,8 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 			true,             // Comprobar claves privadas
 			PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_KEYSTORE_SHOWEXPIREDCERTS), // Mostrar certificados caducados
 			true,             // Comprobar validez temporal del certificado
-			this.certFilters, // Filtros
-			false            // mandatoryCertificate
+			filters,
+			mandatoryCertificate
 			);
     	dialog.show();
 

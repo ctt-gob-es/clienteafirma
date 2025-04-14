@@ -220,6 +220,9 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
         catch (final AOCancelledOperationException e) {
         	throw e;
         }
+        catch (final AOException e) {
+        	throw e;
+        }
         catch (final Exception e) {
             throw new AOException("Error al generar la firma PKCS#1 de la firma PAdES: " + e, e); //$NON-NLS-1$
         }

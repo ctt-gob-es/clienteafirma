@@ -10,9 +10,9 @@ import java.util.Enumeration;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.keystores.jmulticard.ui.CommonPasswordCallback;
+import es.gob.afirma.keystores.jmulticard.ui.DnieCacheCallbackHandler;
 import es.gob.jmulticard.jse.provider.DnieProvider;
-import es.gob.jmulticard.ui.passwordcallback.gui.CommonPasswordCallback;
-import es.gob.jmulticard.ui.passwordcallback.gui.DnieCacheCallbackHandler;
 
 /** Pruebas de tarjetas inteligentes con <i>CallbackHandler</i>. */
 public class TestCallBackHandler {

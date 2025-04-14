@@ -623,11 +623,14 @@ public final class XAdESCoSigner {
 		}
 		catch (final NoSuchAlgorithmException e) {
 			throw new IllegalArgumentException(
-				"No se soporta el algoritmo de firma '" + algorithm + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "':" + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
+		catch (final AOException e) {
+			throw e;
+		}
 		catch (final Exception e) {
-			throw new AOException("Error al generar la cofirma", e); //$NON-NLS-1$
+			throw new AOException("Error al generar la cofirma XAdES", e); //$NON-NLS-1$
 		}
 
 		return Utils.writeXML(
@@ -772,7 +775,7 @@ public final class XAdESCoSigner {
 		ObjectIdentifier objectIdentifier = null;
 		if (oid != null) {
 			objectIdentifier = new ObjectIdentifierImpl(
-					"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<>(0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 
 		// Cremos los elementos descriptivos de los datos

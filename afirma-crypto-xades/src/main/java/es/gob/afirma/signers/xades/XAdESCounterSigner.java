@@ -362,6 +362,9 @@ public final class XAdESCounterSigner {
 						);
 			}
 		}
+		catch (final AOException e) {
+			throw e;
+		}
 		catch (final Exception e) {
 			throw new AOException("Error al generar la contrafirma", e); //$NON-NLS-1$
 		}
@@ -430,6 +433,8 @@ public final class XAdESCounterSigner {
 					i++;
 				}
 			}
+		} catch (final AOException e) {
+			throw e;
 		} catch (final Exception e) {
 			throw new AOException(
 					"No se ha podido realizar la contrafirma de hojas", e); //$NON-NLS-1$
@@ -483,6 +488,8 @@ public final class XAdESCounterSigner {
 			for (final Element node : nodes) {
 				cs(node, key, certChain, extraParams, algorithm, doc, uriDereferencer);
 			}
+		} catch (final AOException e) {
+			throw e;
 		} catch (final Exception e) {
 			throw new AOException(
 					"No se ha podido realizar la contrafirma de nodos", e); //$NON-NLS-1$
@@ -564,6 +571,8 @@ public final class XAdESCounterSigner {
 					uriDereferencer
 				);
 			}
+		} catch (final AOException e) {
+			throw e;
 		} catch (final Exception e) {
 			throw new AOException(
 					"No se ha podido realizar la contrafirma del arbol", e); //$NON-NLS-1$
@@ -738,7 +747,7 @@ public final class XAdESCounterSigner {
 		// se debe agregar a las contrafirmas: ETSI EN 319 132-1 V1.1.1 (2016-04)
 		// Apartado 6.3, aclaracion k)
 		if (!profile.equalsIgnoreCase(AOSignConstants.SIGN_PROFILE_BASELINE)) {
-			final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$
+			final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<>(0)); //$NON-NLS-1$ //$NON-NLS-2$
 			final DataObjectFormat dataObjectFormat = new DataObjectFormatImpl(null, objectIdentifier, "text/xml", doc.getInputEncoding(), "#" + referenceId); //$NON-NLS-1$ //$NON-NLS-2$
 			final List<DataObjectFormat> dataObjectFormats = new ArrayList<>();
 			dataObjectFormats.add(dataObjectFormat);
@@ -787,8 +796,11 @@ public final class XAdESCounterSigner {
 				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
+		catch (final AOException e) {
+			throw e;
+		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
+			throw new AOException("Error al generar la contrafirma XAdES", e); //$NON-NLS-1$
 		}
 	}
 

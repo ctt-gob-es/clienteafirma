@@ -93,6 +93,12 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-keystores-jmulticard-ui</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-crypto-core-pkcs7</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
@@ -215,13 +221,13 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
-			<artifactId>jmulticard-ui</artifactId>
+			<artifactId>jmulticard-jsr268</artifactId>
 		</dependency>
-
+		
 		<dependency>
 		    <groupId>org.java-websocket</groupId>
 			<artifactId>Java-WebSocket</artifactId>
- 			<version>1.5.3</version>
+ 			<version>1.6.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -262,6 +268,13 @@
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
 			<version>5.13.0</version>
+		</dependency>
+		
+		<!--  Dependencias para pruebas -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
