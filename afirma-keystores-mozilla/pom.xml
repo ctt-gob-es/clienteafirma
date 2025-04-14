@@ -27,6 +27,14 @@
 			<artifactId>afirma-core-keystores</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
+		
+		<!--  Dependencias para pruebas -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 </project>
