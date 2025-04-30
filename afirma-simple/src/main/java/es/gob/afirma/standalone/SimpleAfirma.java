@@ -128,6 +128,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	private static final String SYSTEM_PROPERTY_DEBUG_LEVEL = "afirma_debug_level"; //$NON-NLS-1$
 
+
+    /**
+     * Propiedad del sistema con la que configurar que se ignoren los lectores de
+     * tarjeta que se reconozcan como lectores virtuales.
+     */
+    private static final String SYSTEM_PROPERTY_IGNORE_VIRTUAL_READERS = "ignoreVirtualReaders"; //$NON-NLS-1$
+
 	/** Directorio de datos de la aplicaci&oacute;n. */
 	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator //$NON-NLS-1$
 			+ "Autofirma"; //$NON-NLS-1$
@@ -210,6 +217,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		// Indicamos si se debe instalar el proveedor de firma XML de Apache
        XmlDSigProviderHelper.configureXmlDSigProvider();
+
+       // Indicamos que no queremos cargar los lectores de tarjeta virtuales
+       System.setProperty(SYSTEM_PROPERTY_IGNORE_VIRTUAL_READERS, Boolean.TRUE.toString());
     }
 
 	/**
@@ -260,11 +270,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				&& !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN);
         if (showDNIeScreen) {
 	        try {
-	        	// Si no hay lectores de tarjetas o el unico es el de Windows Hello
+	        	// Si no hay lectores de tarjetas o el unico es el de Windows Hello,
+	        	// ignoraremos el mostrar la pantalla inicial para el uso del DNIe
 	        	final List<CardTerminal> terminals = javax.smartcardio.TerminalFactory.getDefault().terminals().list();
-
-	        	System.out.println("Terminales encontrados: " + terminals.size());
-
 	        	if (terminals.isEmpty()) {
 	        		showDNIeScreen = false;
 	        	}

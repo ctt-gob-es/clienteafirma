@@ -509,7 +509,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		return;
         	}
         	catch(final Exception e) {
-        		LOGGER.severe("No se ha podido guardar el resultado de la firma: " + e); //$NON-NLS-1$
+        		LOGGER.log(Level.SEVERE, "No se ha podido guardar el resultado de la firma", e); //$NON-NLS-1$
         		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.88"), e); //$NON-NLS-1$
         		return;
         	}
