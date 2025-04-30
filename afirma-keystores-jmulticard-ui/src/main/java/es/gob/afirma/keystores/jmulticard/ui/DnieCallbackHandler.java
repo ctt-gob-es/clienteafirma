@@ -24,6 +24,7 @@ public final class DnieCallbackHandler implements CallbackHandler {
 						"es.gob.jmulticard.callback.CustomTextInputCallback".equals(cb.getClass().getName()) || //$NON-NLS-1$
 						"javax.security.auth.callback.TextInputCallback".equals(cb.getClass().getName()) //$NON-NLS-1$
 					) {
+						LOGGER.info("Solicitamos codigo CAN del DNIe"); //$NON-NLS-1$
 						final UIPasswordCallbackCan uip = new UIPasswordCallbackCan(
 							Messages.getString("CanPasswordCallback.0"), //$NON-NLS-1$
 							null,
@@ -46,9 +47,11 @@ public final class DnieCallbackHandler implements CallbackHandler {
 						}
 					}
 					else if (cb instanceof CustomAuthorizeCallback) {
+						LOGGER.info("Solicitamos autorizacion para el uso del DNIe"); //$NON-NLS-1$
 						DialogBuilder.showSignatureConfirmDialog((CustomAuthorizeCallback)cb);
 					}
 					else if (cb instanceof PasswordCallback) {
+						LOGGER.info("Solicitamos codigo PIN del DNIe"); //$NON-NLS-1$
 						final CommonPasswordCallback uip = new CommonPasswordCallback(
 							((PasswordCallback)cb).getPrompt(),
 							Messages.getString("CommonPasswordCallback.1"), //$NON-NLS-1$

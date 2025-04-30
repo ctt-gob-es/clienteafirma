@@ -42,6 +42,7 @@ package es.gob.afirma.keystores.jmulticard.ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -52,6 +53,7 @@ import java.awt.image.BufferedImage;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -179,7 +181,10 @@ public final class UIPasswordCallbackCan extends PasswordCallback {
             }
         };
         pane.setPreferredSize(new Dimension(350, 310));
-        pane.createDialog(this.parent, this.title).setVisible(true);
+
+        final JDialog dialog = pane.createDialog(this.parent, this.title);
+        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+        dialog.setVisible(true);
 
         final Object selectedValue = pane.getValue();
         if (selectedValue == null) {

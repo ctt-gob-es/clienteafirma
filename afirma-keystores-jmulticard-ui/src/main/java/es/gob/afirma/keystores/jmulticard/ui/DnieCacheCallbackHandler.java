@@ -41,6 +41,7 @@ public final class DnieCacheCallbackHandler implements CallbackHandler, CacheEle
 						"es.gob.jmulticard.callback.CustomTextInputCallback".equals(cb.getClass().getName()) || //$NON-NLS-1$
 						"javax.security.auth.callback.TextInputCallback".equals(cb.getClass().getName()) //$NON-NLS-1$
 					) {
+						LOGGER.info("Solicitamos codigo CAN del DNIe"); //$NON-NLS-1$
 						try {
 							final Method m = cb.getClass().getMethod("setText", String.class); //$NON-NLS-1$
 							final UIPasswordCallbackCan uip = new UIPasswordCallbackCan(
@@ -64,16 +65,17 @@ public final class DnieCacheCallbackHandler implements CallbackHandler, CacheEle
 					}
 					else if (cb instanceof CustomAuthorizeCallback) {
 						if (!this.confirmed) {
-							DialogBuilder.showSignatureConfirmDialog((CustomAuthorizeCallback) cb);
+							LOGGER.info("Solicitamos autorizacion para el uso del DNIe"); //$NON-NLS-1$
+								DialogBuilder.showSignatureConfirmDialog((CustomAuthorizeCallback) cb);
 							this.confirmed = ((CustomAuthorizeCallback) cb).isAuthorized();
 						}
 						((CustomAuthorizeCallback) cb).setAuthorized(this.confirmed);
 					}
 					else if (cb instanceof PasswordCallback) {
-
 						synchronized (LOGGER) {
 							final char[] pin;
 							if (this.cachedPassword == null) {
+								LOGGER.info("Solicitamos codigo PIN del DNIe"); //$NON-NLS-1$
 
 								// Comprobamos si anteriormente se activo la opcion de usar cache para
 								// poner este valor por defecto
