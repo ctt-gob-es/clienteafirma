@@ -36,22 +36,23 @@ public class ActiveWaitingThread extends Thread {
 	public void run() {
 
 		while (!this.cancelled) {
-			try {
-				Thread.sleep(SLEEP_PERIOD);
-			} catch (final InterruptedException e) {
+
+			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
 				if (!this.cancelled) {
-					LOGGER.warning("No se ha podido esperar para el envio de la senal de espera activa para el JavaScript: " + e); //$NON-NLS-1$
+					try {
+						IntermediateServerUtil.sendData(WAIT_CONSTANT, this.storageServiceUrl, this.transactionId);
+					} catch (final IOException e) {
+						LOGGER.warning("No se ha podido enviar la peticion de espera: " + e); //$NON-NLS-1$
+					}
 				}
 			}
 
 			if (!this.cancelled) {
-				synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
+				try {
+					Thread.sleep(SLEEP_PERIOD);
+				} catch (final InterruptedException e) {
 					if (!this.cancelled) {
-						try {
-							IntermediateServerUtil.sendData(WAIT_CONSTANT, this.storageServiceUrl, this.transactionId);
-						} catch (final IOException e) {
-							LOGGER.warning("No se ha podido enviar la peticion de espera: " + e); //$NON-NLS-1$
-						}
+						LOGGER.warning("No se ha podido esperar para el envio de la senal de espera activa para el JavaScript: " + e); //$NON-NLS-1$
 					}
 				}
 			}
