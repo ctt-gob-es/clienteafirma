@@ -849,8 +849,7 @@ public class JSEUIManager implements AOUIManager {
     		                                final String defaultDir,
     		                                final String filename) {
 
-    	// El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
-        // se indica el nombre de fichero
+    	// El metodo setSelectedFile determina el directorio actual y el nombre de fichero
     	try {
     		if (filename != null && defaultDir != null) {
     			jfc.setSelectedFile(new File(defaultDir, filename));
@@ -873,12 +872,12 @@ public class JSEUIManager implements AOUIManager {
     	// Hay extranos casos en los que el mostrar el dialogo de guardado falla con
     	// un IndexOutOfBoundsException al intentar prefijar el directorio y
     	// nombre por defecto del fichero. En esos casos, ignoramos estos parametros
-    	catch (final IndexOutOfBoundsException e) {
+    	catch (final Exception e) {
     		LOGGER.warning("No se pudo seleccionar el directorio por defecto para el guardado: " + e); //$NON-NLS-1$
     		if (filename != null) {
     			try {
     				jfc.setSelectedFile(new File(filename));
-    			} catch (final IndexOutOfBoundsException ex) {
+    			} catch (final Exception ex) {
     					LOGGER.warning("No se pudo seleccionar nombre de fichero a secas en el dialogo de guardado: " + ex); //$NON-NLS-1$
     			}
     		}
@@ -967,10 +966,7 @@ public class JSEUIManager implements AOUIManager {
 	    @Override
 	    public void setSelectedFile(final File file) {
 	        super.setSelectedFile(file);
-            if (file != null) {
-                super.setSelectedFile(file);
-                this.file = file;
-            }
+            this.file = file;
 	    }
 
 	}
