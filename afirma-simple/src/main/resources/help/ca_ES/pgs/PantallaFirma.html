@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Autofirma</title> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+  <meta name="KEYWORDS" content="firmar, CAdES, XAdES, PAdES, ODF, OOXML formato" /> 
+  <meta name="description" content="Firma electrónica de ficheros." /> 
+  <style>
+	
+	.bold {
+		font-weight: bold;
+	}
+
+  
+  
+  </style> 
+ </head> 
+ <body> 
+  <h2>Pantalla de signatura</h2> 
+  <p> Des d&apos;aquesta pantalla pot selecionar els documents o directoris que desitja signar. </p> 
+  <p align="center"> <img src="../gfx/pantallafirma1_mini.png" alt="Pantalla para la selección y firma de documentos" /> </p> 
+  <p> Pot seleccionar un o diversos documents prement el botó &quot;Seleccionar fitxers a signar&quot; o arrástrando els documents i/o directoris a l&apos;àrea indicada (el requadre de color gris fosc). </p> 
+  <p> En carregar els documents a signar, se li mostraran certs detalls sobre aquests, que variaran segons se seleccioni un únic fitxer o varis: </p> 
+  <p align="center"> <img src="../gfx/pantallafirma4_mini.png" alt="Pantalla para la selección y firma de documentos con un fichero cargado" /> <img src="../gfx/pantallafirma3_mini.png" alt="Pantalla para la selección y firma con múltiples ficheros cargados" /> </p> 
+  <p> En el requadre habilitat per a arrossegar els documents que desitjaven signar li haurà aparegut la informació del fitxer o fitxers que hagi seleccionat. </p> 
+  <p> Si només va seleccionar un fitxer i disposa d&apos;una aplicació predeterminada per a aquest tipus de documents, li apareixerà el botó &quot;Veure fitxer&quot; amb el qual podrà obrir-lo. A més, li apareixerà la informació relativa al fitxer i a la signatura que es generarà (format, atributs de signatura i opcions de signatura). En el cas d&apos;haver configurat dades per al format de signatura seleccionat que es vagi a incloure en la pròpia signatura, com la política de signatura, es mostrarà un enllaç &quot;Veure tots...&quot; des de la qual es podran visualitzar tots els atributs de signatura definits. </p> 
+  <p> Si es van seleccionar diversos fitxers o directoris, pot fer doble clic sobre ells per a obrir-los o prémer amb el botó secundari del ratolí per a veure les opcions de &quot;Veure fitxer&quot; i &quot;Veure els atributs de signatura&quot;. </p> 
+  <p> El botó &quot;Signar&quot; situat en el costat inferior de la pantalla li permetrà signar el document. Si el magatzem de certificats del seu sistema operatiu encara no hagués acabat de carregar-se, el botó apareixerà deshabilitat i amb una imatge animada d&apos;espera. En aquest cas, si us plau, esperi que aquesta desaparegui i s&apos;habiliti el botó. </p> 
+  <p> Una vegada premut el botó, el programa generarà una signatura per a cada document seleccionat. Per a cada tipus de document es generarà la signatura amb el format establert a des del panell <a href="MenuPreferencias.html"> de preferències</a>. </p> 
+  <p> En cas que es desitgi signar en un altre format diferent el fitxer ja seleccionat, es permetrà modificar seleccionant l&apos;enllaç &quot;(Canviar)&quot; que es troba al costat de la informació sobre el format. En seleccionar-ho, s&apos;obrirà la següent finestra on es permet triar el format desitjat: </p> 
+  <p align="center"> <img src="../gfx/dialogocambioformato.png" alt="Pantalla para la selección del formato de firma" /> </p> 
+  <p> Els tipus de document que es distingeixen i els formats de signatura que admeten es mostren en la següent taula: </p> 
+  <table> 
+   <tbody> 
+    <tr> 
+     <th>Tipus de document</th> 
+     <th>Icona</th> 
+     <th>Formats de signatura (ressaltat el per defecte)</th> 
+    </tr> 
+    <tr> 
+     <td>PDF</td> 
+     <td><img src="../../shrd/icon_pdf.png" alt="Icono de documento Adobe PDF" /></td> 
+     <td><strong>PAdES</strong>, CAdES i XAdES.</td> 
+    </tr> 
+    <tr> 
+     <td>XML</td> 
+     <td><img src="../../shrd/icon_xml.png" alt="Icono de documento XML" /></td> 
+     <td><strong>XAdES</strong> i CAdES.</td> 
+    </tr> 
+    <tr> 
+     <td>Factura electrònica</td> 
+     <td><img src="../../shrd/icon_facturae.png" alt="Icono de factura electrónica" /></td> 
+     <td><strong>FacturaE</strong>, CAdES i XAdES.</td> 
+    </tr> 
+    <tr> 
+     <td>OOXML</td> 
+     <td><img src="../../shrd/icon_office_win.png" alt="Icono de documento OOXML" /></td> 
+     <td><strong>CAdES</strong>, XAdES i OOXML (Office Open XML).</td> 
+    </tr> 
+    <tr> 
+     <td>ODF</td> 
+     <td><img src="../../shrd/icon_openoffice.png" alt="Icono de documento ODF" /></td> 
+     <td><strong>CAdES</strong>, XAdES i ODF (Open Document Format).</td> 
+    </tr> 
+    <tr> 
+     <td>Resta de documents</td> 
+     <td><img src="../../shrd/icon_binary.png" alt="Icono de documento binario" /></td> 
+     <td><strong>CAdES</strong> i XAdES.</td> 
+    </tr> 
+    <tr> 
+     <td>Signatura electrònica</td> 
+     <td><img src="../../shrd/icon_sign.png" alt="Icono de firma electrónica" /></td> 
+     <td>El mateix de la signatura original.</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+  <p> Com a excepció a aquest últim cas, no es pot tornar a signar una factura electrònica ja signada en format Factura-e. </p> 
+  <p> En signar fitxers, es mostrarà una finestra per al guardat de la signatura generada si només es va seleccionar un document o un diàleg per a seleccionar el directori de sortida si es van seleccionar varis. Després de guardar les signatures, es mostrarà la <a href="PantallaDetalle.html">pantalla de detall de signatura</a>. </p> 
+  <p> El procés de signatura pot veure&apos;s alterat pels plugins instal·lats en Autofirma. Consulti l&apos;apartat de <a href="MenuPlugins.html">gestió de plugins</a> per a saber més sobre ells. </p> 
+  <p> De manera complementària als botons i elements gràfics, pot usar també la barra de menú o els següents acceleradors de teclat: </p> 
+  <ul> 
+   <li><code>Control (⌘ en macOS) + S</code> : Seleccionar fitxer.</li> 
+   <li><code>Control (⌘ en macOS) + F</code> : Signar el fitxer seleccionat.</li> 
+  </ul> 
+  <h3>Configuració dels formats de signatura</h3> 
+  <p> Pot configurar el format de signatura a utilitzar per cada tipus de fitxer i les particularitats d&apos;aquests formats, així com el comportament general de l&apos;aplicació, a partir del panell <a href="MenuPreferencias.html"> de preferències</a> disponible a través del menú Opcions. </p> 
+  <p> Alguns formats o opcions de signatura poden fer aparèixer opcions de configuració addicionals en la pròpia finestra de signatura: </p> 
+  <ul> 
+   <li> <h4>Opcions de signatura PDF:</h4> <p> La signatura PDF d&apos;un únic document permet configurar el que la signatura es mostri en el document. Per a això serà necessari marcar la casella &quot;Fer la signatura visible dins del PDF&quot;. </p> <p> També és possible inserir una marca visible en el PDF al temps de realitzar la signatura. Aquesta opció modificarà el PDF agregant-li la imatge seleccionada i, seguidament, el signarà. Per a usar aquesta funció serà necessari marcar la casella &quot;Inserir marca visible en el PDF&quot;. Aquesta casella estarà deshabilitada si el document PDF ja està signat, ja que la inserció d&apos;una marca invalidaria les signatures anteriors. </p> <p> Una altra opció disponible seria la de generar un PDF certificat, serà possible si la signatura a realitzar és format PAdES i el document no està prèviament signat. Es realitza en marcar la casella &quot;Generar PDF certificat&quot;, i s&apos;aplica al document el nivell de certificació seleccionat en la llista d&apos;opcions sota aquesta casella. El llistat d&apos;opcions estarà deshabilitat si la casella &quot;Generar PDF certificat&quot; no està habilitada. </p> <p> Aquestes opciónes apareixeran marcades o no per defecte segons s&apos;hagi establert en el <a href="MenuPreferencias.html">panell de preferències</a>. En seleccionar qualsevol d&apos;aquestes caselles, se&apos;ns mostrarà el panell de <a href="VentanaPdfVisible.html">Propietats d&apos;elements visibles en PDF</a>. </p> </li> 
+   <li> <h4>Agregar una nova signatura a un document:</h4> <p> En agregar una nova signatura binària o XML a un document de signatura, es permet configurar si la nova signatura es realitzarà sobre el propi document (cosignatura) o sobre les signatures ja introduïdes (contrasigna). Aquesta opció pot configurar-se des del panell de preferències dels formats CAdES i XAdES. Quan aplicació, Autofirma mostrarà a l&apos;usuari un botó &quot;Opcions Avançades&quot; des del qual poder accedir directament a aquestes opcions de configuració. </p> </li> 
+  </ul> 
+  <p> En els processos de signatura de múltiples documents s&apos;omet qualsevol configuració que obligui a detenir el procés de signatura. Així, per exemple, s&apos;ometrà la sol·licitud de contrasenya dels PDF i la configuració de signatura visible i marca visible es demanarà una única vegada i s&apos;aplicarà a tots els documents amb la mateixa configuració. </p>  
+ </body>
+</html>

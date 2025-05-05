@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Properties of signatures and visible marks PDF</title>
+  <meta name="AppleTitle" content="Ayuda de Autofirma">
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png">
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+ </head>
+ <body> 
+  <h2>Properties of visible signatures PDF</h2>
+  <p>By enabling the creation of visible signatures PDF, the user will be given the possibility to select a signature area on the PDF to be signed in PAdES format.</p>
+  <p align="center"><img src="../gfx/menufirmaspadesvisible1_mini.png" alt="Signature position selection window"></p>
+  <p>This menu allows you to use the mouse to select a rectangular area from one of the pages of the PDF.</p>
+  <ul>
+  	<li><b> X: </b> Number of pixels on the X axis at the beginning of the signature area.</li>
+  	<li><b> And: </b> Number of pixels on the Y axis at the beginning of the signature area.</li>
+  	<li><b> Width: </b> Number of pixels that extends horizontally to the signature area.</li>
+  	<li><b> Height: </b> Number of pixels vertically extending the signature area.</li>
+  	<li><b> (Preview of PDF page): </b> The user must click and drag the mouse over this area to select the visible signature area. The positions and the size of the signature area are expressed in pixels with respect to the scale on which the image of the page is shown.</li>
+  	<li><b> &lt;&lt;: </b> Button to move the display to the first page of the PDF.</li>
+  	<li><b> &lt;: </b> Button to move the display to the front page of the PDF. You can reproduce this behavior by pressing the left cursor key on your keyboard.</li>
+  	<li><b> >: </b> Button to move the display to the next page of the PDF. You can reproduce this behavior by pressing the &quot;right cursor&quot; key on your keyboard. If we are on the last page of the PDF this option will allow us to create a blank page at the end of the document in which the signature can be inserted.</li>
+  	<li><b> >>: </b> Button to move the display to the last page of the PDF.</li>
+  </ul>
+  <p>In this same window, at the bottom, it is allowed to indicate the page or pages where the visible signature must appear. The options are as follows:</p>
+  <ul>
+  	<li><b> Current page: </b> The visible signature will appear on the page selected in the top position selector.</li>
+  	<li>All <b> pages: </b> The visible signature will appear on all pages of the document.</li>
+  	<li><b> Page selection: </b> This option allows you to select the page or page range where the visible signature will appear. If you want to indicate a page or several pages where the visible signature is displayed, you can indicate page by page with a comma separation (1,4.7: <code> </code> It is stamped on pages 1, 4 and 7 or indicating a range of pages through a script (1-8: <code> </code> It is printed on the pages from 1 to 8). It is also possible to indicate the pages according to their position since the end of the document. For this, the position with a negative value (-2: <code> </code> Stamp the signature on the penultimate page). These mechanisms can be combined. For example:<ul>
+  			<li><i> 3-6, 8, 10--1: </i> It indicates that it will be stamped on the pages from 3 to 6, on 8 and from 10 to the last page.</li>
+  		</ul>
+  	</li>
+  </ul>
+  <p>The button containing a question mark (?) allows you to open the support <b> page </b> for the visible signature.</p>
+  <p>The signature area disappeared by changing the screen from the PDF. Select the area for the visible signature of the PDF and then press the <b> Next button. </b></p>
+  <p>Next, a new window will be displayed in which the user will be able to configure the appearance of the signature.</p>
+  <p align="center"><img src="../gfx/menufirmaspadesvisible2_mini.png" alt="Signature Aspect Configuration Window"></p>
+  <p>This interface allows you to configure the following properties for visible signature:</p>
+	<ul>
+	<li><b> Preview. </b> The image file can be configured by clicking on the preview of the signature. Images with transparencies are not allowed.</li>
+	<li><b> Signature settings: </b></li>
+	<ul>
+	  <li><b> Signature image: </b> Image path with signing section. It can be selected by the <b> Browse </b> button and removed by the <b> Clean button. </b> Transparencies in the image are not supported and will be omitted if found.</li>
+	  <li>Signature <b> text: </b> Text to be shown in the signature of the PDF. For the configuration of the text to be shown in the signature it is possible to use a number of key words which will be replaced by the appropriate texts of the holder or issuer of the signature certificate at the time of signature. These are:</li>
+	  <ul>
+	  	<p><li><b> $$SUBJECTCN$$ </b><ul><li>Common name (CN, Common Name) within the X.500 Principal of the signature certificate holder.</li></ul></li></p>
+	  	<p><li><b> $$ISSUERCN$$ </b><ul><li>Common name (CN, Common Name) within the X.500 Principal of the issuer of the signature certificate.</li></ul></li></p>
+	  	<p><li><b> $$CERTSERIAL$$ </b><ul><li>Serial number of the signature certificate.</li></ul></li></p>
+	  	<p><li><b> $$SIGNDATE=PATTERN$$ </b><ul><li>Date of signature, where SKIPPER must indicate the format in which the date must be shown, following the scheme defined by Oracle for the SimpleDateFormat class.</li></ul></li></p>
+	  	<p><li><b> $GIVENNAME$ </b><ul><li>Name of the holder (G, Given Name) declared in the certificate. This value may not appear on the certificate, in which case the pattern will be replaced by empty chain.</li></ul></li></p>
+		<p><li><b> $$SURNAME$$ </b><ul><li>Surname of the holder (SN, Surname) declared in the certificate. This value may not appear on the certificate, in which case the pattern will be replaced by empty chain.</li></ul></li></p>
+		<p><li><b> $$ORGANIZATION$$ </b><ul><li>Organization (O, Organization) of the holder declared in the certificate. This value may not appear on the certificate, in which case the pattern will be replaced by empty chain.</li></ul></li></p>
+		<p><li><b> $$PSEUDONYM$$$ </b><ul><li>Pseudonym of certificate. This value may not appear on the certificate, in which case the pattern will be replaced by empty chain.</li></ul></li></p>
+	 	<p><li><b> $$OU$$ </b><ul><li>Organizational Unit (OU, Organization Unit) of the certificate. This value may not appear on the certificate, in which case the pattern will be replaced by empty chain.</li></ul></li></p>
+	 	<p><li><b> $$OUS$$ </b><ul><li>List of Organizational Units of the certificate. In case there were more than one, they would all be presented separated by &quot;, &quot;. The certificate may not have defined Organizational Units, in which case the pattern will be replaced by empty chain.</li></ul></li></p>
+	 	<p><li><b> $$TITLE$$ </b><ul><li>Information on the position or role of the certificate holder. This value may not appear on the certificate, in which case the pattern will be replaced by empty chain.</li></ul></li></p>
+	 	<p><li><b> $$REASON$$ </b><ul><li>That is why the PDF is signed, configured the signature operation by means of the property &quot;Reason&quot;. The pattern shall be replaced by empty chain if this value has not been established.</li></ul></li></p>
+		<p><li><b> $$LOCATION$$ </b><ul><li>The city in which the PDF is signed, configured the signature operation by means of the &quot;ProductionCity&quot; property. The pattern shall be replaced by empty chain if this value has not been established.</li></ul></li></p>
+		<p><li><b> $$CONTACT$$ </b><ul><li>Contact information of the signatory of the PDF, set up the signature operation by means of the property &quot;firmContact&quot;. The pattern shall be replaced by empty chain if this value has not been established.</li></ul></li></p>
+	  </ul>
+	  <li>The following format options can be applied to the text:</li>
+	  <ul>
+		<li>Font.</li>
+		<li>Font size.</li>
+		<li>Text rotation.</li>
+		<li>Font style (Bold, Cursive, Underlined or Tachado).</li>
+		<li>Text color.</li>
+	  </ul>
+	  <p>The &quot;Remember settings&quot; box allows you to save the set settings (text, image and styles) for use in the following signatures. The &quot;Restore default settings&quot; button will return the panel settings to the default values.</p>
+	</ul>
+  <p>If you do not want to add a visible signature to the PDF, before pressing the sign button on the signature screen, make sure that the &quot;Make the visible signature within the PDF&quot; box is not selected.</p><br><h2>Properties of visible marks</h2>
+  <p>By enabling the insertion of visible marks in the PDF, the user will be given the opportunity to select an area on the PDF he will be signing.</p>
+  <p align="center"><img src="../gfx/menufirmaspadesvisible3_mini.png" alt="Brand Position Selection Window"></p>
+  <p>This menu allows you to use the mouse to select a rectangular area on one or all of the pages of the PDF.</p>
+  <ul>
+  	<li><b> Select image: </b> Clicking this button will open a window in which you will be able to select the brand image. No transparencies are allowed in the image and will be omitted if found</li>
+  	<li><b> X: </b> Number of pixels on the X-axis where the mark is placed.</li>
+  	<li><b> And: </b> Number of pixels on the Y axis where the mark is placed.</li>
+  	<li><b> Width: </b> Number of pixels to be extended horizontally to the mark.</li>
+  	<li><b> Height: </b> Number of pixels to be displayed vertically.</li>
+  	<li><b> (Preview of PDF page): </b> The user must click and drag the mouse over this area to select the area where the brand will be placed.</li>
+  	<li><b> &lt;&lt;: </b> Button to move the display to the first page of the PDF.</li>
+  	<li><b> &lt;: </b> Button to move the display to the front page of the PDF. You can reproduce this behavior by pressing the left cursor key on your keyboard.</li>
+  	<li><b> >: </b> Button to move the display to the next page of the PDF. You can reproduce this behavior by pressing the &quot;right cursor&quot; key on your keyboard.</li>
+  	<li><b> >>: </b> Button to move the display to the last page of the PDF.</li>
+  	<li><b> Include image on all pages: </b> Check to select that the mark is inserted in all pages of the PDF.</li>
+  </ul>
+  <p>The brand area disappeared when you changed the page of the PDF. Select the page, image and area for the mark visible in the PDF and then press the <b> OK button. </b></p>
+  
+  <p>If you do not want to add a visible mark to the PDF, before pressing the sign button on the signature screen, make sure that the &quot;Insert a visible mark into the PDF&quot; checkbox is not selected. <b> </b></p>
+  
+ </body>
+</html>

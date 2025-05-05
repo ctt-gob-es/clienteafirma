@@ -12,29 +12,35 @@ package es.gob.afirma.standalone.ui;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.EventObject;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.LanguageManager;
 import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.GenericMenuOption;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginLoader;
@@ -257,6 +263,110 @@ public final class MainMenu extends JMenuBar {
 				);
         	}
         }
+        
+        // Crear el JMenu que contendrá las opciones de idioma
+        final JMenu languageMenu = new JMenu(SimpleAfirmaMessages.getString("MainMenu.38"));
+        
+        final ButtonGroup langGroup = new ButtonGroup();
+
+        // Crear las opciones de idioma
+        final String[] defaultLanguages = {SimpleAfirmaMessages.getString("MainMenu.39"), SimpleAfirmaMessages.getString("MainMenu.40"), 
+        		SimpleAfirmaMessages.getString("MainMenu.41"), SimpleAfirmaMessages.getString("MainMenu.42"),
+        		SimpleAfirmaMessages.getString("MainMenu.43"), SimpleAfirmaMessages.getString("MainMenu.44")};
+        
+        String localeConf = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
+        // Si no hay ninguno configurado, por defcto estara seleccionado el espanol
+        if (localeConf == null) {
+        	localeConf = LanguageManager.AFIRMA_DEFAULT_LOCALES[0].toString();
+        }
+        
+        for (int i = 0; i < defaultLanguages.length; i++) {
+            final JRadioButtonMenuItem langItem = new JRadioButtonMenuItem(defaultLanguages[i]);
+            final Locale locale = LanguageManager.AFIRMA_DEFAULT_LOCALES[i];
+            if (localeConf.equals(locale.toString())) {
+            	langItem.setSelected(true);
+            }
+            langItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent ae) {
+                	Locale.setDefault(locale);
+                    PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
+                    SimpleAfirmaMessages.changeLocale();
+                    showRestartWarning();
+                }
+            });
+            langGroup.add(langItem);
+            languageMenu.add(langItem);
+        }
+        
+        final Locale [] importedLocales = LanguageManager.getImportedLocales();
+        for (int i = 0; i < importedLocales.length; i++) {
+        	final String langName = LanguageManager.getLanguageName(importedLocales[i]);
+        	final Locale locale = importedLocales[i];
+        	// Se comprueba si el idioma importado no se trata de una version actualizada
+        	// de un idioma proporcionado por Autofirma para que no se duplique en el menu
+        	if (!LanguageManager.isDefaultLocale(locale)) {
+	        	final JRadioButtonMenuItem importedLangItem = new JRadioButtonMenuItem(langName);      
+	        	if (localeConf.equals(locale.toString())) {
+	        		importedLangItem.setSelected(true);
+	            }
+	        	importedLangItem.addActionListener(new ActionListener() {
+	                @Override
+	                public void actionPerformed(final ActionEvent ae) {
+	                	Locale.setDefault(locale);
+	                    PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
+	                    SimpleAfirmaMessages.changeLocale();
+	                    showRestartWarning();
+	                }
+	            });
+	        	langGroup.add(importedLangItem);
+	            languageMenu.add(importedLangItem);
+        	}
+        }
+        
+        languageMenu.addSeparator();
+        
+        final JMenuItem importLanguageMenu = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.45")); //$NON-NLS-1$
+        importLanguageMenu.getAccessibleContext().setAccessibleDescription(
+        		SimpleAfirmaMessages.getString("MainMenu.45")); //$NON-NLS-1$
+        importLanguageMenu.setAccelerator(
+            	KeyStroke.getKeyStroke(
+            		KeyEvent.VK_I,
+            		Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
+            	)
+            );
+        final String extsDesc = SimpleAfirmaMessages.getString("MainMenu.47") + " (*.zip)"; 
+        importLanguageMenu.addActionListener(ae -> {
+			final File fileToLoad;
+			try {
+				fileToLoad = AOUIFactory.getLoadFiles(
+					SimpleAfirmaMessages.getString("MainMenu.46"), //$NON-NLS-1$
+					null,
+					null,
+					new String [] {"zip"}, //$NON-NLS-1$
+					extsDesc,
+					false,
+					true,
+					DesktopUtil.getDefaultDialogsIcon(),
+					MainMenu.this
+				)[0];
+			}
+			catch(final AOCancelledOperationException e) {
+				return;
+			}
+			try {
+				LanguageManager.addLanguage(fileToLoad);
+				showRestartWarning();
+			} catch (final Exception e1) {
+				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("MainMenu.48"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("MainMenu.45"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE,
+						e1);
+			}
+		});
+        
+        languageMenu.add(importLanguageMenu);
+        this.add(languageMenu);
 
         // Comprobamos si existen menus adicionales de plugins que deben ser anadidos a la
         // barra de menu principal
@@ -473,5 +583,38 @@ public final class MainMenu extends JMenuBar {
 	public static void doMenuAction(final String actionClass, final Frame parent)
 			throws PluginException{
 		PluginLoader.getPluginAction(actionClass).start(parent);
+	}
+	
+	private static void showRestartWarning() {
+		final List<String> command = LanguageManager.getResetApplicationCommand();
+		// Ejecutamos una nueva instancia de la aplicacion
+		if (command != null) {
+			// Consultamos si se desea reiniciar la aplicacion
+			final int option = JOptionPane.showConfirmDialog(
+					null,
+					SimpleAfirmaMessages.getString("MainMenu.50"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("MainMenu.51"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+			if (option == JOptionPane.YES_OPTION) {
+				try {
+					new ProcessBuilder(command).start();
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "No se ha podido arrancar la nueva instancia de la aplicacion", e); //$NON-NLS-1$
+				}
+
+				// Salimos de la aplicacion antes de que se llegue a cargar la nueva instancia
+				System.exit(0);
+			}
+		}
+		// Pedimos al usuario que reinicie la aplicacion
+		else {
+			JOptionPane.showMessageDialog(
+					null,
+					SimpleAfirmaMessages.getString("MainMenu.49"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("MainMenu.50"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE);
+		}
 	}
 }

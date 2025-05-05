@@ -71,6 +71,9 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 					                  final String dialogSubHeadline,
 						              final boolean showControlButons,
 						              final boolean disableCertificateSelection) {
+		
+		// Al instanciar el dialogo, se actualiza el Locale por si se hubiera modificado el idioma
+		CertificateSelectionDialogMessages.updateLocale();
 
 		this.parent = parent;
 	    this.ksdm = ksdm;
@@ -255,7 +258,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Cambia el almac&eacute;n de claves actual.
 	 * @param ksType Tipo de almac&eacute;n de claves.
-	 * @param ksName Nombre de almac&eacute;n de claves
+	 * @param ksName Nombrede almac&eacute;n de claves
 	 * @param ksLibPath Librer&iacute;a de almac&eacute;n de claves.  */
 	public void changeKeyStore(final int ksType, final String ksName, final String ksLibPath) {
 
@@ -280,9 +283,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 			// Cambiamos el titulo del dialogo
 			this.currentKeyStoreTypeName = this.ksdm.getKeyStoreName();
-			final String name = this.currentKeyStoreTypeName != null ? this.currentKeyStoreTypeName : ksName;
 			this.certDialog.setTitle(CertificateSelectionDialogMessages.getString(
-					"CertificateSelectionDialog.0", name)); //$NON-NLS-1$
+					"CertificateSelectionDialog.0", this.currentKeyStoreTypeName)); //$NON-NLS-1$
 		}
 	}
 
@@ -304,7 +306,6 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 			}
 		}
 	};
-
 
 	private static final class CertOptionPane extends JOptionPane {
 

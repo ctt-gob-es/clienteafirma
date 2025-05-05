@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Plugins</title> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+  <meta name="KEYWORDS" content="plugin, hash" /> 
+  <meta name="description" content="Plugins." /> 
+ </head> 
+ <body> 
+  <h2>Plugins</h2> 
+  <p> Al costat d&apos;Autofirma es distribuïxen una sèrie de plugins que permeten agregar a l&apos;aplicació funcions addicionals. </p> 
+  <h3>Càlcul i comprovació d&apos;empremtes digitals</h3> 
+  <p> Este plugin agrega a Autofirma opcions per a calcular l&apos;empremta digital (hash) d&apos;un fitxer o de tots els fitxers d&apos;un directori i comprovar eixes mateixes petjades que s&apos;han generat. </p> 
+  <p> Una vegada s&apos;instal·la el plugin, apareixerà en la barra de menús d&apos;Autofirma l&apos;opció &quot;Empremtes digitals&quot; amb les diferents operacions que es poden realitzar. </p> 
+  <ul> 
+   <li><b>Calcular empremta digital:</b> Permet calcular l&apos;hash d&apos;un fitxer i guardar-lo a disc. El format i l&apos;extensió del fitxer d&apos;hash variarà segons el format seleccionat.</li> 
+   <p align="center"> <img src="../gfx/pluginhash_calculo_fichero_mini.png" alt="Pantalla de cálculo de ficheros" /> </p> 
+   <ul> 
+    <li><b>Fitxer sobre el qual calcular l&apos;empremta digital:</b> Fitxer del qual desitgem calcular l&apos;hash.</li> 
+    <li><b>Algorisme d&apos;empremta digital:</b> Algorisme d&apos;hash.</li> 
+    <li><b>Format de l&apos;empremta digital:</b> Codificació emprada per a guardar l&apos;hash: 
+     <ul> 
+      <li>Hexadecimal en ASCII (Base16): La petjada s&apos;emmagatzemarà com a cadena hexadecimal termiada en &apos;h&apos;.</li> 
+      <li>Base64: La petjada s&apos;emmagatzemarà en Base 64.</li> 
+      <li>Binari: La petjada s&apos;emmagatzemarà sense codificar.</li> 
+     </ul> </li> 
+    <li><b>Copiar empremta digital al portapapers:</b> En activar esta opció, a més de guardar l&apos;hash en fitxer, es copiarà al portapapers. L&apos;hash es copiarà amb la codificació del format seleccionat o, si es va seleccionar el format binari, en hexadecimal.</li> 
+   </ul> 
+   <br /> 
+   <li><b>Comprovar empremta digital:</b> Permet comprovar l&apos;hash d&apos;un fitxer.</li> 
+   <p align="center"> <img src="../gfx/pluginhash_comprobacion_fichero_mini.png" alt="Pantalla de comprobación de ficheros" /> </p> 
+   <ul> 
+    <li><b>Fitxer de dades:</b> Fitxer al qual correspon l&apos;empremta digital que es desitja comprovar.</li> 
+    <li><b>Fitxer que conté l&apos;empremta digital:</b> Fitxer amb l&apos;empremta digital.</li> 
+   </ul> 
+   <br /> 
+   <li><b>Calcular empremta digital en directori:</b> Permet calcular l&apos;hash dels fitxers d&apos;un directori.</li> 
+   <p align="center"> <img src="../gfx/pluginhash_calculo_directorio_mini.png" alt="Pantalla de cálculo de hash de directorio" /> </p> 
+   <ul> 
+    <li><b>Directori sobre el qual calcular les empremtes digitals:</b> Directori amb els fitxers dels quals volem calcular l&apos;empremta digital.</li> 
+    <li><b>Algorisme d&apos;empremta digital:</b> Algorisme d&apos;hash.</li> 
+    <li><b>Recursivo:</b> En activar-la es calcularà també l&apos;hash dels fitxers localitzats en els subdirectoris del directori seleccionat.</li> 
+   </ul> 
+   <br /> 
+   <li><b>Comprovar empremta digital en directori:</b> Permet comprovar l&apos;hash dels fitxers d&apos;un directori.</li> 
+   <p align="center"> <img src="../gfx/pluginhash_comprobacion_directorio_mini.png" alt="Pantalla de comprobación de hash de directorio" /> </p> 
+   <ul> 
+    <li><b>Directori:</b> Directori amb els fitxers als quals corresponen les empremtes digitals que es desitgen comprovar.</li> 
+    <li><b>Fitxer d&apos;empremtes digitals:</b> Fitxer amb les empremtes digitals que es comprovaran.</li> 
+   </ul> 
+  </ul> 
+  <p> En instal·lar el plugin d&apos;empremtes digitals en sistemes Windows, també s&apos;agreguen les opcions de generar i comprovar empremtes digitals en el menú contextual de fitxers i directoris del sistema. </p> 
+  <p>Les opcions que apareixen són:</p> 
+  <ul> 
+   <li><b>Generar empremta digital:</b> Esta opció apareix en el menú contextual de tots els fitxers i directoris i permet generar l&apos;hash del fitxer o dels fitxers del directori.</li> 
+   <li><b>Comprovar empremta digital:</b> Esta opció apareix en el menú contextual dels fitxers d&apos;hashes (.hash, .hashb64, .hashfiles i .hexhash) i permet seleccionar el fitxer o directori del qual es desitja comprovar l&apos;hash.</li> 
+  </ul>  
+ </body>
+</html>

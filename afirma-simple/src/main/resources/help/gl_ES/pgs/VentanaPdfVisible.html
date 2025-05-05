@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Propiedades das firmas e marcas visibles PDF</title> 
+  <meta name="AppleTitle" content="Ayuda de Autofirma" /> 
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png" /> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+ </head> 
+ <body> 
+  <h2>Propiedades das firmas visibles PDF</h2> 
+  <p>Ao habilitar a creación de firmas visibles PDF, darase ao usuario a posibilidade de seleccionar unha área de firma sobre o PDF que vaia asinar en formato PAdES.</p> 
+  <p align="center"> <img src="../gfx/menufirmaspadesvisible1_mini.png" alt="Ventana de selección de posición de firma" /> </p> 
+  <p> Este menú permite utilizar o rato para seleccionar unha área rectangular dunha das páxinas do PDF. </p> 
+  <ul> 
+   <li><b>X</b>: Número de píxeles no eixo X no empeza a área de firma.</li> 
+   <li><b>E</b>: Número de píxeles no eixo E no empeza a área de firma.</li> 
+   <li><b>Anchura</b>: Número de píxeles que se estende en horizontal a área de firma.</li> 
+   <li><b>Altura</b>: Número de píxeles que se estende en vertical a área de firma.</li> 
+   <li><b>(Previsualización da páxina do PDF)</b>: O usuario debe facer clic sostido e arrastrar o rato sobre esta área para seleccionar a área visible de firma. As posicións e o tamaño da área de firma exprésase en píxeles con respecto á escala na que se mostra a imaxe da páxina.</li> 
+   <li><b>&lt;&lt;</b>: Botón para desprazar a visualización á primeira páxina do PDF.</li> 
+   <li><b>&lt;</b>: Botón para desprazar a visualización á páxina anterior do PDF. Pode reproducirse este comportamento pulsando a tecla &quot;cursor esquerdo&quot; do seu teclado.</li> 
+   <li><b>&gt;</b>: Botón para desprazar a visualización á seguinte páxina do PDF. Pode reproducirse este comportamento pulsando a tecla &quot;cursor dereito&quot; do seu teclado. Se nos/nos atopamos na última páxina do PDF esta opció permitiranos crear unha páxina en branco ao final do documento na que se poderá inserir a firma.</li> 
+   <li><b>&gt;&gt;</b>: Botón para desprazar a visualización á última páxina do PDF.</li> 
+  </ul> 
+  <p> Nesta mesma xanela, na parte inferior, permítese indicar a páxina ou páxinas onde debe aparecer a firma visible. As opcións que se permiten son as seguintes: </p> 
+  <ul> 
+   <li> <b>Páxina actual</b>: A firma visible aparecerá na páxina que se seleccionou no selector de posición superior. </li> 
+   <li> <b>Todas as páxinas</b>: A firma visible aparecerá en todas as páxinas do documento. </li> 
+   <li> <b>Selección de páxinas</b>: Nesta opción permítese seleccionar a páxina ou rango de páxinas onde aparecerá a firma visible. Se se desexa indicar unha páxina ou varias páxinas onde estampar a firma visible, é posible indicando páxina a páxina cunha separación de comas (<code>1,4,7</code>: Estámpase nas páxinas 1, 4 e 7) ou indicando un rango de páxinas a través dun guión (<code>1-8</code>: Estámpase nas páxinas desde a 1 ata a 8). Tamén se permite indicar as páxinas segundo a súa posición desde o final do documento. Para iso utilizarase a posición cun valor negativo (<code>-2</code>: Estampará a firma na penúltima páxina). Estes mecanismos pódense combinar. Por exemplo: 
+    <ul> 
+     <li><i>3-6, 8, 10--1</i>: Indica que se estampará nas páxinas desde a 3 á 6, na 8 e desde a 10 á última páxina.</li> 
+    </ul> </li> 
+  </ul> 
+  <p> O botón que contén un signo de interrogación (<b>?</b>) permite abrir a páxina de axuda para a firma visible. </p> 
+  <p> A área de sinatura desaparecera ao cambiar de pantalla do PDF. Seleccione a área para a firma visible do PDF e a seguir, pulse o botón <b>Seguinte</b>. </p> 
+  <p> A seguir, mostrarase unha nova xanela na que o usuario poderá configurar o aspecto da firma. </p> 
+  <p align="center"> <img src="../gfx/menufirmaspadesvisible2_mini.png" alt="Ventana de configuración del aspecto de firma" /> </p> 
+  <p> Esta interface permite configurar as seguintes propiedades para a firma visible: </p> 
+  <ul> 
+   <li><b>Vista previa</b>. Pode configurarse o ficheiro de imaxe pulsando sobre a previsualización da firma. Non se permiten imaxes con transparencias.</li> 
+   <li><b>Configuración de firma:</b></li> 
+   <ul> 
+    <li><b>Imaxe de firma:</b> Ruta da imaxe coa rúbrica de firma. Pode seleccionarse mediante o botón <b>Examinar</b> e eliminarse mediante o botón <b>Limpar</b>. Non se admiten transparencias na imaxe e se omitirán en caso de atoparse.</li> 
+    <li><b>Texto de firma: </b> Texto a mostrar no sinatura do PDF. Para a configuración do texto que se desexa mostrar na firma é posible utilizar unha serie de palabras crave que serán substituídas polos textos apropiados do titular ou emisor do certificado de firma no momento de asinar. Estas son:</li> 
+    <ul> 
+     <p></p> 
+     <li><b>$$SUBJECTCN$$</b> 
+      <ul> 
+       <li>Nome común (CN, Common Name) dentro do X.500 Principal do titular do certificado de firma.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$ISSUERCN$$</b> 
+      <ul> 
+       <li>Nome común (CN, Common Name) dentro do X.500 Principal do emisor do certificado de firma.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$CERTSERIAL$$</b> 
+      <ul> 
+       <li>Número de serie do certificado de firma.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$SIGNDATE=PATRÓN$$</b> 
+      <ul> 
+       <li>Data da firma, onde PATRÓN debe indicar o formato no que debe mostrarse a data, seguindo o esquema definido por Oracle para a clase SimpleDateFormat.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$GIVENNAME$$</b> 
+      <ul> 
+       <li>Nome do titular (G, Given Name) declarado no certificado. Este valor podería non aparecer no certificado, nese caso, o patrón substituirase por cadea baleira.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$SURNAME$$</b> 
+      <ul> 
+       <li>Apelidos do titular (SN, Surname) declarado no certificado. Este valor podería non aparecer no certificado, nese caso, o patrón substituirase por cadea baleira.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$ORGANIZATION$$</b> 
+      <ul> 
+       <li>Organización (Ou, Organization) do titular declarada no certificado. Este valor podería non aparecer no certificado, nese caso, o patrón substituirase por cadea baleira.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$PSEUDONYM$$</b> 
+      <ul> 
+       <li>Pseudónimo do certificado. Este valor podería non aparecer no certificado, nese caso, o patrón substituirase por cadea baleira.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$OU$$</b> 
+      <ul> 
+       <li>Unidade Organizativa (OU, Organization Unit) do certificado. Este valor podería non aparecer no certificado, nese caso, o patrón substituirase por cadea baleira.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$OUS$$</b> 
+      <ul> 
+       <li>Listaxe de Unidades Organizativas do certificado. No caso de que houbese máis dunha, presentaríanse todas separadas por &quot;, &quot;. O certificado podería non ter definidas Unidades Organizativas, nese caso, o patrón substituirase por cadea baleira.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$TITLE$$</b> 
+      <ul> 
+       <li>Información sobre o posto ou rol do titular do certificado. Este valor podería non aparecer no certificado, nese caso, o patrón substituirase por cadea baleira.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$REASON$$</b> 
+      <ul> 
+       <li>Razón pola que se asina o PDF, configurada a operación de firma mediante a propiedade &quot;signatureReason&quot;. O patrón substituirase por cadea baleira se non se estableceu este valor.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$LOCATION$$</b> 
+      <ul> 
+       <li>Cidade na que se asina o PDF, configurada a operación de firma mediante a propiedade &quot;signatureProductionCity&quot;. O patrón substituirase por cadea baleira se non se estableceu este valor.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$CONTACT$$</b> 
+      <ul> 
+       <li>Información de contacto do asinante do PDF, configurada a operación de firma mediante a propiedade &quot;signatureContact&quot;. O patrón substituirase por cadea baleira se non se estableceu este valor.</li> 
+      </ul></li> 
+     <p></p> 
+    </ul> 
+    <li>Ao texto pódenselle aplicar as seguintes opcións de formato:</li> 
+    <ul> 
+     <li>Fonte de letra.</li> 
+     <li>Tamaño de letra.</li> 
+     <li>Rotación do texto.</li> 
+     <li>Estilo de fonte (Negrita, Cursiva, Subliñado ou Tachado).</li> 
+     <li>Cor do texto.</li> 
+    </ul> 
+    <p>A casa &quot;Lembrar configuración&quot; permite gardar a configuración establecida (texto, imaxe e estilos) para utilizala nas seguintes firmas. O botón &quot;Restaurar configuración por defecto&quot; devolverá a configuración do panel aos valores por defecto.</p> 
+   </ul> 
+   <p> Se non se desexa agregar unha firma visible ao PDF, antes de pulsar o botón asinar na pantalla de firma, asegúrese de que non se atopa seleccionada a casa &quot;Facer a firma visible dentro do PDF&quot;. </p> 
+   <br /> 
+   <h2>Propiedades das marcas visibles</h2> 
+   <p>Ao habilitar a inserción de marcas visibles no PDF, darase ao usuario a posibilidade de seleccionar unha área sobre o PDF que vaia asinar.</p> 
+   <p align="center"> <img src="../gfx/menufirmaspadesvisible3_mini.png" alt="Ventana de selección de posición de marca" /> </p> 
+   <p> Este menú permite utilizar o rato para seleccionar unha área rectangular nunha ou todas as páxinas do PDF. </p> 
+   <ul> 
+    <li><b>Seleccionar imaxe:</b> Ao pulsar este botón abrirase unha xanela na que poderá seleccionar a imaxe de marca. Non se admiten transparencias na imaxe e se omitirán en caso de atoparse</li> 
+    <li><b>X</b>: Número de píxeles no eixo X no que situar a marca.</li> 
+    <li><b>E</b>: Número de píxeles no eixo E no que situar a marca.</li> 
+    <li><b>Anchura</b>: Número de píxeles que se debe estender en horizontal a marca.</li> 
+    <li><b>Altura</b>: Número de píxeles que se debe estender en vertical a marca.</li> 
+    <li><b>(Previsualización da páxina do PDF):</b> O usuario debe facer clic sostido e arrastrar o rato sobre esta área para seleccionar a área no que se colocará a marca.</li> 
+    <li><b>&lt;&lt;:</b> Botón para desprazar a visualización á primeira páxina do PDF.</li> 
+    <li><b>&lt;:</b> Botón para desprazar a visualización á páxina anterior do PDF. Pode reproducirse este comportamento pulsando a tecla &quot;cursor esquerdo&quot; do seu teclado.</li> 
+    <li><b>&gt;:</b> Botón para desprazar a visualización á seguinte páxina do PDF. Pode reproducirse este comportamento pulsando a tecla &quot;cursor dereito&quot; do seu teclado.</li> 
+    <li><b>&gt;&gt;:</b> Botón para desprazar a visualización á última páxina do PDF.</li> 
+    <li><b>Incluír imaxe en todas as páxinas:</b> Casa para seleccionar que a marca se insira en todas as páxinas do PDF.</li> 
+   </ul> 
+   <p> A área de marca desaparecera ao cambiar de páxina do PDF. Seleccione a páxina, imaxe e área para a marca visible no PDF e a seguir, pulse o botón <b>Aceptar</b>. </p> 
+   <p> Se non se desexa agregar unha marca visible ao PDF, antes de pulsar o botón asinar na pantalla de firma, asegúrese de que non se atopa seleccionada a casa &quot;<b>Inserir unha marca visible dentro do PDF</b>&quot;. </p> 
+  </ul>  
+ </body>
+</html>

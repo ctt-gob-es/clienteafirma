@@ -42,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
@@ -124,6 +125,9 @@ public class JSEUIManager implements AOUIManager {
 			                        final String charSet,
 			                        final boolean beep,
 			                        final Object c) {
+    	
+    	UIManager.put("OptionPane.okButtonText", JSEUIMessages.getString("JSEUIManager.3")); //$NON-NLS-1$ //$NON-NLS-2$
+    	UIManager.put("OptionPane.cancelButtonText", JSEUIMessages.getString("JSEUIManager.5"));  //$NON-NLS-1$//$NON-NLS-2$
 
         final JPasswordField pwd = new JPasswordField(10);
         if (charSet != null) {
@@ -198,6 +202,9 @@ public class JSEUIManager implements AOUIManager {
 			                              final String charSet,
 			                              final boolean beep,
 			                              final Object c) {
+    	
+    	UIManager.put("OptionPane.okButtonText", JSEUIMessages.getString("JSEUIManager.3")); //$NON-NLS-1$ //$NON-NLS-2$
+    	UIManager.put("OptionPane.cancelButtonText", JSEUIMessages.getString("JSEUIManager.5"));  //$NON-NLS-1$//$NON-NLS-2$
 
         final JPasswordField pwd1 = new JPasswordField(10);
         if (charSet != null) {
@@ -337,6 +344,10 @@ public class JSEUIManager implements AOUIManager {
                                         final Object initialSelectionValue) {
 
     	final Component parent = parentComponent instanceof Component ? (Component) parentComponent : null;
+    	
+    	UIManager.put("OptionPane.okButtonText", JSEUIMessages.getString("JSEUIManager.3")); //$NON-NLS-1$ //$NON-NLS-2$
+    	UIManager.put("OptionPane.cancelButtonText", JSEUIMessages.getString("JSEUIManager.5"));  //$NON-NLS-1$//$NON-NLS-2$
+
         final Icon dialogIcon = icon instanceof Icon ? (Icon) icon : null;
         if (selectionValues == null) {
         	return JOptionPane.showInputDialog(
@@ -363,6 +374,9 @@ public class JSEUIManager implements AOUIManager {
     												   final KeyStoreDialogManager ksdm) {
 
     	final Component parent = parentComponent instanceof Component ? (Component) parentComponent : null;
+    	
+    	UIManager.put("OptionPane.okButtonText", JSEUIMessages.getString("JSEUIManager.3")); //$NON-NLS-1$ //$NON-NLS-2$
+    	UIManager.put("OptionPane.cancelButtonText", JSEUIMessages.getString("JSEUIManager.5"));  //$NON-NLS-1$//$NON-NLS-2$
 
     	try {
     		final Class<?> csdClass = Class.forName(
@@ -483,6 +497,11 @@ public class JSEUIManager implements AOUIManager {
 			                           final String title,
 			                           final int optionType,
 			                           final int messageType) {
+    	
+    	UIManager.put("OptionPane.okButtonText", JSEUIMessages.getString("JSEUIManager.3")); //$NON-NLS-1$ //$NON-NLS-2$
+    	UIManager.put("OptionPane.cancelButtonText", JSEUIMessages.getString("JSEUIManager.5"));  //$NON-NLS-1$//$NON-NLS-2$
+    	UIManager.put("OptionPane.yesButtonText", JSEUIMessages.getString("JSEUIManager.99")); //$NON-NLS-1$ //$NON-NLS-2$
+    	UIManager.put("OptionPane.noButtonText", JSEUIMessages.getString("JSEUIManager.100"));  //$NON-NLS-1$//$NON-NLS-2$
 
     	final JOptionPane option = new JOptionPane(
     			message,
@@ -540,6 +559,9 @@ public class JSEUIManager implements AOUIManager {
 								  final String title,
 								  final int messageType,
 								  final Object icon) {
+    	
+    	UIManager.put("OptionPane.okButtonText", JSEUIMessages.getString("JSEUIManager.3")); //$NON-NLS-1$ //$NON-NLS-2$
+    	UIManager.put("OptionPane.cancelButtonText", JSEUIMessages.getString("JSEUIManager.5"));  //$NON-NLS-1$//$NON-NLS-2$
 
     	final JOptionPane option = new JOptionPane(
     			message,
@@ -635,7 +657,18 @@ public class JSEUIManager implements AOUIManager {
                                final Object parent) {
 
         final Component parentComponent = parent instanceof Component ? (Component) parent : null;
-
+        
+        UIManager.put("FileChooser.lookInLabelText", JSEUIMessages.getString("JSEUIManager.93") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        UIManager.put("FileChooser.fileNameLabelText", JSEUIMessages.getString("JSEUIManager.94") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$    
+        UIManager.put("FileChooser.openButtonText", JSEUIMessages.getString("JSEUIManager.96"));  //$NON-NLS-1$//$NON-NLS-2$
+        UIManager.put("FileChooser.cancelButtonText", JSEUIMessages.getString("JSEUIManager.97"));  //$NON-NLS-1$//$NON-NLS-2$
+        
+        if (selectDirectory) {
+            UIManager.put("FileChooser.folderNameLabelText", JSEUIMessages.getString("JSEUIManager.98") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        } else {
+            UIManager.put("FileChooser.filesOfTypeLabelText", JSEUIMessages.getString("JSEUIManager.95") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        }
+        
         final JFileChooser jfc;
         if (icon instanceof Image) {
         	jfc = new JFileChooser() {
@@ -713,6 +746,12 @@ public class JSEUIManager implements AOUIManager {
 			                   final Object parent) throws IOException {
 
         final Component parentComponent = parent instanceof Component ? (Component) parent : null;
+        
+        UIManager.put("FileChooser.lookInLabelText", JSEUIMessages.getString("JSEUIManager.93") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        UIManager.put("FileChooser.fileNameLabelText", JSEUIMessages.getString("JSEUIManager.94") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        UIManager.put("FileChooser.filesOfTypeLabelText", JSEUIMessages.getString("JSEUIManager.95") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        UIManager.put("FileChooser.saveButtonText", JSEUIMessages.getString("JSEUIManager.89"));  //$NON-NLS-1$//$NON-NLS-2$
+        UIManager.put("FileChooser.cancelButtonText", JSEUIMessages.getString("JSEUIManager.97"));  //$NON-NLS-1$//$NON-NLS-2$
 
         boolean tryAgain = true;
         File file = null;
@@ -849,38 +888,32 @@ public class JSEUIManager implements AOUIManager {
     		                                final String defaultDir,
     		                                final String filename) {
 
-    	// El metodo setSelectedFile determina el directorio actual y el nombre de fichero
+    	// El metodo setSelectedFile determina tambien el directorio actual, asi que lo usamos cuando
+        // se indica el nombre de fichero
     	try {
-    		if (filename != null && defaultDir != null) {
-    			jfc.setSelectedFile(new File(defaultDir, filename));
-    		}
-    		else {
-    			final String newDir = defaultDir != null ? defaultDir : get(PREFERENCE_DIRECTORY, null);
-    			if (filename != null) {
-    				if (newDir != null) {
-    					jfc.setSelectedFile(new File(newDir, filename));
-    				}
-    				else {
-    					jfc.setSelectedFile(new File(filename));
-    				}
-    			}
-    			else if (newDir != null) {
-    				jfc.setCurrentDirectory(new File(newDir));
-    			}
-    		}
+        if (filename != null && defaultDir != null) {
+        	jfc.setSelectedFile(new File(defaultDir, filename));
+        }
+        else {
+        	final String newDir = defaultDir != null ? defaultDir : get(PREFERENCE_DIRECTORY, null);
+        	if (filename != null) {
+        		if (newDir != null) {
+        			jfc.setSelectedFile(new File(newDir, filename));
+        		}
+        		else {
+        			jfc.setSelectedFile(new File(filename));
+        		}
+        	}
+        	else if (newDir != null) {
+        		jfc.setCurrentDirectory(new File(newDir));
+        	}
+        }
     	}
     	// Hay extranos casos en los que el mostrar el dialogo de guardado falla con
-    	// un IndexOutOfBoundsException al intentar prefijar el directorio y
+    	// un ArrayIndexOutOfBoundsException al intentar prefijar el directorio y
     	// nombre por defecto del fichero. En esos casos, ignoramos estos parametros
-    	catch (final Exception e) {
-    		LOGGER.warning("No se pudo seleccionar el directorio por defecto para el guardado: " + e); //$NON-NLS-1$
-    		if (filename != null) {
-    			try {
-    				jfc.setSelectedFile(new File(filename));
-    			} catch (final Exception ex) {
-    					LOGGER.warning("No se pudo seleccionar nombre de fichero a secas en el dialogo de guardado: " + ex); //$NON-NLS-1$
-    			}
-    		}
+    	catch (final ArrayIndexOutOfBoundsException e) {
+    		LOGGER.warning("No se pudo seleccionar el directorio/nombre de fichero por defecto para el guardado: " + e); //$NON-NLS-1$
     	}
     }
 
@@ -966,7 +999,10 @@ public class JSEUIManager implements AOUIManager {
 	    @Override
 	    public void setSelectedFile(final File file) {
 	        super.setSelectedFile(file);
-            this.file = file;
+            if (file != null) {
+                super.setSelectedFile(file);
+                this.file = file;
+            }
 	    }
 
 	}

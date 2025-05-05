@@ -1,0 +1,196 @@
+<html>
+ <head> 
+  <title>Menú preferències</title> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+  <meta name="KEYWORDS" content="firmar, CAdES, XAdES, PAdES, OOXML, ODF, formato" /> 
+  <meta name="description" content="Menú preferencias." /> 
+ </head> 
+ <body> 
+  <h2>Menú Preferències</h2> 
+  <p> Per a configurar les signatures generades per l&apos;eina, accedisca al menú de configuració a través de l&apos;opció &quot;Eines&quot; -&gt; &quot;Preferències&quot; en la barra de menús de l&apos;aplicació. Des d&apos;este menú pot configurar el comportament general de l&apos;aplicació i les signatures generades per a cada tipus de format. </p> 
+  <p> Si polsa en el botó &quot;Cancel·lar&quot; des de qualsevol de les pestanyes del menú, es tancarà est ignorant qualsevol canvi realitzat; si es polsa el botó &quot;Acceptar&quot; es tancarà el menú deixant configurades les opcions definides en el menú i si es polsa el botó &quot;Aplicar ara&quot;, s&apos;aplicaran els canvis realitzats sense tancar el menú. </p> 
+  <h3>Menú &quot;General&quot;</h3> 
+  <p align="center"> <img src="../gfx/menugeneral_mini.png" alt="Pantalla para la configuración del comportamniento general de la aplicación" /> </p> 
+  <ul> 
+   <li><b>Opcions generals:</b> 
+    <ul> 
+     <li><b>Importar configuració general de l&apos;aplicació:</b> Opció per a importar un fitxer de la configuració proporcionat per un administrador.</li> 
+     <li><b>Restaurar configuració general de l&apos;aplicació:</b> Opció per a restaurar la configuració per defecte de l&apos;aplicació.</li> 
+     <li><b>No demanar confirmació en tancar l&apos;aplicació:</b> Permet eixir de l&apos;aplicació sense confirmació de l&apos;usuari.</li> 
+     <li><b>Buscar actualitzacions a l&apos;inici:</b> Permet configurar si es deuen búscar si hi ha actualitzacions disponibles en iniciar l&apos;aplicacion.</li> 
+     <li><b>Habilitar JMulticard per a l&apos;ús de les targetes de la FNMT i DNIe:</b> Només en Windows i Linux. Configura si ha d&apos;utilitzar-se el controlador integrat en Autofirma per a l&apos;ús de les targetes de FNMT i DNIe. En cas de desactivar-se, s&apos;utilitzaran els controladors oposats en el sistema. L&apos;ús d&apos;esta funció permet usar les targetes compatibles quan l&apos;usuari no té instal·lat el seu controlador o existeix alguna incompatibilitat amb ell. Esta funció pot ocasionar que se sol·licite a l&apos;usuari múltiples vegades la inserció del PIN de la targeta en processos de signatura massiva. Esta configuració no tindrà efecte fins a la pròxima vegada que s&apos;òbriga l&apos;aplicació.</li> 
+     <li><b>Funcionament optimitzat per a VDI:</b> Només en Windows. Configura la comunicació per WebScokets amb el navegador de tal manera que s&apos;evitaran bloquejos quan s&apos;utilitze Autofirma en un entorn VDI. No obstant això, esta configuració ralenteix la comunicació quan la quantitat de dades a transmetre és gran, per la qual cosa no es recomana en altres entorns.</li> 
+    </ul> </li> 
+   <li><b>Opcions de signatura:</b> 
+    <ul> 
+     <li><b>Algorisme de signatura:</b> Algorisme de signatura per defecte que utilitza l&apos;aplicació per a generar les signatures electròniques.</li> 
+     <li><b>Formats de signatura:</b> Configura quin format de signatura ha d&apos;aplicar-se quan es proporciona determinat tipus de document. En polsar el botó &quot;Configurar formats&quot; es mostra un diàleg amb els tipus de document per als quals es pot configurar un format de signatura específic: 
+      <ul> 
+       <li>Documents PDF</li> 
+       <li>Documents OOXML de Microsoft Office</li> 
+       <li>Factures electròniques</li> 
+       <li>Fitxers XML genèrics</li> 
+       <li>Fitxers ODF de LibreOffice o OpenOffice</li> 
+       <li>Resta de fitxers</li> 
+      </ul> <p>Qualsevol d&apos;estos tipus de fitxer poden signar-se amb els formats CAdES i XAdES (concordes a la configuració establida en les pestanyes corresponents) i alguns d&apos;ells poden ser signats en formats específics.<br /> El tipus de document &quot;Resta de fitxers&quot; fa referència a qualsevol document que no estiga en qualsevol de les categories anteriors. </p> <p><b><u>ADVERTIMENT:</u></b> No es recomana que es modifique que les factures electròniques se signen en un format diferent al de factura electrònica. </p> </li> 
+     <li><b>Sol·licitar confirmació per a signar:</b> Quan està habilitada esta opció se sol·licita confirmació a l&apos;usuari abans de signar.</li> 
+     <li><b>Permetre agregar noves signatures a documents amb signatures no vàlides:</b> En habilitar esta opció, Autofirma no impedirà agregar noves signatures (cosignatura o contrafirma) a documents en els quals es trobe que ja hi ha signatures i estes no siguen vàlides (estiguen corruptes o amb certificats caducats).</li> 
+     <li><b>Sobreescriure fitxers en el directori d&apos;eixida:</b> Opció per a configurar si es desitja que, en generar l&apos;estructura de directoris de signatures resultant d&apos;un procés de signatura massiva, i en cas de trobar un fitxer amb el mateix nom amb el qual es guardarà una signatura, se sobreescriga el fitxer preexistent pel nou fitxer de signatura o es guarde la signatura utilitzant un nou nom.</li> 
+    </ul> </li> 
+   <li><b>Configuració de xarxa:</b> 
+    <ul> 
+     <li><b>Acceptar només connexions amb llocs segurs (Recomanat):</b> Si esta opció està activada es comprovarà la confiança del certificat SSL dels llocs web als quals haja de connectar-se l&apos;aplicació. Si es treballa en llocs web amb un certificat SSL no reconegut, és probable que haja de deshabilitar esta opció.</li> 
+    </ul> 
+    <ul> 
+     <li><b>Dominis segurs:</b> Opció per a configurar una llista de dominis que Autofirma tractarà com a assegurances en connectar a traves de SSL. Per a saber més, consulte la pàgina <a href="VentanaListaBlancaDominios.html">Configuració de llista blanca de dominis</a>.</li> 
+    </ul> 
+    <ul> 
+     <li><b>Configurar proxy:</b> Opció per a configurar el proxy per a totes les connexions de xarxa d&apos;Autofirma. Per a saber més, consulte la pàgina <a href="VentanaConfigurarProxy.html">Configuració del proxy de xarxa</a>.</li> 
+    </ul> 
+    <ul> 
+     <li><b>Certificats de confiança:</b> Opció per a configurar certificats de confiança en connexions de xarxa. Per a saber més, consulte la pàgina <a href="VentanaCertificadosConfianza.html">Certificats de confiança</a>.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Signatures PAdES (PDF)&quot;</h3> 
+  <p align="center"> <img src="../gfx/menufirmaspades_mini.png" alt="Pantalla para la configuración de las firmas de documentos PDF" /> </p> 
+  <ul> 
+   <li><b>Configuració de la política de signatura:</b> Permet declarar la política de signatura que se segueix en les signatures PAdES. <p>Els valors accessibles a través del panell de configuració són:</p> 
+    <ul> 
+     <li>Cap política: La signatures de PDF generades no declararan política de signatura.</li> 
+     <li>Política de signatura de l&apos;AGE 1.9: Es declara la política de signatura de l&apos;AGE v1.9.</li> 
+     <li>Política a mesura: Permet configurar manualment cadascuna de les propietats de la política.</li> 
+     <ul> 
+      <li>Identificador de la política.</li> 
+      <li>Empremta digital de l&apos;identificador de la política.</li> 
+      <li>Algorisme d&apos;empremta digital de l&apos;identificador de la política.</li> 
+      <li>Qualificador de la política</li> 
+     </ul> 
+    </ul> </li> 
+   <li><b>Opcions de signatura:</b> Opcions generals de signatura PAdESFormato bàsic de signatura. 
+    <ul> 
+     <li>Format bàsic de signatura: Permet configurar el format bàsic de les signatures PAdES: 
+      <ul> 
+       <li>PAdES Bàsic: És el format de signatura PAdES generat per Adobe Acrobat i l&apos;utilitzat per defecte per Autofirma.</li> 
+       <li>PAdES-BES: És el format que més s&apos;ajusta a l&apos;estàndard PAdES, però Adobe Reader/Acrobat no valguda correctament les multisignatures generades a partir d&apos;ell.</li> 
+      </ul> </li> 
+     <li>Realitzar per defecte signatures visibles PDF: En habilitar esta opció i signar un document en format PAdES, se li presentarà a l&apos;usuari una finestra per a la selecció de l&apos;àrea del PDF en el qual s&apos;agregarà la signatura visible. Consulte l&apos;apartat <a href="VentanaPdfVisible.html">Signatures visibles PDF</a> per a major detall.</li> 
+     <li>Ofuscar identificadors d&apos;usuari dels certificats de les signatures visibles: En habilitar esta opció, s&apos;ofuscaran els identificadors d&apos;usuari introducidido en els textos visibles PDF en prendre les dades d&apos;un certificat. L&apos;ofuscació no es realitzarà quan el certificat de signatura siga un certificat de pseudònim.</li> 
+     <li>Aplicar marca visible a documents PDF: En habilitar esta opció i signar un document en format PAdES, se li presentarà a l&apos;usuari una finestra per a la selecció de l&apos;àrea i pàgines del PDF en les quals s&apos;agregarà una marca visible. Consulte l&apos;apartat <a href="VentanaPdfVisible.html">Marques visibles PDF</a> per a major detall.</li> 
+     <li>Generar PDF certificat: En habilitar esta opció, es permetrà a l&apos;usuari generar un PDF certificat, amb el nivell de certificació que es trie en el llistat situat a continuació.</li> 
+     <ul> 
+      <li>Sense certificar: No es realitza signatura certificada del document, generar signa PAdES.</li> 
+      <li>Certificada d&apos;autor: No s&apos;admeten canvis.</li> 
+      <li>Certificada d&apos;autor per a formularis: Només es permeten accions d&apos;emplenat de formularis, signatura i addició de pàgines.</li> 
+      <li>Certificada comú: Només es permeten accions de comentaris, emplenat de formularis, signatura i addició de pàgines.</li> 
+     </ul> 
+    </ul> </li> 
+   <li><b>Metadades de les signatures PAdES:</b> 
+    <ul> 
+     <li>Raó per la qual se signa el document: Descripció breu del motiu de la signatura.</li> 
+     <li>Ciutat en la qual es realitza la signatura: Ciutat en la qual es localitza el signant en el moment de la signatura.</li> 
+     <li>Contacte del signant: Adreça de correu electrònic.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Signatures CAdES (binàries)&quot;</h3> 
+  <p align="center"> <img src="../gfx/menufirmascades_mini.png" alt="Pantalla para la configuración de las firmas de documentos binarios" /> </p> 
+  <ul> 
+   <li><b>Configuració de la política de signatura:</b> Permet declarar la política de signatura que se segueix en les signatures CAdES: <p>Els valors accessibles a través del panell de configuració són:</p> 
+    <ul> 
+     <li>Cap política: La signatures generades no declararan política de signatura.</li> 
+     <li>Política de signatura de l&apos;AGE 1.9: Es declara la política de signatura de l&apos;AGE v1.9</li> 
+     <li>Política a mesura: Permet configurar manualment cadascuna de les propietats de la política.</li> 
+     <ul> 
+      <li>Identificador de la política.</li> 
+      <li>Empremta digital de l&apos;identificador de la política.</li> 
+      <li>Algorisme d&apos;empremta digital de l&apos;identificador de la política.</li> 
+      <li>Qualificador de la política</li> 
+     </ul> 
+    </ul> </li> 
+   <li><b>Opcions de signatura:</b> 
+    <ul> 
+     <li>Incloure una còpia de les dades signades en la pròpia signatura: Configura si la signatura electrònica ha d&apos;emmagatzemar internament les dades signades.</li> 
+    </ul> </li> 
+   <li><b>Operació en multisignatures:</b> Permet configurar l&apos;operació que haurà de realitzar-se quan el fitxer d&apos;entrada siga un signatura CAdES. 
+    <ul> 
+     <li>Cosignatura: Cosignatura la signatura d&apos;entrada.</li> 
+     <li>Contrafirma (únicament dels nodes fulla): Contrafirma els nodes fulla de la signatura d&apos;entrada.</li> 
+     <li>Contrafirma (de tot l&apos;arbre): Contrafirma tots els nodes de signatura de la signatura d&apos;entrada.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Signatures XAdES (XML)&quot;</h3> 
+  <p align="center"> <img src="../gfx/menufirmasxades_mini.png" alt="Pantalla para la configuración de las firmas de documentos XML" /> </p> 
+  <ul> 
+   <li><b>Configuració de la política de signatura:</b> Permet declarar la política de signatura que se segueix en les signatures XAdES: <p>Els valors accessibles a través del panell de configuració són:</p> 
+    <ul> 
+     <li>Cap política: La signatures de XML generades no declararan política de signatura.</li> 
+     <li>Política de signatura de l&apos;AGE 1.9: Es declara la política de signatura de l&apos;AGE v1.9</li> 
+     <li>Política a mesura: Permet configurar manualment cadascuna de les propietats de la política.</li> 
+     <ul> 
+      <li>Identificador de la política.</li> 
+      <li>Empremta digital de l&apos;identificador de la política.</li> 
+      <li>Algorisme d&apos;empremta digital de l&apos;identificador de la política.</li> 
+      <li>Qualificador de la política</li> 
+     </ul> 
+    </ul> </li> 
+   <li><b>Opcions de signatura:</b> 
+    <ul> 
+     <li><b>Format de les signatures:</b> 
+      <ul> 
+       <li>XAdES Enveloping: Es configura la manera enveloping (la signatura embolica a les dades signades).</li> 
+       <li>XAdES Detached: Es configura la manera detached (signatura i dades en una super-estructura XML).</li> 
+       <li>XAdES Enveloped: Es configura la manera enveloped (la signatura s&apos;insereix dins de les dades XML).</li> 
+      </ul> </li> 
+    </ul> <p><b><u>ADVERTIMENT:</u></b> La política de signatura de l&apos;AGE, només permet la realització de signatures en formats Enveloped i Internally Detached (ací referida com Detached). Així doncs, només es podran configurar estos formats de signatura quan es declare la política de signatura de l&apos;AGE.</p> </li> 
+   <li><b>Metadades de les signatures XAdES:</b> 
+    <ul> 
+     <li>Ciutat en la qual es realitza la signatura: Ciutat en la qual es localitza el signant en el moment de la signatura.</li> 
+     <li>Província en la qual es realitza la signatura: Província en la qual es localitza el signant en el moment de la signatura.</li> 
+     <li>Codi postal en la qual es realitza la signatura: Codi postal en la qual es localitza el signant en el moment de la signatura.</li> 
+     <li>País en el qual es realitza la signatura: País la que es localitza el signant en el moment de la signatura.</li> 
+     <li>Càrrec del signant: Càrrec de qui realitza la signatura.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Factura Electrònica&quot;</h3> 
+  <p align="center"> <img src="../gfx/menufirmasfacturae_mini.png" alt="Pantalla para la configuración de las firmas de facturas electrónicas" /> </p> 
+  <ul> 
+   <li><b>Configuració de la política de signatura:</b> Permet declarar la versió de la política de signatura de Factura electrònica que ha d&apos;utilitzar-se.</li> 
+   <li><b>Opcions de signatura:</b> 
+    <ul> 
+     <li>Paper del signant de la factura electrònica: Permet configurar el rol que exerceix el signant en el cicle de vida de la factura.</li> 
+    </ul> </li> 
+   <li><b>Metadades de les factures electròniques:</b> 
+    <ul> 
+     <li>Ciutat en la qual es realitza la signatura: Ciutat en la qual es localitza el signant en el moment de la signatura.</li> 
+     <li>Província en la qual es realitza la signatura: Província en la qual es localitza el signant en el moment de la signatura.</li> 
+     <li>Codi postal en la qual es realitza la signatura: Codi postal en la qual es localitza el signant en el moment de la signatura.</li> 
+     <li>País en el qual es realitza la signatura: País la que es localitza el signant en el moment de la signatura.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Magatzems de claus&quot;</h3> 
+  <p align="center"> <img src="../gfx/menualmacenesclaves_mini.png" alt="Pantalla para la configuración de las firmas de facturas electrónicas" /> </p> 
+  <ul> 
+   <li><b>Magatzem per defecte:</b> 
+    <ul> 
+     <li>Permet seleccionar el magatzem de claus que es carregarà per defecte en la interfície d&apos;escriptori.</li> 
+     <li><b>Veure contingut:</b> Permet veure els certificats que conté el magatzem seleccionat.</li> 
+     <li><b>Usar també en les crides d&apos;Autofirma des del navegador:</b> Indica si es desitja que el magatzem configurat siga el que es carregue per defecte també quan es cride a Autofirma des del navegador.</li> 
+    </ul> </li> 
+   <li><b>Filtres de certificats:</b> 
+    <ul> 
+     <li><b>No mostrar la pantalla inicial de DNIe i treballar sempre amb el magatzem per defecte:</b> Omet la pantalla inicial en detectar un DNIe i s&apos;utilitzarà el magatzem per defecte que estiga configurat.</li> 
+     <li><b>Permetre l&apos;ús de certificats caducats:</b> En estar habilitada esta opció, els certificats caducats apareixeran en el diàleg de selecció de certificats de signatura, la qual cosa permetrà signar amb ells.</li> 
+     <li><b>Usar sol certificats específics per a signatura en les signatures electròniques (atribut de no repudi):</b> Si està marcada esta opció, només es mostraran els certificats que declaren específicament ser de signatura.</li> 
+     <li><b>Usar exclusivament certificats de pseudònim quan estan disponibles:</b> Restringeix que únicament es puguen usar certificats de pseudònim quan estos estiguen disponibles.</li> 
+     <li><b>Ometre certificat d&apos;autenticació de DNIe:</b> Oculta el certificat d&apos;autenticació inclòs en els magatzems de claus per a DNIe.</li> 
+    </ul> </li> 
+   <li><b>Targetes intel·ligents:</b> 
+    <ul> 
+     <li>Permet donar d&apos;alta targetes intel·ligents a partir del seu controlador PKCS#11 per a poder usar-les directament com un magatzem de claus accessible des del diàleg de seleccín de certificats. Les targetes intel·ligents agregades ací, es podran configurar com a magatzems per defecte en el desplegable del primer apartat.</li> 
+     <li><b>Connectar:</b> Realitza una prova de connexió amb el magatzem de claus de la targeta intel·ligent seleccionada.</li> 
+     <li><b>Agregar targeta:</b> Afig una nova targeta intel·ligent. S&apos;obrirà un diàleg on introduir un nom per a la targeta intel·ligent i la ruta on es troba el seu controlador PKCS#11.</li> 
+     <li><b>Modificar:</b> Permet modificar el nom i la ruta del controlador de la targeta intel·ligent seleccionada.</li> 
+     <li><b>Eliminar:</b> Elimina la targeta intel·ligent seleccionada en el desplegable.</li> 
+    </ul> </li> 
+  </ul>  
+ </body>
+</html>

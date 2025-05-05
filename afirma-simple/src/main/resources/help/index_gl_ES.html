@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head> 
+  <title>Autofirma</title> 
+  <meta name="AppleTitle" content="Ayuda de Autofirma" /> 
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png" /> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+  <script>
+
+      function getLanguageFolder() {
+        return "gl_ES/";
+      }
+
+    function loadScreen(page) {
+        var folder = getLanguageFolder();
+        
+        var cleanedPageAddress = cleanAddress(page);
+        document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="' + folder + cleanedPageAddress + '" width="107%" style="align:right; min-height:100vh; margin: 0 auto;"></object>';
+	}
+    
+    function cleanAddress(page) {
+    	return page.replace('\\', '/').replace('..', '').replace(' ', '%20')
+    		.replace('?', '%3F').replace('&', '%26').replace('<', '%3C').replace('>', '%3E');
+	}
+  
+  
+  </script> 
+  <style>
+ 
+	body {
+		overflow-y: hidden;
+	}
+ 
+	.sidebar {
+		height: 100%;
+		min-height: 400px;
+		width: 20%; 
+		position: fixed; 
+		z-index: 1;
+		top: 0;
+		left: 0;
+		padding-top: 60px; 
+		overflow-y: scroll;
+	}
+	
+	.sidebar ul {
+		margin:0;
+		padding:0;
+	}
+	
+	.sidebar li {
+		border: 2px solid white; 
+		list-style: none;
+		padding: 7px;
+		margin: 10px;
+		background-color: #96181c; 
+		text-decoration: none; 
+		font-family: 'Helvetica', sans-serif; 
+		border-radius: 15px; 
+	}
+	
+	.sidebar a {
+		text-decoration: none;
+		color: white;
+	}
+	
+	.content {
+		margin-left: 20%;
+		width:75%;
+	}
+
+  
+  </style> 
+ </head> 
+ <body> 
+  <div id="sidebar" class="sidebar"> 
+   <ul> 
+    <li><a href="javascript:loadScreen(&quot;Autofirma.html&quot;);">Autofirma</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/PantallaEspera.html&quot;);">Esperando á inserción do DNIe...</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/PantallaFirma.html&quot;);">Firma electrónica de documentos</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/PantallaDetalle.html&quot;);">Detalle das firmas unha vez completadas</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/MenuPreferencias.html&quot;);">Menu de configuración</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/MenuRestauracion.html&quot;);">Panel de restauración da instalación</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/MenuPlugins.html&quot;);">Panel de gestion de plugins</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/Plugins.html&quot;);">Plugins</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/VentanaConfigurarProxy.html&quot;);">Xanela de configuración de proxy</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/VentanaListaBlancaDominios.html&quot;);">Xanela de configuración de lista branca de dominios</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/VentanaPdfVisible.html&quot;);">Xanela de configuración de elementos visibles en PDF</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/LineaComandos.html&quot;);">Uso por liña de comandos</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/Licencia.html&quot;);">Licenza de uso e distribucion</a></li> 
+   </ul> 
+  </div> 
+  <div id="dynamicContent" class="content"> 
+  </div> 
+  <script>	
+	var urlToString = window.location.search;
+	var urlParams = new URLSearchParams(urlToString);
+	var redirectPage = urlParams.get('redirectPage');
+	loadScreen(redirectPage);
+
+  
+  </script>  
+ </body>
+</html>

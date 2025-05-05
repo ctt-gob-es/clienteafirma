@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Autofirma</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="sinatu, CAdES, XAdES, PAdES, ODF, OOXML formatua">
+  <meta name="description" content="Fitxategien sinadura elektronikoa.">
+  <style>
+	
+	.bold {
+		font-weight: bold;
+	}
+
+  </style>
+ </head>
+ <body> 
+  <h2>Sinadura-pantaila</h2>
+  <p>Pantaila honetatik, sinatu nahi dituzun dokumentu edo direktorioak hauta ditzakezu.</p>
+  <p align="center"><img src="../gfx/pantallafirma1_mini.png" alt="Dokumentuak hautatzeko eta sinatzeko pantaila"></p>
+  <p>Dokumentu bat edo gehiago hauta ditzakezu &quot;Hautatu sinatu beharreko fitxategiak&quot; botoia sakatuta edo dokumentuak eta/edo direktorioak adierazitako eremura arrastatuta (lauki gris iluna).</p>
+  <p>Sinatu beharreko dokumentuak kargatzean, horiei buruzko xehetasun batzuk erakutsiko zaizkizu. Xehetasun horiek aldatu egingo dira fitxategi bakarra edo batzuk hautatu ahala:</p>
+  <p align="center"><img src="../gfx/pantallafirma4_mini.png" alt="Kargatutako fitxategi bat duten dokumentuak hautatzeko eta sinatzeko pantaila"> <img src="../gfx/pantallafirma3_mini.png" alt="Hautatzeko eta sinatzeko pantaila, hainbat fitxategi kargatuta dituena"></p>
+  <p>Sinatu nahi zenituen dokumentuak arrastatzeko gaitutako laukian, hautatutako fitxategiari edo fitxategiei buruzko informazioa agertuko zaizu.</p>
+  <p>Fitxategi bat bakarrik hautatu baduzu eta dokumentu-mota horietarako aurrez zehaztutako aplikazio bat baduzu, &quot;Ikusi fitxategia&quot; botoia agertuko zaizu, eta horrekin ireki ahal izango duzu. Gainera, fitxategiari eta sortuko den sinadurari buruzko informazioa agertuko zaizu (formatua, sinadura-atributuak eta sinadura-aukerak). Sinaduran bertan sartuko den hautatutako sinadura-formaturako datuak konfiguratu badira (adibidez, sinadura-politika), &quot;Ikusi guztiak...&quot; esteka bistaratuko da, eta definitutako sinadura-atributu guztiak ikusi ahal izango dira.</p>
+  <p>Fitxategi edo direktorio bat baino gehiago hautatu badira, bi klik egin ditzakezu irekitzeko, edo saguaren bigarren botoiarekin sakatu &quot;Ikusi fitxategia&quot; eta &quot;Ikusi sinaduraren atributuak&quot; aukerak ikusteko.</p>
+  <p>Pantailaren beheko aldean dagoen &quot;Sinatu&quot; botoiak dokumentua sinatzeko aukera emango dizu. Zure sistema eragileko ziurtagiri-biltegia oraindik kargatzen amaitu ez bada, botoia desgaituta agertuko da, eta itxaroteko irudi animatua izango du. Kasu horretan, itxaron, mesedez, desagertu arte eta botoia gaitu arte.</p>
+  <p>botoia sakatutakoan, programak sinadura bat sortuko du hautatutako dokumentu bakoitzerako. Dokumentu-mota bakoitzerako, <a href="MenuPreferencias.html"> lehentasun-paneletik a formatuarekin sortuko da sinadura. </a></p>
+   <p>Hautatutako fitxategia beste formatu batean sinatu nahi bada, formatuari buruzko informazioaren ondoan dagoen &quot;(Aldatu)&quot; esteka hautatuz aldatu ahal izango da. Hautatzean, leiho hau irekiko da, eta nahi den formatua aukeratu ahal izango da:</p>
+   <p align="center"><img src="../gfx/dialogocambioformato.png" alt="Sinadura-formatua hautatzeko pantaila"></p>
+   <p>Taula honetan ageri dira bereizten diren dokumentu-motak eta onartzen dituzten sinadura-formatuak:</p>
+  <table>
+   <tr><th>Dokumentu-mota</th><th>Ikonoa</th><th>Sinadura-formatuak (lehenetsia nabarmenduta)</th></tr>
+   <tr><td>PDF</td><td><img src="../../shrd/icon_pdf.png" alt="Adobe PDF dokumentuaren ikonoa"></td><td><strong> PAdES, </strong> CAdES eta XAdES.</td></tr>
+   <tr><td>XML</td><td><img src="../../shrd/icon_xml.png" alt="XML dokumentuaren ikonoa"></td><td><strong> XAdES </strong> eta CAdES.</td></tr>
+   <tr><td>Faktura elektronikoa</td><td><img src="../../shrd/icon_facturae.png" alt="Faktura elektronikoaren ikonoa"></td><td><strong> Faktura E, </strong> CAdES eta XAdES.</td></tr>
+   <tr><td>OOXML</td><td><img src="../../shrd/icon_office_win.png" alt="OOXML dokumentuaren ikonoa"></td><td><strong> CAdES, </strong> XAdES eta OOXML (Office Open XML).</td></tr>
+   <tr><td>ZFD</td><td><img src="../../shrd/icon_openoffice.png" alt="ODF dokumentuaren ikonoa"></td><td><strong> CAdES, </strong> XAdES eta ODF (Open Document Format).</td></tr>
+   <tr><td>Gainerako dokumentuak</td><td><img src="../../shrd/icon_binary.png" alt="Dokumentu bitarraren ikonoa"></td><td><strong> CAdES </strong> eta XAdES.</td></tr>
+   <tr><td>Sinadura elektronikoa</td><td><img src="../../shrd/icon_sign.png" alt="Sinadura elektronikoaren ikonoa"></td><td>Jatorrizko sinaduraren berdina.</td></tr>
+  </table>
+  <p>Azken kasu horren salbuespen gisa, ezin da berriro sinatu faktura elektronikoa, dagoeneko sinatuta dagoena, Faktura-e formatuan.</p>
+  <p>Fitxategiak sinatzean, sortutako sinadura gordetzeko leiho bat bistaratuko da, baldin eta dokumentu bat edo elkarrizketa bat baino hautatu ez bada irteerako direktorioa hautatzeko, bat baino gehiago hautatu badira. Sinadurak gorde ondoren, <a href="PantallaDetalle.html"> sinaduraren xehetasunen pantaila bistaratuko da. </a></p>
+  <p>Autofirman instalatutako plugin-ek alda dezakete sinadura-prozesua. Kontsultatu <a href="MenuPlugins.html"> pluginen kudeaketari </a> buruzko atala, horiei buruz gehiago jakiteko.</p>
+  <p>Botoien eta elementu grafikoen osagarri gisa, menu-barra edo teklatu-azeleragailu hauek ere erabil ditzakezu:</p>
+  <ul>
+   <li><code> Kontrola (“macOS” aukeran) + S: </code> Hautatu fitxategia.</li>
+   <li><code> Kontrola (“macOS”-en) + F: </code> Hautatutako fitxategia sinatzea.</li>
+  </ul>
+
+  <h3>Sinadura-formatuak konfiguratzea</h3>
+  <p>Fitxategi-mota bakoitzak erabili beharreko sinadura-formatua eta formatu horien berezitasunak konfigura ditzakezu, baita aplikazioaren portaera orokorra ere, Opciones menuaren bidez eskura dagoen <a href="MenuPreferencias.html"> lehentasun-paneletik </a> abiatuta.</p>
+  <p>Sinadura-formatu edo -aukera batzuek konfigurazio-aukera osagarriak bistara ditzakete sinadura-leihoan bertan:</p>
+  <ul>
+    <li><h4>PDF sinaduraren aukerak:</h4>
+     <p>Dokumentu bakar baten PDF sinadurak aukera ematen du sinadura dokumentuan agertzen dena konfiguratzeko. Horretarako, &quot;PDF formatuan ageriko sinadura egin&quot; laukitxoa markatu behar da.</p>
+     <p>Sinadura egitean, PDFan ageriko marka bat ere sar daiteke. Aukera honek PDFa aldatuko du hautatutako irudia gehituta, eta, ondoren, sinatu egingo du. Funtzio hau erabiltzeko, &quot;Txertatu marka ikusgai PDFan&quot; laukia markatu behar da. Lauki hau desgaituta egongo da PDF dokumentua sinatuta badago, marka bat txertatzeak aurreko sinadurak baliogabetuko bailituzke.</p>
+     <p>Beste aukera bat PDF ziurtatu bat sortzea litzateke. Egin beharreko sinadura PAdES formatua bada eta dokumentua aldez aurretik sinatuta ez badago egin daiteke. &quot;Sortu PDF ziurtatua&quot; laukia markatzean egiten da, eta laukitxo horren azpian aukeren zerrendan hautatutako ziurtapen-maila aplikatzen zaio dokumentuari. Aukeren zerrenda desgaituta egongo da &quot;Sortu PDF ziurtatua&quot; laukia gaituta ez badago.</p>
+     <p>Aukera horiek lehenespenez markatuta edo markatu gabe agertuko <a href="MenuPreferencias.html"> dira, lehentasun-panelean ezarritakoaren arabera. </a> Laukitxo horietako bat hautatzean, <a href="VentanaPdfVisible.html"> PDFn ikusgai dauden elementuen propietateen panela agertuko zaigu. </a></p>
+    </li>
+    <li><h4>Gehitu sinadura berri bat dokumentu bati:</h4>
+     <p>Sinadura-dokumentu bati sinadura bitar edo XML berri bat gehitzean, sinadura berria dokumentuaren gainean (berrsinadura) edo lehendik sartutako sinaduren gainean (baieztapena) egingo den konfigura daiteke. Aukera hori CAdES eta XAdES formatuen lehentasun-paneletik konfigura daiteke. Aplikatzen duzunean, Autofirmak &quot;Aukera aurreratuak&quot; botoia erakutsiko dio erabiltzaileari, konfigurazio-aukera horietara zuzenean sartzeko.</p>
+   </li>
+  </ul>
+  <p>Dokumentu anitzen sinadura-prozesuetan ez da sinadura-prozesua gelditzera behartzen duen konfiguraziorik egiten. Adibidez, PDFetako pasahitza ez da eskatuko, eta sinadura ikusgaiaren eta marka ikusgaiaren konfigurazioa behin bakarrik eskatuko da, eta konfigurazio bera duten dokumentu guztiei aplikatuko zaie.</p>
+ </body>
+</html>

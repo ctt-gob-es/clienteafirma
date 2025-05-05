@@ -47,7 +47,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.smartcardio.CardTerminal;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -67,6 +66,7 @@ import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.LanguageManager;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
@@ -128,18 +128,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	private static final String SYSTEM_PROPERTY_DEBUG_LEVEL = "afirma_debug_level"; //$NON-NLS-1$
 
-
-    /**
-     * Propiedad del sistema con la que configurar que se ignoren los lectores de
-     * tarjeta que se reconozcan como lectores virtuales.
-     */
-    private static final String SYSTEM_PROPERTY_IGNORE_VIRTUAL_READERS = "ignoreVirtualReaders"; //$NON-NLS-1$
-
 	/** Directorio de datos de la aplicaci&oacute;n. */
 	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator //$NON-NLS-1$
 			+ "Autofirma"; //$NON-NLS-1$
 
 	private static final String PLUGINS_DIRNAME = "plugins"; //$NON-NLS-1$
+	
+	private static final String LANGUAGES_DIRNAME = "languages"; //$NON-NLS-1$
 
 	/**
 	 * Inicio (en min&uacute;sculas) de una ruta que invoca a la aplicaci&oacute;n
@@ -217,9 +212,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		// Indicamos si se debe instalar el proveedor de firma XML de Apache
        XmlDSigProviderHelper.configureXmlDSigProvider();
-
-       // Indicamos que no queremos cargar los lectores de tarjeta virtuales
-       System.setProperty(SYSTEM_PROPERTY_IGNORE_VIRTUAL_READERS, Boolean.TRUE.toString());
     }
 
 	/**
@@ -256,12 +248,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * la configurada por defecto en la interfaz para el tipo de fichero seleccionado.
      */
 	void initGUI(final File preSelectedFile, final SignOperationConfig signConfig) {
-        // Cargamos las preferencias establecidas
-		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
-		if (defaultLocale == null || defaultLocale.isEmpty()) {
-			defaultLocale = Locale.getDefault().toString();
-		}
-        setDefaultLocale(buildLocale(defaultLocale));
 
         // Una excepcion en un constructor no siempre deriva en un objeto nulo,
         // por eso usamos un booleano para ver si fallo, en vez de una comprobacion
@@ -270,13 +256,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				&& !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN);
         if (showDNIeScreen) {
 	        try {
-	        	// Si no hay lectores de tarjetas o el unico es el de Windows Hello,
-	        	// ignoraremos el mostrar la pantalla inicial para el uso del DNIe
-	        	final List<CardTerminal> terminals = javax.smartcardio.TerminalFactory.getDefault().terminals().list();
-	        	if (terminals.isEmpty()) {
-	        		showDNIeScreen = false;
-	        	}
-	        	else if (Platform.getOS() == Platform.OS.WINDOWS && terminals.size() == 1 && terminals.get(0).getName().startsWith("Windows Hello")) {
+	        	if (javax.smartcardio.TerminalFactory.getDefault().terminals().list().isEmpty()) {
 	        		showDNIeScreen = false;
 	        	}
 			} catch (final Exception e) {
@@ -763,7 +743,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     public static void setDefaultLocale(final Locale l) {
         if (l != null) {
             Locale.setDefault(l);
-            PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, l.toString());
+            PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, l.toString());   
+            LanguageManager.init(getLanguagesDir());
             SimpleAfirmaMessages.changeLocale();
         }
     }
@@ -808,9 +789,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				LOGGER.log(Level.WARNING, "No se han podido copiar los ficheros de ayuda a disco", e); //$NON-NLS-1$
 			}
 		}
+		
+		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
+		if (defaultLocale == null || defaultLocale.isEmpty()) {
+			defaultLocale = Locale.getDefault().toString();
+		}
 
 		// Cargamos el fichero
-		final String indexHelpFile = helpDir + File.separator + "index.html"; //$NON-NLS-1$
+		final String indexHelpFile = helpDir + File.separator + "index_" + defaultLocale + ".html"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		try (final InputStream is = new FileInputStream(indexHelpFile)) {
 			Desktop.getDesktop().browse(new URI(HelpResourceManager.createHelpFileLauncher(indexHelpFile + "?redirectPage=" + redirectPage))); //$NON-NLS-1$
@@ -853,6 +839,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * @param args Par&aacute;metros en l&iacute;nea de comandos
 	 */
     public static void main(final String[] args) {
+    	
+        // Cargamos las preferencias establecidas
+		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
+		if (defaultLocale == null || defaultLocale.isEmpty()) {
+			defaultLocale = Locale.getDefault().toString();
+		}
+        setDefaultLocale(buildLocale(defaultLocale));
 
     	// Configuramos el log de la aplicacion
     	configureLog();
@@ -1394,6 +1387,19 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			appDir = DesktopUtil.getApplicationDirectory();
 		}
 		return new File(appDir, PLUGINS_DIRNAME);
+	}
+    
+    /**
+     * Obtiene el directorio en el que se encuentran guardados o se deben
+     * guardar los idiomas.
+     * @return Directorio de idiomas.
+     */
+    private static File getLanguagesDir() {
+		File appDir = DesktopUtil.getAlternativeDirectory();
+		if (appDir == null) {
+			appDir = DesktopUtil.getApplicationDirectory();
+		}
+		return new File(appDir, LANGUAGES_DIRNAME);
 	}
 
 }

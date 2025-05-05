@@ -352,7 +352,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 			}
 
 			if (validationMessage != null) {
-				details.getSigner().getValidityResult().put("Validacion", validationMessage); //$NON-NLS-1$
+				details.getSigner().getValidityResult().put(SimpleAfirmaMessages.getString("ValidationInfoDialog.68"), validationMessage); //$NON-NLS-1$
 			}
     	}
     }

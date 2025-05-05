@@ -27,6 +27,7 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,6 +69,7 @@ import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.Permission;
 import es.gob.afirma.standalone.plugins.PluginCommand;
@@ -112,6 +114,14 @@ final class CommandLineLauncher {
 	static void processCommandLine(final String[] args) {
 
 		final Console console = System.console();
+		
+        // Cargamos las preferencias establecidas
+		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
+		if (defaultLocale == null || defaultLocale.isEmpty()) {
+			defaultLocale = Locale.getDefault().toString();
+		}
+        SimpleAfirma.setDefaultLocale(buildLocale(defaultLocale));
+		
 		try (final PrintWriter pw = console != null ? console.writer() : new PrintWriter(System.out)) {
 
 			// Comprobamos si hay que mostrar la sintaxis de la aplicacion
@@ -1209,4 +1219,15 @@ final class CommandLineLauncher {
 		final String title = CommandLineMessages.getString("CommandLineLauncher.127"); //$NON-NLS-1$
 		AOUIFactory.showErrorMessage(message, title, JOptionPane.ERROR_MESSAGE, t);
 	}
+	
+    private static Locale buildLocale(final String locale) {
+        final String[] frags = locale.split("_"); //$NON-NLS-1$
+        if (frags.length == 1) {
+            return new Locale(frags[0]);
+		}
+		if (frags.length == 2) {
+            return new Locale(frags[0], frags[1]);
+		}
+		return new Locale(frags[0], frags[1], frags[2]);
+    }
 }

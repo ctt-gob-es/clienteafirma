@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Autofirma</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="certificate, OCSP, counteraffirms, co-signed, joint">
+  <meta name="description" content="Show the details of a signature made.">
+ </head>
+ <body> 
+  <h3>Detail screen of the signature(s) made</h3>
+  <p>After completion of a signature operation, a screen with information on the outcome of the operation is displayed.</p>
+  <p align="center"><img src="../gfx/pantalladetalle_mini.png" alt="Display with details of the signature made when a single document is signed"> <img src="../gfx/pantalladetalle2_mini.png" alt="Display with the list of signatures made when multiple documents are signed"></p>
+  <p>If you want more information about the signature, you can click on the <u> Details of the Signature </u> link and a dialogue will be shown with information about it:</p>
+  <p align="center"><img src="../gfx/pantalladetallesfirma.png" alt="Screen with extended signature information"></p>
+  <p>This screen is divided into three sections:</p>
+  <p><b> Information about the signed file or output directory </b> <br/> The entire path of the signed file (you can copy this path by clicking on it with the right mouse button) or that of the output directory. If the PAdES signature of a PDF document was made, a button will be displayed to open the signed document with the default application in the system.</p>
+  <p><b> Information about the certificate used to make signatures </b> <br/>It is possible to see the certificate (by default application of the OS) by clicking on the hyperlinks.</p>
+  <p><b> In the case of signing a document, at least the following points are shown by means of a tree structure:</b></p>
+  <ul>
+   <li>Signature format: CAdES, PAdES, XAdES, Am, OOXML or ODF.</li>
+   <li>Signed data: It indicates whether the data is embedded in the firm itself and allows access to them if they are.</li>
+   <li>Signature tree: Hierarchical structure of the signatures found in the document. You can see the certificate used for each of them by clicking on the corresponding link.</li>
+  </ul>
+  <p>Keyboard cursors can be used to move between the elements of the tree.</p>
+  <p>In case you have signed multiple files, a list will be displayed with the generated files, their size and result. In the case of signatures that could not be generated, the path of the input file shall be displayed. You can double-click on one of the signatures listed to access your detailed information.</p>
+ </body>
+</html>

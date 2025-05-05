@@ -56,9 +56,9 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 
 	private static final long serialVersionUID = 4299378019540627483L;
 
-	private static final String FACTURAE_ROL_EMISOR = "Emisor"; //$NON-NLS-1$
-	private static final String FACTURAE_ROL_RECEPTOR = "Receptor"; //$NON-NLS-1$
-	private static final String FACTURAE_ROL_TERCERO = "Tercero"; //$NON-NLS-1$
+	private static final RoleItem FACTURAE_ROL_EMISOR = new RoleItem(SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.5"), "Emisor"); //$NON-NLS-1$
+	private static final RoleItem FACTURAE_ROL_RECEPTOR = new RoleItem(SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.6"), "Receptor"); //$NON-NLS-1$
+	private static final RoleItem FACTURAE_ROL_TERCERO = new RoleItem(SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.7"), "Tercero"); //$NON-NLS-1$
 
 	private static final String SIGN_FORMAT_FACTURAE = AOSignConstants.SIGN_FORMAT_FACTURAE;
 
@@ -82,14 +82,14 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	private final JTextField facturaeSignatureProductionProvince = new JTextField();
 	private final JTextField facturaeSignatureProductionPostalCode = new JTextField();
 	private final JTextField facturaeSignatureProductionCountry = new JTextField();
-
-	private final JComboBox<Object> facturaeRol = new JComboBox<>(
-		new Object[] {
+	
+	private final RoleItem [] roleItems = new RoleItem[] {
 			FACTURAE_ROL_EMISOR,
 			FACTURAE_ROL_RECEPTOR,
 			FACTURAE_ROL_TERCERO
-		}
-	);
+	};
+
+	private final JComboBox<Object> facturaeRol = new JComboBox<>(this.roleItems);
 
 	private final JPanel panelPolicies = new JPanel();
 	private PolicyPanel facturaePolicyPanel;
@@ -289,7 +289,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	/** Guarda las preferencias de FacturaE. */
 	void savePreferences() {
 
-		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNER_ROLE, this.facturaeRol.getSelectedItem().toString());
+		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNER_ROLE, ((RoleItem) this.facturaeRol.getSelectedItem()).getValue());
 
 		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY, this.facturaeSignatureProductionCity.getText());
 		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE, this.facturaeSignatureProductionProvince.getText());
@@ -324,9 +324,14 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	}
 
 	void loadPreferences() {
-		this.facturaeRol.setSelectedItem(
-			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNER_ROLE)
-		);
+		
+		final String signerRoleValue = PreferencesManager.get(PREFERENCE_FACTURAE_SIGNER_ROLE);
+		
+		for (final RoleItem item : this.roleItems) {
+			if (item.getValue().equals(signerRoleValue)) {
+				this.facturaeRol.setSelectedItem(item);
+			}
+		}		
 
 		this.facturaeSignatureProductionCity.setText(
 			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY)

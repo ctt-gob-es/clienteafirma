@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Pluginak</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="plugina, hash">
+  <meta name="description" content="Pluginak.">
+ </head>
+ <body> 
+  <h2>Pluginak</h2>
+  <p>Autofirmarekin batera, plugin-multzo bat banatzen da, aplikazioari funtzio gehigarriak eransteko.</p>
+  <h3>Aztarna digitalak kalkulatzea eta egiaztatzea</h3>
+  <p>Plugin horrek fitxategi baten edo direktorio bateko fitxategi guztien aztarna digitala (hash) kalkulatzeko aukerak gehitzen dizkio Autofirmari, eta sortu diren aztarna horiek egiaztatzeko aukera ematen du.</p>
+  <p>Plugina instalatutakoan, Autofirmaren menu-barran &quot;Aztarna digitalak&quot; aukera agertuko da egin daitezkeen eragiketa guztiekin.</p>
+  <ul>
+  	<li><b> Aztarna digitala kalkulatu: </b> Fitxategi baten hash-a kalkulatzeko eta diskora gordetzeko aukera ematen du. Hash fitxategiaren formatua eta luzapena aldatu egingo dira hautatutako formatuaren arabera.</li>
+  	<p align="center"><img src="../gfx/pluginhash_calculo_fichero_mini.png" alt="Fitxategiak kalkulatzeko pantaila"></p>
+  	<ul>
+  		<li><b> Aztarna digitala kalkulatzeko fitxategia: </b> hash-a kalkulatu nahi dugun fitxategia.</li>
+  		<li><b> Hatz-markaren algoritmoa: </b> Hash-algoritmoa.</li>
+  		<li><b> Hatz-marka digitalaren formatua: </b> Hash-a gordetzeko erabilitako kodea:<ul>
+  				<li>Hamaseitarra ASCIIn (Base16): H-tan neurtutako kate hamaseitar gisa biltegiratuko da aztarna.</li>
+  				<li>64. oinarria: Aztarna 64. oinarrian gordeko da.</li>
+  				<li>Bitarra: Hatz-marka kodifikatu gabe biltegiratuko da.</li>
+  			</ul>
+  		</li>
+  		<li><b> Kopiatu aztarna digitala arbelean: </b> Aukera hau aktibatzean, hash-a fitxategian gordetzeaz gain, arbelean kopiatuko da. Hash-a hautatutako formatuaren kodifikazioarekin kopiatuko da, edo, formatu bitarra hautatuz gero, formatu hamaseitarrean.</li>
+  	</ul><br><li><b> Aztarna digitala egiaztatzea: </b> Fitxategi baten hash-a egiaztatzeko balio du.</li>
+  	<p align="center"><img src="../gfx/pluginhash_comprobacion_fichero_mini.png" alt="Fitxategiak egiaztatzeko pantaila"></p>
+  	<ul>
+  		<li><b> Datuen fitxategia: </b> Egiaztatu nahi den aztarna digitalari dagokion fitxategia.</li>
+  		<li><b> Hatz-marka digitala duen fitxategia: </b> hatz-marka digitala duen fitxategia.</li>
+  	</ul><br><li><b> Aztarna digitala direktorioan kalkulatzea: </b> Direktorio bateko fitxategien hash-a kalkulatzeko balio du.</li>
+  	<p align="center"><img src="../gfx/pluginhash_calculo_directorio_mini.png" alt="Direktorioko hash-a kalkulatzeko pantaila"></p>
+  	<ul>
+  		<li><b> Aztarna digitalak kalkulatzeko direktorioa: </b> Aztarna digitala kalkulatzeko erabili nahi ditugun fitxategien direktorioa.</li>
+  		<li><b> Hatz-markaren algoritmoa: </b> Hash-algoritmoa.</li>
+  		<li><b> Errekurtsiboa: </b> Aktibatzean, hautatutako direktorioko azpidirektorioetan dauden fitxategien hash-a ere kalkulatuko da.</li>
+  	</ul><br><li><b> Egiaztatu aztarna digitala direktorioan: </b> Direktorio bateko fitxategien hash-a egiaztatzeko aukera ematen du.</li>
+  	<p align="center"><img src="../gfx/pluginhash_comprobacion_directorio_mini.png" alt="Direktorioko hash-ak egiaztatzeko pantaila"></p>
+  	<ul>
+  		<li><b> Direktorioa: </b> Egiaztatu nahi diren hatz-markak zein fitxategiri dagozkion adierazten duen direktorioa.</li>
+  		<li><b> Hatz-aztarnen fitxategia: </b> Egiaztatuko diren aztarna digitalen fitxategia.</li>
+  	</ul>
+  </ul>
+  
+  <p>Windows sistemetan aztarna digitalen plugina instalatzean, aztarna digitalak sortzeko eta egiaztatzeko aukerak gehitzen dira sistemako fitxategi eta direktorioen laster-menuan.</p>
+  <p>Aukera hauek agertzen dira:</p>
+  <ul>
+  	<li><b> Hatz-marka digitala sortzea: </b> Aukera hau fitxategi eta direktorio guztien laster-menuan agertzen da, eta fitxategiaren edo direktorioko fitxategien hash-a sortzeko aukera ematen du.</li>
+  	<li><b> Aztarna digitala egiaztatzea: </b> Aukera hau hashes-en fitxategien laster-menuan agertzen da (.hash, .hashb64, .hashfiles eta .hexhash), eta aukera ematen du hash-a zein fitxategi edo direktoriotatik egiaztatu nahi den hautatzeko.</li>
+  </ul>
+ </body>
+</html>

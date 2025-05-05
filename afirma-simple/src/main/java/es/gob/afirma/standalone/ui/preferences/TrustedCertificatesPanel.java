@@ -131,7 +131,9 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 	private void createImportedCertsTable() {
 
-		  final String[] columnNames = { "Nombre", "Emitido por", "Fecha de expiracion" };  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		  final String[] columnNames = { SimpleAfirmaMessages.getString("TrustedCertificatesDialog.33"),  //$NON-NLS-1$
+				  						SimpleAfirmaMessages.getString("TrustedCertificatesDialog.34"),  //$NON-NLS-1$
+				  						SimpleAfirmaMessages.getString("TrustedCertificatesDialog.35") };  //$NON-NLS-1$
 		  this.model = new DefaultTableModel(null, columnNames) {
 			  /** Serial Id. */
 			private static final long serialVersionUID = -3513927556747399446L;
