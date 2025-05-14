@@ -22,7 +22,7 @@ import java.util.zip.ZipEntry;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.OfficeAnalizer;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -76,7 +76,7 @@ public final class AOOOXMLSigner implements AOSigner {
      * @param sign Documento OOXML
      * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso. */
 	@Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+	public byte[] getData(final byte[] sign) throws AOInvalidSignatureFormatException, IOException, AOException {
 		return getData(sign, null) ;
 	}
 
@@ -85,7 +85,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
         // Si no es una firma OOXML valida, lanzamos una excepcion
         if (!isSign(sign)) {
-            throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
         }
 
         // Devolvemos el propio OOXML firmado.

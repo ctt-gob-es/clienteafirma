@@ -9,11 +9,11 @@
 
 package es.gob.afirma.signers.xades;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 
 /** Excepci&oacute;n para notificar que se ha encontrado un objeto que no es una factura electr&oacute;nica v&aacute;lida.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class InvalidEFacturaDataException extends AOInvalidFormatException {
+public class InvalidEFacturaDataException extends AOInvalidSignatureFormatException {
 
 	private static final long serialVersionUID = -7465457150119381288L;
 

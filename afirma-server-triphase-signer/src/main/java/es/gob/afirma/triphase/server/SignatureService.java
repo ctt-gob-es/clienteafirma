@@ -497,8 +497,15 @@ public final class SignatureService extends HttpServlet {
 					LOGGER.info("Se ha calculado el resultado de la prefirma y se devuelve"); //$NON-NLS-1$
 				}
 				catch (final RuntimeConfigNeededException e) {
-					LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la prefirma de los datos", e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED, e.getRequestorText()) + ": " + e); //$NON-NLS-1$
+					if (e.isDenied())
+					{
+						LOGGER.log(Level.SEVERE, "La firma fallo en la prefirma por no obtener permisos/informacion del usuario o la aplicacion", e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.PRESIGN_ERROR) + ": " + e); //$NON-NLS-1$
+					}
+					else {
+						LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la prefirma de los datos", e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED, e.getRequestorText()) + ": " + e); //$NON-NLS-1$
+					}
 					out.flush();
 					return;
 				}
@@ -623,8 +630,15 @@ public final class SignatureService extends HttpServlet {
 					}
 				}
 				catch (final RuntimeConfigNeededException e) {
-					LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la postfirma de los datos", e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED) + ":" + e.getRequestorText() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					if (e.isDenied())
+					{
+						LOGGER.log(Level.SEVERE, "La firma fallo en la postfirma por no obtener permisos/informacion del usuario o la aplicacion", e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.PRESIGN_ERROR) + ": " + e); //$NON-NLS-1$
+					}
+					else {
+						LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la postfirma de los datos", e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED, e.getRequestorText()) + ": " + e); //$NON-NLS-1$
+					}
 					out.flush();
 					return;
 				}

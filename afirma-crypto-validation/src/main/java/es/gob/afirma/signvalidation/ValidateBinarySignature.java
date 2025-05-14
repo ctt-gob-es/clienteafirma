@@ -39,7 +39,7 @@ import org.spongycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.spongycastle.util.Store;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
@@ -118,7 +118,7 @@ public final class ValidateBinarySignature extends SignValider {
 				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.NO_DATA));
 			}
 		}
-    	catch (final AOInvalidFormatException e1) {
+    	catch (final AOInvalidSignatureFormatException e1) {
     		Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
 				"Se ha pedido validar una firma como CAdES, pero no es CAdES: " + e1  //$NON-NLS-1$
 			);

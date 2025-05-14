@@ -57,10 +57,12 @@ import org.spongycastle.tsp.TimeStampResponse;
 import org.spongycastle.tsp.TimeStampToken;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
+import es.gob.afirma.signers.pkcs7.BinaryErrorCode;
 
 /** Generador local de sellos de tiempo para PKCS#7.
  * Puede probarse de forma sencilla con la TSA de CatCert:
@@ -500,14 +502,24 @@ public final class CMSTimestamper {
 
          final byte[] requestBytes = request.getEncoded();
 
-         final byte[] rawResponse = getTSAResponse(requestBytes);
+         byte[] rawResponse;
+         try {
+        	 rawResponse = getTSAResponse(requestBytes);
+         }
+         catch (final IOException e) {
+        	 throw new AOException("No se ha podido conectar con el servicio La respuesta de la TSA no tiene un formato valido: " + e, e, ErrorCode.Communication.TSA_CONNECTION_ERROR); //$NON-NLS-1$
+         }
+         catch (final Exception e) {
+        	 throw new AOException("Error en la generacion del sello de tiempo: " + e, e, BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$
+         }
+
          final TimeStampResponse response;
          try {
             response = new TimeStampResponse(rawResponse);
          }
          catch (final Exception e) {
-        	 LOGGER.severe("Respuesta de la TSA: " + new String(rawResponse)); //$NON-NLS-1$
-            throw new AOException("Error obteniendo la respuesta de la TSA: " + e, e); //$NON-NLS-1$
+        	LOGGER.severe("Respuesta de la TSA: " + new String(rawResponse)); //$NON-NLS-1$
+            throw new AOException("La respuesta de la TSA no tiene un formato valido: " + e, e, BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$
          }
 
          // Validamos los atributos de la respuesta (RFC 3161 PKIStatus)
@@ -515,18 +527,18 @@ public final class CMSTimestamper {
             response.validate(request);
          }
          catch (final Exception e) {
-            throw new AOException("Error validando la respuesta de la TSA: " + e, e); //$NON-NLS-1$
+            throw new AOException("La respuesta de la TSA no es valida: " + e, e, BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$
          }
          final PKIFailureInfo failure = response.getFailInfo();
          final int value = failure == null ? 0 : failure.intValue();
          if (value != 0) {
-             throw new AOException("Respuesta invalida de la TSA ('" + this.tsaURL + "') con el codigo " + value); //$NON-NLS-1$ //$NON-NLS-2$
+             throw new AOException("Respuesta invalida de la TSA ('" + this.tsaURL + "') con el codigo " + value, BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
          }
 
          // Extraemos el token de sello de tiempo (quitando la informacion de estado de las comunicaciones)
          final TimeStampToken  tsToken = response.getTimeStampToken();
          if (tsToken == null) {
-             throw new AOException("La respuesta de la TSA ('" + this.tsaURL + "') no es un sello de tiempo valido: " + new String(rawResponse)); //$NON-NLS-1$ //$NON-NLS-2$
+             throw new AOException("La respuesta de la TSA ('" + this.tsaURL + "') no contiene un sello de tiempo valido: " + new String(rawResponse), BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
          }
 
          return tsToken.getEncoded();

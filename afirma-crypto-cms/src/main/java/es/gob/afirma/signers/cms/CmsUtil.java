@@ -13,7 +13,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.Signature;
-import java.security.SignatureException;
 
 import org.spongycastle.asn1.ASN1Encoding;
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
@@ -26,6 +25,8 @@ import org.spongycastle.cms.CMSProcessable;
 import org.spongycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.signers.pkcs7.BinaryErrorCode;
 
 final class CmsUtil {
 
@@ -46,7 +47,7 @@ final class CmsUtil {
             sig = Signature.getInstance(signatureAlgorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
         }
 
         final byte[] tmp;
@@ -54,23 +55,16 @@ final class CmsUtil {
             tmp = signedAttr2.getEncoded(ASN1Encoding.DER);
         }
         catch (final IOException ex) {
-            throw new AOException("Error obteniendo los atributos firmados", ex); //$NON-NLS-1$
+            throw new AOException("Error obteniendo los atributos firmados", ex, BinaryErrorCode.Internal.INTERNAL_BINARY_SIGNING_ERROR); //$NON-NLS-1$
         }
 
-        // Indicar clave privada para la firma
+        // Inicializamos el objeto de firma
         try {
             sig.initSign(key);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
-        }
-
-        // Actualizamos la configuracion de firma
-        try {
             sig.update(tmp);
         }
-        catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
+        catch (final Exception e) {
+            throw new AOException("Error al inicializar la firma con la clave privada", e, ErrorCode.Internal.INVALID_SIGNING_KEY); //$NON-NLS-1$
         }
 
         // firmamos.
@@ -79,11 +73,10 @@ final class CmsUtil {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
+            throw new AOException("Error durante el proceso de firma", e, ErrorCode.Internal.SIGNING_PKCS1_ERROR); //$NON-NLS-1$
         }
 
         return new DEROctetString(realSig);
-
     }
 
     static ContentInfo getContentInfo(final byte[] content2, final boolean omitContent, final String dataType) throws IOException {

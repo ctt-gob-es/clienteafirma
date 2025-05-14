@@ -68,7 +68,8 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.keystores.AOCancelledSMOperationException;
 import es.gob.afirma.core.keystores.AuthenticationException;
 import es.gob.afirma.core.keystores.LockedKeyStoreException;
@@ -473,11 +474,11 @@ public final class AOODFSigner implements AOSigner {
 	            			causeName = cause.getCause() != null ? cause.getCause().getClass().getName() : null;
 	            			// Si la tarjeta esta bloqueada
 	            			if ("es.gob.jmulticard.card.AuthenticationModeLockedException".equals(causeName)) { //$NON-NLS-1$
-	            				throw new LockedKeyStoreException("El almacen de claves esta bloqueado", e); //$NON-NLS-1$
+	            				throw new LockedKeyStoreException("El almacen de claves esta bloqueado", e, ErrorCode.Functional.SMARTCARD_LOCKED); //$NON-NLS-1$
 	            			}
 	            			// Si se ha insertado un PIN incorrecto
 	            			if ("es.gob.jmulticard.card.BadPinException".equals(causeName)) { //$NON-NLS-1$
-	            				throw new PinException("La contrasena del almacen o certificado es incorrecta", e); //$NON-NLS-1$
+	            				throw new PinException("La contrasena del almacen o certificado es incorrecta", e, ErrorCode.Functional.INVALID_SMARTCARD_PIN); //$NON-NLS-1$
 	            			}
 	            			throw new AuthenticationException("Ocurrio un error de autenticacion al utilizar la clave de firma", cause); //$NON-NLS-1$
 	            		}
@@ -617,20 +618,20 @@ public final class AOODFSigner implements AOSigner {
     /** {@inheritDoc} */
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
+			throws AOInvalidSignatureFormatException, IOException {
 		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) throws AOInvalidSignatureFormatException, IOException {
 
     	if (sign.length >= THRESHOLD_FILE_SIZE) {
     		throw new IOException("Los datos tienen un tamano superior al permitido."); //$NON-NLS-1$
     	}
 
     	if (!isSign(sign)) {
-    		throw new AOInvalidFormatException("Los datos indicados no se corresponden con un ODF firmado"); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("Los datos indicados no se corresponden con un ODF firmado"); //$NON-NLS-1$
     	}
 
         try {
@@ -809,16 +810,16 @@ public final class AOODFSigner implements AOSigner {
      * @return Documento de entrada si este es ODF, <code>null</code> en cualquier otro caso
      * @throws IOException Si ocurren problemas al leer la firma */
 	@Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+	public byte[] getData(final byte[] sign) throws AOInvalidSignatureFormatException, IOException, AOException {
 		return getData(sign, null);
 	}
 
     @Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidSignatureFormatException, IOException {
 
         // Si no es una firma ODF valida, lanzamos una excepcion
         if (!isSign(sign)) {
-            throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
         }
 
         // TODO: Por ahora, devolveremos el propio ODF firmado.
@@ -838,7 +839,7 @@ public final class AOODFSigner implements AOSigner {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
         if (!isSign(data)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_ODF);
     }

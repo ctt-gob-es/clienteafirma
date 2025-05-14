@@ -32,7 +32,10 @@ import com.aowagie.text.pdf.PdfStamper;
 import com.aowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.InvalidLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signers.pades.common.PdfErrorCode;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
 
@@ -166,7 +169,10 @@ public final class PdfTimestamper {
 	        			throw new PdfIsPasswordProtectedException(e);
 	        		}
 	        		catch (final DocumentException e) {
-						throw new AOException("Error de formato en el PDF de entrada: " + e, e); //$NON-NLS-1$
+						throw new AOFormatFileException("Error de formato en el PDF de entrada: " + e, e); //$NON-NLS-1$
+					}
+	        		catch (final IOException e) {
+	        			throw new AOException("Error en la composicion del documento firmado", e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$
 					}
 
 	        		// Aplicamos todos los atributos de firma
@@ -200,7 +206,7 @@ public final class PdfTimestamper {
 						sap.preClose(exc, signTime, null);
 					}
 	        		catch (final DocumentException e) {
-						throw new AOException("Error en el procesado del PDF: " + e, e); //$NON-NLS-1$
+						throw new AOException("Error en el procesado del PDF: " + e, e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$
 					}
 
 	        		// Obtenemos el rango procesable
@@ -219,7 +225,8 @@ public final class PdfTimestamper {
 
 	                if (tspToken.length > CSIZE) {
 	                	throw new AOException(
-	            			"El tamano del sello de tiempo (" + tspToken.length + ") supera el maximo permitido para un PDF (" + CSIZE + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	            			"El tamano del sello de tiempo (" + tspToken.length + ") supera el maximo permitido para un PDF (" + CSIZE + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	            			PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR
 	        			);
 	                }
 
@@ -232,7 +239,7 @@ public final class PdfTimestamper {
 	    		    }
 	    		    catch (final Exception e) {
 	    		    	baos.close();
-	    		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
+	    		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$
 	    		    }
 
 	        	    return baos.toByteArray();
@@ -273,10 +280,10 @@ public final class PdfTimestamper {
 					);
 		}
 		catch (final InvocationTargetException e) {
-			throw new AOException("Error al generar los sellos de tiempo", e); //$NON-NLS-1$
+			throw new AOException("Error al generar los sellos de tiempo", e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido generar el sello de tiempo", e); //$NON-NLS-1$
+			throw new InvalidLibraryException("Error con las bibliotecas de composicion del sello de tiempo para firmas PDF", e); //$NON-NLS-1$
 		}
 	}
 

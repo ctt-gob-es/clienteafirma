@@ -1,0 +1,175 @@
+package es.gob.afirma.core;
+
+public class ErrorCode {
+
+	public static final String ERROR_HARDWARE = "1"; //$NON-NLS-1$
+	public static final String ERROR_INTERNAL = "2"; //$NON-NLS-1$
+	public static final String ERROR_THIRD_PARTY = "3"; //$NON-NLS-1$
+	public static final String ERROR_COMMUNICATION = "4"; //$NON-NLS-1$
+	public static final String ERROR_FUNCTIONAL = "5"; //$NON-NLS-1$
+	public static final String ERROR_REQUEST = "6"; //$NON-NLS-1$
+
+	public static final String ERROR_TRIPHASE_SERVICE  = "3004"; //$NON-NLS-1$
+
+	private final String code;
+
+	private String description;
+
+	public ErrorCode(final String code) {
+		this(code, null);
+	}
+
+	public ErrorCode(final String code, final String description) {
+		checkCode(code);
+		this.code = code;
+		this.description = description;
+	}
+
+	private static void checkCode(final String errorCode) {
+
+		boolean error = false;
+		if (errorCode == null || errorCode.length() != 6) {
+			error = true;
+		}
+		else {
+			for (int i = 0; !error && i < errorCode.length(); i++) {
+				if (!Character.isDigit(errorCode.charAt(i))) {
+					error = true;
+				}
+			}
+		}
+		if (error) {
+			throw new IllegalArgumentException("Los codigos de error deben ser un numero de 6 digitos"); //$NON-NLS-1$
+		}
+	}
+
+	public String getCode() {
+		return this.code;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
+	}
+
+	@Override
+	public String toString() {
+		return this.code + ": " + this.description; //$NON-NLS-1$
+	}
+
+	public boolean checkType(final String type) {
+		return this.code.startsWith(type);
+	}
+
+//	public static class Hardware {
+//	}
+
+	public static class Internal {
+
+		public static ErrorCode LIBRARY_NOT_FOUND						= new ErrorCode("200002", "No se encuentran dependencias necesarias para la ejecucion de la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode SIGNINIG_KEY_AUTHENTICATION_ERROR		= new ErrorCode("200108", "No se pudo acceder a la clave de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		//public static ErrorCode INVALID_SIGNATURE_ALGORITHM				= new ErrorCode("200109", "Algoritmo de firma no soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INVALID_SIGNING_KEY						= new ErrorCode("200110", "Clave de firma no valida"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SIGNING_PKCS1_ERROR						= new ErrorCode("200111", "Error al generar la firma PKCS#1"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INVALID_PKCS1_VALUE						= new ErrorCode("200112", "La firma no se ha generado con el certificado seleccionado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode VERIFING_PKCS1_ERROR					= new ErrorCode("200113", "No se pudo verificar la firma generada"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode ENCODING_SIGNING_CERTIFICATE			= new ErrorCode("200114", "Error codificando el certificado de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNKNOWN_SIGNING_ERROR					= new ErrorCode("200115", "Error desconocido durante la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode COMPATIBLE_SIGNATURE_NOT_FOUND			= new ErrorCode("200116", "No se ha encontrado una firma compatible con el formato de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode BUILDING_ASIC_CONTAINER_ERROR			= new ErrorCode("200117", "Error al contruir el contenedor ASiC de la nueva firma"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode SIGNING_LTS								= new ErrorCode("210001", "Se esta intentando firmar una firma longeva que quedará invalidada"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY	= new ErrorCode("210002", "La firma resultante sera incompatible con la politica de firma de la AGE"); //$NON-NLS-1$ //$NON-NLS-2$
+
+	}
+
+	public static class ThirdParty {
+		public static ErrorCode PRESIGN_HTTP_ERROR		 				= new ErrorCode("300400", "El servicio de prefirma devolvio un error HTTP"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode MALFORMED_PRESIGN_RESPONSE		 		= new ErrorCode("300401", "La respuesta del servidor trifasico al hacer la prefirma no es valida"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode PRESIGNS_NOT_FOUND				 		= new ErrorCode("300402", "No se han obtenido prefirmas del servicio de prefirma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode POSTSIGN_HTTP_ERROR		 				= new ErrorCode("300404", "El servicio de postfirma devolvio un error HTTP"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode POSTSIGN_ERROR					 		= new ErrorCode("300405", "La respuesta del servidor trifasico al hacer la postfirma no es valida"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode MALFORMED_POSTSIGN_RESPONSE				= new ErrorCode("300407", "El servidor trifasico devolvio una respuesta con texto OK pero no llega el formato correcto"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_1				= new ErrorCode("300409", "ERR-1 en la prefirma: No se ha indicado la operacion a realizar"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_2				= new ErrorCode("300410", "ERR-2 en la prefirma: No se ha indicado el identificador del documento"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_3				= new ErrorCode("300411", "ERR-3 en la prefirma: No se ha indicado el algoritmo de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_4				= new ErrorCode("300412", "ERR-4 en la prefirma: No se ha indicado el formato de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_5				= new ErrorCode("300413", "ERR-5 en la prefirma: No se ha indicado el certificado de usuario"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_6				= new ErrorCode("300414", "ERR-6 en la prefirma: El formato de los parametros adicionales suministrados es erroneo"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_7				= new ErrorCode("300415", "ERR-7 en la prefirma: El certificado de usuario no esta en formato X.509"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_8				= new ErrorCode("300416", "ERR-8 en la prefirma: Formato de firma no soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_9				= new ErrorCode("300417", "ERR-9 en la prefirma: Error realizando la prefirma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_10				= new ErrorCode("300418", "ERR-10 en la prefirma: Error al almacenar el documento"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_11				= new ErrorCode("300419", "ERR-11 en la prefirma: Operacion desconocida"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_12				= new ErrorCode("300420", "ERR-12 en la prefirma: Error realizando la postfirma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_13				= new ErrorCode("300421", "ERR-13 en la prefirma: No se indicado una sub-operacion valida a realizar (firma, cofirma,...)"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_14				= new ErrorCode("300422", "ERR-14 en la prefirma: Error al recuperar el documento"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_15				= new ErrorCode("300423", "ERR-15 en la la prefirma: El formato de los datos de sesion suministrados es erroneo"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_16				= new ErrorCode("300424", "ERR-16 en la la prefirma: Error al generar el codigo de verificacion de las firmas"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_17				= new ErrorCode("300425", "ERR-17 en la la prefirma: Error al comprobar el codigo de verificacion de las firmas"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_18				= new ErrorCode("300426", "ERR-18 en la la prefirma: Error de integridad en la firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_19				= new ErrorCode("300427", "ERR-19 en la la prefirma: El formato de los datos de operacion suministrados es erroneo"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_PRESIGN_ERROR_20				= new ErrorCode("300428", "ERR-20 en la la prefirma: Algoritmo de firma no soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_1				= new ErrorCode("300430", "ERR-1 en la postfirma: No se ha indicado la operacion a realizar"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_2				= new ErrorCode("300431", "ERR-2 en la postfirma: No se ha indicado el identificador del documento"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_3				= new ErrorCode("300432", "ERR-3 en la postfirma: No se ha indicado el algoritmo de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_4				= new ErrorCode("300433", "ERR-4 en la postfirma: No se ha indicado el formato de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_5				= new ErrorCode("300434", "ERR-5 en la postfirma: No se ha indicado el certificado de usuario"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_6				= new ErrorCode("300435", "ERR-6 en la postfirma: El formato de los parametros adicionales suministrados es erroneo"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_7				= new ErrorCode("300436", "ERR-7 en la postfirma: El certificado de usuario no esta en formato X.509"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_8				= new ErrorCode("300437", "ERR-8 en la postfirma: Formato de firma no soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_9				= new ErrorCode("300438", "ERR-9 en la postfirma: Error realizando la prefirma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_10			= new ErrorCode("300439", "ERR-10 en la postfirma: Error al almacenar el documento"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_11			= new ErrorCode("300440", "ERR-11 en la postfirma: Operacion desconocida"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_12			= new ErrorCode("300441", "ERR-12 en la postfirma: Error realizando la postfirma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_13			= new ErrorCode("300442", "ERR-13 en la postfirma: No se indicado una sub-operacion valida a realizar (firma, cofirma,...)"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_14			= new ErrorCode("300443", "ERR-14 en la postfirma: Error al recuperar el documento"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_15			= new ErrorCode("300444", "ERR-15 en la la postfirma: El formato de los datos de sesion suministrados es erroneo"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_16			= new ErrorCode("300445", "ERR-16 en la la postfirma: Error al generar el codigo de verificacion de las firmas"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_17			= new ErrorCode("300446", "ERR-17 en la la postfirma: Error al comprobar el codigo de verificacion de las firmas"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_18			= new ErrorCode("300447", "ERR-18 en la la postfirma: Error de integridad en la firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_19			= new ErrorCode("300448", "ERR-19 en la la postfirma: El formato de los datos de operacion suministrados es erroneo"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_POSTSIGN_ERROR_20			= new ErrorCode("300449", "ERR-20 en la la postfirma: Algoritmo de firma no soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode TRI_SERVER_UNKNOWN_PRESIGN_ERROR		= new ErrorCode("300451", "No se reconoce el error remitido por el servicio de prefirma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode TRI_SERVER_UNKNOWN_POSTSIGN_ERROR		= new ErrorCode("300452", "No se reconoce el error remitido por el servicio de postfirma"); //$NON-NLS-1$ //$NON-NLS-2$
+
+	}
+
+	public static class Communication {
+		public static ErrorCode PRESIGN_SERVICE_CONNECTION_ERROR		= new ErrorCode("401300", "Error de conexion con el servidor trifasico al hacer la prefirma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode POSTSIGN_SERVICE_CONNECTION_ERROR		= new ErrorCode("401400", "Error de conexion con el servidor trifasico al hacer la posfirma"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode TSA_CONNECTION_ERROR					= new ErrorCode("410001", "Error en la comuicacion con la autoridad de sellado de tiempo"); //$NON-NLS-1$ //$NON-NLS-2$
+
+
+	}
+
+	public static class Request {
+		public static ErrorCode SIGNATURE_FORMAT_NOT_FOUND		= new ErrorCode("600104", "No se ha recibido el formato de firma para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNSUPPORTED_SIGNATURE_FORMAT	= new ErrorCode("600105", "El formato de firma indicado en la operacion de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SIGNATURE_ALGORITHM_NOT_FOUND	= new ErrorCode("600106", "No se ha recibido el algoritmo de firma para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNSUPPORTED_SIGNATURE_ALGORITHM	= new ErrorCode("600107", "El algoritmo de firma indicado en la operacion de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode DATA_NOT_FOUND					= new ErrorCode("600100", "No se ha recibido los datos en la peticion ni el id del fichero a descargar para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode UNSUPPORTED_COUNTERSIGN_CONFIG	= new ErrorCode("600110", "No se soporta la configuracion de nodos a contrafirmar"); //$NON-NLS-1$ //$NON-NLS-2$
+
+
+	}
+
+	public static class Functional {
+		public static ErrorCode CANCELLED_OPERATION		= new ErrorCode("500001", "Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode CERTIFICATE_NEEDED 		= new ErrorCode("501001", "Error en la operacion, no hay certificados"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INVALID_FORMAT_FILE		= new ErrorCode("501002", "El formato de fichero no es valido para la operacion que se intenta realizar"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INVALID_SMARTCARD_PIN	= new ErrorCode("501003", "El PIN del la tarjeta inteligente es incorrecto"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SMARTCARD_LOCKED		= new ErrorCode("501004", "La tarjeta inteligente esta bloqueada"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+}

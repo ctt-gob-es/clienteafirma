@@ -38,6 +38,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.common.PdfErrorCode;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pades.common.PdfHasUnregisteredSignaturesException;
 import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
@@ -130,8 +131,8 @@ public final class PdfSessionManager {
 			}
 			throw new PdfIsPasswordProtectedException("El PDF esta protegido contra lectura", e); //$NON-NLS-1$
 		}
-		catch (final Exception e1) {
-			LOGGER.warning("No ha podido registrarse la firma en el historico XMP: " + e1); //$NON-NLS-1$
+		catch (final Exception e) {
+			LOGGER.warning("No ha podido registrarse la firma en el historico XMP: " + e); //$NON-NLS-1$
 			inPDF = pdfBytes;
 		}
 
@@ -304,17 +305,17 @@ public final class PdfSessionManager {
 
 		PdfUtil.checkPdfCertification(pdfReader.getCertificationLevel(), extraParams);
 
-		// Definimos el comportamiento cuando se encuentran firmas no registradas
-		if (PdfUtil.pdfHasUnregisteredSignatures(pdfReader)) {
-			final String allowUnregisteredSignatureValue = extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES);
-			// Si no se especifica el comportamiento, informamos de que se requiere autorizacion para completar la operacion
-			if (allowUnregisteredSignatureValue == null || allowUnregisteredSignatureValue.trim().isEmpty()) {
-				throw new PdfHasUnregisteredSignaturesException("El PDF contiene firmas sin registrar"); //$NON-NLS-1$
+		// En caso de que no se hayan permitido expresamente las firmas no registradas y se encuentren, valoramos que hacer
+		final String allowUnregisteredSignatureValue = extraParams.getProperty(PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES);
+		if (!Boolean.parseBoolean(allowUnregisteredSignatureValue) && PdfUtil.pdfHasUnregisteredSignatures(pdfReader)) {
+			// Creamos la excepcion para notificar el problema
+			final PdfHasUnregisteredSignaturesException e = new PdfHasUnregisteredSignaturesException("El PDF contiene firmas sin registrar"); //$NON-NLS-1$
+			// Si expresamente se indico que no estan permitido agregar nuevas firmas en esta situacion, marcamos la excepcion para que
+			// se aborte la operacion
+			if (allowUnregisteredSignatureValue != null && !allowUnregisteredSignatureValue.trim().isEmpty()) {
+				e.setDenied(true);
 			}
-			// Si se ha indicado expresamente que no se permite, lanzamos un error; y si esta permitido, se continua con el proceso
-			if (!Boolean.parseBoolean(allowUnregisteredSignatureValue)) {
-				throw new AOException("El PDF contiene firmas sin registrar y estas no estan permitidas"); //$NON-NLS-1$
-			}
+			throw e;
 		}
 
 		// Los derechos van firmados por Adobe, y como desde iText se invalidan
@@ -368,7 +369,7 @@ public final class PdfSessionManager {
 		}
 		catch (final DocumentException e) {
 			LOGGER.severe("Error al crear la firma para estampar: " + e); //$NON-NLS-1$
-			throw new AOException("Error al crear la firma para estampar", e); //$NON-NLS-1$
+			throw new AOException("Error al crear la firma para estampar", e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$
 		}
 		catch (final BadPasswordException e) {
 			// Devolvemos una excepcion u otra segun si se nos proporciono
@@ -598,7 +599,7 @@ public final class PdfSessionManager {
 		}
 		catch (final DocumentException e) {
 			LOGGER.severe("Error al estampar la firma: " + e); //$NON-NLS-1$
-			throw new AOException("Error al estampar la firma", e); //$NON-NLS-1$
+			throw new AOException("Error al estampar la firma", e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$
 		}
 
 		final PdfObject pdfObject = ((com.aowagie.text.pdf.PdfStamperImp) stp.getWriter()).getFileID();

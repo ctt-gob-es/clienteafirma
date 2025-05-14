@@ -24,10 +24,12 @@ import com.aowagie.text.pdf.PdfSignatureAppearance;
 import com.aowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.SignEnhancer;
 import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
+import es.gob.afirma.signers.pades.common.PdfErrorCode;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
@@ -187,7 +189,7 @@ public final class PAdESTriPhaseSigner {
             md = MessageDigest.getInstance(parameters.getDigestAlgorithm()).digest(pdfRangeBytes);
         }
         catch (final NoSuchAlgorithmException e) {
-            throw new AOException("El algoritmo de huella digital no es valido: " + e, e); //$NON-NLS-1$
+            throw new AOException("El algoritmo de huella digital no es valido: " + e, e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
         }
         parameters.setDataDigest(md);
 
@@ -328,7 +330,8 @@ public final class PAdESTriPhaseSigner {
 
         if (signature.getSign().length > reservedSize) {
         	throw new AOException(
-    			"El tamano de la firma (" + signature.getSign().length + ") supera el maximo permitido para un PDF (" + reservedSize + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    			"El tamano de la firma (" + signature.getSign().length + ") supera el maximo permitido para un PDF (" + reservedSize + ")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    			PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR
 			);
         }
 
@@ -355,7 +358,7 @@ public final class PAdESTriPhaseSigner {
 		    }
 		    catch (final Exception e) {
 		    	baos.close();
-		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
+		        throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$
 		    }
 		    ret = new String(baos.toByteArray(), StandardCharsets.ISO_8859_1).replace(badFileID, signature.getFileID()).getBytes(StandardCharsets.ISO_8859_1);
         }

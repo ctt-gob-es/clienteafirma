@@ -16,12 +16,15 @@ import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 
-/** Define los requerimientos de las clases capaces de efectuar firmas digitales simples (un &uacute;nico firmante).
+/**
+ * Define los requerimientos de las clases capaces de efectuar firmas digitales simples (un &uacute;nico firmante).
  * @version 1.0
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
 public interface AOSimpleSigner {
 
-    /** Firma electr&oacute;nicamente unos datos (t&iacute;picamente el contenido de un fichero).
+    /**
+     * Firma electr&oacute;nicamente unos datos (t&iacute;picamente el contenido de un fichero).
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma (cada implementaci&oacute;n puede aceptar unos valores diferentes)
      * @param key Clave privada a usar para firmar
@@ -29,7 +32,8 @@ public interface AOSimpleSigner {
      * @param extraParams Par&aacute;metros adicionales para la firma (dependientes de cada implementaci&oacute;n)
      * @return Contenido firmado
      * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos */
+     * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos
+     */
     byte[] sign(byte[] data, String algorithm, PrivateKey key, Certificate[] certChain, Properties extraParams) throws AOException, IOException;
 
 }

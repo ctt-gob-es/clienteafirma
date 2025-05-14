@@ -34,7 +34,7 @@ final class AOKeyStoreManagerHelperSingle {
 			                                                                     IOException {
 		if (store == null) {
 			throw new AOKeyStoreManagerException(
-				"Es necesario proporcionar el fichero X.509 o PKCS#7"); //$NON-NLS-1$
+				"Es necesario proporcionar el fichero X.509 o PKCS#7", KeyStoreErrorCode.Internal.LOADING_CERTIFICATE_ERROR); //$NON-NLS-1$
 		}
 
 		final Provider pkcs7Provider;
@@ -55,7 +55,7 @@ final class AOKeyStoreManagerHelperSingle {
 		}
 		catch (final Exception e) {
 			throw new AOKeyStoreManagerException(
-				"No se ha podido obtener el almacen PKCS#7 / X.509", e); //$NON-NLS-1$
+				"No se ha podido obtener el almacen PKCS#7 / X.509", e, KeyStoreErrorCode.Internal.LOADING_CERTIFICATE_ERROR); //$NON-NLS-1$
 		}
 
 		try {
@@ -67,15 +67,15 @@ final class AOKeyStoreManagerHelperSingle {
 						throw new IOException("Contrasena invalida: " + e, e); //$NON-NLS-1$
 			}
 			throw new AOKeyStoreManagerException(
-				"No se ha podido abrir el almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
+				"No se ha podido abrir el almacen PKCS#7 / X.509 solicitado", e, KeyStoreErrorCode.Internal.LOADING_CERTIFICATE_ERROR); //$NON-NLS-1$
 		}
 		catch (final CertificateException e) {
 			throw new AOKeyStoreManagerException(
-				"No se han podido cargar los certificados del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
+				"No se han podido cargar los certificados del almacen PKCS#7 / X.509 solicitado", e, KeyStoreErrorCode.Internal.LOADING_CERTIFICATE_ERROR); //$NON-NLS-1$
 		}
 		catch (final NoSuchAlgorithmException e) {
 			throw new AOKeyStoreManagerException(
-				"No se ha podido verificar la integridad del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
+				"No se ha podido verificar la integridad del almacen PKCS#7 / X.509 solicitado", e, KeyStoreErrorCode.Internal.LOADING_CERTIFICATE_ERROR); //$NON-NLS-1$
 		}
 
 		return ks;

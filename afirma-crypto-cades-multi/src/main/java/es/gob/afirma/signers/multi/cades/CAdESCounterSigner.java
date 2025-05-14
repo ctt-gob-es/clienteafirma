@@ -46,11 +46,10 @@ import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AOSimpleSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESParameters;
@@ -113,13 +112,13 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * </pre> */
 final class CAdESCounterSigner {
 
-    private final AOSimpleSigner ss;
+    private final AOPkcs1Signer ss;
 
     /**
      * Construye el firmador con un firmador PKCS#1 concreto.
      * @param p1Signer Firmador para la generaci&oacute;n del PKCS#1.
      */
-    CAdESCounterSigner(final AOSimpleSigner p1Signer) {
+    CAdESCounterSigner(final AOPkcs1Signer p1Signer) {
     	this.ss = p1Signer != null ? p1Signer : new AOPkcs1Signer();
     }
 
@@ -160,7 +159,7 @@ final class CAdESCounterSigner {
         // Pasamos el primer elemento de la secuencia original, que es el OID de SignedData
         final Object o = pkcs7RootSequenceElements.nextElement();
         if (!(o instanceof ASN1ObjectIdentifier) && ((ASN1ObjectIdentifier)o).equals(PKCSObjectIdentifiers.signedData)) {
-			throw new AOFormatFileException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
 		}
 
         // Obtenemos el Context-Specific
@@ -302,7 +301,7 @@ final class CAdESCounterSigner {
         				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
         				// Si no, se informa debidamente para que se consulte al usuario
         				if (allowSignLts != null) {
-        					throw new AOException(e.getMessage());
+        					e.setDenied(true);
         				}
         				throw e;
         			}
@@ -493,13 +492,6 @@ final class CAdESCounterSigner {
     		                 final PrivateKey key,
     		                 final java.security.cert.Certificate[] certChain,
     		                 final Properties extraParams) throws AOException {
-    	try {
-			return this.ss.sign(data, signatureAlgorithm, key, certChain, extraParams);
-		}
-    	catch (final IOException e) {
-			throw new AOException(
-				"Error en la firma PKCS#1 de la contrafirma CAdES: " + e, e //$NON-NLS-1$
-			);
-		}
+		return this.ss.sign(data, signatureAlgorithm, key, certChain, extraParams);
     }
 }

@@ -11,20 +11,20 @@ package es.gob.afirma.core;
 
 /** Excepci&oacute;n que indica una operaci&oacute;n cancelada voluntariamente
  * por el usuario. */
-public class AOCancelledOperationException extends RuntimeException {
+public class AOCancelledOperationException extends AORuntimeException {
 
     private static final long serialVersionUID = 4447842480432712246L;
 
     /** Crea una excepci&oacute;n sin informaci&oacute;n adicional. */
     public AOCancelledOperationException() {
-        super();
+        super(ErrorCode.Functional.CANCELLED_OPERATION);
     }
 
     /** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n. */
     public AOCancelledOperationException(final String msg) {
-        super(msg);
+        super(msg, ErrorCode.Functional.CANCELLED_OPERATION);
     }
 
     /** Crea la excepci&oacute;n con un mensaje determinado y la causa que la origin&oacute;.
@@ -34,6 +34,6 @@ public class AOCancelledOperationException extends RuntimeException {
      * 		  Causa de la excepci&oacute;n.
      */
     public AOCancelledOperationException(final String msg, final Exception e) {
-        super(msg, e);
+        super(msg, e, ErrorCode.Functional.CANCELLED_OPERATION);
     }
 }

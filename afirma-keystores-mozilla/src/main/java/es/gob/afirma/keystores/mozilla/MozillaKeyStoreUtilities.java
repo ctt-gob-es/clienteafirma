@@ -36,6 +36,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
 import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
 
@@ -94,10 +95,10 @@ public final class MozillaKeyStoreUtilities {
 		FNMT_64("FNMT-RCM Modulo PKCS#11 64bits", "FNMT_P11_x64.dll", Platform.OS.WINDOWS, true), //$NON-NLS-1$ //$NON-NLS-2$
 		FNMT_32("FNMT-RCM Modulo PKCS#11 32bits", "FNMT_P11.dll", Platform.OS.WINDOWS, true); //$NON-NLS-1$ //$NON-NLS-2$
 
-		private String description;
-		private String lib;
-		private Platform.OS os;
-		private boolean forcedLoad;
+		private final String description;
+		private final String lib;
+		private final Platform.OS os;
+		private final boolean forcedLoad;
 		KnownModule(final String description, final String lib, final Platform.OS os, final boolean forcedLoad) {
 			this.description = description;
 			this.lib = lib;
@@ -627,7 +628,7 @@ public final class MozillaKeyStoreUtilities {
 					ret = (Provider) configureMethod.invoke(p, f.getAbsolutePath());
 				}
 				catch (final Exception ex2) {
-					throw new AOException("Ocurrio un error al configurar el proveedor de acceso a NSS", ex2); //$NON-NLS-1$
+					throw new AOException("Ocurrio un error al configurar el proveedor de acceso a NSS", ex2, KeyStoreErrorCode.Internal.LOADING_MOZILLA_KEYSTORE_ERROR); //$NON-NLS-1$
 				}
 			}
 		}

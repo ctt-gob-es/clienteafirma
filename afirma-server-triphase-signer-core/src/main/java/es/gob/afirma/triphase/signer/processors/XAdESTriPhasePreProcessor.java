@@ -27,7 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -309,7 +309,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Con FacturaE solo podemos firmar facturas
 		if (this.facturae && !new AOFacturaESigner().isValidDataFile(data)) {
-			throw new AOInvalidFormatException(
+			throw new AOInvalidSignatureFormatException(
 				"Los datos proporcionados no son una factura electronica compatible" //$NON-NLS-1$
 			);
 		}

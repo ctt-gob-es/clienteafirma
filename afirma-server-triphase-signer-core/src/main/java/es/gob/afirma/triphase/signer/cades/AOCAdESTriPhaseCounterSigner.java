@@ -51,7 +51,7 @@ import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -249,7 +249,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 		return md.digest(data);
 	}
 
-	private static SignedData loadSignature(final byte[] signature) throws IOException, AOFormatFileException {
+	private static SignedData loadSignature(final byte[] signature) throws IOException, AOInvalidSignatureFormatException {
 
 		// Leemos los datos originales (la firma que nos llega)
     	final ASN1Sequence dsq;
@@ -263,7 +263,7 @@ public final class AOCAdESTriPhaseCounterSigner {
         // Pasamos el primer elemento de la secuencia original, que es el OID de SignedData
         final Object o = pkcs7RootSequenceElements.nextElement();
         if (!(o instanceof ASN1ObjectIdentifier) && ((ASN1ObjectIdentifier)o).equals(PKCSObjectIdentifiers.signedData)) {
-			throw new AOFormatFileException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
 		}
 
         // Obtenemos el Context-Specific
@@ -420,15 +420,15 @@ public final class AOCAdESTriPhaseCounterSigner {
 	 * Obtiene el SignedData con la informaci&oacute;n de la firma.
 	 * @param sign Firma de la que obtener la informaci&acute;n de la firma.
 	 * @return SignedData con la informaci&oacute;n de la firma.
-	 * @throws AOFormatFileException Cuando la firma no tiene un formato soportado.
+	 * @throws AOInvalidSignatureFormatException Cuando la firma no tiene un formato soportado.
 	 */
-	private static SignedData getSignedData(final byte[] sign) throws AOFormatFileException {
+	private static SignedData getSignedData(final byte[] sign) throws AOInvalidSignatureFormatException {
 		final ASN1Sequence dsq = ASN1Sequence.getInstance(sign);
 		final Enumeration<?> e = dsq.getObjects();
 		// Elemento con el OID SignedData
 		final Object o = e.nextElement();
         if (!(o instanceof ASN1ObjectIdentifier) && ((ASN1ObjectIdentifier)o).equals(PKCSObjectIdentifiers.signedData)) {
-			throw new AOFormatFileException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
 		}
 		// SignedData
 		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();

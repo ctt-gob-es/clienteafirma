@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.Base64;
@@ -200,7 +200,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				CAdESMultiUtil.checkUnsupportedAttributes(sign);
 			}
 			catch (final IOException e) {
-				throw new AOFormatFileException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
+				throw new AOInvalidSignatureFormatException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
 			} catch (final SigningLTSException e) {
 				// Si se indico expresamente que no se debia permitir la cofirma de
 				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
@@ -210,7 +210,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				}
 				throw e;
 			} catch (final Exception e) {
-				throw new AOFormatFileException("No se ha proporcionado una firma CAdES que se pueda cofirmar", e); //$NON-NLS-1$
+				throw new AOInvalidSignatureFormatException("No se ha proporcionado una firma CAdES que se pueda cofirmar", e); //$NON-NLS-1$
 			}
 		}
 
@@ -365,20 +365,19 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final String allowSignLts = extraParams.getProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES);
 		if (allowSignLts == null || !Boolean.parseBoolean(allowSignLts)) {
 			try {
-				CAdESMultiUtil.checkUnsupportedAttributes(sign);
+				CAdESMultiUtil.checkLongTermAttributes(sign);
 			}
 			catch (final IOException e) {
-				throw new AOFormatFileException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
+				throw new AOInvalidSignatureFormatException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
 			} catch (final RuntimeConfigNeededException e) {
 				// Si se indico expresamente que no se debia permitir la cofirma de
-				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
-				// Si no, se informa debidamente para que se consulte al usuario
+				// firmas de archivo, se configura que se deniegue la operacion
 				if (allowSignLts != null) {
-					throw new AOException(e.getMessage());
+					e.setDenied(true);
 				}
 				throw e;
 			} catch (final Exception e) {
-				throw new AOFormatFileException("No se ha proporcionado una firma CAdES que se pueda contrafirmar", e); //$NON-NLS-1$
+				throw new AOInvalidSignatureFormatException("No se ha proporcionado una firma CAdES que se pueda contrafirmar", e); //$NON-NLS-1$
 			}
 		}
 

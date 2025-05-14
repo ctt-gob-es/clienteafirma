@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
@@ -164,7 +164,7 @@ public final class PreferencesPlistHandler {
 				//						null);
 				//			}
 			}
-			catch (final AOInvalidFormatException e) {
+			catch (final AOInvalidSignatureFormatException e) {
 				LOGGER.log(Level.SEVERE, "No se ha podido extraer la informacion de la firma del fichero de configuracion", e); //$NON-NLS-1$
 				AOUIFactory.showErrorMessage(
 						ConfiguratorCommonMessages.getString("PreferencesPlistHandler.7"), //$NON-NLS-1$
@@ -174,7 +174,7 @@ public final class PreferencesPlistHandler {
 				return;
 			}
 		}
-		catch (final AOInvalidFormatException e) {
+		catch (final AOInvalidSignatureFormatException e) {
 			LOGGER.severe("El fichero de configuracion no esta firmado"); //$NON-NLS-1$
 			signMessage = ConfiguratorCommonMessages.getString("PreferencesPlistHandler.3"); //$NON-NLS-1$
 		}

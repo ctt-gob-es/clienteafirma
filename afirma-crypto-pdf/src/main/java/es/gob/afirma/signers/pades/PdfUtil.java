@@ -133,7 +133,8 @@ public final class PdfUtil {
 		return calendar;
 	}
 
-	/** Obtiene el lector iText de PDF.
+	/**
+	 * Obtiene el lector iText de PDF.
 	 * @param inPDF PDF de entrada.
 	 * @param xParams Par&aacute;metros adicionales.
 	 * @param headless Si se establece a <code>true</code> se evita cualquier di&aacute;logo
@@ -144,14 +145,12 @@ public final class PdfUtil {
 	 * @throws BadPdfPasswordException Si el PDF estaba protegido con contrase&ntilde;a y
 	 *                                 se indic&oacute; una incorrecta.
 	 * @throws InvalidPdfException Si el PDF era inv&aacute;lido o estaba corrupto.
-	 * @throws IOException Si hay errores en la lectura o escritura de datos.
-	 *  */
+	 */
 	public static PdfReader getPdfReader(final byte[] inPDF,
 			                             final Properties xParams,
 			                             final boolean headless) throws PdfIsPasswordProtectedException,
 																		BadPdfPasswordException,
-			                                                            InvalidPdfException,
-			                                                            IOException {
+			                                                            InvalidPdfException {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -211,10 +210,11 @@ public final class PdfUtil {
 		// (PdfIsCertifiedException). Si no se permiten y se establecio un comportamiento (que ya
 		// sabemos que no fue forzar las firmas), lanzamos un error definitivo (AOException).
 		if (!signAllowed) {
+			final PdfIsCertifiedException e = new PdfIsCertifiedException("El PDF esta certificado"); //$NON-NLS-1$
 			if (forceSignature == null) {
-				throw new PdfIsCertifiedException("El PDF esta certificado"); //$NON-NLS-1$
+				e.setDenied(true);
 			}
-			throw new AOException("El PDF esta certificado y se configuro que no se admitia su firma"); //$NON-NLS-1$
+			throw e;
 		}
 	}
 
@@ -238,7 +238,7 @@ public final class PdfUtil {
 	}
 
 	static boolean pdfHasUnregisteredSignatures(final byte[] pdf, final Properties xParams)
-			throws InvalidPdfException, PdfIsPasswordProtectedException, BadPdfPasswordException, IOException {
+			throws InvalidPdfException, PdfIsPasswordProtectedException, BadPdfPasswordException {
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 		final PdfReader pdfReader = PdfUtil.getPdfReader(
 			pdf,

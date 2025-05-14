@@ -60,14 +60,14 @@ final class AOKeyStoreManagerHelperCapiAddressBook {
             ks = KeyStore.getInstance(ksType.getProviderName(), p);
         }
         catch (final Exception e) {
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen " + ksType.getProviderName() + ": " + e, e);  //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen " + ksType.getProviderName() + ": " + e, e, KeyStoreErrorCode.Internal.LOADING_PUBLIC_WINDOWS_KEYSTORE_ERROR);  //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         try {
             ks.load(null, null);
         }
         catch (final Exception e) {
-            throw new AOKeyStoreManagerException("No se ha podido abrir el almacen " + ksType.getProviderName() + ": " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOKeyStoreManagerException("No se ha podido abrir el almacen " + ksType.getProviderName() + ": " + e, e, KeyStoreErrorCode.Internal.LOADING_PUBLIC_WINDOWS_KEYSTORE_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return ks;

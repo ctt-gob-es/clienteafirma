@@ -22,6 +22,7 @@ import org.spongycastle.cms.SignerInformation;
 import org.spongycastle.cms.SignerInformationStore;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
@@ -142,7 +143,7 @@ public class CAdESParameters {
 					dataDigest = MessageDigest.getInstance(digestAlgorithmName).digest(data);
 				}
 				catch (final NoSuchAlgorithmException e) {
-					throw new AOException("Algoritmo no soportado: " + e, e); //$NON-NLS-1$
+					throw new AOException("No se ha podido extraer un algoritmo de huella soportado del algoritmo de firma: " + e, e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
 				}
 			}
 			else {

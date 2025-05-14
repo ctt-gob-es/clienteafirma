@@ -15,6 +15,8 @@ import java.security.cert.Certificate;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.asic.ASiCUtil;
@@ -32,11 +34,20 @@ public final class AOCAdESASiCSCounterSigner implements AOCounterSigner {
 			                  final Object[] targets,
 			                  final PrivateKey key,
 			                  final Certificate[] certChain,
-			                  final Properties extraParams) throws AOException,
-			                                                       IOException {
+			                  final Properties extraParams) throws AOException {
 		// Extraemos firma y datos del ASiC
-		final byte[] packagedData = ASiCUtil.getASiCSData(sign);
-		final byte[] packagedSign = ASiCUtil.getASiCSBinarySignature(sign);
+		byte[] packagedSign;
+		try {
+			packagedSign = ASiCUtil.getASiCSBinarySignature(sign);
+		} catch (final IOException e) {
+			throw new AOInvalidSignatureFormatException("No se encontro la firma CAdES dentro del contenedor ASiC", e); //$NON-NLS-1$
+		}
+		byte[] packagedData;
+		try {
+			packagedData = ASiCUtil.getASiCSData(sign);
+		} catch (final IOException e) {
+			throw new AOInvalidSignatureFormatException("No se encontraron los datos firmados dentro del contenedor CAdES-ASiC", e); //$NON-NLS-1$
+		}
 
 		// Creamos la contrafirma
 		final byte[] newCounterSign = new AOCAdESCounterSigner().countersign(
@@ -50,11 +61,15 @@ public final class AOCAdESASiCSCounterSigner implements AOCounterSigner {
 		);
 
 		// Devolvemos un nuevo ASiC
-		return ASiCUtil.createSContainer(
-			newCounterSign,
-			packagedData,
-			ASiCUtil.getASiCSDataFilename(sign),
-			ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE
-		);
+		try {
+			return ASiCUtil.createSContainer(
+					newCounterSign,
+					packagedData,
+					ASiCUtil.getASiCSDataFilename(sign),
+					ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE
+					);
+		} catch (final IOException e) {
+			throw new AOException("No se ha podido construir el contenedor CAdES-ASiC", e, ErrorCode.Internal.BUILDING_ASIC_CONTAINER_ERROR); //$NON-NLS-1$
+		}
 	}
 }

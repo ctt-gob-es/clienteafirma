@@ -48,6 +48,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -61,6 +62,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
 import es.gob.afirma.signers.xml.style.CannotDereferenceException;
 import es.gob.afirma.signers.xml.style.IsInnerlException;
@@ -329,7 +331,7 @@ public final class XAdESSigner {
 			}
 			catch(final Exception e) {
 				throw new AOException(
-					"La codificacion indicada en 'encoding' debe ser una URI: " + e, e //$NON-NLS-1$
+					"La codificacion indicada en 'encoding' debe ser una URI: " + e, e, XAdESErrorCode.Request.INVALID_ENCODING_URI //$NON-NLS-1$
 				);
 			}
 		}
@@ -379,7 +381,7 @@ public final class XAdESSigner {
 		// Un externally detached con URL permite los datos nulos o vacios
 		if ((data == null || data.length == 0)
 				&& !AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED.equals(format)) {
-			throw new AOException("No se han podido leer los datos a firmar"); //$NON-NLS-1$
+			throw new AOException("No se han proporcionado los datos a firmar", ErrorCode.Request.DATA_NOT_FOUND); //$NON-NLS-1$
 		}
 
 		// Propiedades del documento XML original
@@ -391,7 +393,7 @@ public final class XAdESSigner {
 			docBuilder = Utils.getNewDocumentBuilder();
 		}
 		catch (final Exception e) {
-			throw new AOException("No se han podido componer la factoria para la construccion de la firma", e); //$NON-NLS-1$
+			throw new AOException("No se han podido componer la factoria para la construccion de la firma", e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 
 		// Elemento de datos
@@ -636,7 +638,7 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e) {
 				throw new AOException(
-					"Error al crear la firma en formato " + format + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+					"Error al crear la firma en formato " + format + ": " + e, e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
 		}
@@ -1623,7 +1625,6 @@ public final class XAdESSigner {
 		// Dereferenciamos las URL de tipo HTTP/HTTPS
 		else if (HTTP_PROTOCOL_PREFIX.equalsIgnoreCase(uri.substring(0, HTTP_PROTOCOL_PREFIX.length())) ||
 				HTTPS_PROTOCOL_PREFIX.equalsIgnoreCase(uri.substring(0, HTTPS_PROTOCOL_PREFIX.length()))) {
-			try {
 
 				final UrlHttpManager httpManager = UrlHttpManagerFactory.getInstalledManager();
 
@@ -1640,6 +1641,7 @@ public final class XAdESSigner {
 					throw new AOException("Error en la recuperacion de un recurso externo: " + e, e); //$NON-NLS-1$
 				}
 
+			try {
 				final byte[] md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestMethod.getAlgorithm()))
 						.digest(data);
 

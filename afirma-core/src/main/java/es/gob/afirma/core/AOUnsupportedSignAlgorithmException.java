@@ -9,17 +9,21 @@
 
 package es.gob.afirma.core;
 
-/** Excepci&oacute;n para notificar que se ha encontrado un objeto con un formato
- * inesperado. */
-public class AOInvalidFormatException extends AOException {
+/**
+ * Excepci&oacute;n lanzada cuando se detecta un algoritmo de firma no
+ * reconocido o a partir del cual no se pueden generar toda la
+ * configuraci&oacute;n necesaria para componer la firma en el formato deseado.
+ */
+public final class AOUnsupportedSignAlgorithmException extends AOException {
 
-    private static final long serialVersionUID = 825249824660706387L;
+    /** Serial Id. */
+	private static final long serialVersionUID = 5925504116235792982L;
 
-    /** Crea la excepci&oacute;n con un mensaje determinado.
+	/** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n. */
-    public AOInvalidFormatException(final String msg) {
-        super(msg);
+    public AOUnsupportedSignAlgorithmException(final String msg) {
+        super(msg, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM);
     }
 
     /** Crea la excepci&oacute;n con un mensaje determinado.
@@ -27,7 +31,7 @@ public class AOInvalidFormatException extends AOException {
      *        Mensaje descriptivo de la excepci&oacute;n.
      * @param e
      *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
-    public AOInvalidFormatException(final String msg, final Exception e) {
-        super(msg, e);
+    public AOUnsupportedSignAlgorithmException(final String msg, final Exception e) {
+        super(msg, e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM);
     }
 }

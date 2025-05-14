@@ -668,7 +668,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			}
 			catch (final Exception e) {
 				LOGGER.severe("No se ha podido extraer la clave del almacen: " + e); //$NON-NLS-1$
-				throw new AOException("No se ha podido extraer la clave del almacen", e); //$NON-NLS-1$
+				throw new AOException("No se ha podido extraer la clave del almacen", e, KeyStoreErrorCode.Internal.LOADING_PRIVATE_KEY_ERROR); //$NON-NLS-1$
 			}
 		}
 

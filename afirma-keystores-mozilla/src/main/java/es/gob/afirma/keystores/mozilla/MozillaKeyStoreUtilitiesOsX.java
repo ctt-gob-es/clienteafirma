@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.mozilla.apple.ShellScript;
 
 /** Utilidades para la gesti&oacute;n de almacenes de claves Mozilla NSS en Apple OS X.
@@ -111,10 +112,10 @@ public final class MozillaKeyStoreUtilitiesOsX {
 			System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
-			throw new AOException("La configuracion de NSS para Mac OS X ha fallado por motivos de seguridad: " + e); //$NON-NLS-1$
+			throw new AOException("La configuracion de NSS para Mac OS X ha fallado por motivos de seguridad: " + e, KeyStoreErrorCode.Internal.LOADING_MOZILLA_KEYSTORE_ERROR); //$NON-NLS-1$
 		}
 		catch(final UnsatisfiedLinkError e) {
-			throw new AOException("La configuracion de NSS para Mac OS X ha fallado: " + e); //$NON-NLS-1$
+			throw new AOException("La configuracion de NSS para Mac OS X ha fallado: " + e, KeyStoreErrorCode.Internal.LOADING_MOZILLA_KEYSTORE_ERROR); //$NON-NLS-1$
 		}
 	}
 

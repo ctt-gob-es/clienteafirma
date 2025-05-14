@@ -63,7 +63,7 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -1196,13 +1196,13 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     /** {@inheritDoc} */
 	@Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign) throws AOInvalidSignatureFormatException {
 		return getData(sign, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidSignatureFormatException {
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1213,7 +1213,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         try {
             // comprueba que sea una documento de firma valido
             if (!isSign(sign)) {
-                throw new AOInvalidFormatException("El documento no es un documento de firmas valido."); //$NON-NLS-1$
+                throw new AOInvalidSignatureFormatException("El documento no es un documento de firmas valido."); //$NON-NLS-1$
             }
 
             // obtiene la raiz del documento de firmas
@@ -1261,7 +1261,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
         catch (final Exception ex) {
-            throw new AOInvalidFormatException("Error al leer el fichero de firmas", ex); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("Error al leer el fichero de firmas", ex); //$NON-NLS-1$
         }
 
         // si no se ha recuperado ningun dato se devuelve null
@@ -1802,6 +1802,9 @@ public final class AOXMLDSigSigner implements AOSigner {
                 countersignSigners(root, targets, key, certChain, onlySignningCert, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
 
+        }
+        catch (final AOException e) {
+        	throw e;
         }
         catch (final Exception e) {
             throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
@@ -2374,7 +2377,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
 
         if (!isSign(data)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
         final AOSignInfo signInfo = new AOSignInfo(AOSignConstants.SIGN_FORMAT_XMLDSIG);

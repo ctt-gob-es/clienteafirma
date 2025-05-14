@@ -134,8 +134,10 @@ public final class ValidatePdfSignature extends SignValider {
 			final Map<String, String> errors = DataAnalizerUtil.checkPDFForm(reader);
 			if (errors != null && !errors.isEmpty()) {
 				// Si no estaba definido un comportamiento concreto, consultaremos al usuario.
-				if (allowSignModifiedFormProp == null && isRelaxed()) {
-					throw new PdfFormModifiedException("Se han detectado cambios en un formulario posteriores a la primera firma"); //$NON-NLS-1$
+				if (isRelaxed()) {
+					final PdfFormModifiedException e = new PdfFormModifiedException("Se han detectado cambios en un formulario posteriores a la primera firma"); //$NON-NLS-1$
+					e.setDenied(allowSignModifiedFormProp != null);
+					throw e;
 				}
 				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.MODIFIED_FORM));
 

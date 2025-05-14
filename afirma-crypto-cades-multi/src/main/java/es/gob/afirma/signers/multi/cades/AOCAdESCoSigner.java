@@ -9,19 +9,23 @@
 
 package es.gob.afirma.signers.multi.cades;
 
-import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.spongycastle.cms.CMSSignedData;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.cades.CAdESExtraParams;
 import es.gob.afirma.signers.cades.CAdESParameters;
+import es.gob.afirma.signers.pkcs7.BinaryErrorCode;
 
 /** Operaciones de cofirma CAdES. */
 public final class AOCAdESCoSigner implements AOCoSigner {
@@ -34,7 +38,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
                          final String algorithm,
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
-                         final Properties xParams) throws AOException, IOException {
+                         final Properties xParams) throws AOException {
 
 		return cosign(null, sign, algorithm, key, certChain, xParams);
     }
@@ -46,7 +50,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
                          final String algorithm,
                          final PrivateKey key,
                          final java.security.cert.Certificate[] certChain,
-                         final Properties xParams) throws AOException, IOException {
+                         final Properties xParams) throws AOException {
 
         final Properties extraParams = getExtraParams(xParams);
 
@@ -55,14 +59,14 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 		final String allowSignLts = extraParams.getProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES);
 		if (allowSignLts == null || !Boolean.parseBoolean(allowSignLts)) {
 			try {
-				CAdESMultiUtil.checkUnsupportedAttributes(sign);
+				CAdESMultiUtil.checkLongTermAttributes(sign);
 			}
 			catch (final SigningLTSException e) {
 				// Si se indico expresamente que no se debia permitir la cofirma de
 				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
 				// Si no, se informa debidamente para que se consulte al usuario
 				if (allowSignLts != null) {
-					throw new AOException(e.getMessage());
+					e.setDenied(true);
 				}
 				throw e;
 			}
@@ -76,7 +80,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
         	signedData = new CMSSignedData(sign);
         }
         catch (final Exception e) {
-        	throw new AOException("La firma proporcionada no es CMS/CAdES", e); //$NON-NLS-1$
+        	throw new AOInvalidSignatureFormatException("La firma proporcionada no es CMS/CAdES", e); //$NON-NLS-1$
 		}
 
         final CAdESParameters parameters = CAdESParameters.load(data, signedData, algorithm, extraParams);
@@ -93,8 +97,14 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 		catch (final AOException e) {
 			throw e;
 		}
+        catch (final NoSuchAlgorithmException e) {
+        	throw new AOException("Algoritmo de firma o huella digital no soportado", e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
+		}
+        catch (final CertificateException e) {
+        	throw new AOException("Error generando la Contrafirma CAdES", e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
+		}
 		catch (final Exception e) {
-			throw new AOException("Error generando la cofirma CAdES: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error generando la cofirma CAdES: " + e, e, BinaryErrorCode.Internal.UNKWNON_BINARY_SIGNING_ERROR); //$NON-NLS-1$
 		}
     }
 

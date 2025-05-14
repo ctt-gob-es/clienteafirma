@@ -17,7 +17,9 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.InvalidLibraryException;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignInfo;
@@ -27,6 +29,7 @@ import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.CAdESExtraParams;
+import es.gob.afirma.signers.pkcs7.BinaryErrorCode;
 
 /** Firmador CAdES ASiC-S.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -52,8 +55,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			           final String algorithm,
 			           final PrivateKey key,
 			           final Certificate[] certChain,
-			           final Properties xParams) throws AOException,
-			                                            IOException {
+			           final Properties xParams) throws AOException {
 
 		final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -62,24 +64,28 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 
 		final byte[] signature = new AOCAdESSigner().sign(data, algorithm, key, certChain, extraParams);
 
-		return ASiCUtil.createSContainer(
-			signature,
-			data,
-			ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE,
-			extraParams.getProperty(CAdESASiCExtraParams.ASICS_FILENAME)
-		);
+		try {
+			return ASiCUtil.createSContainer(
+				signature,
+				data,
+				ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE,
+				extraParams.getProperty(CAdESASiCExtraParams.ASICS_FILENAME)
+			);
+		} catch (final IOException e) {
+			throw new AOException("No se ha podido construir el contenedor CAdES-ASiC", e, ErrorCode.Internal.BUILDING_ASIC_CONTAINER_ERROR); //$NON-NLS-1$
+		}
 	}
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign,
-			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException,
+			                               final boolean asSimpleSignInfo) throws AOInvalidSignatureFormatException,
 			                                                                      IOException {
 		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params,
-											final boolean asSimpleSignInfo) throws AOInvalidFormatException,
+											final boolean asSimpleSignInfo) throws AOInvalidSignatureFormatException,
 																					IOException {
 		return new AOCAdESSigner().getSignersStructure(
 				ASiCUtil.getASiCSBinarySignature(sign),
@@ -119,12 +125,12 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	}
 
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidSignatureFormatException, IOException {
 		return ASiCUtil.getASiCSData(sign);
 	}
 
 	@Override
-	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
+	public byte[] getData(final byte[] signData) throws AOInvalidSignatureFormatException, IOException {
 		return getData(signData, null);
 	}
 
@@ -138,7 +144,8 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 		return getSignInfo(signData, null);
 	}
 
-    /** Cofirma en formato CAdES los datos encontrados en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
+    /**
+     * Cofirma en formato CAdES los datos encontrados en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
      * a&ntilde;adiendo esta nueva firma a la del contenedor (se sustituye la antigua por la el nuevo fichero con todas las firmas).
      * No se pueden cofirmar con esta clase contenedores ASiC-S que ya contengan firmas XML.
      * <p>
@@ -175,48 +182,56 @@ public final class AOCAdESASiCSSigner implements AOSigner {
      *                    separada, datos y firma.
      * @return Contenedor ASiC-S con su fichero de firmas conteniendo la nueva firma.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
-     * @throws IOException Si hay problemas en el tratamiento de datos. */
+     */
 	@Override
 	public byte[] cosign(final byte[] data,
 			             final byte[] sign,
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) throws AOException, IOException {
+			             final Properties extraParams) throws AOException {
+		AOCoSigner cosigner;
         try {
-			return ((AOCoSigner) Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCoSigner").getConstructor().newInstance()).cosign( //$NON-NLS-1$
-				data,
-				sign,
-				algorithm,
-				key,
-				certChain,
-				extraParams
-			);
+        	cosigner = (AOCoSigner) Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCoSigner").getConstructor().newInstance(); //$NON-NLS-1$
 		}
         catch (final InstantiationException e) {
-        	throw new AOException("Error al instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("Error al instanciar la clase de cofirmas CAdES: " + e, e); //$NON-NLS-1$
 		}
         catch (final IllegalAccessException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
 		}
         catch (final ClassNotFoundException e) {
-        	throw new AOException("No se ha encontrado la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha encontrado la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
 		}
         catch (final IllegalArgumentException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
 		}
         catch (final InvocationTargetException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
 		}
         catch (final NoSuchMethodException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por falta de un constructor por defecto sin parametros: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por falta de un constructor por defecto sin parametros: " + e, e); //$NON-NLS-1$
 		}
         catch (final SecurityException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por motivos de seguridad: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por motivos de seguridad: " + e, e); //$NON-NLS-1$
+		}
+
+        try {
+			return cosigner.cosign(
+					data,
+					sign,
+					algorithm,
+					key,
+					certChain,
+					extraParams
+				);
+		} catch (final IOException e) {
+			throw new AOException("Error desconocido en la composicion de la cofirma CAdES-ASiC: " + e, e, BinaryErrorCode.Internal.UNKWNON_BINARY_SIGNING_ERROR); //$NON-NLS-1$
 		}
 	}
 
-    /** Cofirma en formato CAdES los datos encontrador en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
+    /**
+     * Cofirma en formato CAdES los datos encontrador en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
      * a&ntilde;adiendo esta nueva firma a la del contenedor (se sustituye la antigua por la el nuevo fichero con todas las firmas).
      * No se pueden cofirmar con esta clase contenedores ASiC-S que ya contengan firmas XML.
      * <p>
@@ -245,13 +260,13 @@ public final class AOCAdESASiCSSigner implements AOSigner {
      *                    separada, datos y firma.
      * @return Contenedor ASiC-S con su fichero de firmas conteniendo la nueva firma.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
-     * @throws IOException Si hay problemas en el tratamiento de datos. */
+     */
 	@Override
 	public byte[] cosign(final byte[] sign,
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) throws AOException, IOException {
+			             final Properties extraParams) throws AOException {
 		return cosign(null, sign, algorithm, key, certChain, extraParams);
 	}
 
@@ -262,39 +277,46 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 			                  final Object[] targets,
 			                  final PrivateKey key,
 			                  final Certificate[] certChain,
-			                  final Properties extraParams) throws AOException,
-			                                                       IOException {
-        try {
-			return ((AOCounterSigner) Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCounterSigner").getConstructor().newInstance()).countersign( //$NON-NLS-1$
-				sign,
-				algorithm,
-				targetType,
-				targets,
-				key,
-				certChain,
-				extraParams
-			);
+			                  final Properties extraParams) throws AOException {
+
+		AOCounterSigner countersigner;
+		try {
+			countersigner = (AOCounterSigner) Class.forName("es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCounterSigner").getConstructor().newInstance(); //$NON-NLS-1$
 		}
         catch (final InstantiationException e) {
-        	throw new AOException("Error al instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("Error al instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
 		}
         catch (final IllegalAccessException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
 		}
         catch (final ClassNotFoundException e) {
-        	throw new AOException("No se ha encontrado la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha encontrado la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
 		}
         catch (final IllegalArgumentException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
 		}
         catch (final InvocationTargetException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC: " + e, e); //$NON-NLS-1$
 		}
         catch (final NoSuchMethodException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por falta de un constructor por defecto sin parametros: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por falta de un constructor por defecto sin parametros: " + e, e); //$NON-NLS-1$
 		}
         catch (final SecurityException e) {
-        	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por motivos de seguridad: " + e, e); //$NON-NLS-1$
+        	throw new InvalidLibraryException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por motivos de seguridad: " + e, e); //$NON-NLS-1$
+		}
+
+        try {
+        	return countersigner.countersign(
+    				sign,
+    				algorithm,
+    				targetType,
+    				targets,
+    				key,
+    				certChain,
+    				extraParams
+    			);
+		} catch (final IOException e) {
+			throw new AOException("Error desconocido en la composicion de la contrafirma CAdES-ASiC: " + e, e, BinaryErrorCode.Internal.UNKWNON_BINARY_SIGNING_ERROR); //$NON-NLS-1$
 		}
 	}
 

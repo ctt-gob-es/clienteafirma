@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivateKey;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 
 public class TestBatchJson {
@@ -60,20 +62,28 @@ public class TestBatchJson {
 	}
 
 	@Test
-	@Ignore
-	public void testBatchWithCounterSigns() throws CertificateEncodingException, IOException, AOException {
+//	@Ignore
+	public void testBatchWithCounterSigns() throws CertificateEncodingException, IOException, AOException, GeneralSecurityException {
 
 		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$
 		final String batchPostSignerUrl = BASE_URL + "postsign"; //$NON-NLS-1$
 
 
 		//final byte[] dataRef = readFile(new File("C:\\Users\\carlos.gamuci\\Desktop\\Entrada\\cofirma.csig"));
-		final byte[] dataRef = "cofirma.csig".getBytes();
-		final String dataRefB64 = Base64.encode(dataRef);
+		final String cosignRefB64 = Base64.encode("cofirma.csig".getBytes());
+		final String signRefB64 = Base64.encode("firma.csig".getBytes());
+		final String docxRefB64 = Base64.encode("Entrada.docx".getBytes());
+		final String facturaRefB64 = Base64.encode("factura.xml".getBytes());
 
-		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"suboperation\":\"countersign\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"" + dataRefB64 + "\"}, "
-				+ "{\"id\":\"2\", \"datareference\":\"" + dataRefB64 + "\", \"format\":\"XAdES\", \"suboperation\":\"sign\", \"extraParams\":\"format=XAdES Detached\"}]}";
+
+		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"suboperation\":\"countersign\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"" + cosignRefB64 + "\"}, "
+//				+ "{\"id\":\"2\", \"datareference\":\"" + docxRefB64 + "\", \"format\":\"XAdES\", \"suboperation\":\"sign\", \"extraParams\":\"format=XAdES Detached\"}, "
+//				+ "{\"id\":\"3\", \"datareference\":\"" + signRefB64 + "\"}, "
+//				+ "{\"id\":\"4\", \"datareference\":\"" + facturaRefB64 + "\", \"format\":\"CAdES\", \"suboperation\":\"sign\"}"
+				+ "]}";
 		final String batchB64 = Base64.encode(batch.getBytes(StandardCharsets.UTF_8));
+
+		SslSecurityManager.disableSslChecks();
 
 		final String result = BatchSigner.signJSON(batchB64, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
 

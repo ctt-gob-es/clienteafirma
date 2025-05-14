@@ -28,7 +28,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
@@ -43,23 +43,23 @@ public class XAdESValidator {
      * @param checkCertificates Indica si debe validarse la vigencia de los certificados.
      * @throws CertificateException Cuando se valide la vigencia del certificado no lo est&eacute;.
 	 * @throws InvalidSignatureException Cuando la firma no sea v&aacute;lida.
-	 * @throws AOInvalidFormatException Cuando los datos no est&eacute;n firmados con XAdES.
+	 * @throws AOInvalidSignatureFormatException Cuando los datos no est&eacute;n firmados con XAdES.
      */
 	public static void validate(final byte[] sign, final boolean checkCertificates)
-			throws CertificateException, InvalidSignatureException, AOInvalidFormatException {
+			throws CertificateException, InvalidSignatureException, AOInvalidSignatureFormatException {
 
         final Document doc;
         try {
             doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
-        	throw new AOInvalidFormatException("La firma no es XML", e); //$NON-NLS-1$
+        	throw new AOInvalidSignatureFormatException("La firma no es XML", e); //$NON-NLS-1$
         }
 
         // Obtenemos el elemento Signature
         final NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
         if (nl.getLength() == 0) {
-        	throw new AOInvalidFormatException("No se encontro la firma de los datos"); //$NON-NLS-1$
+        	throw new AOInvalidSignatureFormatException("No se encontro la firma de los datos"); //$NON-NLS-1$
         }
 
         try {

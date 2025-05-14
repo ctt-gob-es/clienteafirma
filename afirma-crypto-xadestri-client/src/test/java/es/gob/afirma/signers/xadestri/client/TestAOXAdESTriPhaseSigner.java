@@ -218,12 +218,12 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	//@Ignore
 	public void pruebaContrafirmaXAdESDetached() throws Exception {
 
 		final byte[] signature;
 		try (
-			final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-detached.xml"); //$NON-NLS-1$
+			final InputStream is = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\HEAD.zip_signed.xsig");//ClassLoader.getSystemResourceAsStream("firma-xades-detached.xml"); //$NON-NLS-1$
 		) {
 			signature = AOUtil.getDataFromInputStream(is);
 		}
@@ -235,9 +235,13 @@ public class TestAOXAdESTriPhaseSigner {
 		final Properties config = new Properties();
 		config.setProperty("serverUrl", SERVER_URL); //$NON-NLS-1$
 
+		final long startTime = System.currentTimeMillis();
+
 		final AOXAdESTriPhaseSigner signer = new AOXAdESTriPhaseSigner();
 
 		final byte[] result = signer.countersign(signature, AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, CounterSignTarget.LEAFS, null, pke.getPrivateKey(), pke.getCertificateChain(), config);
+
+		System.out.println("Tiempo: " + (System.currentTimeMillis() - startTime));
 
 		final File tempFile = File.createTempFile("xades-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
 		try (

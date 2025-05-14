@@ -20,7 +20,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -202,13 +202,13 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
+			throws AOInvalidSignatureFormatException, IOException {
 		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
+			throws AOInvalidSignatureFormatException, IOException {
 		return new AOXAdESSigner().getSignersStructure(
 			ASiCUtil.getASiCSXMLSignature(sign),
 			asSimpleSignInfo
@@ -247,7 +247,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	}
 
 	@Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+	public byte[] getData(final byte[] sign) throws AOInvalidSignatureFormatException, IOException, AOException {
 		return getData(sign, null);
 	}
 
