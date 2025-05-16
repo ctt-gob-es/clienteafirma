@@ -1,0 +1,12 @@
+
+ Autofirma 1.9
+ Copyright 2011, 2025 Government of Spain
+
+ Autofirma is Free Software; you can redistribute it and/or modify it
+ under the terms of at least one of these two licences;
+
+     - The GNU General Public License as published by the Free Software
+     Foundation; version 2 of the License, or (at your choice) any later version.
+
+     - The "European Software License" version 1.1 of the License, or (at your 
+     option) any later version.

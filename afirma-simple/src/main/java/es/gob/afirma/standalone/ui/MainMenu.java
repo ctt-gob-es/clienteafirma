@@ -47,6 +47,7 @@ import es.gob.afirma.standalone.plugins.manager.PluginLoader;
 import es.gob.afirma.standalone.ui.plugins.PluginsManagementDialog;
 import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigDialog;
+import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
 /** Barra de men&uacute; para toda la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -300,28 +301,30 @@ public final class MainMenu extends JMenuBar {
         }
         
         final Locale [] importedLocales = LanguageManager.getImportedLocales();
-        for (int i = 0; i < importedLocales.length; i++) {
-        	final String langName = LanguageManager.getLanguageName(importedLocales[i]);
-        	final Locale locale = importedLocales[i];
-        	// Se comprueba si el idioma importado no se trata de una version actualizada
-        	// de un idioma proporcionado por Autofirma para que no se duplique en el menu
-        	if (!LanguageManager.isDefaultLocale(locale)) {
-	        	final JRadioButtonMenuItem importedLangItem = new JRadioButtonMenuItem(langName);      
-	        	if (localeConf.equals(locale.toString())) {
-	        		importedLangItem.setSelected(true);
-	            }
-	        	importedLangItem.addActionListener(new ActionListener() {
-	                @Override
-	                public void actionPerformed(final ActionEvent ae) {
-	                	Locale.setDefault(locale);
-	                    PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
-	                    SimpleAfirmaMessages.changeLocale();
-	                    showRestartWarning();
-	                }
-	            });
-	        	langGroup.add(importedLangItem);
-	            languageMenu.add(importedLangItem);
-        	}
+        if (importedLocales != null) {
+	        for (int i = 0; i < importedLocales.length; i++) {
+	        	final String langName = LanguageManager.getLanguageName(importedLocales[i]);
+	        	final Locale locale = importedLocales[i];
+	        	// Se comprueba si el idioma importado no se trata de una version actualizada
+	        	// de un idioma proporcionado por Autofirma para que no se duplique en el menu
+	        	if (!LanguageManager.isDefaultLocale(locale)) {
+		        	final JRadioButtonMenuItem importedLangItem = new JRadioButtonMenuItem(langName);      
+		        	if (localeConf.equals(locale.toString())) {
+		        		importedLangItem.setSelected(true);
+		            }
+		        	importedLangItem.addActionListener(new ActionListener() {
+		                @Override
+		                public void actionPerformed(final ActionEvent ae) {
+		                	Locale.setDefault(locale);
+		                    PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
+		                    SimpleAfirmaMessages.changeLocale();
+		                    showRestartWarning();
+		                }
+		            });
+		        	langGroup.add(importedLangItem);
+		            languageMenu.add(importedLangItem);
+	        	}
+	        }
         }
         
         languageMenu.addSeparator();
@@ -587,13 +590,15 @@ public final class MainMenu extends JMenuBar {
 	
 	private static void showRestartWarning() {
 		final List<String> command = LanguageManager.getResetApplicationCommand();
+		// Actualizamos los mensajes para dialogo con el nuevo locale
+		JSEUIMessages.updateLocale();
 		// Ejecutamos una nueva instancia de la aplicacion
 		if (command != null) {
 			// Consultamos si se desea reiniciar la aplicacion
-			final int option = JOptionPane.showConfirmDialog(
+			final int option = AOUIFactory.showConfirmDialog(
 					null,
-					SimpleAfirmaMessages.getString("MainMenu.50"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("MainMenu.51"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("MainMenu.50"), //$NON-NLS-1$
 					JOptionPane.YES_NO_OPTION,
 					JOptionPane.WARNING_MESSAGE);
 			if (option == JOptionPane.YES_OPTION) {
@@ -610,7 +615,7 @@ public final class MainMenu extends JMenuBar {
 		}
 		// Pedimos al usuario que reinicie la aplicacion
 		else {
-			JOptionPane.showMessageDialog(
+			AOUIFactory.showMessageDialog(
 					null,
 					SimpleAfirmaMessages.getString("MainMenu.49"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("MainMenu.50"), //$NON-NLS-1$

@@ -1,0 +1,12 @@
+ 
+ Autofirma 1.9
+ Copyright 2011, 2025 Goberno de España
+ 
+ Autofirma é Software Libre; podes redistribuír e/ou modificar
+ baixo os termos de polo menos unha destas dúas licenzas;
+
+     - A "GNU General Public License" tal como é publicada pola Free Software 
+     Foundation; version 2 da Licenza, ou (á súa elección) calquera versión posterior.
+
+     - A "European Software License"; versión 1.1 da Licenza, ou (á súa elección) calquera
+     versión posterior.

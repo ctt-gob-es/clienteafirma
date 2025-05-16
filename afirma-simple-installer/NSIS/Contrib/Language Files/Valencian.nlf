@@ -1,0 +1,192 @@
+﻿# Header, don't edit
+NLF v6
+# Language ID
+2051
+# Font and size - dash (-) means default
+-
+-
+# Codepage - dash (-) means ASCII code page
+1252
+# RTL - anything else than RTL means LTR
+-
+# Translation by MoNKi & Joel
+# Review and minor corrections Darwin Rodrigo Toledo Càceres (niwrad777@gmail.com) www.winamp-es.com
+# ^Branding
+Nullsoft Install System %s
+# ^SetupCaption
+Instal·lació de $(^Name)
+# ^UninstallCaption
+Desinstal·lació de $(^Name)
+# ^LicenseSubCaption
+: Acord de Llicència
+# ^ComponentsSubCaption
+: Opcions d'Instal·lació
+# ^DirSubCaption
+: Directori d'Instal·lació
+# ^InstallingSubCaption
+: Instal·lant
+# ^CompletedSubCaption
+: Completat
+# ^UnComponentsSubCaption
+: Opcions de Desinstal·lació
+# ^UnDirSubCaption
+: Directori de Desinstal·lació
+# ^ConfirmSubCaption
+: Confirmació
+# ^UninstallingSubCaption
+: Desinstal·lant
+# ^UnCompletedSubCaption
+: Completat
+# ^BackBtn
+< &Arrere
+# ^NextBtn
+&Següent >
+# ^AgreeBtn
+A&cepto
+# ^AcceptBtn
+A&cepto els termes de la llicència
+# ^DontAcceptBtn
+&No accepte els termes de la llicència
+# ^InstallBtn
+&Instal·lar
+# ^UninstallBtn
+&Desinstal·lar
+# ^CancelBtn
+Cancel·lar
+# ^CloseBtn
+&Tancar
+# ^BrowseBtn
+&Examinar...
+# ^ShowDetailsBtn
+Veure &detalls
+# ^ClickNext
+Pressione Següent per a continuar.
+# ^ClickInstall
+Pressione Instal·lar per a començar la instal·lació.
+# ^ClickUninstall
+Pressione Desinstal·lar per a començar la desinstal·lació.
+# ^Name
+Nom
+# ^Completed
+Completat
+# ^LicenseText
+Per favor, revise l'acord de llicència abans d'instal·lar $(^NameDA). Si accepta tots els termes de l'acord, pressione Accepte.
+# ^LicenseTextCB
+Per favor, revise l'acord de llicència abans d'instal·lar $(^NameDA). Si accepta tots els termes de l'acord, marque a baix la casella. $_CLICK
+# ^LicenseTextRB
+Per favor, revise l'acord de llicència abans d'instal·lar $(^NameDA). Si accepta tots els termes de l'acord, seleccione a baix la primera opció. $_CLICK
+# ^UnLicenseText
+Per favor, revise l'acord de llicència abans de desinstal·lar $(^NameDA). Si accepta tots els termes de l'acord, pressione Accepte.
+# ^UnLicenseTextCB
+Per favor, revise l'acord de llicència abans de desinstal·lar $(^NameDA). Si accepta tots els termes de l'acord, marque a baix la casella. $_CLICK.
+# ^UnLicenseTextRB
+Per favor, revise l'acord de llicència abans de desinstal·lar $(^NameDA). Si accepta tots els termes de l'acord, seleccione a baix la primera opció. $_CLICK
+# ^Custom
+Personalitzada
+# ^ComponentsText
+Marque els components que desitge instal·lar i desmarcatge els components que no desitge instal·lar. $_CLICK
+# ^ComponentsSubText1
+Tipus d'instal·lació:
+# ^ComponentsSubText2_NoInstTypes
+Seleccione els components a instal·lar:
+# ^ComponentsSubText2
+O seleccione els components opcionals que desitge instal·lar:
+# ^UnComponentsText
+Marque els components que desitge desinstal·lar i desmarcatge els components que no desitge desinstal·lar. $_CLICK
+# ^UnComponentsSubText1
+Tipus de desinstal·lació:
+# ^UnComponentsSubText2_NoInstTypes
+Seleccione els components a desinstal·lar:
+# ^UnComponentsSubText2
+O seleccione els components opcionals que desitge desinstal·lar:
+# ^DirText
+El programa d'instal·lació instal·larà $(^NameDA) en el següent directori. Per a instal·lar en un directori diferent, pressione Examinar i seleccione un altre directori. $_CLICK
+# ^DirSubText
+Directori de Destinació
+# ^DirBrowseText
+Seleccione el directori en el qual instal·larà $(^NameDA):
+# ^UnDirText
+El programa d'instal·lació desinstal·larà $(^NameDA) del següent directori. Per a desinstal·lar d'un directori diferent, pressione Examinar i seleccione un altre directori. $_CLICK
+# ^UnDirSubText
+""
+# ^UnDirBrowseText
+Seleccione el directori des del qual desinstal·larà $(^NameDA):
+# ^SpaceAvailable
+Espai disponible: 
+# ^SpaceRequired
+Espai requerit: 
+# ^UninstallingText
+$(^NameDA) serà desinstal·lat del següent directori. $_CLICK
+# ^UninstallingSubText
+Desinstal·lant des de:
+# ^FileError
+Error obrint arxiu per a escriptura: \r\n\t"$0"\r\nPresione avortar per a anul·lar la instal·lació,\r\nreintentar per a tornar a intentar escriure l'arxiu, o\r\nomitir per a ignorar este arxiu
+# ^FileError_NoIgnore
+Error obrint arxiu per a escriptura: \r\n\t"$0"\r\nPresione reintentar per a tornar a intentar escriure l'arxiu, o\r\ncancelar per a anul·lar la instal·lació
+# ^CantWrite
+"No va poder escriure's: "
+# ^CopyFailed
+Va fallar la còpia
+# ^CopyTo
+"Copiar a "
+# ^Registering
+"Registrant: "
+# ^Unregistering
+"Eliminant registre: "
+# ^SymbolNotFound
+"No va poder trobar-se símbol: "
+# ^CouldNotLoad
+"No va poder carregar-se: "
+# ^CreateFolder
+"Creant directori: "
+# ^CreateShortcut
+"Creant accés directe: "
+# ^CreatedUninstaller
+"Creant desinstalador: "
+# ^Delete
+"Esborrar arxiu: "
+# ^DeleteOnReboot
+"Esborrar al reinici: "
+# ^ErrorCreatingShortcut
+"Error creant accés directe: "
+# ^ErrorCreating
+"Error creant: "
+# ^ErrorDecompressing
+Error descomprimint dades! Instal·lador corrupte?
+# ^ErrorRegistering
+Error registrant DLL
+# ^ExecShell
+"Extraient  comando: "
+# ^Exec
+"Extraient : "
+# ^Extract
+"Extraure: "
+# ^ErrorWriting
+"Extraure: error escrivint a l'arxiu "
+# ^InvalidOpcode
+Instal·lador corrupte: codi d'operació no vàlid
+# ^NoOLE
+"Sense OLE para: "
+# ^OutputFolder
+"Directori d'eixida: "
+# ^RemoveFolder
+"Eliminar directori: "
+# ^RenameOnReboot
+"Canviar de nom al reinici: "
+# ^Rename
+"Canviar de nom: "
+# ^Skipped
+"Omés: "
+# ^CopyDetails
+Copiar Detalls al Portapapers
+# ^LogInstall
+Registrar procés d'instal·lació 
+# ^Byte
+B
+# ^Quilo
+ K
+# ^Mega
+ M
+# ^Giga
+ G
+

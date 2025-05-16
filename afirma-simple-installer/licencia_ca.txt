@@ -1,0 +1,12 @@
+ 
+ Autofirma 1.9
+ Copyright 2011, 2025 Govern d'Espanya
+ 
+ Autofirma és Programari Lliure; pots redistribuir-ho i/o modificar-ho
+ sota els termes d'almenys una d'aquestes dues llicències;
+
+   - La "GNU General Public License" tal com és publicada per la Free Programari 
+     Foundation; version 2 de la Llicència, o (a la seva elecció) qualsevol versió posterior.
+
+   - L'"European Software License"; versió 1.1 de la Llicència, o (a la seva elecció)
+     qualsevol versió posterior.

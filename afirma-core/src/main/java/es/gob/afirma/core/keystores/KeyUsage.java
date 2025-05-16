@@ -10,6 +10,8 @@ package es.gob.afirma.core.keystores;
 
 import java.security.cert.X509Certificate;
 
+import es.gob.afirma.core.ui.CoreMessages;
+
 /** Identificador de uso de certificados correspondiente a la subestructura
  * X.509 ASN.1:
  * <pre>
@@ -215,30 +217,30 @@ public final class KeyUsage {
 	@Override
 	public String toString() {
 		if (this.usage == null) {
-			return "Desconocido"; //$NON-NLS-1$
+			return CoreMessages.getString("KeyUsage.0"); //$NON-NLS-1$
 		}
 		if (includes(SIGN) && includes(AUTH) && includes(CYPH)) {
-			return "Firma, autenticaci\u00F3n y cifrado"; //$NON-NLS-1$
+			return CoreMessages.getString("KeyUsage.1"); //$NON-NLS-1$
 		}
 		if (includes(AUTH) && includes(CYPH)) {
-			return "Autenticaci\u00F3n y cifrado"; //$NON-NLS-1$
+			return CoreMessages.getString("KeyUsage.2"); //$NON-NLS-1$
 		}
 		if (includes(SIGN) && includes(AUTH) && includes(CYPH)) {
-			return "Firma y cifrado"; //$NON-NLS-1$
+			return CoreMessages.getString("KeyUsage.3"); //$NON-NLS-1$
 		}
 		if (includes(SIGN) && includes(AUTH)) {
-			return "Firma y autenticaci\u00F3n"; //$NON-NLS-1$
+			return CoreMessages.getString("KeyUsage.4"); //$NON-NLS-1$
 		}
 		if (includes(AUTH)) {
-			return "Autenticaci\u00F3n"; //$NON-NLS-1$
+			return CoreMessages.getString("KeyUsage.5"); //$NON-NLS-1$
 		}
 		if (includes(SIGN)) {
-			return "Firma"; //$NON-NLS-1$
+			return CoreMessages.getString("KeyUsage.6"); //$NON-NLS-1$
 		}
 		if (includes(CYPH)) {
-			return "Cifrado"; //$NON-NLS-1$
+			return CoreMessages.getString("KeyUsage.7"); //$NON-NLS-1$
 		}
-		return "Otros"; //$NON-NLS-1$
+		return CoreMessages.getString("KeyUsage.8"); //$NON-NLS-1$
 	}
 
 }

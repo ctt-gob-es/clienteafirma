@@ -91,7 +91,7 @@ public class LanguageManager {
 	 */
 	private static File copyLanguageToDirectory(final File langFile, final File langDir) throws IOException, LanguageException {
 
-		// Creamos el directorio de plugins si es preciso
+		// Creamos el directorio de idiomas si es preciso
 		if (!langDir.isDirectory()) {
 			try {
 				if (!langDir.getParentFile().exists()) {
@@ -104,15 +104,15 @@ public class LanguageManager {
 			}
 		}
 		
-		final File outPluginFile = new File(langDir, langFile.getName());
-		try (OutputStream fos = new FileOutputStream(outPluginFile)) {
+		final File outLangFile = new File(langDir, langFile.getName());
+		try (OutputStream fos = new FileOutputStream(outLangFile)) {
 			Files.copy(langFile.toPath(), fos);
 		}
-		AOFileUtils.setAllPermissions(outPluginFile);
+		AOFileUtils.setAllPermissions(outLangFile);
 		
-		unzipFile(outPluginFile, langDir.getAbsolutePath());
+		unzipFile(outLangFile, langDir.getAbsolutePath());
 		
-		return outPluginFile;
+		return outLangFile;
 		
 	}
 	

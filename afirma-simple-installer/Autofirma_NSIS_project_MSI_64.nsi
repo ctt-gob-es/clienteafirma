@@ -46,7 +46,7 @@ VIAddVersionKey "FileDescription" "Autofirma (64 bits)"
   ;Mostramos la pagina de bienvenida
   !insertmacro MUI_PAGE_WELCOME
   ;Pagina donde mostramos el contrato de licencia 
-  !insertmacro MUI_PAGE_LICENSE "licencia.txt"
+  !insertmacro MUI_PAGE_LICENSE $(LICENSE)
   ;Pagina donde se selecciona el directorio donde instalar nuestra aplicacion
   !insertmacro MUI_PAGE_DIRECTORY
   ;Pagina de instalacion de ficheros
@@ -63,7 +63,25 @@ VIAddVersionKey "FileDescription" "Autofirma (64 bits)"
 ;--------------------------------
 ;Idiomas
  
-  !insertmacro MUI_LANGUAGE "Spanish"
+ !insertmacro MUI_LANGUAGE "Spanish"
+ !insertmacro MUI_LANGUAGE "English"
+ !insertmacro MUI_LANGUAGE "Catalan"
+ !insertmacro MUI_LANGUAGE "Basque"
+ !insertmacro MUI_LANGUAGE "Galician"
+ !insertmacro MUI_LANGUAGE "Valencian"
+ 
+;Incluimos el archivo con los literales multidioma
+  !include "lang_strings.nsh"
+
+;Licencias
+ LicenseLangString LICENSE ${LANG_SPANISH} "licencia_es.txt"
+ LicenseLangString LICENSE ${LANG_ENGLISH} "licencia_en.txt"
+ LicenseLangString LICENSE ${LANG_CATALAN} "licencia_ca.txt"
+ LicenseLangString LICENSE ${LANG_GALICIAN} "licencia_gl.txt"
+ LicenseLangString LICENSE ${LANG_BASQUE} "licencia_eu.txt"
+ LicenseLangString LICENSE ${LANG_VALENCIAN} "licencia_va.txt"
+ 
+ LicenseData $(LICENSE)
 
 ; Para generar instaladores en diferentes idiomas podemos escribir lo siguiente:
 ;  !insertmacro MUI_LANGUAGE ${LANGUAGE}
@@ -84,7 +102,7 @@ OutFile Autofirma64\AutofirmaGenerator.exe
 ; Bienvenido al Asistente de Instalacion de Aplicacion $Name
 ; no se ve el contenido de la variable $Name si el tamano es muy grande
 Name "Autofirma"
-Caption "Instalador de Autofirma"
+Caption $(INST_CAPTION)
 Icon ic_launcher.ico
 
 ;Comprobacion de integridad del fichero activada
@@ -111,13 +129,17 @@ Var CONFIG_PATH
 Var UPDATE_CONFIG
 ;Parametro que indica si se debe utilizar el JRE instalada junto a Autofirma o no.
 Var USE_SYSTEM_JRE
+;Parametro que indica la ruta con el archivo de idioma
+Var LANGUAGE_PATH
+;Parametro que indica el idioma a usar por Autofirma
+Var DEFAULT_LANGUAGE
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
 InstallDir "$PROGRAMFILES64\Autofirma"
 
 ;Mensaje que mostraremos para indicarle al usuario que seleccione un directorio
-DirText "Elija un directorio donde instalar la aplicación:"
+DirText $(CHOOSE_DIR)
 
 ;Indicamos que cuando la instalacion se complete no se cierre el instalador automaticamente
 AutoCloseWindow false
@@ -204,7 +226,12 @@ Section "Autofirma" sPrograma
 	File  Autofirma64\Autofirma.exe
 	File  Autofirma64\AutofirmaConfigurador.exe
 	File  Autofirma64\AutofirmaCommandLine.exe
-	File  licencia.txt
+	File  licencia_es.txt
+	File  licencia_en.txt
+	File  licencia_ca.txt
+	File  licencia_va.txt
+	File  licencia_eu.txt
+	File  licencia_gl.txt
 	File  ic_firmar.ico
 
 	;Si no se ha solicitado usar el JRE instalado en el sistema, copiamos el JRE del instalador
@@ -228,20 +255,20 @@ Section "Autofirma" sPrograma
 
 	;Registro
 	;CascadeAfirma.reg
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" $(SIGN_WITH_AUTOFIRMA)
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\Autofirma.exe"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\Autofirma.exe sign -gui -i "%1"'
 	
 	;Verify
 	; .csig
-	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" "Firma binaria CMS/CAdES"
+	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" $(BINARY_SIGNATURE)
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con Autofirma"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
 
 	;Verify
 	; .xsig
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" "Firma XMLDSig/XAdES"
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" $(XADES_SIGNATURE)
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con Autofirma"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
@@ -282,8 +309,18 @@ Section "Autofirma" sPrograma
 	StrCpy $R8 ""
 	StrCmp $UPDATE_CONFIG "true" 0 +2
 		StrCpy $R8 "-update_config"
+		
+	; Comprobamos si el administrador le ha pasado el parametro con el almacen
+	StrCpy $R9 ""
+	StrCmp $LANGUAGE_PATH "false" +2
+		StrCpy $R9 '-language_path "$LANGUAGE_PATH"'
+		
+	; Comprobamos si el administrador le ha pasado el parametro con el almacen
+	StrCpy $1 ""
+	StrCmp $DEFAULT_LANGUAGE "false" +2
+		StrCpy $1 '-default_language "$DEFAULT_LANGUAGE"'
 
-	ExecWait '"$INSTDIR\$PATH\AutofirmaConfigurador.exe" $R4 $R5 $R6 $R7 $R8 /passive'
+	ExecWait '"$INSTDIR\$PATH\AutofirmaConfigurador.exe" $R4 $R5 $R6 $R7 $R8 $R9 $1 /passive'
 
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
@@ -316,6 +353,8 @@ Function .onInit
 	${GetOptions} $R0 "/CONFIG_PATH=" $CONFIG_PATH
 	${GetOptions} $R0 "/UPDATE_CONFIG=" $UPDATE_CONFIG
 	${GetOptions} $R0 "/USE_SYSTEM_JRE=" $USE_SYSTEM_JRE
+	${GetOptions} $R0 "/LANGUAGE_PATH=" $LANGUAGE_PATH
+	${GetOptions} $R0 "/DEFAULT_LANGUAGE=" $DEFAULT_LANGUAGE
 	
 	; Comprobamos que no solo se informe de un parametro, sino de
 	; los dos o de ninguno
@@ -334,6 +373,11 @@ Function .onInit
 	${AndIf} $KEYSTORE_PATH != "false" 
 		IfFileExists "$CERTIFICATE_PATH" 0 +2
 		IfFileExists "$KEYSTORE_PATH" +2 0
+			Abort
+	${EndIf}
+	
+	${If} $LANGUAGE_PATH != "false"
+		IfFileExists "$LANGUAGE_PATH" +2 0
 			Abort
 	${EndIf}
 
@@ -559,17 +603,17 @@ Function AddCertificateToStore
         i ${CERT_STORE_ADD_ALWAYS}, i 0) i .R0"
       System::Call "crypt32::CertFreeCertificateContext(i r0)"
       ${If} $R0 = 0
-        StrCpy $0 "Unable to add certificate to certificate store"
+        StrCpy $0 $(CANT_OPEN_KEYSTORE)
       ${Else}
         StrCpy $0 "success"
       ${EndIf}
       System::Call "crypt32::CertCloseStore(i r1, i 0)"
     ${Else}
       System::Call "crypt32::CertFreeCertificateContext(i r0)"
-      StrCpy $0 "No fue posible abrir el almacén de certificados"
+      StrCpy $0 $(CANT_OPEN_KEYSTORE)
     ${EndIf}
   ${Else}
-    StrCpy $0 "No fue posible abrir el fichero de certificados"
+    StrCpy $0 $(CANT_OPEN_CERT_FILE)
   ${EndIf}
  
   Pop $R0
@@ -786,11 +830,11 @@ Function AddToPath
   System::Call "advapi32::RegQueryValueEx(i $3, t'PATH', i 0, i 0, t.r1, *i ${NSIS_MAX_STRLEN} r2) i.r4"
   System::Call "advapi32::RegCloseKey(i $3)"
   IntCmp $4 234 0 +3 +3 ; $4 == ERROR_MORE_DATA
-    DetailPrint "El PATH es demasiado largo. No se le agregará la ruta de AutoAfirma."
+    DetailPrint $(PATH_TOO_LONG)
     Goto done
   IntCmp $4 0 +5 ; $4 != NO_ERROR
     IntCmp $4 2 +3 ; $4 != ERROR_FILE_NOT_FOUND
-      DetailPrint "Error inesperado al agregar la ruta al PATH: $4"
+      DetailPrint "$(PATH_ERROR) $4"
       Goto done
     StrCpy $1 ""
   ; Check if already in PATH
@@ -810,10 +854,10 @@ Function AddToPath
   IntOp $2 $2 + $3
   IntOp $2 $2 + 2 ; $2 = strlen(dir) + strlen(PATH) + sizeof(";")
   IntCmp $2 ${NSIS_MAX_STRLEN} +3 +3 0
-    DetailPrint "La ruta de Autofirma hace que el PATH sea demasiado largo. No se agregará"
+    DetailPrint $(AUTOFIRMA_PATH_TOO_LONG)
     Goto done
   ; Append dir to PATH
-  DetailPrint "Agregamos al PATH: $0"
+  DetailPrint "$(ADD_TO_PATH) $0"
   StrCpy $2 $1 1 -1
   StrCmp $2 ";" 0 +2
     StrCpy $1 $1 -1 ; remove trailing ';'
@@ -851,7 +895,7 @@ Function RemoveFromPath
   Call StrStr
   Pop $2 ; pos of our dir
   StrCmp $2 "" done
-  DetailPrint "Eliminamos del PATH: $0"
+  DetailPrint "$(DELETE_FROM_PATH) $0"
   StrLen $3 "$0;"
   StrLen $4 $2
   StrCpy $5 $1 -$4 ; $5 is now the part before the path to remove

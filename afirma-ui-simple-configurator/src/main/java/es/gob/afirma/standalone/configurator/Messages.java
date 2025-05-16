@@ -9,14 +9,34 @@
 
 package es.gob.afirma.standalone.configurator;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
+import es.gob.afirma.core.ui.LanguageManager;
 
 /** Manejador de las cadenas de texto externalizadas. */
 final class Messages {
+	
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	
 	private static final String BUNDLE_NAME = "es.gob.afirma.standalone.configurator.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_BASENAME = "messages"; //$NON-NLS-1$
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
-			.getBundle(BUNDLE_NAME);
+	private static ResourceBundle RESOURCE_BUNDLE;
+	
+	static {
+    	updateLocale();
+    }
 
 	private Messages() {
 		// No instanciable
@@ -30,7 +50,26 @@ final class Messages {
 			return RESOURCE_BUNDLE.getString(key);
 		}
 		catch (final Exception e) {
-			return '!' + key + '!';
+			try {
+				final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+				final ResourceBundle temporalBundle;
+
+				if (LanguageManager.isDefaultLocale(baseLocale)) {
+					temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
+				} else {
+					final File localeDir = new File(LanguageManager.getLanguagesDir(),
+							baseLocale.getLanguage() + "_" + baseLocale.getCountry()); //$NON-NLS-1$
+					URL[] urls = null;
+					urls = new URL[] { localeDir.toURI().toURL() };
+					final ClassLoader loader = new URLClassLoader(urls);
+					temporalBundle = ResourceBundle.getBundle(BUNDLE_BASENAME, Locale.getDefault(), loader);
+				}
+
+				return temporalBundle.getString(key);
+
+			} catch (final Exception e1) {
+				return '!' + key + '!';
+			}
 		}
 	}
 
@@ -51,7 +90,25 @@ final class Messages {
             text = RESOURCE_BUNDLE.getString(key);
         }
         catch (final Exception e) {
-            return '!' + key + '!';
+        	if(!LanguageManager.isDefaultLocale(Locale.getDefault())) {
+        		try {
+					final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+					final ResourceBundle temporalBundle;
+					
+					if(LanguageManager.isDefaultLocale(baseLocale)) {
+						temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
+					} else {
+						temporalBundle = setImportedLangResource();
+					}
+					
+					text = temporalBundle.getString(key);
+					
+				} catch (final Exception e1) {
+					return '!' + key + '!';
+				}          	
+        	}
+        	
+			return '!' + key + '!';   
         }
 
         if (params != null && params.length > 0) {
@@ -63,5 +120,27 @@ final class Messages {
         }
 
         return text;
+    }
+    
+    /** Cambia la localizaci&oacute;n a la establecida por defecto. */
+    public static void updateLocale() {
+    	if (LanguageManager.isDefaultLocale(Locale.getDefault()) && !LanguageManager.existDefaultLocaleNewVersion()) {
+    		RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
+    	} else {
+    		RESOURCE_BUNDLE = setImportedLangResource();
+    	}
+    }
+    
+    private static ResourceBundle setImportedLangResource() {
+    	final File localeDir = new File(LanguageManager.getLanguagesDir(), Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry()); //$NON-NLS-1$
+		final File file = new File(localeDir, BUNDLE_BASENAME + "_" + Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry() + ".properties"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
+        	return new PropertyResourceBundle(reader);
+        } catch (final FileNotFoundException e) {
+			LOGGER.severe("Recurso para jseuimessages no encontrado: "+ e); //$NON-NLS-1$
+		} catch (final IOException e) {
+			LOGGER.severe("Error al leer el recurso para jseuimessages: "+ e); //$NON-NLS-1$
+		}
+        return null;
     }
 }

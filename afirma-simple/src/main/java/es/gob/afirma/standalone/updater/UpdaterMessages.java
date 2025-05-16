@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -42,8 +41,22 @@ final class UpdaterMessages {
 		try {
 			return RESOURCE_BUNDLE.getString(key);
 		}
-		catch (final MissingResourceException e) {
-			return '!' + key + '!';
+		catch (final Exception e) {
+			try {
+				final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+				final ResourceBundle temporalBundle;
+
+				if (LanguageManager.isDefaultLocale(baseLocale)) {
+					temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
+				} else {
+					temporalBundle = setImportedLangResource();
+				}
+
+				return temporalBundle.getString(key);
+
+			} catch (final Exception e1) {
+				return '!' + key + '!';
+			}
 		}
 	}
 	

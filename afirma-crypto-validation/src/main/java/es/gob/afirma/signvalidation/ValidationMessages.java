@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -44,7 +43,7 @@ public final class ValidationMessages {
         try {
             return bundle.getString(key);
         }
-        catch (final MissingResourceException e) {
+        catch (final Exception e) {
 			try {
 				final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
 				final ResourceBundle temporalBundle;

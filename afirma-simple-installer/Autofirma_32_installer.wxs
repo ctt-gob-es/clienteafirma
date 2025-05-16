@@ -22,11 +22,13 @@
 		<Property Id="CONFIG_PATH" Value="false" Secure="yes" Admin="yes" />
 		<Property Id="UPDATE_CONFIG" Value="false" Secure="yes" Admin="yes" />
 		<Property Id="USE_SYSTEM_JRE" Value="false" Secure="yes" Admin="yes" />
+		<Property Id="DEFAULT_LANGUAGE" Value="false" Secure="yes" Admin="yes" />
+		<Property Id="LANGUAGE_PATH" Value="false" Secure="yes" Admin="yes" />
 		
 		<!-- Ejecucion del instalador -->
 		<CustomAction Id='QtExecInstall'
 					  FileKey='$(var.ProjectName)Generator.exe'
-					  ExeCommand='/S /FIREFOX_SECURITY_ROOTS=[FIREFOX_SECURITY_ROOTS] /CREATE_ICON=[CREATE_ICON] /CERTIFICATE_PATH=[CERTIFICATE_PATH] /KEYSTORE_PATH=[KEYSTORE_PATH] /CONFIG_PATH=[CONFIG_PATH] /UPDATE_CONFIG=[UPDATE_CONFIG] /USE_SYSTEM_JRE=[USE_SYSTEM_JRE]' 
+					  ExeCommand='/S /FIREFOX_SECURITY_ROOTS=[FIREFOX_SECURITY_ROOTS] /CREATE_ICON=[CREATE_ICON] /CERTIFICATE_PATH=[CERTIFICATE_PATH] /KEYSTORE_PATH=[KEYSTORE_PATH] /CONFIG_PATH=[CONFIG_PATH] /UPDATE_CONFIG=[UPDATE_CONFIG] /USE_SYSTEM_JRE=[USE_SYSTEM_JRE] /DEFAULT_LANGUAGE=[DEFAULT_LANGUAGE] /LANGUAGE_PATH=[LANGUAGE_PATH]'
                       Execute="deferred"
                       Return="check"
 					  Impersonate="no" />
