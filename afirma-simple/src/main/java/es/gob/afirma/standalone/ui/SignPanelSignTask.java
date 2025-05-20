@@ -181,7 +181,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		return;
         	}
         	catch (final Exception e) {
-        		LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$
+        		LOGGER.severe("Ocurrio un error al extraer la clave privada del certificado seleccionado: " + e); //$NON-NLS-1$
         		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.56"), e); //$NON-NLS-1$
         		return;
         	}
@@ -361,7 +361,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 					this.selectedPke = getPrivateKeyEntry(filters, true);
 				}
 				catch (final Exception e2) {
-					LOGGER.log(Level.SEVERE, "Ocurrio un error al extraer la clave privada del certificiado seleccionado", e2); //$NON-NLS-1$
+					LOGGER.log(Level.SEVERE, "Ocurrio un error al extraer la clave privada del certificado seleccionado", e2); //$NON-NLS-1$
 					showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.56"), e); //$NON-NLS-1$
 					return;
 				}
