@@ -70,7 +70,7 @@ import es.gob.afirma.core.ui.LanguageManager;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.KeystoreAlternativeException;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
@@ -456,7 +456,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						this // Parent
 				);
 
-			} catch (final AOKeystoreAlternativeException e) {
+			} catch (final KeystoreAlternativeException e) {
 	 			LOGGER.log(Level.SEVERE, "Error al seleccionar el tipo de almacen", e); //$NON-NLS-1$
 	 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.54"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
@@ -535,7 +535,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     						this // Parent
     				);
 
-    			} catch (final AOKeystoreAlternativeException e) {
+    			} catch (final KeystoreAlternativeException e) {
     	 			LOGGER.log(Level.SEVERE, "Error al seleccionar el tipo de almacen", e); //$NON-NLS-1$
     	 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.54"), //$NON-NLS-1$
     						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$

@@ -1216,11 +1216,13 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         return originalName + (inText != null ? inText : "") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    /** Devuelve un nuevo documento con ra&iacute;z "AFIRMA" del que cuelga el
+    /**
+     * Devuelve un nuevo documento con ra&iacute;z "AFIRMA" del que cuelga el
      * documento especificado.
      * @param docu Documento que estar&aacute; contenido en el nuevo documento.
      * @return Documento con ra&iacute;z "AFIRMA".
-     * @throws ParserConfigurationException Cuando se produce un error al analizar el XML. */
+     * @throws ParserConfigurationException Cuando se produce un error al analizar el XML.
+     */
     static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Crea un nuevo documento con la raiz "AFIRMA"

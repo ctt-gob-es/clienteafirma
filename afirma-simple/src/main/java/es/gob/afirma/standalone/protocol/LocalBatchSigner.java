@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -221,7 +221,7 @@ public class LocalBatchSigner {
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGN_WITHOUT_DATA;
 			throw new SocketOperationException(errorCode, e);
 		}
-		catch (final AOInvalidFormatException e) {
+		catch (final AOInvalidSignatureFormatException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA;
 			throw new SocketOperationException(errorCode, e);

@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.CustomRuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
@@ -781,7 +781,7 @@ final class ProtocolInvocationLauncherSign {
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGN_WITHOUT_DATA;
 			throw new SocketOperationException(errorCode, e);
 		}
-		catch (final AOInvalidFormatException e) {
+		catch (final AOInvalidSignatureFormatException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA;
 			throw new SocketOperationException(errorCode, e);

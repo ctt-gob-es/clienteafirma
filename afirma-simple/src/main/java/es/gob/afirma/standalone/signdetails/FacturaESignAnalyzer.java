@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
@@ -94,7 +94,7 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     		createSignDetails(signaturesList);
     	}
     	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 	}
 
@@ -121,9 +121,9 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 	/**
 	 * Construye los detalles de la firma.
 	 * @param signaturesList Lista con datos de firmas.
-	 * @throws AOInvalidFormatException Error formateando los datos.
+	 * @throws AOInvalidSignatureFormatException Error formateando los datos.
 	 */
-	private void createSignDetails(final NodeList signaturesList) throws AOInvalidFormatException {
+	private void createSignDetails(final NodeList signaturesList) throws AOInvalidSignatureFormatException {
     	try {
     		for (int i = 0 ; i < signaturesList.getLength() ; i++) {
     			final Element signature = (Element) signaturesList.item(i);
@@ -135,7 +135,7 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
     		}
     	}
     	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 	}
 
@@ -144,15 +144,15 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 	 * @param signElement Elemento XML con datos de la firma.
 	 * @param signProfile Perfil de la firma.
 	 * @return Detalles de la firma.
-	 * @throws AOInvalidFormatException Error formateando datos.
+	 * @throws AOInvalidSignatureFormatException Error formateando datos.
 	 */
-	private static SignDetails buildSignDetails(final Element signElement, final String signProfile) throws AOInvalidFormatException {
+	private static SignDetails buildSignDetails(final Element signElement, final String signProfile) throws AOInvalidSignatureFormatException {
 
 		final SignDetails xadesSignDetails = new SignDetails();
 		xadesSignDetails.setSignProfile(signProfile);
 		final Element signatureMethodElement = XAdESUtil.getSignatureMethodElement(signElement);
 		if (signatureMethodElement == null) {
-			throw new AOInvalidFormatException("El elemento SignatureMethod no existe"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("El elemento SignatureMethod no existe"); //$NON-NLS-1$
 		}
 		String algorithm = SIGN_ALGOS_URI.get(signatureMethodElement.getAttribute("Algorithm")); //$NON-NLS-1$
 		if (algorithm == null) {
@@ -181,7 +181,7 @@ public class FacturaESignAnalyzer implements SignAnalyzer {
 			}
 
 			if (!existingNamespace) {
-				throw new AOInvalidFormatException(
+				throw new AOInvalidSignatureFormatException(
 						"Una de las firmas encontradas en el documento contiene una version inexistente de XAdES"); //$NON-NLS-1$
 			}
 

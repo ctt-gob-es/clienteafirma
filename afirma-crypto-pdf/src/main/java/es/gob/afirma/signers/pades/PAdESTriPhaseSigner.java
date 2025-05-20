@@ -343,8 +343,8 @@ public final class PAdESTriPhaseSigner {
 		try {
 			pts = PdfSessionManager.getSessionData(inPdf, signerCertificateChain, signature.getSignTime(), signature.getExtraParams(), secureMode);
 		}
-		catch (final InvalidPdfException e) {
-			throw new IOException(e);
+		catch (final AOException e) {
+			throw e;
 		}
         final PdfSignatureAppearance sap = pts.getSAP();
 

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.Base64;
@@ -39,6 +40,7 @@ import es.gob.afirma.signvalidation.InvalidSignatureException;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.ValidateBinarySignature;
+import es.gob.afirma.triphase.signer.TriphaseErrorCode;
 import es.gob.afirma.triphase.signer.cades.AOCAdESTriPhaseCoSigner;
 import es.gob.afirma.triphase.signer.cades.AOCAdESTriPhaseCounterSigner;
 
@@ -151,7 +153,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Cargamos la configuracion de la operacion
 		if (triphaseData.getSignsCount() < 1) {
 			LOGGER.severe("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
-			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
+			throw new AOException("No se ha encontrado la informacion de firma en la peticion", TriphaseErrorCode.Request.MALFORMED_PRESIGN); //$NON-NLS-1$
 		}
 
 		final TriSign config = triphaseData.getSign(0);
@@ -197,21 +199,21 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final String allowSignLts = extraParams.getProperty(CAdESExtraParams.ALLOW_SIGN_LTS_SIGNATURES);
 		if (allowSignLts == null || !Boolean.parseBoolean(allowSignLts)) {
 			try {
-				CAdESMultiUtil.checkUnsupportedAttributes(sign);
+				CAdESMultiUtil.checkLongTermAttributes(sign);
 			}
-			catch (final IOException e) {
-				throw new AOInvalidSignatureFormatException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
-			} catch (final SigningLTSException e) {
+			catch (final SigningLTSException e) {
 				// Si se indico expresamente que no se debia permitir la cofirma de
 				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
 				// Si no, se informa debidamente para que se consulte al usuario
 				if (allowSignLts != null) {
-					throw new AOException(e.getMessage());
+					e.setDenied(true);
 				}
 				throw e;
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				throw new AOInvalidSignatureFormatException("No se ha proporcionado una firma CAdES que se pueda cofirmar", e); //$NON-NLS-1$
 			}
+
 		}
 
 		// Comprobamos la validez de la firma de entrada si se solicito
@@ -241,16 +243,15 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		try {
 			presign = AOCAdESTriPhaseCoSigner.preCoSign(
 				data,
-				algorithm,
 				cert,
 				parameters
 			);
 		}
 		catch (final CertificateEncodingException e) {
-			throw new AOException("Error de codificacion de certificado en la pre-cofirma CAdES: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error de codificacion de certificado en la pre-cofirma CAdES: " + e, e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		}
 		catch (final NoSuchAlgorithmException e) {
-			throw new AOException("Error de algoritmo no soportado en la pre-cofirma CAdES: " + e, e); //$NON-NLS-1$
+			throw new AOException("No se soporta el algoritmo de huella extraido del de firma para la pre-cofirma CAdES: " + e, e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
 		}
 
 		LOGGER.fine("Se prepara la respuesta de la pre-cofirma CAdES"); //$NON-NLS-1$
@@ -309,14 +310,14 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		if (data == null) {
 			messageDigest = ObtainContentSignedData.obtainMessageDigest(sign, AOSignConstants.getDigestAlgorithmName(algorithm));
 			if (messageDigest == null) {
-				throw new AOException("No se han encontrado datos dentro de la firma ni una huella digital compatible con el algoritmo: " + algorithm); //$NON-NLS-1$
+				throw new ContainsNoDataException("No se han encontrado datos dentro de la firma ni una huella digital compatible con el algoritmo: " + algorithm); //$NON-NLS-1$
 			}
 		}
 
 		// Cargamos la configuracion de la operacion
 		if (triphaseData.getSignsCount() < 1) {
 			LOGGER.severe("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
-			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
+			throw new AOException("No se ha encontrado la informacion de firma en la peticion", TriphaseErrorCode.Request.MALFORMED_PRESIGN); //$NON-NLS-1$
 		}
 
 		final TriSign config = triphaseData.getSign(0);
@@ -340,7 +341,7 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			);
 		}
 		catch (final CertificateEncodingException e) {
-			throw new AOException("Error de codificacion de certificado en la post-cofirma CAdES: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error de codificacion de certificado en la post-cofirma CAdES: " + e, e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		}
 
 		LOGGER.info("Postfirma CAdES - Cofirma - FIN"); //$NON-NLS-1$
@@ -367,16 +368,15 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			try {
 				CAdESMultiUtil.checkLongTermAttributes(sign);
 			}
-			catch (final IOException e) {
-				throw new AOInvalidSignatureFormatException("Los datos proporcionados no se corresponden con una firma CAdES", e); //$NON-NLS-1$
-			} catch (final RuntimeConfigNeededException e) {
+			catch (final RuntimeConfigNeededException e) {
 				// Si se indico expresamente que no se debia permitir la cofirma de
 				// firmas de archivo, se configura que se deniegue la operacion
 				if (allowSignLts != null) {
 					e.setDenied(true);
 				}
 				throw e;
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				throw new AOInvalidSignatureFormatException("No se ha proporcionado una firma CAdES que se pueda contrafirmar", e); //$NON-NLS-1$
 			}
 		}

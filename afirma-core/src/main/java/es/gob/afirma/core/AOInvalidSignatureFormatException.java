@@ -23,7 +23,7 @@ public class AOInvalidSignatureFormatException extends AOException {
      *        Mensaje descriptivo de la excepci&oacute;n.
      */
     public AOInvalidSignatureFormatException(final String msg) {
-        super(msg, ErrorCode.Internal.COMPATIBLE_SIGNATURE_NOT_FOUND);
+        super(msg, ErrorCode.Functional.COMPATIBLE_SIGNATURE_NOT_FOUND);
     }
 
     /**
@@ -33,8 +33,8 @@ public class AOInvalidSignatureFormatException extends AOException {
      * @param e
      *        Excepci&oacute;n que ha causado el lanzamiento de esta.
      */
-    public AOInvalidSignatureFormatException(final String msg, final Exception e) {
-        super(msg, e, ErrorCode.Internal.COMPATIBLE_SIGNATURE_NOT_FOUND);
+    public AOInvalidSignatureFormatException(final String msg, final Throwable e) {
+        super(msg, e, ErrorCode.Functional.COMPATIBLE_SIGNATURE_NOT_FOUND);
     }
 
     /**

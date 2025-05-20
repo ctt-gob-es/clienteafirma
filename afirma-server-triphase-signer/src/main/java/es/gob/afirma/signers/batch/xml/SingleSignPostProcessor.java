@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
@@ -120,7 +121,7 @@ final class SingleSignPostProcessor {
 			TriPhaseHelper.checkSignaturesIntegrity(td, docBytes, certChain[0], algorithm, needVerifyPkcs1);
 		}
 		catch (final Exception e) {
-			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
+			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e, ErrorCode.Internal.INVALID_PKCS1_VALUE); //$NON-NLS-1$
 		}
 
 		// Identificamos el algoritmo de firma apropiado la clave del certificado seleccionado

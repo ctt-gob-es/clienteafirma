@@ -12,7 +12,7 @@ package es.gob.afirma.keystores;
 
 /** Indica que ocurri&oacute; un error intentando obtener un <code>KeyStore</code>, pero que se obtuvo uno de un tipo alternativo.
  * @version 0.1 */
-public final class AOKeystoreAlternativeException extends Exception {
+public final class KeystoreAlternativeException extends Exception {
 
     private static final long serialVersionUID = -1536411480952188376L;
 
@@ -27,7 +27,7 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Mensaje descriptivo de la excepci&oacute;n.
      * @param e
      *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
-    public AOKeystoreAlternativeException(final AOKeyStore ks, final String desc, final Exception e) {
+    public KeystoreAlternativeException(final AOKeyStore ks, final String desc, final Exception e) {
         super(desc, e);
         this.alternativeKs = ks;
     }
@@ -38,7 +38,7 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Almac&eacute;n de claves y certificados alternativo
      * @param desc
      *        Mensaje descriptivo de la excepci&oacute;n. */
-    public AOKeystoreAlternativeException(final AOKeyStore ks, final String desc) {
+    public KeystoreAlternativeException(final AOKeyStore ks, final String desc) {
         super(desc);
         this.alternativeKs = ks;
     }

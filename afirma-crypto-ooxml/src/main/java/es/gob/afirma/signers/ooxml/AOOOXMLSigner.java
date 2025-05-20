@@ -147,7 +147,7 @@ public final class AOOOXMLSigner implements AOSigner {
         }
 
         if (!isSign(data)) {
-            throw new AOFormatFileException("Los datos introducidos no se corresponden con documento OOXML"); //$NON-NLS-1$
+            throw new AOFormatFileException("Los datos introducidos no se corresponden con documento OOXML", OOXMLErrorCode.Functional.OOXML_DOCUMENT_NEEDED); //$NON-NLS-1$
         }
 
         // Aqui vendria el analisis de la firma buscando alguno de los otros datos de relevancia
@@ -302,11 +302,11 @@ public final class AOOOXMLSigner implements AOSigner {
 
         // Comprobamos si es un documento OOXML valido.
         if (!OfficeAnalizer.isOOXMLDocument(data)) {
-            throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento OOXML"); //$NON-NLS-1$
+            throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento OOXML", OOXMLErrorCode.Functional.OOXML_DOCUMENT_NEEDED); //$NON-NLS-1$
         }
 
         if (certChain == null || certChain.length < 1) {
-        	throw new IllegalArgumentException("Debe proporcionarse a menos el certificado del firmante"); //$NON-NLS-1$
+        	throw new IllegalArgumentException("La cadena de certificados debe contener al menos un elemento"); //$NON-NLS-1$
         }
 
         final Properties xParams = extraParams != null ? extraParams : new Properties();
@@ -422,7 +422,7 @@ public final class AOOOXMLSigner implements AOSigner {
         	throw e;
         }
         catch (final Exception e) {
-            throw new AOException("Error durante la firma OOXML: " + e, e); //$NON-NLS-1$
+            throw new AOException("Error durante la firma OOXML: " + e, e, OOXMLErrorCode.Internal.UNKWNON_OOXML_SIGNING_ERROR); //$NON-NLS-1$
         }
     }
 

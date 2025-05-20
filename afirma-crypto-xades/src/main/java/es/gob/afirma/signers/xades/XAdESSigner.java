@@ -13,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -235,9 +236,10 @@ public final class XAdESSigner {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
-			throw new IllegalArgumentException(
-				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
-			);
+			throw new AOException(
+					"Los formatos de firma XML no soportan el algoritmo de firma " + algorithm, //$NON-NLS-1$
+					ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM
+				);
 		}
 
 		// ***********************************************************************************************
@@ -331,7 +333,7 @@ public final class XAdESSigner {
 			}
 			catch(final Exception e) {
 				throw new AOException(
-					"La codificacion indicada en 'encoding' debe ser una URI: " + e, e, XAdESErrorCode.Request.INVALID_ENCODING_URI //$NON-NLS-1$
+					"La codificacion indicada en 'encoding' debe ser una URI: " + e, e, XMLErrorCode.Request.INVALID_ENCODING_URI //$NON-NLS-1$
 				);
 			}
 		}
@@ -600,7 +602,7 @@ public final class XAdESSigner {
 					dataElement.setAttributeNS(null, AOXAdESSigner.XMLDSIG_ATTR_ENCODING_STR, encoding);
 				}
 				catch (final Exception ex) {
-					throw new AOException("Error al convertir los datos a Base64", ex); //$NON-NLS-1$
+					throw new AOException("Error analizar y procesar los datos para incluirlos en la firma", ex, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
 				}
 			}
 
@@ -652,7 +654,8 @@ public final class XAdESSigner {
 		}
 		catch (final Exception e) {
 			throw new AOException(
-				"No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido obtener un generador de huellas digitales para el algoritmo " + digestMethodAlgorithm, //$NON-NLS-1$
+				e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI
 			);
 		}
 
@@ -674,7 +677,8 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e1) {
 				throw new AOException(
-					"No se ha podido crear el canonizador para el algoritmo indicado (" + canonicalizationAlgorithm + "): " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
+					"No se ha podido crear el canonizador para el algoritmo indicado " + canonicalizationAlgorithm, //$NON-NLS-1$
+					e1, XMLErrorCode.Request.INVALID_CANONICALIZATION_URI
 				);
 			}
 		}
@@ -695,7 +699,7 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e) {
 				throw new AOException(
-					"No se puede encontrar el algoritmo transformacion Base64: " + e, e //$NON-NLS-1$
+					"No se puede encontrar el algoritmo transformacion Base64: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR //$NON-NLS-1$
 				);
 			}
 		}
@@ -784,7 +788,7 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e) {
 				throw new AOException(
-					"Error al generar la firma en formato enveloping", e //$NON-NLS-1$
+					"Error al generar la firma en formato enveloping", e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR //$NON-NLS-1$
 				);
 			}
 
@@ -878,7 +882,7 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e) {
 				throw new AOException(
-					"Error al generar la firma en formato detached: " + e, e //$NON-NLS-1$
+					"Error al generar la firma en formato detached: " + e, e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR //$NON-NLS-1$
 				);
 			}
 
@@ -935,7 +939,7 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e) {
 				throw new AOException(
-						"No se ha podido crear el metodo de huella digital para la referencia a datos externos: " + e, e //$NON-NLS-1$
+						"No se ha podido crear el metodo de huella digital para la referencia a datos externos: " + e, e, XMLErrorCode.Request.INVALID_PRECALCULATED_DATA_HASH_ALGORITHM //$NON-NLS-1$
 						);
 			}
 
@@ -948,30 +952,13 @@ public final class XAdESSigner {
 					LOGGER.warning("No se ha proporcionado la huella asociada a la referencia del parametro '" + XAdESExtraParams.URI  //$NON-NLS-1$
 						+ "'. Compruebe proporcionar la huella como datos y el parametro '"  //$NON-NLS-1$
 							+ XAdESExtraParams.PRECALCULATED_HASH_ALGORITHM + "' con algoritmo de hash"); //$NON-NLS-1$
-					throw new AOException("No se ha proporcionado la huella asociada a la referencia"); //$NON-NLS-1$
+					throw new AOException("No se ha proporcionado la huella asociada a la referencia", XAdESErrorCode.Request.REFERENCE_HASH_NOT_FOUND); //$NON-NLS-1$
 				}
 
-				try {
-					refDataList = loadManifestReferencesData(
+				refDataList = loadManifestReferencesData(
 						data,
 						referenceId,
-						extraParams
-					);
-				}
-				catch (final NoSuchAlgorithmException e) {
-					throw new AOException(
-						"No se ha podido calcular la huella de los datos proporcionados", //$NON-NLS-1$
-						e
-					);
-				}
-				catch (final Exception e) {
-					LOGGER.severe("No se han indicado los parametros necesarios ('uri1', 'uri2'... y 'md1', 'md2'...) para construir las referencias a los datos"); //$NON-NLS-1$
-					throw new AOException(
-						"No se han indicado los parametros necesarios para construir las referencias a los datos", //$NON-NLS-1$
-						e
-					);
-				}
-
+						extraParams);
 
 				// Creamos todas las referencias
 				for (final ExternalReferenceData refData : refDataList) {
@@ -988,7 +975,7 @@ public final class XAdESSigner {
 					catch (final Exception e) {
 						throw new AOException(
 							"Error al generar la firma Manifest al no poder crear una de las referencias externas", //$NON-NLS-1$
-							e
+							e, XMLErrorCode.Request.INVALID_REFERENCE_URI
 						);
 					}
 				}
@@ -1006,7 +993,7 @@ public final class XAdESSigner {
 				} catch (final NoSuchAlgorithmException e) {
 					throw new AOException(
 							"Error al cargar la referencia externa de la firma Externally Detached", //$NON-NLS-1$
-							e
+							e, XMLErrorCode.Request.INVALID_PRECALCULATED_DATA_HASH_ALGORITHM
 							);
 				}
 
@@ -1025,7 +1012,7 @@ public final class XAdESSigner {
 					catch (final Exception e) {
 						throw new AOException(
 								"Error crear la referencia externa de la firma Externally Detached", //$NON-NLS-1$
-								e
+								 e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR
 								);
 					}
 				}
@@ -1101,7 +1088,8 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e) {
 				throw new AOException(
-					"Error al generar la firma en formato enveloped: " + e, e //$NON-NLS-1$
+					"Error al generar la firma en formato enveloped: " + e, //$NON-NLS-1$
+					e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR
 				);
 			}
 
@@ -1295,7 +1283,7 @@ public final class XAdESSigner {
 			throw e;
 		}
 		catch (final Exception e) {
-			throw new AOException("Error al generar la firma XAdES: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error al generar la firma XAdES: " + e, e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 
 		// Si se esta realizando una firma enveloping simple no tiene sentido el nodo raiz,
@@ -1505,13 +1493,11 @@ public final class XAdESSigner {
 	 * @param extraParams Configuraci&oacute;n de firma.
 	 * @return Listado de referencias externas.
 	 * @throws AOException Cuando se encuentra un defecto en los par&aacute;metros proporcionados.
-	 * @throws NoSuchAlgorithmException Cuando el algoritmo de huella indicado no es v&aacute;lido
-	 *                                  e intenta usarse para calcular la huella de los datos.
 	 */
 	private static List<ExternalReferenceData> loadManifestReferencesData(
 			final byte[] digest,
 			final String referenceId,
-			final Properties extraParams) throws NoSuchAlgorithmException, AOException {
+			final Properties extraParams) throws AOException {
 
 		final List<ExternalReferenceData> refsList = new ArrayList<>();
 
@@ -1521,7 +1507,8 @@ public final class XAdESSigner {
 		if (extraParams.containsKey(XAdESExtraParams.URI)) {
 			if (digest == null) {
 				throw new AOException(
-					"No se ha proporcionado en el parametro de datos la huella correspondiente a los datos referenciados por la URI" //$NON-NLS-1$
+					"No se ha proporcionado en el parametro de datos la huella correspondiente a los datos referenciados por la URI", //$NON-NLS-1$
+					XAdESErrorCode.Request.REFERENCE_HASH_NOT_FOUND
 				);
 			}
 			final String uri = extraParams.getProperty(XAdESExtraParams.URI);
@@ -1541,7 +1528,8 @@ public final class XAdESSigner {
 			while (extraParams.containsKey(XAdESExtraParams.URI_PREFIX + i)) {
 				if (!extraParams.containsKey(XAdESExtraParams.MD_PREFIX + i)) {
 					throw new AOException(
-						String.format("No se ha indicado la huella de la referencia %d del manifest", Integer.valueOf(i)) //$NON-NLS-1$
+						String.format("No se ha indicado la huella de la referencia %d del manifest", Integer.valueOf(i)), //$NON-NLS-1$
+						XAdESErrorCode.Request.REFERENCE_HASH_NOT_FOUND
 					);
 				}
 				final byte[] md;
@@ -1552,7 +1540,7 @@ public final class XAdESSigner {
 					LOGGER.log(Level.WARNING, "Se ha indicado un base 64 no valido como huella de la referencia " + i, e); //$NON-NLS-1$
 					throw new AOException(
 						String.format("Se ha indicado un base 64 no valido como huella de la referencia %d del manifest", Integer.valueOf(i)), //$NON-NLS-1$
-						e
+						e, XAdESErrorCode.Request.INVALID_REFERENCE_HASH
 					);
 				}
 				final ExternalReferenceData refData = new ExternalReferenceData(
@@ -1570,7 +1558,7 @@ public final class XAdESSigner {
 			}
 
 			if (refsList.size() == 0) {
-				throw new AOException("No se han proporcionado las referencias y huellas de los datos a firmar"); //$NON-NLS-1$
+				throw new AOException("No se han proporcionado las referencias y huellas de los datos a firmar", XAdESErrorCode.Request.MANIFEST_REFERENCES_NOT_FOUND); //$NON-NLS-1$
 			}
 		}
 
@@ -1615,9 +1603,28 @@ public final class XAdESSigner {
 					).digest(AOUtil.getDataFromInputStream(lfis))
 				);
 			}
+			catch (final IOException e) {
+				throw new AOException(
+					"Error al leer el documento local al que referencia la firma: " + uri, //$NON-NLS-1$
+					e, ErrorCode.Internal.LOADING_LOCAL_FILE_ERROR
+				);
+			}
+			catch (final NoSuchAlgorithmException e) {
+				throw new AOException(
+					"Error al leer el documento local al que referencia la firma: " + uri, //$NON-NLS-1$
+					e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI
+				);
+			}
+			catch (final URISyntaxException e) {
+				throw new AOException(
+					"El formato de la URI a los datos de firma no es valido: " + uri, //$NON-NLS-1$
+					e, XAdESErrorCode.Request.INVALID_DATA_REFERENCE_URI
+				);
+			}
 			catch (final Exception e) {
 				throw new AOException(
-					"No se ha podido crear la referencia XML a partir de la URI local (" + uri + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+					"No se ha podido crear la referencia XML a partir de la URI local " + uri, //$NON-NLS-1$
+					e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR
 				);
 			}
 		}
@@ -1626,23 +1633,24 @@ public final class XAdESSigner {
 		else if (HTTP_PROTOCOL_PREFIX.equalsIgnoreCase(uri.substring(0, HTTP_PROTOCOL_PREFIX.length())) ||
 				HTTPS_PROTOCOL_PREFIX.equalsIgnoreCase(uri.substring(0, HTTPS_PROTOCOL_PREFIX.length()))) {
 
-				final UrlHttpManager httpManager = UrlHttpManagerFactory.getInstalledManager();
+			final UrlHttpManager httpManager = UrlHttpManagerFactory.getInstalledManager();
 
-				byte[] data;
-				final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
-				try {
-					data = httpManager.readUrl(uri, UrlHttpMethod.GET, errorProcessor);
-				} catch (final IOException e) {
-					if (errorProcessor.isCancelled()) {
-						LOGGER.info(
-								"El usuario no permite la importacion del certificado SSL de confianza de un recurso externo en: " //$NON-NLS-1$
-								+ LoggerUtil.getTrimStr(uri));
-					}
-					throw new AOException("Error en la recuperacion de un recurso externo: " + e, e); //$NON-NLS-1$
-				}
-
+			byte[] data;
+			final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
 			try {
-				final byte[] md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestMethod.getAlgorithm()))
+				data = httpManager.readUrl(uri, UrlHttpMethod.GET, errorProcessor);
+			} catch (final IOException e) {
+				if (errorProcessor.isCancelled()) {
+					LOGGER.info(
+							"El usuario no permite la importacion del certificado SSL de confianza de un recurso externo en: " //$NON-NLS-1$
+							+ LoggerUtil.getTrimStr(uri));
+				}
+				throw new AOException("Error en la recuperacion de un recurso externo: " + e, e, XMLErrorCode.Communication.DERREFERENCING_DATA_ERROR); //$NON-NLS-1$
+			}
+
+			final String digestMethodAlgorithm = AOSignConstants.getDigestAlgorithmName(digestMethod.getAlgorithm());
+			try {
+				final byte[] md = MessageDigest.getInstance(digestMethodAlgorithm)
 						.digest(data);
 
 				ref = fac.newReference(
@@ -1654,9 +1662,16 @@ public final class XAdESSigner {
 					md
 				);
 			}
+			catch (final NoSuchAlgorithmException e) {
+				throw new AOException(
+						"No se ha podido obtener un generador de huellas digitales para el algoritmo " + digestMethodAlgorithm, e, //$NON-NLS-1$
+					XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI
+				);
+			}
 			catch (final Exception e) {
 				throw new AOException(
-					"No se ha podido crear la referencia XML a partir de la URI local (" + uri + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+					"No se ha podido crear la referencia XML a partir de la URI local " + uri, e, //$NON-NLS-1$
+					XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR
 				);
 			}
 		}
@@ -1669,7 +1684,8 @@ public final class XAdESSigner {
 			}
 			catch (final Exception e) {
 				throw new AOException(
-					"No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest: " + e, e //$NON-NLS-1$
+					"No se ha podido crear la referencia Externally Detached, probablemente por no obtenerse el metodo de digest: " + e, e, //$NON-NLS-1$
+					XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR
 				);
 			}
 		}

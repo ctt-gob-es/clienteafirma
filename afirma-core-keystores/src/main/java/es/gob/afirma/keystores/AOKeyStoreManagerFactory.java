@@ -53,7 +53,7 @@ public final class AOKeyStoreManagerFactory {
      *                        modales de ser necesario.
      * @return <code>KeyStoreManager</code> del tipo indicado
      * @throws AOCancelledOperationException Cuando el usuario cancela el proceso (por ejemplo, al introducir la contrase&ntilde;a)
-     * @throws AOKeystoreAlternativeException Cuando ocurre cualquier otro problema durante el proceso
+     * @throws KeystoreAlternativeException Cuando ocurre cualquier otro problema durante el proceso
      * @throws IOException Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
      * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n &uacute;nicamente disponible para
      *                                               un sistema operativo distinto del actual
@@ -63,7 +63,7 @@ public final class AOKeyStoreManagerFactory {
                                                                  final String lib,
                                                                  final String description,
                                                                  final PasswordCallback pssCallback,
-                                                                 final Object parentComponent) throws AOKeystoreAlternativeException,
+                                                                 final Object parentComponent) throws KeystoreAlternativeException,
                                                                                                       IOException {
     	boolean forceReset;
     	// Se usa try-catch para capturar errores de permisos de lectura de variables
@@ -163,7 +163,7 @@ public final class AOKeyStoreManagerFactory {
         	return new AggregatedKeyStoreManager(getSmartCafeJavaKeyStoreManager(pssCallback, forceReset, parentComponent));
         }
 
-        throw new AOKeystoreAlternativeException(
+        throw new KeystoreAlternativeException(
              getAlternateKeyStoreType(store),
              "La plataforma de navegador '"  //$NON-NLS-1$
                + store.getName()
@@ -179,7 +179,7 @@ public final class AOKeyStoreManagerFactory {
     		                                                final String lib,
   		                                                    final PasswordCallback pssCallback,
   		                                                    final boolean forceReset,
-  		                                                    final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+  		                                                    final Object parentComponent) throws KeystoreAlternativeException, IOException {
         String storeFilename = null;
         if (lib != null && !lib.isEmpty() && new File(lib).exists()) {
             storeFilename = lib;
@@ -207,7 +207,7 @@ public final class AOKeyStoreManagerFactory {
             ksm.init(null, is, pssCallback, null, forceReset);
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
+            throw new KeystoreAlternativeException(
         	   AOKeyStore.JAVA,
                "No se ha podido abrir el almacen de tipo " + ksm.getType().getName() + " para el fichero " + lib, //$NON-NLS-1$ //$NON-NLS-2$
                e
@@ -220,7 +220,7 @@ public final class AOKeyStoreManagerFactory {
     		                                                  final PasswordCallback pssCallback,
     		                                                  final boolean forceReset,
     		                                                  final Object parentComponent) throws IOException,
-    		                                                  						               AOKeystoreAlternativeException {
+    		                                                  						               KeystoreAlternativeException {
     	final FileKeyStoreManager p12Ksm = new Pkcs12KeyStoreManager();
     	p12Ksm.setKeyStoreFile(lib);
 
@@ -241,7 +241,7 @@ public final class AOKeyStoreManagerFactory {
     														final PasswordCallback pssCallback,
     														final boolean forceReset,
     														final Object parentComponent) throws IOException,
-    															                                 AOKeystoreAlternativeException {
+    															                                 KeystoreAlternativeException {
     	final FileKeyStoreManager javaKsm = new JavaKeyStoreManager();
     	javaKsm.setKeyStoreFile(lib);
 
@@ -260,14 +260,14 @@ public final class AOKeyStoreManagerFactory {
 
 	private static AOKeyStoreManager getSmartCafeJavaKeyStoreManager(final PasswordCallback pssCallback,
 			                                                     final boolean forceReset,
-			                                                     final Object parentComponent) throws AOKeystoreAlternativeException,
+			                                                     final Object parentComponent) throws KeystoreAlternativeException,
 	                                                                                                  IOException {
 		final AOKeyStoreManager ksm = new AOKeyStoreManager();
 		try {
 			ksm.init(AOKeyStore.SMARTCAFE, null, pssCallback, new Object[] { parentComponent }, forceReset);
 		}
 		catch (final AOKeyStoreManagerException e) {
-			throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(AOKeyStore.PKCS12),
+			throw new KeystoreAlternativeException(getAlternateKeyStoreType(AOKeyStore.PKCS12),
 				"Error al inicializar el modulo G&D SmartCafe 100% Java: " + e, e //$NON-NLS-1$
 			);
 		}
@@ -277,14 +277,14 @@ public final class AOKeyStoreManagerFactory {
 
 	private static AOKeyStoreManager getCeresJavaKeyStoreManager(final PasswordCallback pssCallback,
 																	final boolean forceReset,
-																	final Object parentComponent) throws AOKeystoreAlternativeException,
+																	final Object parentComponent) throws KeystoreAlternativeException,
 	IOException {
 		final AOKeyStoreManager ksm = new AOKeyStoreManager();
 		try {
 			ksm.init(AOKeyStore.CERES, null, pssCallback, new Object[] { parentComponent }, forceReset);
 		}
 		catch (final AOKeyStoreManagerException e) {
-			throw new AOKeystoreAlternativeException(
+			throw new KeystoreAlternativeException(
 					getAlternateKeyStoreType(AOKeyStore.PKCS12),
 					"Error al inicializar el modulo CERES 100% Java: " + e, //$NON-NLS-1$
 					e
@@ -296,14 +296,14 @@ public final class AOKeyStoreManagerFactory {
 
 	private static AOKeyStoreManager getCeres430JavaKeyStoreManager(final PasswordCallback pssCallback,
 																	final boolean forceReset,
-																	final Object parentComponent) throws AOKeystoreAlternativeException,
+																	final Object parentComponent) throws KeystoreAlternativeException,
 																										IOException {
 		final AOKeyStoreManager ksm = new AOKeyStoreManager();
 		try {
 			ksm.init(AOKeyStore.CERES_430, null, pssCallback, new Object[] { parentComponent }, forceReset);
 		}
 		catch (final AOKeyStoreManagerException e) {
-			throw new AOKeystoreAlternativeException(
+			throw new KeystoreAlternativeException(
 					getAlternateKeyStoreType(AOKeyStore.PKCS12),
 					"Error al inicializar el modulo CERES 430 100% Java: " + e, //$NON-NLS-1$
 					e
@@ -315,7 +315,7 @@ public final class AOKeyStoreManagerFactory {
 
 	private static AOKeyStoreManager getDnieJavaKeyStoreManager(final PasswordCallback pssCallback,
 																final boolean forceReset,
-    	                                                        final Object parentComponent) throws AOKeystoreAlternativeException,
+    	                                                        final Object parentComponent) throws KeystoreAlternativeException,
     																							     IOException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
     	try {
@@ -323,7 +323,7 @@ public final class AOKeyStoreManagerFactory {
     		ksm.init(AOKeyStore.DNIEJAVA, null, pssCallback, new Object[] { parentComponent }, forceReset);
     	}
     	catch (final AOKeyStoreManagerException e) {
-    	   throw new AOKeystoreAlternativeException(
+    	   throw new KeystoreAlternativeException(
                 getAlternateKeyStoreType(AOKeyStore.PKCS12),
                 "Error al inicializar el modulo DNIe 100% Java: " + e, //$NON-NLS-1$
                 e
@@ -338,7 +338,7 @@ public final class AOKeyStoreManagerFactory {
                                                             final PasswordCallback pssCallback,
                                                             final boolean forceReset,
                                                             final Object parentComponent) throws IOException,
-                                                                                                 AOKeystoreAlternativeException {
+                                                                                                 KeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String storeFilename = null;
         if (lib != null && !lib.isEmpty() && new File(lib).exists()) {
@@ -381,7 +381,7 @@ public final class AOKeyStoreManagerFactory {
             ksm.init(store, is, pssCallback, null, forceReset);
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
+            throw new KeystoreAlternativeException(
                getAlternateKeyStoreType(store),
                "No se ha podido abrir el almacen de tipo " + store.getName(), //$NON-NLS-1$
                e
@@ -395,7 +395,7 @@ public final class AOKeyStoreManagerFactory {
                                                               final PasswordCallback pssCallback,
                                                               final boolean forceReset,
                                                               final Object parentComponent) throws IOException,
-                                                                                                   AOKeystoreAlternativeException {
+                                                                                                   KeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         String p11Lib = null;
         if (lib != null && !lib.isEmpty()) {
@@ -447,7 +447,7 @@ public final class AOKeyStoreManagerFactory {
     		);
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
+            throw new KeystoreAlternativeException(
                  getAlternateKeyStoreType(AOKeyStore.PKCS11),
                  "Error al inicializar el modulo PKCS#11: " + e, //$NON-NLS-1$
                  e
@@ -458,13 +458,13 @@ public final class AOKeyStoreManagerFactory {
 
     private static AOKeyStoreManager getWindowsAddressBookKeyStoreManager(final AOKeyStore store,
     		                                                              final boolean forceReset) throws IOException,
-                                                                                                  AOKeystoreAlternativeException {
+                                                                                                  KeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AOKeyStoreManager();
         try {
             ksm.init(store, null, NullPasswordCallback.getInstance(), null, forceReset);
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
+            throw new KeystoreAlternativeException(
                  getAlternateKeyStoreType(store),
                  "Error al inicializar el almacen " + store.getName(), //$NON-NLS-1$
                  e
@@ -473,14 +473,14 @@ public final class AOKeyStoreManagerFactory {
         return ksm;
     }
 
-    private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager(final boolean forceReset) throws AOKeystoreAlternativeException,
+    private static AOKeyStoreManager getWindowsMyCapiKeyStoreManager(final boolean forceReset) throws KeystoreAlternativeException,
     		                                                                                          IOException {
     	final AggregatedKeyStoreManager ksmCapi = new CAPIUnifiedKeyStoreManager();
 		try {
 			ksmCapi.init(AOKeyStore.WINDOWS, null, null, null, forceReset);
 		}
 		catch (final AOKeyStoreManagerException e) {
-			throw new AOKeystoreAlternativeException(
+			throw new KeystoreAlternativeException(
                  getAlternateKeyStoreType(AOKeyStore.WINDOWS),
                  "Error al obtener almacen WINDOWS: " + e, //$NON-NLS-1$
                  e
@@ -493,14 +493,14 @@ public final class AOKeyStoreManagerFactory {
     private static AggregatedKeyStoreManager getNssKeyStoreManager(final String KsmClassName,
     		                                                       final PasswordCallback pssCallback,
     		                                                       final boolean forceReset,
-    		                                                       final Object parentComponent) throws AOKeystoreAlternativeException,
+    		                                                       final Object parentComponent) throws KeystoreAlternativeException,
                                                                                                         IOException {
     	final AggregatedKeyStoreManager ksmUni;
     	try {
     		ksmUni = (AggregatedKeyStoreManager) Class.forName(KsmClassName).getConstructor().newInstance();
     	}
     	catch(final Exception e) {
-    		throw new AOKeystoreAlternativeException(
+    		throw new KeystoreAlternativeException(
 				getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
 				"Error al obtener dinamicamente el almacen NSS: " + e, //$NON-NLS-1$
 				e
@@ -511,7 +511,7 @@ public final class AOKeyStoreManagerFactory {
     		ksmUni.init(AOKeyStore.SHARED_NSS, null, pssCallback, new Object[] { parentComponent }, forceReset);
     	}
     	catch (final AOException e) {
-    		throw new AOKeystoreAlternativeException(
+    		throw new KeystoreAlternativeException(
 				getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
 				"Error al inicializar el almacen NSS: " + e, //$NON-NLS-1$
 				e
@@ -522,7 +522,7 @@ public final class AOKeyStoreManagerFactory {
 
     private static AggregatedKeyStoreManager getSharedNssKeyStoreManager(final PasswordCallback pssCallback,
                                                                          final boolean forceReset,
-                                                                         final Object parentComponent) throws AOKeystoreAlternativeException,
+                                                                         final Object parentComponent) throws KeystoreAlternativeException,
                                                                                                               IOException {
     	return getNssKeyStoreManager(
 			"es.gob.afirma.keystores.mozilla.shared.SharedNssKeyStoreManager",  //$NON-NLS-1$
@@ -535,7 +535,7 @@ public final class AOKeyStoreManagerFactory {
     private static AggregatedKeyStoreManager mozillaKeyStoreManager = null;
     private static AggregatedKeyStoreManager getMozillaUnifiedKeyStoreManager(final PasswordCallback pssCallback,
     		                                                                  final boolean forceReset,
-                                                                              final Object parentComponent) throws AOKeystoreAlternativeException,
+                                                                              final Object parentComponent) throws KeystoreAlternativeException,
     		                                                                                                       IOException {
     	AggregatedKeyStoreManager ksm = mozillaKeyStoreManager;
     	if (ksm == null) {
@@ -568,7 +568,7 @@ public final class AOKeyStoreManagerFactory {
     		                                                          final String lib,
     		                                                          final boolean forceReset,
     		                                                          final Object parentComponent) throws IOException,
-                                                                                                           AOKeystoreAlternativeException {
+                                                                                                           KeystoreAlternativeException {
     	final AOKeyStoreManager ksm = new AppleKeyStoreManager();
         // En Mac OS X podemos inicializar un KeyChain en un fichero particular o el por defecto del sistema
         try (
@@ -583,7 +583,7 @@ public final class AOKeyStoreManagerFactory {
             );
         }
         catch (final AOException e) {
-            throw new AOKeystoreAlternativeException(
+            throw new KeystoreAlternativeException(
         		getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e //$NON-NLS-1$
     		);
         }

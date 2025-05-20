@@ -29,7 +29,7 @@ public class SigningLTSException extends RuntimeConfigNeededException {
 	 * @param message Mensaje descriptivo del problema.
 	 */
 	public SigningLTSException(final String message) {
-		super(message, RuntimeConfigNeededException.RequestType.CONFIRM, REQUESTOR_MSG_CODE, EXTRA_PARAM_NEEDED, ErrorCode.Internal.SIGNING_LTS);
+		super(message, RuntimeConfigNeededException.RequestType.CONFIRM, REQUESTOR_MSG_CODE, EXTRA_PARAM_NEEDED, ErrorCode.Functional.SIGNING_LTS);
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class SigningLTSException extends RuntimeConfigNeededException {
 	 */
 	public SigningLTSException(final String message, final boolean possible) {
 		super(message, RuntimeConfigNeededException.RequestType.CONFIRM,
-				possible ? REQUESTOR_POSSIBLE_MSG_CODE : REQUESTOR_MSG_CODE , EXTRA_PARAM_NEEDED, ErrorCode.Internal.SIGNING_LTS);
+				possible ? REQUESTOR_POSSIBLE_MSG_CODE : REQUESTOR_MSG_CODE , EXTRA_PARAM_NEEDED, ErrorCode.Functional.SIGNING_LTS);
 	}
 
 	/**
@@ -52,6 +52,6 @@ public class SigningLTSException extends RuntimeConfigNeededException {
 	 */
 	public SigningLTSException(final String message, final Throwable cause, final boolean possible) {
 		super(message, RuntimeConfigNeededException.RequestType.CONFIRM,
-				possible ? REQUESTOR_POSSIBLE_MSG_CODE : REQUESTOR_MSG_CODE, EXTRA_PARAM_NEEDED, ErrorCode.Internal.SIGNING_LTS, cause);
+				possible ? REQUESTOR_POSSIBLE_MSG_CODE : REQUESTOR_MSG_CODE, EXTRA_PARAM_NEEDED, ErrorCode.Functional.SIGNING_LTS, cause);
 	}
 }

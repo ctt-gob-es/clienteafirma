@@ -45,7 +45,6 @@ import javax.swing.JScrollPane;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -308,7 +307,7 @@ final class PreferencesPanelCades extends JScrollPane {
 		return policyConfigPanel;
 	}
 
-	void checkPreferences() throws AOException {
+	void checkPreferences() throws ConfigurationException {
 
 		loadCadesPolicy();
 
@@ -319,7 +318,7 @@ final class PreferencesPanelCades extends JScrollPane {
 				new Oid(p.getPolicyIdentifier().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (final GSSException e) {
-				throw new AOException("El identificador debe ser un OID", e); //$NON-NLS-1$
+				throw new ConfigurationException("El identificador debe ser un OID", e); //$NON-NLS-1$
 			}
 		}
 	}

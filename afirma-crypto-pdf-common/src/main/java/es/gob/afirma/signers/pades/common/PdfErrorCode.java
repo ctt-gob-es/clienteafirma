@@ -21,8 +21,8 @@ public class PdfErrorCode {
 		public static ErrorCode ITEXT_VERSION_NOT_SUPPORTED = new ErrorCode("300002", "Se ha encontrado una version de iText no soportada"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	public static class Request {
-		public static ErrorCode DOCUMENT_TOO_LARGE						= new ErrorCode("600111", "El documento supera el tamano maximo permitido"); //$NON-NLS-1$ //$NON-NLS-2$
+	public static class Functional {
+		public static ErrorCode PDF_DOCUMENT_NEEDED 		= new ErrorCode("510005", "La firma requiere que los datos sean PDF"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

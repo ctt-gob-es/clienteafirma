@@ -1,11 +1,9 @@
 package es.gob.afirma.standalone.configurator.common;
 
-import es.gob.afirma.core.AOException;
-
 /**
  * Excepci&oacute;n para indicar que una firma no es v&aacute;lida.
  */
-public class InvalidSignatureException extends AOException {
+public class InvalidSignatureException extends Exception {
 
 	/** Serial Id. */
 	private static final long serialVersionUID = -3747038770621522703L;

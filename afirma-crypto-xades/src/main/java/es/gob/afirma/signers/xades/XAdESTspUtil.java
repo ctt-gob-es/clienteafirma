@@ -26,10 +26,13 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 import nu.xom.converters.DOMConverter;
 
 /** Estampador de sellos de tiempo en firmas XAdES.
@@ -89,8 +92,9 @@ public final class XAdESTspUtil {
 			);
 		}
 		catch (SAXException | IOException | ParserConfigurationException e) {
-			throw new AOException(
-				"No se puede analizar la firma para agregar el sello de tiempo: " + e, e //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException(
+				"No se puede analizar la firma para agregar el sello de tiempo: " + e, //$NON-NLS-1$
+				e
 			);
 		}
 
@@ -99,7 +103,7 @@ public final class XAdESTspUtil {
 			"QualifyingProperties" //$NON-NLS-1$
 		);
 		if (nl.getLength() < 1) {
-			throw new AOException(
+			throw new AOMalformedSignatureException(
 				"La firma no tiene 'QualifyingProperties', no se puede aplicar el sello de tiempo" //$NON-NLS-1$
 			);
 		}
@@ -120,9 +124,14 @@ public final class XAdESTspUtil {
 				tsaParams
 			);
 		}
-		catch (NoSuchAlgorithmException | IOException e) {
+		catch (final IOException e) {
 			throw new AOException(
-				"Error obteniendo el sello de la TSA: " + e, e //$NON-NLS-1$
+				"No se ha podido conectar con la TSA: " + e, e, ErrorCode.Communication.TSA_CONNECTION_ERROR //$NON-NLS-1$
+			);
+		}
+		catch (final NoSuchAlgorithmException e) {
+			throw new AOException(
+				"Error obteniendo el sello de la TSA: " + e, e, ErrorCode.Request.INVALID_TIMESTAMP_HASH_ALGORITHM //$NON-NLS-1$
 			);
 		}
 
@@ -145,7 +154,7 @@ public final class XAdESTspUtil {
 		}
 		catch (SAXException | IOException | ParserConfigurationException e) {
 			throw new AOException(
-				"Error creando el nodo XML de sello de tiempo: " + e, e //$NON-NLS-1$
+				"Error creando el nodo XML de sello de tiempo: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR //$NON-NLS-1$
 			);
 		}
 

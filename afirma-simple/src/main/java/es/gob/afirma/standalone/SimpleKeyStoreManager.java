@@ -26,7 +26,8 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.KeystoreAlternativeException;
+import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.SmartCardLockedException;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
@@ -48,9 +49,11 @@ public final class SimpleKeyStoreManager {
      * @param parent Componente padre para la modalidad.
      * @return <code>KeyStore</code> apropiado.
      * @throws AOKeyStoreManagerException Si ocurre cualquier problema durante la obtenci&oacute;n del <code>KeyStore</code>.
-     * @throws NoDnieFoundException Si se obliga al uso de DNIe pero este no se proporciona. */
+     * @throws NoDnieFoundException Si se obliga al uso de DNIe pero este no se proporciona.
+     * @throws KeystoreAlternativeException
+     */
     static AOKeyStoreManager getKeyStore(final boolean dnie, final boolean forced, final Component parent)
-    		throws AOKeyStoreManagerException, NoDnieFoundException {
+    		throws AOKeyStoreManagerException, NoDnieFoundException, KeystoreAlternativeException {
 
     	// -- Se ha habilitado el uso de DNIe --
 
@@ -231,7 +234,7 @@ public final class SimpleKeyStoreManager {
 		}
     }
 
-    private static AOKeyStoreManager getKeyStoreManager(final AOKeyStore aoks, final Component parent) throws IOException, AOKeystoreAlternativeException {
+    private static AOKeyStoreManager getKeyStoreManager(final AOKeyStore aoks, final Component parent) throws IOException, KeystoreAlternativeException {
     	String lib = null;
     	if (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks)) {
     		lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
@@ -358,9 +361,11 @@ public final class SimpleKeyStoreManager {
      * Devuelve el gestor del almac&eacute;n de claves del sistema.
      * @param parent Componente padre.
      * @return Gestor del almac&eacute;n de claves del sistema.
-     * @throws AOKeyStoreManagerException Error al obtener el gestor.
+     * @throws KeystoreAlternativeException Cuando falla la carga del almac&eacute;n, pero se propone un almac&eacute;n alternativo.
+     * @throws AOKeyStoreManagerException Cuando falla la carga del almac&eacute;n.
      */
-    private static AOKeyStoreManager loadSystemAOKSManager(final Component parent) throws AOKeyStoreManagerException {
+    private static AOKeyStoreManager loadSystemAOKSManager(final Component parent)
+    		throws KeystoreAlternativeException, AOKeyStoreManagerException {
     	final OS os = Platform.getOS();
     	final AOKeyStore osks = AOKeyStore.getDefaultKeyStoreTypeByOs(os);
     	try {
@@ -368,9 +373,13 @@ public final class SimpleKeyStoreManager {
 					osks,
 					parent
 				);
-		} catch (final Exception e1) {
+		}
+    	catch (final KeystoreAlternativeException e) {
+ 			throw e;
+ 		}
+    	catch (final Exception e) {
 			throw new AOKeyStoreManagerException(
-	        		"No se ha podido incializar el almacen del sistema", e1 //$NON-NLS-1$
+	        		"No se ha podido inicializar el almacen del sistema", e, KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR //$NON-NLS-1$
 	    		);
 		}
     }

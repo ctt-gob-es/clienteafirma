@@ -619,11 +619,11 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra un DNIe insertado,
 	 * si no se pudo cargar o si se cancel&oacute; la carga.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
-	 * @throws AOKeystoreAlternativeException Cuando no se identifica el sistema operativo como uno de
+	 * @throws KeystoreAlternativeException Cuando no se identifica el sistema operativo como uno de
 	 * los soportados.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openSystemKeyStore(final Object parent) throws AOKeystoreAlternativeException,
+	private static AOKeyStoreManager openSystemKeyStore(final Object parent) throws KeystoreAlternativeException,
 		                                                                               Exception {
 		final AOKeyStore ks;
 		final Platform.OS currentOs = Platform.getOS();
@@ -637,7 +637,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			ks = AOKeyStore.APPLE;
 		}
 		else {
-			throw new AOKeystoreAlternativeException(null, "No se ha podido identificar un almacen del sistema compatible"); //$NON-NLS-1$
+			throw new KeystoreAlternativeException(null, "No se ha podido identificar un almacen del sistema compatible"); //$NON-NLS-1$
 		}
 
 		try {

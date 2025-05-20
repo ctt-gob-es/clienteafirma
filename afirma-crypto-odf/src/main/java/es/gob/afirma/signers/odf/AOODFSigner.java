@@ -85,6 +85,7 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 
 /** Manejador de firmas electr&oacute;nicas XML de ficheros ODF en formato compatible
@@ -114,7 +115,7 @@ public final class AOODFSigner implements AOSigner {
     /** Algoritmo de huella digital por defecto para las referencias XML. */
     private static final String DEFAULT_DIGEST_METHOD = DigestMethod.SHA1;
 
-    private static final String DIGEST_METHOD_ALGORITHM_NAME = "SHA1"; //$NON-NLS-1$
+    //private static final String DIGEST_METHOD_ALGORITHM_NAME = "SHA1"; //$NON-NLS-1$
 
     private static final String ENTRY_MIMETYPE = "mimetype"; //$NON-NLS-1$
 
@@ -157,7 +158,7 @@ public final class AOODFSigner implements AOSigner {
                        final Properties xParams) throws AOException {
 
     	if (data.length >= THRESHOLD_FILE_SIZE) {
-    		throw new AOException("Los datos tienen un tamano superior al permitido"); //$NON-NLS-1$
+    		throw new AOException("Los datos tienen un tamano superior al permitido", ErrorCode.Functional.DOCUMENT_TOO_LARGE); //$NON-NLS-1$
     	}
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
@@ -166,7 +167,7 @@ public final class AOODFSigner implements AOSigner {
         final boolean useOpenOffice31Mode = Boolean.parseBoolean(extraParams.getProperty(AOODFExtraParams.USE_OPEN_OFFICE_31_MODE));
 
         if (!isValidDataFile(data)) {
-            throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento ODF"); //$NON-NLS-1$
+            throw new AOFormatFileException("Los datos introducidos no se corresponden con un documento ODF", ODFErrorCode.Functional.ODF_DOCUMENT_NEEDED); //$NON-NLS-1$
         }
 
         String fullPath = MANIFEST_PATH;
@@ -207,13 +208,15 @@ public final class AOODFSigner implements AOSigner {
 	            // Datos necesarios para la firma
 
 	            // MessageDigest
+	            final String digestAlgorithmName = AOSignConstants.getDigestAlgorithmName(digestMethodAlgorithm);
 	            final MessageDigest md;
 	            try {
-		            md = MessageDigest.getInstance(DIGEST_METHOD_ALGORITHM_NAME);
+		            md = MessageDigest.getInstance(digestAlgorithmName);
 	            }
 	            catch (final Exception e) {
 	            	throw new AOException(
-	        			"No se ha podido obtener un generador de huellas digitales con el algoritmo " + DIGEST_METHOD_ALGORITHM_NAME + ": " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+	        			"No se ha podido obtener un generador de huellas digitales con el algoritmo " + digestAlgorithmName + ": " + e, //$NON-NLS-1$ //$NON-NLS-2$
+	        			e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI
 	    			);
 	            }
 
@@ -227,7 +230,8 @@ public final class AOODFSigner implements AOSigner {
 	            }
 	            catch (final Exception e) {
 	                throw new AOException(
-	                      "No se ha podido obtener un generador de huellas digitales con el algoritmo: " + digestMethodAlgorithm, e //$NON-NLS-1$
+	                      "La URI indicada no se asocia a un algoritmo de huella soportado : " + digestMethodAlgorithm, e, //$NON-NLS-1$
+	                      XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI
 	                );
 	            }
 
@@ -538,13 +542,13 @@ public final class AOODFSigner implements AOSigner {
             return baos.toByteArray();
         }
         catch (final SAXException saxex) {
-            throw new AOFormatFileException("Estructura de archivo no valida '" + fullPath + "': " + saxex); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOFormatFileException("No se ha podido generar una estructura de archivo no valida '" + fullPath + "': " + saxex, ODFErrorCode.Internal.INTERNAL_ODF_SIGNING_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final AOException e) {
             throw e;
         }
         catch (final Exception e) {
-            throw new AOException("No ha sido posible generar la firma ODF: " + e, e); //$NON-NLS-1$
+            throw new AOException("No ha sido posible generar la firma ODF: " + e, e, ODFErrorCode.Internal.UNKWNON_ODF_SIGNING_ERROR); //$NON-NLS-1$
         }
     }
 

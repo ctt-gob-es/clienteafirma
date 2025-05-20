@@ -10,6 +10,7 @@
 package es.gob.afirma.triphase.signer.processors;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -28,6 +29,7 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -36,13 +38,16 @@ import es.gob.afirma.core.signers.Pkcs1Utils;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
+import es.gob.afirma.signers.xades.AOMalformedSignatureException;
 import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 import es.gob.afirma.signvalidation.InvalidSignatureException;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.ValidateXMLSignature;
+import es.gob.afirma.triphase.signer.TriphaseErrorCode;
 import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide;
 import es.gob.afirma.triphase.signer.xades.XAdESTriPhaseSignerServerSide.Op;
 import es.gob.afirma.triphase.signer.xades.XmlPreSignException;
@@ -181,7 +186,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
 			throw new AOException(
-				"El formato de firma XAdES no soporta el algoritmo de firma '" + algorithm + "'" //$NON-NLS-1$ //$NON-NLS-2$
+				"El formato de firma XAdES no soporta el algoritmo de firma " + algorithm, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM //$NON-NLS-1$
 			);
 		}
 
@@ -198,28 +203,28 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 			);
 		}
 		catch (final InvalidKeyException e) {
-			throw new AOException("Error en la prefirma XAdES por problemas con las claves: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES por problemas con las claves: " + e, e, ErrorCode.Internal.INVALID_SIGNING_KEY); //$NON-NLS-1$
 		}
 		catch (final NoSuchAlgorithmException e) {
-			throw new AOException("Error en la prefirma XAdES por no soportarse un algoritmo: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES por no soportarse el algoritmo de la clave de firma: " + e, e, ErrorCode.Internal.INVALID_SIGNING_KEY); //$NON-NLS-1$
 		}
 		catch (final SignatureException e) {
-			throw new AOException("Error en la prefirma XAdES en la firma: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES en la firma: " + e, e, ErrorCode.Internal.SIGNING_PKCS1_ERROR); //$NON-NLS-1$
 		}
 		catch (final SAXException e) {
-			throw new AOException("Error en la prefirma XAdES en el proceso SAX del XML: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES en el proceso SAX del XML: " + e, e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 		catch (final ParserConfigurationException e) {
-			throw new AOException("Error en la prefirma XAdES por problemas en el parser SAX: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES por problemas en el parser SAX: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 		catch (final MarshalException e) {
-			throw new AOException("Error en la prefirma XAdES al empaquetar el XML: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES al empaquetar el XML: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 		catch (final XMLSignatureException e) {
-			throw new AOException("Error en la prefirma XAdES en la firma XMLDSig: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES en la firma XMLDSig: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 		catch (final XmlPreSignException e) {
-			throw new AOException("Error en la prefirma XAdES: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la prefirma XAdES: " + e, e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 
 		// Recuperamos el identificador asociado a la firma u obtenemos uno si no lo tenia
@@ -412,7 +417,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		if (triphaseData.getSignsCount() < 1) {
 			LOGGER.severe("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
-			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
+			throw new AOException("No se ha encontrado la informacion de firma en la peticion", TriphaseErrorCode.Request.MALFORMED_PRESIGN); //$NON-NLS-1$
 		}
 
 		// El XML base se incluye como datos de sesion de la primera firma y solo de la primera
@@ -444,7 +449,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 					pkcs1sign = Pkcs1Utils.decodeSignature(pkcs1sign);
 					pkcs1Base64 = Base64.encode(pkcs1sign);
 				} catch (final SignatureException e) {
-					LOGGER.warning("No se ha podido decodificar el PKCS#1 del servicio. Se usara el PKCS#1 recibido: " + e);
+					LOGGER.warning("No se ha podido decodificar el PKCS#1 del servicio. Se usara el PKCS#1 recibido: " + e); //$NON-NLS-1$
 				}
 			}
 
@@ -471,9 +476,12 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				op
 			);
 		}
+		catch (final AOException e) {
+			throw e;
+		}
 		catch (final Exception e) {
 			throw new AOException(
-				"Error recreando los datos a firmar y la cadena de certificados: " + e, e //$NON-NLS-1$
+				"Error recreando los datos a firmar y la cadena de certificados: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR //$NON-NLS-1$
 			);
 		}
 
@@ -485,9 +493,14 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				extraParams
 			);
 		}
+		catch (final UnsupportedEncodingException e) {
+			throw new AOMalformedSignatureException(
+				"La firma declara una codificacion no soportada", e //$NON-NLS-1$
+			);
+		}
 		catch (final Exception e) {
 			throw new AOException(
-				"Error insertando los datos a firmar y la cadena de certificados: " + e, e //$NON-NLS-1$
+				"Error insertando los datos a firmar y la cadena de certificados: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR //$NON-NLS-1$
 			);
 		}
 

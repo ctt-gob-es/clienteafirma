@@ -48,7 +48,7 @@ public class AGEPolicyIncompatibilityException extends CustomRuntimeConfigNeeded
 	 * de confirmaci&oacute;n al usuario.
 	 */
 	public AGEPolicyIncompatibilityException(final String message, final int operation) {
-		super(message, RuntimeConfigNeededException.RequestType.CONFIRM, getMessageCode(operation), EXTRA_PARAM_NEEDED, ErrorCode.Internal.SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY);
+		super(message, RuntimeConfigNeededException.RequestType.CONFIRM, getMessageCode(operation), EXTRA_PARAM_NEEDED, ErrorCode.Functional.SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class AGEPolicyIncompatibilityException extends CustomRuntimeConfigNeeded
 	 * @param cause Origen del problema.
 	 */
 	public AGEPolicyIncompatibilityException(final String message, final int operation, final Throwable cause) {
-		super(message, RuntimeConfigNeededException.RequestType.CONFIRM, getMessageCode(operation), EXTRA_PARAM_NEEDED, ErrorCode.Internal.SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY, cause);
+		super(message, RuntimeConfigNeededException.RequestType.CONFIRM, getMessageCode(operation), EXTRA_PARAM_NEEDED, ErrorCode.Functional.SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY, cause);
 	}
 
 	@Override

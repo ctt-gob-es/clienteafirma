@@ -11,6 +11,8 @@ public class AOTriphaseException extends AOException {
 	/** Serial Id. */
 	private static final long serialVersionUID = -6210469965589338895L;
 
+	private static final String ERROR_PREFIX = "ERR-"; //$NON-NLS-1$
+
 	private String serverExceptionClassname = null;
 
 	/**
@@ -32,8 +34,22 @@ public class AOTriphaseException extends AOException {
 	/**
 	 * Obtiene la excepci&oacute;n que se&ntilde;ala un error durante un proceso de firma trif&aacute;fica
 	 * a partir del mensaje recibido del servidor.
+	 * @param serverErrorCode Identificador del tipo de error de firma trif&aacute;sica.
 	 * @param msg Mensaje recibido del servidor.
-	 * @param presign {@code true} indica que la operaci&oacute;n
+	 * @param cause Excepci&oacute;n que caus&oacute; el error.
+	 * @return Excepci&oacute;n que se&ntilde;ala un error durante un proceso de firma trif&aacute;fica
+	 *         a partir del mensaje recibido del servidor.
+	 */
+	public static AOTriphaseException parsePresignException(final int serverErrorCode, final String msg, final Throwable cause) {
+		return parsePresignException(ERROR_PREFIX + serverErrorCode, msg, cause.getClass().getName());
+	}
+
+	/**
+	 * Obtiene la excepci&oacute;n que se&ntilde;ala un error durante un proceso de firma trif&aacute;fica
+	 * a partir del mensaje recibido del servidor.
+	 * @param serverErrorCode Identificador del tipo de error de firma trif&aacute;sica.
+	 * @param msg Mensaje recibido del servidor.
+	 * @param exceptionClassname Nombre de la excepci&oacute;n que caus&oacute; el error.
 	 * @return Excepci&oacute;n que se&ntilde;ala un error durante un proceso de firma trif&aacute;fica
 	 *         a partir del mensaje recibido del servidor.
 	 */

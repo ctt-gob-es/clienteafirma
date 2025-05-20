@@ -19,7 +19,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.LoggerUtil;
@@ -121,7 +120,7 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 
 	/** {@inheritDoc} */
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidSignatureFormatException {
+	public byte[] getData(final byte[] sign, final Properties params) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 

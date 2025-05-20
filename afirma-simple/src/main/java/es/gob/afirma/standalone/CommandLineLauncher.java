@@ -50,7 +50,7 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.KeystoreAlternativeException;
 import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.filters.CertFilterManager;
@@ -114,14 +114,14 @@ final class CommandLineLauncher {
 	static void processCommandLine(final String[] args) {
 
 		final Console console = System.console();
-		
+
         // Cargamos las preferencias establecidas
 		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
 		if (defaultLocale == null || defaultLocale.isEmpty()) {
 			defaultLocale = Locale.getDefault().toString();
 		}
         SimpleAfirma.setDefaultLocale(buildLocale(defaultLocale));
-		
+
 		try (final PrintWriter pw = console != null ? console.writer() : new PrintWriter(System.out)) {
 
 			// Comprobamos si hay que mostrar la sintaxis de la aplicacion
@@ -175,7 +175,7 @@ final class CommandLineLauncher {
 
 				String msg;
 				final Throwable cause = e.getCause();
-				if (cause != null && cause instanceof AOKeystoreAlternativeException) {
+				if (cause != null && cause instanceof KeystoreAlternativeException) {
 					msg = CommandLineMessages.getString("CommandLineLauncher.49", cause.getMessage()); //$NON-NLS-1$
 				} else if (cause != null) {
 					msg = cause.getMessage();
@@ -538,7 +538,7 @@ final class CommandLineLauncher {
 
 		}
 		catch (IOException |
-			   AOKeystoreAlternativeException |
+			   KeystoreAlternativeException |
 			   KeyStoreException              |
 			   NoSuchAlgorithmException       |
 			   UnrecoverableEntryException    |
@@ -675,7 +675,7 @@ final class CommandLineLauncher {
 				params.getPassword()
 			);
 		}
-		catch (IOException | AOException | AOKeystoreAlternativeException e) {
+		catch (IOException | AOException | KeystoreAlternativeException e) {
 			throw new CommandLineException(e.getMessage(), e);
 		}
 
@@ -747,7 +747,7 @@ final class CommandLineLauncher {
 			                   final File inputFile,
 			                   final String alias,
 			                   final AOKeyStoreManager ksm,
-			                   final String storePassword) throws CommandLineException, IOException, AOException {
+			                   final String storePassword) throws CommandLineException, IOException {
 
 		ksm.setEntryPasswordCallBack(
 			new CachePasswordCallback(
@@ -759,10 +759,10 @@ final class CommandLineLauncher {
 			ke = ksm.getKeyEntry(alias);
 		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido obtener la referencia a la clave privada: " + e, e); //$NON-NLS-1$
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.147"), e); //$NON-NLS-1$
 		}
 		if (ke == null) {
-			throw new AOException("No se hay ninguna entrada en el almacen con el alias indicado: " + alias); //$NON-NLS-1$
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.148", alias)); //$NON-NLS-1$
 		}
 
 		// Leemos el fichero de entrada
@@ -860,7 +860,7 @@ final class CommandLineLauncher {
 			resBytes = sign(command, fmt, signatureAlgorithm, xParams, inputFile, alias, ksm, storePassword);
 		}
 		catch(final Exception e) {
-			throw new AOException("Error en la operacion de firma: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.149"), e); //$NON-NLS-1$
 		}
 
 		return resBytes;
@@ -937,7 +937,7 @@ final class CommandLineLauncher {
 		try {
 			aliases = getKsm(params.getStore(), params.getPassword()).getAliases();
 		}
-		catch (IOException | AOKeystoreAlternativeException e) {
+		catch (IOException | KeystoreAlternativeException e) {
 			throw new CommandLineException(e.getMessage(), e);
 		}
 		final StringBuilder sb = new StringBuilder();
@@ -961,7 +961,7 @@ final class CommandLineLauncher {
 	private static AOKeyStoreManager getKsm(final String storeType,
 			                                final String pwd) throws IOException,
 	                                                                 CommandLineException,
-	                                                                 AOKeystoreAlternativeException {
+	                                                                 KeystoreAlternativeException {
 		final AOKeyStore store;
 		String lib = null;
 		if (STORE_AUTO.equals(storeType) || storeType == null) {
@@ -1219,7 +1219,7 @@ final class CommandLineLauncher {
 		final String title = CommandLineMessages.getString("CommandLineLauncher.127"); //$NON-NLS-1$
 		AOUIFactory.showErrorMessage(message, title, JOptionPane.ERROR_MESSAGE, t);
 	}
-	
+
     private static Locale buildLocale(final String locale) {
         final String[] frags = locale.split("_"); //$NON-NLS-1$
         if (frags.length == 1) {

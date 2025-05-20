@@ -49,7 +49,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -677,7 +676,7 @@ public final class PreferencesPanelXades extends JScrollPane {
 		return adesPolicy;
 	}
 
-	void checkPreferences() throws AOException {
+	void checkPreferences() throws ConfigurationException {
 
 		loadXadesPolicy();
 
@@ -688,7 +687,7 @@ public final class PreferencesPanelXades extends JScrollPane {
 				new URI(p.getPolicyIdentifier());
 			}
 			catch (final URISyntaxException e) {
-				throw new AOException("El identificador debe ser una URI", e); //$NON-NLS-1$
+				throw new ConfigurationException("El identificador debe ser una URI", e); //$NON-NLS-1$
 			}
 		}
 	}

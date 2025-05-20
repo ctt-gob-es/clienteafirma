@@ -106,6 +106,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 			}
 
 			// Postfirmamos la firma
+			ProcessResult resultado;
 			try {
 				ss.doPostProcess(
 					certChain,
@@ -115,37 +116,30 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 					this.documentManager,
 					this.docCacheManager
 				);
+
+				resultado = ProcessResult.PROCESS_RESULT_DONE_SAVED;
+			}
+			catch (final SaveDataException e) {
+				LOGGER.log(Level.SEVERE, "Error de guardado en una de las firmas del lote (" + ss.getId() + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+				resultado = new ProcessResult(ProcessResult.Result.DONE_BUT_ERROR_SAVING, e.getMessage());
+				error = true;
 			}
 			catch (final Exception e) {
-
+				LOGGER.log(Level.SEVERE, "Error en una de las firmas del lote (" + ss.getId() + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+				resultado = new ProcessResult(ProcessResult.Result.ERROR_POST, e.getMessage());
 				error = true;
+			}
 
-				final ProcessResult.Result resultado;
-				if (e instanceof AOSaveDataException) {
-					resultado = ProcessResult.Result.DONE_BUT_ERROR_SAVING;
-				} else {
-					resultado = ProcessResult.Result.ERROR_POST;
-				}
-
-				ss.setProcessResult(new ProcessResult(resultado, e.getMessage()));
-
+			if (error) {
 				if (this.stopOnError) {
-					LOGGER.log(
-							Level.SEVERE,
-							"Error en una de las firmas del lote (" + ss.getId() + "), se parara el proceso: " + e, //$NON-NLS-1$ //$NON-NLS-2$
-							e
-							);
+					LOGGER.severe("Se detiene la firma del lote"); //$NON-NLS-1$
 					ignoreRemaining = true;
-				}
-				else {
-					LOGGER.severe(
-							"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento: " + e //$NON-NLS-1$ //$NON-NLS-2$
-							);
+				} else {
+					LOGGER.warning("Se continua con el siguiente elemento del lote"); //$NON-NLS-1$
 				}
 				continue;
 			}
-
-			ss.setProcessResult(ProcessResult.PROCESS_RESULT_DONE_SAVED);
+			ss.setProcessResult(resultado);
 		}
 
 		// Tenemos los datos subidos, ahora hay que, si hubo error, deshacer

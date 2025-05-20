@@ -41,7 +41,6 @@ import javax.swing.JTextField;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -82,7 +81,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	private final JTextField facturaeSignatureProductionProvince = new JTextField();
 	private final JTextField facturaeSignatureProductionPostalCode = new JTextField();
 	private final JTextField facturaeSignatureProductionCountry = new JTextField();
-	
+
 	private final RoleItem [] roleItems = new RoleItem[] {
 			FACTURAE_ROL_EMISOR,
 			FACTURAE_ROL_RECEPTOR,
@@ -324,14 +323,14 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	}
 
 	void loadPreferences() {
-		
+
 		final String signerRoleValue = PreferencesManager.get(PREFERENCE_FACTURAE_SIGNER_ROLE);
-		
+
 		for (final RoleItem item : this.roleItems) {
 			if (item.getValue().equals(signerRoleValue)) {
 				this.facturaeRol.setSelectedItem(item);
 			}
-		}		
+		}
 
 		this.facturaeSignatureProductionCity.setText(
 			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY)
@@ -499,7 +498,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 		return adesPolicy;
 	}
 
-	void checkPreferences() throws AOException {
+	void checkPreferences() throws ConfigurationException {
 		final AdESPolicy p = this.facturaePolicyPanel.getSelectedPolicy();
 		if (p != null) {
 			// No nos interesa el resultado, solo si construye sin excepciones
@@ -507,7 +506,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 				new Oid(p.getPolicyIdentifier().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (final GSSException e) {
-				throw new AOException("El identificador debe ser un OID", e); //$NON-NLS-1$
+				throw new ConfigurationException("El identificador debe ser un OID", e); //$NON-NLS-1$
 			}
 		}
 	}

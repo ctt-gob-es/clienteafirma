@@ -30,6 +30,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESConstants;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 
 /** Manejador de firmas XML XAdES ASiC-S.
@@ -76,7 +77,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			digestValue = hash(data, externalReferencesHashAlgorithm);
 		}
 		catch (final Exception e) {
-			throw new AOException("No se reconoce el algoritmo de huella digital", e); //$NON-NLS-1$
+			throw new AOException("No se reconoce el algoritmo de huella digital", e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI); //$NON-NLS-1$
 		}
 
 		final byte[] xadesSignature = new AOXAdESSigner().sign(

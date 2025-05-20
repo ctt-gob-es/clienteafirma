@@ -57,7 +57,6 @@ import javax.swing.JTextField;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -484,7 +483,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		return signatureOptionsPanel;
 	}
 
-	void checkPreferences() throws AOException {
+	void checkPreferences() throws ConfigurationException {
 
 		loadPadesPolicy();
 
@@ -495,7 +494,7 @@ final class PreferencesPanelPades extends JScrollPane {
 				new Oid(p.getPolicyIdentifier().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (final GSSException e) {
-				throw new AOException("El identificador debe ser un OID", e); //$NON-NLS-1$
+				throw new ConfigurationException("El identificador debe ser un OID", e); //$NON-NLS-1$
 			}
 		}
 	}

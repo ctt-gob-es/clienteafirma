@@ -50,6 +50,7 @@ import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndicationImpl;
@@ -198,7 +199,7 @@ public final class XAdESUtil {
 			xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
 		}
 		catch (final Exception e) {
-			throw new AOException(
+			throw new AOMalformedSignatureException(
 				"No se ha podido instanciar la firma XML Avanzada de JXAdES: " + e, e //$NON-NLS-1$
 			);
 		}
@@ -211,7 +212,7 @@ public final class XAdESUtil {
 		}
 		catch (final Exception e) {
 			throw new AOException(
-				"No se ha podido establecer el algoritmo de huella digital: " + e, e //$NON-NLS-1$
+				"No se ha podido establecer el algoritmo de huella digital: " + e, e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI //$NON-NLS-1$
 			);
 		}
 
@@ -230,12 +231,13 @@ public final class XAdESUtil {
 		catch (final XPathExpressionException e1) {
 			throw new AOException(
 				"No se ha podido evaluar la expresion indicada para la insercion de la firma Enveloped ('" + xpathExpression + "'): " + e1, //$NON-NLS-1$ //$NON-NLS-2$
-				e1
+				e1, XMLErrorCode.Request.INVALID_NODE_SELECTOR_XPATH
 			);
 		}
 		if (nodeList.getLength() < 1) {
 			throw new AOException(
-				"La expresion indicada para la insercion de la firma Enveloped ('" + xpathExpression + "') no ha devuelto ningun nodo" //$NON-NLS-1$ //$NON-NLS-2$
+				"La expresion indicada para la insercion de la firma Enveloped ('" + xpathExpression + "') no ha devuelto ningun nodo", //$NON-NLS-1$ //$NON-NLS-2$
+				XMLErrorCode.Request.INVALID_NODE_SELECTOR_XPATH
 			);
 		}
 		if (nodeList.getLength() > 1) {

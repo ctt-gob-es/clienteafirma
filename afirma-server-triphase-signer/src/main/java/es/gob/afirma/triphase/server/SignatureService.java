@@ -384,7 +384,7 @@ public final class SignatureService extends HttpServlet {
 				}
 				catch (final Throwable e) {
 					LOGGER.log(Level.WARNING, "Error al recuperar el documento", e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(14) + ": " + new AOTriphaseException(e.toString(), e)); //$NON-NLS-1$
+					out.print(AOTriphaseException.parsePresignException(ErrorManager.RECOVERING_DOCUMENT_ERROR, e.getMessage(), e).toString());
 					out.flush();
 					return;
 				}
@@ -491,7 +491,7 @@ public final class SignatureService extends HttpServlet {
 						);
 					}
 					else {
-						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
+						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation, TriServiceErrorCode.Request.CRYPTO_OPERATION_NOT_FOUND); //$NON-NLS-1$
 					}
 
 					LOGGER.info("Se ha calculado el resultado de la prefirma y se devuelve"); //$NON-NLS-1$
@@ -626,7 +626,7 @@ public final class SignatureService extends HttpServlet {
 						);
 					}
 					else {
-						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
+						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation, TriServiceErrorCode.Request.UNSUPPORTED_CRYPTO_OPERATION); //$NON-NLS-1$
 					}
 				}
 				catch (final RuntimeConfigNeededException e) {

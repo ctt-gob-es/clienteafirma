@@ -44,12 +44,15 @@ import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AGEPolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicyPropertiesManager;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormat;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormatImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifier;
@@ -100,7 +103,7 @@ public final class XAdESCoSigner {
 			signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
 		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("No se ha podido leer el documento XML de firmas", e); //$NON-NLS-1$
 		}
 
 		return cosign(signDocument, algorithm, pk, certChain, xParams);
@@ -220,7 +223,7 @@ public final class XAdESCoSigner {
 			}
 			catch(final Exception e) {
 				throw new AOException(
-					"La codificacion indicada en 'encoding' debe ser una URI: " + e, e //$NON-NLS-1$
+					"La codificacion indicada en 'encoding' debe ser una URI: " + e, e, XMLErrorCode.Request.INVALID_ENCODING_URI //$NON-NLS-1$
 				);
 			}
 		}
@@ -243,7 +246,7 @@ public final class XAdESCoSigner {
 				root = docSig.getDocumentElement();
 			}
 			catch (final Exception e) {
-				throw new AOException("No se ha estructurar el documento XML de firmas", e); //$NON-NLS-1$
+				throw new AOException("No se ha podido estructurar el documento XML de firmas", e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
 			}
 		}
 
@@ -259,12 +262,13 @@ public final class XAdESCoSigner {
 			}
 			catch (final SigningLTSException e) {
 				// Si se indico expresamente que no se debia permitir la cofirma de
-				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
-				// Si no, se informa debidamente para que se consulte al usuario
+				// firmas de archivo, se configura la excepcion para bloquear la ejecucion.
+				// Si no, se informara debidamente para que se consulte al usuario
+				final SigningLTSException ex = new SigningLTSException("La cofirma de firmas de archivo invalidara el sello de archivo", e, false); //$NON-NLS-1$
 				if (allowSignLts != null) {
-					throw new AOException(e.getMessage());
+					e.setDenied(true);
 				}
-				throw new SigningLTSException("La cofirma de firmas de archivo invalidara el sello de archivo", e, false); //$NON-NLS-1$
+				throw ex;
 			}
 		}
 
@@ -282,7 +286,8 @@ public final class XAdESCoSigner {
 		}
 		catch (final Exception e) {
 			throw new AOException(
-				"No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido obtener un generador de huellas digitales para el algoritmo " + digestMethodAlgorithm, //$NON-NLS-1$
+				 e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI
 			);
 		}
 
@@ -337,10 +342,10 @@ public final class XAdESCoSigner {
 				currentTransformList = Utils.getObjectReferenceTransforms(currentReference, XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX);
 			}
 			catch (final NoSuchAlgorithmException e) {
-				throw new AOException("Se ha declarado una transformacion personalizada de un tipo no soportado", e); //$NON-NLS-1$
+				throw new AOException("Se ha declarado una transformacion personalizada de un tipo no soportado", e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI); //$NON-NLS-1$
 			}
 			catch (final InvalidAlgorithmParameterException e) {
-				throw new AOException("Se han especificado parametros erroneos para una transformacion personalizada", e); //$NON-NLS-1$
+				throw new AOException("Se han especificado parametros erroneos para una transformacion personalizada", e, XMLErrorCode.Request.INVALID_TRANSFORMATION); //$NON-NLS-1$
 			}
 
 			// Creamos un identificador de referencia para el objeto a firmar y lo almacenamos
@@ -507,7 +512,7 @@ public final class XAdESCoSigner {
 								.prepareOperationWithConfirmation(extraParams);
 						}
 						else {
-							throw new AOException("La politica de la AGE no soporta la cofirma XAdES Enveloping"); //$NON-NLS-1$
+							throw new AOException("La politica de la AGE no soporta la cofirma XAdES Enveloping", ErrorCode.Functional.SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY); //$NON-NLS-1$
 						}
 					}
 
@@ -630,7 +635,7 @@ public final class XAdESCoSigner {
 			throw e;
 		}
 		catch (final Exception e) {
-			throw new AOException("Error al generar la cofirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error al generar la cofirma XAdES", e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 
 		return Utils.writeXML(
@@ -651,12 +656,12 @@ public final class XAdESCoSigner {
 	private static Element copyManifest(final String referenceUri, final Element signatureElement) throws AOException {
 		// Obtenemos el manifest de la firma original
 		if (!referenceUri.startsWith("#")) { //$NON-NLS-1$
-			throw new AOException("La URI de la firma original que referencia al manifest debe ser local"); //$NON-NLS-1$
+			throw new AOMalformedSignatureException("La URI de la firma original que referencia al manifest debe ser local (empezar por '#')"); //$NON-NLS-1$
 		}
 		final String manifestId = referenceUri.substring(1);
 		final Element manifestElement = XAdESUtil.findElementById(manifestId, signatureElement, false);
 		if (manifestElement == null) {
-			throw new AOException("No se encontro el manifest dentro de la firma"); //$NON-NLS-1$
+			throw new AOMalformedSignatureException("No se encontro el manifest dentro de la firma"); //$NON-NLS-1$
 		}
 
 		// Clonamos el nodo del manifest

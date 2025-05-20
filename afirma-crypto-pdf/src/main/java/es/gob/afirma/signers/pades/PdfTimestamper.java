@@ -32,7 +32,6 @@ import com.aowagie.text.pdf.PdfStamper;
 import com.aowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.InvalidLibraryException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.pades.common.PdfErrorCode;
@@ -169,7 +168,7 @@ public final class PdfTimestamper {
 	        			throw new PdfIsPasswordProtectedException(e);
 	        		}
 	        		catch (final DocumentException e) {
-						throw new AOFormatFileException("Error de formato en el PDF de entrada: " + e, e); //$NON-NLS-1$
+						throw new AOException("El estado del PDF de entrada es inconsistente: " + e, e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$
 					}
 	        		catch (final IOException e) {
 	        			throw new AOException("Error en la composicion del documento firmado", e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$

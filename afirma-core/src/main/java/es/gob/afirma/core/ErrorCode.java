@@ -71,6 +71,7 @@ public class ErrorCode {
 
 		public static ErrorCode LIBRARY_NOT_FOUND						= new ErrorCode("200002", "No se encuentran dependencias necesarias para la ejecucion de la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
 
+		public static ErrorCode LOADING_LOCAL_FILE_ERROR				= new ErrorCode("200102", " Error al cargar el fichero local para realizar la firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode SIGNINIG_KEY_AUTHENTICATION_ERROR		= new ErrorCode("200108", "No se pudo acceder a la clave de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		//public static ErrorCode INVALID_SIGNATURE_ALGORITHM				= new ErrorCode("200109", "Algoritmo de firma no soportado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode INVALID_SIGNING_KEY						= new ErrorCode("200110", "Clave de firma no valida"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -79,11 +80,9 @@ public class ErrorCode {
 		public static ErrorCode VERIFING_PKCS1_ERROR					= new ErrorCode("200113", "No se pudo verificar la firma generada"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode ENCODING_SIGNING_CERTIFICATE			= new ErrorCode("200114", "Error codificando el certificado de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode UNKNOWN_SIGNING_ERROR					= new ErrorCode("200115", "Error desconocido durante la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode COMPATIBLE_SIGNATURE_NOT_FOUND			= new ErrorCode("200116", "No se ha encontrado una firma compatible con el formato de firma"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode BUILDING_ASIC_CONTAINER_ERROR			= new ErrorCode("200117", "Error al contruir el contenedor ASiC de la nueva firma"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		public static ErrorCode SIGNING_LTS								= new ErrorCode("210001", "Se esta intentando firmar una firma longeva que quedará invalidada"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY	= new ErrorCode("210002", "La firma resultante sera incompatible con la politica de firma de la AGE"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode BUILDING_ASIC_CONTAINER_ERROR			= new ErrorCode("200117", "Error al contruir el contenedor ASiC de la nueva firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNSUPPORTED_HASH_ALGORITHM				= new ErrorCode("200118", "No se soporta un algoritmo de hash establecido internamente"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 
@@ -151,25 +150,35 @@ public class ErrorCode {
 
 	}
 
-	public static class Request {
-		public static ErrorCode SIGNATURE_FORMAT_NOT_FOUND		= new ErrorCode("600104", "No se ha recibido el formato de firma para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode UNSUPPORTED_SIGNATURE_FORMAT	= new ErrorCode("600105", "El formato de firma indicado en la operacion de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode SIGNATURE_ALGORITHM_NOT_FOUND	= new ErrorCode("600106", "No se ha recibido el algoritmo de firma para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode UNSUPPORTED_SIGNATURE_ALGORITHM	= new ErrorCode("600107", "El algoritmo de firma indicado en la operacion de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+	public static class Functional {
+		public static ErrorCode CANCELLED_OPERATION						= new ErrorCode("500001", "Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INVALID_SIGNATURE						= new ErrorCode("500002", "La firma que se trata de procesar es invalida"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		public static ErrorCode DATA_NOT_FOUND					= new ErrorCode("600100", "No se ha recibido los datos en la peticion ni el id del fichero a descargar para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode CERTIFICATE_NEEDED 						= new ErrorCode("501001", "Error en la operacion, no hay certificados"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INVALID_FORMAT_FILE						= new ErrorCode("501002", "El formato de fichero no es valido para la operacion que se intenta realizar"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INVALID_SMARTCARD_PIN					= new ErrorCode("501003", "El PIN del la tarjeta inteligente es incorrecto"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SMARTCARD_LOCKED						= new ErrorCode("501004", "La tarjeta inteligente esta bloqueada"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode DOCUMENT_TOO_LARGE						= new ErrorCode("501005", "El documento supera el tamano maximo permitido"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode COMPATIBLE_SIGNATURE_NOT_FOUND			= new ErrorCode("501006", "La firma no es compatible con el formato de firma utilizado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SIGNING_LTS								= new ErrorCode("501007", "Se esta intentando firmar una firma longeva que quedará invalidada"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY	= new ErrorCode("501008", "La firma resultante sera incompatible con la politica de firma de la AGE"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		public static ErrorCode UNSUPPORTED_COUNTERSIGN_CONFIG	= new ErrorCode("600110", "No se soporta la configuracion de nodos a contrafirmar"); //$NON-NLS-1$ //$NON-NLS-2$
-
-
+		public static ErrorCode SIGNING_MALFORMED_SIGNATURE				= new ErrorCode("510006", "La firma no es compatible o esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	public static class Functional {
-		public static ErrorCode CANCELLED_OPERATION		= new ErrorCode("500001", "Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
+	public static class Request {
+		public static ErrorCode DATA_NOT_FOUND						= new ErrorCode("600100", "No se ha recibido los datos en la peticion ni el id del fichero a descargar para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		public static ErrorCode CERTIFICATE_NEEDED 		= new ErrorCode("501001", "Error en la operacion, no hay certificados"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode INVALID_FORMAT_FILE		= new ErrorCode("501002", "El formato de fichero no es valido para la operacion que se intenta realizar"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode INVALID_SMARTCARD_PIN	= new ErrorCode("501003", "El PIN del la tarjeta inteligente es incorrecto"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode SMARTCARD_LOCKED		= new ErrorCode("501004", "La tarjeta inteligente esta bloqueada"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SIGNATURE_FORMAT_NOT_FOUND			= new ErrorCode("600104", "No se ha recibido el formato de firma para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNSUPPORTED_SIGNATURE_FORMAT		= new ErrorCode("600105", "El formato de firma indicado en la operacion de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SIGNATURE_ALGORITHM_NOT_FOUND		= new ErrorCode("600106", "No se ha recibido el algoritmo de firma para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNSUPPORTED_SIGNATURE_ALGORITHM		= new ErrorCode("600107", "El algoritmo de firma indicado en la operacion de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static ErrorCode UNSUPPORTED_COUNTERSIGN_CONFIG		= new ErrorCode("600110", "No se soporta la configuracion de nodos a contrafirmar"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNSUPPORTED_POLICY_HASH_ALGORITHM	= new ErrorCode("600111", "El algoritmo de huella indicado en la política de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INVALID_COUNTERSIGNATURE_INDEX		= new ErrorCode("600112", "El numero indicado no se corresponde con la posicion de ninguna contrafirma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INVALID_TIMESTAMP_HASH_ALGORITHM	= new ErrorCode("600113", "El algoritmo de huella para el sello de tiempo no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+
+
 	}
 }

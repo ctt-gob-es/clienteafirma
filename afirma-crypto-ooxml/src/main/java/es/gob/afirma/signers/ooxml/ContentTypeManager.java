@@ -73,7 +73,7 @@ final class ContentTypeManager {
 						this.overrideContentTypes.put(getAttributeValue(attNodes, "PartName"), getAttributeValue(attNodes, "ContentType")); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
-				catch (final AOException e) {
+				catch (final IllegalArgumentException e) {
 					Logger.getLogger("es.gob.afirma").warning("Se encontro un nodo en el [Content_Types].xml no valido: " + e);  //$NON-NLS-1$//$NON-NLS-2$
 					continue;
 				}
@@ -103,13 +103,13 @@ final class ContentTypeManager {
 	 * @param attrName Nombre el atributo a recuperar.
 	 * @return Valor del atributo.
 	 * @throws AOException Cuando el nodo o el atributo no existen. */
-	private static String getAttributeValue(final NamedNodeMap nodeMap, final String attrName) throws AOException {
+	private static String getAttributeValue(final NamedNodeMap nodeMap, final String attrName) {
 		if (nodeMap == null) {
-			throw new AOException("El nodo no contenia atributos"); //$NON-NLS-1$
+			throw new IllegalArgumentException("El nodo no contenia atributos"); //$NON-NLS-1$
 		}
 		final Node attNode = nodeMap.getNamedItem(attrName);
 		if (attNode == null) {
-			throw new AOException("No existe el atributo: " + attrName); //$NON-NLS-1$
+			throw new IllegalArgumentException("No existe el atributo: " + attrName); //$NON-NLS-1$
 		}
 		return attNode.getNodeValue();
 	}

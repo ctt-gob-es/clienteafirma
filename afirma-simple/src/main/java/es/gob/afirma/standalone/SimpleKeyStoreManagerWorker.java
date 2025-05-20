@@ -16,6 +16,7 @@ import javax.swing.SwingWorker;
 
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.KeystoreAlternativeException;
 
 final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
 
@@ -34,7 +35,7 @@ final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
     }
 
     @Override
-    protected Void doInBackground() throws AOKeyStoreManagerException {
+    protected Void doInBackground() throws AOKeyStoreManagerException, KeystoreAlternativeException {
         if (SimpleAfirma.DEBUG) {
             Logger.getLogger("es.gob.afirma").info("Solicitado establecimiento de KeyStore (DNIe=" + this.dnie + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }

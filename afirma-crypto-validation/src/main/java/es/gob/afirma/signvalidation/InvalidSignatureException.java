@@ -1,6 +1,7 @@
 package es.gob.afirma.signvalidation;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 
 /**
  * Excepci&oacute;n para indicar que una firma no es v&aacute;lida.
@@ -15,7 +16,7 @@ public class InvalidSignatureException extends AOException {
 	 * @param msg Descripci&oacute;n del error.
 	 */
 	public InvalidSignatureException(final String msg) {
-		super(msg);
+		super(msg, ErrorCode.Functional.INVALID_SIGNATURE);
 	}
 
 	/**
@@ -23,7 +24,7 @@ public class InvalidSignatureException extends AOException {
 	 * @param cause Motivo del error.
 	 */
 	public InvalidSignatureException(final Throwable cause) {
-		super(cause);
+		super(cause, ErrorCode.Functional.INVALID_SIGNATURE);
 	}
 
 	/**
@@ -32,6 +33,6 @@ public class InvalidSignatureException extends AOException {
 	 * @param cause Motivo del error.
 	 */
 	public InvalidSignatureException(final String msg, final Throwable cause) {
-		super(msg, cause);
+		super(msg, cause, ErrorCode.Functional.INVALID_SIGNATURE);
 	}
 }
