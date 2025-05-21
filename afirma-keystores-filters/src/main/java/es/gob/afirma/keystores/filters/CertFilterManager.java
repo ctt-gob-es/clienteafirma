@@ -87,10 +87,16 @@ public final class CertFilterManager {
 	private boolean allowExternalStores = true;
 
 	/**
-	 * Identifica los filtros que deben aplicarse sobre una serie de certificados para
-	 * comprobar cuales de ellos se ajustan a nuestra necesidades.
-	 * @param propertyFilters Listado de propiedades entre las que identificar las que
-	 * establecen los criterios de filtrado.
+	 * Construye el objeto con los filtros que deben aplicarse sobre una serie
+	 * de certificados para comprobar cuales de ellos se ajustan a nuestra
+	 * necesidades.
+	 * @param filters Listado de filtros que se deben establecer.
+	 * @param mandatoryCertificate Indica si se debe seleccionar
+	 * autom&aacute;ticamente el certificado si s&oacute;lo hay uno que supere
+	 * el filtro.
+	 * @param allowExternalStores Indica si se deber&iacute;a permitir
+	 * seleccionar otros almacenes de certificados sobre los que tambi&eacute;n
+	 * se aplicar&aacute;n estos filtros.
 	 */
 	public CertFilterManager(final List<CertificateFilter> filters, final boolean mandatoryCertificate, final boolean allowExternalStores) {
 
@@ -101,10 +107,13 @@ public final class CertFilterManager {
 		this.allowExternalStores = allowExternalStores;
 	}
 
-	/** Identifica los filtros que deben aplicarse sobre una serie de certificados para
-	 * comprobar cuales de ellos se ajustan a nuestra necesidades.
-	 * @param propertyFilters Listado de propiedades entre las que identificar las que
-	 * establecen los criterios de filtrado. */
+	/**
+	 * Construye el objeto con los filtros que deben aplicarse sobre una serie de
+	 * certificados para comprobar cuales de ellos se ajustan a nuestra necesidades
+	 * a partir de las propiedades de configuraci&oacute;n de una operaci&oacute;n.
+	 * @param propertyFilters Conjunto de propiedades entre las que identificar las que
+	 * establecen los criterios de filtrado.
+	 */
 	public CertFilterManager(final Properties propertyFilters) {
 
 		this.mandatoryCertificate = isMandatoryCertificate(propertyFilters);

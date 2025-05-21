@@ -91,7 +91,7 @@ public class BatchConfigManager {
 
 	/**
 	 * Indica si los servicios de firma de lotes XML est&aacute;n inicializados o no.
-	 * @return
+	 * @return {@code true} si est&aacute; inicializado, {@code false} en caso contrario.
 	 */
 	public static boolean isInitialized() {
 		return initialized;
