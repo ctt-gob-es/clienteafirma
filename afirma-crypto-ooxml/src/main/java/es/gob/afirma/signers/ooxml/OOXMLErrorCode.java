@@ -6,8 +6,8 @@ public class OOXMLErrorCode {
 
 	public static class Internal {
 
-		public static ErrorCode UNKWNON_OOXML_SIGNING_ERROR		= new ErrorCode("213005", "Error desconocido en la generación de la firma OOXML"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode INTERNAL_OOXML_SIGNING_ERROR	= new ErrorCode("213006", "Error interno en la generación de la firma OOXML"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNKWNON_OOXML_SIGNING_ERROR		= new ErrorCode("213005", "Error desconocido en la generacion de la firma OOXML"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INTERNAL_OOXML_SIGNING_ERROR	= new ErrorCode("213006", "Error interno en la generacion de la firma OOXML"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 

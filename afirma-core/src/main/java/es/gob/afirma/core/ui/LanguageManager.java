@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +24,6 @@ import java.util.zip.ZipInputStream;
 import es.gob.afirma.core.LanguageException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.LoggerUtil;
-import es.gob.afirma.core.misc.Platform;
 
 /**
  * Gestiona los idiomas
@@ -40,9 +40,6 @@ public class LanguageManager {
 	
 	private static final String FALLBACK_LOCALE = "fallback.locale"; //$NON-NLS-1$
 	
-	private static final File HELP_DIR = new File(Platform.getUserHome() + File.separator + ".afirma" + File.separator //$NON-NLS-1$
-			+ "Autofirma" + File.separator + "help"); //$NON-NLS-1$ //$NON-NLS-2$
-	
 	private static File languagesDir;
 	
 	public static final Locale [] AFIRMA_DEFAULT_LOCALES = {
@@ -58,25 +55,22 @@ public class LanguageManager {
 		languagesDir = langDir;
 	}
 	
-	/** Importa y agrega un nuevo idioma. 
-	 * @throws Exception Error al importar idioma*/
-	public static void addLanguage(final File langFile) throws Exception {
+	/** 
+	 * Importa y agrega un nuevo idioma. 
+	 * @throws IOException 
+	 * @throws LanguageException 
+	 * @throws IOException Error al leer archivo con informaci&oacute;n sobre el idioma
+	 * @throws LanguageException Error al importar idioma
+	 * */
+	public static void addLanguage(final File langFile) throws IOException, LanguageException {
 		
 		Map<String, String> langProps = null;
 		
-		try {
-			langProps = readMetadataInfo(langFile);
-		} catch (final Exception e) {
-			throw e;
-		}
+		langProps = readMetadataInfo(langFile);
 		
 		final String localeName = langProps.get(LOCALE_PROP);
 
-		try {
-			copyLanguageToDirectory(langFile, new File(languagesDir, localeName));
-		} catch (final Exception e) {
-			throw e;
-		}
+		copyLanguageToDirectory(langFile, new File(languagesDir, localeName));
 	}
 	
 	/**
@@ -208,7 +202,11 @@ public class LanguageManager {
 
 				File outputFile;
 				if (entryName.startsWith("help/") || entryName.startsWith("help\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-					outputFile = new File(HELP_DIR, entryName.substring(("help" + File.separator).length())); //$NON-NLS-1$
+					final File helpInstallDir = new File(getApplicationDirectory() + File.separator + "help"); //$NON-NLS-1$
+					if (helpInstallDir.isDirectory()) {
+						helpInstallDir.mkdirs();
+					}
+					outputFile = new File(helpInstallDir, entryName.substring(("help" + File.separator).length())); //$NON-NLS-1$
 				} else {
 					outputFile = new File(dirPath, entryName);
 				}
@@ -393,5 +391,22 @@ public class LanguageManager {
     public static File getLanguagesDir() {
     	return languagesDir;
     }
+    
+	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n.
+	 * @return Directorio de ejecuci&oacute;n. */
+	private static File getApplicationDirectory() {
+
+		// Identificamos el directorio de instalacion
+		try {
+			return new File(
+				LanguageManager.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
+			).getParentFile();
+		}
+		catch (final URISyntaxException e) {
+			LOGGER.warning("No se pudo localizar el directorio del fichero en ejecucion: " + e); //$NON-NLS-1$
+		}
+
+		return null;
+	}
 
 }

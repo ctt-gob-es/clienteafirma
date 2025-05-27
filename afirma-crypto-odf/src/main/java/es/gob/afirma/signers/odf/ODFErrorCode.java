@@ -6,8 +6,8 @@ public class ODFErrorCode {
 
 	public static class Internal {
 
-		public static ErrorCode UNKWNON_ODF_SIGNING_ERROR	= new ErrorCode("213003", "Error desconocido en la generación de la firma ODF"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode INTERNAL_ODF_SIGNING_ERROR	= new ErrorCode("213004", "Error interno en la generación de la firma ODF"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNKWNON_ODF_SIGNING_ERROR	= new ErrorCode("213003", "Error desconocido en la generacion de la firma ODF"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INTERNAL_ODF_SIGNING_ERROR	= new ErrorCode("213004", "Error interno en la generacion de la firma ODF"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 

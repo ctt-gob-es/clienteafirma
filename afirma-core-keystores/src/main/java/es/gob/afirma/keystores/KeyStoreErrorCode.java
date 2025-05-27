@@ -6,7 +6,7 @@ public class KeyStoreErrorCode {
 
 	public static class Internal {
 
-		public static ErrorCode LOADING_KEYSTORE_INTERNAL_ERROR				= new ErrorCode("201101", "Error genérico al cargar el almacen de certificados"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode LOADING_KEYSTORE_INTERNAL_ERROR				= new ErrorCode("201101", "Error generico al cargar el almacen de certificados"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode LOADING_PRIVATE_KEY_ERROR					= new ErrorCode("201103", "Error al cargar la clave del certificado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode LOADING_CERTIFICATE_ERROR					= new ErrorCode("201106", "Error al cargar el certificado suelto o en PKCS#7"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode LOADING_WINDOWS_KEYSTORE_ERROR				= new ErrorCode("201107", "Error al cargar el almacen de certificados de Windows"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -160,7 +160,7 @@ public class ErrorCode {
 		public static ErrorCode SMARTCARD_LOCKED						= new ErrorCode("501004", "La tarjeta inteligente esta bloqueada"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode DOCUMENT_TOO_LARGE						= new ErrorCode("501005", "El documento supera el tamano maximo permitido"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode COMPATIBLE_SIGNATURE_NOT_FOUND			= new ErrorCode("501006", "La firma no es compatible con el formato de firma utilizado"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode SIGNING_LTS								= new ErrorCode("501007", "Se esta intentando firmar una firma longeva que quedará invalidada"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode SIGNING_LTS								= new ErrorCode("501007", "Se esta intentando firmar una firma longeva que quedara invalidada"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY	= new ErrorCode("501008", "La firma resultante sera incompatible con la politica de firma de la AGE"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static ErrorCode SIGNING_MALFORMED_SIGNATURE				= new ErrorCode("510006", "La firma no es compatible o esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -175,7 +175,7 @@ public class ErrorCode {
 		public static ErrorCode UNSUPPORTED_SIGNATURE_ALGORITHM		= new ErrorCode("600107", "El algoritmo de firma indicado en la operacion de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static ErrorCode UNSUPPORTED_COUNTERSIGN_CONFIG		= new ErrorCode("600110", "No se soporta la configuracion de nodos a contrafirmar"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode UNSUPPORTED_POLICY_HASH_ALGORITHM	= new ErrorCode("600111", "El algoritmo de huella indicado en la política de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNSUPPORTED_POLICY_HASH_ALGORITHM	= new ErrorCode("600111", "El algoritmo de huella indicado en la politica de firma no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode INVALID_COUNTERSIGNATURE_INDEX		= new ErrorCode("600112", "El numero indicado no se corresponde con la posicion de ninguna contrafirma"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode INVALID_TIMESTAMP_HASH_ALGORITHM	= new ErrorCode("600113", "El algoritmo de huella para el sello de tiempo no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
 

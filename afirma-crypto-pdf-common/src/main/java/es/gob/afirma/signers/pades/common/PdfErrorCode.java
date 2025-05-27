@@ -5,8 +5,8 @@ import es.gob.afirma.core.ErrorCode;
 public class PdfErrorCode {
 
 	public static class Internal {
-		public static ErrorCode UNKWNON_PADES_SIGNING_ERROR				= new ErrorCode("212001", "Error desconocido en la generación de la firma PAdES"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static ErrorCode INTERNAL_PADES_SIGNING_ERROR			= new ErrorCode("212002", "Error interno en la generación de la firma PAdES"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode UNKWNON_PADES_SIGNING_ERROR				= new ErrorCode("212001", "Error desconocido en la generacion de la firma PAdES"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode INTERNAL_PADES_SIGNING_ERROR			= new ErrorCode("212002", "Error interno en la generacion de la firma PAdES"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode SIGNING_PDF_WITH_UNREGISTER_SIGNATURES	= new ErrorCode("212003", "Se esta intentando firmar una firma PDF con firmas sin registrar"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode SIGNING_PDF_WITH_BAD_PASSWORD			= new ErrorCode("212004", "La contrasena del PDF no era correcta"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static ErrorCode SIGNING_PDF_WITHOUT_PASSWORD			= new ErrorCode("212005", "El PDF necesita contrasena"); //$NON-NLS-1$ //$NON-NLS-2$
