@@ -44,7 +44,7 @@ final class AOKeyStoreManagerHelperSingle {
 		}
 		catch (final Exception e) {
 			throw new MissingLibraryException(
-				"No se ha podido instanciar el proveedor SingleCertKeyStoreProvider: " + e, e); //$NON-NLS-1$
+				"No se ha podido instanciar el proveedor SingleCertKeyStoreProvider: " + e, e, KeyStoreErrorCode.ThirdParty.AFIRMA_SINGLE_CERT_PROVIDER_NOT_FOUND); //$NON-NLS-1$
 		}
 		Security.addProvider(pkcs7Provider);
 

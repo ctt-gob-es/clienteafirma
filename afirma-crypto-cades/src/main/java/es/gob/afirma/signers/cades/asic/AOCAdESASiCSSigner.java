@@ -37,7 +37,8 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 
 	private static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
 
-    /** Firma datos en formato CAdES devolviendo el resultado empaquetado como ASiC-S.
+    /**
+     * Firma datos en formato CAdES devolviendo el resultado empaquetado como ASiC-S.
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma.
      * @param key Clave privada a usar para firmar.
@@ -49,7 +50,7 @@ public final class AOCAdESASiCSSigner implements AOSigner {
      *                separada, datos y firma.
      * @return Firma en formato CAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
-     * @throws IOException Si hay problemas en el tratamiento de datos. */
+     */
 	@Override
 	public byte[] sign(final byte[] data,
 			           final String algorithm,

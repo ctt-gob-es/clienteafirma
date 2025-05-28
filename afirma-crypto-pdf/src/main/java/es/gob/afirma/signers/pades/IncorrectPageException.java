@@ -9,11 +9,14 @@
 
 package es.gob.afirma.signers.pades;
 
+import es.gob.afirma.core.AORuntimeException;
+import es.gob.afirma.signers.pades.common.PdfErrorCode;
+
 /**
  * Indica que la pagina indicada donde firmar no es correcta
  * @author Jos&eacute; Montero Rivero
  */
-public final class IncorrectPageException extends IllegalArgumentException {
+public final class IncorrectPageException extends AORuntimeException {
 
 	private static final long serialVersionUID = -2415913095143368605L;
 
@@ -22,7 +25,7 @@ public final class IncorrectPageException extends IllegalArgumentException {
 	 * @param msg Mensaje de error.
 	 */
 	public IncorrectPageException(final String msg) {
-		super(msg);
+		super(msg, PdfErrorCode.Request.INVALID_SIGNATURE_PAGE);
 	}
 
 }

@@ -52,11 +52,11 @@ public class TestBatchJson {
 		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$
 		final String batchPostSignerUrl = BASE_URL + "postsign"; //$NON-NLS-1$
 
-//		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"RW50cmFkYS50eHQ=\"}]}";
-//		final String batchB64 = Base64.encode(batch.getBytes(StandardCharsets.UTF_8));
-		final String batchB64 = "eyJhbGdvcml0aG0iOiJTSEEyNTYiLCJmb3JtYXQiOiJDQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJzaW5nbGVzaWducyI6W3siaWQiOiI5YzAyNjY5Ny03MTI0LTRkMGItOGMyOS1kNDllNjJmZjUzMzEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaCJ9LHsiaWQiOiJkNzcwMjI4Zi1jMDMyLTQxMTktODYwNS0wYTQzOTcyMjExMDEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaElEST0iLCJmb3JtYXQiOiJYQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJleHRyYXBhcmFtcyI6IlptOXliV0YwUFZoQlpFVlRJRVJsZEdGamFHVmtDbVY0Y0ZCdmJHbGplVDFHYVhKdFlVRkhSUT09In1dLCJzdG9wb25lcnJvciI6ZmFsc2V9"; //$NON-NLS-1$
+//		final byte[] batchEncoded = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"RW50cmFkYS50eHQ=\"}]}".getBytes(StandardCharsets.UTF_8);
+//		final byte[] batchEncoded = batch.getBytes(StandardCharsets.UTF_8);
+		final byte[] batchEncoded = Base64.decode("eyJhbGdvcml0aG0iOiJTSEEyNTYiLCJmb3JtYXQiOiJDQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJzaW5nbGVzaWducyI6W3siaWQiOiI5YzAyNjY5Ny03MTI0LTRkMGItOGMyOS1kNDllNjJmZjUzMzEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaCJ9LHsiaWQiOiJkNzcwMjI4Zi1jMDMyLTQxMTktODYwNS0wYTQzOTcyMjExMDEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaElEST0iLCJmb3JtYXQiOiJYQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJleHRyYXBhcmFtcyI6IlptOXliV0YwUFZoQlpFVlRJRVJsZEdGamFHVmtDbVY0Y0ZCdmJHbGplVDFHYVhKdFlVRkhSUT09In1dLCJzdG9wb25lcnJvciI6ZmFsc2V9"); //$NON-NLS-1$
 
-		final String result = BatchSigner.signJSON(batchB64, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
+		final String result = BatchSigner.signJSON(batchEncoded, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
 
 		System.out.println("Resultado:\n" + result); //$NON-NLS-1$
 	}
@@ -81,11 +81,11 @@ public class TestBatchJson {
 //				+ "{\"id\":\"3\", \"datareference\":\"" + signRefB64 + "\"}, "
 //				+ "{\"id\":\"4\", \"datareference\":\"" + facturaRefB64 + "\", \"format\":\"CAdES\", \"suboperation\":\"sign\"}"
 				+ "]}";
-		final String batchB64 = Base64.encode(batch.getBytes(StandardCharsets.UTF_8));
+		final byte[] batchEncoded = batch.getBytes(StandardCharsets.UTF_8);
 
 		SslSecurityManager.disableSslChecks();
 
-		final String result = BatchSigner.signJSON(batchB64, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
+		final String result = BatchSigner.signJSON(batchEncoded, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
 
 		System.out.println("Resultado:\n" + result); //$NON-NLS-1$
 	}

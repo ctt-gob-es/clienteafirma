@@ -88,8 +88,8 @@ public class RuntimeConfigNeededException extends AOException {
 	}
 
 	/**
-	 * Establece si se ha denegado la posibilidad de configurar o permitir la operaci&oacute;n.
-	 * @param denied {@code true} si la operaci&oacute;n debe bloquearse, {@code false} en caso
+	 * Indica si se ha denegado la posibilidad de configurar o permitir la operaci&oacute;n.
+	 * @return {@code true} si la operaci&oacute;n debe bloquearse, {@code false} en caso
 	 * de que se pueda obtener a&uacute;n la configuraci&oacute;n necesaria.
 	 */
 	public boolean isDenied() {

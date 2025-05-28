@@ -158,7 +158,6 @@ public final class AOCAdESSigner implements AOSigner {
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
      * @return Firma CAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
-     * @throws IOException Si hay problemas en el tratamiento de datos.
      */
     @Override
 	public byte[] cosign(final byte[] data,

@@ -20,7 +20,6 @@ public class InvalidLibraryException extends AORuntimeException {
 	/**
 	 * Crea una nueva instancia de la excepci&oacute;n.
 	 * @param msg Mensaje de la excepci&oacute;n.
-	 * @param code C&oacute;digo de error.
 	 */
 	public InvalidLibraryException(final String msg) {
 		super(msg, ErrorCode.Internal.LIBRARY_NOT_FOUND);
@@ -30,7 +29,6 @@ public class InvalidLibraryException extends AORuntimeException {
 	 * Crea una nueva instancia de la excepci&oacute;n.
 	 * @param msg Mensaje de la excepci&oacute;n
 	 * @param e Excepci&oacute;n original.
-	 * @param code C&oacute;digo de error.
 	 */
 	public InvalidLibraryException(final String msg, final Throwable e) {
 		super(msg, e, ErrorCode.Internal.LIBRARY_NOT_FOUND);

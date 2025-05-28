@@ -9,8 +9,11 @@
 
 package es.gob.afirma.keystores;
 
+import es.gob.afirma.core.AORuntimeException;
+import es.gob.afirma.core.ErrorCode;
+
 /** Excepci&oacute;n que denota un error derivado del uso de una tarjeta inteligente. */
-public class SmartCardException extends RuntimeException {
+public class SmartCardException extends AORuntimeException {
 
 	/** Serial Id. */
 	private static final long serialVersionUID = -7200145202118291387L;
@@ -18,9 +21,10 @@ public class SmartCardException extends RuntimeException {
 	/**
 	 * Se contruye la excepci&oacute;n con un mensaje descriptivo.
 	 * @param msg Mensaje que describe el error que origin&oacute; la excepci&oacute;n.
+	 * @param errorCode C&oacute;digo del error espec&iacute;fico que caus&oacute; la excepci&oacute;n.
 	 */
-	public SmartCardException(final String msg) {
-		super(msg);
+	public SmartCardException(final String msg, final ErrorCode errorCode) {
+		super(msg, errorCode);
 	}
 
 	/**
@@ -28,8 +32,9 @@ public class SmartCardException extends RuntimeException {
 	 * origin&oacute;.
 	 * @param msg Mensaje que describe el error que origin&oacute; la excepci&oacute;n.
 	 * @param t Error que origin&oacute; la excepci&oacute;n.
+	 * @param errorCode C&oacute;digo del error espec&iacute;fico que caus&oacute; la excepci&oacute;n.
 	 */
-	public SmartCardException(final String msg, final Throwable t) {
-		super(msg, t);
+	public SmartCardException(final String msg, final Throwable t, final ErrorCode errorCode) {
+		super(msg, t, errorCode);
 	}
 }

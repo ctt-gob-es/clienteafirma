@@ -6,8 +6,8 @@ public class XMLErrorCode {
 
 	public static class Internal {
 
-		public static final ErrorCode UNKWNON_XML_SIGNING_ERROR				= new ErrorCode("213001", "Error desconocido en la generación de la firma XML"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode INTERNAL_XML_SIGNING_ERROR				= new ErrorCode("213002", "Error interno en la generación de la firma XML"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode UNKWNON_XML_SIGNING_ERROR				= new ErrorCode("213001", "Error desconocido en la generacion de la firma XML"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode INTERNAL_XML_SIGNING_ERROR			= new ErrorCode("213002", "Error interno en la generacion de la firma XML"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode UNSUPPORTED_TRANSFORMATION_ALGORITHM	= new ErrorCode("213004", "El tipo de transformacion declarado no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}

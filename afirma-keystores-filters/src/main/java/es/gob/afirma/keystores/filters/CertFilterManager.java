@@ -89,8 +89,9 @@ public final class CertFilterManager {
 	/**
 	 * Identifica los filtros que deben aplicarse sobre una serie de certificados para
 	 * comprobar cuales de ellos se ajustan a nuestra necesidades.
-	 * @param propertyFilters Listado de propiedades entre las que identificar las que
-	 * establecen los criterios de filtrado.
+	 * @param filters Listado filtros de certificados.
+	 * @param mandatoryCertificate Indica si el certificado se deber&iacute;a seleccionar autom&acute;ticamente si s&oacute;lo hay uno.
+	 * @param allowExternalStores Indica si se debe permitir seleccionar un almac&eacute;n distinto al por defecto.
 	 */
 	public CertFilterManager(final List<CertificateFilter> filters, final boolean mandatoryCertificate, final boolean allowExternalStores) {
 

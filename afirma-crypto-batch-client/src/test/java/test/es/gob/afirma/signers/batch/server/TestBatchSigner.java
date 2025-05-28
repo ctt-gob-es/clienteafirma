@@ -14,7 +14,6 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Logger;
 
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 
 /** Pruebas del cliente de firma por lote.
@@ -76,7 +75,7 @@ public final class TestBatchSigner {
 		pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
 		final String res = BatchSigner.signXML(
-			Base64.encode(SAMPLE_BATCH_XML.getBytes(), true),
+			SAMPLE_BATCH_XML.getBytes(),
 			"http://localhost:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
 			"http://localhost:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
 			pke.getCertificateChain(),

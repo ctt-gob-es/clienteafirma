@@ -404,7 +404,7 @@ final class ProtocolInvocationLauncherBatch {
 				batchResult = LocalBatchSigner.signLocalBatch(batchConfig, pke);
 			} else {
 				batchResult = BatchSigner.signJSON(
-						Base64.encode(options.getData(), true),
+						options.getData(),
 						options.getBatchPresignerUrl(),
 						options.getBatchPostSignerUrl(),
 						pke.getCertificateChain(),
@@ -413,7 +413,7 @@ final class ProtocolInvocationLauncherBatch {
 			}
 		} else {
 			batchResult = BatchSigner.signXML(
-					Base64.encode(options.getData(), true),
+					options.getData(),
 					options.getBatchPresignerUrl(),
 					options.getBatchPostSignerUrl(),
 					pke.getCertificateChain(),

@@ -7,15 +7,19 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.core.misc.protocol;
+package es.gob.afirma.standalone.protocol;
 
-/** Error que indica que se necesita una versi&oacute;n m&aacute;s actualizada del aplicativo.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class ParameterNeedsUpdatedVersionException extends ParameterException {
+import es.gob.afirma.core.AOException;
+
+/**
+ * Error que indica que se necesita una versi&oacute;n m&aacute;s actualizada del aplicativo.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
+public final class NeedsUpdatedVersionException extends AOException {
 
 	private static final long serialVersionUID = 7936191422727825394L;
 
-	ParameterNeedsUpdatedVersionException() {
+	NeedsUpdatedVersionException() {
 		super("Se necesita actualizar la aplicacion"); //$NON-NLS-1$
 	}
 

@@ -20,7 +20,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import es.gob.afirma.core.LanguageException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -29,22 +28,22 @@ import es.gob.afirma.core.misc.Platform;
  * Gestiona los idiomas
  */
 public class LanguageManager {
-	
+
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-	
+
 	private static final String METADATA_FILENAME = "metadata.info"; //$NON-NLS-1$
-	
+
 	private static final String LOCALE_PROP = "locale"; //$NON-NLS-1$
-	
+
 	private static final String LANGUAGE_NAME_PROP = "language.name"; //$NON-NLS-1$
-	
+
 	private static final String FALLBACK_LOCALE = "fallback.locale"; //$NON-NLS-1$
-	
+
 	private static final File HELP_DIR = new File(Platform.getUserHome() + File.separator + ".afirma" + File.separator //$NON-NLS-1$
 			+ "Autofirma" + File.separator + "help"); //$NON-NLS-1$ //$NON-NLS-2$
-	
+
 	private static File languagesDir;
-	
+
 	public static final Locale [] AFIRMA_DEFAULT_LOCALES = {
 	    	new Locale("es", "ES"), //$NON-NLS-1$ //$NON-NLS-2$
 	        new Locale("en", "EN"), //$NON-NLS-1$ //$NON-NLS-2$
@@ -53,23 +52,26 @@ public class LanguageManager {
 	        new Locale("eu", "ES"), //$NON-NLS-1$ //$NON-NLS-2$
 	        new Locale("va", "ES")  //$NON-NLS-1$ //$NON-NLS-2$
 	};
-	
+
 	public static void init(final File langDir) {
 		languagesDir = langDir;
 	}
-	
-	/** Importa y agrega un nuevo idioma. 
-	 * @throws Exception Error al importar idioma*/
+
+	/**
+	 * Importa y agrega un nuevo idioma.
+	 * @param langFile Fichero de idioma.
+	 * @throws Exception Error al importar idioma.
+	 */
 	public static void addLanguage(final File langFile) throws Exception {
-		
+
 		Map<String, String> langProps = null;
-		
+
 		try {
 			langProps = readMetadataInfo(langFile);
 		} catch (final Exception e) {
 			throw e;
 		}
-		
+
 		final String localeName = langProps.get(LOCALE_PROP);
 
 		try {
@@ -78,7 +80,7 @@ public class LanguageManager {
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * Copia un fichero de idioma al directorio de idiomas de manera corriente, presuponiendo que se dispone
 	 * de permisos en el directorio de idiomas y su directorio padre. Si no existiese el directorio de idiomas,
@@ -89,7 +91,7 @@ public class LanguageManager {
 	 * @throws IOException Cuando ocurre un error de permisos o durante la copia.
 	 * @throws PluginInstalledException Cuando el idioma ya existe.
 	 */
-	private static File copyLanguageToDirectory(final File langFile, final File langDir) throws IOException, LanguageException {
+	private static File copyLanguageToDirectory(final File langFile, final File langDir) throws IOException {
 
 		// Creamos el directorio de idiomas si es preciso
 		if (!langDir.isDirectory()) {
@@ -103,19 +105,19 @@ public class LanguageManager {
 				throw new IOException("No se ha podido crear el directorio interno de idiomas: " + LoggerUtil.getCleanUserHomePath(langDir.getAbsolutePath()), e); //$NON-NLS-1$
 			}
 		}
-		
+
 		final File outLangFile = new File(langDir, langFile.getName());
 		try (OutputStream fos = new FileOutputStream(outLangFile)) {
 			Files.copy(langFile.toPath(), fos);
 		}
 		AOFileUtils.setAllPermissions(outLangFile);
-		
+
 		unzipFile(outLangFile, langDir.getAbsolutePath());
-		
+
 		return outLangFile;
-		
+
 	}
-	
+
 	/**
 	 * Crea un directorio y sus subdirectorios y le concede permisos de lectura, escritura y ejecucion a todos los usuarios.
 	 * @param dir Directorio.
@@ -128,10 +130,10 @@ public class LanguageManager {
 		}
 		AOFileUtils.setAllPermissions(dir);
 	}
-	
+
 	private static Map<String, String> readMetadataInfo(final File langFile) throws IOException {
 	        final String metadataFile = "metadata.info";   //$NON-NLS-1$
-	        final Map<String, String> langProps = new HashMap<String, String>();
+	        final Map<String, String> langProps = new HashMap<>();
 
 	        try (ZipFile zipFile = new ZipFile(langFile.getAbsolutePath())) {
 	            final ZipEntry entry = zipFile.getEntry(metadataFile);
@@ -156,27 +158,27 @@ public class LanguageManager {
 	        } catch (final IOException e) {
 	        	throw new IOException("Error al leer el archivo " + metadataFile, e); //$NON-NLS-1$
 	        }
-	        
+
 	        return langProps;
 	}
-	
+
 	private static String readMetadataLanguageName(final File langFile) throws IOException {
         String result = null;
         try (FileInputStream fis = new FileInputStream(langFile);
         	BufferedReader reader = new BufferedReader(new InputStreamReader(fis))) {
             String line;
-            while ((line = reader.readLine()) != null) { 
+            while ((line = reader.readLine()) != null) {
             	final String[] parts = line.split("=", 2); //$NON-NLS-1$
             	if (LANGUAGE_NAME_PROP.equals(parts[0])) {
             		result = parts[1];
             	}
-            }          
+            }
         } catch (final IOException e) {
         	throw new IOException("Error al leer el archivo " + langFile, e); //$NON-NLS-1$
         }
         return result;
 	}
-	
+
 	public static Locale readMetadataBaseLocale(final Locale locale) throws IOException {
         Locale result = null;
         final File localeDir = new File(languagesDir, locale.getLanguage() + "_" + locale.getCountry()); //$NON-NLS-1$
@@ -184,20 +186,20 @@ public class LanguageManager {
         try (FileInputStream fis = new FileInputStream(metadataFile);
         	BufferedReader reader = new BufferedReader(new InputStreamReader(fis))) {
             String line;
-            while ((line = reader.readLine()) != null) { 
+            while ((line = reader.readLine()) != null) {
             	final String[] parts = line.split("=", 2); //$NON-NLS-1$
             	if (FALLBACK_LOCALE.equals(parts[0])) {
             		final String baseLocale = parts[1];
             		final String[] localeParts = baseLocale.split("_", 2); //$NON-NLS-1$
             		result = new Locale(localeParts[0], localeParts[1]);
             	}
-            }          
+            }
         } catch (final IOException e) {
         	throw new IOException("Error al leer el archivo " + metadataFile, e); //$NON-NLS-1$
         }
-        return result;       
+        return result;
 	}
-	
+
 	private static void unzipFile(final File zipFile, final String dirPath) {
 
 		try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
@@ -237,7 +239,7 @@ public class LanguageManager {
 
 		zipFile.delete();
 	}
-    
+
     public static Locale [] getImportedLocales() {
     	Locale [] result = null;
     	if (languagesDir.exists()) {
@@ -254,7 +256,7 @@ public class LanguageManager {
     	}
     	return result;
     }
-    
+
     public static String getLanguageName(final Locale locale) {
     	final File localeDir = new File(languagesDir, locale.getLanguage() + "_" + locale.getCountry()); //$NON-NLS-1$
     	final File metadataFile = new File(localeDir, METADATA_FILENAME);
@@ -269,7 +271,7 @@ public class LanguageManager {
     	}
     	return result;
     }
-    
+
     /**
      * Comprueba si el idioma pertenece a alguno de los que ofrece Autofirma por defecto.
      * @param locale Idioma a comprobar.
@@ -284,7 +286,7 @@ public class LanguageManager {
     	}
     	return result;
     }
-    
+
     /**
      * Comprueba si existe una version importada por el usuario de los idiomas que ofrece Autofirma.
      * @return true en caso de que exista una version importada del idioma configurado.
@@ -293,7 +295,7 @@ public class LanguageManager {
 		final File localeDir = new File(LanguageManager.getLanguagesDir(), Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry()); //$NON-NLS-1$
         return localeDir.exists();
     }
-    
+
 	/**
 	 * Si es posible, devuelve el comando a ejecutar para arrancar la aplicaci&oacute;n.
 	 * Si no se encuentra un modo de arrancar la nueva instancia de la aplicaci&oacute;n,
@@ -313,7 +315,7 @@ public class LanguageManager {
 
 		// Compone el comando necesario para arrancar la aplicacion
 		final List<String> command = getCommand(currentFile);
-		
+
 		return command;
 	}
 
@@ -361,7 +363,7 @@ public class LanguageManager {
 
 		return command;
 	}
-	
+
 	/**
 	 * Comprueba si un fichero JAR se encuentra dentro de la estructura de una aplicaci&oacute;n Mac
 	 * y devuelve el ejecutable del mismo nombre para su arranque.

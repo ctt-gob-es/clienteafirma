@@ -169,7 +169,8 @@ public final class AOKeyStoreManagerFactory {
                + store.getName()
                + "' mas sistema operativo '" //$NON-NLS-1$
                + Platform.getOS()
-               + "' no esta soportada" //$NON-NLS-1$
+               + "' no esta soportada", //$NON-NLS-1$
+               KeyStoreErrorCode.Functional.UNSUPPORTED_KEYSTORE
         );
     }
 
@@ -179,7 +180,8 @@ public final class AOKeyStoreManagerFactory {
     		                                                final String lib,
   		                                                    final PasswordCallback pssCallback,
   		                                                    final boolean forceReset,
-  		                                                    final Object parentComponent) throws KeystoreAlternativeException, IOException {
+  		                                                    final Object parentComponent)
+  		                                                    		throws IOException, AOKeyStoreManagerException {
         String storeFilename = null;
         if (lib != null && !lib.isEmpty() && new File(lib).exists()) {
             storeFilename = lib;
@@ -206,13 +208,7 @@ public final class AOKeyStoreManagerFactory {
 		) {
             ksm.init(null, is, pssCallback, null, forceReset);
         }
-        catch (final AOException e) {
-            throw new KeystoreAlternativeException(
-        	   AOKeyStore.JAVA,
-               "No se ha podido abrir el almacen de tipo " + ksm.getType().getName() + " para el fichero " + lib, //$NON-NLS-1$ //$NON-NLS-2$
-               e
-            );
-        }
+
         return ksm;
     }
 
@@ -224,17 +220,27 @@ public final class AOKeyStoreManagerFactory {
     	final FileKeyStoreManager p12Ksm = new Pkcs12KeyStoreManager();
     	p12Ksm.setKeyStoreFile(lib);
 
-    	return addFileKeyStoreManager(
-    			p12Ksm,
-			new String[] {
-                "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
-            },
-            KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"), //$NON-NLS-1$
-			lib,
-			pssCallback,
-			forceReset,
-			parentComponent
-		);
+    	try {
+    		return addFileKeyStoreManager(
+    				p12Ksm,
+    				new String[] {
+    						"pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
+    				},
+    				KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"), //$NON-NLS-1$
+    				lib,
+    				pssCallback,
+    				forceReset,
+    				parentComponent
+    				);
+    	}
+        catch (final AOException e) {
+            throw new KeystoreAlternativeException(
+        	   AOKeyStore.JAVA,
+               "No se ha podido abrir el almacen de tipo PKCS#12 con el fichero " + lib, //$NON-NLS-1$
+               e,
+               KeyStoreErrorCode.Internal.LOADING_PKCS12_KEYSTORE_ERROR
+            );
+        }
 	}
 
     private static AOKeyStoreManager getJavaKeyStoreManager(final String lib,
@@ -245,17 +251,27 @@ public final class AOKeyStoreManagerFactory {
     	final FileKeyStoreManager javaKsm = new JavaKeyStoreManager();
     	javaKsm.setKeyStoreFile(lib);
 
-    	return addFileKeyStoreManager(
-    		javaKsm,
-			new String[] {
-                "jks" //$NON-NLS-1$
-            },
-            KeyStoreMessages.getString("AOKeyStoreManagerFactory.1"), //$NON-NLS-1$
-			lib,
-			pssCallback,
-			forceReset,
-			parentComponent
-		);
+    	try {
+    		return addFileKeyStoreManager(
+    				javaKsm,
+    				new String[] {
+    						"jks" //$NON-NLS-1$
+    				},
+    				KeyStoreMessages.getString("AOKeyStoreManagerFactory.1"), //$NON-NLS-1$
+    				lib,
+    				pssCallback,
+    				forceReset,
+    				parentComponent
+    				);
+    	}
+    	catch (final AOException e) {
+    		throw new KeystoreAlternativeException(
+    				AOKeyStore.JAVA,
+    				"No se ha podido abrir el almacen de tipo Java con el fichero " + lib, //$NON-NLS-1$
+    				e,
+    				KeyStoreErrorCode.Internal.LOADING_JAVA_KEYSTORE_ERROR
+    				);
+    	}
     }
 
 	private static AOKeyStoreManager getSmartCafeJavaKeyStoreManager(final PasswordCallback pssCallback,
@@ -268,7 +284,9 @@ public final class AOKeyStoreManagerFactory {
 		}
 		catch (final AOKeyStoreManagerException e) {
 			throw new KeystoreAlternativeException(getAlternateKeyStoreType(AOKeyStore.PKCS12),
-				"Error al inicializar el modulo G&D SmartCafe 100% Java: " + e, e //$NON-NLS-1$
+				"Error al inicializar el modulo G&D SmartCafe 100% Java: " + e, //$NON-NLS-1$
+				e,
+				KeyStoreErrorCode.Internal.LOADING_JMULTICARD_KEYSTORE_ERROR
 			);
 		}
 		ksm.setPreferred(true);
@@ -287,7 +305,8 @@ public final class AOKeyStoreManagerFactory {
 			throw new KeystoreAlternativeException(
 					getAlternateKeyStoreType(AOKeyStore.PKCS12),
 					"Error al inicializar el modulo CERES 100% Java: " + e, //$NON-NLS-1$
-					e
+					e,
+					KeyStoreErrorCode.Internal.LOADING_JMULTICARD_KEYSTORE_ERROR
 					);
 		}
 		ksm.setPreferred(true);
@@ -306,7 +325,8 @@ public final class AOKeyStoreManagerFactory {
 			throw new KeystoreAlternativeException(
 					getAlternateKeyStoreType(AOKeyStore.PKCS12),
 					"Error al inicializar el modulo CERES 430 100% Java: " + e, //$NON-NLS-1$
-					e
+					e,
+					KeyStoreErrorCode.Internal.LOADING_JMULTICARD_KEYSTORE_ERROR
 					);
 		}
 		ksm.setPreferred(true);
@@ -326,7 +346,8 @@ public final class AOKeyStoreManagerFactory {
     	   throw new KeystoreAlternativeException(
                 getAlternateKeyStoreType(AOKeyStore.PKCS12),
                 "Error al inicializar el modulo DNIe 100% Java: " + e, //$NON-NLS-1$
-                e
+                e,
+				KeyStoreErrorCode.Internal.LOADING_JMULTICARD_KEYSTORE_ERROR
            );
 		}
     	ksm.setPreferred(true);
@@ -384,7 +405,8 @@ public final class AOKeyStoreManagerFactory {
             throw new KeystoreAlternativeException(
                getAlternateKeyStoreType(store),
                "No se ha podido abrir el almacen de tipo " + store.getName(), //$NON-NLS-1$
-               e
+               e,
+               KeyStoreErrorCode.Internal.LOADING_FILE_CERTSTORE_ERROR
             );
         }
         return ksm;
@@ -450,7 +472,8 @@ public final class AOKeyStoreManagerFactory {
             throw new KeystoreAlternativeException(
                  getAlternateKeyStoreType(AOKeyStore.PKCS11),
                  "Error al inicializar el modulo PKCS#11: " + e, //$NON-NLS-1$
-                 e
+                 e,
+                 KeyStoreErrorCode.Internal.LOADING_PKCS11_KEYSTORE_ERROR
             );
         }
         return ksm;
@@ -467,7 +490,8 @@ public final class AOKeyStoreManagerFactory {
             throw new KeystoreAlternativeException(
                  getAlternateKeyStoreType(store),
                  "Error al inicializar el almacen " + store.getName(), //$NON-NLS-1$
-                 e
+                 e,
+                 KeyStoreErrorCode.Internal.LOADING_PUBLIC_WINDOWS_KEYSTORE_ERROR
             );
         }
         return ksm;
@@ -483,7 +507,8 @@ public final class AOKeyStoreManagerFactory {
 			throw new KeystoreAlternativeException(
                  getAlternateKeyStoreType(AOKeyStore.WINDOWS),
                  "Error al obtener almacen WINDOWS: " + e, //$NON-NLS-1$
-                 e
+                 e,
+                 KeyStoreErrorCode.Internal.LOADING_WINDOWS_KEYSTORE_ERROR
              );
 		}
 
@@ -503,7 +528,9 @@ public final class AOKeyStoreManagerFactory {
     		throw new KeystoreAlternativeException(
 				getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
 				"Error al obtener dinamicamente el almacen NSS: " + e, //$NON-NLS-1$
-				e
+				e,
+                KeyStoreErrorCode.Internal.LOADING_MOZILLA_KEYSTORE_ERROR
+
 			);
     	}
     	try {
@@ -514,7 +541,8 @@ public final class AOKeyStoreManagerFactory {
     		throw new KeystoreAlternativeException(
 				getAlternateKeyStoreType(AOKeyStore.MOZ_UNI),
 				"Error al inicializar el almacen NSS: " + e, //$NON-NLS-1$
-				e
+				e,
+                KeyStoreErrorCode.Internal.LOADING_WINDOWS_KEYSTORE_ERROR
 			);
     	}
     	return ksmUni;
@@ -584,7 +612,9 @@ public final class AOKeyStoreManagerFactory {
         }
         catch (final AOException e) {
             throw new KeystoreAlternativeException(
-        		getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e //$NON-NLS-1$
+        		getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", //$NON-NLS-1$
+        		e,
+                KeyStoreErrorCode.Internal.LOADING_APPLE_KEYSTORE_ERROR
     		);
         }
         final AggregatedKeyStoreManager aksm = new AggregatedKeyStoreManager(ksm);

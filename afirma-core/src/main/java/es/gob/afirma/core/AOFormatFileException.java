@@ -17,24 +17,6 @@ public class AOFormatFileException extends AOException {
 
     private static final long serialVersionUID = 6785819338728771962L;
 
-//    /**
-//     * Crea una excepci&oacute;n relacionada con un formato de fichero con un mensaje determinado.
-//     * @param msg Mensaje descriptivo de la excepci&oacute;n.
-//     */
-//    public AOFormatFileException(final String msg) {
-//        super(msg, ErrorCode.Functional.INVALID_FORMAT_FILE);
-//    }
-//
-//    /**
-//     * Crea una excepci&oacute;n relacionada con un formato de fichero con un mensaje determinado
-//     * y preservando la pila de exceptiones.
-//     * @param msg Mensaje descriptivo de la excepci&oacute;n.
-//     * @param e Excepci&oacute;n que a su vez origin&oacute; esta.
-//     */
-//    public AOFormatFileException(final String msg, final Throwable e) {
-//        super(msg, e, ErrorCode.Functional.INVALID_FORMAT_FILE);
-//    }
-
     /**
      * Crea una excepci&oacute;n relacionada con un formato de fichero con un mensaje determinado.
      * @param msg Mensaje descriptivo de la excepci&oacute;n.

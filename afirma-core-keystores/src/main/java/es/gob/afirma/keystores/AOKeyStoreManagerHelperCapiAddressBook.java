@@ -50,7 +50,7 @@ final class AOKeyStoreManagerHelperCapiAddressBook {
                 p = (Provider) Class.forName("es.gob.afirma.keystores.capiaddressbook.MSCAPIAddressBook").getConstructor().newInstance(); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                throw new MissingLibraryException("No se ha podido instanciar el proveedor MSCAPIAddressBook", e); //$NON-NLS-1$
+                throw new MissingLibraryException("No se ha podido instanciar el proveedor MSCAPIAddressBook", e, KeyStoreErrorCode.ThirdParty.AFIRMA_MSCAPI_ADDRESBOOK_PROVIDER_NOT_FOUND); //$NON-NLS-1$
             }
             Security.addProvider(p);
         }

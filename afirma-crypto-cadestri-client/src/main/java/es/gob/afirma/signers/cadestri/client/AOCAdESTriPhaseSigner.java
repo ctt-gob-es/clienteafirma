@@ -19,6 +19,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -273,10 +274,21 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error decodificando el certificado del firmante en la prefirma", e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		}
 		catch (final HttpError e) {
-			throw new AOException("El servicio de prefirma devolvio un error", e, ErrorCode.ThirdParty.PRESIGN_HTTP_ERROR); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "El servicio de firma devolvio un error durante la prefirma: " + e, e); //$NON-NLS-1$
+			final AOException ex;
+			if (e.getResponseCode() == 400) {
+				ex = new AOException("Error en los parametros enviados al servicio de prefirma", e, ErrorCode.Request.INVALID_PARAMS_TO_PRESIGN);  //$NON-NLS-1$
+			}
+			else if (e.getResponseCode() / 100 == 4) {
+				ex = new AOException("Error en la comunicacion con el servicio de firma de prefirma", e, ErrorCode.Communication.PRESIGN_SERVICE_COMMUNICATION_ERROR);  //$NON-NLS-1$
+			}
+			else {
+				ex = new AOException("El servicio de prefirma devolvio un error", e, ErrorCode.ThirdParty.PRESIGN_HTTP_ERROR);  //$NON-NLS-1$
+			}
+			throw ex;
 		}
 		catch (final IOException e) {
-			throw new AOException("Error en la llamada de prefirma al servidor", e, ErrorCode.Communication.PRESIGN_SERVICE_CONNECTION_ERROR); //$NON-NLS-1$
+			throw new AOException("No se ha podido conectar con el servicio de prefirma", e, ErrorCode.Communication.PRESIGN_SERVICE_CONNECTION_ERROR); //$NON-NLS-1$
 		}
 
 		// Comprobamos que no se trate de un error
@@ -340,10 +352,21 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			throw new AOException("Error decodificando el certificado del firmante en la postfirma", e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		}
 		catch (final HttpError e) {
-			throw new AOException("El servicio de postfirma devolvio un error", e, ErrorCode.ThirdParty.POSTSIGN_HTTP_ERROR); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "El servicio de firma devolvio un error durante la postfirma: " + e, e); //$NON-NLS-1$
+			final AOException ex;
+			if (e.getResponseCode() == 400) {
+				ex = new AOException("Error en los parametros enviados al servicio de postfirma", e, ErrorCode.Request.INVALID_PARAMS_TO_POSTSIGN);  //$NON-NLS-1$
+			}
+			else if (e.getResponseCode() / 100 == 4) {
+				ex = new AOException("Error en la comunicacion con el servicio de firma de postfirma", e, ErrorCode.Communication.POSTSIGN_SERVICE_COMMUNICATION_ERROR);  //$NON-NLS-1$
+			}
+			else {
+				ex = new AOException("El servicio de postfirma devolvio un error", e, ErrorCode.ThirdParty.POSTSIGN_HTTP_ERROR);  //$NON-NLS-1$
+			}
+			throw ex;
 		}
 		catch (final IOException e) {
-			throw new AOException("Error en la llamada de postfirma al servidor", e, ErrorCode.Communication.POSTSIGN_SERVICE_CONNECTION_ERROR); //$NON-NLS-1$
+			throw new AOException("No se ha podido conectar con el servicio de postfirma", e, ErrorCode.Communication.POSTSIGN_SERVICE_CONNECTION_ERROR); //$NON-NLS-1$
 		}
 
 		// Comprobamos que no se trate de un error
