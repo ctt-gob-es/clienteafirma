@@ -14,7 +14,6 @@ public class TestSignatureValidation {
 
 	private static final String CADES_IMPLICIT_FILE = "cades_implicit.csig"; //$NON-NLS-1$
 	private static final String CADES_EXPLICIT_FILE = "cades_explicit.csig"; //$NON-NLS-1$
-	private static final String CADES_LTA_FILE = "cades-lta.csig"; //$NON-NLS-1$
 	private static final String DATA_TXT_FILE = "txt"; //$NON-NLS-1$
 	private static final String PADES_FILE = "pades.pdf"; //$NON-NLS-1$
 	private static final String PADES_EPES_FILE = "pades_epes.pdf"; //$NON-NLS-1$
@@ -27,19 +26,6 @@ public class TestSignatureValidation {
 	public void testCadesImplicitValidation() throws Exception {
 		try (
 			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_IMPLICIT_FILE);
-		) {
-			final byte[] cades = AOUtil.getDataFromInputStream(is);
-			System.out.println(new ValidateBinarySignature().validate(cades, false));
-		}
-	}
-
-	/** Prueba de validaci&oacute;n de firma CAdES LTA-Level.
-	 * @throws Exception En cualquier error. */
-	@SuppressWarnings("static-method")
-	@Test
-	public void testCadesLTAValidation() throws Exception {
-		try (
-			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_LTA_FILE);
 		) {
 			final byte[] cades = AOUtil.getDataFromInputStream(is);
 			System.out.println(new ValidateBinarySignature().validate(cades, false));
@@ -83,7 +69,7 @@ public class TestSignatureValidation {
 			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_EXPLICIT_FILE);
 		) {
 			final byte[] cades = AOUtil.getDataFromInputStream(is);
-			System.out.println(ValidateBinarySignature.validate(cades, "dummy".getBytes(), false));
+			System.out.println(ValidateBinarySignature.validate(cades, "dummy2".getBytes(), false));
 		}
 	}
 

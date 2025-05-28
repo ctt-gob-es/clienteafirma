@@ -226,18 +226,17 @@ public final class ValidateBinarySignature extends SignValider {
 			if (checkCertificates) {
 				cert.checkValidity();
 
-				final ContentVerifierProvider contentVerifierProvider =
-						new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert);
+			}
+			final ContentVerifierProvider contentVerifierProvider =
+					new JcaContentVerifierProviderBuilder().setProvider(new BouncyCastleProvider()).build(cert);
 
-
-				if (!signer.verify(
-						new SignerInformationVerifier(
-								new DefaultCMSSignatureAlgorithmNameGenerator(),
-								new DefaultSignatureAlgorithmIdentifierFinder(),
-								contentVerifierProvider,
-								new BcDigestCalculatorProvider()))) {
-					throw new CMSException("Firma no valida"); //$NON-NLS-1$
-				}
+			if (!signer.verify(
+					new SignerInformationVerifier(
+							new DefaultCMSSignatureAlgorithmNameGenerator(),
+							new DefaultSignatureAlgorithmIdentifierFinder(),
+							contentVerifierProvider,
+							new BcDigestCalculatorProvider()))) {
+				throw new CMSException("Firma no valida"); //$NON-NLS-1$
 			}
 		} catch (final CertificateExpiredException e) {
 			// Certificado caducado
