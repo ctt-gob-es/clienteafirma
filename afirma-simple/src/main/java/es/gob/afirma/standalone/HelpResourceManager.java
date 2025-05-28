@@ -19,6 +19,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -101,6 +104,36 @@ public final class HelpResourceManager {
     	}
 
 	}
+	
+	public static void extractImportedResources(final File helpDir) throws IOException {
+		
+		final File helpInstallDir = new File(DesktopUtil.getApplicationDirectory() + File.separator + "help"); //$NON-NLS-1$
+
+		if (!helpInstallDir.isDirectory()) {
+            return;
+        }
+
+        final Path helpDirPath = helpDir.toPath();
+
+        copyFromInstallDir(helpInstallDir.toPath(), helpDirPath);
+
+	}
+	
+    private static void copyFromInstallDir(final Path helpInstallDir, final Path helpDirPath) throws IOException {
+        final File[] files = helpInstallDir.toFile().listFiles();
+        if (files == null) return;
+
+        for (final File f : files) {
+            if (f.isDirectory()) {
+                final Path newFile = helpDirPath.resolve(f.getName());
+                Files.createDirectories(newFile);
+                copyFromInstallDir(f.toPath(), newFile);
+            }
+            else {
+                Files.copy(f.toPath(), helpDirPath.resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+    }
 
     /** Crea el directorio de usuario del programa si no existe, */
     private static void createHelpDir(final File helpDir) {
@@ -181,4 +214,6 @@ public final class HelpResourceManager {
         }
         return "file:///" + launcherTempFile.getAbsolutePath().replace("\\", "/");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     }
+    
+    
 }

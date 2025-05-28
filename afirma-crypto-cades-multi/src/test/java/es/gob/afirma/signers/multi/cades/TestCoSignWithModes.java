@@ -180,25 +180,14 @@ public class TestCoSignWithModes {
 	/** Esta firma no debe ser posible. Cofirma impl&iacute;cita con algoritmo SHA512withRSA sobre firma expl&iacute;cita
 	 * con algoritmo de SHA256withRSA.
 	 * @throws Exception en cualquier error. */
-	@Test
+	@Test (expected = ContainsNoDataException.class)
 	public void testCofirmaImplicitaSHA512SobreFirmaExplicitaSHA256() throws Exception {
 
 		final String algorithm = AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA;
 
-		boolean noData = false;
-		try {
-			this.signer.cosign(
-					this.explicitSHA256Signature, algorithm,
-					this.pke.getPrivateKey(), this.pke.getCertificateChain(), this.implicitParams);
-		}
-		catch (final AOException e) {
-			// Se espera que se produzca un erro debido a que no se encuentran ni los datos ni
-			// la huella generada con el algoritmo usado en la firma dentro de la firma de entrada
-			if (e.getCause() instanceof ContainsNoDataException) {
-				noData = true;
-			}
-		}
-		Assert.assertTrue("No debe ser posible cofirmar una firma sin los datos originales ni la huella en generada con el algoritmo usado en la firma", noData); //$NON-NLS-1$
+		this.signer.cosign(
+				this.explicitSHA256Signature, algorithm,
+				this.pke.getPrivateKey(), this.pke.getCertificateChain(), this.implicitParams);
 	}
 
 	/** Cofirma impl&iacute;cita con algoritmo SHA512withRSA sobre firma impl&iacute;cita
@@ -222,25 +211,13 @@ public class TestCoSignWithModes {
 	/** Esta firma no debe ser posible. Cofirma expl&iacute;cita con algoritmo SHA512withRSA sobre firma expl&iacute;cita
 	 * con algoritmo de SHA256withRSA.
 	 * @throws Exception en cualquier error. */
-	@Test
+	@Test (expected = ContainsNoDataException.class)
 	public void testCofirmaExplicitaSHA512SobreFirmaExplicitaSHA256() throws Exception {
 
 		final String algorithm = AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA;
-
-		boolean noData = false;
-		try {
-			this.signer.cosign(
+		this.signer.cosign(
 				this.explicitSHA256Signature, algorithm,
 				this.pke.getPrivateKey(), this.pke.getCertificateChain(), this.explicitParams);
-		}
-		catch (final AOException e) {
-			// Se espera que se produzca un erro debido a que no se encuentran ni los datos ni
-			// la huella generada con el algoritmo usado en la firma dentro de la firma de entrada
-			if (e.getCause() instanceof ContainsNoDataException) {
-				noData = true;
-			}
-		}
-		Assert.assertTrue("No debe ser posible cofirmar una firma sin los datos originales ni la huella en generada con el algoritmo usado en la firma", noData); //$NON-NLS-1$
 	}
 
 	/** Cofirma expl&iacute;cita con algoritmo SHA512withRSA sobre firma impl&iacute;cita

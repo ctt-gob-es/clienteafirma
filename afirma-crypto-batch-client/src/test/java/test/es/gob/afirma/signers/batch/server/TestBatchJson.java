@@ -62,7 +62,7 @@ public class TestBatchJson {
 	}
 
 	@Test
-//	@Ignore
+	@Ignore
 	public void testBatchWithCounterSigns() throws CertificateEncodingException, IOException, AOException, GeneralSecurityException {
 
 		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$
@@ -70,17 +70,17 @@ public class TestBatchJson {
 
 
 		//final byte[] dataRef = readFile(new File("C:\\Users\\carlos.gamuci\\Desktop\\Entrada\\cofirma.csig"));
-		final String cosignRefB64 = Base64.encode("cofirma.csig".getBytes());
-		final String signRefB64 = Base64.encode("firma.csig".getBytes());
-		final String docxRefB64 = Base64.encode("Entrada.docx".getBytes());
-		final String facturaRefB64 = Base64.encode("factura.xml".getBytes());
+		final String cosignRefB64 = Base64.encode("cofirma.csig".getBytes()); //$NON-NLS-1$
+//		final String signRefB64 = Base64.encode("firma.csig".getBytes()); //$NON-NLS-1$
+//		final String docxRefB64 = Base64.encode("Entrada.docx".getBytes()); //$NON-NLS-1$
+//		final String facturaRefB64 = Base64.encode("factura.xml".getBytes()); //$NON-NLS-1$
 
 
-		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"suboperation\":\"countersign\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"" + cosignRefB64 + "\"}, "
+		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"suboperation\":\"countersign\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"" + cosignRefB64 + "\"}, " //$NON-NLS-1$ //$NON-NLS-2$
 //				+ "{\"id\":\"2\", \"datareference\":\"" + docxRefB64 + "\", \"format\":\"XAdES\", \"suboperation\":\"sign\", \"extraParams\":\"format=XAdES Detached\"}, "
 //				+ "{\"id\":\"3\", \"datareference\":\"" + signRefB64 + "\"}, "
 //				+ "{\"id\":\"4\", \"datareference\":\"" + facturaRefB64 + "\", \"format\":\"CAdES\", \"suboperation\":\"sign\"}"
-				+ "]}";
+				+ "]}"; //$NON-NLS-1$
 		final byte[] batchEncoded = batch.getBytes(StandardCharsets.UTF_8);
 
 		SslSecurityManager.disableSslChecks();

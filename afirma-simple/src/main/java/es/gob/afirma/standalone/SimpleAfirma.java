@@ -798,6 +798,16 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		// Cargamos el fichero
 		final String indexHelpFile = helpDir + File.separator + "index_" + defaultLocale + ".html"; //$NON-NLS-1$ //$NON-NLS-2$
 
+		// Comprobamos si existe una version importada de la ayuda del idioma
+		final File helpInstallIndexFile = new File(DesktopUtil.getApplicationDirectory() + File.separator + "help"+ File.separator + "index_" + defaultLocale + ".html"); //$NON-NLS-1$
+		if (helpInstallIndexFile.exists()) {
+			try {
+				HelpResourceManager.extractImportedResources(helpDir);
+			} catch (final IOException e) {
+				LOGGER.log(Level.WARNING, "No se ha podido importar el archivo de ayuda correctamente", e); //$NON-NLS-1$
+			}
+		}
+		
 		try (final InputStream is = new FileInputStream(indexHelpFile)) {
 			Desktop.getDesktop().browse(new URI(HelpResourceManager.createHelpFileLauncher(indexHelpFile + "?redirectPage=" + redirectPage))); //$NON-NLS-1$
 		}

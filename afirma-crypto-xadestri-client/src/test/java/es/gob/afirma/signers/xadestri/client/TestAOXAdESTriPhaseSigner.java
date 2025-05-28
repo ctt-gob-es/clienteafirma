@@ -218,12 +218,12 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	//@Ignore
+	@Ignore
 	public void pruebaContrafirmaXAdESDetached() throws Exception {
 
 		final byte[] signature;
 		try (
-			final InputStream is = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\HEAD.zip_signed.xsig");//ClassLoader.getSystemResourceAsStream("firma-xades-detached.xml"); //$NON-NLS-1$
+			final InputStream is = ClassLoader.getSystemResourceAsStream("firma-xades-detached.xml"); //$NON-NLS-1$
 		) {
 			signature = AOUtil.getDataFromInputStream(is);
 		}
