@@ -376,6 +376,9 @@ public class CAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				}
 				throw e;
 			}
+			catch (final AOException e) {
+				throw e;
+			}
 			catch (final Exception e) {
 				throw new AOInvalidSignatureFormatException("No se ha proporcionado una firma CAdES que se pueda contrafirmar", e); //$NON-NLS-1$
 			}

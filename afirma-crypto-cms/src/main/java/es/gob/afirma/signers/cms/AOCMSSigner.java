@@ -141,6 +141,9 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 return new CoSigner().coSigner(csp, sign, omitContent, this.dataType, key, certChain, this.atrib, this.uatrib, messageDigest);
             }
+            catch (final AOException e) {
+                throw e;
+            }
             catch (final Exception e) {
                 throw new AOException("Error generando la Cofirma PKCS#7", e, BinaryErrorCode.Internal.UNKWNON_BINARY_SIGNING_ERROR); //$NON-NLS-1$
             }

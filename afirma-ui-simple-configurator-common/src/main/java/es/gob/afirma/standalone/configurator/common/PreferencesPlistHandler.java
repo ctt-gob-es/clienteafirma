@@ -357,7 +357,7 @@ public final class PreferencesPlistHandler {
 		}
 	}
 
-	/** Error de a&aacute;lisis del fichero de preferencias. */
+	/** Error de an&aacute;lisis del fichero de preferencias. */
 	public static class InvalidPreferencesFileException extends Exception {
 
 		private static final long serialVersionUID = 1L;

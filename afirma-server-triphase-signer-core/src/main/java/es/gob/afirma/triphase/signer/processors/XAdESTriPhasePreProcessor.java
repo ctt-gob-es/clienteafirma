@@ -498,6 +498,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				"La firma declara una codificacion no soportada", e //$NON-NLS-1$
 			);
 		}
+		catch (final AOException e) {
+			throw e;
+		}
 		catch (final Exception e) {
 			throw new AOException(
 				"Error insertando los datos a firmar y la cadena de certificados: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR //$NON-NLS-1$

@@ -141,6 +141,9 @@ public final class AOPkcs1Signer implements AOSigner {
 					throw new AOException("El PKCS#1 de firma obtenido no se genero con el certificado indicado", ErrorCode.Internal.INVALID_PKCS1_VALUE); //$NON-NLS-1$
 				}
 			}
+			catch (final AOException e) {
+				throw e;
+			}
 			catch (final Exception e) {
 				throw new AOException("Error al verificar el PKCS#1 de la firma", e, ErrorCode.Internal.VERIFING_PKCS1_ERROR); //$NON-NLS-1$
 			}
