@@ -19,11 +19,13 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.ProxyConfig;
 import es.gob.afirma.standalone.ProxyConfig.ConfigType;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
 
@@ -319,11 +321,12 @@ public class ProxyPanelHandler {
 		// Comprobamos si no se puedo identificar el proxy
 		if (proxy == null) {
 			LOGGER.info("No se han detectado un proxy valido configurado en el sistema"); //$NON-NLS-1$
-			AOUIFactory.showMessageDialog(
+			AOUIFactory.showErrorMessage(
 					this.view,
 					SimpleAfirmaMessages.getString("ProxyDialog.14"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("ProxyDialog.11"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE
+					AOUIFactory.ERROR_MESSAGE,
+					new AOException(SimpleErrorCode.Internal.NO_DETECTED_PROXIES)
 					);
 		}
 	}
@@ -384,11 +387,11 @@ public class ProxyPanelHandler {
 			}
 			else {
 				this.SUBLOGGER.info("Conexion proxy incorrecta"); //$NON-NLS-1$
-				AOUIFactory.showMessageDialog(
-					this.parent,
+				AOUIFactory.showErrorMessage(
 					SimpleAfirmaMessages.getString("ProxyDialog.10"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE
+					AOUIFactory.ERROR_MESSAGE,
+					new AOException(SimpleErrorCode.Communication.PROXY_CONNECTION)
 				);
 			}
 			if (this.parent != null) {

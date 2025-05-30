@@ -71,7 +71,8 @@ public class ErrorCode {
 
 		public static final ErrorCode LIBRARY_NOT_FOUND							= new ErrorCode("200002", "No se encuentran dependencias necesarias para la ejecucion de la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode LOADING_DATA_ERROR						= new ErrorCode("200003", "Error durante la carga de datos"); //$NON-NLS-1$ //$NON-NLS-2$
-
+		public static final ErrorCode ERROR_IMPORT_LANGUAGE						= new ErrorCode("200006", "Error al importar idioma"); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		public static final ErrorCode LOADING_LOCAL_FILE_ERROR					= new ErrorCode("200102", " Error al cargar el fichero local para realizar la firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode SIGNINIG_KEY_AUTHENTICATION_ERROR			= new ErrorCode("200108", "No se pudo acceder a la clave de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		//public static final ErrorCode INVALID_SIGNATURE_ALGORITHM				= new ErrorCode("200109", "Algoritmo de firma no soportado"); //$NON-NLS-1$ //$NON-NLS-2$

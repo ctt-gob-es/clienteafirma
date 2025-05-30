@@ -20,6 +20,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -69,7 +71,7 @@ public class LanguageManager {
 		try {
 			langProps = readMetadataInfo(langFile);
 		} catch (final Exception e) {
-			throw e;
+			throw new AOException(ErrorCode.Internal.ERROR_IMPORT_LANGUAGE);
 		}
 
 		final String localeName = langProps.get(LOCALE_PROP);
@@ -77,7 +79,7 @@ public class LanguageManager {
 		try {
 			copyLanguageToDirectory(langFile, new File(languagesDir, localeName));
 		} catch (final Exception e) {
-			throw e;
+			throw new AOException(ErrorCode.Internal.ERROR_IMPORT_LANGUAGE);
 		}
 	}
 

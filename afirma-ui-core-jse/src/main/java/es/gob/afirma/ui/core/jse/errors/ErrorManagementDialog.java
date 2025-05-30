@@ -6,6 +6,8 @@ import javax.accessibility.Accessible;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
+import es.gob.afirma.core.AOControlledException;
+
 /**
  * Di&aacute;logo con las opciones de gesti&oacute;n de plugins.
  */
@@ -14,8 +16,14 @@ public final class ErrorManagementDialog extends JDialog {
 	/** Serial Id. */
 	private static final long serialVersionUID = -5699987186099323728L;
 
-	private ErrorManagementDialog(final Frame parent, final boolean modal, final Object message, final String title, final int messageType, final Throwable t) {
+	private ErrorManagementDialog(final Frame parent, final boolean modal, Object message, String title, final int messageType, final Throwable t) {
 		super(parent, modal);
+		
+		if (t instanceof AOControlledException) {
+			message = "AF" + ((AOControlledException) t).getErrorCode().getCode() + " - " + message; //$NON-NLS-1$ //$NON-NLS-2$
+			title = title + " - " + "AF" + ((AOControlledException) t).getErrorCode().getCode(); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
 		setTitle(title);
 		final ErrorManagementPanel errorPanel = new ErrorManagementPanel(this, t, message, messageType);
 		add(errorPanel);
@@ -35,8 +43,14 @@ public final class ErrorManagementDialog extends JDialog {
 		resize();
 	}
 
-	private ErrorManagementDialog(final JDialog parent, final boolean modal, final Object message, final String title, final int messageType, final Throwable t) {
+	private ErrorManagementDialog(final JDialog parent, final boolean modal, Object message, String title, final int messageType, final Throwable t) {
 		super(parent, modal);
+		
+		if (t instanceof AOControlledException) {
+			message = "AF" + ((AOControlledException) t).getErrorCode().getCode() + " - " + message; //$NON-NLS-1$ //$NON-NLS-2$
+			title = title + " - " + "AF" + ((AOControlledException) t).getErrorCode().getCode(); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
 		setTitle(title);
 		final ErrorManagementPanel errorPanel = new ErrorManagementPanel(this, t, message, messageType);
 		add(errorPanel);

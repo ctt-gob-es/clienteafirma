@@ -137,11 +137,11 @@ public final class PreferencesPlistHandler {
 
 		if (!AOFileUtils.isXML(configData)) {
 			LOGGER.severe("El fichero de preferencias no es XML"); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(
+			AOUIFactory.showMessageDialog(
+					null,
 					ConfiguratorCommonMessages.getString("PreferencesPlistHandler.9"), //$NON-NLS-1$
 					ConfiguratorCommonMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE,
-					null
+					AOUIFactory.WARNING_MESSAGE
 				);
 			return;
 		}

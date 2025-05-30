@@ -29,11 +29,13 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.misc.http.TrustStoreManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.ui.core.jse.certificateselection.CertificateUtils;
 
 final class TrustedCertificatesPanel extends JPanel  {
@@ -220,7 +222,7 @@ final class TrustedCertificatesPanel extends JPanel  {
     				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.27"), //$NON-NLS-1$
     				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE,
-    				e);
+    				new AOException(SimpleErrorCode.Internal.ERROR_LOAD_TRUSTED_CERT));
     		result = null;
     	}
 

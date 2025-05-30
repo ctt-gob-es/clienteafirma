@@ -56,6 +56,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.AOUtil;
@@ -799,7 +800,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		final String indexHelpFile = helpDir + File.separator + "index_" + defaultLocale + ".html"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Comprobamos si existe una version importada de la ayuda del idioma
-		final File helpInstallIndexFile = new File(DesktopUtil.getApplicationDirectory() + File.separator + "help"+ File.separator + "index_" + defaultLocale + ".html"); //$NON-NLS-1$
+		final File helpInstallIndexFile = new File(DesktopUtil.getApplicationDirectory() + File.separator + "help"+ File.separator + "index_" + defaultLocale + ".html"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (helpInstallIndexFile.exists()) {
 			try {
 				HelpResourceManager.extractImportedResources(helpDir);
@@ -813,6 +814,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se ha podido leer el archivo de ayuda correctamente", e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.58"), //$NON-NLS-1$
+                    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    					JOptionPane.ERROR_MESSAGE, 
+                    					new AOException(SimpleErrorCode.Internal.CANT_LOAD_HELP));
 		}
 	}
 

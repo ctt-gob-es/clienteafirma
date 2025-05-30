@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.protocol;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.standalone.SimpleErrorCode;
 
 /**
  * Error que indica que se necesita una versi&oacute;n m&aacute;s actualizada del aplicativo.
@@ -20,7 +21,7 @@ public final class NeedsUpdatedVersionException extends AOException {
 	private static final long serialVersionUID = 7936191422727825394L;
 
 	NeedsUpdatedVersionException() {
-		super("Se necesita actualizar la aplicacion"); //$NON-NLS-1$
+		super(SimpleErrorCode.Internal.NEEDS_UPDATED_VERSION);
 	}
 
 }

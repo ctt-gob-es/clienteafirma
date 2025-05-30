@@ -26,10 +26,12 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.Permission;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
 import es.gob.afirma.standalone.plugins.PluginInfo;
+import es.gob.afirma.standalone.plugins.manager.AOPluginException;
 import es.gob.afirma.standalone.plugins.manager.JarNoSignedException;
 import es.gob.afirma.standalone.plugins.manager.JarVerifier;
 import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
@@ -124,8 +126,13 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		try {
 			plugin = PluginsManager.loadPluginFromFiles(new File[] { pluginFile });
 		}
-		catch (final Exception e) {
+		catch (final PluginException e) {
 			LOGGER.log(Level.WARNING, "No se pudo cargar el plugin", e); //$NON-NLS-1$
+			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.0"), new AOPluginException(SimpleErrorCode.Internal.NOT_VALID_PLUGIN)); //$NON-NLS-1$
+			return;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Error al cargar el plugin", e); //$NON-NLS-1$
 			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.0"), null); //$NON-NLS-1$
 			return;
 		}
