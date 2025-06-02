@@ -50,8 +50,8 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeystoreAlternativeException;
 import es.gob.afirma.keystores.CertificateFilter;
+import es.gob.afirma.keystores.KeystoreAlternativeException;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.signers.batch.client.BatchSigner;
@@ -503,12 +503,11 @@ final class CommandLineLauncher {
 			) {
 				inputXml = AOUtil.getDataFromInputStream(bis);
 			}
-			final String xml;
-			if (!Base64.isBase64(inputXml)) {
-				xml = Base64.encode(inputXml, true);
-			}
-			else {
-				xml = new String(inputXml).replace("+", "-").replace("/", "_"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			final byte[] xml;
+			if (Base64.isBase64(inputXml)) {
+				xml = Base64.decode(inputXml, 0, inputXml.length, false);
+			} else {
+				xml = inputXml;
 			}
 			final String res = BatchSigner.signXML(
 				xml,
@@ -538,7 +537,6 @@ final class CommandLineLauncher {
 
 		}
 		catch (IOException |
-			   KeystoreAlternativeException |
 			   KeyStoreException              |
 			   NoSuchAlgorithmException       |
 			   UnrecoverableEntryException    |
@@ -675,7 +673,7 @@ final class CommandLineLauncher {
 				params.getPassword()
 			);
 		}
-		catch (IOException | AOException | KeystoreAlternativeException e) {
+		catch (IOException | AOException e) {
 			throw new CommandLineException(e.getMessage(), e);
 		}
 
