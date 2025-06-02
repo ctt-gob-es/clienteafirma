@@ -187,7 +187,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			// Preguntamos si se desea susituir la version instalada del plugin por la nueva
 			final int option = JOptionPane.showConfirmDialog(
 					this.view,
-					String.format(SimpleAfirmaMessages.getString("PluginsManagementHandler.1"), info.getName()), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.1", info.getName()), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("PluginsManagementHandler.16"), //$NON-NLS-1$
 					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (option != JOptionPane.YES_OPTION) {
@@ -356,9 +356,10 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 
 		// Pedimos confirmacion para el borrado
-		if (JOptionPane.OK_OPTION != JOptionPane.showConfirmDialog(this.view.getParentWindow(),
-				String.format(SimpleAfirmaMessages.getString("PluginsManagementHandler.5"), //$NON-NLS-1$
-						plugin.getInfo().getName()))) {
+		if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(this.view.getParentWindow(),
+				SimpleAfirmaMessages.getString("PluginsManagementHandler.5", plugin.getInfo().getName()), //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PluginsManagementHandler.14"), //$NON-NLS-1$
+				JOptionPane.YES_NO_CANCEL_OPTION)) {
 			return;
 		}
 
