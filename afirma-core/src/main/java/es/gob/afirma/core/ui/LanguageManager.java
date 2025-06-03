@@ -35,9 +35,9 @@ public class LanguageManager {
 
 	private static final String METADATA_FILENAME = "metadata.info"; //$NON-NLS-1$
 
-	private static final String LOCALE_PROP = "locale"; //$NON-NLS-1$
+	public static final String LOCALE_PROP = "locale"; //$NON-NLS-1$
 
-	private static final String LANGUAGE_NAME_PROP = "language.name"; //$NON-NLS-1$
+	public static final String LANGUAGE_NAME_PROP = "language.name"; //$NON-NLS-1$
 
 	private static final String FALLBACK_LOCALE = "fallback.locale"; //$NON-NLS-1$
 
@@ -63,8 +63,9 @@ public class LanguageManager {
 	 * Importa y agrega un nuevo idioma.
 	 * @param langFile Fichero de idioma.
 	 * @throws Exception Error al importar idioma.
+	 * @return Propiedades del idioma.
 	 */
-	public static void addLanguage(final File langFile) throws Exception {
+	public static Map<String, String> addLanguage(final File langFile) throws Exception {
 
 		Map<String, String> langProps = null;
 
@@ -81,6 +82,8 @@ public class LanguageManager {
 		} catch (final Exception e) {
 			throw new AOException(ErrorCode.Internal.ERROR_IMPORT_LANGUAGE);
 		}
+		
+		return langProps;
 	}
 
 	/**

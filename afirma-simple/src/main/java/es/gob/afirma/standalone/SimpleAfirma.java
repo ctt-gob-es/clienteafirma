@@ -793,7 +793,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		
 		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
 		if (defaultLocale == null || defaultLocale.isEmpty()) {
-			defaultLocale = Locale.getDefault().toString();
+			defaultLocale = "es_ES"; //$NON-NLS-1$
 		}
 
 		// Cargamos el fichero

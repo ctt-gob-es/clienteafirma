@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -282,8 +283,10 @@ public final class MainMenu extends JMenuBar {
         }
         
         for (int i = 0; i < defaultLanguages.length; i++) {
-            final JRadioButtonMenuItem langItem = new JRadioButtonMenuItem(defaultLanguages[i]);
             final Locale locale = LanguageManager.AFIRMA_DEFAULT_LOCALES[i];
+            final LocaleOption localeOption = new LocaleOption(defaultLanguages[i], locale);
+            final JRadioButtonMenuItem langItem = new JRadioButtonMenuItem(localeOption.toString());
+            langItem.putClientProperty("localeData", localeOption); //$NON-NLS-1$
             if (localeConf.equals(locale.toString())) {
             	langItem.setSelected(true);
             }
@@ -308,7 +311,9 @@ public final class MainMenu extends JMenuBar {
 	        	// Se comprueba si el idioma importado no se trata de una version actualizada
 	        	// de un idioma proporcionado por Autofirma para que no se duplique en el menu
 	        	if (!LanguageManager.isDefaultLocale(locale)) {
-		        	final JRadioButtonMenuItem importedLangItem = new JRadioButtonMenuItem(langName);      
+		            final LocaleOption localeOption = new LocaleOption(langName, locale);
+		            final JRadioButtonMenuItem importedLangItem = new JRadioButtonMenuItem(localeOption.toString());
+		            importedLangItem.putClientProperty("localeData", localeOption); //$NON-NLS-1$    
 		        	if (localeConf.equals(locale.toString())) {
 		        		importedLangItem.setSelected(true);
 		            }
@@ -358,8 +363,13 @@ public final class MainMenu extends JMenuBar {
 				return;
 			}
 			try {
-				LanguageManager.addLanguage(fileToLoad);
-				showRestartWarning();
+				final Map <String, String> langProps = LanguageManager.addLanguage(fileToLoad);
+				addNewLocaleToMenu(langProps, langGroup, languageMenu);
+				AOUIFactory.showMessageDialog(
+						null,
+						SimpleAfirmaMessages.getString("MainMenu.52"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("MainMenu.45"), //$NON-NLS-1$
+						JOptionPane.INFORMATION_MESSAGE);
 			} catch (final Exception e1) {
 				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("MainMenu.48"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -621,5 +631,34 @@ public final class MainMenu extends JMenuBar {
 					SimpleAfirmaMessages.getString("MainMenu.50"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
 		}
+	}
+	
+	private static void addNewLocaleToMenu(final Map <String, String> langProps, final ButtonGroup langGroup, final JMenu languageMenu) {
+		
+		final String localeProp = langProps.get(LanguageManager.LOCALE_PROP);
+		final String[] parts = localeProp.split("_"); //$NON-NLS-1$
+		final Locale locale = new Locale(parts[0], parts[1]);
+		
+		if (!LanguageManager.isDefaultLocale(locale)) { 
+			
+			final LocaleOption localeOption = new LocaleOption(langProps.get(LanguageManager.LANGUAGE_NAME_PROP), locale);
+			final JRadioButtonMenuItem newImportedLangItem = new JRadioButtonMenuItem(localeOption.toString());
+			newImportedLangItem.putClientProperty("localeData", localeOption); //$NON-NLS-1$
+			
+			newImportedLangItem.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(final ActionEvent ae) {
+	            	Locale.setDefault(locale);
+	                PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
+	                SimpleAfirmaMessages.changeLocale();
+	                showRestartWarning();
+	            }
+	        });
+		
+		
+    		langGroup.add(newImportedLangItem);
+    		languageMenu.insert(newImportedLangItem, languageMenu.getItemCount() - 2);
+		}
+        
 	}
 }
