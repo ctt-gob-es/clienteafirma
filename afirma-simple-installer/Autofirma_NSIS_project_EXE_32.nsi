@@ -353,7 +353,7 @@ Section "Autofirma" sPrograma
 	${ElseIf} $LANGUAGE == 1069
 		StrCpy $R1 "-default_language eu_ES"
 	${ElseIf} $LANGUAGE == 1033
-		StrCpy $R1 "-default_language en_EN"
+		StrCpy $R1 "-default_language en_US"
 	${Else}
 		StrCpy $R1 "-default_language es_ES"
 	${EndIf}

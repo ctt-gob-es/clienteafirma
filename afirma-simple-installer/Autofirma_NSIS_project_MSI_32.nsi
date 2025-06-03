@@ -133,6 +133,12 @@ Var USE_SYSTEM_JRE
 Var LANGUAGE_PATH
 ;Parametro que indica el idioma a usar por Autofirma
 Var DEFAULT_LANGUAGE
+;Variable para el registro
+Var SIGN_STRING
+;Variable para el registro
+Var BINARY_STRING
+;Variable para el registro
+Var XADES_STRING
 
 ;Indicamos cual sera el directorio por defecto donde instalaremos nuestra
 ;aplicacion, el usuario puede cambiar este valor en tiempo de ejecucion.
@@ -250,22 +256,70 @@ Section "Autofirma" sPrograma
 	WriteRegStr HKLM "SOFTWARE\$PATH" "InstallDir" $INSTDIR
 	WriteRegStr HKLM "SOFTWARE\$PATH" "Version" "${VERSION}"
 
+	${If} $DEFAULT_LANGUAGE == "es_ES"
+        StrCpy $SIGN_STRING "Firmar con Autofirma"
+    ${ElseIf} $DEFAULT_LANGUAGE == "ca_ES"
+        StrCpy $SIGN_STRING "Signar amb Autofirma"
+    ${ElseIf} $DEFAULT_LANGUAGE == "va_ES"
+        StrCpy $SIGN_STRING "Signar amb Autofirma"
+    ${ElseIf} $DEFAULT_LANGUAGE == "gl_ES"
+        StrCpy $SIGN_STRING "Asinar con Autofirma"
+    ${ElseIf} $DEFAULT_LANGUAGE == "eu_ES"
+        StrCpy $SIGN_STRING "Autofirmarekin sinatu"
+    ${ElseIf} $DEFAULT_LANGUAGE == "en_US"
+        StrCpy $SIGN_STRING "Sign with Autofirma"
+    ${Else}
+        StrCpy $SIGN_STRING "Firmar con Autofirma"
+    ${EndIf}
+
 	;Registro
 	;CascadeAfirma.reg
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" $(SIGN_WITH_AUTOFIRMA)
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" $SIGN_STRING
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\Autofirma.exe"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\Autofirma.exe sign -gui -i "%1"'
 	
+	${If} $DEFAULT_LANGUAGE == "es_ES"
+        StrCpy $BINARY_STRING "Firma binaria CMS/CAdES"
+    ${ElseIf} $DEFAULT_LANGUAGE == "ca_ES"
+        StrCpy $BINARY_STRING "Signatura binària CMS/CAdES"
+    ${ElseIf} $DEFAULT_LANGUAGE == "va_ES"
+        StrCpy $BINARY_STRING "Signatura binària CMS/CAdES"
+    ${ElseIf} $DEFAULT_LANGUAGE == "gl_ES"
+        StrCpy $BINARY_STRING "Firma binaria CMS/CAdES"
+    ${ElseIf} $DEFAULT_LANGUAGE == "eu_ES"
+        StrCpy $BINARY_STRING "CMS/CAdES sinadura bitarra"
+    ${ElseIf} $DEFAULT_LANGUAGE == "en_US"
+        StrCpy $BINARY_STRING "Binary signature CMS/CAdES"
+    ${Else}
+        StrCpy $BINARY_STRING "Firma binaria CMS/CAdES"
+    ${EndIf}
+	
 	;Verify
 	; .csig
-	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" $(BINARY_SIGNATURE)
+	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" $BINARY_STRING
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con Autofirma"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
 
+	${If} $DEFAULT_LANGUAGE == "es_ES"
+        StrCpy $XADES_STRING "Firma XMLDSig/XAdES"
+    ${ElseIf} $DEFAULT_LANGUAGE == "ca_ES"
+        StrCpy $XADES_STRING "Signatura XMLDSig/XAdES"
+    ${ElseIf} $DEFAULT_LANGUAGE == "va_ES"
+        StrCpy $XADES_STRING "Signatura XMLDSig/XAdES"
+    ${ElseIf} $DEFAULT_LANGUAGE == "gl_ES"
+        StrCpy $XADES_STRING "Firma XMLDSig/XAdES"
+    ${ElseIf} $DEFAULT_LANGUAGE == "eu_ES"
+        StrCpy $XADES_STRING "Sinadura: XMLDSig/XAdES"
+    ${ElseIf} $DEFAULT_LANGUAGE == "en_US"
+        StrCpy $XADES_STRING "Signature XMLDSig/XAdES"
+    ${Else}
+        StrCpy $XADES_STRING "Firma XMLDSig/XAdES"
+    ${EndIf}
+
 	;Verify
 	; .xsig
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" $(XADES_SIGNATURE)
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" $XADES_STRING
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con Autofirma"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'

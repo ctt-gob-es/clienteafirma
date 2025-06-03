@@ -316,14 +316,14 @@ Section "Autofirma" sPrograma
 
 	;Verify
 	; .csig
-	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" "Firma binaria CMS/CAdES"
+	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" $(BINARY_SIGNATURE)
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" $(VERIFY_WITH_AUTOFIRMA)
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
 
 	;Verify
 	; .xsig
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" "Firma XMLDSig/XAdES"
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" $(XADES_SIGNATURE)
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" $(VERIFY_WITH_AUTOFIRMA)
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
@@ -359,7 +359,7 @@ Section "Autofirma" sPrograma
 	${ElseIf} $LANGUAGE == 1069
 		StrCpy $R1 "-default_language eu_ES"
 	${ElseIf} $LANGUAGE == 1033
-		StrCpy $R1 "-default_language en_EN"
+		StrCpy $R1 "-default_language en_US"
 	${Else}
 		StrCpy $R1 "-default_language es_ES"
 	${EndIf}
