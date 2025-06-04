@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.LoggerUtil;
@@ -258,7 +259,7 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 			final File langFile = new File(config.getLanguagePath());
 			try {
 				LanguageManager.addLanguage(langFile);
-			} catch (final Exception e) {
+			} catch (final AOException e) {
 				LOGGER.log(Level.SEVERE, "Error al agregar archivo de idioma", e); //$NON-NLS-1$
 			}
 		}

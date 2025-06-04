@@ -8,7 +8,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +38,6 @@ import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginInstalledException;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsPreferences;
-import es.gob.afirma.standalone.so.macos.MacUtils;
 
 /**
  * Manegador de eventos de PluginsManagementPanel.
@@ -407,17 +405,8 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	 */
 	private static void resetApplication() {
 
-		File currentFile;
-		try {
-			currentFile = new File(PluginsManagementHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-		}
-		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se ha podido identificar el fichero ejecutable", e); //$NON-NLS-1$
-			return;
-		}
-
 		// Compone el comando necesario para arrancar la aplicacion
-		final List<String> command = getCommand(currentFile);
+		final List<String> command = DesktopUtil.getResetApplicationCommand();
 
 		// Ejecutamos una nueva instancia de la aplicacion
 		if (command != null) {
@@ -448,51 +437,6 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 					SimpleAfirmaMessages.getString("PluginsManagementHandler.18"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
 		}
-	}
-
-	/**
-	 * Devuelve el comando necesario para ejecutar la aplicaci&oacute;n o {@code null}
-	 * si no hay una forma efectiva de ejecutarla
-	 * @param currentFile Fichero o directorio con la aplicaci&oacute;n.
-	 * @return Par&aacute;meros para la ejecuci&oacute;n de la aplicaci&oacute;n.
-	 */
-	private static List<String> getCommand(final File currentFile) {
-
-		// La aplicacion se ejecutan las clases Java. No va a poder ejecutarse sin las
-		// dependencias, por lo que se omite
-		if (currentFile.isDirectory()) {
-			return null;
-		}
-
-		// La aplicacion se ejecuta desde un JAR
-		List<String> command;
-		if (currentFile.getName().toLowerCase().endsWith(".jar")) { //$NON-NLS-1$
-
-			// Si ese JAR forma parte de un ejecutable macOS, usamos el ejecutable
-			final File appMac = MacUtils.getMacApp(currentFile);
-			if (appMac != null && appMac.isFile()) {
-				command = new ArrayList<>();
-				command.add(appMac.getAbsolutePath());
-			}
-			else {
-				final String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				command = new ArrayList<>();
-				command.add(java);
-				command.add("-jar"); //$NON-NLS-1$
-				command.add(currentFile.getPath());
-			}
-		}
-		// La aplicacion es un ejecutable de Windows
-		else if (currentFile.getName().toLowerCase().endsWith(".exe")) { //$NON-NLS-1$
-			command = new ArrayList<>();
-			command.add(currentFile.getPath());
-		}
-		// En cualquier otro caso, no reiniciamos
-		else {
-			command = null;
-		}
-
-		return command;
 	}
 
 	void configPlugin() {

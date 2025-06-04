@@ -34,6 +34,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.LanguageManager;
@@ -370,7 +371,7 @@ public final class MainMenu extends JMenuBar {
 						SimpleAfirmaMessages.getString("MainMenu.52"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("MainMenu.45"), //$NON-NLS-1$
 						JOptionPane.INFORMATION_MESSAGE);
-			} catch (final Exception e1) {
+			} catch (final AOException e1) {
 				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("MainMenu.48"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE,
@@ -599,7 +600,7 @@ public final class MainMenu extends JMenuBar {
 	}
 	
 	private static void showRestartWarning() {
-		final List<String> command = LanguageManager.getResetApplicationCommand();
+		final List<String> command = DesktopUtil.getResetApplicationCommand();
 		// Actualizamos los mensajes para dialogo con el nuevo locale
 		JSEUIMessages.updateLocale();
 		// Ejecutamos una nueva instancia de la aplicacion

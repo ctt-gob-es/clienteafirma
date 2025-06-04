@@ -9,9 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -65,7 +63,7 @@ public class LanguageManager {
 	 * @throws Exception Error al importar idioma.
 	 * @return Propiedades del idioma.
 	 */
-	public static Map<String, String> addLanguage(final File langFile) throws Exception {
+	public static Map<String, String> addLanguage(final File langFile) throws AOException {
 
 		Map<String, String> langProps = null;
 
@@ -301,101 +299,6 @@ public class LanguageManager {
         return localeDir.exists();
     }
 
-	/**
-	 * Si es posible, devuelve el comando a ejecutar para arrancar la aplicaci&oacute;n.
-	 * Si no se encuentra un modo de arrancar la nueva instancia de la aplicaci&oacute;n,
-	 * no se hace nada.
-	 * @return Comando de arranque.
-	 */
-	public static List<String> getResetApplicationCommand() {
-
-		File currentFile;
-		try {
-			currentFile = new File(LanguageManager.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-		}
-		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se ha podido identificar el fichero ejecutable", e); //$NON-NLS-1$
-			return null;
-		}
-
-		// Compone el comando necesario para arrancar la aplicacion
-		final List<String> command = getCommand(currentFile);
-
-		return command;
-	}
-
-	/**
-	 * Devuelve el comando necesario para ejecutar la aplicaci&oacute;n o {@code null}
-	 * si no hay una forma efectiva de ejecutarla
-	 * @param currentFile Fichero o directorio con la aplicaci&oacute;n.
-	 * @return Par&aacute;meros para la ejecuci&oacute;n de la aplicaci&oacute;n.
-	 */
-	private static List<String> getCommand(final File currentFile) {
-
-		// La aplicacion se ejecutan las clases Java. No va a poder ejecutarse sin las
-		// dependencias, por lo que se omite
-		if (currentFile.isDirectory()) {
-			return null;
-		}
-
-		// La aplicacion se ejecuta desde un JAR
-		List<String> command;
-		if (currentFile.getName().toLowerCase().endsWith(".jar")) { //$NON-NLS-1$
-
-			// Si ese JAR forma parte de un ejecutable macOS, usamos el ejecutable
-			final File appMac = getMacApp(currentFile);
-			if (appMac != null && appMac.isFile()) {
-				command = new ArrayList<>();
-				command.add(appMac.getAbsolutePath());
-			}
-			else {
-				final String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				command = new ArrayList<>();
-				command.add(java);
-				command.add("-jar"); //$NON-NLS-1$
-				command.add(currentFile.getPath());
-			}
-		}
-		// La aplicacion es un ejecutable de Windows
-		else if (currentFile.getName().toLowerCase().endsWith(".exe")) { //$NON-NLS-1$
-			command = new ArrayList<>();
-			command.add(currentFile.getPath());
-		}
-		// En cualquier otro caso, no reiniciamos
-		else {
-			command = null;
-		}
-
-		return command;
-	}
-
-	/**
-	 * Comprueba si un fichero JAR se encuentra dentro de la estructura de una aplicaci&oacute;n Mac
-	 * y devuelve el ejecutable del mismo nombre para su arranque.
-	 * @param jarFile Fichero JAR
-	 * @return Fichero de ejecuci&oacute;n o {@code null} si no se puede localizar.
-	 */
-	private static File getMacApp(final File jarFile) {
-
-		final File jarDir = jarFile.getParentFile();
-		if (jarDir != null && "JAR".equals(jarDir.getName())) { //$NON-NLS-1$
-			final File resourcesDir = jarDir.getParentFile();
-			if (resourcesDir != null && "Resources".equals(resourcesDir.getName())) { //$NON-NLS-1$
-				final File contentsDir = resourcesDir.getParentFile();
-				if (contentsDir != null && "Contents".equals(contentsDir.getName())) { //$NON-NLS-1$
-					final File macOSDir = new File(contentsDir, "MacOS"); //$NON-NLS-1$
-					if (macOSDir.isDirectory()) {
-						final String exeName = jarFile.getName().substring(0, jarFile.getName().length() - ".jar".length()); //$NON-NLS-1$
-						final File exeFile = new File(macOSDir, exeName);
-						if (exeFile.isFile()) {
-							return exeFile;
-						}
-					}
-				}
-			}
-		}
-		return null;
-	}
 
     public static File getLanguagesDir() {
     	return languagesDir;
