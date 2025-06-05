@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.ui.pdf;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -22,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
@@ -40,12 +41,14 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
@@ -59,7 +62,11 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.signers.pades.PdfUtil;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.standalone.LookAndFeelManager;
+import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.pdf.PageLabel.PageLabelListener;
 import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
@@ -118,8 +125,12 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 	final JButton previousPageButton = new JButton("<"); //$NON-NLS-1$
 	final JButton nextPageButton = new JButton(">"); //$NON-NLS-1$
 	final JButton lastPageButton = new JButton(">>"); //$NON-NLS-1$
-	final JCheckBox allPagesCheckbox = new JCheckBox(SignPdfUiMessages.getString("SignPdfUiStamp.7")); //$NON-NLS-1$
-
+	
+	final JRadioButton actualPageRadioBtn = new JRadioButton(SignPdfUiMessages.getString("SignPdfUiPanel.23")); //$NON-NLS-1$
+	final JRadioButton allPagesRadioBtn = new JRadioButton(SignPdfUiMessages.getString("SignPdfUiPanel.24")); //$NON-NLS-1$
+	final JRadioButton selectPagesRadioBtn = new JRadioButton(SignPdfUiMessages.getString("SignPdfUiPanel.25")); //$NON-NLS-1$
+	final JTextField selectionPagesRange = new JTextField();
+	
 	private JDialog dialogParent;
 
 	private final PdfDocument pdfDocument;
@@ -273,6 +284,56 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 
 		gbc.gridy++;
 		gbc.weighty = 0.0;
+
+		final GridBagConstraints selectionPagesGbc = new GridBagConstraints();
+		selectionPagesGbc.fill = GridBagConstraints.BOTH;
+		selectionPagesGbc.gridy = 0;
+		selectionPagesGbc.gridx = 0;
+		selectionPagesGbc.insets = new Insets(2, 2, 2, 2);
+
+		final JPanel pagesSelectionPanel = new JPanel();
+		pagesSelectionPanel.setLayout(new GridBagLayout());
+		final TitledBorder pagesSelectionTb = BorderFactory.createTitledBorder(SignPdfUiMessages.getString("SignPdfUiStamp.28")); //$NON-NLS-1$
+		pagesSelectionTb.setTitleFont(getFont().deriveFont(Font.PLAIN));
+		pagesSelectionPanel.setBorder(pagesSelectionTb);
+
+		final ButtonGroup selectionPagesBtnGroup = new ButtonGroup();
+
+		this.actualPageRadioBtn.addActionListener(
+				e -> { this.selectionPagesRange.setEnabled(false); }
+		);
+		this.allPagesRadioBtn.addActionListener(
+				e -> { this.selectionPagesRange.setEnabled(false); }
+		);
+		this.selectPagesRadioBtn.addActionListener(
+				e -> { this.selectionPagesRange.setEnabled(true);}
+		);
+
+		this.actualPageRadioBtn.setSelected(true);
+		this.selectionPagesRange.setEnabled(false);
+		selectionPagesBtnGroup.add(this.actualPageRadioBtn);
+		selectionPagesBtnGroup.add(this.allPagesRadioBtn);
+		selectionPagesBtnGroup.add(this.selectPagesRadioBtn);
+
+		pagesSelectionPanel.add(this.actualPageRadioBtn , selectionPagesGbc);
+		selectionPagesGbc.gridy++;
+		pagesSelectionPanel.add(this.allPagesRadioBtn, selectionPagesGbc);
+		selectionPagesGbc.gridy++;
+		pagesSelectionPanel.add(this.selectPagesRadioBtn, selectionPagesGbc);
+		selectionPagesGbc.gridx++;
+		selectionPagesGbc.weightx = 1.0;
+		selectionPagesGbc.insets = new Insets(0, 5, 0, 0);
+		pagesSelectionPanel.add(this.selectionPagesRange, selectionPagesGbc);
+		selectionPagesGbc.gridx++;
+		selectionPagesGbc.weightx = 0;
+		selectionPagesGbc.ipadx = 6;
+		selectionPagesGbc.ipady = 6;
+		pagesSelectionPanel.add(createHelpButton(), selectionPagesGbc);
+
+		add(pagesSelectionPanel, gbc);
+
+		gbc.gridy++;
+		gbc.weighty = 0.0;
 		add(createButtonsPanel(), gbc);
 		enableButtons();
 	}
@@ -310,9 +371,6 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 		final JPanel selectPagePanel = new JPanel();
 		selectPagePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-		final JPanel selectAllPanel = new JPanel();
-		selectAllPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-
 		this.indexLabel.setText(
 			SignPdfUiMessages.getString(
 				"SignPdfUiStamp.6", //$NON-NLS-1$
@@ -340,25 +398,7 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 		selectPagePanel.add(this.nextPageButton);
 		selectPagePanel.add(this.lastPageButton);
 
-		this.allPagesCheckbox.addItemListener(evt -> {
-			if (evt.getStateChange() == ItemEvent.SELECTED) {
-				SignPdfUiPanelStamp.this.firstPageButton.setEnabled(false);
-				SignPdfUiPanelStamp.this.previousPageButton.setEnabled(false);
-				SignPdfUiPanelStamp.this.nextPageButton.setEnabled(false);
-				SignPdfUiPanelStamp.this.lastPageButton.setEnabled(false);
-			}
-			else {
-				enableButtons();
-			}
-		});
-		this.allPagesCheckbox.getAccessibleContext().setAccessibleDescription(
-				SignPdfUiMessages.getString("SignPdfUiStamp.16") //$NON-NLS-1$
-			);
-
-		selectAllPanel.add(this.allPagesCheckbox);
-
 		panel.add(selectPagePanel);
-		panel.add(selectAllPanel);
 
 		return panel;
 	}
@@ -530,11 +570,24 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 		);
 		this.okButton.addActionListener(
 			e -> {
-				if (SignPdfUiPanelStamp.this.allPagesCheckbox.isSelected()) {
-					SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE_PAGE, "0"); //$NON-NLS-1$
+				if (this.allPagesRadioBtn.isSelected()) {
+					this.extraParams.put(PdfExtraParams.IMAGE_PAGE, "all"); //$NON-NLS-1$
+				}
+				else if (this.selectPagesRadioBtn.isSelected()) {
+					final boolean correctFormat = PdfUtil.checkPagesRangeInputFormat(this.selectionPagesRange.getText());
+					if (!correctFormat) {
+						AOUIFactory.showMessageDialog(
+								this,
+								SignPdfUiMessages.getString("SignPdfUiPanel.26"), //$NON-NLS-1$,
+								SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+								JOptionPane.ERROR_MESSAGE
+							);
+						return;
+					}
+					this.extraParams.put(PdfExtraParams.IMAGE_PAGE, this.selectionPagesRange.getText());
 				}
 				else {
-					SignPdfUiPanelStamp.this.extraParams.put(PdfExtraParams.IMAGE_PAGE, Integer.toString(getCurrentPage()));
+					this.extraParams.put(PdfExtraParams.IMAGE_PAGE, Integer.toString(getCurrentPage()));
 				}
 
 				SignPdfUiPanelStamp.this.extraParams.put(
@@ -580,6 +633,62 @@ final class SignPdfUiPanelStamp extends JPanel implements KeyListener,
 		}
 
 		return panel;
+	}
+
+	/**
+	 * Crea el bot&oacute;n para abrir la ayuda de firmas visibles.
+	 * @return Bot&oacute;n funcional para abrir la ayuda.
+	 */
+	private static JButton createHelpButton() {
+
+		final URL helpImgResource;
+
+		if (LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
+			helpImgResource = SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"); //$NON-NLS-1$;
+		} else {
+			helpImgResource = SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"); //$NON-NLS-1$;
+		}
+
+		final JButton helpBtn = new JButton(
+				new ImageIcon(
+						helpImgResource,
+						SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
+				)
+		);
+		helpBtn.setBorder(BorderFactory.createEmptyBorder());
+		helpBtn.setRolloverEnabled(false);
+		helpBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		helpBtn.getAccessibleContext().setAccessibleDescription(
+				SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
+		);
+		helpBtn.addActionListener(
+				e -> SimpleAfirma.showHelp("pgs/VentanaPdfVisible.html")
+		);
+
+		helpBtn.addFocusListener(
+				new FocusListener() {
+					  @Override
+					  public void focusGained(final FocusEvent e) {
+						  if (LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
+							  helpBtn.setIcon(new ImageIcon(
+									  SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
+									  SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
+							));
+						 }
+					  }
+					  @Override
+					  public void focusLost(final FocusEvent e) {
+						  if (LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
+							 helpBtn.setIcon(new ImageIcon(
+									 SignPdfUiPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"), //$NON-NLS-1$
+									 SignPdfUiMessages.getString("SignPdfUiPanel.27") //$NON-NLS-1$
+							));
+						 }
+					  }
+				}
+		);
+
+		return helpBtn;
 	}
 
 	@Override

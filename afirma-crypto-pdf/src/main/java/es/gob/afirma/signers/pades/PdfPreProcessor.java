@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -227,29 +228,10 @@ public final class PdfPreProcessor {
 			return;
 		}
 
-		int pageNum;
-		try {
-			pageNum = Integer.parseInt(imagePage.trim());
-		}
-		catch(final NumberFormatException e) {
-			throw new IOException(
-				"Se ha indicado un numero de pagina con formato invalido para insertar la imagen (" + imagePage + "): " + e, e //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
+		final int totalPages = pdfReader.getNumberOfPages();
+		final List<Integer> pages = PdfUtil.getImagePages(extraParams, totalPages);
 
-		if (pageNum == LAST_PAGE) {
-			pageNum = pdfReader.getNumberOfPages();
-		}
-		final int pageLimit;
-		if (pageNum == ALL_PAGES) {
-			pageNum = FIRST_PAGE;
-			pageLimit = pdfReader.getNumberOfPages();
-		}
-		else {
-			pageLimit = pageNum;
-		}
-
-		for (int i= pageNum; i<=pageLimit; i++) {
+		for (int i : pages) {
 			addImage(
 				image,
 				(int) rect.getWidth(),
