@@ -54,56 +54,56 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 
 		var LOCALIZED_STRINGS = new Array();
-		LOCALIZED_STRINGS["es_ES"] = {
-				access_from_pc: "Acceda desde un PC para realizar el tr&aacute;mite.",
-				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
-				checktime_warn: "Se ha detectado un desfase horario entre su sistema y el servidor. Se recomienda que se corrija antes de pulsar Aceptar para continuar.",
-				checktime_err: "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema y recargar esta p&aacute;gina antes de continuar.",
-				checktime_local_time: "Hora de su sistema",
-				checktime_server_time: "Hora del servidor",
-				close: "Cerrar",
-				contact_admin: "Por favor, informe del error si el problema persiste: ",
-				error_connecting_autofirma: "No es posible conectar con Autofirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
-				error_connecting_client: "No es posible conectar con el cliente de firma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
-				error_connecting_service: "No se ha podido conectar con el servicio de la aplicaci&oacute;n de firma. Es probable que no pueda completar firmas electr&oacute;nicas desde esta p&aacute;gina.",
-				error_connecting_server_recovering: "No se pudo conectar con el servicio de la aplicaci&oacute;n para recuperar el resultado de la operaci&oacute;n.",
-				firefox_reinstall_message: "Instalar o restaurar Autofirma requerir&aacute; cerrar el navegador y reiniciar el tr&aacute;mite.",
-				install_client: "<br>Si lo tiene instalado o lo acaba de instalar, pulse el bot&oacute;n para reintentar la operaci&oacute;n.",
-				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
-				loading: "Cargando",
-				no_compatible_procedure: "Esta aplicaci&oacute;n no permite firmar desde el navegador en dispositivos m&oacute;viles. ",
-				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Firma Electr&oacute;nica</a>",
-				procedure_from_url: "Puede realizar el tr&aacute;mite desde la siguiente aplicaci&oacute;n:",
-				restore_installation: "Si lo tiene instalado, puede restaurar la instalaci&oacute;n desde Autofirma en Herramientas -> Restaurar instalaci&oacute;n",
-				retry_operation: "Reintentar operaci\u00F3n",
-				timeout_receiving_sign: "No se ha podido conectar con el cliente de firma. Si no lo tiene instalado, puede descargarlo desde:",
-				warning: "Advertencia:"
-		};
-		LOCALIZED_STRINGS["gl_ES"] = {
-				access_from_pc: "Acceso desde un PC para realizar o tr&aacute;mite.",
-				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgao de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
-				checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recom&eacute;ndase corrixilo antes de pulsar Aceptar para continuar.",
-				checktime_err: "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
-				checktime_local_time: "Hora do seu sistema",
-				checktime_server_time: "Hora do servidor",
-				close: "Pechar",
-				contact_admin: "Por favor, informe do erro se o problema persiste: ",
-				error_connecting_autofirma: "Non se puido conectar con Autofirma debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
-				error_connecting_client: "Non se puido conectar ao cliente da sinatura debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
-				error_connecting_service: "Non se puido conectar ao servizo da aplicaci&oacute;n de sinatura. &Eacute; posible que non poida completar sinaturas electr&oacute;nicas desde esta p&aacute;xina.",
-				error_connecting_server_recovering: "Non se puido conectar ao servizo de aplicaci&oacute;n para recuperar o resultado da operaci&oacute;n",
-				firefox_reinstall_message: "Ser&aacute; necesario instalar ou restaurar Autofirma pecha o navegador e reinicia o proceso.",
-				install_client: "Se o tes instalado ou o acabas de instalar, preme o bot&oacute;n para tentar de novo a operaci&oacute;n.",
-				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga na App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
-				loading: "Cargando",
-				no_compatible_procedure: "Esta aplicaci&oacute;n non permite asinar desde o navegador en dispositivos m&oacute;biles.",
-				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Sinatura Electr&oacute;nica</a>",
-				procedure_from_url: "Podes realizar o tr&aacute;mite dende a seguinte aplicaci&oacute;n:",
-				restore_installation: "Se o tes instalado, podes restaurar a instalaci&oacute;n desde Autofirma en Ferramentas -> Restaurar instalaci&oacute;n.",
-				retry_operation: "Reintento a operaci\u00F3n",
-				timeout_receiving_sign: "Non se puido conectar co cliente que asina. Se non o tes instalado, podes descargalo desde:",
-				warning: "Aviso:"
-		};
+	  	LOCALIZED_STRINGS["es_ES"] = {
+		    access_from_pc: "Acceda desde un PC para realizar el tr&aacute;mite.",
+		    android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgalo de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png'/></a>",
+		    checktime_warn: "Se ha detectado un desfase horario entre su sistema y el servidor. Se recomienda que se corrija antes de pulsar Aceptar para continuar.",
+		    checktime_err: "Se ha detectado un desfase horario entre su sistema y el servidor. Debe corregir la hora de su sistema y recargar esta p&aacute;gina antes de continuar.",
+		    checktime_local_time: "Hora de su sistema",
+		    checktime_server_time: "Hora del servidor",
+		    close: "Cerrar",
+		    contact_admin: "Por favor, informe del error si el problema persiste: ",
+		    error_connecting_autofirma: "No es posible conectar con Autofirma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
+		    error_connecting_client: "No es posible conectar con el cliente de firma debido a un problema de comunicaci&oacute;n o de instalaci&oacute;n del cliente. En caso de no tenerlo instalado, puede descargarse desde el siguiente enlace:",
+		    error_connecting_service: "No se ha podido conectar con el servicio de la aplicaci&oacute;n de firma. Es probable que no pueda completar firmas electr&oacute;nicas desde esta p&aacute;gina.",
+		    error_connecting_server_recovering: "No se pudo conectar con el servicio de la aplicaci&oacute;n para recuperar el resultado de la operaci&oacute;n.",
+		    firefox_reinstall_message: "Instalar o restaurar Autofirma requerir&aacute; cerrar el navegador y reiniciar el tr&aacute;mite.",
+		    install_client: "<br>Si lo tiene instalado o lo acaba de instalar, pulse el bot&oacute;n para reintentar la operaci&oacute;n.",
+		    ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store'></a>",
+		    loading: "Cargando",
+		    no_compatible_procedure: "Esta aplicaci&oacute;n no permite firmar desde el navegador en dispositivos m&oacute;viles. ",
+		    pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Firma Electr&oacute;nica</a>",
+		    procedure_from_url: "Puede realizar el tr&aacute;mite desde la siguiente aplicaci&oacute;n:",
+		    restore_installation: "Si lo tiene instalado, puede restaurar la instalaci&oacute;n desde Autofirma en Herramientas -> Restaurar instalaci&oacute;n",
+		    retry_operation: "Reintentar operaci\u00F3n",
+		    timeout_receiving_sign: "No se ha podido conectar con el cliente de firma. Si no lo tiene instalado, puede descargarlo desde:",
+		    warning: "Advertencia:",
+	  	};
+	  	LOCALIZED_STRINGS["gl_ES"] = {
+		    access_from_pc: "Acceso desde un PC para realizar o tr&aacute;mite.",
+		    android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Desc&aacute;rgao de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png'/></a>",
+		    checktime_warn: "Destectouse un desfase horario entre o seu sistema e o servidor. Recom&eacute;ndase corrixilo antes de pulsar Aceptar para continuar.",
+		    checktime_err: "Destectouse un desfase horario entre o seu sistema e o servidor. Debe corrixir a hora do seu sistema antes de continuar.",
+		    checktime_local_time: "Hora do seu sistema",
+		    checktime_server_time: "Hora do servidor",
+		    close: "Pechar",
+		    contact_admin: "Por favor, informe do erro se o problema persiste: ",
+		    error_connecting_autofirma: "Non se puido conectar con Autofirma debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
+		    error_connecting_client: "Non se puido conectar ao cliente da sinatura debido a un problema de comunicaci&oacute;n ou de instalaci&oacute;n do cliente. Se non o tes instalado, p&oacute;dese descargar dende a seguinte ligaz&oacute;n:",
+		    error_connecting_service: "Non se puido conectar ao servizo da aplicaci&oacute;n de sinatura. &Eacute; posible que non poida completar sinaturas electr&oacute;nicas desde esta p&aacute;xina.",
+		    error_connecting_server_recovering: "Non se puido conectar ao servizo de aplicaci&oacute;n para recuperar o resultado da operaci&oacute;n",
+		    firefox_reinstall_message: "Ser&aacute; necesario instalar ou restaurar Autofirma pecha o navegador e reinicia o proceso.",
+		    install_client: "Se o tes instalado ou o acabas de instalar, preme o bot&oacute;n para tentar de novo a operaci&oacute;n.",
+		    ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga na App Store'></a>",
+		    loading: "Cargando",
+		    no_compatible_procedure: "Esta aplicaci&oacute;n non permite asinar desde o navegador en dispositivos m&oacute;biles.",
+		    pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Sinatura Electr&oacute;nica</a>",
+		    procedure_from_url: "Podes realizar o tr&aacute;mite dende a seguinte aplicaci&oacute;n:",
+		    restore_installation: "Se o tes instalado, podes restaurar a instalaci&oacute;n desde Autofirma en Ferramentas -> Restaurar instalaci&oacute;n.",
+		    retry_operation: "Reintento a operaci\u00F3n",
+		    timeout_receiving_sign: "Non se puido conectar co cliente que asina. Se non o tes instalado, podes descargalo desde:",
+		    warning: "Aviso:",
+	  	};
 
 		var DEFAULT_LOCALE = LOCALIZED_STRINGS["es_ES"];
 
@@ -943,122 +943,137 @@ var AutoScript = ( function ( window, undefined ) {
 			clienteFirma.setKeyStore(keystore);
 		}
 		
-		/* Metodo para cargar los estilos por defecto del dialogo */
-		function loadSupportDialogStyles() {
-						
-			var styles = 
-				"@media all and (max-width: 1200px) {" +  
-		        "#afirmaMessagePanel {" +
-		        	  "display: flex;" +
-		        	  "align-items: center;" +
-		        	  "justify-content: center;" + 
-		        	  "flex-direction: column;" +
-		          "}" +
-		          "#afirmaImgDiv {" +
-		        	  "width: 50%;" +
-		        	  "background-position: center;" +
-		          "}" +
-		    	"}" +
-		    	"@media all and (max-width: 1600px) {" +  
-		        	"#afirmaChildDiv {" +
-				  	  "width: 40%;" +
-				  	  "margin-top: 200px;" +
-					"}" +
-		    	"}" +
-		    	".afirmaDefaultDialogClass {" +
-				  "background-color: white;" +
-				  "width: 30%;" +
-				  "padding: 20px;" +
-				  "margin-top: 300px;" +
-				  "border: 2px solid black;" +
-				  "border-radius: 15px;" +
-				"}" +
-				".afirmaDefaultCompatibleDialogClass {" +
-				  "background-color: white;" +
-				  "width: 30%;" +
-				  "padding: 20px;" +
-				  "position: fixed;" +
-				  "top: 30%;" +
-				  "left: 35%;" +
-				  "border: 2px solid black;" +
-				  "border-radius: 15px;" +
-				"}" +
-			    ".afirmaDefaultLoadingTextClass {" +
-				  "font-family: helvetica;" +
-				  "font-weight: bold;" +
-				  "font-size: 20pt;" +
-				  "text-align:center;" +
-				"}" +
-				".afirmaDefaultErrorMessageClass {" +
-				  "vertical-align: top;" +
-				  "float: right;" +
-				  "width: 85%;" +
-				"}" +
-				".afirmaDefaultLoadingMessageClass {" +
-				  "display: flex;" + 
-				  "justify-content: center; " +
-				  "align-items: center;" +
-				  "flex-direction: row;" +
-				  "width: 85%;" +
-				"}" +
-				".afirmaDefaultErrorTextClass {" +
-				  "font-family: helvetica;" +
-				  "font-weight: bold;" +
-				  "font-size: 10pt;" +
-				  "vertical-align: top;" +
-				"}" +
-				".afirmaDefaultActionButtonClass {" +
-				  "margin-top: 3%;" +
-				"}" +
-				".afirmaDefaultCloseButtonClass {" +
-				  "margin-left: 3%;" +
-				  "margin-top: 3%;" +
-				"}" +
-				".afirmaDefaultWarningTextClass {" +
-				  "text-decoration: underline;" +
-				"}" +
-				".afirmaDefaultLogoClass {" +
-					"background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABg2lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpaJVBzuIOGSoTnZRkY6likWwUNoKrTqYXPoFTRqSFBdHwbXg4Mdi1cHFWVcHV0EQ/ABxF5wUXaTE/yWFFjEeHPfj3b3H3TtAaFaZavbEAFWzjHQiLubyq2LgFQL8GMAQohIz9WRmMQvP8XUPH1/vIjzL+9yfY1ApmAzwicQxphsW8Qbx3Kalc94nDrGypBCfE08ZdEHiR67LLr9xLjks8MyQkU3PE4eIxVIXy13MyoZKPEscVlSN8oWcywrnLc5qtc7a9+QvDBa0lQzXaY4jgSUkkYIIGXVUUIWFCK0aKSbStB/38I85/hS5ZHJVwMixgBpUSI4f/A9+d2sWZ6bdpGAc6H2x7Y8JILALtBq2/X1s260TwP8MXGkdf60JRD9Jb3S08BEwvA1cXHc0eQ+43AFGn3TJkBzJT1MoFoH3M/qmPDByC/Svub2193H6AGSpq+Ub4OAQmCxR9rrHu/u6e/v3TLu/H5arcrVRvvChAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH6QIDCxUWWt6gwAAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAR1SURBVHja7ZtNiFtVFMd/5+XVacGCHyuno9jaDwcZpZOXmY5m4hTGliKIFoqKFnQhKgjWRS0IikhFcCVYETeKDCjYhQpSEXRC5sXUkgxdVAXRWnShCxdarRTG5B0Xk5E2ZJLcmzd3XjLeZfJezrm/e8+5/3PeC6zxIavtQCHNiCc8dJlTA7yc/ZK/XNj3VxtAymNYlSOXfqYXKQKfuLDvJXIXCtOujK86gEibAtizZgBI8zw0XMxwS18CKIyxuRgwUxhnG4Bo80Qcwf19CUCURxUe9qpcU/egKQCJeKDvACiI6OKRp4LWV1qWiY1tcxnu7CsAxQx7gS0NO0Ja7Jan+isElKcNxdi9hQzX9wWAUpqbgb2NK99qBwB+SnmmLwDUPJ6/dLX/ywFeazmu8GRpgk09DSAcYzva/FiT9vXI+lqVZ3t7B0S8AqSWWWLpIHc8vqQbeg5AMc1uYL+hEmwcA16NN3oOQH4KX4XXjGuB5uOucIz7egrAur85DNzaxgMxCKVjp8a4ticAFAN2qPKCZTG03BhcUN5MPID8FL7C28D6DmoDs66UciAMOJhoAP4FjgK3t7omVdcBqFVb7q1wlHQiAcyluRs43FYY1Sce2fUlN+BxPI58ECuAQsBOEd43+V3xrBuzmxcijp/YykAiAOR3caO32MjcaBjT3XSmd2+8ivc+OLCMyHIFID/OkF/lc2Cw03uWcoB035rff9053lHLuXQNoLiTQb/KLHCTlUrWWJ5NHAzT7HMOID/OkKaYRex1usT0cMbzGHYKoJBmxK9RAnZ0mYZX9emUFYAwYDolhNB9t0biCQE0qusKU81iae+EwjqSNdRlCKRi81rjOYmWOkyuAERd+ltFuVh3/CzwSwyx3BsAVHhXlRvuqPA1QK7Cx5MVNqkwjfJ9v++AF3NlHsnN82vjF7kyX7DAuMAZS4+cAjA3JoTZCi+1umTyDL8jPGgDWJMeAl7EUenAyWyZb4CC8e8nPARq5893PimFT5O+A0yN6b4fWOjYKTV/P0jVLi/ZARBqpoLr5ARXG3h1ZaKlMGq+3apV7jFYzT0WE0l2EpSIQ/mp9tI7DJgCi5eknCZBsYg34bbUBV7XFuVvaZStwAwWJbJbIWSZcASeKAbMzqUZvWziE2yYy/BY1eMrYMgyKzutBrupBaZEmA8DfgR+AgZq/zAipr3EmJSgb7kD4qjit9DwukxXfQVxewxGJG30WDm8Et0QdwBE7YytqKBxWQ1qAkPA6TGoCQwBnIYAa3wHJDEJeiS9I7TSI0q2EqwpPCfCHx3RjUiJcMxkgWxDwLfNAYbWZnMVXjW5IQw4BGxPpA4w7b6oUrGgbHSP056gqe72PAsAEfNGlytVlzpADSdjDEA9MwDgEIBhEvwtO8/Ppgau8DhtYsdtNWjgmMJJGwO7TvEn8K1BfeJwBxjQFqXUxeleMrBTcweg81NARfioixr/w46FhmcHwE4HKDO6+IZIO3FydrLMd7bzz5b5LAw4ItT/Ytfap3P8P8zHv6ZaYpBH636jAAAAAElFTkSuQmCC);"+
-					"background-repeat: no-repeat;" +
-					"background-position: left;" +
-					"display: block;" +
-					"width: 15%;" +
-					"min-width: 70px;" +
-					"height: 70px;" +
-				"}" +
-				".afirmaDefaultBackgroundClass {" +
-				  "display: block;" +
-				  "background-color: rgba(50,50,50,0.3);" +
-				  "width: 100%;" +
-				  "height: 100%;" +
-				  "z-index: 9990;" +
-				  "position: fixed;" +
-				  "left: 0;" +
-				  "top: 0;" +
-				"}" +
-		    	".afirmaDefaultSpinner {" +
-				  "border: 4px solid rgba(0, 0, 0, 0.1);" +
-				  "width: 15px;" +
-				  "height: 15px;" +
-				  "float: right;" +
-				  "margin-left: 10px;" +
-				  "border-radius: 50%;" +
-				  "border-left-color: #96181C;" +
-				  "animation: spin 1s ease infinite;" +
-				"}" +
-				"@keyframes spin {" +
-				  "0% {" +
-				  	"transform: rotate(0deg);" +
-				  "}" +
-				  "100% {" +
-				  	"transform: rotate(360deg);" +
-				  "}" +
-				"}";
+		/** Carga los estilos por defecto del diálogo de soporte de manera responsiva */
+		  function loadSupportDialogStyles() {
+		    var styles = `
+		        /* Backdrop que siempre ocupa todo el viewport y centra el modal */
+		        .modal-backdrop {
+		            position: fixed;
+		            top: 0;
+		            left: 0;
+		            width: 100vw;
+		            height: 100vh;
+		            background: rgba(0, 0, 0, 0.6);
+		            z-index: 9990;
+		            display: flex;
+		            align-items: center;
+		            justify-content: center;
+		            box-sizing: border-box;
+		        }
+		        /* Contenedor principal del diálogo */
+		        .modal-container {
+		            background-color: #ffffff;
+		            border-radius: 8px;
+		            padding: 20px;
+		            box-shadow: 0 0px 15px 2px rgb(0 0 0 / 50%);
+		            width: 90%;
+		            max-width: 500px;
+		            max-height: 90vh;
+		            overflow-y: auto;
+		            box-sizing: border-box;
+		            display: flex;
+		            flex-direction: column;
+		            align-items: center;
+		            text-align: center;
+		        }
+		        /* Ajuste para pantallas más grandes */
+		        @media (min-width: 600px) {
+		            .modal-container {
+		                width: 500px;
+		            }
+		            /* En pantallas grandes, botones en columna */
+		            .modal-buttons {
+		              display: flex;
+		              flex-direction: row !important;
+		              justify-content: flex-end;
+		            }
 
-			var styleSheet = document.createElement("style")
-			styleSheet.innerText = styles
-			document.head.appendChild(styleSheet)
-		}
+		            .modal-buttons button {
+		              margin: 0 0.5rem 0 0;
+		          }
+		        }
+		        /* Panel de contenido: logo + texto */
+		        #afirmaMessagePanel {
+		            display: flex;
+		            flex-direction: column;
+		            align-items: center;
+		        }
+		        /* Logo (reutiliza la clase existente) */
+		        #afirmaImgDiv {
+		            width: 15%;
+		            min-width: 70px;
+		            height: 70px;
+		            background-image: url(data:image/png;base64,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);
+		            background-repeat: no-repeat;
+		            background-position: center;
+		            background-size: contain;
+		            margin-bottom: 1rem;
+		        }
+		        #afirmaCloseButton {
+		          background-color: #878787;
+		        }
+		        /* Texto del mensaje */
+		        .modal-message {
+		            margin-top: 10px;
+		            font-family: Helvetica, Arial, sans-serif;
+		            font-size: 16px;
+		            color: #333;
+		        }
+
+		        .modal-message a {
+		          color: #c33400;
+		          line-height: 1.5rem;
+		        }
+
+		        .modal-message a img {
+		            margin-top: 1rem;
+		            width: 140px;
+		            max-width: 140px;
+		        }
+		        /* Panel de botones: por defecto en fila (pantallas pequeñas) */
+		        .modal-buttons {
+		            display: flex;
+		            flex-direction: column;
+		            justify-content: flex-end;
+		            width: 100%;
+		            margin-top: 20px;
+		            box-sizing: border-box;
+		        }
+		        .modal-buttons button {
+		            flex: 1;
+		            margin-top: 0.4rem;
+		            padding: 0.5rem 1rem;
+		            border: none;
+		            border-radius: 4px;
+		            font-family: Helvetica, Arial, sans-serif;
+		            font-size: 16px;
+		            cursor: pointer;
+		            box-sizing: border-box;
+		            background-color: #c33400;
+		            color: #fff;
+		        }
+		        /* Elimina margen derecho del último botón */
+		        .modal-buttons button:last-child {
+		            margin-right: 0;
+		        }
+		        /* Spinner para indicar carga */
+		        .modal-spinner {
+		            border: 4px solid rgba(0, 0, 0, 0.1);
+		            border-top-color: #c33400;
+		            width: 24px;
+		            height: 24px;
+		            border-radius: 50%;
+		            animation: spin 1s linear infinite;
+		            margin-top: 10px;
+		        }
+		        @keyframes spin {
+		            to { transform: rotate(360deg); }
+		        }
+		    `;
+		    var styleSheet = document.createElement("style");
+		    styleSheet.innerText = styles;
+		    document.head.appendChild(styleSheet);
+		  }
 		
 		function checkServletsConfig(clientAddress) {
 			if (storageServletAddress == null || retrieverServletAddress == null) {
@@ -1335,150 +1350,141 @@ var AutoScript = ( function ( window, undefined ) {
 				return enabled;
 			}
 			
-			function showSupportDialog(messageType, actionButtonText, actionButtonCallback, closeButtonText, closeButtonCallback) {
-				
-				if (!enabled) {
-					return false;
-				}
+			/**
+		     * Muestra un diálogo de soporte responsivo.
+		     * Siempre se utiliza un div con backdrop que bloquea todo el scroll (body y html).
+		     * El modal se centra y adapta a cambios de tamaño.
+		     * Cierra el modal si se pulsa la tecla Esc.
+		     * Parámetros:
+		     *   - messageType: contenido HTML del mensaje a mostrar (puede incluir spinner).
+		     *   - actionButtonText: texto del botón de acción (opcional).
+		     *   - actionButtonCallback: callback al hacer clic en botón de acción (opcional).
+		     *   - closeButtonText: texto del botón de cierre (opcional).
+		     *   - closeButtonCallback: callback al cerrar el diálogo (opcional).
+		     */
+		    function showSupportDialog(
+		      messageType,
+		      actionButtonText,
+		      actionButtonCallback,
+		      closeButtonText,
+		      closeButtonCallback
+		    ) {
+		      if (!Dialog.isEnabled()) {
+		        return false;
+		      }
+		      disposeSupportDialog();
 
-				disposeSupportDialog();
-				
-				//DIV HIJO
-				var parentDiv = null;
+		      // Backdrop que bloquea y centra
+		      var parentDiv = document.createElement("div");
+		      parentDiv.setAttribute("id", "afirmaSupportDialog");
+		      parentDiv.setAttribute("class", "modal-backdrop");
 
-				//DIV HIJO
-				var childDiv;
+		      // Contenedor principal del modal
+		      var childDiv = document.createElement("div");
+		      childDiv.setAttribute("id", "afirmaChildDiv");
+		      childDiv.setAttribute("class", "modal-container");
 
-				//PANEL CON LOGO Y MENSAJE
-				var messagePanel = document.createElement("div");
+		      // Panel de contenido: logo + mensaje
+		      var messagePanel = document.createElement("div");
+		      messagePanel.setAttribute("id", "afirmaMessagePanel");
 
-				//IMG DIV
-				var imgDiv = document.createElement("div");
+		      var imgDiv = document.createElement("div");
+		      imgDiv.setAttribute("id", "afirmaImgDiv");
+		      imgDiv.setAttribute("class", logoClass);
 
-				//MESSAGE DIV
-				var messageDiv = document.createElement("div");
+		      var messageDiv = document.createElement("div");
+		      var spanSupportMessage = document.createElement("span");
+		      spanSupportMessage.setAttribute("class", "modal-message");
+		      spanSupportMessage.innerHTML = messageType;
 
-				//SPAN CON MENSAJE
-				var spanSupportMessage = document.createElement("span");
-				
-				if (!!Platform.isInternetExplorer()) {
-					parentDiv = document.createElement("div");
-					parentDiv.setAttribute('id', 'afirmaSupportDialog');
-					parentDiv.setAttribute('class', backgroundClass);
-					childDiv = document.createElement("div");
-					childDiv.setAttribute('class', dialogCompatibleClass);
-				} else {
-					childDiv = document.createElement("dialog");
-					childDiv.setAttribute('class', dialogClass);
-					childDiv.addEventListener("keydown", function(event) {
-						if (event.key === "Escape") {
-							Dialog.disposeSupportDialog(); 
-						    if (!!closeButtonCallback) { 
-								closeButtonCallback(); 
-							}
-						}
-					});
-				}
+		      messageDiv.appendChild(spanSupportMessage);
+		      messagePanel.appendChild(imgDiv);
+		      messagePanel.appendChild(messageDiv);
 
-				childDiv.setAttribute('id', 'afirmaChildDiv');			
-				childDiv.setAttribute('tabindex', '0');				
+		      // Panel de botones
+		      var buttonsPanel = document.createElement("div");
+		      buttonsPanel.setAttribute("class", "modal-buttons");
 
-				messagePanel.setAttribute('id', 'afirmaMessagePanel');
-				messagePanel.setAttribute('style', 'display: flex; align-items:center; justify-content: center;');
+		      var isLoadingDialog = true;
 
-				imgDiv.setAttribute('id', 'afirmaImgDiv');
-				imgDiv.setAttribute('class', logoClass);
-				
-				// Panel de botones para aceptar y cancelar
-				var buttonsPanel = document.createElement("div");
-				
-				var isLoadingDialog = true;
-				var actionButtonActivated = false;
+		      if (actionButtonText !== undefined && actionButtonText != null) {
+		        var actionButton = document.createElement("button");
+		        actionButton.setAttribute("id", "afirmaActionButton");
+		        actionButton.textContent = actionButtonText;
+		        actionButton.addEventListener("click", function () {
+		          disposeSupportDialog();
+		          if (actionButtonCallback) actionButtonCallback();
+		        });
+		        buttonsPanel.appendChild(actionButton);
+		        isLoadingDialog = false;
+		      }
 
-				if (actionButtonText !== undefined && actionButtonText != null) {
+		      if (closeButtonText !== undefined && closeButtonText != null) {
+		        var closeButton = document.createElement("button");
+		        closeButton.setAttribute("id", "afirmaCloseButton");
+		        closeButton.textContent = closeButtonText;
+		        closeButton.addEventListener("click", function () {
+		          disposeSupportDialog();
+		          if (closeButtonCallback) closeButtonCallback();
+		        });
+		        buttonsPanel.appendChild(closeButton);
+		        isLoadingDialog = false;
+		      }
 
-					//BOTON DE ACCION
-					var actionButton = document.createElement("button");
+		      if (isLoadingDialog) {
+		        if (!enabledLoading) return false;
+		        var spinner = document.createElement("div");
+		        spinner.setAttribute("class", "modal-spinner");
+		        messagePanel.appendChild(spinner);
+		      } else {
+		        if (!enabledError) return false;
+		      }
 
-					buttonsPanel.setAttribute('id', 'afirmaButtonsPanel');
-					buttonsPanel.setAttribute('style', 'float: right; text-align: right; width: 100%;');
-					actionButton.setAttribute('id', 'afirmaActionButton');
-					actionButton.setAttribute('class', actionButtonClass);
-					actionButton.addEventListener('click', function() { Dialog.disposeSupportDialog(); if (!!actionButtonCallback) { actionButtonCallback(); } });
-					actionButton.textContent = actionButtonText;
-					
-					buttonsPanel.appendChild(actionButton);
-					isLoadingDialog = false;
-					actionButtonActivated = true;
-				}
-				
-				if (closeButtonText !== undefined && closeButtonText != null) {
+		      childDiv.appendChild(messagePanel);
+		      if (!isLoadingDialog) childDiv.appendChild(buttonsPanel);
 
-					//BOTON DE CERRAR
-					var closeButton = document.createElement("button");
-					
-					if (!actionButtonActivated) {
-						buttonsPanel.setAttribute('id', 'afirmaButtonsPanel');
-						buttonsPanel.setAttribute('style', 'float: right; text-align: right; width: 100%;');
-					}
-					
-					closeButton.setAttribute('id', 'afirmaCloseButton');
-					closeButton.addEventListener('click', function() { Dialog.disposeSupportDialog(); if (!!closeButtonCallback) { closeButtonCallback(); } });
-					closeButton.setAttribute('class', closeButtonClass);
-					closeButton.textContent = closeButtonText;
-					
-					buttonsPanel.appendChild(closeButton);
-					isLoadingDialog = false;
-				}
+		      parentDiv.appendChild(childDiv);
+		      document.body.appendChild(parentDiv);
 
-				// Panel con mensaje a mostrar
-				messageDiv.setAttribute('id', 'afirmaMessageDiv');
-				spanSupportMessage.setAttribute('id', 'spanSupportMessage');
-				spanSupportMessage.innerHTML = messageType;
-				
-				if (!!isLoadingDialog) {
-					if (!!enabledLoading) {
-						spanSupportMessage.setAttribute('class', loadingTextClass);
-						messageDiv.setAttribute('class', 'afirmaDefaultLoadingMessageClass');
-					} else {
-						return false;
-					}
-				} else {
-					if (!!enabledError) {
-						spanSupportMessage.setAttribute('class', errorTextClass);
-						messageDiv.setAttribute('class', 'afirmaDefaultErrorMessageClass');
-					} else {
-						return false;
-					}
-				}
-				
-				messagePanel.appendChild(imgDiv);
-				messageDiv.appendChild(spanSupportMessage);
-				messagePanel.appendChild(messageDiv);
-				childDiv.appendChild(messagePanel);			
-				childDiv.appendChild(buttonsPanel);		
+		      // Bloquear scroll en body y html
+		      document.body.style.overflow = "hidden";
+		      document.documentElement.style.overflow = "hidden";
 
-				if (parentDiv != null) {
-					parentDiv.appendChild(childDiv);
-					document.body.appendChild(parentDiv);
-				} else {
-					document.body.appendChild(childDiv);
-					
-					childDiv.showModal();
-				}
+		      // Listener para cerrar con Esc
+		      var escListener = function (event) {
+		        if (event.key === "Escape") {
+		          disposeSupportDialog();
+		          if (closeButtonCallback) closeButtonCallback();
+		        }
+		      };
+		      document.addEventListener("keydown", escListener);
 
-				return true;	
-			}
-			
-			function disposeSupportDialog() {
-				if (document.getElementById("afirmaChildDiv") != null) {
-					if (!!Platform.isInternetExplorer()) {
-						document.body.removeChild(document.getElementById("afirmaSupportDialog"));
-					} else {
-						document.body.removeChild(document.getElementById("afirmaChildDiv"));
-					}				
-				}
-			}
+		      // Guardar la referencia para eliminar después
+		      parentDiv._escListener = escListener;
+
+		      return true;
+	    	}
+
+		    /**
+		     * Cierra y elimina el diálogo de soporte abierto y restaura el scroll.
+		     * Elimina también el listener de tecla Esc.
+		     */
+		    function disposeSupportDialog() {
+		      var existingBackdrop = document.getElementById("afirmaSupportDialog");
+		      if (existingBackdrop) {
+		        // Eliminar listener de Esc si existe
+		        if (existingBackdrop._escListener) {
+		          document.removeEventListener(
+		            "keydown",
+		            existingBackdrop._escListener
+		          );
+		        }
+		        document.body.removeChild(existingBackdrop);
+		        // Restaurar scroll en body y html
+		        document.body.style.overflow = "";
+		        document.documentElement.style.overflow = "";
+		      }
+		    }
 			
 			/* Construye el mensaje que debe mostrarse en un error de conexion con la aplicacion */
 			function buildErrorConnectingApplicationMsg() {
