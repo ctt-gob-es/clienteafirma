@@ -59,7 +59,6 @@ public final class MainMenu extends JMenuBar {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private final JMenuItem firmarMenuItem;
     private final JMenuItem abrirMenuItem;
 
     private final JFrame parent;
@@ -79,7 +78,6 @@ public final class MainMenu extends JMenuBar {
      *  <li>
      *   <ul>
      *    <li>Ctrl+B = Abrir archivo</li>
-     *    <li>Ctrl+I = Firmar archivo</li>
      *    <li>Ctrl+V = Ver firma</li>
      *    <li>Alt+F4 = Salir del programa</li>
      *   </ul>
@@ -106,7 +104,6 @@ public final class MainMenu extends JMenuBar {
         this.saf = s;
         this.parent = p;
 
-        this.firmarMenuItem = new JMenuItem();
         this.abrirMenuItem = new JMenuItem();
 
         // Importante: No cargar en un invokeLater, da guerra
@@ -158,19 +155,6 @@ public final class MainMenu extends JMenuBar {
 			}
 		);
         menuArchivo.add(this.abrirMenuItem);
-
-        this.firmarMenuItem.setText(SimpleAfirmaMessages.getString("MainMenu.5")); //$NON-NLS-1$
-        this.firmarMenuItem.setAccelerator(
-    		KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-		);
-        this.firmarMenuItem.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString("MainMenu.6") //$NON-NLS-1$
-        );
-        this.firmarMenuItem.setEnabled(false);
-        this.firmarMenuItem.addActionListener(
-    		e -> MainMenu.this.getSimpleAfirma().signLoadedFile()
-		);
-        menuArchivo.add(this.firmarMenuItem);
 
         final JMenuItem validateSignMenu = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.34")); //$NON-NLS-1$
         validateSignMenu.setAccelerator(
@@ -433,7 +417,6 @@ public final class MainMenu extends JMenuBar {
         if (!isMac) {
             this.abrirMenuItem.setMnemonic(KeyEvent.VK_B);
             ayudaMenuItem.setMnemonic(KeyEvent.VK_U);
-            this.firmarMenuItem.setMnemonic(KeyEvent.VK_F);
         }
         // Acciones especificas de Mac OS X
         else {
@@ -489,14 +472,6 @@ public final class MainMenu extends JMenuBar {
     public void setEnabledOpenCommand(final boolean en) {
         if (this.abrirMenuItem != null) {
             this.abrirMenuItem.setEnabled(en);
-        }
-    }
-
-    /** Habilita o deshabilita el elemento de men&uacute; de firma de fichero.
-     * @param en <code>true</code> para habilitar el elemento de men&uacute; de firma de fichero, <code>false</code> para deshabilitarlo */
-    public void setEnabledSignCommand(final boolean en) {
-        if (this.firmarMenuItem != null) {
-            this.firmarMenuItem.setEnabled(en);
         }
     }
 

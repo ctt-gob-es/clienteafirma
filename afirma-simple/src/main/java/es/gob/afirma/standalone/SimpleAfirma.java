@@ -613,7 +613,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     @Override
     public void showResultsInfo(final byte[] signature, final SignOperationConfig signConfig,
     		final X509Certificate signingCert) {
-    	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
     	List<SignValidity> validityList = new ArrayList<>();
@@ -685,7 +684,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     @Override
     public void showResultsInfo(final List<SignOperationConfig> signConfig, final File outDir,
     		final X509Certificate signingCert) {
-    	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
 		final JPanel newPanel = new SignResultListPanel(this, signConfig, outDir, signingCert);
@@ -747,19 +745,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, l.toString());   
             LanguageManager.init(getLanguagesDir());
             SimpleAfirmaMessages.changeLocale();
-        }
-    }
-
-	/**
-	 * Habilita o desabilita el men&uacute; <i>Archivo</i> de la barra de
-     * men&uacute;.
-	 *
-	 * @param e <code>true</code> para habilitar el men&uacute; <i>Archivo</i>,
-	 *          <code>false</code> para deshabilitarlo
-	 */
-    public void setSignMenuCommandEnabled(final boolean e) {
-        if (this.mainMenu != null) {
-            this.mainMenu.setEnabledSignCommand(e);
         }
     }
 

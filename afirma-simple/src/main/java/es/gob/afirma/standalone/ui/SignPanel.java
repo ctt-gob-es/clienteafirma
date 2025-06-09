@@ -373,7 +373,6 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     /** M&eacute;todo para indicar a la clase que el <code>AOKeyStoreManager</code> est&aacute; listo para usarse. */
     public void notifyStoreReady() {
         if (this.signOperationConfigs != null && !this.signOperationConfigs.isEmpty()) {
-        	 this.saf.setSignMenuCommandEnabled(true);
             this.lowerPanel.updateSignButtonState(true);
         }
     }
