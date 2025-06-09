@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -26,6 +27,7 @@ import es.gob.afirma.signers.xades.EFacturaAlreadySignedException;
 import es.gob.afirma.signers.xades.InvalidEFacturaDataException;
 import es.gob.afirma.signers.xml.InvalidXMLException;
 import es.gob.afirma.signvalidation.InvalidSignatureException;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.plugins.SignOperation;
 import es.gob.afirma.standalone.protocol.SingleSignOperation.Operation;
 
@@ -96,8 +98,8 @@ public class LocalBatchSigner {
 			signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
 		}
 		catch (final Exception e) {
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INCOMPATIBLE_KEY_TYPE;
-			throw new SocketOperationException(errorCode, e);
+			final ErrorCode errorCode = ErrorCode.Internal.INVALID_SIGNING_KEY;
+			throw new SocketOperationException(e, errorCode);
 		}
 
 		final String format = singleConfig.getFormat();
@@ -109,20 +111,19 @@ public class LocalBatchSigner {
 		if (!AOSignConstants.SIGN_FORMAT_AUTO.equalsIgnoreCase(format)) {
 			signer = AOSignerFactory.getSigner(format);
 			if (signer == null) {
-				LOGGER.severe("No hay un firmador configurado para el formato: " + LoggerUtil.getTrimStr(format)); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_FORMAT;
+				LOGGER.severe("No se soporta el formato de firma indicado: " + LoggerUtil.getTrimStr(format)); //$NON-NLS-1$
+				final ErrorCode errorCode = ErrorCode.Request.UNSUPPORTED_SIGNATURE_FORMAT;
 				throw new SocketOperationException(errorCode);
 			}
 		}
 
-		// En no haber fijado aun el firmador significa que se selecciono el formato AUTO y
+		// No haber fijado aun el firmador significa que se selecciono el formato AUTO y
 		// es necesario identificar cual es el que se deberia usar
 		if (signer == null) {
 			final String signFormat = ProtocolInvocationLauncherUtil.identifyFormatFromData(data, SignOperation.Operation.valueOf(cryptoOperation.name()));
 			if (signFormat == null) {
-				LOGGER.severe(
-					"Los datos no se corresponden con una firma electronica o no se pudieron analizar"); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNKNOWN_SIGNER;
+				LOGGER.severe("Los datos no se corresponden con una firma electronica o no se pudieron analizar"); //$NON-NLS-1$
+				final ErrorCode errorCode = SimpleErrorCode.Functional.CANT_IDENTIFY_SIGNATURE_FORMAT;
 				throw new SocketOperationException(errorCode);
 			}
 			signer = AOSignerFactory.getSigner(signFormat);
@@ -172,8 +173,7 @@ public class LocalBatchSigner {
 					break;
 				default:
 					LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
-					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION;
-					throw new SocketOperationException(errorCode);
+					throw new SocketOperationException(SimpleErrorCode.Request.UNSUPPORTED_OPERATION);
 				}
 			}
 			catch (final AOTriphaseException tex) {
@@ -181,85 +181,72 @@ public class LocalBatchSigner {
 			}
 		} catch (final SocketOperationException e) {
 			throw e;
-		} catch (final IllegalArgumentException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
-			throw new SocketOperationException(errorCode, e);
+		}
+		catch (final IllegalArgumentException e) {
+			LOGGER.log(Level.SEVERE, "Se ha recibido algun parametro de firma invalido o no compatible", e); //$NON-NLS-1$
+			final ErrorCode errorCode = SimpleErrorCode.Request.INVALID_FORMAT_SIGNATURE_PARAM;
+			throw new SocketOperationException(e, errorCode);
 		}
 		catch (final AOTriphaseException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_RECOVER_SERVER_DOCUMENT;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Error durante la operacion de firma trifasica", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final InvalidPdfException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_PDF;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Los datos no son un documento PDF", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final InvalidXMLException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_XML;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Los datos no son un XML", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final AOFormatFileException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_DATA;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "El formato de los datos no es valido para esta operacion", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final InvalidEFacturaDataException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_FACTURAE;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Los datos no son una factura electronica", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final EFacturaAlreadySignedException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_FACE_ALREADY_SIGNED;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "La factura electronica ya estaba firmada", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final ContainsNoDataException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGN_WITHOUT_DATA;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "La firma no contiene los datos a firmar ni un hash que se pueda reutilizar", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final AOInvalidSignatureFormatException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "La firma no es compatible con el formato de firma utilizado", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final PdfHasUnregisteredSignaturesException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_UNREG_SIGN;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "El PDF tiene firmas sin registrar", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final PdfIsCertifiedException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_CERTIFIED;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "El PDF esta certificado", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final BadPdfPasswordException | PdfIsPasswordProtectedException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PDF_WRONG_PASSWORD;
-			throw new SocketOperationException(errorCode, e);
+			throw new SocketOperationException(e);
 		}
 		catch (final UnsupportedOperationException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION;
-			throw new SocketOperationException(errorCode, e);
+			throw new SocketOperationException(e, SimpleErrorCode.Request.UNSUPPORTED_OPERATION);
 		}
 		catch (final InvalidSignatureException e) {
 			LOGGER.log(Level.SEVERE, "La firma de entrada no es valida", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
-			throw new SocketOperationException(errorCode, e);
+			throw new SocketOperationException(e);
 		}
 		catch (final AOException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma local de lote", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Error desconocido al realizar la operacion de firma local de lote", e); //$NON-NLS-1$
+			final ErrorCode errorCode = SimpleErrorCode.Internal.INTERNAL_LOCAL_BATCH_ERROR;
+			throw new SocketOperationException(e, errorCode);
 		}
 
 		return sign;

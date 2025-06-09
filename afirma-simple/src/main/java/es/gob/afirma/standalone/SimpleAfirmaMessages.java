@@ -30,16 +30,18 @@ public final class SimpleAfirmaMessages {
     private static final String BUNDLE_BASENAME = "simpleafirmamessages"; //$NON-NLS-1$
     private static ResourceBundle bundle;
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    
+
     static {
 		changeLocale();
     }
 
     private SimpleAfirmaMessages() { /* No permitimos la instanciacion */ }
 
-    /** Obtiene un mensaje.
+    /**
+     * Obtiene un mensaje.
      * @param key Clave del mensaje
-     * @return Mensaje correspondiente a la clave */
+     * @return Mensaje correspondiente a la clave
+     */
     public static String getString(final String key) {
         try {
             return bundle.getString(key);
@@ -63,7 +65,8 @@ public final class SimpleAfirmaMessages {
 		}
     }
 
-    /** Recupera el texto identificado con la clave proporcionada y sustituye las
+    /**
+     * Recupera el texto identificado con la clave proporcionada y sustituye las
      * subcadenas de tipo "%i" por el texto correspondiente segun posicion de los
      * parametros indicados despues de la clave. Las posiciones empiezan a contar
      * por 0. As&iacute;, el texto "%0" se sustituira por el segundo par&aacute;metro
@@ -72,7 +75,8 @@ public final class SimpleAfirmaMessages {
      * conllevar&aacute; errores en el resultado.
      * @param key Clave del texto.
      * @param params Par&aacute;metros que se desean insertar.
-     * @return Recurso textual con las subcadenas sustituidas. */
+     * @return Recurso textual con las subcadenas sustituidas.
+     */
     public static String getString(final String key, final String... params) {
 
         String text;
@@ -84,21 +88,21 @@ public final class SimpleAfirmaMessages {
         		try {
 					final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
 					final ResourceBundle temporalBundle;
-					
+
 					if(LanguageManager.isDefaultLocale(baseLocale)) {
 						temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
 					} else {
 						temporalBundle = setImportedLangResource();
 					}
-					
+
 					text = temporalBundle.getString(key);
-					
+
 				} catch (final Exception e1) {
 					return '!' + key + '!';
-				}          	
+				}
         	}
-        	
-			return '!' + key + '!';   
+
+			return '!' + key + '!';
         }
 
         if (params != null && params.length > 0) {
@@ -111,18 +115,20 @@ public final class SimpleAfirmaMessages {
 
         return text;
     }
-    
-    /** Cambia la localizaci&oacute;n a la establecida por defecto. 
-     * @throws MalformedURLException */
+
+    /**
+     * Cambia la localizaci&oacute;n a la establecida por defecto.
+     * @throws MalformedURLException
+     */
     public static void changeLocale() {
     	if (LanguageManager.isDefaultLocale(Locale.getDefault()) && !LanguageManager.existDefaultLocaleNewVersion()) {
     		bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
     	} else {
     		bundle = setImportedLangResource();
     	}
-    	
+
     }
-    
+
     private static ResourceBundle setImportedLangResource() {
     	final File localeDir = new File(LanguageManager.getLanguagesDir(), Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry()); //$NON-NLS-1$
 		final File file = new File(localeDir, BUNDLE_BASENAME + "_" + Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry() + ".properties"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

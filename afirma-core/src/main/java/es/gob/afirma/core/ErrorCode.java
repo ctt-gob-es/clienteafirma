@@ -64,6 +64,16 @@ public class ErrorCode {
 		return this.code.startsWith(type);
 	}
 
+	@Override
+	public boolean equals(final Object obj) {
+		return obj instanceof ErrorCode ? this.code.equals(((ErrorCode) obj).code) : false;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.code.hashCode();
+	}
+
 //	public static class Hardware {
 //	}
 
@@ -76,15 +86,16 @@ public class ErrorCode {
 		public static final ErrorCode LOADING_LOCAL_FILE_ERROR					= new ErrorCode("200102", " Error al cargar el fichero local para realizar la firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode SIGNINIG_KEY_AUTHENTICATION_ERROR			= new ErrorCode("200108", "No se pudo acceder a la clave de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		//public static final ErrorCode INVALID_SIGNATURE_ALGORITHM				= new ErrorCode("200109", "Algoritmo de firma no soportado"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode INVALID_SIGNING_KEY						= new ErrorCode("200110", "Clave de firma no valida"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode INVALID_SIGNING_KEY						= new ErrorCode("200110", "La clave de firma no es valida o no es compatible con el algoritmo seleccionado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode SIGNING_PKCS1_ERROR						= new ErrorCode("200111", "Error al generar la firma PKCS#1"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_PKCS1_VALUE						= new ErrorCode("200112", "La firma no se ha generado con el certificado seleccionado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode VERIFING_PKCS1_ERROR						= new ErrorCode("200113", "No se pudo verificar la firma generada"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode ENCODING_SIGNING_CERTIFICATE				= new ErrorCode("200114", "Error codificando el certificado de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode UNKNOWN_SIGNING_ERROR						= new ErrorCode("200115", "Error desconocido durante la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		public static final ErrorCode BUILDING_ASIC_CONTAINER_ERROR				= new ErrorCode("200117", "Error al construir el contenedor ASiC de la nueva firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode UNSUPPORTED_HASH_ALGORITHM				= new ErrorCode("200118", "No se soporta un algoritmo de hash establecido internamente"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static final ErrorCode BUILDING_ASIC_CONTAINER_ERROR				= new ErrorCode("214001", "Error al construir el contenedor ASiC de la nueva firma"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 
@@ -163,11 +174,14 @@ public class ErrorCode {
 		public static final ErrorCode CERTIFICATE_NEEDED 						= new ErrorCode("501001", "Error en la operacion, no hay certificados"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_FORMAT_FILE						= new ErrorCode("501002", "El formato de fichero no es valido para la operacion que se intenta realizar"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_SMARTCARD_PIN						= new ErrorCode("501003", "El PIN del la tarjeta inteligente es incorrecto"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode SMARTCARD_LOCKED							= new ErrorCode("501004", "La tarjeta inteligente esta bloqueada"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		public static final ErrorCode DOCUMENT_TOO_LARGE						= new ErrorCode("501005", "El documento supera el tamano maximo permitido"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode COMPATIBLE_SIGNATURE_NOT_FOUND			= new ErrorCode("501006", "La firma no es compatible con el formato de firma utilizado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode SIGNING_LTS								= new ErrorCode("501007", "Se esta intentando firmar una firma longeva que quedara invalidada"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY	= new ErrorCode("501008", "La firma resultante sera incompatible con la politica de firma de la AGE"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode SIGNING_WITH_POLICY_INCOMPATIBILITY		= new ErrorCode("501008", "La firma resultante sera incompatible con la politica de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		public static final ErrorCode KEYSTORE_LOCKED							= new ErrorCode("511003", "El almacen de claves esta bloqueado"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode SMARTCARD_LOCKED							= new ErrorCode("511004", "La tarjeta inteligente esta bloqueada"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode SIGNING_MALFORMED_SIGNATURE				= new ErrorCode("510006", "La firma no es compatible o esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
 	}

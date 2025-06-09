@@ -15,12 +15,14 @@ public enum ProtocolVersion {
 	VERSION_2 (2),
 	/** Versi&oacute;n 3: devuelve el nombre del fichero seleccionado en las operaciones de firma. */
 	VERSION_3 (3),
-	/** Seguridad adicional en la comunicacion por WebSockets. */
-	VERSION_4 (4);
+	/** Versi&oacute;n 4: seguridad adicional en la comunicacion por WebSockets. */
+	VERSION_4 (4),
+	/** Versi&oacute;n 5: evoluci&oacute;n de los c&oacute;digos de error devueltos por la aplicaci&oacute;n. */
+	VERSION_5 (5);
 
-	private int version;
+	private final int version;
 
-	private ProtocolVersion(final int version) {
+	ProtocolVersion(final int version) {
 		this.version = version;
 	}
 

@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.crypto.NativeDataCipher;
 import es.gob.afirma.standalone.plugins.DataCipher;
 import es.gob.afirma.standalone.plugins.EncryptingException;
@@ -52,7 +53,7 @@ public class NativeSignDataProcessor extends SignDataProcessor {
 	 */
 	@Override
 	public StringBuilder postProcess(final List<SignResult> results, final SignOperation signOperation)
-					throws es.gob.afirma.standalone.plugins.EncryptingException, PluginControlledException {
+					throws EncryptingException, PluginControlledException {
 
 		// Solo enviaremos los resultados de la primera firma, ya que solo deberia haber
 		// una firma
@@ -67,21 +68,46 @@ public class NativeSignDataProcessor extends SignDataProcessor {
 		// Si tenemos clave de cifrado, ciframos los datos
 		if (this.cipher != null) {
 			LOGGER.info("Se cifran los datos resultantes con la clave de cifrado proporcionada"); //$NON-NLS-1$
-			try {
-				// El CipherData devuelve los datos directamente en Base64
-				dataToSend.append(this.cipher.cipher(certEncoded));
-				dataToSend.append(RESULT_SEPARATOR);
-				dataToSend.append(this.cipher.cipher(sign));
 
-				// A partir del protocolo version 3, si se cargo un fichero, se devuelve el nombre
-				if (extraData != null && !extraData.isEmpty() && getProtocolVersion() >= 3) {
-					dataToSend.append(RESULT_SEPARATOR);
-					dataToSend.append(this.cipher.cipher(buildExtraDataResult(extraData)));
-				}
+
+			String cipheredCert;
+			try {
+				cipheredCert = this.cipher.cipher(certEncoded);
 			}
 			catch (final Exception e) {
-				throw new EncryptingException("Error al cifrar los datos a enviar", e); //$NON-NLS-1$
+				throw new EncryptingException("Error al cifrar el certificado de firma a enviar", e, SimpleErrorCode.Internal.ENCRIPTING_SIGNING_CERT); //$NON-NLS-1$
 			}
+
+
+			final String cipheredSignature;
+			try {
+				cipheredSignature = this.cipher.cipher(sign);
+			}
+			catch (final Exception e) {
+				throw new EncryptingException("Error al cifrar la firma a enviar", e, SimpleErrorCode.Internal.ENCRIPTING_SIGNATURE); //$NON-NLS-1$
+			}
+
+			String cipheredExtraData = null;
+			// A partir del protocolo version 3, si se cargo un fichero, se devuelve el nombre
+			if (extraData != null && !extraData.isEmpty() && getProtocolVersion() >= 3) {
+				try {
+					cipheredExtraData = this.cipher.cipher(buildExtraDataResult(extraData));
+				}
+				catch (final Exception e) {
+					throw new EncryptingException("Error al cifrar los datos extra de firma a enviar", e, SimpleErrorCode.Internal.ENCRIPTING_SIGNATURE_EXTRA_DATA); //$NON-NLS-1$
+				}
+			}
+
+			// Concatenamos todos los datos para componener la respuesta
+			// El CipherData devuelve los datos directamente en Base64
+			dataToSend.append(cipheredCert);
+			dataToSend.append(RESULT_SEPARATOR);
+			dataToSend.append(cipheredSignature);
+			if (cipheredExtraData != null) {
+				dataToSend.append(RESULT_SEPARATOR);
+				dataToSend.append(cipheredExtraData);
+			}
+
 		}
 		else {
 			LOGGER.fine("Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado"); //$NON-NLS-1$

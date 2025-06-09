@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.protocol.UrlParameters;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -20,6 +21,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.standalone.DataAnalizerUtil;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.plugins.SignOperation.Operation;
 
@@ -31,21 +33,21 @@ final class ProtocolInvocationLauncherUtil {
 		// No instanciable
 	}
 
-	static final class InvalidEncryptedDataLengthException extends Exception {
+	static final class InvalidEncryptedDataLengthException extends AOException {
 
 		private static final long serialVersionUID = 1L;
 
 		InvalidEncryptedDataLengthException(final String msg) {
-			super(msg);
+			super(msg, SimpleErrorCode.Internal.ERROR_RECIVED_FROM_CLIENT);
 		}
 	}
 
-	static final class DecryptionException extends Exception {
+	static final class DecryptionException extends AOException {
 
 		private static final long serialVersionUID = 1L;
 
 		DecryptionException(final String msg, final Throwable e) {
-			super(msg, e);
+			super(msg, e, SimpleErrorCode.Internal.DECRYPTING_PARAMS_ERROR);
 		}
 	}
 

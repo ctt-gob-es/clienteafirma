@@ -14,11 +14,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 
 final class ProtocolInvocationLauncherSave {
@@ -26,7 +28,6 @@ final class ProtocolInvocationLauncherSave {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String RESULT_OK = "OK"; //$NON-NLS-1$
-	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
 
 	private ProtocolInvocationLauncherSave() {
 		// No instanciable
@@ -50,12 +51,12 @@ final class ProtocolInvocationLauncherSave {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
 					Integer.valueOf(protocolVersion),
 					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
+			final ErrorCode errorCode = SimpleErrorCode.Request.UNSUPPORED_PROTOCOL_VERSION;
+			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
 		}
 
         // Comprobamos si se exige una version minima del Cliente
@@ -63,12 +64,12 @@ final class ProtocolInvocationLauncherSave {
         	final String minimumRequestedVersion = options.getMinimumClientVersion();
         	final Version requestedVersion = new Version(minimumRequestedVersion);
         	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_MINIMUM_VERSION_NON_SATISTIED;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode);
-				if (!bySocket){
-					throw new SocketOperationException(errorCode);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+				final ErrorCode errorCode = SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED;
+    			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
+    			if (!bySocket){
+    				throw new SocketOperationException(errorCode);
+    			}
+    			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
         	}
         }
 
@@ -93,18 +94,18 @@ final class ProtocolInvocationLauncherSave {
 		catch(final AOCancelledOperationException e) {
 			LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 			if (!bySocket){
-				throw new SocketOperationException(RESULT_CANCEL);
+				throw e;
 			}
-			return RESULT_CANCEL;
+			return ProtocolInvocationLauncherErrorManager.CANCEL_RESPONSE;
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error en el guardado de datos: " + e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_SAVE_DATA;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+			final ErrorCode errorCode = SimpleErrorCode.Internal.CANT_SAVE_FILE;
+			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
 			if (!bySocket){
 				throw new SocketOperationException(errorCode);
 			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
 		}
 
 		if (options.getStorageServletUrl() != null) {
@@ -121,8 +122,9 @@ final class ProtocolInvocationLauncherSave {
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT, e);
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT);
+					final ErrorCode errorCode = SimpleErrorCode.Communication.SENDING_RESULT_OPERATION;
+					ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
 				}
 			}
 		}
@@ -137,10 +139,6 @@ final class ProtocolInvocationLauncherSave {
 
 	public static String getResultOk() {
 		return RESULT_OK;
-	}
-
-	public static String getResultCancel() {
-		return RESULT_CANCEL;
 	}
 
 }

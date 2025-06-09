@@ -14,14 +14,17 @@ import java.util.Collections;
 
 import org.java_websocket.WebSocket;
 
+import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.standalone.SimpleErrorCode;
+
 /**
  * Servidor para la comunicaci&oacute;n por <i>WebSocket</i> acorde a la versi&oacute;n 4
  * del protocolo de Autofirma.
  */
-public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
+public final class AfirmaWebSocketServerV4Sup extends AfirmaWebSocketServer {
 
-	/** Versi&oacute;n de protocolo. */
-	private static final int PROTOCOL_VERSION = 4;
+	/** Identificador de versi&oacute;n del protocolo versi&oacute;n 4. **/
+	private static final int PROTOCOL_VERSION_4 = 4;
 
 	/** Prefijo de las peticiones de eco. */
 	private static final String ECHO_REQUEST_PREFIX = "echo="; //$NON-NLS-1$
@@ -43,14 +46,17 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 	/** Uno de los prefijos que puede presentar el mensaje de invocaci&oacute;n de una firma de lote. Versi&oacute;n 1. */
 	private static final String HEADER_BATCH_2 = "afirma://batch/?"; //$NON-NLS-1$
 
+	private final int protocol;
+
 	/**
 	 * Genera un servidor websocket que atiende las peticiones de Autofirma.
 	 * @param port Puerto a trav&eacute;s del que realizar la comunicaci&oacute;n.
 	 * @param sessionId Identificador de sesi&oacute;n con la que deben autenticarse
 	 * las llamadas.
 	 */
-	public AfirmaWebSocketServerV4(final int port, final String sessionId) {
+	public AfirmaWebSocketServerV4Sup(final int port, final String sessionId, final int protocol) {
 		super(port, sessionId);
+		this.protocol = protocol;
 	}
 
 	@Override
@@ -61,8 +67,7 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 		final InetAddress remoteAddress = ws.getRemoteSocketAddress().getAddress();
 		if (remoteAddress == null || !isLocalAddress(remoteAddress)) {
 			LOGGER.warning("Peticion al socket desde IP externa o sin identificar: " + remoteAddress); //$NON-NLS-1$
-			final String errorResponse = ProtocolInvocationLauncherErrorManager.getErrorMessage(
-					ProtocolInvocationLauncherErrorManager.ERROR_EXTERNAL_REQUEST_TO_SOCKET);
+			final String errorResponse = getErrorMessage(SimpleErrorCode.Communication.EXTERNAL_REQUEST, this.protocol);
 			broadcast(errorResponse, Collections.singletonList(ws));
 			return;
 		}
@@ -71,8 +76,7 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 		// mensaje enviado no coincide con el mismo, ignoraremos la peticion
 		if (this.sessionId != null && !this.sessionId.equals(getSessionId(message))) {
 			LOGGER.warning("La peticion no incluia el id de sesion correcto"); //$NON-NLS-1$
-			final String errorResponse = ProtocolInvocationLauncherErrorManager.getErrorMessage(
-					ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SESSION_ID);
+			final String errorResponse = getErrorMessage(SimpleErrorCode.Request.INVALID_SESSION_ID, this.protocol);
 			broadcast(errorResponse, Collections.singletonList(ws));
 			return;
 		}
@@ -88,8 +92,18 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 			final boolean batchOperation = message.startsWith(HEADER_BATCH_1) || message.startsWith(HEADER_BATCH_2);
 			setConnectionLostTimeout(batchOperation ? 240 : 60);
 			// Ejecutamos la peticion y devolvemos el resultado
-			broadcast(ProtocolInvocationLauncher.launch(message, PROTOCOL_VERSION, true), Collections.singletonList(ws));
+			broadcast(ProtocolInvocationLauncher.launch(message, this.protocol, true), Collections.singletonList(ws));
 		}
+	}
+
+	/**
+	 * Compone el mensaje de error de respuesta para la versi&oacute;n del protocolo en cuesti&oacute;n.
+	 * @param errorCode C&oacute;digo de error.
+	 * @param protocolVersion Versi&oacute;n del protocolo.
+	 * @return Mensaje de error.
+	 */
+	private static String getErrorMessage(final ErrorCode errorCode, final int protocolVersion) {
+		return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
 	}
 
 	/**

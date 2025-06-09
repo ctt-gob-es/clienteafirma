@@ -42,7 +42,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.AGEPolicyIncompatibilityException;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.ErrorCode;
@@ -505,14 +505,14 @@ public final class XAdESCoSigner {
 					if (AdESPolicyPropertiesManager.isAgePolicyConfigurated(policyId)) {
 						final String avoidAgePolicyIncompatibilities = extraParams.getProperty(XAdESExtraParams.AVOID_AGE_POLICY_INCOMPATIBILITIES);
 						if (avoidAgePolicyIncompatibilities == null) {
-							throw new AGEPolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping", AGEPolicyIncompatibilityException.OP_COSIGN); //$NON-NLS-1$
+							throw new SignaturePolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping", SignaturePolicyIncompatibilityException.OP_COSIGN); //$NON-NLS-1$
 						}
 						else if (Boolean.parseBoolean(avoidAgePolicyIncompatibilities)) {
-							new AGEPolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping") //$NON-NLS-1$
+							new SignaturePolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping") //$NON-NLS-1$
 								.prepareOperationWithConfirmation(extraParams);
 						}
 						else {
-							throw new AOException("La politica de la AGE no soporta la cofirma XAdES Enveloping", ErrorCode.Functional.SIGNING_WITH_AGE_POLICY_INCOMPATIBILITY); //$NON-NLS-1$
+							throw new AOException("La politica de la AGE no soporta la cofirma XAdES Enveloping", ErrorCode.Functional.SIGNING_WITH_POLICY_INCOMPATIBILITY); //$NON-NLS-1$
 						}
 					}
 
