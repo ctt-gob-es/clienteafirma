@@ -109,8 +109,8 @@ var AutoScript = ( function ( window, undefined ) {
 				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descarrega-ho de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
 				checktime_warn: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Es recomana que es corregisca abans de polsar Acceptar per a continuar.",
 				checktime_err: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Ha de corregir l'hora del seu sistema i recarregar esta p&agrave;gina abans de continuar.",
-				checktime_local_estafe: "Hora del seu sistema",
-				checktime_server_estafe: "Hora del servidor",
+				checktime_local_time: "Hora del seu sistema",
+				checktime_server_time: "Hora del servidor",
 				close: "Tancar",
 				contact_admin: "Per favor, informe de l'error si el problema persisteix: ",
 				error_connecting_autofirma: "No &eacute;s possible connectar amb Autofirma a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tindre-ho instal·lat, pot descarregar-se des del següent enllaç:",
@@ -134,8 +134,8 @@ var AutoScript = ( function ( window, undefined ) {
 				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descarrega-ho de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
 				checktime_warn: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Es recomana que es corregeixi abans de pr&eacute;mer Acceptar per a continuar.",
 				checktime_err: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Ha de corregir l'hora del seu sistema i recarregar aquesta p&agrave;gina abans de continuar.",
-				checktime_local_estafi: "Hora del seu sistema",
-				checktime_server_estafi: "Hora del servidor",
+				checktime_local_time: "Hora del seu sistema",
+				checktime_server_time: "Hora del servidor",
 				close: "Tancar",
 				contact_admin: "Si us plau, informe de l'error si el problema persisteix: ",
 				error_connecting_autofirma: "No &eacute;s possible connectar amb Autofirma a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tenir-ho instal·lat, pot descarregar-se des del següent enllaç:",
@@ -179,7 +179,7 @@ var AutoScript = ( function ( window, undefined ) {
 				timeout_receiving_sign: "Ezin izan da konektatu sinadura-bezeroarekin. Instalatuta ez baduzu, hemendik deskarga dezakezu:",
 				warning: "Oharra:"
 		};
-		LOCALIZED_STRINGS["en_EN"] = {
+		LOCALIZED_STRINGS["en_US"] = {
 				access_from_pc: "Access from a PC to perform the procedure. ",
 				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Download Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
 				checktime_warn: "A time lag between your system and the server has been detected. It is recommended that it be corrected before pressing OK to continue. ",
@@ -706,7 +706,11 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 
 		var setLocale = function (locale) {
-			currentLocale = (locale == null || LOCALIZED_STRINGS[locale] == null ? DEFAULT_LOCALE : LOCALIZED_STRINGS[locale]); 
+			currentLocale = (!locale || !LOCALIZED_STRINGS[locale]) ? DEFAULT_LOCALE : LOCALIZED_STRINGS[locale]; 
+		}
+		
+		var setLocaleMessages = function (localeMessages) {
+			currentLocale = !localeMessages ? DEFAULT_LOCALE : localeMessages; 
 		}
 
 		var getErrorMessage = function () {
@@ -1844,7 +1848,7 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		var AppAfirmaWebSocketClient = ( function (window, undefined) {
 			
-			var PROTOCOL_VERSION = 4;
+			var PROTOCOL_VERSION = 5;
 			
 			var SERVER_HOST = "127.0.0.1";
 
@@ -1897,7 +1901,7 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			/** Limite superior del rango donde buscar el puerto a abrir. */ 
 			var maxPort = null;
-						
+
 			/**
 			 * Establece el rango del que se obtendran los puertos aleatorios.
 			 * Si solo se indica un valor, siempre se usara ese puerto.
@@ -2696,6 +2700,7 @@ var AutoScript = ( function ( window, undefined ) {
 				getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
+				setLocaleMessages : setLocaleMessages,
 				getErrorMessage : getErrorMessage,
 				getErrorType : getErrorType	
 			}
