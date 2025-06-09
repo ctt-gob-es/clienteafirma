@@ -1383,6 +1383,10 @@ var AutoScript = ( function ( window, undefined ) {
 		      var childDiv = document.createElement("div");
 		      childDiv.setAttribute("id", "afirmaChildDiv");
 		      childDiv.setAttribute("class", "modal-container");
+		      // Accessibility: identify as modal dialog
+		      childDiv.setAttribute("role", "dialog");
+		      childDiv.setAttribute("aria-modal", "true");
+		      childDiv.setAttribute("aria-label", "Autofirma");
 
 		      // Panel de contenido: logo + mensaje
 		      var messagePanel = document.createElement("div");
@@ -1395,19 +1399,20 @@ var AutoScript = ( function ( window, undefined ) {
 		      var messageDiv = document.createElement("div");
 		      var spanSupportMessage = document.createElement("span");
 		      spanSupportMessage.setAttribute("class", "modal-message");
+		      spanSupportMessage.setAttribute("id", "afirmaSupportDialogLabel");
 		      spanSupportMessage.innerHTML = messageType;
 
 		      messageDiv.appendChild(spanSupportMessage);
 		      messagePanel.appendChild(imgDiv);
 		      messagePanel.appendChild(messageDiv);
 
-		      // Panel de botones
+		      // Buttons panel
 		      var buttonsPanel = document.createElement("div");
 		      buttonsPanel.setAttribute("class", "modal-buttons");
 
 		      var isLoadingDialog = true;
 
-		      if (actionButtonText !== undefined && actionButtonText != null) {
+		      if (actionButtonText != null) {
 		        var actionButton = document.createElement("button");
 		        actionButton.setAttribute("id", "afirmaActionButton");
 		        actionButton.textContent = actionButtonText;
@@ -1419,7 +1424,7 @@ var AutoScript = ( function ( window, undefined ) {
 		        isLoadingDialog = false;
 		      }
 
-		      if (closeButtonText !== undefined && closeButtonText != null) {
+		      if (closeButtonText != null) {
 		        var closeButton = document.createElement("button");
 		        closeButton.setAttribute("id", "afirmaCloseButton");
 		        closeButton.textContent = closeButtonText;
@@ -1446,11 +1451,24 @@ var AutoScript = ( function ( window, undefined ) {
 		      parentDiv.appendChild(childDiv);
 		      document.body.appendChild(parentDiv);
 
-		      // Bloquear scroll en body y html
+		      // Ocultar el overlay para los lectores de pantalla y todo lo demás que no sea el parentDiv
+		      Array.from(document.body.children).forEach(function (el) {
+		        if (el !== parentDiv) {
+		          el.setAttribute("aria-hidden", "true");
+		        }
+		      });
+
+		      // Prevenir el scroll de la página
 		      document.body.style.overflow = "hidden";
 		      document.documentElement.style.overflow = "hidden";
 
-		      // Listener para cerrar con Esc
+		      // Manejar el focus
+		      var previousActive = document.activeElement;
+		      parentDiv._previousActive = previousActive;
+		      childDiv.setAttribute("tabindex", "-1");
+		      childDiv.focus();
+
+		      // Listener para cerrar la ventana
 		      var escListener = function (event) {
 		        if (event.key === "Escape") {
 		          disposeSupportDialog();
@@ -1458,32 +1476,42 @@ var AutoScript = ( function ( window, undefined ) {
 		        }
 		      };
 		      document.addEventListener("keydown", escListener);
-
-		      // Guardar la referencia para eliminar después
 		      parentDiv._escListener = escListener;
 
 		      return true;
-	    	}
+		    }
 
-		    /**
+			/**
 		     * Cierra y elimina el diálogo de soporte abierto y restaura el scroll.
 		     * Elimina también el listener de tecla Esc.
 		     */
 		    function disposeSupportDialog() {
-		      var existingBackdrop = document.getElementById("afirmaSupportDialog");
-		      if (existingBackdrop) {
-		        // Eliminar listener de Esc si existe
-		        if (existingBackdrop._escListener) {
-		          document.removeEventListener(
-		            "keydown",
-		            existingBackdrop._escListener
-		          );
-		        }
-		        document.body.removeChild(existingBackdrop);
-		        // Restaurar scroll en body y html
-		        document.body.style.overflow = "";
-		        document.documentElement.style.overflow = "";
-		      }
+		      	// Obtén el overlay
+		      	var overlay = document.getElementById("afirmaSupportDialog");
+		      	if (!overlay) return;
+		
+		      	// Restaurar la visibilidad del screen reader
+		      	Array.from(document.body.children).forEach(function (el) {
+			        if (el !== overlay) {
+		          		el.removeAttribute("aria-hidden");
+		        	}
+		      	});
+		
+		      	// Restaurar Scroll
+		      	document.body.style.overflow = "";
+		      	document.documentElement.style.overflow = "";
+		
+	      		// Restaurar Focus
+		      	var previousActive = overlay._previousActive;
+		      	if (previousActive && typeof previousActive.focus === "function") {
+		        	previousActive.focus();
+		      	}
+		
+		      	// Limpiar el event listener
+		      	document.removeEventListener("keydown", overlay._escListener);
+		
+	      		// Eliminar el overlay
+	      		overlay.remove();
 		    }
 			
 			/* Construye el mensaje que debe mostrarse en un error de conexion con la aplicacion */
