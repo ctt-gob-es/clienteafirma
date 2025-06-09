@@ -29,7 +29,7 @@ NSIS/
 
 ## Descarga de plugins
 
-Antes de ejecutar el script, compruebe que los plugins se encuentra en la caprtea `plugins`. En caso contrario debes descargar los plugins desde las siguientes páginas:
+Antes de ejecutar el script, compruebe que los plugins se encuentra en la carpeta `plugins`. En caso contrario debes descargar los plugins desde las siguientes páginas:
 
 - [`nsProcess`](https://nsis.sourceforge.io/NsProcess_plugin)
 - [`registry`](https://nsis.sourceforge.io/Registry_plug-in)
