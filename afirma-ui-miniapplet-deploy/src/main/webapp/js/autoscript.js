@@ -77,7 +77,7 @@ var AutoScript = ( function ( window, undefined ) {
 		    restore_installation: "Si lo tiene instalado, puede restaurar la instalaci&oacute;n desde Autofirma en Herramientas -> Restaurar instalaci&oacute;n",
 		    retry_operation: "Reintentar operaci\u00F3n",
 		    timeout_receiving_sign: "No se ha podido conectar con el cliente de firma. Si no lo tiene instalado, puede descargarlo desde:",
-		    warning: "Advertencia:",
+		    warning: "Advertencia:"
 	  	};
 	  	LOCALIZED_STRINGS["gl_ES"] = {
 		    access_from_pc: "Acceso desde un PC para realizar o tr&aacute;mite.",
@@ -102,7 +102,7 @@ var AutoScript = ( function ( window, undefined ) {
 		    restore_installation: "Se o tes instalado, podes restaurar a instalaci&oacute;n desde Autofirma en Ferramentas -> Restaurar instalaci&oacute;n.",
 		    retry_operation: "Reintento a operaci\u00F3n",
 		    timeout_receiving_sign: "Non se puido conectar co cliente que asina. Se non o tes instalado, podes descargalo desde:",
-		    warning: "Aviso:",
+		    warning: "Aviso:"
 	  	};
 
 		var DEFAULT_LOCALE = LOCALIZED_STRINGS["es_ES"];
@@ -4772,7 +4772,6 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				iterations++;
 
-				var errorOcurred = false;
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.readyState == 4) {
 						if (httpRequest.status == 200) {
@@ -4784,11 +4783,17 @@ var AutoScript = ( function ( window, undefined ) {
 									iterations = 0;
 									afirmaConnected = true;
 								}
-								setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + (oldIterations), "&it=" + iterations), cipherKey, intentURL, idDocument, afirmaConnected, successCallback, errorCallback);
+								setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + oldIterations, "&it=" + iterations), cipherKey, intentURL, idDocument, afirmaConnected, successCallback, errorCallback);
 							}
 						}
+						// En iOS, a veces, despues de abrirse Autofirma, la primera llamada al metodo de recuperacion
+						// del servidor intermedio llega con status 0. En lugar de ententer este estado como un error,
+						// proseguimos intentandolo hasta obtener un respuesta correcta o agotar los intentos 
+						else if (httpRequest.status == 0) {
+							var oldIterations = iterations-1;
+							setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + oldIterations, "&it=" + iterations), cipherKey, intentURL, idDocument, successCallback, errorCallback);
+						}
 						else {
-							errorOcurred = true;
 							var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
 																			function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback)},
 																			function() {errorResponseFunction("java.lang.IOException", currentLocale.error_connecting_server_recovering + "(Status: " + httpRequest.status + ")", errorCallback);});
@@ -4797,21 +4802,6 @@ var AutoScript = ( function ( window, undefined ) {
 							}
 						}
 					}
-				}
-				try {
-					httpRequest.onerror = function() {
-						if (!errorOcurred) {
-							var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
-																			function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback)},
-																			function (){errorResponseFunction("java.lang.Exception","No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback)});
-							if (!enabled) {
-								errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback);
-							}
-						}
-					}
-				}
-				catch (e) {
-					// Vacio
 				}
 
 				httpRequest.open("POST", url, true);
