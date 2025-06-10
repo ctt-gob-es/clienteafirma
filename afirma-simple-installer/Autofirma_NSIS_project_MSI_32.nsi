@@ -74,12 +74,12 @@ VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
   !include "lang_strings.nsh"
 
 ;Licencias
- LicenseLangString LICENSE ${LANG_SPANISH} "licencia_es.txt"
- LicenseLangString LICENSE ${LANG_ENGLISH} "licencia_en.txt"
- LicenseLangString LICENSE ${LANG_CATALAN} "licencia_ca.txt"
- LicenseLangString LICENSE ${LANG_GALICIAN} "licencia_gl.txt"
- LicenseLangString LICENSE ${LANG_BASQUE} "licencia_eu.txt"
- LicenseLangString LICENSE ${LANG_VALENCIAN} "licencia_va.txt"
+ LicenseLangString LICENSE ${LANG_SPANISH} "license\licencia_es.txt"
+ LicenseLangString LICENSE ${LANG_ENGLISH} "license\licencia_en.txt"
+ LicenseLangString LICENSE ${LANG_CATALAN} "license\licencia_ca.txt"
+ LicenseLangString LICENSE ${LANG_GALICIAN} "license\licencia_gl.txt"
+ LicenseLangString LICENSE ${LANG_BASQUE} "license\licencia_eu.txt"
+ LicenseLangString LICENSE ${LANG_VALENCIAN} "license\licencia_va.txt"
  
  LicenseData $(LICENSE)
 
@@ -229,12 +229,12 @@ Section "Autofirma" sPrograma
 	File  Autofirma32\Autofirma.exe
 	File  Autofirma32\AutofirmaConfigurador.exe
 	File  Autofirma32\AutofirmaCommandLine.exe
-	File  licencia_es.txt
-	File  licencia_en.txt
-	File  licencia_ca.txt
-	File  licencia_va.txt
-	File  licencia_eu.txt
-	File  licencia_gl.txt
+	File  license\licencia_es.txt
+	File  license\licencia_en.txt
+	File  license\licencia_ca.txt
+	File  license\licencia_va.txt
+	File  license\licencia_eu.txt
+	File  license\licencia_gl.txt
 	File  ic_firmar.ico
 
 	;Si no se ha solicitado usar el JRE instalado en el sistema, copiamos el JRE del instalador
