@@ -944,10 +944,10 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 		
 		/** Carga los estilos por defecto del diálogo de soporte de manera responsiva */
-		  function loadSupportDialogStyles() {
+	  	function loadSupportDialogStyles() {
 		    var styles = `
 		        /* Backdrop que siempre ocupa todo el viewport y centra el modal */
-		        .modal-backdrop {
+		        .afirma-modal-backdrop {
 		            position: fixed;
 		            top: 0;
 		            left: 0;
@@ -961,7 +961,7 @@ var AutoScript = ( function ( window, undefined ) {
 		            box-sizing: border-box;
 		        }
 		        /* Contenedor principal del diálogo */
-		        .modal-container {
+		        .afirma-modal-container {
 		            background-color: #ffffff;
 		            border-radius: 8px;
 		            padding: 20px;
@@ -978,28 +978,28 @@ var AutoScript = ( function ( window, undefined ) {
 		        }
 		        /* Ajuste para pantallas más grandes */
 		        @media (min-width: 600px) {
-		            .modal-container {
+		            .afirma-modal-container {
 		                width: 500px;
 		            }
 		            /* En pantallas grandes, botones en columna */
-		            .modal-buttons {
+		            .afirma-modal-button-container {
 		              display: flex;
 		              flex-direction: row !important;
 		              justify-content: flex-end;
 		            }
-
-		            .modal-buttons button {
+		
+		            .afirma-modal-button-container button {
 		              margin: 0 0.5rem 0 0;
 		          }
 		        }
 		        /* Panel de contenido: logo + texto */
-		        #afirmaMessagePanel {
+		        .afirma-modal-message-panel {
 		            display: flex;
 		            flex-direction: column;
 		            align-items: center;
 		        }
 		        /* Logo (reutiliza la clase existente) */
-		        #afirmaImgDiv {
+		        .afirma-modal-logo {
 		            width: 15%;
 		            min-width: 70px;
 		            height: 70px;
@@ -1009,29 +1009,52 @@ var AutoScript = ( function ( window, undefined ) {
 		            background-size: contain;
 		            margin-bottom: 1rem;
 		        }
-		        #afirmaCloseButton {
+		        .afirma-modal-close-button {
 		          background-color: #878787;
+		          color: #fff;
+		          flex: 1;
+		          margin-top: 0.4rem;
+		          padding: 0.5rem 1rem;
+		          border: none;
+		          border-radius: 4px;
+		          font-family: Helvetica, Arial, sans-serif;
+		          font-size: 16px;
+		          cursor: pointer;
+		          box-sizing: border-box;
+		        }
+		        .afirma-modal-action-button {
+		          background-color: #c33400;
+		          color: #fff;
+		          flex: 1;
+		          margin-top: 0.4rem;
+		          padding: 0.5rem 1rem;
+		          border: none;
+		          border-radius: 4px;
+		          font-family: Helvetica, Arial, sans-serif;
+		          font-size: 16px;
+		          cursor: pointer;
+		          box-sizing: border-box;
 		        }
 		        /* Texto del mensaje */
-		        .modal-message {
-		            margin-top: 10px;
-		            font-family: Helvetica, Arial, sans-serif;
-		            font-size: 16px;
-		            color: #333;
+		        .afirma-modal-loading-message, .afirma-modal-error-message {
+		          margin-top: 10px;
+		          font-family: Helvetica, Arial, sans-serif;
+		          font-size: 16px;
+		          color: #333;
 		        }
-
-		        .modal-message a {
+		
+		        .afirma-modal-loading-message a, .afirma-modal-error-message a {
 		          color: #c33400;
 		          line-height: 1.5rem;
 		        }
-
-		        .modal-message a img {
+		
+		        .afirma-modal-loading-message a img, .afirma-modal-error-message a img {
 		            margin-top: 1rem;
 		            width: 140px;
 		            max-width: 140px;
 		        }
 		        /* Panel de botones: por defecto en fila (pantallas pequeñas) */
-		        .modal-buttons {
+		        .afirma-modal-button-container {
 		            display: flex;
 		            flex-direction: column;
 		            justify-content: flex-end;
@@ -1039,25 +1062,12 @@ var AutoScript = ( function ( window, undefined ) {
 		            margin-top: 20px;
 		            box-sizing: border-box;
 		        }
-		        .modal-buttons button {
-		            flex: 1;
-		            margin-top: 0.4rem;
-		            padding: 0.5rem 1rem;
-		            border: none;
-		            border-radius: 4px;
-		            font-family: Helvetica, Arial, sans-serif;
-		            font-size: 16px;
-		            cursor: pointer;
-		            box-sizing: border-box;
-		            background-color: #c33400;
-		            color: #fff;
-		        }
 		        /* Elimina margen derecho del último botón */
-		        .modal-buttons button:last-child {
+		        .afirma-modal-button-container button:last-child {
 		            margin-right: 0;
 		        }
 		        /* Spinner para indicar carga */
-		        .modal-spinner {
+		        .afirma-modal-spinner {
 		            border: 4px solid rgba(0, 0, 0, 0.1);
 		            border-top-color: #c33400;
 		            width: 24px;
@@ -1208,419 +1218,461 @@ var AutoScript = ( function ( window, undefined ) {
 			};
 		})(window, undefined);
 		
-		/**
-		 * Dialogo para mostrar mensajes con posibles errores y con botones operables a nivel interno.
-		 */
-		var Dialog = ( function () {
-			
-			var pcDownloadURL = currentLocale.pc_download_url;
-			var androidDownloadURL = currentLocale.android_download_url;
-			var iosDownloadURL = currentLocale.ios_download_url;
-			var backgroundClass = "afirmaDefaultBackgroundClass";
-			var loadingTextClass = "afirmaDefaultLoadingTextClass";
-			var errorTextClass = "afirmaDefaultErrorTextClass";
-			var actionButtonClass = "afirmaDefaultActionButtonClass";
-			var closeButtonClass = "afirmaDefaultCloseButtonClass";
-			var logoClass = "afirmaDefaultLogoClass";
-			var dialogClass = "afirmaDefaultDialogClass";
-			var dialogCompatibleClass = "afirmaDefaultCompatibleDialogClass";
-			var spinnerClass = "afirmaDefaultSpinner";
-			var adminContactInfo = null;
-			var alternativeAndroidAppLink = null;
-			var alternativeIOSAppLink = null;
-			var enabled = true;
-			var enabledLoading = true;
-			var enabledError = true;
-			var warningClass = 'afirmaDefaultWarningTextClass';
-			var warningText = "<span id='afirmaWarningText' class='"+ warningClass + "'>" + currentLocale.warning + "</span> ";
-			
-			function enableSupportDialog(isEnabled) {
-				enabled = isEnabled;
-			}
-			
-			function enableLoadingDialog(isEnabled) {
-				enabledLoading = isEnabled;
-			}
-			
-			function enableErrorDialog(isEnabled) {
-				enabledError = isEnabled;
-			}
-			
-			function setBackgroundClass(customClass) {
-				backgroundClass = customClass;
-			}
-			
-			function setDialogClass(customClass) {
-				if (!!Platform.isInternetExplorer()) {
-					dialogCompatibleClass = customClass;
-				} else {
-					dialogClass = customClass;
-				}			
-			}
-			
-			function setLoadingTextClass(customClass) {
-				loadingTextClass = customClass;
-			}
-			
-			function setErrorTextClass(customClass) {
-				errorTextClass = customClass;
-			}
-			
-			function setActionButtonClass(customClass) {
-				actionButtonClass = customClass;
-			}
-			
-			function setCloseButtonClass(customClass) {
-				closeButtonClass = customClass;
-			}
-			
-			function setLogoClass(customClass) {
-				logoClass = customClass;
-			}
-			
-			function setSpinnerClass(customClass) {
-				spinnerClass = customClass;
-			}
-			
-			function setPCDownloadURL(url) {
-				pcDownloadURL = url;
-			}
-			
-			function setAndroidDownloadURL(url) {
-				androidDownloadURL = url;
-			}
-			
-			function setIOSDownloadURL(url) {
-				iosDownloadURL = url;
-			}
-			
-			function setAdminContactInfo(text) {
-				adminContactInfo = text;
-			}
-			
-			function setAlternativeAndroidAppLink(text) {
-				alternativeAndroidAppLink = text;
-			}
-			
-			function setAlternativeIOSAppLink(text) {
-				alternativeIOSAppLink = text;
-			}
-			
-			function setWarningClass(customClass) {
-				warningClass = customClass;
-				warningText = "<span id='afirmaWarningText' class='"+ warningClass + "'>" + currentLocale.warning + "</span> ";
-			}
-			
-			function isEnabled() {
-				return enabled;
-			}
-			
-			function showLoadingDialog() {
-				showSupportDialog(currentLocale.loading + "<div class='" + spinnerClass + "'></div>");
-			}
-			
-			function showErrorDialog(errorType, actionButtonCallback, closeButtonCallback) {
-				var messageError;
-				var actionButtonText = null;
-				var closeButtonText = currentLocale.close;
-				switch (errorType){
-					case ERROR_CONNECTING_AFIRMA:
-						messageError = Dialog.buildErrorConnectingApplicationMsg();
-						actionButtonText = currentLocale.retry_operation;
-						break;
-					case ERROR_NO_COMPATIBLE_PROCEDURE:
-						messageError = Dialog.buildCustomNoCompatibleProcedure();
-						break;
-					case ERROR_CONNECTING_SERVICE:
-						messageError = Dialog.buildCustomErrorServerMsg();
-						if (!!isCompatibleProcedure) {
-							actionButtonText = currentLocale.retry_operation;
-						}
-						break;
-					case ERROR_CHECKING_SERVICE:
-						var adminMsg = "";
-						if (adminContactInfo != null) {
-							adminMsg = " " + currentLocale.contact_admin + " " + adminContactInfo;
-						}
-						messageError = currentLocale.error_connecting_service + adminMsg;
-						break;
-				}
-				var enabled = showSupportDialog(messageError, actionButtonText, actionButtonCallback, 
-																closeButtonText, closeButtonCallback);					
-				return enabled;
-			}
-			
-			/**
-		     * Muestra un diálogo de soporte responsivo.
-		     * Siempre se utiliza un div con backdrop que bloquea todo el scroll (body y html).
-		     * El modal se centra y adapta a cambios de tamaño.
-		     * Cierra el modal si se pulsa la tecla Esc.
-		     * Parámetros:
-		     *   - messageType: contenido HTML del mensaje a mostrar (puede incluir spinner).
-		     *   - actionButtonText: texto del botón de acción (opcional).
-		     *   - actionButtonCallback: callback al hacer clic en botón de acción (opcional).
-		     *   - closeButtonText: texto del botón de cierre (opcional).
-		     *   - closeButtonCallback: callback al cerrar el diálogo (opcional).
-		     */
-		    function showSupportDialog(
-		      messageType,
-		      actionButtonText,
-		      actionButtonCallback,
-		      closeButtonText,
-		      closeButtonCallback
-		    ) {
-		      if (!Dialog.isEnabled()) {
-		        return false;
-		      }
-		      disposeSupportDialog();
-
-		      // Backdrop que bloquea y centra
-		      var parentDiv = document.createElement("div");
-		      parentDiv.setAttribute("id", "afirmaSupportDialog");
-		      parentDiv.setAttribute("class", "modal-backdrop");
-
-		      // Contenedor principal del modal
-		      var childDiv = document.createElement("div");
-		      childDiv.setAttribute("id", "afirmaChildDiv");
-		      childDiv.setAttribute("class", "modal-container");
-		      // Accessibility: identify as modal dialog
-		      childDiv.setAttribute("role", "dialog");
-		      childDiv.setAttribute("aria-modal", "true");
-		      childDiv.setAttribute("aria-label", "Autofirma");
-
-		      // Panel de contenido: logo + mensaje
-		      var messagePanel = document.createElement("div");
-		      messagePanel.setAttribute("id", "afirmaMessagePanel");
-
-		      var imgDiv = document.createElement("div");
-		      imgDiv.setAttribute("id", "afirmaImgDiv");
-		      imgDiv.setAttribute("class", logoClass);
-
-		      var messageDiv = document.createElement("div");
-		      var spanSupportMessage = document.createElement("span");
-		      spanSupportMessage.setAttribute("class", "modal-message");
-		      spanSupportMessage.setAttribute("id", "afirmaSupportDialogLabel");
-		      spanSupportMessage.innerHTML = messageType;
-
-		      messageDiv.appendChild(spanSupportMessage);
-		      messagePanel.appendChild(imgDiv);
-		      messagePanel.appendChild(messageDiv);
-
-		      // Buttons panel
-		      var buttonsPanel = document.createElement("div");
-		      buttonsPanel.setAttribute("class", "modal-buttons");
-
-		      var isLoadingDialog = true;
-
-		      if (actionButtonText != null) {
-		        var actionButton = document.createElement("button");
-		        actionButton.setAttribute("id", "afirmaActionButton");
-		        actionButton.textContent = actionButtonText;
-		        actionButton.addEventListener("click", function () {
-		          disposeSupportDialog();
-		          if (actionButtonCallback) actionButtonCallback();
-		        });
-		        buttonsPanel.appendChild(actionButton);
-		        isLoadingDialog = false;
-		      }
-
-		      if (closeButtonText != null) {
-		        var closeButton = document.createElement("button");
-		        closeButton.setAttribute("id", "afirmaCloseButton");
-		        closeButton.textContent = closeButtonText;
-		        closeButton.addEventListener("click", function () {
-		          disposeSupportDialog();
-		          if (closeButtonCallback) closeButtonCallback();
-		        });
-		        buttonsPanel.appendChild(closeButton);
-		        isLoadingDialog = false;
-		      }
-
-		      if (isLoadingDialog) {
-		        if (!enabledLoading) return false;
-		        var spinner = document.createElement("div");
-		        spinner.setAttribute("class", "modal-spinner");
-		        messagePanel.appendChild(spinner);
-		      } else {
-		        if (!enabledError) return false;
-		      }
-
-		      childDiv.appendChild(messagePanel);
-		      if (!isLoadingDialog) childDiv.appendChild(buttonsPanel);
-
-		      parentDiv.appendChild(childDiv);
-		      document.body.appendChild(parentDiv);
-
-		      // Ocultar el overlay para los lectores de pantalla y todo lo demás que no sea el parentDiv
-		      Array.from(document.body.children).forEach(function (el) {
-		        if (el !== parentDiv) {
-		          el.setAttribute("aria-hidden", "true");
-		        }
-		      });
-
-		      // Prevenir el scroll de la página
-		      document.body.style.overflow = "hidden";
-		      document.documentElement.style.overflow = "hidden";
-
-		      // Manejar el focus
-		      var previousActive = document.activeElement;
-		      parentDiv._previousActive = previousActive;
-		      childDiv.setAttribute("tabindex", "-1");
-		      childDiv.focus();
-
-		      // Listener para cerrar la ventana
-		      var escListener = function (event) {
-		        if (event.key === "Escape") {
-		          disposeSupportDialog();
-		          if (closeButtonCallback) closeButtonCallback();
-		        }
-		      };
-		      document.addEventListener("keydown", escListener);
-		      parentDiv._escListener = escListener;
-
-		      return true;
-		    }
-
-			/**
-		     * Cierra y elimina el diálogo de soporte abierto y restaura el scroll.
-		     * Elimina también el listener de tecla Esc.
-		     */
-		    function disposeSupportDialog() {
-		      	// Obtén el overlay
-		      	var overlay = document.getElementById("afirmaSupportDialog");
-		      	if (!overlay) return;
-		
-		      	// Restaurar la visibilidad del screen reader
-		      	Array.from(document.body.children).forEach(function (el) {
-			        if (el !== overlay) {
-		          		el.removeAttribute("aria-hidden");
-		        	}
-		      	});
-		
-		      	// Restaurar Scroll
-		      	document.body.style.overflow = "";
-		      	document.documentElement.style.overflow = "";
-		
-	      		// Restaurar Focus
-		      	var previousActive = overlay._previousActive;
-		      	if (previousActive && typeof previousActive.focus === "function") {
-		        	previousActive.focus();
-		      	}
-		
-		      	// Limpiar el event listener
-		      	document.removeEventListener("keydown", overlay._escListener);
-		
-	      		// Eliminar el overlay
-	      		overlay.remove();
-		    }
-			
-			/* Construye el mensaje que debe mostrarse en un error de conexion con la aplicacion */
-			function buildErrorConnectingApplicationMsg() {
-				if (Platform.isAndroid() || Platform.isIOS()) {
-					return currentLocale.error_connecting_client + "<br>" + Dialog.buildCustomUrl();
-				} else {
-					return currentLocale.error_connecting_autofirma + "<br>" + Dialog.buildCustomUrl();
-				}
-			}
-			
-			/** Construye el enlace que se necesite segun el SO con el que se opere. */
-			function buildCustomUrl() {
-				var autoFirmaLink;
-				if (Platform.isAndroid()) {
-					autoFirmaLink = androidDownloadURL;
-					autoFirmaLink += "<br>" + currentLocale.install_client;
-				} else if (Platform.isIOS()) {
-					autoFirmaLink = iosDownloadURL;
-					autoFirmaLink += "<br>" + currentLocale.install_client;
-				} else {
-					autoFirmaLink = pcDownloadURL;
-					autoFirmaLink += "<br>" + currentLocale.restore_installation;
-					if (Platform.isFirefox()) {
-						autoFirmaLink += "<br>" + warningText + currentLocale.firefox_reinstall_message;
-					}
-				}
-				return autoFirmaLink;
-			}
-
-			/** Construye el mensaje para tramites incompatibles que se necesite segun el SO con el que se opere. */
-			function buildCustomNoCompatibleProcedure() {
-				var noCompatibleMsg = currentLocale.no_compatible_procedure;
-				if (Platform.isAndroid() && alternativeAndroidAppLink != null) {
-					noCompatibleMsg += currentLocale.procedure_from_url + " " + alternativeAndroidAppLink;
-				} else if (Platform.isIOS() && alternativeIOSAppLink != null) {
-					noCompatibleMsg += currentLocale.procedure_from_url + " " + alternativeIOSAppLink;
-				} else {
-					noCompatibleMsg += currentLocale.access_from_pc;
-				}
-				return noCompatibleMsg;
-			}
-
-			/** Construye el mensaje para errores relacionados con la conexion del servidor. */
-			function buildCustomErrorServerMsg() {
-				var errorMsg = currentLocale.error_connecting_server_recovering;
-				if (!isCompatibleProcedure) {
-					errorMsg = buildCustomNoCompatibleProcedure();
-				} else if (isErrorCheckingServices && !!adminContactInfo) {
-					errorMsg += " " + currentLocale.contact_admin + " " + adminContactInfo;
-				}
-				return errorMsg;
-			}
-			
-			return {
-				buildErrorConnectingApplicationMsg : buildErrorConnectingApplicationMsg,
-				buildCustomUrl : buildCustomUrl,
-				buildCustomNoCompatibleProcedure : buildCustomNoCompatibleProcedure,
-				buildCustomErrorServerMsg : buildCustomErrorServerMsg,
-				enableSupportDialog : enableSupportDialog,
-				enableLoadingDialog : enableLoadingDialog,
-				enableErrorDialog : enableErrorDialog,
-				setBackgroundClass : setBackgroundClass,
-				setDialogClass : setDialogClass,
-				setLoadingTextClass : setLoadingTextClass,
-				setErrorTextClass : setErrorTextClass,
-				setWarningClass : setWarningClass,
-				setActionButtonClass : setActionButtonClass,
-				setCloseButtonClass : setCloseButtonClass,
-				setLogoClass : setLogoClass,
-				setSpinnerClass : setSpinnerClass,
-				isEnabled : isEnabled,
-				setAlternativeAndroidAppLink : setAlternativeAndroidAppLink,
-				setAlternativeIOSAppLink : setAlternativeIOSAppLink,
-				setPCDownloadURL : setPCDownloadURL,
-				setAndroidDownloadURL : setAndroidDownloadURL,
-				setIOSDownloadURL : setIOSDownloadURL,
-				setAdminContactInfo : setAdminContactInfo,
-				showLoadingDialog : showLoadingDialog,
-				showErrorDialog : showErrorDialog,
-				disposeSupportDialog : disposeSupportDialog
-			};
-		})();
-		
+	   /**
+	   * Dialogo para mostrar mensajes con posibles errores y con botones operables a nivel interno.
+	   */
+	  var Dialog = (function () {
+	    //URLs por defecto
+	    var pcDownloadURL = currentLocale.pc_download_url;
+	    var androidDownloadURL = currentLocale.android_download_url;
+	    var iosDownloadURL = currentLocale.ios_download_url;
+	
+	    //Clases por defecto
+	    var backgroundClass = "afirma-modal-backdrop";
+	    var dialogClass = "afirma-modal-container";
+	    var messagePannelClass = "afirma-modal-message-panel";
+	    var loadingTextClass = "afirma-modal-loading-message";
+	    var errorTextClass = "afirma-modal-error-message";
+	    var buttonContainerClass = "afirma-modal-button-container";
+	    var actionButtonClass = "afirma-modal-action-button";
+	    var closeButtonClass = "afirma-modal-close-button";
+	    var logoClass = "afirma-modal-logo";
+	    var spinnerClass = "afirma-modal-spinner";
+	    var warningClass = "afirma-modal-warning";
+	
+	    var adminContactInfo = null;
+	    var alternativeAndroidAppLink = null;
+	    var alternativeIOSAppLink = null;
+	
+	    // Flags
+	    var enabled = true;
+	    var enabledLoading = true;
+	    var enabledError = true;
+	    var warningText =
+	      "<span id='afirmaWarningText' class='" +
+	      warningClass +
+	      "'>" +
+	      currentLocale.warning +
+	      "</span> ";
+	
+	    //Setters
+	    function enableSupportDialog(isEnabled) {
+	      enabled = isEnabled;
+	    }
+	    function enableLoadingDialog(isEnabled) {
+	      enabledLoading = isEnabled;
+	    }
+	    function enableErrorDialog(isEnabled) {
+	      enabledError = isEnabled;
+	    }
+	
+	    function setBackgroundClass(cls) {
+	      backgroundClass = cls;
+	    }
+	    function setDialogClass(cls) {
+	      dialogClass = cls;
+	    }
+	    function setLoadingTextClass(cls) {
+	      loadingTextClass = cls;
+	    }
+	    function setErrorTextClass(cls) {
+	      errorTextClass = cls;
+	    }
+	    function setMessagePannelClass(cls) {
+	      messagePannelClass = cls;
+	    }
+	    function setButtonContainerClass(cls) {
+	      buttonContainerClass = cls;
+	    }
+	    function setActionButtonClass(cls) {
+	      actionButtonClass = cls;
+	    }
+	    function setCloseButtonClass(cls) {
+	      closeButtonClass = cls;
+	    }
+	    function setLogoClass(cls) {
+	      logoClass = cls;
+	    }
+	    function setSpinnerClass(cls) {
+	      spinnerClass = cls;
+	    }
+	
+	    function setPCDownloadURL(url) {
+	      pcDownloadURL = url;
+	    }
+	    function setAndroidDownloadURL(url) {
+	      androidDownloadURL = url;
+	    }
+	    function setIOSDownloadURL(url) {
+	      iosDownloadURL = url;
+	    }
+	    function setAdminContactInfo(text) {
+	      adminContactInfo = text;
+	    }
+	    function setAlternativeAndroidAppLink(text) {
+	      alternativeAndroidAppLink = text;
+	    }
+	    function setAlternativeIOSAppLink(text) {
+	      alternativeIOSAppLink = text;
+	    }
+	
+	    function setWarningClass(customClass) {
+	      warningClass = customClass;
+	      warningText =
+	        "<span id='afirmaWarningText' class='" +
+	        warningClass +
+	        "'>" +
+	        currentLocale.warning +
+	        "</span> ";
+	    }
+	
+	    function isEnabled() {
+	      return enabled;
+	    }
+	
+	    function showLoadingDialog() {
+	      showSupportDialog(currentLocale.loading);
+	    }
+	
+	    function showErrorDialog(
+	      errorType,
+	      actionButtonCallback,
+	      closeButtonCallback
+	    ) {
+	      var messageError;
+	      var actionButtonText = null;
+	      var closeButtonText = currentLocale.close;
+	      switch (errorType) {
+	        case ERROR_CONNECTING_AFIRMA:
+	          messageError = Dialog.buildErrorConnectingApplicationMsg();
+	          actionButtonText = currentLocale.retry_operation;
+	          break;
+	        case ERROR_NO_COMPATIBLE_PROCEDURE:
+	          messageError = Dialog.buildCustomNoCompatibleProcedure();
+	          break;
+	        case ERROR_CONNECTING_SERVICE:
+	          messageError = Dialog.buildCustomErrorServerMsg();
+	          if (!!isCompatibleProcedure) {
+	            actionButtonText = currentLocale.retry_operation;
+	          }
+	          break;
+	        case ERROR_CHECKING_SERVICE:
+	          var adminMsg = "";
+	          if (adminContactInfo != null) {
+	            adminMsg =
+	              " " + currentLocale.contact_admin + " " + adminContactInfo;
+	          }
+	          messageError = currentLocale.error_connecting_service + adminMsg;
+	          break;
+	      }
+	      var enabled = showSupportDialog(
+	        messageError,
+	        actionButtonText,
+	        actionButtonCallback,
+	        closeButtonText,
+	        closeButtonCallback
+	      );
+	      return enabled;
+	    }
+	
+	    /**
+	     * Muestra un diálogo de soporte responsivo.
+	     * Siempre se utiliza un div con backdrop que bloquea todo el scroll (body y html).
+	     * El modal se centra y adapta a cambios de tamaño.
+	     * Cierra el modal si se pulsa la tecla Esc.
+	     * Parámetros:
+	     *   - messageType: contenido HTML del mensaje a mostrar (puede incluir spinner).
+	     *   - actionButtonText: texto del botón de acción (opcional).
+	     *   - actionButtonCallback: callback al hacer clic en botón de acción (opcional).
+	     *   - closeButtonText: texto del botón de cierre (opcional).
+	     *   - closeButtonCallback: callback al cerrar el diálogo (opcional).
+	     */
+	    function showSupportDialog(
+	      messageType,
+	      actionButtonText,
+	      actionButtonCallback,
+	      closeButtonText,
+	      closeButtonCallback
+	    ) {
+	      if (!Dialog.isEnabled()) return false;
+	      disposeSupportDialog();
+	
+	      // Backdrop that blocks and centers
+	      var parentDiv = document.createElement("div");
+	      parentDiv.setAttribute("id", "afirmaSupportDialog");
+	      parentDiv.setAttribute("class", backgroundClass);
+	
+	      // Main modal container
+	      var childDiv = document.createElement("div");
+	      childDiv.setAttribute("id", "afirmaChildDiv");
+	      childDiv.setAttribute("class", dialogClass);
+	      // Accessibility: identify as modal dialog
+	      childDiv.setAttribute("role", "dialog");
+	      childDiv.setAttribute("aria-modal", "true");
+	      // Use aria-label instead of aria-labelledby to avoid duplicate reading
+	      childDiv.setAttribute("aria-label", "Autofirma");
+	
+	      // Content panel: logo + message
+	      var messagePanel = document.createElement("div");
+	      messagePanel.setAttribute("id", "afirmaMessagePanel");
+	      messagePanel.setAttribute("class", messagePannelClass);
+	
+	      var imgDiv = document.createElement("div");
+	      imgDiv.setAttribute("id", "afirmaImgDiv");
+	      imgDiv.setAttribute("class", logoClass);
+	
+	      var isLoadingDialog = true;
+	
+	      if (actionButtonText != null || closeButtonText != null) {
+	        isLoadingDialog = false;
+	      }
+	
+	      var messageDiv = document.createElement("div");
+	      var spanSupportMessage = document.createElement("span");
+	      if (isLoadingDialog) {
+	        spanSupportMessage.setAttribute("class", loadingTextClass);
+	      } else {
+	        spanSupportMessage.setAttribute("class", errorTextClass);
+	      }
+	      spanSupportMessage.setAttribute("id", "afirmaSupportDialogLabel");
+	      spanSupportMessage.innerHTML = messageType;
+	
+	      messageDiv.appendChild(spanSupportMessage);
+	      messagePanel.appendChild(imgDiv);
+	      messagePanel.appendChild(messageDiv);
+	
+	      // Buttons panel
+	      var buttonsPanel = document.createElement("div");
+	      buttonsPanel.setAttribute("class", buttonContainerClass);
+	
+	      if (actionButtonText != null) {
+	        var actionButton = document.createElement("button");
+	        actionButton.setAttribute("id", "afirmaActionButton");
+	        actionButton.setAttribute("class", actionButtonClass);
+	        actionButton.textContent = actionButtonText;
+	        actionButton.addEventListener("click", function () {
+	          disposeSupportDialog();
+	          if (actionButtonCallback) actionButtonCallback();
+	        });
+	        buttonsPanel.appendChild(actionButton);
+	        isLoadingDialog = false;
+	      }
+	
+	      if (closeButtonText != null) {
+	        var closeButton = document.createElement("button");
+	        closeButton.setAttribute("id", "afirmaCloseButton");
+	        closeButton.setAttribute("class", closeButtonClass);
+	        closeButton.textContent = closeButtonText;
+	        closeButton.addEventListener("click", function () {
+	          disposeSupportDialog();
+	          if (closeButtonCallback) closeButtonCallback();
+	        });
+	        buttonsPanel.appendChild(closeButton);
+	        isLoadingDialog = false;
+	      }
+	
+	      if (isLoadingDialog) {
+	        if (!enabledLoading) return false;
+	        var spinner = document.createElement("div");
+	        spinner.setAttribute("class", spinnerClass);
+	        messagePanel.appendChild(spinner);
+	      } else {
+	        if (!enabledError) return false;
+	      }
+	
+	      childDiv.appendChild(messagePanel);
+	      if (!isLoadingDialog) childDiv.appendChild(buttonsPanel);
+	
+	      // (Se elimina aria-labelledby/aria-describedby para evitar duplicados)
+	
+	      parentDiv.appendChild(childDiv);
+	      document.body.appendChild(parentDiv);
+	
+	      // Hide background from screen readers
+	      Array.from(document.body.children).forEach(function (el) {
+	        if (el !== parentDiv) {
+	          el.setAttribute("aria-hidden", "true");
+	        }
+	      });
+	
+	      // Prevent page scrolling
+	      document.body.style.overflow = "hidden";
+	      document.documentElement.style.overflow = "hidden";
+	
+	      // Manage focus
+	      var previousActive = document.activeElement;
+	      parentDiv._previousActive = previousActive;
+	      childDiv.setAttribute("tabindex", "-1");
+	      childDiv.focus();
+	
+	      // Close on Escape and restore focus
+	      var escListener = function (event) {
+	        if (event.key === "Escape") {
+	          disposeSupportDialog();
+	          if (closeButtonCallback) closeButtonCallback();
+	        }
+	      };
+	      document.addEventListener("keydown", escListener);
+	      parentDiv._escListener = escListener;
+	
+	      return true;
+	    }
+	
+	    /**
+	     * Cierra y elimina el diálogo de soporte abierto y restaura el scroll.
+	     * Elimina también el listener de tecla Esc.
+	     */
+	    function disposeSupportDialog() {
+	      // Obtén el overlay
+	      var overlay = document.getElementById("afirmaSupportDialog");
+	      if (!overlay) return;
+	
+	      // Restaurar la visibilidad del screen reader
+	      Array.from(document.body.children).forEach(function (el) {
+	        if (el !== overlay) {
+	          el.removeAttribute("aria-hidden");
+	        }
+	      });
+	
+	      // Restaurar Scroll
+	      document.body.style.overflow = "";
+	      document.documentElement.style.overflow = "";
+	
+	      // Restaurar Focus
+	      var previousActive = overlay._previousActive;
+	      if (previousActive && typeof previousActive.focus === "function") {
+	        previousActive.focus();
+	      }
+	
+	      // Limpiar el event listener
+	      document.removeEventListener("keydown", overlay._escListener);
+	
+	      // Eliminar el overlay
+	      overlay.remove();
+	    }
+	
+	    /* Construye el mensaje que debe mostrarse en un error de conexion con la aplicacion */
+	    function buildErrorConnectingApplicationMsg() {
+	      if (Platform.isAndroid() || Platform.isIOS()) {
+	        return (
+	          currentLocale.error_connecting_client +
+	          "<br>" +
+	          Dialog.buildCustomUrl()
+	        );
+	      } else {
+	        return (
+	          currentLocale.error_connecting_autofirma +
+	          "<br>" +
+	          Dialog.buildCustomUrl()
+	        );
+	      }
+	    }
+	
+	    /** Construye el enlace que se necesite segun el SO con el que se opere. */
+	    function buildCustomUrl() {
+	      var autoFirmaLink;
+	      if (Platform.isAndroid()) {
+	        autoFirmaLink = androidDownloadURL;
+	        autoFirmaLink += "<br>" + currentLocale.install_client;
+	      } else if (Platform.isIOS()) {
+	        autoFirmaLink = iosDownloadURL;
+	        autoFirmaLink += "<br>" + currentLocale.install_client;
+	      } else {
+	        autoFirmaLink = pcDownloadURL;
+	        autoFirmaLink += "<br>" + currentLocale.restore_installation;
+	        if (Platform.isFirefox()) {
+	          autoFirmaLink +=
+	            "<br>" + warningText + currentLocale.firefox_reinstall_message;
+	        }
+	      }
+	      return autoFirmaLink;
+	    }
+	
+	    /** Construye el mensaje para tramites incompatibles que se necesite segun el SO con el que se opere. */
+	    function buildCustomNoCompatibleProcedure() {
+	      var noCompatibleMsg = currentLocale.no_compatible_procedure;
+	      if (Platform.isAndroid() && alternativeAndroidAppLink != null) {
+	        noCompatibleMsg +=
+	          currentLocale.procedure_from_url + " " + alternativeAndroidAppLink;
+	      } else if (Platform.isIOS() && alternativeIOSAppLink != null) {
+	        noCompatibleMsg +=
+	          currentLocale.procedure_from_url + " " + alternativeIOSAppLink;
+	      } else {
+	        noCompatibleMsg += currentLocale.access_from_pc;
+	      }
+	      return noCompatibleMsg;
+	    }
+	
+	    /** Construye el mensaje para errores relacionados con la conexion del servidor. */
+	    function buildCustomErrorServerMsg() {
+	      var errorMsg = currentLocale.error_connecting_server_recovering;
+	      if (!isCompatibleProcedure) {
+	        errorMsg = buildCustomNoCompatibleProcedure();
+	      } else if (isErrorCheckingServices && !!adminContactInfo) {
+	        errorMsg += " " + currentLocale.contact_admin + " " + adminContactInfo;
+	      }
+	      return errorMsg;
+	    }
+	
+	    return {
+	      buildErrorConnectingApplicationMsg: buildErrorConnectingApplicationMsg,
+	      buildCustomUrl: buildCustomUrl,
+	      buildCustomNoCompatibleProcedure: buildCustomNoCompatibleProcedure,
+	      buildCustomErrorServerMsg: buildCustomErrorServerMsg,
+	      enableSupportDialog: enableSupportDialog,
+	      enableLoadingDialog: enableLoadingDialog,
+	      enableErrorDialog: enableErrorDialog,
+	      setBackgroundClass: setBackgroundClass,
+	      setDialogClass: setDialogClass,
+	      setLoadingTextClass: setLoadingTextClass,
+	      setErrorTextClass: setErrorTextClass,
+	      setWarningClass: setWarningClass,
+	      setMessagePannelClass: setMessagePannelClass,
+	      setButtonContainerClass: setButtonContainerClass,
+	      setActionButtonClass: setActionButtonClass,
+	      setCloseButtonClass: setCloseButtonClass,
+	      setLogoClass: setLogoClass,
+	      setSpinnerClass: setSpinnerClass,
+	      isEnabled: isEnabled,
+	      setAlternativeAndroidAppLink: setAlternativeAndroidAppLink,
+	      setAlternativeIOSAppLink: setAlternativeIOSAppLink,
+	      setPCDownloadURL: setPCDownloadURL,
+	      setAndroidDownloadURL: setAndroidDownloadURL,
+	      setIOSDownloadURL: setIOSDownloadURL,
+	      setAdminContactInfo: setAdminContactInfo,
+	      showLoadingDialog: showLoadingDialog,
+	      showErrorDialog: showErrorDialog,
+	      disposeSupportDialog: disposeSupportDialog,
+	    };
+	  })();
+	  
 		/* Con esta variable se da visibilidad solo a los metodos que podran utilizar los integradores */
-		SupportDialog = (function() {
-			return {
-				enableSupportDialog: Dialog.enableSupportDialog,
-				enableLoadingDialog: Dialog.enableLoadingDialog,
-				enableErrorDialog: Dialog.enableErrorDialog,
-				setLoadingTextClass: Dialog.setLoadingTextClass,
-				setPCDownloadURL: Dialog.setPCDownloadURL,
-				setBackgroundClass: Dialog.setBackgroundClass,
-				setDialogClass: Dialog.setDialogClass,
-				setLoadingTextClass: Dialog.setLoadingTextClass,
-				setErrorTextClass: Dialog.setErrorTextClass,
-				setWarningClass: Dialog.setWarningClass,
-				setActionButtonClass: Dialog.setActionButtonClass,
-				setCloseButtonClass: Dialog.setCloseButtonClass,
-				setLogoClass: Dialog.setLogoClass,
-				setSpinnerClass: Dialog.setSpinnerClass,
-				setPCDownloadURL: Dialog.setPCDownloadURL,
-				setAndroidDownloadURL: Dialog.setAndroidDownloadURL,
-				setIOSDownloadURL: Dialog.setIOSDownloadURL,
-				setAdminContactInfo: Dialog.setAdminContactInfo,
-				setAlternativeAndroidAppLink : Dialog.setAlternativeAndroidAppLink,
-				setAlternativeIOSAppLink : Dialog.setAlternativeIOSAppLink,
-			};
-		})();
+		SupportDialog = (function () {
+		    return {
+		      enableSupportDialog: Dialog.enableSupportDialog,
+		      enableLoadingDialog: Dialog.enableLoadingDialog,
+		      enableErrorDialog: Dialog.enableErrorDialog,
+		      setLoadingTextClass: Dialog.setLoadingTextClass,
+		      setPCDownloadURL: Dialog.setPCDownloadURL,
+		      setBackgroundClass: Dialog.setBackgroundClass,
+		      setDialogClass: Dialog.setDialogClass,
+		      setLoadingTextClass: Dialog.setLoadingTextClass,
+		      setErrorTextClass: Dialog.setErrorTextClass,
+		      setWarningClass: Dialog.setWarningClass,
+		      setMessagePannelClass: Dialog.setMessagePannelClass,
+		      setButtonContainerClass: Dialog.setButtonContainerClass,
+		      setActionButtonClass: Dialog.setActionButtonClass,
+		      setCloseButtonClass: Dialog.setCloseButtonClass,
+		      setLogoClass: Dialog.setLogoClass,
+		      setSpinnerClass: Dialog.setSpinnerClass,
+		      setPCDownloadURL: Dialog.setPCDownloadURL,
+		      setAndroidDownloadURL: Dialog.setAndroidDownloadURL,
+		      setIOSDownloadURL: Dialog.setIOSDownloadURL,
+		      setAdminContactInfo: Dialog.setAdminContactInfo,
+		      setAlternativeAndroidAppLink: Dialog.setAlternativeAndroidAppLink,
+		      setAlternativeIOSAppLink: Dialog.setAlternativeIOSAppLink,
+		    };
+  		})();
 		
 		/**
 		 * Funciones de utilidad.
