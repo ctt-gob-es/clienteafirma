@@ -13,6 +13,7 @@ public class SimpleErrorCode {
 		public static final ErrorCode ENCRIPTING_SIGNING_CERT			= new ErrorCode("200101", "Error al cifrar el certificado de firma para enviarlo al servidor intermedio"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode ENCRIPTING_SIGNATURE_EXTRA_DATA	= new ErrorCode("200116", "Error al cifrar la informacion extra de firma para enviarla al servidor intermedio"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode POSTPROCESING_SIGNATURE			= new ErrorCode("200117", "Error en el postproceso de la firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode UNKNOWN_SIGNING_BY_SOCKETS_ERROR	= new ErrorCode("200118", "Error desconocido durante la operacion de firma usando la comunicacion por sockets"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode ENCRIPTING_SELECTED_CERT			= new ErrorCode("200200", "Error al cifrar el certificado seleccionado para enviarlo al servidor intermedio"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode UNKNOWN_SELECTING_CERT_ERROR		= new ErrorCode("200201", "Error desconocido durante la operacion de seleccion de certificado"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -25,6 +26,7 @@ public class SimpleErrorCode {
 		public static final ErrorCode INTERNAL_JSON_BATCH_ERROR			= new ErrorCode("200410", "Error interno al procesar un lote de firmas JSON"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INTERNAL_XML_BATCH_ERROR			= new ErrorCode("200411", "Error interno al procesar un lote de firmas XML"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INTERNAL_LOCAL_BATCH_ERROR		= new ErrorCode("200412", "Error interno realizando la firma batch local"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode UNKNOWN_BATCH_ERROR				= new ErrorCode("200413", "Error desconocido al procesar un lote de firmas"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode UNKNOWN_LOADING_DATA_ERROR		= new ErrorCode("200600", "Error general durante la operacion de carga de fichero"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode CANT_LOAD_FILE					= new ErrorCode("200601", "Error al cargar el fichero local"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -58,13 +60,19 @@ public class SimpleErrorCode {
 
 		public static final ErrorCode SENDING_RESULT_OPERATION			= new ErrorCode("401200", "Error en el envio del resultado de la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
 
+		public static final ErrorCode EXTERNAL_REQUEST					= new ErrorCode("420001", "Se ha realizado la peticion desde un puerto externo"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		public static final ErrorCode EXTERNAL_REQUEST					= new ErrorCode("420001", "Se ha realizado la petición desde un puerto externo"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode SENDING_RESULT_OPERATION_BY_SOCKET	= new ErrorCode("420501", "Error en el envio del resultado de la operacion por socket"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode READING_FROM_SOCKET					= new ErrorCode("420502", "No se pudieron leer los datos del socket"); //$NON-NLS-1$ //$NON-NLS-2$
+
+
 	}
 
 	public static class Functional {
 
-		public static final ErrorCode MINIMUM_VERSION_NON_SATISTIED		= new ErrorCode("500005", "Se requiere una version posterior de la aplicacion"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode MINIMUM_VERSION_NON_SATISTIED		= new ErrorCode("500005", "La web solicito una version posterior de Autofirma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode SIGNER_REQUIREMENT_NOT_SUPPORTED	= new ErrorCode("500006", "El firmador hizo una peticion de datos no soportada"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode VALIDATOR_REQUIREMENT_NOT_SUPPORTED	= new ErrorCode("500007", "El validador hizo una peticion de datos no soportada"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode NO_CERTS_FOUND_SIGNING			= new ErrorCode("501001", "No se han encontrado certificados para realizar la seleccion"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode CANT_IDENTIFY_SIGNATURE_FORMAT	= new ErrorCode("501009", "No se ha podido identificar un formato de firma para los datos"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -85,6 +93,9 @@ public class SimpleErrorCode {
 		public static final ErrorCode UNSUPPORED_PROTOCOL_VERSION		= new ErrorCode("620011", "Version de protocolo de comunicacion con el navegador no soportada"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode REQUEST_URI_NOT_FOUND				= new ErrorCode("620012", "No se ha proporcionado la URI de invocacion"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode PORTS_NOT_FOUND					= new ErrorCode("620013", "No se han proporciona los puertos de conexion"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode MALFORMED_REQUEST_TO_SOCKET		= new ErrorCode("620016", "Los parametros recibidos en el socket no son correctos"); //$NON-NLS-1$ //$NON-NLS-2$
+
+
 
 	}
 }

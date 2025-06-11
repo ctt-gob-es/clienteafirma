@@ -188,6 +188,7 @@ public class ErrorCode {
 
 	public static class Request {
 		public static final ErrorCode UNSUPPORTED_CIPHER_KEY				= new ErrorCode("600009", "La clave de cifrado recibida no esta soportada"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode LOCAL_RETRIEVE_URL					= new ErrorCode("600010", "La URL del servlet de recuperacion no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode DATA_NOT_FOUND						= new ErrorCode("600100", "No se ha recibido los datos en la peticion ni el id del fichero a descargar para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode RETRIEVE_URL_TO_SIGN_NOT_FOUND		= new ErrorCode("600101", "No se ha recibido la URL del servlet para descargar la informacion de la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$

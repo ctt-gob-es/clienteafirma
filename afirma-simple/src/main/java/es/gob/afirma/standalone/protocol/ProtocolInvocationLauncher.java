@@ -358,12 +358,12 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterException e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma por lote: " + e, e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, e);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode(), ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
 			} catch (final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error en la operacion de firma por lote: " + e, e); //$NON-NLS-1$
-				final ErrorCode errorCode = SimpleErrorCode.Internal.INTERNAL_JSON_BATCH_ERROR;
+				final ErrorCode errorCode = SimpleErrorCode.Internal.UNKNOWN_BATCH_ERROR;
                 ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, errorCode);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode, ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
             }
         }
         // Se solicita una operacion de seleccion de certificado
@@ -433,12 +433,12 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterException e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de seleccion de certificados: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, e);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode(), ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
 			} catch (final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de seleccion de certificados: " + e, e); //$NON-NLS-1$
 				final ErrorCode errorCode = SimpleErrorCode.Internal.UNKNOWN_SELECTING_CERT_ERROR;
                 ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, errorCode);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode, ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
             }
         }
         // Se solicita una operacion de guardado
@@ -514,16 +514,16 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterLocalAccessRequestedException e) {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, e);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode(), ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
 			} catch (final ParameterException e) {
             	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado", e); //$NON-NLS-1$
             	ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, e);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode(), ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
 			} catch (final Exception e) {
             	LOGGER.log(Level.SEVERE, "Error en los parametros de guardado", e); //$NON-NLS-1$
 				final ErrorCode errorCode = SimpleErrorCode.Internal.UNKNOWN_SAVING_DATA_ERROR;
                 ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, errorCode);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode, ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
             }
         }
 
@@ -612,16 +612,16 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterLocalAccessRequestedException e) {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, e);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode(), ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
 			} catch (final ParameterException e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma y guardado: " + e, e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, e);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode(), ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
 			} catch (final Exception e) {
                 LOGGER.log(Level.SEVERE, "Error en los parametros de firma y guardado: " + e, e); //$NON-NLS-1$
                 final ErrorCode errorCode = ErrorCode.Internal.UNKNOWN_SIGNING_ERROR;
                 ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, errorCode);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode, ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
             }
         }
 
@@ -793,16 +793,16 @@ public final class ProtocolInvocationLauncher {
 			} catch (final ParameterLocalAccessRequestedException e) {
                 LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
                 ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, e);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode(), ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
 			} catch (final ParameterException e) {
                 LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, e);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode(), ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
 			} catch (final Exception e) {
                 LOGGER.severe("Error desconocido en la operacion de carga: " + e); //$NON-NLS-1$
                 final ErrorCode errorCode = SimpleErrorCode.Internal.UNKNOWN_LOADING_DATA_ERROR;
                 ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, errorCode);
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode, ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
             }
         }
 

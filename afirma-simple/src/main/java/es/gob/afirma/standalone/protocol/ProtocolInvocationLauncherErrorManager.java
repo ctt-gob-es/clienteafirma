@@ -19,6 +19,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.KeyStoreErrorCode;
+import es.gob.afirma.signers.batch.client.BatchErrorCode;
 import es.gob.afirma.signers.pades.common.PdfErrorCode;
 import es.gob.afirma.signers.pkcs7.BinaryErrorCode;
 import es.gob.afirma.signers.xades.XAdESErrorCode;
@@ -48,10 +49,8 @@ final class ProtocolInvocationLauncherErrorManager {
 	private static final String ERROR_UNSUPPORTED_OPERATION = "SAF_04"; //$NON-NLS-1$
 	private static final String ERROR_CANNOT_SAVE_DATA = "SAF_05"; //$NON-NLS-1$
 	private static final String ERROR_UNSUPPORTED_FORMAT = "SAF_06"; //$NON-NLS-1$
-	private static final String ERROR_CANNOT_FIND_KEYSTORE = "SAF_07"; //$NON-NLS-1$
 	private static final String ERROR_CANNOT_ACCESS_KEYSTORE = "SAF_08"; //$NON-NLS-1$
 	private static final String ERROR_SIGNATURE_FAILED = "SAF_09"; //$NON-NLS-1$
-	private static final String ERROR_NO_CERTIFICATES_SYSTEM = "SAF_10"; //$NON-NLS-1$
 	private static final String ERROR_SENDING_RESULT = "SAF_11"; //$NON-NLS-1$
 	private static final String ERROR_ENCRIPTING_DATA = "SAF_12"; //$NON-NLS-1$
 	private static final String ERROR_LOCAL_ACCESS_BLOCKED = "SAF_13"; //$NON-NLS-1$
@@ -63,9 +62,7 @@ final class ProtocolInvocationLauncherErrorManager {
 	private static final String ERROR_NO_CERTIFICATES_KEYSTORE = "SAF_19"; //$NON-NLS-1$
 	private static final String ERROR_LOCAL_BATCH_SIGN = "SAF_20"; //$NON-NLS-1$
 	private static final String ERROR_UNSUPPORTED_PROCEDURE = "SAF_21"; //$NON-NLS-1$
-	private static final String ERROR_UNSOPPORTED_WEB_PROCEDURE = "SAF_22"; //$NON-NLS-1$
 	private static final String ERROR_INVALID_POLICY = "SAF_23"; //$NON-NLS-1$
-	private static final String ERROR_RECOVERING_LOG = "SAF_24"; //$NON-NLS-1$
 	private static final String ERROR_CANNOT_LOAD_DATA = "SAF_25"; //$NON-NLS-1$
 	private static final String ERROR_CONTACT_BATCH_SERVICE = "SAF_26"; //$NON-NLS-1$
 	private static final String ERROR_BATCH_SIGNATURE = "SAF_27"; //$NON-NLS-1$
@@ -77,21 +74,15 @@ final class ProtocolInvocationLauncherErrorManager {
 	private static final String ERROR_PDF_WRONG_PASSWORD = "SAF_33"; //$NON-NLS-1$
 	private static final String ERROR_PDF_UNREG_SIGN = "SAF_34"; //$NON-NLS-1$
 	private static final String ERROR_PDF_CERTIFIED = "SAF_35"; //$NON-NLS-1$
-	private static final String ERROR_CANNOT_FIND_SSL_KEYSTORE = "SAF_36"; //$NON-NLS-1$
-	private static final String ERROR_CANNOT_ACCESS_SSL_KEYSTORE = "SAF_37"; //$NON-NLS-1$
 	private static final String ERROR_INVALID_FACTURAE = "SAF_38"; //$NON-NLS-1$
 	private static final String ERROR_INVALID_SIGNATURE = "SAF_39"; //$NON-NLS-1$
-	private static final String ERROR_RECOVER_SERVER_DOCUMENT = "SAF_40"; //$NON-NLS-1$
 	private static final String ERROR_MINIMUM_VERSION_NON_SATISTIED = "SAF_41"; //$NON-NLS-1$
-	private static final String ERROR_POSTPROCESSING_DATA = "SAF_42"; //$NON-NLS-1$
 	private static final String ERROR_VISIBLE_SIGNATURE = "SAF_43"; //$NON-NLS-1$
 	private static final String ERROR_SIGN_WITHOUT_DATA = "SAF_44"; //$NON-NLS-1$
 	private static final String ERROR_CANNOT_OPEN_SOCKET = "SAF_45"; //$NON-NLS-1$
 	private static final String ERROR_INVALID_SESSION_ID = "SAF_46"; //$NON-NLS-1$
-	private static final String ERROR_EXTERNAL_REQUEST_TO_SOCKET = "SAF_47"; //$NON-NLS-1$
 	private static final String ERROR_PDF_SHADOW_ATTACK = "SAF_48"; //$NON-NLS-1$
 	private static final String ERROR_SIGNING_LTS_SIGNATURE = "SAF_49"; //$NON-NLS-1$
-	private static final String ERROR_CONFIRMATION_NEEDED = "SAF_50"; //$NON-NLS-1$
 	private static final String ERROR_INCOMPATIBLE_KEY_TYPE = "SAF_51"; //$NON-NLS-1$
 	private static final String ERROR_LOCKED_KEYSTORE = "SAF_52"; //$NON-NLS-1$
 
@@ -109,10 +100,8 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_UNSUPPORTED_OPERATION, ProtocolMessages.getString("ProtocolLauncher.4")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_SAVE_DATA, ProtocolMessages.getString("ProtocolLauncher.5")); //$NON-NLS-1$
 		ERRORS.put(ERROR_UNSUPPORTED_FORMAT, ProtocolMessages.getString("ProtocolLauncher.6")); //$NON-NLS-1$
-		ERRORS.put(ERROR_CANNOT_FIND_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.7")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_ACCESS_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.8")); //$NON-NLS-1$
 		ERRORS.put(ERROR_SIGNATURE_FAILED, ProtocolMessages.getString("ProtocolLauncher.9")); //$NON-NLS-1$
-		ERRORS.put(ERROR_NO_CERTIFICATES_SYSTEM, ProtocolMessages.getString("ProtocolLauncher.10")); //$NON-NLS-1$
 		ERRORS.put(ERROR_SENDING_RESULT, ProtocolMessages.getString("ProtocolLauncher.11")); //$NON-NLS-1$
 		ERRORS.put(ERROR_ENCRIPTING_DATA, ProtocolMessages.getString("ProtocolLauncher.12")); //$NON-NLS-1$
 		ERRORS.put(ERROR_LOCAL_ACCESS_BLOCKED, ProtocolMessages.getString("ProtocolLauncher.13")); //$NON-NLS-1$
@@ -124,9 +113,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_NO_CERTIFICATES_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.19")); //$NON-NLS-1$
 		ERRORS.put(ERROR_LOCAL_BATCH_SIGN, ProtocolMessages.getString("ProtocolLauncher.20")); //$NON-NLS-1$
 		ERRORS.put(ERROR_UNSUPPORTED_PROCEDURE, ProtocolMessages.getString("ProtocolLauncher.21")); //$NON-NLS-1$
-		ERRORS.put(ERROR_UNSOPPORTED_WEB_PROCEDURE, ProtocolMessages.getString("ProtocolLauncher.22")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_POLICY, ProtocolMessages.getString("ProtocolLauncher.33")); //$NON-NLS-1$
-		ERRORS.put(ERROR_RECOVERING_LOG, ProtocolMessages.getString("ProtocolLauncher.34")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_LOAD_DATA, ProtocolMessages.getString("ProtocolLauncher.35")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CONTACT_BATCH_SERVICE, ProtocolMessages.getString("ProtocolLauncher.36")); //$NON-NLS-1$
 		ERRORS.put(ERROR_BATCH_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.37")); //$NON-NLS-1$
@@ -138,21 +125,15 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_PDF_WRONG_PASSWORD, ProtocolMessages.getString("ProtocolLauncher.43")); //$NON-NLS-1$
 		ERRORS.put(ERROR_PDF_UNREG_SIGN, ProtocolMessages.getString("ProtocolLauncher.44")); //$NON-NLS-1$
 		ERRORS.put(ERROR_PDF_CERTIFIED, ProtocolMessages.getString("ProtocolLauncher.45")); //$NON-NLS-1$
-		ERRORS.put(ERROR_CANNOT_FIND_SSL_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.46")); //$NON-NLS-1$
-		ERRORS.put(ERROR_CANNOT_ACCESS_SSL_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.47")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_FACTURAE, ProtocolMessages.getString("ProtocolLauncher.48")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.49")); //$NON-NLS-1$
-		ERRORS.put(ERROR_RECOVER_SERVER_DOCUMENT, ProtocolMessages.getString("ProtocolLauncher.50")); //$NON-NLS-1$
 		ERRORS.put(ERROR_MINIMUM_VERSION_NON_SATISTIED, ProtocolMessages.getString("ProtocolLauncher.53")); //$NON-NLS-1$
-		ERRORS.put(ERROR_POSTPROCESSING_DATA, ProtocolMessages.getString("ProtocolLauncher.54")); //$NON-NLS-1$
 		ERRORS.put(ERROR_VISIBLE_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.55")); //$NON-NLS-1$
 		ERRORS.put(ERROR_SIGN_WITHOUT_DATA, ProtocolMessages.getString("ProtocolLauncher.56")); //$NON-NLS-1$
 		ERRORS.put(ERROR_CANNOT_OPEN_SOCKET, ProtocolMessages.getString("ProtocolLauncher.57")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_SESSION_ID, ProtocolMessages.getString("ProtocolLauncher.58")); //$NON-NLS-1$
-		ERRORS.put(ERROR_EXTERNAL_REQUEST_TO_SOCKET, ProtocolMessages.getString("ProtocolLauncher.59")); //$NON-NLS-1$
 		ERRORS.put(ERROR_PDF_SHADOW_ATTACK, ProtocolMessages.getString("ProtocolLauncher.63")); //$NON-NLS-1$
 		ERRORS.put(ERROR_SIGNING_LTS_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.64")); //$NON-NLS-1$
-		ERRORS.put(ERROR_CONFIRMATION_NEEDED, ProtocolMessages.getString("ProtocolLauncher.65")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INCOMPATIBLE_KEY_TYPE, ProtocolMessages.getString("ProtocolLauncher.66")); //$NON-NLS-1$
 		ERRORS.put(ERROR_LOCKED_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.67")); //$NON-NLS-1$
 	}
@@ -202,14 +183,17 @@ final class ProtocolInvocationLauncherErrorManager {
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.UNSUPPORTED_COUNTERSIGN_CONFIG, ERROR_PARAMS);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.UNSUPPORTED_POLICY_HASH_ALGORITHM, ERROR_PARAMS);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM, ERROR_PARAMS);
+		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Request.MALFORMED_REQUEST_TO_SOCKET, ERROR_PARAMS);
+		OLD_ERRORS_ASSOCIATION.put(BatchErrorCode.Request.INVALID_PARAMS_TO_PRESIGN_JSON_BATCH, ERROR_PARAMS);
+		OLD_ERRORS_ASSOCIATION.put(BatchErrorCode.Request.INVALID_PARAMS_TO_PRESIGN_XML_BATCH, ERROR_PARAMS);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Request.UNSUPPORTED_OPERATION, ERROR_UNSUPPORTED_OPERATION);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.CANT_SAVE_FILE, ERROR_CANNOT_SAVE_DATA);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.UNSUPPORTED_SIGNATURE_FORMAT, ERROR_UNSUPPORTED_FORMAT);
-		OLD_ERRORS_ASSOCIATION.put(ERROR_CANNOT_FIND_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.7")); //$NON-NLS-1$
 		OLD_ERRORS_ASSOCIATION.put(KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR, ERROR_CANNOT_ACCESS_KEYSTORE);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Internal.UNKNOWN_SIGNING_ERROR, ERROR_SIGNATURE_FAILED);
-		OLD_ERRORS_ASSOCIATION.put(ERROR_NO_CERTIFICATES_SYSTEM, ProtocolMessages.getString("ProtocolLauncher.10")); //$NON-NLS-1$
+		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.UNKNOWN_SIGNING_BY_SOCKETS_ERROR, ERROR_SIGNATURE_FAILED);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Communication.SENDING_RESULT_OPERATION, ERROR_SENDING_RESULT);
+		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Communication.SENDING_RESULT_OPERATION_BY_SOCKET, ERROR_SENDING_RESULT);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.ENCRIPTING_SIGNATURE, ERROR_ENCRIPTING_DATA);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.ENCRIPTING_SIGNING_CERT, ERROR_ENCRIPTING_DATA);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.ENCRIPTING_SIGNATURE_EXTRA_DATA, ERROR_ENCRIPTING_DATA);
@@ -217,7 +201,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.ENCRIPTING_BATCH_RESULT, ERROR_ENCRIPTING_DATA);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.ENCRIPTING_BATCH_SIGNING_CERT, ERROR_ENCRIPTING_DATA);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.ENCRYPTING_PARAMS_ERROR, ERROR_ENCRIPTING_DATA);
-		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.INVALID_RETRIEVE_URL_TO_SIGN, ERROR_LOCAL_ACCESS_BLOCKED);
+		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_RETRIEVE_URL, ERROR_LOCAL_ACCESS_BLOCKED);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_PRESIGN_BATCH_URL, ERROR_LOCAL_ACCESS_BLOCKED);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_POSTSIGN_BATCH_URL, ERROR_LOCAL_ACCESS_BLOCKED);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_STORAGE_URL_TO_SAVE, ERROR_LOCAL_ACCESS_BLOCKED);
@@ -240,13 +224,14 @@ final class ProtocolInvocationLauncherErrorManager {
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Functional.NO_CERTS_FOUND_SIGNING_BATCH, ERROR_NO_CERTIFICATES_KEYSTORE);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.INTERNAL_LOCAL_BATCH_ERROR, ERROR_LOCAL_BATCH_SIGN);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Request.UNSUPPORED_PROTOCOL_VERSION, ERROR_UNSUPPORTED_PROCEDURE);
-		OLD_ERRORS_ASSOCIATION.put(ERROR_UNSOPPORTED_WEB_PROCEDURE, ProtocolMessages.getString("ProtocolLauncher.22")); //$NON-NLS-1$
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Functional.SIGNING_WITH_POLICY_INCOMPATIBILITY, ERROR_INVALID_POLICY);
-		OLD_ERRORS_ASSOCIATION.put(ERROR_RECOVERING_LOG, ProtocolMessages.getString("ProtocolLauncher.34")); //$NON-NLS-1$
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.CANT_LOAD_FILE, ERROR_CANNOT_LOAD_DATA);
-		OLD_ERRORS_ASSOCIATION.put(ERROR_CONTACT_BATCH_SERVICE, ProtocolMessages.getString("ProtocolLauncher.36")); //$NON-NLS-1$
+		OLD_ERRORS_ASSOCIATION.put(BatchErrorCode.Communication.JSON_BATCH_PRESIGN_COMMUNICATION_ERROR, ERROR_CONTACT_BATCH_SERVICE);
+		OLD_ERRORS_ASSOCIATION.put(BatchErrorCode.Communication.XML_BATCH_PRESIGN_COMMUNICATION_ERROR, ERROR_CONTACT_BATCH_SERVICE);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.INTERNAL_JSON_BATCH_ERROR, ERROR_BATCH_SIGNATURE);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.INTERNAL_XML_BATCH_ERROR, ERROR_BATCH_SIGNATURE);
+		OLD_ERRORS_ASSOCIATION.put(BatchErrorCode.ThirdParty.XML_BATCH_PRESIGN_ERROR, ERROR_BATCH_SIGNATURE);
+		OLD_ERRORS_ASSOCIATION.put(BatchErrorCode.ThirdParty.XML_BATCH_POSTSIGN_ERROR, ERROR_BATCH_SIGNATURE);
 		OLD_ERRORS_ASSOCIATION.put(PdfErrorCode.Functional.PDF_DOCUMENT_NEEDED, ERROR_INVALID_PDF);
 		OLD_ERRORS_ASSOCIATION.put(XMLErrorCode.Functional.XML_DOCUMENT_NEEDED, ERROR_INVALID_XML);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Functional.INVALID_FORMAT_FILE, ERROR_INVALID_DATA);
@@ -256,24 +241,24 @@ final class ProtocolInvocationLauncherErrorManager {
 		OLD_ERRORS_ASSOCIATION.put(PdfErrorCode.Internal.SIGNING_PDF_WITHOUT_PASSWORD, ERROR_PDF_WRONG_PASSWORD);
 		OLD_ERRORS_ASSOCIATION.put(PdfErrorCode.Internal.SIGNING_PDF_WITH_UNREGISTER_SIGNATURES, ERROR_PDF_UNREG_SIGN);
 		OLD_ERRORS_ASSOCIATION.put(PdfErrorCode.Internal.SIGNING_PDF_WITH_CERTIFIED_SIGN, ERROR_PDF_CERTIFIED);
-		OLD_ERRORS_ASSOCIATION.put(ERROR_CANNOT_FIND_SSL_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.46")); //$NON-NLS-1$
-		OLD_ERRORS_ASSOCIATION.put(ERROR_CANNOT_ACCESS_SSL_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.47")); //$NON-NLS-1$
 		OLD_ERRORS_ASSOCIATION.put(XAdESErrorCode.Functional.FACTURAE_NEEDED, ERROR_INVALID_FACTURAE);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Functional.INVALID_SIGNATURE, ERROR_INVALID_SIGNATURE);
-		OLD_ERRORS_ASSOCIATION.put(ERROR_RECOVER_SERVER_DOCUMENT, ProtocolMessages.getString("ProtocolLauncher.50")); //$NON-NLS-1$
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED, ERROR_MINIMUM_VERSION_NON_SATISTIED);
-		OLD_ERRORS_ASSOCIATION.put(ERROR_POSTPROCESSING_DATA, ProtocolMessages.getString("ProtocolLauncher.54")); //$NON-NLS-1$
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Functional.VISIBLE_SIGNATURE_IS_MANDATORY, ERROR_VISIBLE_SIGNATURE);
 		OLD_ERRORS_ASSOCIATION.put(BinaryErrorCode.Functional.SIGNATURE_DOESNT_CONTAIN_DATA, ERROR_SIGN_WITHOUT_DATA);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.SOCKET_INITIALIZING_ERROR, ERROR_CANNOT_OPEN_SOCKET);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Request.INVALID_SESSION_ID, ERROR_INVALID_SESSION_ID);
-		OLD_ERRORS_ASSOCIATION.put(ERROR_EXTERNAL_REQUEST_TO_SOCKET, ProtocolMessages.getString("ProtocolLauncher.59")); //$NON-NLS-1$
-		OLD_ERRORS_ASSOCIATION.put(ERROR_PDF_SHADOW_ATTACK, ProtocolMessages.getString("ProtocolLauncher.63")); //$NON-NLS-1$
-		OLD_ERRORS_ASSOCIATION.put(ERROR_SIGNING_LTS_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.64")); //$NON-NLS-1$
-		OLD_ERRORS_ASSOCIATION.put(ERROR_CONFIRMATION_NEEDED, ProtocolMessages.getString("ProtocolLauncher.65")); //$NON-NLS-1$
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Internal.INVALID_SIGNING_KEY, ERROR_INCOMPATIBLE_KEY_TYPE);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Functional.KEYSTORE_LOCKED, ERROR_LOCKED_KEYSTORE);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Functional.SMARTCARD_LOCKED, ERROR_LOCKED_KEYSTORE);
+
+		// Codigos sin asociacion directa, pero que se devolvian antes
+		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Internal.UNKNOWN_SIGNING_ERROR, ERROR_PARAMS);
+		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.UNKNOWN_SELECTING_CERT_ERROR, ERROR_PARAMS);
+		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.UNKNOWN_BATCH_ERROR, ERROR_PARAMS);
+		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.UNKNOWN_LOADING_DATA_ERROR, ERROR_PARAMS);
+		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.UNKNOWN_SAVING_DATA_ERROR, ERROR_PARAMS);
+		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Communication.READING_FROM_SOCKET, ERROR_PARAMS);
 	}
 
 	static void showError(final int protocolVersion, final AOControlledException controlledException) {

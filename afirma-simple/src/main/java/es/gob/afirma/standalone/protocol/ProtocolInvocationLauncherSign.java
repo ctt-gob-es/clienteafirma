@@ -420,12 +420,13 @@ final class ProtocolInvocationLauncherSign {
 					} catch (final RuntimeConfigNeededException e) {
 						LOGGER.warning("La validacion de la firma ha revelado una situacion que requiere la intervencion del usuario: " + e); //$NON-NLS-1$
 
-						// Se requiere confirmacion por parte del usuario
+						// Si se necesita confirmacion del usuario, pero no hay interfaces graficas
 						if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
-							LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario. Se abortara la operacion"); //$NON-NLS-1$
-							throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CONFIRMATION_NEEDED, e.getMessage(), e);
+							LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario durante la validacion de la firma. Se abortara la operacion"); //$NON-NLS-1$
+							throw new SocketOperationException(e);
 						}
 
+						// Se requiere confirmacion por parte del usuario
 						if (e.getRequestType() == RequestType.CONFIRM) {
 							final int result = AOUIFactory.showConfirmDialog(null, SimpleAfirmaMessages.getString(e.getRequestorText()),
 									SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
@@ -456,8 +457,9 @@ final class ProtocolInvocationLauncherSign {
 							}
 						}
 						else {
-							LOGGER.severe("No se puede gestionar la solicitud de datos necesaria para completar la firma"); //$NON-NLS-1$
-							throw new SocketOperationException(e.getRequestorText(), e.getMessage(), e);
+							LOGGER.severe("No se reconoce el tipo de datos solicitado para completar la validacion de la firma: " + LoggerUtil.getTrimStr(e.getRequestType().name()) //$NON-NLS-1$
+								+ ": " + LoggerUtil.getTrimStr(e.getRequestorText())); //$NON-NLS-1$
+							throw new SocketOperationException(e.getMessage(), e, SimpleErrorCode.Functional.VALIDATOR_REQUIREMENT_NOT_SUPPORTED);
 						}
 					}
 				} while (validity == null);
@@ -773,12 +775,13 @@ final class ProtocolInvocationLauncherSign {
 		catch (final RuntimeConfigNeededException e) {
 			LOGGER.warning("No se puede completar la firma sin intervencion del usuario: " + e); //$NON-NLS-1$
 
-			// Se requiere confirmacion por parte del usuario
+			// Si se necesita confirmacion del usuario, pero no hay interfaces graficas
 			if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
-				LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario. Se abortara la operacion"); //$NON-NLS-1$
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CONFIRMATION_NEEDED, e.getMessage(), e);
+				LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario durante la firma. Se abortara la operacion"); //$NON-NLS-1$
+				throw new SocketOperationException(e);
 			}
 
+			// Se requiere confirmacion por parte del usuario
 			if (e.getRequestType() == RequestType.CONFIRM) {
 				final int result = AOUIFactory.showConfirmDialog(null, SimpleAfirmaMessages.getString(e.getRequestorText()),
 						SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
@@ -812,8 +815,9 @@ final class ProtocolInvocationLauncherSign {
 				}
 			}
 			else {
-				LOGGER.severe("No se puede gestionar la solicitud de datos necesaria para completar la firma"); //$NON-NLS-1$
-				throw new SocketOperationException(e.getRequestorText(), e.getMessage(), e);
+				LOGGER.severe("No se reconoce el tipo de datos solicitado para completar la firma: " + LoggerUtil.getTrimStr(e.getRequestType().name()) //$NON-NLS-1$
+					+ ": " + LoggerUtil.getTrimStr(e.getRequestorText())); //$NON-NLS-1$
+				throw new SocketOperationException(e.getMessage(), e, SimpleErrorCode.Functional.SIGNER_REQUIREMENT_NOT_SUPPORTED);
 			}
 
 			LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$

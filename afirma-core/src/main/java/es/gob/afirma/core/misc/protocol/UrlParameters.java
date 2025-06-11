@@ -287,7 +287,7 @@ public abstract class UrlParameters {
 				}
 				catch (final LocalAccessRequestException e) {
 					throw new ParameterLocalAccessRequestedException(
-						"La URL del servicio de recuperacion de datos no puede ser local", e, ErrorCode.Request.INVALID_RETRIEVE_URL_TO_SIGN //$NON-NLS-1$
+						"La URL del servicio de recuperacion de datos no puede ser local", e, ErrorCode.Request.LOCAL_RETRIEVE_URL //$NON-NLS-1$
 					);
 				}
 				catch (final IllegalArgumentException e) {

@@ -32,7 +32,6 @@ import es.gob.afirma.core.keystores.PinException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.protocol.ParameterException;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
@@ -383,24 +382,6 @@ final class ProtocolInvocationLauncherBatch {
 			// En este caso no dejamos prefijado el certificado
 			ProtocolInvocationLauncher.setStickyKeyEntry(null);
 			throw new SocketOperationException(e);
-		}
-		catch (final HttpError e) {
-			String errorCode;
-			if (e.getResponseCode() == 400) {
-				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
-				LOGGER.severe("Error en los parametros enviados al servicio: " + LoggerUtil.getTrimStr(e.toString()));  //$NON-NLS-1$
-			}
-			else if (e.getResponseCode() / 100 == 4) {
-				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE;
-				LOGGER.log(Level.SEVERE, "Error en la comunicacion con el servicio de firma de lotes", LoggerUtil.getTrimStr(e.toString()));//$NON-NLS-1$
-			}
-			else {
-				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
-				LOGGER.log(Level.SEVERE, "Error en el servicio de firma de lotes", e); //$NON-NLS-1$
-			}
-			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-
-			throw new SocketOperationException(errorCode);
 		}
 		catch (final AOException e) {
 			LOGGER.info("Error durante la firma del lote: " + e); //$NON-NLS-1$

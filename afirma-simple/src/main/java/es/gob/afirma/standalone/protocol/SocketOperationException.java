@@ -27,6 +27,10 @@ class SocketOperationException extends AOException {
 		super(cause, cause.getErrorCode());
 	}
 
+	SocketOperationException(final String message, final AOException cause) {
+		super(message, cause, cause.getErrorCode());
+	}
+
 	SocketOperationException(final String message, final ErrorCode errorCode) {
 		super(message, errorCode);
 	}
