@@ -314,6 +314,33 @@ var AutoScript = ( function ( window, undefined ) {
 		var ERROR_CONNECTING_SERVICE = 3;
 		var ERROR_CHECKING_SERVICE = 4;
 		
+		/* Codigos de error */
+		var ERRORCODE_INTERNAL_BROWSER_CANT_PREPROCESS = "AS220005";
+		var ERRORCODE_INTERNAL_WEBSOCKET_INVALID_RESP = "AS220006";
+		
+		var ERRORCODE_THIRDPARTY_UPLOADING_TO_SERVER = "AS300302";
+				
+		var ERRORCODE_COMMUNICATION_CANT_CONNECT_SERVER = "AS400003";
+		var ERRORCODE_COMMUNICATION_WEBSOCKET_CLOSE = "AS420002";
+		var ERRORCODE_COMMUNICATION_SOCKET_CONNECTING_APP = "AS420503";
+		var ERRORCODE_COMMUNICATION_SOCKET_NETWORK_ERROR = "AS420504";
+		
+		var ERRORCODE_FUNCTIONAL_CANCELLED_OP = "AS500001";
+		var ERRORCODE_FUNCTIONAL_UPLOAD_FILE_SERVER = "AS500007";
+		var ERRORCODE_FUNCTIONAL_UPLOAD_MULTIPLE_FILE_SERVER = "AS500008";
+		
+		var ERRORCODE_REQUEST_RETRIEVE_URL_NOT_FOUND = "AS600101";
+		var ERRORCODE_REQUEST_STORAGE_URL_NOT_FOUND = "AS600102";
+		var ERRORCODE_REQUEST_TOO_LONG_URL = "AS620014";
+		var ERRORCODE_REQUEST_UPLOADING_TO_APP = "AS620015";
+		var ERRORCODE_REQUEST_WEBSOCKET_INVOICE_APP = "AS620017";
+		var ERRORCODE_REQUEST_WEBSOCKET_MEMORY_ERROR = "AS620018";
+		var ERRORCODE_REQUEST_WEBSOCKET_UNKNOWN_ERROR = "AS620019";
+		var ERRORCODE_REQUEST_SOCKET_INVOICE_APP = "AS620020";
+		var ERRORCODE_REQUEST_SOCKET_MEMORY_ERROR = "AS620021";
+		var ERRORCODE_REQUEST_SOCKET_UNKNOWN_ERROR = "AS620022";
+			
+	
 		/**
 		 * Realiza la descarga de datos de una URL y, una vez termina, llama al metodo
 		 * successFunction pasandole los datos descargados en base 64, o errorFunction,
@@ -719,6 +746,14 @@ var AutoScript = ( function ( window, undefined ) {
 
 		var getErrorType = function () {
 			return clienteFirma.getErrorType();
+		}
+		
+		var getErrorCode = function () {
+			return clienteFirma.getErrorCode();
+		}
+		
+		var getErrorCodeNumber = function () {
+			return clienteFirma.getErrorCodeNumber();
 		}
 		
 		var setServlets = function(storageServlet, retrieverServlet) {
@@ -1869,6 +1904,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/** Informacion de error. */
 			var errorMessage = '';
 			var errorType = '';
+			var errorCode = '';
 		
 			
 			/** WebSocket para la comunicacion con la aplicacion. Antes de crearlo
@@ -1901,7 +1937,7 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			/** Limite superior del rango donde buscar el puerto a abrir. */ 
 			var maxPort = null;
-
+						
 			/**
 			 * Establece el rango del que se obtendran los puertos aleatorios.
 			 * Si solo se indica un valor, siempre se usara ese puerto.
@@ -2218,11 +2254,12 @@ var AutoScript = ( function ( window, undefined ) {
 						console.log("Tratamos de conectar con el cliente a traves de WebSockets en los puertos " + ports);
 						setTimeout(waitAppAndProcessRequest, 3000, ports, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, url, successCB, errorCB);
 					} catch (e) {
+						errorCode = ERRORCODE_REQUEST_WEBSOCKET_INVOICE_APP;
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA, 
 																		function (){execAppIntent(url, successCB, errorCB)} , 
-																		function (){errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," ")); });
+																		function (){errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCode); });
 						if(!enabled) {
-							errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+							errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCode);
 						}
 					}
 				}
@@ -2280,11 +2317,13 @@ var AutoScript = ( function ( window, undefined ) {
 	
 						ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
 						
+						errorCode = ERRORCODE_REQUEST_WEBSOCKET_INVOICE_APP;
+						
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 															function (){execAppIntent(url, successCB, errorCB)}, 
-															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCode);});
 						if (!enabled) {
-							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCode);
 						}
 					}			
 				}
@@ -2322,7 +2361,7 @@ var AutoScript = ( function ( window, undefined ) {
 						connected = false;
 						ws = null;
 						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
-						processErrorResponse("java.lang.InterruptedException", "Autofirma se ha cerrado o ha cerrado el websocket de comunicacion");
+						processErrorResponse("java.lang.InterruptedException", "Autofirma se ha cerrado o ha cerrado el websocket de comunicacion", ERRORCODE_COMMUNICATION_WEBSOCKET_CLOSE);
 					}
 				};
 
@@ -2378,9 +2417,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (retries <= 0) {
 					var enabled =  Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																function (){sendEcho(ws, idSession, 1)}, 
-																function (){processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+																function (){processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ERRORCODE_REQUEST_WEBSOCKET_INVOICE_APP);});
 					if (!enabled) {
-						processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+						processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ERRORCODE_REQUEST_WEBSOCKET_INVOICE_APP);
 					}
 					return;
 				}
@@ -2406,15 +2445,17 @@ var AutoScript = ( function ( window, undefined ) {
 			 * el tipo de operacion que la envie.
 			 */
 			function processResponse (data) {
+				
+				
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario", ERRORCODE_FUNCTIONAL_CANCELLED_OP);
 					return;
 				}
 				
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
-					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
+					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion", ERRORCODE_REQUEST_WEBSOCKET_MEMORY_ERROR);
 					return;
 				}
 				
@@ -2426,7 +2467,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					processErrorResponse("java.lang.Exception", "Error desconocido");
+					processErrorResponse("java.lang.Exception", "Error desconocido", ERRORCODE_REQUEST_WEBSOCKET_UNKNOWN_ERROR);
 					return;
 				}
 
@@ -2465,13 +2506,14 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Procesa la respuesta cuando se detecta un error.
 			 */
-			function processErrorResponse(exception, message) {
+			function processErrorResponse(exception, message, code) {
 				errorType = exception;
 				errorMessage = message;
+				errorCode = code;
 				if (!!errorCallback) {
 					var responseErrorCallback = errorCallback;
 					setCallbacks(null, null);
-					responseErrorCallback(exception, message);
+					responseErrorCallback(exception, message, code);
 				}
 			}
 			
@@ -2487,7 +2529,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// pudiendo obtener cada dato del par teniendo en cuenta el
 				// separador ":"
 				if (data.indexOf(":") <= 0) {
-					processErrorResponse("java.lang.Exception", "Respuesta no valida");
+					processErrorResponse("java.lang.Exception", "Respuesta no valida", ERRORCODE_INTERNAL_WEBSOCKET_INVALID_RESP);
 					return;
 				}
 
@@ -2555,7 +2597,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				// Termina mal
 				else {
-					processErrorResponse("java.lang.Exception", "Error desconocido al procesar los datos");
+					processErrorResponse("java.lang.Exception", "Error desconocido al procesar los datos", ERRORCODE_REQUEST_WEBSOCKET_UNKNOWN_ERROR);
 				}
 			}
 
@@ -2682,6 +2724,20 @@ var AutoScript = ( function ( window, undefined ) {
 			function getErrorType () {
 				return errorType;
 			}
+			
+			/**
+			 * Recupera el codigo completo del ultimo error capturado.
+			 */
+			function getErrorCode () {
+				return errorCode;
+			}
+			
+			/**
+			 * Recupera el numero de codigo del ultimo error capturado.
+			 */
+			function getErrorCodeNumber () {
+				return errorCode.substring(2);
+			}
 
 			/* Metodos que publicamos del objeto AppAfirmaWebSocketClient */
 			return {
@@ -2702,7 +2758,9 @@ var AutoScript = ( function ( window, undefined ) {
 				setLocale : setLocale,
 				setLocaleMessages : setLocaleMessages,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType	
+				getErrorType : getErrorType,
+				getErrorType : getErrorCode,
+				getErrorCodeNumber : getErrorCodeNumber
 			}
 		});
 
@@ -2717,6 +2775,7 @@ var AutoScript = ( function ( window, undefined ) {
 			 */
 			var errorMessage = '';
 			var errorType = '';
+			var errorCode = '';
 
 			/** Puerto a traves del que se ha conectado con la aplicacion nativa. */
 			var port = "";
@@ -3003,9 +3062,9 @@ var AutoScript = ( function ( window, undefined ) {
 					} catch (e){
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																	function (){execAppIntent(url);}, 
-																	function (){errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+																	function (){errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ERRORCODE_REQUEST_SOCKET_INVOICE_APP);});
 						if (!enabled) {
-							errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+							errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ERRORCODE_REQUEST_SOCKET_INVOICE_APP);
 						}
 					}
 				}
@@ -3165,9 +3224,9 @@ var AutoScript = ( function ( window, undefined ) {
 								}
 								var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																			function (){execAppIntent(url)},
-																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ERRORCODE_REQUEST_SOCKET_INVOICE_APP);});
 								if (!enabled) {
-									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ERRORCODE_REQUEST_SOCKET_INVOICE_APP);
 								}
 							}
 							return;
@@ -3221,7 +3280,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// El envio no se fragmenta
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
+						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText, ERRORCODE_COMMUNICATION_SOCKET_CONNECTING_APP);
 					}
 					// Las operaciones que no requieren respuesta, llaman directamente a la funcion de exito 
 					if (isSaveOperation) {
@@ -3234,7 +3293,7 @@ var AutoScript = ( function ( window, undefined ) {
 					else {
 						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
 							if (Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
-								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor", ERRORCODE_REQUEST_SOCKET_MEMORY_ERROR);
 								return;
 							}
 							// Juntamos los fragmentos
@@ -3251,11 +3310,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) {
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0) {
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ERRORCODE_COMMUNICATION_SOCKET_CONNECTING_APP);
 						}
 						// error desconocido 
 						else {
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ERRORCODE_COMMUNICATION_SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3278,7 +3337,7 @@ var AutoScript = ( function ( window, undefined ) {
 				var urlToSend = url.substring(((i-1) * URL_MAX_SIZE), Math.min(URL_MAX_SIZE * i, url.length));
 				httpRequest.onreadystatechange = function () {
 					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, ERRORCODE_COMMUNICATION_SOCKET_CONNECTING_APP);
 						return;
 					}
 					// Respuesta afirmativa, hay que mandar mas fragmentos
@@ -3313,11 +3372,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) { 
 						// Status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0){
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ERRORCODE_COMMUNICATION_SOCKET_CONNECTING_APP);
 						}
 						// Error desconocido 
 						else{
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ERRORCODE_COMMUNICATION_SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3340,7 +3399,7 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 
 					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, ERRORCODE_COMMUNICATION_SOCKET_CONNECTING_APP);
 					}
 
 					// Se ha realizado la operacion save, no controlamos reintentos ni el exito de la peticion
@@ -3371,11 +3430,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) { 
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0){
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ERRORCODE_COMMUNICATION_SOCKET_CONNECTING_APP);
 						}
 						// error desconocido 
 						else{
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ERRORCODE_COMMUNICATION_SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3395,7 +3454,7 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
 						if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
-							errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+							errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor", ERRORCODE_REQUEST_SOCKET_MEMORY_ERROR);
 							return;
 						}
 						//console.log("recibida la parte " + part);
@@ -3436,11 +3495,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) { 
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0){
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ERRORCODE_COMMUNICATION_SOCKET_CONNECTING_APP);
 						}
 						// error desconocido 
 						else{
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ERRORCODE_COMMUNICATION_SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3463,7 +3522,8 @@ var AutoScript = ( function ( window, undefined ) {
 			function successSelectCertServiceResponseFunction (data) {
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					errorCode = ERRORCODE_FUNCTIONAL_CANCELLED_OP;
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario", errorCode);
 					return;
 				}
 
@@ -3475,7 +3535,8 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					errorCallback("java.lang.Exception", "Error desconocido");
+					errorCode = ERRORCODE_REQUEST_SOCKET_UNKNOWN_ERROR;
+					errorCallback("java.lang.Exception", "Error desconocido", errorCode);
 					return;
 				}
 
@@ -3489,9 +3550,11 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param data Resultado obtenido.
 			 */
 			function successServiceResponseFunction (data) {
+				
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					errorCode = ERRORCODE_FUNCTIONAL_CANCELLED_OP;
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario", errorCode);
 					return;
 				}
 				
@@ -3508,7 +3571,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
-					errorCallback("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
+					errorCallback("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion", ERRORCODE_REQUEST_SOCKET_MEMORY_ERROR);
 					return;
 				}
 				
@@ -3520,7 +3583,8 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					errorCallback("java.lang.Exception", "Error desconocido");
+					errorCode = ERRORCODE_REQUEST_SOCKET_UNKNOWN_ERROR;
+					errorCallback("java.lang.Exception", "Error desconocido", errorCode);
 					return;
 				}
 				
@@ -3600,16 +3664,18 @@ var AutoScript = ( function ( window, undefined ) {
 				successCallback(signature, certificate);
 			}
 			
-			function errorServiceResponseFunction(exception, message){
+			function errorServiceResponseFunction(exception, message, errCode){
+				errorCode = errCode;
 				if (errorCallback) {
-					errorCallback(exception, message);
+					errorCallback(exception, message, errorCode);
 				}
 			}
 			
 			function successBatchResponseFunction (data) {
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					errorCode = ERRORCODE_FUNCTIONAL_CANCELLED_OP;
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario", errorCode);
 					return;
 				}
 				
@@ -3621,7 +3687,8 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					errorCallback("java.lang.Exception", "Error desconocido");
+					errorCode = ERRORCODE_REQUEST_SOCKET_UNKNOWN_ERROR;
+					errorCallback("java.lang.Exception", "Error desconocido", errorCode);
 					return;
 				}
 				
@@ -3781,6 +3848,22 @@ var AutoScript = ( function ( window, undefined ) {
 			function getErrorType () {
 				return errorType;
 			}
+			
+			/**
+			 * Recupera el codigo comleto del ultimo error capturado.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getErrorCode () {
+				return errorCode;
+			}
+			
+			/**
+			 * Recupera el numero del codigo del ultimo error capturado.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getErrorCodeNumber () {
+				return errorCode.substring(2);
+			}
 
 			/* Metodos que publicamos del objeto AppAfirmaJSSocket */
 			return {
@@ -3803,7 +3886,9 @@ var AutoScript = ( function ( window, undefined ) {
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType			
+				getErrorType : getErrorType,
+				getErrorCode : getErrorCode,
+				getErrorCodeNumber : getErrorCodeNumber	
 			}
 		});
 
@@ -3843,6 +3928,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 			var errorMessage = '';
 			var errorType = '';
+			var errorCode = '';
 			var defaultKeyStore = null;
 			var retrieverServletAddress = null;
 			var storageServletAddress = null;
@@ -3907,11 +3993,11 @@ var AutoScript = ( function ( window, undefined ) {
 				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
 				if (isURLTooLong(url)) {
 					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
+						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos", ERRORCODE_REQUEST_STORAGE_URL_NOT_FOUND);
 						return;
 					}
 					else if (retrieverServletAddress == null || retrieverServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para la recuperacion de datos");
+						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para la recuperacion de datos", ERRORCODE_REQUEST_RETRIEVE_URL_NOT_FOUND);
 						return;
 					}
 					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
@@ -3998,7 +4084,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
 				if (isURLTooLong(url)) {
 					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
+						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos", ERRORCODE_REQUEST_STORAGE_URL_NOT_FOUND);
 						return;
 					}
 
@@ -4070,7 +4156,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
 				if (isURLTooLong(url)) {
 					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
+						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos", ERRORCODE_REQUEST_STORAGE_URL_NOT_FOUND);
 						return;
 					}
 
@@ -4251,13 +4337,14 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Carga de fichero de datos. Se realiza mediante la invocacion de una app nativa. 
 			 */
 			function getFileNameContentBase64 (title, extensions, description, filePath, successCallback, errorCallback) {
-				var errorType = "java.lang.UnsupportedOperationException";
-				var errorMessage = "La operacion de carga de fichero no esta disponible por servidor intermedio";
+				errorType = "java.lang.UnsupportedOperationException";
+				errorMessage = "La operacion de carga de fichero no esta disponible por servidor intermedio";
+				errorCode = ERRORCODE_FUNCTIONAL_UPLOAD_FILE_SERVER;
 				if (!errorCallback) {
-					throwException(errorType, errorMessage);
+					throwException(errorType, errorMessage, errorCode);
 				}
 				else {
-					errorCallback(errorType, errorMessage);
+					errorCallback(errorType, errorMessage, errorCode);
 				}
 			}
 
@@ -4265,13 +4352,14 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Carga de multiples ficheros de datos. Se realiza mediante la invocacion de una app nativa. 
 			 */
 			function getMultiFileNameContentBase64  (title, extensions, description, filePath, successCallback, errorCallback) {
-				var errorType = "java.lang.UnsupportedOperationException";
-				var errorMessage = "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio";
+				errorType = "java.lang.UnsupportedOperationException";
+				errorMessage = "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio";
+				errorCode = ERRORCODE_FUNCTIONAL_UPLOAD_MULTIPLE_FILE_SERVER;
 				if (!errorCallback) {
-					throwException(errorType, errorMessage);
+					throwException(errorType, errorMessage, errorCode);
 				}
 				else {
-					errorCallback(errorType, errorMessage);
+					errorCallback(errorType, errorMessage, errorCode);
 				}
 			}
 
@@ -4295,6 +4383,20 @@ var AutoScript = ( function ( window, undefined ) {
 			function getErrorType () {
 				return errorType;
 			}
+			
+			/**
+			 * Recupera el codigo completo del ultimo error capturado.
+			 */
+			function getErrorCode () {
+				return errorCode;
+			}
+			
+			/**
+			 * Recupera el numero de codigo del ultimo error capturado.
+			 */
+			function getErrorCodeNumber () {
+				return errorCode.substring(2);
+			}
 
 			/**
 			 * Establece las rutas de los servlets encargados de almacenar y recuperar las firmas de los dispositivos moviles.
@@ -4307,9 +4409,10 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Establece el error indicado como error interno y lanza una excepcion.
 			 */
-			function throwException (type, message) {
+			function throwException (type, message, errCode) {
 				errorType = type;
 				errorMessage = message;
+				errorCode = errCode;
 				throw new Error();
 			}
 
@@ -4369,7 +4472,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Subimos los datos al servidor intermedio
 				var httpRequest = getHttpRequest();
 				if (!httpRequest) {
-					throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
+					throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar", ERRORCODE_INTERNAL_BROWSER_CANT_PREPROCESS);
 				}
 				httpRequest.open("POST", storageServletAddress, true);
 				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -4381,7 +4484,8 @@ var AutoScript = ( function ( window, undefined ) {
 						 if (httpRequest.status == 200) {
 							url = buildUrlWithoutData(op, fileId, retrieverServletAddress, cipherKey);
 							if (isURLTooLong(url)) {
-								errorCallback("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.");
+								errorCode = ERRORCODE_REQUEST_TOO_LONG_URL;
+								errorCallback("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.", errorCode);
 								return;
 							}
 							execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
@@ -4389,11 +4493,12 @@ var AutoScript = ( function ( window, undefined ) {
 					else {
 						errorOcurred = true;
 						console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
+						errorCode = ERRORCODE_REQUEST_UPLOADING_TO_APP;
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
 								 function() { sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) },
-								 function() { errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");});
+								 function() { errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa", errorCode);});
 						if (!enabled) {
-							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");
+							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa", errorCode);
 						}
 					}
 					}
@@ -4402,7 +4507,8 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) {	
 						if (!errorOcurred) {
 							console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
-							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
+							errorCode = ERRORCODE_THIRDPARTY_UPLOADING_TO_SERVER;
+							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa", errorCode);
 						}
 					}
 				}
@@ -4423,7 +4529,8 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.send(requestData);
 				}
 				catch(e) {
-					errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto");	
+					errorCode = ERRORCODE_COMMUNICATION_CANT_CONNECT_SERVER;
+					errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto", errorCode);	
 				}
 			}
 			
@@ -4559,15 +4666,27 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				// Si se obtiene otro mensaje de error, se deja de intentar y se ejecuta la funcion callback de error
-				if (html.substr(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {
-					errorMessage = html.substring(html.indexOf(":=") + 2);
+				if (html.substr(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {		
 					if (html.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
 						errorType = "es.gob.afirma.core.AOCancelledOperationException";
 					} else {
 						errorType = "java.lang.Exception";
 					}
+					var errorCodeAndMessage = html.substring(html.indexOf(":=") + 2);
+					// Se comprueba si la respuesta viene de modo codigo-mensaje o no
+					if(errorCodeAndMessage.indexOf(" - ") != -1) {
+						var splitCode = errorCodeAndMessage.substring(0, errorCodeAndMessage.indexOf(" - "));
+						if (splitCode.length == 8 && (splitCode.startsWith("AU") || splitCode.startsWith("AA") || splitCode.startsWith("AI"))) {
+							errorCode = splitCode;
+							errorMessage = errorCodeAndMessage.substring(errorCodeAndMessage.indexOf(" - ") + 3);
+						} else {
+							errorMessage = errorCodeAndMessage;
+						}								
+					} else {
+						errorMessage = errorCodeAndMessage;
+					}
 					if (!!errorCallback) {
-						errorCallback(errorType, errorMessage);
+						errorCallback(errorType, errorMessage, errorCode);
 					}
 					return false;
 				}
@@ -4575,7 +4694,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Se ha cancelado la operacion
 				if (html == "CANCEL" || html == "CANCEL\r\n" || html == "CANCEL\n") {
 					if (!!errorCallback) {
-						errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+						errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario", ERRORCODE_FUNCTIONAL_CANCELLED_OP);
 					}
 					return false;
 				}
@@ -4728,7 +4847,7 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			function errorResponseFunction (type, message, errorCallback) {
-				
+							
 				// Cerramos el dialogo de espera al obtener el error
 				Dialog.disposeSupportDialog();
 
@@ -4988,7 +5107,9 @@ var AutoScript = ( function ( window, undefined ) {
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType
+				getErrorType : getErrorType,
+				getErrorCode : getErrorCode,
+				getErrorCodeNumber : getErrorCodeNumber
 			}
 		});
 		
@@ -5062,6 +5183,8 @@ var AutoScript = ( function ( window, undefined ) {
 			/* Gestion de errores */
 			getErrorMessage : getErrorMessage,
 			getErrorType : getErrorType,
+			getErrorCode : getErrorCode,
+			getErrorCodeNumber : getErrorCodeNumber,
 
 			/* Utilidad JavaScript*/
 			getBase64FromText : getBase64FromText,
