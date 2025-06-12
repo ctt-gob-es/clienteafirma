@@ -747,7 +747,7 @@ public final class XAdESCounterSigner {
 		// se debe agregar a las contrafirmas: ETSI EN 319 132-1 V1.1.1 (2016-04)
 		// Apartado 6.3, aclaracion k)
 		if (!profile.equalsIgnoreCase(AOSignConstants.SIGN_PROFILE_BASELINE)) {
-			final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<>(0)); //$NON-NLS-1$ //$NON-NLS-2$
+			final ObjectIdentifier objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:1.2.840.10003.5.109.10", null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$
 			final DataObjectFormat dataObjectFormat = new DataObjectFormatImpl(null, objectIdentifier, "text/xml", doc.getInputEncoding(), "#" + referenceId); //$NON-NLS-1$ //$NON-NLS-2$
 			final List<DataObjectFormat> dataObjectFormats = new ArrayList<>();
 			dataObjectFormats.add(dataObjectFormat);

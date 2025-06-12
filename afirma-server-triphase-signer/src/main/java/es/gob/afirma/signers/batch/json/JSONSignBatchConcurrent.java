@@ -160,9 +160,11 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		for (final ResultSingleSign error : errors) {
 			errorsJson.put(buildJSONSingleResut(error));
 		}
-		trisigns.forEach((signatureId, trisign) -> {
+
+		for (String signatureId : trisigns.keySet().toArray(new String[0])) {
+			TriphaseData trisign = trisigns.get(signatureId);
 			trisignsJson.put(TriphaseDataParser.triphaseDataToJson(trisign));
-		});
+		}
 
 		return buildPreBatch(this.format.toString(), trisignsJson, errorsJson);
 	}

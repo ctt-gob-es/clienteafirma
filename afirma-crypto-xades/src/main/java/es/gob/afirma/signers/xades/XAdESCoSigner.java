@@ -775,7 +775,7 @@ public final class XAdESCoSigner {
 		ObjectIdentifier objectIdentifier = null;
 		if (oid != null) {
 			objectIdentifier = new ObjectIdentifierImpl(
-					"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<>(0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					"OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 
 		// Cremos los elementos descriptivos de los datos

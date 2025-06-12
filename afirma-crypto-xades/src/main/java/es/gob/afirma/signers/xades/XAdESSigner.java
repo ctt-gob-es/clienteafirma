@@ -1413,7 +1413,7 @@ public final class XAdESSigner {
 					"OIDAsURN", //$NON-NLS-1$
 					dataOid,
 					null,
-					new ArrayList<>(0));
+					new ArrayList<String>(0));
 		}
 
 		return new DataObjectFormatImpl(

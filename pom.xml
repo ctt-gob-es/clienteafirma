@@ -58,7 +58,7 @@
 		<afirma.legible.version>1_8_0</afirma.legible.version>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 
-		<jdk.version>1.8</jdk.version>
+		<jdk.version>1.7</jdk.version>
 		
 		<junit.version>4.13.2</junit.version>
 	</properties>
