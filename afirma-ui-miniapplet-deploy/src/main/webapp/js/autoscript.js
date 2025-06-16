@@ -2452,6 +2452,29 @@ var AutoScript = ( function ( window, undefined ) {
 					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario", ERRORCODE_FUNCTIONAL_CANCELLED_OP);
 					return;
 				}
+
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {		
+					if (data.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorMessage;
+					var errorCode;
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					processErrorResponse(errorType, errorMessage, errorCode);
+					return;
+				}
 				
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
@@ -2736,7 +2759,7 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Recupera el numero de codigo del ultimo error capturado.
 			 */
 			function getErrorCodeNumber () {
-				return errorCode.substring(2);
+				return !!errorCode ? errorCode.substring(2) : null;
 			}
 
 			/* Metodos que publicamos del objeto AppAfirmaWebSocketClient */
@@ -3862,7 +3885,7 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Implementada en el applet Java de firma.
 			 */
 			function getErrorCodeNumber () {
-				return errorCode.substring(2);
+				return !!errorCode ? errorCode.substring(2) : null;
 			}
 
 			/* Metodos que publicamos del objeto AppAfirmaJSSocket */
@@ -4395,7 +4418,7 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Recupera el numero de codigo del ultimo error capturado.
 			 */
 			function getErrorCodeNumber () {
-				return errorCode.substring(2);
+				return !!errorCode ? errorCode.substring(2) : null;
 			}
 
 			/**
@@ -4676,7 +4699,7 @@ var AutoScript = ( function ( window, undefined ) {
 					// Se comprueba si la respuesta viene de modo codigo-mensaje o no
 					if(errorCodeAndMessage.indexOf(" - ") != -1) {
 						var splitCode = errorCodeAndMessage.substring(0, errorCodeAndMessage.indexOf(" - "));
-						if (splitCode.length == 8 && (splitCode.startsWith("AU") || splitCode.startsWith("AA") || splitCode.startsWith("AI"))) {
+						if (splitCode.length == 8) {
 							errorCode = splitCode;
 							errorMessage = errorCodeAndMessage.substring(errorCodeAndMessage.indexOf(" - ") + 3);
 						} else {

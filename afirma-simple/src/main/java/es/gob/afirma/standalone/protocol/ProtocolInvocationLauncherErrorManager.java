@@ -326,8 +326,22 @@ final class ProtocolInvocationLauncherErrorManager {
 
 		String message;
 		final String textKey = "Error." + errorCode.getCode(); //$NON-NLS-1$
-		if (errorCode.checkType(ErrorCode.ERROR_REQUEST)) {
-			message = ProtocolMessages.getTargetString(textKey, "Error.62XXXX"); //$NON-NLS-1$
+		if (errorCode.checkType(ErrorCode.ERROR_HARDWARE)) {
+			message = ProtocolMessages.getTargetString(textKey, "Error.1XXXXX"); //$NON-NLS-1$
+		} else if (errorCode.checkType(ErrorCode.ERROR_INTERNAL)) {
+			message = ProtocolMessages.getTargetString(textKey, "Error.2XXXXX"); //$NON-NLS-1$
+		} if (errorCode.checkType(ErrorCode.ERROR_THIRD_PARTY)) {
+			message = ProtocolMessages.getTargetString(textKey, "Error.3XXXXX"); //$NON-NLS-1$
+		} else if (errorCode.checkType(ErrorCode.ERROR_COMMUNICATION)) {
+			message = ProtocolMessages.getTargetString(textKey, "Error.4XXXXX"); //$NON-NLS-1$
+		} else if (errorCode.checkType(ErrorCode.ERROR_FUNCTIONAL)) {
+			message = ProtocolMessages.getTargetString(textKey, "Error.5XXXXX"); //$NON-NLS-1$
+		} else if (errorCode.checkType(ErrorCode.ERROR_REQUEST)) {
+			if (errorCode.checkType(ErrorCode.ERROR_REQUEST_FROM_BROWSER)) {
+				message = ProtocolMessages.getTargetString(textKey, "Error.62XXXX"); //$NON-NLS-1$
+			} else {
+				message = ProtocolMessages.getTargetString(textKey, "Error.6XXXXX"); //$NON-NLS-1$
+			}
 		} else {
 			message = ProtocolMessages.getTargetString(textKey, "Error"); //$NON-NLS-1$
 		}

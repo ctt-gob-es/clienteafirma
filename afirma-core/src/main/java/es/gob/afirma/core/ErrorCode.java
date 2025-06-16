@@ -9,6 +9,8 @@ public class ErrorCode {
 	public static final String ERROR_FUNCTIONAL = "5"; //$NON-NLS-1$
 	public static final String ERROR_REQUEST = "6"; //$NON-NLS-1$
 
+	public static final String ERROR_REQUEST_FROM_BROWSER = "62"; //$NON-NLS-1$
+
 	public static final String ERROR_TRIPHASE_SERVICE  = "3004"; //$NON-NLS-1$
 
 	private final String code;
