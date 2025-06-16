@@ -97,6 +97,7 @@ public class ErrorCode {
 
 		public static final ErrorCode BUILDING_ASIC_CONTAINER_ERROR				= new ErrorCode("214001", "Error al construir el contenedor ASiC de la nueva firma"); //$NON-NLS-1$ //$NON-NLS-2$
 
+		public static final ErrorCode PLUGIN_ERROR								= new ErrorCode("240000", "Error con el plugin"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static class ThirdParty {

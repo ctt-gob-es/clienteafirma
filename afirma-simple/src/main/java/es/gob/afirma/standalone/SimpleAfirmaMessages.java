@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.ui.LanguageManager;
@@ -45,24 +46,24 @@ public final class SimpleAfirmaMessages {
     public static String getString(final String key) {
         try {
             return bundle.getString(key);
+        } catch (Exception ignored) {
+            // Fallback a base locale
+            try {
+	            Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+	            ResourceBundle tempBundle = LanguageManager.isDefaultLocale(baseLocale) ? ResourceBundle.getBundle(BUNDLE_NAME, baseLocale) : setImportedLangResource();
+                return tempBundle.getString(key);
+            } catch (Exception ignored2) {
+                // Fallback a es_ES
+                Locale esLocale = new Locale("es", "ES");
+                ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
+                try {
+                    return esBundle.getString(key);
+                } catch (Exception e) {
+                    LOGGER.warning("Falta el recurso para la clave: " + key);
+                    return "!" + key + "!";
+                }
+            }
         }
-		catch (final Exception e) {
-			try {
-				final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
-				final ResourceBundle temporalBundle;
-
-				if (LanguageManager.isDefaultLocale(baseLocale)) {
-					temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
-				} else {
-					temporalBundle = setImportedLangResource();
-				}
-
-				return temporalBundle.getString(key);
-
-			} catch (final Exception e1) {
-				return '!' + key + '!';
-			}
-		}
     }
 
     /**
@@ -78,41 +79,35 @@ public final class SimpleAfirmaMessages {
      * @return Recurso textual con las subcadenas sustituidas.
      */
     public static String getString(final String key, final String... params) {
-
         String text;
         try {
             text = bundle.getString(key);
-        }
-        catch (final Exception e) {
-        	if(!LanguageManager.isDefaultLocale(Locale.getDefault())) {
-        		try {
-					final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
-					final ResourceBundle temporalBundle;
-
-					if(LanguageManager.isDefaultLocale(baseLocale)) {
-						temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
-					} else {
-						temporalBundle = setImportedLangResource();
-					}
-
-					text = temporalBundle.getString(key);
-
-				} catch (final Exception e1) {
-					return '!' + key + '!';
-				}
-        	}
-
-			return '!' + key + '!';
-        }
-
-        if (params != null && params.length > 0) {
-            for (int i = 0; i < params.length; i++) {
-            	if (params[i] != null) {
-            		text = text.replace("%" + i, params[i]); //$NON-NLS-1$
-            	}
+        } catch (Exception ignored) {
+            // Fallback a base locale
+            try {
+	            Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+	            ResourceBundle tempBundle = LanguageManager.isDefaultLocale(baseLocale) ? ResourceBundle.getBundle(BUNDLE_NAME, baseLocale) : setImportedLangResource();
+                text = tempBundle.getString(key);
+            } catch (Exception ignored2) {
+                // Fallback a es_ES
+                Locale esLocale = new Locale("es", "ES");
+                ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
+                try {
+                    text = esBundle.getString(key);
+                } catch (Exception e) {
+                    LOGGER.warning("Falta el recurso para la clave: " + key);
+                    return "!" + key + "!";
+                }
             }
         }
 
+        if (params != null) {
+            for (int i = 0; i < params.length; i++) {
+                if (params[i] != null) {
+                    text = text.replace("%" + i, params[i]);
+                }
+            }
+        }
         return text;
     }
 
@@ -121,12 +116,31 @@ public final class SimpleAfirmaMessages {
      * @throws MalformedURLException
      */
     public static void changeLocale() {
-    	if (LanguageManager.isDefaultLocale(Locale.getDefault()) && !LanguageManager.existDefaultLocaleNewVersion()) {
-    		bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
-    	} else {
-    		bundle = setImportedLangResource();
-    	}
-
+        final Locale current = Locale.getDefault();
+        ResourceBundle rb = null;
+        if (LanguageManager.isDefaultLocale(current) && !LanguageManager.existDefaultLocaleNewVersion()) {
+            try {
+                rb = ResourceBundle.getBundle(BUNDLE_NAME, current);
+            }
+            catch (final Exception e) {
+                LOGGER.log(Level.WARNING, "No existe el bundle interno para Locale " + current + ", se usara por defecto", e);
+                rb = ResourceBundle.getBundle(BUNDLE_NAME, Locale.ENGLISH);
+            }
+        }
+        else {
+            rb = setImportedLangResource();
+            if (rb == null) {
+                LOGGER.warning("No se encontro recurso externo para Locale " + current + ", usando default interno");
+                try {
+                    rb = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("es", "ES"));
+                }
+                catch (final Exception e) {
+                    LOGGER.log(Level.SEVERE,
+                        "El bundle para el Locale es_ES tampoco esta disponible", e);
+                }
+            }
+        }
+        bundle = rb;
     }
 
     private static ResourceBundle setImportedLangResource() {

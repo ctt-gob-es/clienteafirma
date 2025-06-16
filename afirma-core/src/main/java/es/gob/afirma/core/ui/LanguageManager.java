@@ -70,7 +70,7 @@ public class LanguageManager {
 		try {
 			langProps = readMetadataInfo(langFile);
 		} catch (final Exception e) {
-			throw new AOException(ErrorCode.Internal.ERROR_IMPORT_LANGUAGE);
+			throw new AOException(new ErrorCode("230001"));
 		}
 
 		final String localeName = langProps.get(LOCALE_PROP);
@@ -78,7 +78,7 @@ public class LanguageManager {
 		try {
 			copyLanguageToDirectory(langFile, new File(languagesDir, localeName));
 		} catch (final Exception e) {
-			throw new AOException(ErrorCode.Internal.ERROR_IMPORT_LANGUAGE);
+			throw new AOException(new ErrorCode("230001"));
 		}
 		
 		return langProps;

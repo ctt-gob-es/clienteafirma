@@ -41,8 +41,17 @@ public class SimpleErrorCode {
 		public static final ErrorCode ERROR_RECIVED_FROM_CLIENT			= new ErrorCode("220003", "El servicio cliente ya notifico un error durante la peticion"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode ENCRYPTING_PARAMS_ERROR			= new ErrorCode("220004", "Error encriptando los datos del servidor"); //$NON-NLS-1$ //$NON-NLS-2$
 
+		public static final ErrorCode GENERIC_LANGUAGE_IMPORT_ERROR		= new ErrorCode("230000", "Error importando el idioma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode CANT_READ_FILE					= new ErrorCode("230001", "No se ha podido leer correctamente el archivo ZIP"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode CANT_CREATE_DIRECTORY				= new ErrorCode("230002", "Se ha producido un error al crear el directorio del idioma"); //$NON-NLS-1$ //$NON-NLS-2$
 
-
+		
+		public static final ErrorCode GENERIC_PLUGIN_LOAD_ERROR   		= new ErrorCode("240000", "Ha ocurrido un error al intentar cargar el plugin"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode UNINSTALL_PLUGIN_ERROR   			= new ErrorCode("240001", "Ocurrio un error al desinstalar el plugin"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode ERROR_IN_PLUGIN   				= new ErrorCode("240002", "El propio plugin devolvio un error durante su instalacion"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode CANT_REMOVE_LOADED_PLUGIN   		= new ErrorCode("240003", "Ha ocurrido un error al eliminar el plugin anterior"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode PLUGIN_DIRECTORY_ERROR   			= new ErrorCode("240004", "El plugin seleccionado ya se encuentra instalado"); //$NON-NLS-1$ //$NON-NLS-2$
+        
 //		public static final ErrorCode NOTIFIED_ERROR_FROM_APP				= new ErrorCode("2200XX", "Error desenNo se pudo abrir el socket de comunicacion"); //$NON-NLS-1$ //$NON-NLS-2$
 
 
@@ -80,6 +89,27 @@ public class SimpleErrorCode {
 
 		public static final ErrorCode NO_CERTS_FOUND_SELECTING_CERT		= new ErrorCode("502001", "No se han encontrado certificados para realizar la seleccion"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode NO_CERTS_FOUND_SIGNING_BATCH		= new ErrorCode("504001", "No se han encontrado certificados para realizar la firma del lote"); //$NON-NLS-1$ //$NON-NLS-2$
+	
+		public static final ErrorCode POLICY_DEFAULT_ERROR                  = new ErrorCode("521000", "Ha ocurrido un error configurando la politica");
+        public static final ErrorCode INVALID_POLICY_IDENTIFIER             = new ErrorCode("521001", "El identificador de politica no puede ser nulo ni vacio");
+        public static final ErrorCode INVALID_POLICY_IDENTIFIER_URI         = new ErrorCode("521002", "El identificador debe ser una URI valida");
+        public static final ErrorCode MISSING_DIGEST_ALGORITHM              = new ErrorCode("521003", "Si se indica la huella digital es obligatorio indicar tambien el algoritmo");
+        public static final ErrorCode UNREACHABLE_POLICY_IDENTIFIER_URI		= new ErrorCode("521004", "Si no se especifica la huella digital, el identificador debe ser una URI accesible");
+        public static final ErrorCode INVALID_POLICY_IDENTIFIER_HASH_BASE64 = new ErrorCode("521005", "La huella digital debe estar en formato Base64");
+        public static final ErrorCode INVALID_POLICY_QUALIFIER_URI 			= new ErrorCode("521006", "El calificador debe ser una URI valida");
+        public static final ErrorCode INVALID_POLICY_IDENTIFIER_OID 		= new ErrorCode("521007", "El identificador debe tener un formato OID valido");
+        public static final ErrorCode EMPTY_POLICY_HASH 					= new ErrorCode("521008", "La huella digital no puede ser nula ni vacia");
+        public static final ErrorCode INVALID_POLICY_QUALIFIER_URL 			= new ErrorCode("521009", "El calificador debe ser una URL valida");
+
+        public static final ErrorCode MALFORMED_PLUGIN_SERVICE    			= new ErrorCode("530001", "Se han encontrado plugins mal definidos en el fichero importado"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode NO_PLUGIN_FOUND             			= new ErrorCode("530002", "No se encontro ningun plugin en los archivos"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode MULTIPLE_PLUGINS_FOUND      			= new ErrorCode("530003", "No se permite la carga simultanea de varios plugins"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode BUTTON_NO_ACTION            			= new ErrorCode("530004", "El plugin no ha definido accion para un boton"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode BUTTON_NO_WINDOW            			= new ErrorCode("530005", "El plugin no ha definido la ventana en la que debe aparecer un boton"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode INVALID_ACTION_CLASS        			= new ErrorCode("530006", "El plugin definio una clase de accion erronea"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode INVALID_PLUGIN_FILE   				= new ErrorCode("530007", "El plugin no es valido para ser importado"); //$NON-NLS-1$ //$NON-NLS-2$
+        public static final ErrorCode ALREADY_INSTALLED_PLUGIN   			= new ErrorCode("530008", "El plugin seleccionado ya se encuentra instalado"); //$NON-NLS-1$ //$NON-NLS-2$
+        
 	}
 
 	public static class Request {
