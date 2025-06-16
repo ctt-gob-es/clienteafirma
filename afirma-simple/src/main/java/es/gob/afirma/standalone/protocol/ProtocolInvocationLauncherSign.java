@@ -470,8 +470,10 @@ final class ProtocolInvocationLauncherSign {
 				if (validity.getValidity() == SIGN_DETAIL_TYPE.KO &&
 						(cryptoOperation != Operation.SIGN || validity.getError() != VALIDITY_ERROR.NO_SIGN)) {
 					LOGGER.severe("La firma indicada no es valida: " + validity); //$NON-NLS-1$
-					final ErrorCode errorCode = ErrorCode.Functional.INVALID_SIGNATURE;
-					throw new SocketOperationException(errorCode);
+					final ErrorCode errorCode = validity.getErrorCode() != null
+							? validity.getErrorCode()
+							: ErrorCode.Functional.INVALID_SIGNATURE;
+					throw new SocketOperationException(validity.getErrorException(), errorCode);
 				}
 			}
 		}

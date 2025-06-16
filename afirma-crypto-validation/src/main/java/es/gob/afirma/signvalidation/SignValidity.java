@@ -9,6 +9,9 @@
 
 package es.gob.afirma.signvalidation;
 
+import es.gob.afirma.core.AOControlledException;
+import es.gob.afirma.core.ErrorCode;
+
 /**
  * Indica si la firma es v&aacute;lida o no.
  * @author Carlos Gamuci
@@ -140,7 +143,7 @@ public final class SignValidity {
         /** Cuando la firma es inv&aacute;lida porque no est&aacute; formada correctamente */
         BAD_BUILD_SIGN,
         /** Cuando la firma es inv&aacute;lida porque no es la &uacute;ltima firma*/
-        CERTIFIED_SIGN_REVISION,
+        CERTIFIED_SIGN_REVISION;
     }
 
     /** Validez de la firma. */
@@ -152,43 +155,83 @@ public final class SignValidity {
     /** Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n. */
     private final Exception errorException;
 
-    /** Identifica la validez de una firma.
+    /** C&oacute;digo de error asociado al problema en la validaci&oacute;n. */
+    private final ErrorCode errorCode;
+
+
+    /**
+     * Identifica la validez de una firma.
      * @param type Validez de la firma.
      * @param error Error que invalida o impide comprobar la firma.
      * @param ex Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
-     *           Si la validaci&oacute;n fue correcta, puede indicarse <code>null</code>. */
+     *           Si la validaci&oacute;n fue correcta, puede indicarse <code>null</code>.
+     */
     public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error, final Exception ex) {
         this.validity = type;
         this.error = error;
         this.errorException = ex;
+        this.errorCode = ex instanceof AOControlledException ? ((AOControlledException) ex).getErrorCode() : null;
     }
 
-    /** Identifica la validez de una firma.
+    /**
+     * Identifica la validez de una firma.
      * @param type Validez de la firma.
-     * @param error Error que invalida o impide comprobar la firma. */
-    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error) {
-    	this(type, error, null);
+     * @param error Error que invalida o impide comprobar la firma.
+     * @param errorCode C&oacute;digo de error asociado al problema en la validaci&oacute;n.
+     */
+    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error, final ErrorCode errorCode) {
+        this.validity = type;
+        this.error = error;
+        this.errorException = null;
+        this.errorCode = errorCode;
     }
 
-    /** Recupera la validez de la firma.
-     * @return Validez de la firma. */
+    /**
+     * Identifica la validez de una firma.
+     * @param type Validez de la firma.
+     * @param error Error que invalida o impide comprobar la firma.
+     */
+    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error) {
+    	this(type, error, (Exception) null);
+    }
+
+    /**
+     * Recupera la validez de la firma.
+     * @return Validez de la firma.
+     */
     public SIGN_DETAIL_TYPE getValidity() {
         return this.validity;
     }
 
-    /** Recupera el error que invalida la firma. Si no existe ning&uacute;n error o este es desconocido,
+    /**
+     * Recupera el error que invalida la firma. Si no existe ning&uacute;n error o este es desconocido,
      * se devolver&aacute; {@code null}.
-     * @return Error que invalida la firma o impide comprobar su validez. */
+     * @return Error que invalida la firma o impide comprobar su validez.
+     */
     public VALIDITY_ERROR getError() {
         return this.error;
     }
 
-    /** Recupera la excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
+    /**
+     * Recupera la excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
      * Devuelve <code>null</code> en una validaci&oacute;n sin errores.
-     * @return Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n. */
+     * @return Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
+     */
     public Exception getErrorException() {
     	return this.errorException;
     }
+
+    /**
+     * Obtiene el codigo de error asociado al error de la validaci&oacute;n.
+     * @return C&oacute;digo de error o {@code null} si no se conoce.
+     */
+    public ErrorCode getErrorCode() {
+		return this.errorCode != null
+				? this.errorCode
+				: this.errorException instanceof AOControlledException
+					? ((AOControlledException) this.errorException).getErrorCode()
+					: null;
+	}
 
     public String validityTypeToString() {
 		if (this.validity.equals(SIGN_DETAIL_TYPE.OK) || this.validity.equals(SIGN_DETAIL_TYPE.GENERATED)) {

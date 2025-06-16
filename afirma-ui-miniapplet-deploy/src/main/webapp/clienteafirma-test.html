@@ -45,8 +45,8 @@
 			document.getElementById('result').value = certificateB64;
 		}
 		
-		function showErrorCallback(errorType, errorMessage) {
-			showLog("Type: " + errorType + "\nMessage: " + errorMessage);
+		function showErrorCallback(errorType, errorMessage, errorCode) {
+			showLog("Type: " + errorType + "\nMessage: " + errorMessage + "\nCodigo: " + errorCode);
 		}
 
 		function doSign() {

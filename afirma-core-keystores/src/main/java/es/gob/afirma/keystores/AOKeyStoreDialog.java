@@ -637,7 +637,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			ks = AOKeyStore.APPLE;
 		}
 		else {
-			throw new KeystoreAlternativeException(null, "No se ha podido identificar un almacen del sistema compatible", KeyStoreErrorCode.Functional.UNDEFINED_DEFAULT_KEYSTORE); //$NON-NLS-1$
+			throw new KeystoreAlternativeException(null, "No se ha podido identificar un almacen del sistema compatible", KeyStoreErrorCode.Internal.UNDEFINED_DEFAULT_KEYSTORE); //$NON-NLS-1$
 		}
 
 		try {

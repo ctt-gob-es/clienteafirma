@@ -12,7 +12,7 @@ public class ODFErrorCode {
 	}
 
 	public static class Functional {
-		public static final ErrorCode ODF_DOCUMENT_NEEDED 		= new ErrorCode("510003", "La firma requiere que los datos sean ODF"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode ODF_DOCUMENT_NEEDED 		= new ErrorCode("510003", "La firma requiere que los datos sean un documento ODF"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 }

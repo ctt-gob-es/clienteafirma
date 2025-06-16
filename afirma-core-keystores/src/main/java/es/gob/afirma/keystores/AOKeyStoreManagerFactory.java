@@ -170,7 +170,7 @@ public final class AOKeyStoreManagerFactory {
                + "' mas sistema operativo '" //$NON-NLS-1$
                + Platform.getOS()
                + "' no esta soportada", //$NON-NLS-1$
-               KeyStoreErrorCode.Functional.UNSUPPORTED_KEYSTORE
+               KeyStoreErrorCode.Request.UNSUPPORTED_KEYSTORE
         );
     }
 

@@ -23,9 +23,6 @@ import es.gob.afirma.standalone.SimpleErrorCode;
  */
 public final class AfirmaWebSocketServerV4Sup extends AfirmaWebSocketServer {
 
-	/** Identificador de versi&oacute;n del protocolo versi&oacute;n 4. **/
-	private static final int PROTOCOL_VERSION_4 = 4;
-
 	/** Prefijo de las peticiones de eco. */
 	private static final String ECHO_REQUEST_PREFIX = "echo="; //$NON-NLS-1$
 

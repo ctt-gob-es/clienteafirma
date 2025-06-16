@@ -22,7 +22,7 @@ public class PdfErrorCode {
 	}
 
 	public static class Functional {
-		public static ErrorCode PDF_DOCUMENT_NEEDED 		= new ErrorCode("510005", "La firma requiere que los datos sean PDF"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static ErrorCode PDF_DOCUMENT_NEEDED 		= new ErrorCode("510005", "La firma requiere que los datos sean un documento PDF"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static class Request {

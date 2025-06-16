@@ -24,7 +24,7 @@ public class KeyStoreErrorCode {
 		public static final ErrorCode LOADING_PKCS11_KEYSTORE_ERROR				= new ErrorCode("201113", "Error al cargar el almacen de certificados a traves del PKCS#11"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode LOADING_JMULTICARD_KEYSTORE_ERROR			= new ErrorCode("201114", "Error al cargar el almacen de certificados con JMulticard"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode LOADING_FILE_CERTSTORE_ERROR				= new ErrorCode("201115", "Error al cargar un certificado desde fichero"); //$NON-NLS-1$ //$NON-NLS-2$
-
+		public static final ErrorCode UNDEFINED_DEFAULT_KEYSTORE				= new ErrorCode("201116", "No hay definido un almacen de claves por defecto para este sistema operativo"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static class ThirdParty {
@@ -35,10 +35,7 @@ public class KeyStoreErrorCode {
 
 	}
 
-	public static class Functional {
-
-		public static final ErrorCode UNSUPPORTED_KEYSTORE						= new ErrorCode("511001", "El almacen de claves solicitado no es compatible con el entorno de ejecucion"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode UNDEFINED_DEFAULT_KEYSTORE				= new ErrorCode("511002", "No hay definido un almacen de claves por defecto para el sistema operativo del usuario"); //$NON-NLS-1$ //$NON-NLS-2$
-
+	public static class Request {
+		public static final ErrorCode UNSUPPORTED_KEYSTORE						= new ErrorCode("600011", "El almacen de claves solicitado no es compatible con el entorno de ejecucion"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

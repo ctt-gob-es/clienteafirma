@@ -50,6 +50,7 @@ import es.gob.afirma.signers.odf.AOODFSigner;
 import es.gob.afirma.signers.ooxml.AOOOXMLSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.SuspectedPSAException;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
@@ -293,14 +294,14 @@ public final class DataAnalizerUtil {
 				// Se comprueba si en la misma pagina se esta solapando alguna firma visible con otra
 				final boolean isOverlappingSignatures = checkSignatureOverlaping(actualDoc.getPage(i).getAnnotations());
 				if (isOverlappingSignatures) {
-					return new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.OVERLAPPING_SIGNATURE);
+					return new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.OVERLAPPING_SIGNATURE, new SuspectedPSAException("El documento incluye firmas visibles solapadas")); //$NON-NLS-1$
 				}
 				actualReviewImage = actualPdfRenderer.renderImageWithDPI(i, 40, ImageType.GRAY);
 				lastReviewImage = lastReviewPdfRenderer.renderImageWithDPI(i, 40, ImageType.GRAY);
 				final boolean equalImages = checkImagesChanges(actualReviewImage, lastReviewImage);
 
 				if (!equalImages) {
-					return new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.MODIFIED_DOCUMENT);
+					return new SignValidity(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER, VALIDITY_ERROR.MODIFIED_DOCUMENT, new SuspectedPSAException("El documento ha cambiado de aspecto")); //$NON-NLS-1$
 				}
 			}
         }

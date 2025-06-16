@@ -36,6 +36,9 @@ final class ProtocolInvocationLauncherErrorManager {
 
 	private static final String AUTOFIRMA_ERROR_PREFIX = "AF"; //$NON-NLS-1$
 
+	private static final String DEFAULT_ERROR_PREFIX = "err-00:="; //$NON-NLS-1$
+	private static final String CANCELLATION_ERROR_PREFIX = "err-11:="; //$NON-NLS-1$
+
 	private static final boolean HEADLESS = Boolean.getBoolean(
 		"es.gob.afirma.protocolinvocation.HeadLess" //$NON-NLS-1$
 	);
@@ -266,22 +269,22 @@ final class ProtocolInvocationLauncherErrorManager {
 	}
 
 	static void showError(final int protocolVersion, final ErrorCode errorCode) {
+		final String message = getText(errorCode);
 
-		final String desc = getErrorMessage(protocolVersion, errorCode);
-
-		String title;
-		if (protocolVersion <= ProtocolVersion.VERSION_4.getVersion()) {
-			title = ProtocolMessages.getString("ProtocolLauncher.67"); //$NON-NLS-1$
+		if (HEADLESS) {
+			LOGGER.warning("No se ha encontrado interfaz grafica para mostrar el error " //$NON-NLS-1$
+					+ AUTOFIRMA_ERROR_PREFIX + errorCode.getCode() + ": " + message); //$NON-NLS-1$
 		}
 		else {
-			title = ProtocolMessages.getString("ProtocolLauncher.29", "AF" + errorCode.getCode()); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		final String message = getErrorMessage(protocolVersion, errorCode);
-
-		if (!HEADLESS) {
+			// En macOS reclamamos el foco
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				MacUtils.focusApplication();
 			}
+
+			// Mostramos el error al usuario
+			final String title = protocolVersion <= ProtocolVersion.VERSION_4.getVersion()
+					? ProtocolMessages.getString("ProtocolLauncher.67") //$NON-NLS-1$
+					: ProtocolMessages.getString("ProtocolLauncher.29", AUTOFIRMA_ERROR_PREFIX + errorCode.getCode()); //$NON-NLS-1$
 			AOUIFactory.showErrorMessage(
 				message,
 				title,
@@ -289,41 +292,32 @@ final class ProtocolInvocationLauncherErrorManager {
 				null
 			);
 		}
-		LOGGER.severe(desc);
 	}
-//
-//	static String getErrorMessage(final ErrorCode errorCode) {
-//		final String code = AUTOFIRMA_ERROR_PREFIX + errorCode.getCode();
-//		ProtocolMessages.getString(code);
-//		return  code + ": " + ; //$NON-NLS-1$
-//	}
 
 	static String getErrorMessage(final int protocolVersion, final ErrorCode errorCode) {
 
-		String oldErrorCode = null;
-		if (protocolVersion <= ProtocolVersion.VERSION_4.getVersion()) {
-			oldErrorCode = OLD_ERRORS_ASSOCIATION.get(errorCode);
-		}
-		return getErrorMessage(protocolVersion, errorCode, oldErrorCode);
-	}
+		String message = null;
 
-	static String getErrorMessage(final int protocolVersion, final ErrorCode errorCode, final String oldErrorCode) {
-
-		String message;
+		// Si se utiliza el protocolo 4 o anterior y el codigo de error tiene un valor antiguo
+		// asociado, se utiliza el formato de mensaje antiguo
 		if (protocolVersion <= ProtocolVersion.VERSION_4.getVersion()) {
-			final String code  = oldErrorCode != null
-					? oldErrorCode
-					: OLD_ERRORS_ASSOCIATION.get(errorCode);
+			final String code = OLD_ERRORS_ASSOCIATION.get(errorCode);
 			if (code != null) {
 				message = code + ": " + ERRORS.get(code); //$NON-NLS-1$
-			} else {
-				message = getText(errorCode);
 			}
 		}
-		else {
+
+		// En caso contrario, se utiliza el formato de mensaje nuevo, pero con una cabecera
+		// compatible con el formato antiguo para mantener la compatibilidad
+		if (message == null) {
+			// Establecemos una cabecera de error compatible con la usada en versiones anteriores del protocolo.
+			// Aunque no transmite informacion, permite que el receptor del error lo identifique como tal
 			final String code = AUTOFIRMA_ERROR_PREFIX + errorCode.getCode();
-			final String text = getText(errorCode);
-			message = code + ": " + text; //$NON-NLS-1$
+			final String prefix = errorCode.equals(ErrorCode.Functional.CANCELLED_OPERATION)
+					? CANCELLATION_ERROR_PREFIX
+					: DEFAULT_ERROR_PREFIX;
+
+			message = prefix + code + " - " + errorCode.getDescription(); //$NON-NLS-1$
 		}
 		return message;
 	}
@@ -338,51 +332,10 @@ final class ProtocolInvocationLauncherErrorManager {
 			message = ProtocolMessages.getTargetString(textKey, "Error"); //$NON-NLS-1$
 		}
 
+		if (message == null) {
+			message = errorCode.getDescription();
+		}
+
 		return message;
 	}
-
-
-//	static void showError(final String code) {
-//		showError(code, null);
-//	}
-//
-//	static void showError(final String code, final Throwable t) {
-//		showError(code, ERRORS.get(code), t);
-//	}
-//
-//	static void showError(final String oldCode, final String message, final Throwable t) {
-//		final String desc = ProtocolMessages.getString("ProtocolLauncher.28") + "\n(" + oldCode + ": " + message + ")";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-//		if (!HEADLESS) {
-//			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-//				MacUtils.focusApplication();
-//			}
-//			AOUIFactory.showErrorMessage(
-//				desc,
-//				ProtocolMessages.getString("ProtocolLauncher.29"), //$NON-NLS-1$
-//				AOUIFactory.ERROR_MESSAGE,
-//				t
-//			);
-//		}
-//		LOGGER.severe(desc);
-//	}
-//
-//	static void showErrorDetail(final String code, final String detail) {
-//		showErrorDetail(code, ERRORS.get(code), detail);
-//	}
-//
-//	static void showErrorDetail(final String code, final String message, final String detail) {
-//		showError(code, message + "\n" + detail, null); //$NON-NLS-1$
-//	}
-//
-//	static void showErrorDetail(final String code, final Throwable t) {
-//		showError(code, t);
-//	}
-//
-//	static void showErrorDetail(final String code, final String message, final Throwable t) {
-//		showError(code, message, t);
-//	}
-//
-//	static String getOldErrorMessage(final String oldCode) {
-//		return oldCode + ": " + ERRORS.get(oldCode); //$NON-NLS-1$
-//	}
 }

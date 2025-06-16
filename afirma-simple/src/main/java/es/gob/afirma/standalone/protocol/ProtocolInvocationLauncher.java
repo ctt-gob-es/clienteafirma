@@ -681,7 +681,10 @@ public final class ProtocolInvocationLauncher {
                 }
                 catch(final AOCancelledOperationException e) {
                     LOGGER.severe("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
-                    msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, ErrorCode.Functional.CANCELLED_OPERATION);
+                    msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
+                    if (!bySocket) {
+                    	msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
+                    }
                 }
 				// solo entra en la excepcion en el caso de que haya que devolver errores a
 				// traves del servidor intermedio

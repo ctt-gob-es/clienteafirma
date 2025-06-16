@@ -13,7 +13,7 @@ public class OOXMLErrorCode {
 
 	public static class Functional {
 		public static final ErrorCode INCOMPATIBLE_JRE			= new ErrorCode("500004", "JRE no compatible con la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode OOXML_DOCUMENT_NEEDED 		= new ErrorCode("510004", "La firma requiere que los datos sean OOXML"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode OOXML_DOCUMENT_NEEDED 		= new ErrorCode("510004", "La firma requiere que los datos sean un documento OOXML"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 }

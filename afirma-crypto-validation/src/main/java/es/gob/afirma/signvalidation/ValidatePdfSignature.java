@@ -30,6 +30,7 @@ import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.signers.pades.PdfUtil;
+import es.gob.afirma.signers.pades.common.PdfErrorCode;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pades.common.PdfFormModifiedException;
 import es.gob.afirma.signers.pades.common.SuspectedPSAException;
@@ -102,6 +103,7 @@ public final class ValidatePdfSignature extends SignValider {
 
 		final Properties xParams = params != null ? params : new Properties();
 
+		List<String> signNames;
 		List<SignValidity> validityList = new ArrayList<>();
 		AcroFields af;
 		PdfReader reader;
@@ -109,18 +111,16 @@ public final class ValidatePdfSignature extends SignValider {
     		final boolean headless = Boolean.parseBoolean(xParams.getProperty(PdfExtraParams.HEADLESS));
 			reader = PdfUtil.getPdfReader(sign, xParams, headless);
 			af = reader.getAcroFields();
+			signNames = af.getSignatureNames();
+			if (signNames.size() == 0) {
+				throw new InvalidSignatureException("No se ha encontrado firmas en el documento"); //$NON-NLS-1$
+			}
 		}
 		catch (final Exception e) {
-			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN));
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN, ValidationErrorCode.Functional.INCOMPATIBLE_SIGNATURE));
 			return validityList;
 		}
-		final List<String> signNames = af.getSignatureNames();
 
-		// Si no hay firmas, no hay nada que comprobar
-		if (signNames.size() == 0) {
-			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN));
-			return validityList;
-		}
 
 		// COMPROBACION DE CAMBIOS EN LOS FORMULARIOS PDF
 
@@ -133,13 +133,13 @@ public final class ValidatePdfSignature extends SignValider {
 		if (!allowSignModifiedForm && af.getTotalRevisions() > 1) {
 			final Map<String, String> errors = DataAnalizerUtil.checkPDFForm(reader);
 			if (errors != null && !errors.isEmpty()) {
+				final PdfFormModifiedException e = new PdfFormModifiedException("Se han detectado cambios en un formulario posteriores a la primera firma"); //$NON-NLS-1$
 				// Si no estaba definido un comportamiento concreto, consultaremos al usuario.
 				if (isRelaxed()) {
-					final PdfFormModifiedException e = new PdfFormModifiedException("Se han detectado cambios en un formulario posteriores a la primera firma"); //$NON-NLS-1$
 					e.setDenied(allowSignModifiedFormProp != null);
 					throw e;
 				}
-				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.MODIFIED_FORM));
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.MODIFIED_FORM, e));
 
 				// Identificado que el formulario se ha modificado para omitir si corresponde la
 				formModified = true;
@@ -180,7 +180,7 @@ public final class ValidatePdfSignature extends SignValider {
 					// Si habia que consultar y no se cumplen los requisitos,
 					// se considera que la firma no es valida
 					if (validity.getValidity() == SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER) {
-						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, validity.getError());
+						validity = new SignValidity(SIGN_DETAIL_TYPE.KO, validity.getError(), validity.getErrorException());
 					}
 					validityList.add(validity);
 				}
@@ -221,21 +221,16 @@ public final class ValidatePdfSignature extends SignValider {
 			}
 		}
 
-		// Cuando la firma sea certificada de tipo 1, sólo la última firma será válida.
+		// Cuando la firma sea certificada de tipo 1, solo la ultima firma sera valida.
 		if (reader.getCertificationLevel() == 1 && validityList.size() == 0) {
 			for (final String name : signNames) {
 
 				final int rev = af.getRevision(name);
 
-				if (rev == af.getTotalRevisions() && rev <= certRevision) {
-					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
+				if (rev > certRevision || rev > af.getTotalRevisions()) {
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFIED_SIGN_REVISION, PdfErrorCode.Internal.SIGNING_PDF_WITH_CERTIFIED_SIGN));
 				}
-				else if(rev < af.getTotalRevisions() && rev <= certRevision) {
-					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.OK, null));
-				}
-				else {
-					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFIED_SIGN_REVISION));
-				}
+
 			}
 		}
 
