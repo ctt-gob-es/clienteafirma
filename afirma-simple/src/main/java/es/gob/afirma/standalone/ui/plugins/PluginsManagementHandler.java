@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +22,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.DesktopUtil;
@@ -124,14 +127,14 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		try {
 			plugin = PluginsManager.loadPluginFromFiles(new File[] { pluginFile });
 		}
-		catch (final PluginException e) {
+		catch (final AOPluginException e) {
 			LOGGER.log(Level.WARNING, "No se pudo cargar el plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.0"), new AOPluginException(SimpleErrorCode.Internal.NOT_VALID_PLUGIN)); //$NON-NLS-1$
+			showError(e); //$NON-NLS-1$
 			return;
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Error al cargar el plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.0"), null); //$NON-NLS-1$
+			showError(new AOPluginException(SimpleErrorCode.Internal.GENERIC_PLUGIN_LOAD_ERROR)); //$NON-NLS-1$
 			return;
 		}
 
@@ -177,7 +180,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 		catch (final PluginControlledException e) {
 			LOGGER.log(Level.WARNING, "El propio plugin devolvio un error durante su instalacion", e); //$NON-NLS-1$
-			showError(e.getLocalizedMessage(), e);
+			showError(new AOPluginException(e.getMessage(), e, SimpleErrorCode.Internal.ERROR_IN_PLUGIN));
 			return;
 		}
 		catch (final PluginInstalledException e) {
@@ -185,7 +188,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			// Preguntamos si se desea susituir la version instalada del plugin por la nueva
 			final int option = JOptionPane.showConfirmDialog(
 					this.view,
-					SimpleAfirmaMessages.getString("PluginsManagementHandler.1", info.getName()), //$NON-NLS-1$
+					extractMessageFromException(e), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("PluginsManagementHandler.16"), //$NON-NLS-1$
 					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (option != JOptionPane.YES_OPTION) {
@@ -194,16 +197,26 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			try {
 				removeLoadedPlugin(info);
 				plugin = this.pluginsManager.installPlugin(pluginFile, info.getInternalName());
-			}
-			catch (final Exception e2) {
-				LOGGER.log(Level.WARNING, "No se ha podido reemplazar la version preexistente del plugin", e2); //$NON-NLS-1$
-				showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.15"), e2); //$NON-NLS-1$
+			} catch (final AOException aoException) {
+				LOGGER.log(Level.WARNING, "No se ha podido reemplazar la version preexistente del plugin", aoException); //$NON-NLS-1$
+				showError(aoException); //$NON-NLS-1$
+				return;
+			} catch (IOException e1) {
+				LOGGER.log(Level.WARNING, "Ocurrio un problema con los ficheros o directorio del plugin", e);
+				showError(new AOPluginException(e.getMessage(), e, SimpleErrorCode.Internal.PLUGIN_DIRECTORY_ERROR));
+				return;
+			} catch (PluginControlledException e1) {
+				LOGGER.log(Level.WARNING, "El propio plugin devolvio un error durante su instalacion", e); //$NON-NLS-1$
+				showError(new AOPluginException(e.getMessage(), e, SimpleErrorCode.Internal.ERROR_IN_PLUGIN));
 				return;
 			}
-		}
-		catch (final Exception e) {
+		} catch (final IOException e) {
+			LOGGER.log(Level.WARNING, "Ocurrio un problema con los ficheros o directorio del plugin", e);
+			showError(new AOPluginException(e.getMessage(), e, SimpleErrorCode.Internal.PLUGIN_DIRECTORY_ERROR));
+			return;
+		} catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Ocurrio un error al instalar el plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.2"), e); //$NON-NLS-1$
+			showError(new AOPluginException(e.getMessage(), e, SimpleErrorCode.Internal.GENERIC_PLUGIN_LOAD_ERROR)); //$NON-NLS-1$
 			return;
 		}
 
@@ -244,7 +257,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Ocurrio un error durante la lectura del fichero de plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.24"), e); //$NON-NLS-1$
+			showError(new AOException(SimpleErrorCode.Functional.INVALID_PLUGIN_FILE)); //$NON-NLS-1$
 			return false;
 		}
 
@@ -327,7 +340,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 				removePlugin(previousPlugin);
 			}
 			catch (final Exception e) {
-				throw new PluginException("Error al eliminar la version preexistente del plugin", e); //$NON-NLS-1$
+				throw new PluginException("Error al eliminar la version preexistente del plugin", e, SimpleErrorCode.Internal.CANT_REMOVE_LOADED_PLUGIN); //$NON-NLS-1$
 			}
 		}
 		// Si no esta, sera un resto residual de un plugin y tendremos que eliminar su directorio
@@ -335,7 +348,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			try {
 				this.pluginsManager.forceRemove(info.getInternalName());
 			} catch (final IOException e) {
-				throw new PluginException("No se pudo eliminar el directorio residual del plugin anterior", e); //$NON-NLS-1$
+				throw new PluginException("No se pudo eliminar el directorio residual del plugin anterior", e, SimpleErrorCode.Internal.CANT_REMOVE_LOADED_PLUGIN); //$NON-NLS-1$
 			}
 		}
 	}
@@ -366,7 +379,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			removePlugin(plugin);
 		} catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Ocurrio un error al desinstalar el plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.6"), e); //$NON-NLS-1$
+			showError(new AOPluginException(SimpleErrorCode.Internal.UNINSTALL_PLUGIN_ERROR)); //$NON-NLS-1$
 			return;
 		}
 
@@ -440,7 +453,6 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	}
 
 	void configPlugin() {
-
 		final AfirmaPlugin plugin = this.view.getPluginsList().getSelectedValue();
 
 		final PluginsPreferences preferences = PluginsPreferences.getInstance(plugin);
@@ -471,10 +483,119 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	private static void showError(final String message, final Throwable t) {
 		AOUIFactory.showErrorMessage(message,
 				SimpleAfirmaMessages.getString("PluginsManagementHandler.7"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE,
+				AOUIFactory.ERROR_MESSAGE,
 				t);
 	}
+	
+	private static void showError(final Throwable t) {
+		AOUIFactory.showErrorMessage(
+				extractMessageFromException(t),
+				SimpleAfirmaMessages.getString("PluginsManagementHandler.7"), //$NON-NLS-1$
+				AOUIFactory.ERROR_MESSAGE,
+				t);
+	}
+	
+	private static String extractMessageFromException(final Throwable t) {
+		String message = null;
+		
+		if (t instanceof AOException) {
+			message = obtainSimpleErrorCodeFromPluginException((AOException) t);
+		} else {
+			message = SimpleAfirmaMessages.getString("PluginManagementError.0");
+		}
+		return message;
+	}
+	
+	private static String obtainSimpleErrorCodeFromPluginException(final AOException exception) {
+	    ErrorCode errorCode;
+	    boolean isInternal = false;
 
+	    // Determine ErrorCode constant and category
+	    switch (exception.getErrorCode().getCode()) {
+	        // Internal errors (240000-series)
+	        case "240000":
+	            errorCode = SimpleErrorCode.Internal.GENERIC_PLUGIN_LOAD_ERROR;
+	            isInternal = true;
+	            break;
+	        case "240001":
+	            errorCode = SimpleErrorCode.Internal.UNINSTALL_PLUGIN_ERROR;
+	            isInternal = true;
+	            break;
+	        case "240002":
+	            errorCode = SimpleErrorCode.Internal.ERROR_IN_PLUGIN;
+	            isInternal = true;
+	            break;
+	        case "240003":
+	            errorCode = SimpleErrorCode.Internal.CANT_REMOVE_LOADED_PLUGIN;
+	            isInternal = true;
+	            break;
+	        case "240004":
+	            errorCode = SimpleErrorCode.Internal.PLUGIN_DIRECTORY_ERROR;
+	            isInternal = true;
+	            break;
+
+	        // Functional errors (530xxx-series)
+	        case "530001":
+	            errorCode = SimpleErrorCode.Functional.MALFORMED_PLUGIN_SERVICE;
+	            break;
+	        case "530002":
+	            errorCode = SimpleErrorCode.Functional.NO_PLUGIN_FOUND;
+	            break;
+	        case "530003":
+	            errorCode = SimpleErrorCode.Functional.MULTIPLE_PLUGINS_FOUND;
+	            break;
+	        case "530004":
+	            errorCode = SimpleErrorCode.Functional.BUTTON_NO_ACTION;
+	            break;
+	        case "530005":
+	            errorCode = SimpleErrorCode.Functional.BUTTON_NO_WINDOW;
+	            break;
+	        case "530006":
+	            errorCode = SimpleErrorCode.Functional.INVALID_ACTION_CLASS;
+	            break;
+	        case "530008":
+	            errorCode = SimpleErrorCode.Functional.ALREADY_INSTALLED_PLUGIN;
+	            break;
+	        case "530007":
+	            errorCode = SimpleErrorCode.Functional.INVALID_PLUGIN_FILE;
+	            break;
+
+	        default:
+	            errorCode = SimpleErrorCode.Internal.GENERIC_PLUGIN_LOAD_ERROR;
+	            isInternal = true;
+	            break;
+	    }
+
+	    int index;
+	    try {
+	        int codeInt = Integer.parseInt(errorCode.getCode());
+	        int base    = isInternal ? Integer.parseInt(SimpleErrorCode.Internal.GENERIC_PLUGIN_LOAD_ERROR.getCode()) : 530000;
+	        index = codeInt - base;
+	        if (index < 0) {
+	            index = 0;
+	        }
+	    }
+	    catch (final Exception ex) {
+	        index = 0;
+	    }
+
+	    String key = "PluginManagementError."
+	               + (isInternal ? "Internal." : "Functional.")
+	               + index;
+
+	    String message;
+	    try {
+	        message = SimpleAfirmaMessages.getString(key);
+	    }
+	    catch (final MissingResourceException mre) {
+	        String defaultKey = "PluginManagementError."
+	                          + (isInternal ? "Internal.0" : "Functional.0");
+	        message = SimpleAfirmaMessages.getString(defaultKey);
+	    }
+
+	    return message;
+	}
+	
 	/**
 	 * Muestra al usuario la informaci&oacute;n de un plugin.
 	 * @param info Informaci&oacute;n del plugin.

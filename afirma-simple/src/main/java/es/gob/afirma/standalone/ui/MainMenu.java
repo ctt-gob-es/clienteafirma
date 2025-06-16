@@ -20,6 +20,7 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,12 +36,14 @@ import javax.swing.KeyStroke;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.LanguageManager;
 import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.VisorFirma;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.GenericMenuOption;
@@ -356,7 +359,8 @@ public final class MainMenu extends JMenuBar {
 						SimpleAfirmaMessages.getString("MainMenu.45"), //$NON-NLS-1$
 						JOptionPane.INFORMATION_MESSAGE);
 			} catch (final AOException e1) {
-				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("MainMenu.48"), //$NON-NLS-1$
+				AOUIFactory.showErrorMessage(
+						extractMessageFromException(e1), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE,
 						e1);
@@ -636,5 +640,54 @@ public final class MainMenu extends JMenuBar {
     		languageMenu.insert(newImportedLangItem, languageMenu.getItemCount() - 2);
 		}
         
+	}
+	
+	private static String extractMessageFromException(final Throwable t) {
+		String message = null;
+		
+		if (t instanceof AOException) {
+			message = obtainSimpleErrorCodeFromPluginException((AOException) t);
+		} else {
+			message = SimpleAfirmaMessages.getString("PluginManagementError.0");
+		}
+		return message;
+	}
+	
+	private static String obtainSimpleErrorCodeFromPluginException(final AOException exception) {
+		ErrorCode errorCode = null;
+		
+		//Check again the code received in the AOException
+	    switch (exception.getErrorCode().getCode()) {
+	    	case "230000": errorCode = SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR; break;
+	        case "230001": errorCode = SimpleErrorCode.Internal.CANT_READ_FILE; break;
+	        case "230002": errorCode = SimpleErrorCode.Internal.CANT_CREATE_DIRECTORY; break;
+	        default:       errorCode = SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR; break;
+	    }
+	    
+	    String message = null;
+	    
+	    int index;
+	    try {
+	        int codeInt = Integer.parseInt(errorCode.getCode());
+	        int base    = Integer.parseInt(SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR.getCode());
+	        index = codeInt - base;
+	        if (index < 0) {
+	            index = 0;
+	        }
+	    }
+	    catch (final Exception ex) {
+	        index = 0;
+	    }
+	    String key = "LanguageManagementError." + index;
+
+	    // Intentamos obtener el mensaje, si no existe usamos el por defecto (0)
+	    try {
+	        message = SimpleAfirmaMessages.getString(key);
+	    }
+	    catch (final MissingResourceException mre) {
+	        message = SimpleAfirmaMessages.getString("LanguageManagementError.0");
+	    }
+
+	    return message;
 	}
 }

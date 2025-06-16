@@ -48,29 +48,24 @@ public final class JSEUIMessages {
     public static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
+        } catch (Exception ignored) {
+            // Fallback a base locale
+            try {
+	            Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+	            ResourceBundle tempBundle = LanguageManager.isDefaultLocale(baseLocale) ? ResourceBundle.getBundle(BUNDLE_NAME, baseLocale) : setImportedLangResource();
+                return tempBundle.getString(key);
+            } catch (Exception ignored2) {
+                // Fallback a es_ES
+                Locale esLocale = new Locale("es", "ES");
+                ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
+                try {
+                    return esBundle.getString(key);
+                } catch (Exception e) {
+                    LOGGER.warning("Falta el recurso para la clave: " + key);
+                    return "!" + key + "!";
+                }
+            }
         }
-        catch (final Exception e) {
-			try {
-				final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
-				final ResourceBundle temporalBundle;
-
-				if (LanguageManager.isDefaultLocale(baseLocale)) {
-					temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
-				} else {
-					final File localeDir = new File(LanguageManager.getLanguagesDir(),
-							baseLocale.getLanguage() + "_" + baseLocale.getCountry()); //$NON-NLS-1$
-					URL[] urls = null;
-					urls = new URL[] { localeDir.toURI().toURL() };
-					final ClassLoader loader = new URLClassLoader(urls);
-					temporalBundle = ResourceBundle.getBundle(BUNDLE_BASENAME, Locale.getDefault(), loader);
-				}
-
-				return temporalBundle.getString(key);
-
-			} catch (final Exception e1) {
-				return '!' + key + '!';
-			}
-		}
     }
 
     /** Recupera el texto identificado con la clave proporcionada y sustituye la
@@ -81,8 +76,7 @@ public final class JSEUIMessages {
     static String getString(final String key, final String text) {
         try {
             return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
 			try {
 				final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
 				final ResourceBundle temporalBundle;
@@ -94,13 +88,20 @@ public final class JSEUIMessages {
 				}
 
 				temporalBundle.getString(key).replace("%0", text); //$NON-NLS-1$
-
-			} catch (final Exception e1) {
-				return '!' + key + '!';
-			}
+				
+				return temporalBundle.getString(key);
+			} catch (Exception e1) {
+                // Fallback a es_ES
+                Locale esLocale = new Locale("es", "ES");
+                ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
+                try {
+                    return esBundle.getString(key);
+                } catch (Exception e2) {
+                    LOGGER.warning("Falta el recurso para la clave: " + key);
+                    return "!" + key + "!";
+                }
+            }
 		}
-        
-        return '!' + key + '!';
     }
 
     /** Recupera el texto identificado con la clave proporcionada y sustituye las
@@ -118,25 +119,22 @@ public final class JSEUIMessages {
             text = RESOURCE_BUNDLE.getString(key);
         }
         catch (final Exception e) {
-        	if(!LanguageManager.isDefaultLocale(Locale.getDefault())) {
-        		try {
-					final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
-					final ResourceBundle temporalBundle;
-					
-					if(LanguageManager.isDefaultLocale(baseLocale)) {
-						temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
-					} else {
-						temporalBundle = setImportedLangResource();
-					}
-					
-					text = temporalBundle.getString(key);
-					
-				} catch (final Exception e1) {
-					return '!' + key + '!';
-				}          	
-        	}
-        	
-			return '!' + key + '!';   
+        	// Fallback a base locale
+            try {
+	            Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+	            ResourceBundle tempBundle = LanguageManager.isDefaultLocale(baseLocale) ? ResourceBundle.getBundle(BUNDLE_NAME, baseLocale) : setImportedLangResource();
+                text = tempBundle.getString(key);
+            } catch (Exception e1) {
+                // Fallback a es_ES
+                Locale esLocale = new Locale("es", "ES");
+                ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
+                try {
+                    text = esBundle.getString(key);
+                } catch (Exception e2) {
+                    LOGGER.warning("Missing resource for key: " + key);
+                    return "!" + key + "!";
+                }
+            }
         }
 
         if (params != null) {

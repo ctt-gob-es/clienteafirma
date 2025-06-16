@@ -20,8 +20,7 @@ public final class ErrorManagementDialog extends JDialog {
 		super(parent, modal);
 		
 		if (t instanceof AOControlledException) {
-			message = "AF" + ((AOControlledException) t).getErrorCode().getCode() + " - " + message; //$NON-NLS-1$ //$NON-NLS-2$
-			title = title + " - " + "AF" + ((AOControlledException) t).getErrorCode().getCode(); //$NON-NLS-1$ //$NON-NLS-2$
+			title = title + " " + "AF" + ((AOControlledException) t).getErrorCode().getCode(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		setTitle(title);
