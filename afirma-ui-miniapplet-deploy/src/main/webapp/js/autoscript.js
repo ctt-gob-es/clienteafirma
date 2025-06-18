@@ -3748,10 +3748,10 @@ var AutoScript = ( function ( window, undefined ) {
 				successCallback(signature, certificate);
 			}
 			
-			function errorServiceResponseFunction(exception, errCode){
+			function errorServiceResponseFunction(exception, message, errCode){
 				errorCode = errCode.code;
 				if (errorCallback) {
-					errorCallback(exception, errCode.message, errorCode);
+					errorCallback(exception, message, errorCode);
 				}
 			}
 			
