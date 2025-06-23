@@ -33,6 +33,9 @@ es_ES/gfx/menulistablancadominios.png
 es_ES/gfx/menulistacertificadosconfianza.png
 es_ES/gfx/menuplugins_mini.png
 es_ES/gfx/menurestaurar_mini.png
+es_ES/gfx/pantalla_elegir_idioma.png
+es_ES/gfx/pantalla_importar_idioma.png
+es_ES/gfx/pantalla_reiniciar_idioma.png
 es_ES/gfx/pantalladetalle2_mini.png
 es_ES/gfx/pantalladetalle_mini.png
 es_ES/gfx/pantalladetallesfirma.png
@@ -45,6 +48,7 @@ es_ES/gfx/pluginhash_calculo_directorio_mini.png
 es_ES/gfx/pluginhash_calculo_fichero_mini.png
 es_ES/gfx/pluginhash_comprobacion_directorio_mini.png
 es_ES/gfx/pluginhash_comprobacion_fichero_mini.png
+es_ES/pgs/CambioIdioma.html
 es_ES/pgs/Licencia.html
 es_ES/pgs/LineaComandos.html
 es_ES/pgs/MenuPlugins.html
@@ -77,6 +81,9 @@ ca_ES/gfx/menulistablancadominios.png
 ca_ES/gfx/menulistacertificadosconfianza.png
 ca_ES/gfx/menuplugins_mini.png
 ca_ES/gfx/menurestaurar_mini.png
+ca_ES/gfx/pantalla_elegir_idioma.png
+ca_ES/gfx/pantalla_importar_idioma.png
+ca_ES/gfx/pantalla_reiniciar_idioma.png
 ca_ES/gfx/pantalladetalle2_mini.png
 ca_ES/gfx/pantalladetalle_mini.png
 ca_ES/gfx/pantalladetallesfirma.png
@@ -89,6 +96,7 @@ ca_ES/gfx/pluginhash_calculo_directorio_mini.png
 ca_ES/gfx/pluginhash_calculo_fichero_mini.png
 ca_ES/gfx/pluginhash_comprobacion_directorio_mini.png
 ca_ES/gfx/pluginhash_comprobacion_fichero_mini.png
+ca_ES/pgs/CambioIdioma.html
 ca_ES/pgs/Licencia.html
 ca_ES/pgs/LineaComandos.html
 ca_ES/pgs/MenuPlugins.html
@@ -121,6 +129,9 @@ va_ES/gfx/menulistablancadominios.png
 va_ES/gfx/menulistacertificadosconfianza.png
 va_ES/gfx/menuplugins_mini.png
 va_ES/gfx/menurestaurar_mini.png
+va_ES/gfx/pantalla_elegir_idioma.png
+va_ES/gfx/pantalla_importar_idioma.png
+va_ES/gfx/pantalla_reiniciar_idioma.png
 va_ES/gfx/pantalladetalle2_mini.png
 va_ES/gfx/pantalladetalle_mini.png
 va_ES/gfx/pantalladetallesfirma.png
@@ -133,6 +144,7 @@ va_ES/gfx/pluginhash_calculo_directorio_mini.png
 va_ES/gfx/pluginhash_calculo_fichero_mini.png
 va_ES/gfx/pluginhash_comprobacion_directorio_mini.png
 va_ES/gfx/pluginhash_comprobacion_fichero_mini.png
+va_ES/pgs/CambioIdioma.html
 va_ES/pgs/Licencia.html
 va_ES/pgs/LineaComandos.html
 va_ES/pgs/MenuPlugins.html
@@ -164,6 +176,9 @@ eu_ES/gfx/menulistablancadominios.png
 eu_ES/gfx/menulistacertificadosconfianza.png
 eu_ES/gfx/menuplugins_mini.png
 eu_ES/gfx/menurestaurar_mini.png
+eu_ES/gfx/pantalla_elegir_idioma.png
+eu_ES/gfx/pantalla_importar_idioma.png
+eu_ES/gfx/pantalla_reiniciar_idioma.png
 eu_ES/gfx/pantalladetalle2_mini.png
 eu_ES/gfx/pantalladetalle_mini.png
 eu_ES/gfx/pantalladetallesfirma.png
@@ -176,6 +191,7 @@ eu_ES/gfx/pluginhash_calculo_directorio_mini.png
 eu_ES/gfx/pluginhash_calculo_fichero_mini.png
 eu_ES/gfx/pluginhash_comprobacion_directorio_mini.png
 eu_ES/gfx/pluginhash_comprobacion_fichero_mini.png
+eu_ES/pgs/CambioIdioma.html
 eu_ES/pgs/Licencia.html
 eu_ES/pgs/LineaComandos.html
 eu_ES/pgs/MenuPlugins.html
@@ -208,6 +224,9 @@ gl_ES/gfx/menulistablancadominios.png
 gl_ES/gfx/menulistacertificadosconfianza.png
 gl_ES/gfx/menuplugins_mini.png
 gl_ES/gfx/menurestaurar_mini.png
+gl_ES/gfx/pantalla_elegir_idioma.png
+gl_ES/gfx/pantalla_importar_idioma.png
+gl_ES/gfx/pantalla_reiniciar_idioma.png
 gl_ES/gfx/pantalladetalle2_mini.png
 gl_ES/gfx/pantalladetalle_mini.png
 gl_ES/gfx/pantalladetallesfirma.png
@@ -220,6 +239,7 @@ gl_ES/gfx/pluginhash_calculo_directorio_mini.png
 gl_ES/gfx/pluginhash_calculo_fichero_mini.png
 gl_ES/gfx/pluginhash_comprobacion_directorio_mini.png
 gl_ES/gfx/pluginhash_comprobacion_fichero_mini.png
+gl_ES/pgs/CambioIdioma.html
 gl_ES/pgs/Licencia.html
 gl_ES/pgs/LineaComandos.html
 gl_ES/pgs/MenuPlugins.html
@@ -252,6 +272,9 @@ en_US/gfx/menulistablancadominios.png
 en_US/gfx/menulistacertificadosconfianza.png
 en_US/gfx/menuplugins_mini.png
 en_US/gfx/menurestaurar_mini.png
+en_US/gfx/pantalla_elegir_idioma.png
+en_US/gfx/pantalla_importar_idioma.png
+en_US/gfx/pantalla_reiniciar_idioma.png
 en_US/gfx/pantalladetalle2_mini.png
 en_US/gfx/pantalladetalle_mini.png
 en_US/gfx/pantalladetallesfirma.png
@@ -264,6 +287,7 @@ en_US/gfx/pluginhash_calculo_directorio_mini.png
 en_US/gfx/pluginhash_calculo_fichero_mini.png
 en_US/gfx/pluginhash_comprobacion_directorio_mini.png
 en_US/gfx/pluginhash_comprobacion_fichero_mini.png
+en_US/pgs/CambioIdioma.html
 en_US/pgs/Licencia.html
 en_US/pgs/LineaComandos.html
 en_US/pgs/MenuPlugins.html
