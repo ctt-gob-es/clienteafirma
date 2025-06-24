@@ -360,7 +360,7 @@ public final class MainMenu extends JMenuBar {
 						JOptionPane.INFORMATION_MESSAGE);
 			} catch (final AOException e1) {
 				AOUIFactory.showErrorMessage(
-						extractMessageFromException(e1), //$NON-NLS-1$
+						extractMessageFromException(e1),
 						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE,
 						e1);
@@ -531,6 +531,13 @@ public final class MainMenu extends JMenuBar {
     	}
     	if (file != null && file.length > 0 && file[0] != null && file[0].isFile()) {
     		new VisorFirma(false, null).initialize(false, file[0]);
+    	} else {
+    		AOUIFactory.showErrorMessage(
+			        SimpleAfirmaMessages.getString("SignPanel.123"), //$NON-NLS-1$
+			        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			        AOUIFactory.ERROR_MESSAGE,
+			        new AOException(SimpleErrorCode.Internal.LOAD_FILE_TO_VIEW)
+			    );
     	}
     }
 
@@ -668,8 +675,8 @@ public final class MainMenu extends JMenuBar {
 	    
 	    int index;
 	    try {
-	        int codeInt = Integer.parseInt(errorCode.getCode());
-	        int base    = Integer.parseInt(SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR.getCode());
+	        final int codeInt = Integer.parseInt(errorCode.getCode());
+	        final int base    = Integer.parseInt(SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR.getCode());
 	        index = codeInt - base;
 	        if (index < 0) {
 	            index = 0;
@@ -678,7 +685,7 @@ public final class MainMenu extends JMenuBar {
 	    catch (final Exception ex) {
 	        index = 0;
 	    }
-	    String key = "LanguageManagementError." + index;
+	    final String key = "LanguageManagementError." + index;
 
 	    // Intentamos obtener el mensaje, si no existe usamos el por defecto (0)
 	    try {

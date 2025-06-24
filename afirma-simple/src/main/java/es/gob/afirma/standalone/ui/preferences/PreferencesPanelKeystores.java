@@ -654,8 +654,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
     		if (smartCardName.isEmpty()
     			|| smartCardP11Path.isEmpty() ) {
     			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27"), //$NON-NLS-1$
-    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    					AOUIFactory.ERROR_MESSAGE,
+    					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+    					AOUIFactory.WARNING_MESSAGE,
     					new Exception(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27")) //$NON-NLS-1$
     					);
 

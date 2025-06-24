@@ -47,7 +47,6 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
@@ -522,11 +521,11 @@ final class PreferencesPanelPades extends JScrollPane {
 	        }
 
 	        // 3) Huella y algoritmo
-	        if (hash == null || "0".equals(hash)) {
+	        if (hash == null || hash.isEmpty() || "0".equals(hash)) {
 	            // Sin huella: URI debe ser accesible y calcular digest
 	            try (InputStream is = new URI(identifier).toURL().openStream()) {
 	                final String algorithm = (algo == null || algo.isEmpty())
-	                    ? "SHA-512"
+	                    ? "SHA-512" //$NON-NLS-1$
 	                    : AOSignConstants.getDigestAlgorithmName(algo);
 	                MessageDigest.getInstance(algorithm)
 	                             .digest(AOUtil.getDataFromInputStream(is));
@@ -881,11 +880,11 @@ final class PreferencesPanelPades extends JScrollPane {
 				this.padesPolicyDlg.saveCurrentPolicy();
 
 			} catch (final AOException e) {
-				String code = e.getErrorCode().getCode();
+				final String code = e.getErrorCode().getCode();
 			    int index;
 			    try {
-			        int codeInt = Integer.parseInt(code);
-			        int base    = Integer.parseInt(SimpleErrorCode.Functional.POLICY_DEFAULT_ERROR.getCode());
+			        final int codeInt = Integer.parseInt(code);
+			        final int base    = Integer.parseInt(SimpleErrorCode.Functional.POLICY_DEFAULT_ERROR.getCode());
 			        index = codeInt - base;
 			        if (index < 0) {
 			            index = 0;
@@ -894,7 +893,7 @@ final class PreferencesPanelPades extends JScrollPane {
 			    catch (final Exception ex) {
 			        index = 0;
 			    }
-			    String key = "PreferencesPanelPolicy." + index;
+			    final String key = "PreferencesPanelPolicy." + index; //$NON-NLS-1$
 
 			    // Intentamos obtener el mensaje, si no existe usamos el por defecto (0)
 			    String message;
@@ -902,12 +901,12 @@ final class PreferencesPanelPades extends JScrollPane {
 			        message = SimpleAfirmaMessages.getString(key);
 			    }
 			    catch (final MissingResourceException mre) {
-			        message = SimpleAfirmaMessages.getString("PreferencesPanelPolicy.0");
+			        message = SimpleAfirmaMessages.getString("PreferencesPanelPolicy.0"); //$NON-NLS-1$
 			    }
 
 			    AOUIFactory.showErrorMessage(
 			        message,
-			        SimpleAfirmaMessages.getString("SimpleAfirma.7"),
+			        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 			        AOUIFactory.ERROR_MESSAGE,
 			        e
 			    );
@@ -923,8 +922,8 @@ final class PreferencesPanelPades extends JScrollPane {
 
 	private boolean isValidOid(final String input) {
         String oid = input;
-        if (input.toLowerCase().startsWith("urn:oid:")) {
-            oid = input.substring("urn:oid:".length());
+        if (input.toLowerCase().startsWith("urn:oid:")) { //$NON-NLS-1$
+            oid = input.substring("urn:oid:".length()); //$NON-NLS-1$
         }
         
         try {

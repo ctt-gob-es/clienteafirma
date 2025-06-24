@@ -37,7 +37,6 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -323,7 +322,7 @@ final class PreferencesPanelCades extends JScrollPane {
 	void checkPreferences() throws AOException {
 		loadCadesPolicy();
 		
-		if (!cadesPolicyDlg.isNoPolicySelected()) {
+		if (!this.cadesPolicyDlg.isNoPolicySelected()) {
 			final String identifier = this.cadesPolicyDlg.getIdentifierField().getText().trim();
 		    final String hash       = this.cadesPolicyDlg.getHashField().getText().trim();
 		    final String algo       = this.cadesPolicyDlg.getHashAlgorithmField().getSelectedItem().toString().trim();
@@ -347,7 +346,7 @@ final class PreferencesPanelCades extends JScrollPane {
 	        }
 
 	        // 3) Huella y algoritmo
-	        if (hash == null || "0".equals(hash)) {
+	        if (hash == null || hash.isEmpty() || "0".equals(hash)) {
 	            // Sin huella: URI debe ser accesible y calcular digest
 	            try (InputStream is = new URI(identifier).toURL().openStream()) {
 	                final String algorithm = (algo == null || algo.isEmpty())
@@ -610,11 +609,11 @@ final class PreferencesPanelCades extends JScrollPane {
 				this.cadesPolicyDlg.saveCurrentPolicy();
 
 			} catch (final AOException e) {
-				String code = e.getErrorCode().getCode();
+				final String code = e.getErrorCode().getCode();
 			    int index;
 			    try {
-			        int codeInt = Integer.parseInt(code);
-			        int base    = Integer.parseInt(SimpleErrorCode.Functional.POLICY_DEFAULT_ERROR.getCode());
+			        final int codeInt = Integer.parseInt(code);
+			        final int base    = Integer.parseInt(SimpleErrorCode.Functional.POLICY_DEFAULT_ERROR.getCode());
 			        index = codeInt - base;
 			        if (index < 0) {
 			            index = 0;
@@ -623,7 +622,7 @@ final class PreferencesPanelCades extends JScrollPane {
 			    catch (final Exception ex) {
 			        index = 0;
 			    }
-			    String key = "PreferencesPanelPolicy." + index;
+			    final String key = "PreferencesPanelPolicy." + index;
 
 			    // Intentamos obtener el mensaje, si no existe usamos el por defecto (0)
 			    String message;

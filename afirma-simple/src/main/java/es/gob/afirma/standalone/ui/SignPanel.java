@@ -57,6 +57,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -410,10 +412,10 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
      	if (dataFiles == null || dataFiles.length == 0) {
      		LOGGER.warning("No se ha cargado ningun fichero valido"); //$NON-NLS-1$
     		AOUIFactory.showErrorMessage(
-    				SimpleAfirmaMessages.getString("SimpleAfirma.12"), //$NON-NLS-1$,
+    				SimpleAfirmaMessages.getString("SignPanel.123"), //$NON-NLS-1$,
     				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE,
-    				null
+    				new AOException(ErrorCode.Internal.LOADING_LOCAL_FILE_ERROR)
     			);
      	}
      	else {
