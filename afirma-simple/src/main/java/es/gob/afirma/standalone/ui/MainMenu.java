@@ -260,12 +260,14 @@ public final class MainMenu extends JMenuBar {
         final ButtonGroup langGroup = new ButtonGroup();
 
         // Crear las opciones de idioma
-        final String[] defaultLanguages = {SimpleAfirmaMessages.getString("MainMenu.39"), SimpleAfirmaMessages.getString("MainMenu.40"),  //$NON-NLS-1$ //$NON-NLS-2$
-        		SimpleAfirmaMessages.getString("MainMenu.41"), SimpleAfirmaMessages.getString("MainMenu.42"), //$NON-NLS-1$ //$NON-NLS-2$
-        		SimpleAfirmaMessages.getString("MainMenu.43"), SimpleAfirmaMessages.getString("MainMenu.44")}; //$NON-NLS-1$ //$NON-NLS-2$
+        final String[] defaultLanguages = {
+        		SimpleAfirmaMessages.getString("MainMenu.39"), SimpleAfirmaMessages.getString("MainMenu.41"), //$NON-NLS-1$ //$NON-NLS-2$
+        		SimpleAfirmaMessages.getString("MainMenu.42"), SimpleAfirmaMessages.getString("MainMenu.43"), //$NON-NLS-1$ //$NON-NLS-2$
+        		SimpleAfirmaMessages.getString("MainMenu.44"),SimpleAfirmaMessages.getString("MainMenu.40") //$NON-NLS-1$ //$NON-NLS-2$
+        		}; 
         
         String localeConf = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
-        // Si no hay ninguno configurado, por defcto estara seleccionado el espanol
+        // Si no hay ninguno configurado, por defecto estara seleccionado el espanol
         if (localeConf == null) {
         	localeConf = LanguageManager.AFIRMA_DEFAULT_LOCALES[0].toString();
         }

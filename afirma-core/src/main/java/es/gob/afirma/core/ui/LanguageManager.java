@@ -45,12 +45,12 @@ public class LanguageManager {
 	private static File languagesDir;
 
 	public static final Locale [] AFIRMA_DEFAULT_LOCALES = {
-	    	new Locale("es", "ES"), //$NON-NLS-1$ //$NON-NLS-2$
-	        new Locale("en", "US"), //$NON-NLS-1$ //$NON-NLS-2$
+	    	new Locale("es", "ES"), //$NON-NLS-1$ //$NON-NLS-2$     
 	        new Locale("ca", "ES"), //$NON-NLS-1$ //$NON-NLS-2$
 	        new Locale("gl", "ES"), //$NON-NLS-1$ //$NON-NLS-2$
 	        new Locale("eu", "ES"), //$NON-NLS-1$ //$NON-NLS-2$
-	        new Locale("va", "ES")  //$NON-NLS-1$ //$NON-NLS-2$
+	        new Locale("va", "ES"),  //$NON-NLS-1$ //$NON-NLS-2$
+	        new Locale("en", "US") //$NON-NLS-1$ //$NON-NLS-2$
 	};
 
 	public static void init(final File langDir) {
