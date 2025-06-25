@@ -54,6 +54,7 @@
 		<triphase.service.version>2.8.1</triphase.service.version>
 		<jmulticard.version>2.0</jmulticard.version>
 		<afirma.lib.itext.version>1.6</afirma.lib.itext.version>
+		<afirma.lib.others.version>0.0.8</afirma.lib.others.version>
 		<spongycastle.version>1.58.0.0</spongycastle.version>
 		<afirma.legible.version>1_8_0</afirma.legible.version>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
@@ -92,19 +93,19 @@
 			<dependency>
 				<groupId>es.gob.afirma.lib</groupId>
 				<artifactId>afirma-lib-jmimemagic</artifactId>
-				<version>0.0.7</version>
+				<version>${afirma.lib.others.version}</version>
 			</dependency>
 			
 			<dependency>
 				<groupId>es.gob.afirma.lib</groupId>
 				<artifactId>afirma-lib-oro</artifactId>
-				<version>0.0.7</version>
+				<version>${afirma.lib.others.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>es.gob.afirma.lib</groupId>
 				<artifactId>afirma-lib-juniversalchardet</artifactId>
-				<version>0.0.7</version>
+				<version>${afirma.lib.others.version}</version>
 			</dependency>
 
 			<dependency>

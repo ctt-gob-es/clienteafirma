@@ -35,25 +35,11 @@
 	</dependencies>
 
 	<build>
-		<plugins>			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<fork>true</fork>
-<!-- 
-					<compilerArgs>
-						<arg>-Xbootclasspath:${java.home}/lib/jsse.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar</arg>
-					</compilerArgs>
- -->
-				</configuration>
-			</plugin>
+		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.2.2</version>
+				<version>3.2.3</version>
 				<configuration>  
 					<archive>  
 						<addMavenDescriptor>false</addMavenDescriptor> 
