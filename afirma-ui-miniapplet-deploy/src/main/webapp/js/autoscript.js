@@ -322,6 +322,9 @@ var AutoScript = ( function ( window, undefined ) {
 		    },
 		    WEBSOCKET_INVALID_RESP: {
 		      code: "AS220006", message: "Respuesta no valida"
+		    },
+		    BROWSER_CANT_RECOVER_RESULT: {
+		      code: "AS220007", message: "Su navegador no permite obtener el resultado de la operacion"
 		    }
 		  },
 		  ThirdParty: {
@@ -356,6 +359,9 @@ var AutoScript = ( function ( window, undefined ) {
 		    },
 		    UPLOAD_MULTIPLE_FILE_SERVER : {
 		      code: "AS500009", message: "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio"
+		    },
+		    NON_OPERATIVE_JS_METHOD : {
+		      code: "AS500010", message: "El metodo JavaScript no se encuentra operativo"
 		    }
 		  },
 		  Request: {
@@ -390,7 +396,7 @@ var AutoScript = ( function ( window, undefined ) {
 		      code: "AS620022", message: "Error desconocido"
 		    },
 		    WEBSERVER_INVOICE_APP : {
-		      code: "AS620023", message: "Ha ocurrido un error al intentar invocar a la aplicacion nativa mediante socket"
+		      code: "AS620023", message: "Ha ocurrido un error al intentar invocar a la aplicacion nativa mediante servidor intermedio"
 		    },
 		    WEBSERVER_INVOICE_APP_TIMEOUT : {
 		      code: "AS620024", message: "El tiempo para la recepcion de la firma por la pagina web ha expirado"
@@ -765,7 +771,7 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		var getCurrentLog = function (successCallback, errorCallback) {
 			if (!!errorCallback) {
-				errorCallback("java.lang.NoSuchMethodException", "El metodo getCurrentLog no se encuentra operativo");
+				errorCallback("java.lang.UnsupportedOperationException", ErrorCode.Functional.NON_OPERATIVE_JS_METHOD.message, ErrorCode.Functional.NON_OPERATIVE_JS_METHOD.code);
 				return;
 			}
 		}
@@ -2318,9 +2324,9 @@ var AutoScript = ( function ( window, undefined ) {
 						errorCode = ErrorCode.Request.WEBSOCKET_INVOICE_APP.code;
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA, 
 																		function (){execAppIntent(url, successCB, errorCB)} , 
-																		function (){errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCode); });
+																		function (){errorCB("java.lang.IOException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode); });
 						if(!enabled) {
-							errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCode);
+							errorCB("java.lang.IOException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);
 						}
 					}
 				}
@@ -2382,9 +2388,9 @@ var AutoScript = ( function ( window, undefined ) {
 						
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 															function (){execAppIntent(url, successCB, errorCB)}, 
-															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCode);});
+															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);});
 						if (!enabled) {
-							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCode);
+							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);
 						}
 					}			
 				}
@@ -2478,9 +2484,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (retries <= 0) {
 					var enabled =  Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																function (){sendEcho(ws, idSession, 1)}, 
-																function (){processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ErrorCode.Request.WEBSOCKET_INVOICE_APP);});
+																function (){processErrorResponse("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSOCKET_INVOICE_APP);});
 					if (!enabled) {
-						processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ErrorCode.Request.WEBSOCKET_INVOICE_APP);
+						processErrorResponse("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSOCKET_INVOICE_APP);
 					}
 					return;
 				}
@@ -2510,7 +2516,7 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario", ErrorCode.Functional.CANCELLED_OP);
+					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP);
 					return;
 				}
 
@@ -2533,13 +2539,13 @@ var AutoScript = ( function ( window, undefined ) {
 						errorCode = errorCodeAndMessage.substring(0, 8)
 						errorMessage = errorCodeAndMessage.substring(11);
 					}
-					processErrorResponse(errorType, errorMessage, errorCode);
+					processErrorResponse(errorType, errorCode, errorMessage);
 					return;
 				}
 				
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
-					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion", ErrorCode.Request.WEBSOCKET_MEMORY_ERROR);
+					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", ErrorCode.Request.WEBSOCKET_MEMORY_ERROR);
 					return;
 				}
 				
@@ -2551,7 +2557,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					processErrorResponse("java.lang.Exception", "Error desconocido", ErrorCode.Request.WEBSOCKET_UNKNOWN_ERROR);
+					processErrorResponse("java.lang.Exception", ErrorCode.Request.WEBSOCKET_UNKNOWN_ERROR);
 					return;
 				}
 
@@ -2590,10 +2596,18 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Procesa la respuesta cuando se detecta un error.
 			 */
-			function processErrorResponse(exception, errCode) {
-				errorType = exception;
-				errorMessage = errCode.message;
-				errorCode = errCode.code;
+			function processErrorResponse(exception, errCode, errMessage) {
+				errorType = exception;	
+				if (!!errMessage) {
+					errorMessage = errMessage;
+				} else {
+					errorMessage = errCode.message;
+				}
+				if (!!errCode.code) {
+					errorCode = errCode.code;
+				} else {
+					errorCode = errCode;
+				}		
 				if (!!errorCallback) {
 					var responseErrorCallback = errorCallback;
 					setCallbacks(null, null);
@@ -3146,9 +3160,9 @@ var AutoScript = ( function ( window, undefined ) {
 					} catch (e){
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																	function (){execAppIntent(url);}, 
-																	function (){errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ErrorCode.Request.SOCKET_INVOICE_APP);});
+																	function (){errorServiceResponseFunction("java.lang.IOException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);});
 						if (!enabled) {
-							errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ErrorCode.Request.SOCKET_INVOICE_APP);
+							errorServiceResponseFunction("java.lang.IOException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);
 						}
 					}
 				}
@@ -3308,9 +3322,9 @@ var AutoScript = ( function ( window, undefined ) {
 								}
 								var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																			function (){execAppIntent(url)},
-																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ErrorCode.Request.SOCKET_INVOICE_APP);});
+																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);});
 								if (!enabled) {
-									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), ErrorCode.Request.SOCKET_INVOICE_APP);
+									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);
 								}
 							}
 							return;
@@ -5026,7 +5040,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				var httpRequest = getHttpRequest();
 				if (!httpRequest) {
-					throwException("java.lang.Exception", "Su navegador no permite obtener el resultado de la operaci\u00F3n");
+					throwException("java.lang.Exception", ErrorCode.Internal.BROWSER_CANT_RECOVER_RESULT);
 				}
 
 				iterations = 0;
@@ -5038,9 +5052,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (wrongInstallation) {
 					var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																	function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
-																	function (){errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP.code);});
+																	function (){errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSERVER_INVOICE_APP.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP.code);});
 					if (!enabled) {
-						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP.code);
+						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSERVER_INVOICE_APP.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP.code);
 					}
 					return;
 				}
@@ -5050,25 +5064,22 @@ var AutoScript = ( function ( window, undefined ) {
 					if(!!afirmaConnected) {
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
 																		function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback)},
-																		function() {errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);});
+																		function() {errorResponseFunction("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);});
 						if (!enabled) {
-							errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);
+							errorResponseFunction("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);
 						}
 					} else {
 						var errorType;
-						var errorCallbackMsg;
 						if (!!isCompatibleProcedure) {
 							errorType = ERROR_CONNECTING_AFIRMA;
-							errorCallbackMsg = Dialog.buildErrorConnectingApplicationMsg();
 						} else {
 							errorType = ERROR_CONNECTING_SERVICE;
-							errorCallbackMsg = Dialog.buildCustomErrorServerMsg();
 						}
 						var enabled = Dialog.showErrorDialog(errorType,
 																	function (){execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
-																	function (){errorCallback("java.lang.IOException", errorCallbackMsg.replace(/<br>/g,""), ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code);});
+																	function (){errorCallback("java.lang.IOException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);});
 						if(!enabled) {
-							errorResponseFunction("java.util.concurrent.TimeoutException", errorCallbackMsg.replace(/<br>/g,""), errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code);
+							errorResponseFunction("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);
 						}
 					}
 					return;
@@ -5094,9 +5105,9 @@ var AutoScript = ( function ( window, undefined ) {
 							errorOcurred = true;
 							var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
 																			function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback)},
-																			function() {errorResponseFunction("java.lang.IOException", currentLocale.error_connecting_server_recovering + "(Status: " + httpRequest.status + ")", errorCallback);});
+																			function() {errorResponseFunction("java.lang.IOException", ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.message + " (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code);});
 							if (!enabled) {
-								errorResponseFunction("java.lang.IOException", currentLocale.error_connecting_server_recovering + "(Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE);
+								errorResponseFunction("java.lang.IOException", ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.message + " (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code);
 							}
 						}
 					}
@@ -5106,9 +5117,9 @@ var AutoScript = ( function ( window, undefined ) {
 						if (!errorOcurred) {
 							var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
 																			function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback)},
-																			function (){errorResponseFunction("java.lang.Exception","No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE)});
+																			function (){errorResponseFunction("java.lang.Exception", ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.message + " (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code)});
 							if (!enabled) {
-								errorResponseFunction("java.lang.Exception", "No se pudo conectar con el servidor intermedio para la recuperacion del resultado de la operacion (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE);
+								errorResponseFunction("java.lang.Exception", ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.message + " (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code);
 							}
 						}
 					}
@@ -5126,7 +5137,7 @@ var AutoScript = ( function ( window, undefined ) {
 				catch(e) {
 					// Error en la llamada para al recuperacion del resultado. No lo encuentra o problema
 					// de tipo cross-domain
-					errorResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma", errorCallback, ErrorCode.Communication.WEBSERVER_NETWORK_ERROR);
+					errorResponseFunction("java.lang.IOException", ErrorCode.Communication.WEBSERVER_NETWORK_ERROR.message, errorCallback, ErrorCode.Communication.WEBSERVER_NETWORK_ERROR.code);
 					return;
 				}
 			}

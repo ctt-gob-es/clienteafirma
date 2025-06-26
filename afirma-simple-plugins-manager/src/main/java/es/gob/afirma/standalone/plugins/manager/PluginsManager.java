@@ -192,7 +192,7 @@ public class PluginsManager {
 					"Error en la carga de un conjunto de ficheros de plugin",  
 					e, 
 					ErrorCode.Internal.PLUGIN_ERROR
-					); //$NON-NLS-1$
+					);
 		} catch (final AOPluginException e) {
 			LOGGER.log(Level.SEVERE, "El plugin importado no es valido", e); //$NON-NLS-1$
 			throw e;
@@ -241,7 +241,7 @@ public class PluginsManager {
 		}
 		catch (final AOPluginException e) {
 			deleteDirectoryAndContent(outPluginFile.getParentFile());
-			throw e; //$NON-NLS-1$
+			throw e;
 		}
 
 		final PluginInfo info = plugin.getInfo();
@@ -308,7 +308,7 @@ public class PluginsManager {
 		// Creamos un directorio para el nuevo plugin
 		final File pluginDir = new File(pluginsDir, pluginName);
 		if (pluginDir.exists()) {
-			throw new PluginInstalledException("El plugin seleccionado ya se encuentra instalado", new ErrorCode("530009")); //$NON-NLS-1$
+			throw new PluginInstalledException("El plugin seleccionado ya se encuentra instalado", ErrorCode.Functional.ALREADY_INSTALLED_PLUGIN); //$NON-NLS-1$
 		}
 		try {
 			createDirWithPermissions(pluginDir);

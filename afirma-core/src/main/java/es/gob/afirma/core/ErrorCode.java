@@ -187,6 +187,8 @@ public class ErrorCode {
 		public static final ErrorCode SMARTCARD_LOCKED							= new ErrorCode("511004", "La tarjeta inteligente esta bloqueada"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode SIGNING_MALFORMED_SIGNATURE				= new ErrorCode("510006", "La firma no es compatible o esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
+	
+        public static final ErrorCode ALREADY_INSTALLED_PLUGIN   				= new ErrorCode("530008", "Ha ocurrido un problema con el directorio de instalacion"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static class Request {

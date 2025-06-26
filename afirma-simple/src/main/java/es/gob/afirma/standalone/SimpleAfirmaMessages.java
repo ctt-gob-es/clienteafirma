@@ -46,21 +46,21 @@ public final class SimpleAfirmaMessages {
     public static String getString(final String key) {
         try {
             return bundle.getString(key);
-        } catch (Exception ignored) {
+        } catch (final Exception ignored) {
             // Fallback a base locale
             try {
-	            Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
-	            ResourceBundle tempBundle = LanguageManager.isDefaultLocale(baseLocale) ? ResourceBundle.getBundle(BUNDLE_NAME, baseLocale) : setImportedLangResource();
+	            final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+	            final ResourceBundle tempBundle = LanguageManager.isDefaultLocale(baseLocale) ? ResourceBundle.getBundle(BUNDLE_NAME, baseLocale) : setImportedLangResource();
                 return tempBundle.getString(key);
-            } catch (Exception ignored2) {
+            } catch (final Exception ignored2) {
                 // Fallback a es_ES
-                Locale esLocale = new Locale("es", "ES");
-                ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
+                final Locale esLocale = new Locale("es", "ES");  //$NON-NLS-1$ //$NON-NLS-2$
+                final ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
                 try {
                     return esBundle.getString(key);
-                } catch (Exception e) {
-                    LOGGER.warning("Falta el recurso para la clave: " + key);
-                    return "!" + key + "!";
+                } catch (final Exception e) {
+                    LOGGER.warning("Falta el recurso para la clave: " + key); //$NON-NLS-1$
+                    return "!" + key + "!";//$NON-NLS-1$//$NON-NLS-2$
                 }
             }
         }
@@ -82,21 +82,21 @@ public final class SimpleAfirmaMessages {
         String text;
         try {
             text = bundle.getString(key);
-        } catch (Exception ignored) {
+        } catch (final Exception ignored) {
             // Fallback a base locale
             try {
-	            Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
-	            ResourceBundle tempBundle = LanguageManager.isDefaultLocale(baseLocale) ? ResourceBundle.getBundle(BUNDLE_NAME, baseLocale) : setImportedLangResource();
+	            final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+	            final ResourceBundle tempBundle = LanguageManager.isDefaultLocale(baseLocale) ? ResourceBundle.getBundle(BUNDLE_NAME, baseLocale) : setImportedLangResource();
                 text = tempBundle.getString(key);
-            } catch (Exception ignored2) {
+            } catch (final Exception ignored2) {
                 // Fallback a es_ES
-                Locale esLocale = new Locale("es", "ES");
-                ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
+                final Locale esLocale = new Locale("es", "ES"); //$NON-NLS-1$ //$NON-NLS-2$
+                final ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
                 try {
                     text = esBundle.getString(key);
-                } catch (Exception e) {
-                    LOGGER.warning("Falta el recurso para la clave: " + key);
-                    return "!" + key + "!";
+                } catch (final Exception e) {
+                    LOGGER.warning("Falta el recurso para la clave: " + key); //$NON-NLS-1$
+                    return "!" + key + "!";//$NON-NLS-1$//$NON-NLS-2$
                 }
             }
         }
@@ -104,7 +104,7 @@ public final class SimpleAfirmaMessages {
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
                 if (params[i] != null) {
-                    text = text.replace("%" + i, params[i]);
+                    text = text.replace("%" + i, params[i]); //$NON-NLS-1$
                 }
             }
         }
@@ -123,20 +123,20 @@ public final class SimpleAfirmaMessages {
                 rb = ResourceBundle.getBundle(BUNDLE_NAME, current);
             }
             catch (final Exception e) {
-                LOGGER.log(Level.WARNING, "No existe el bundle interno para Locale " + current + ", se usara por defecto", e);
+                LOGGER.log(Level.WARNING, "No existe el bundle interno para Locale " + current + ", se usara por defecto", e); //$NON-NLS-1$ //$NON-NLS-2$
                 rb = ResourceBundle.getBundle(BUNDLE_NAME, Locale.ENGLISH);
             }
         }
         else {
             rb = setImportedLangResource();
             if (rb == null) {
-                LOGGER.warning("No se encontro recurso externo para Locale " + current + ", usando default interno");
+                LOGGER.warning("No se encontro recurso externo para Locale " + current + ", usando default interno");//$NON-NLS-1$//$NON-NLS-2$
                 try {
-                    rb = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("es", "ES"));
+                    rb = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("es", "ES")); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 catch (final Exception e) {
                     LOGGER.log(Level.SEVERE,
-                        "El bundle para el Locale es_ES tampoco esta disponible", e);
+                        "El bundle para el Locale es_ES tampoco esta disponible", e); //$NON-NLS-1$
                 }
             }
         }

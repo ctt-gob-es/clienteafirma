@@ -102,6 +102,7 @@ public class SimpleErrorCode {
         public static final ErrorCode EMPTY_POLICY_HASH 					= new ErrorCode("521008", "La huella digital no puede ser nula ni vacia"); //$NON-NLS-1$ //$NON-NLS-2$
         public static final ErrorCode INVALID_POLICY_QUALIFIER_URL 			= new ErrorCode("521009", "El calificador debe ser una URL valida"); //$NON-NLS-1$ //$NON-NLS-2$
 
+        public static final ErrorCode GENERIC_PLUGIN_LOAD_ERROR   			= new ErrorCode("530000", "Ha ocurrido un error al intentar cargar el plugin"); //$NON-NLS-1$ //$NON-NLS-2$
         public static final ErrorCode MALFORMED_PLUGIN_SERVICE    			= new ErrorCode("530001", "Se han encontrado plugins mal definidos en el fichero importado"); //$NON-NLS-1$ //$NON-NLS-2$
         public static final ErrorCode NO_PLUGIN_FOUND             			= new ErrorCode("530002", "No se encontro ningun plugin en los archivos"); //$NON-NLS-1$ //$NON-NLS-2$
         public static final ErrorCode MULTIPLE_PLUGINS_FOUND      			= new ErrorCode("530003", "No se permite la carga simultanea de varios plugins"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -109,8 +110,7 @@ public class SimpleErrorCode {
         public static final ErrorCode BUTTON_NO_WINDOW            			= new ErrorCode("530005", "El plugin no ha definido la ventana en la que debe aparecer un boton"); //$NON-NLS-1$ //$NON-NLS-2$
         public static final ErrorCode INVALID_ACTION_CLASS        			= new ErrorCode("530006", "El plugin definio una clase de accion erronea"); //$NON-NLS-1$ //$NON-NLS-2$
         public static final ErrorCode INVALID_PLUGIN_FILE   				= new ErrorCode("530007", "El plugin no es valido para ser importado"); //$NON-NLS-1$ //$NON-NLS-2$
-        public static final ErrorCode ALREADY_INSTALLED_PLUGIN   			= new ErrorCode("530008", "El plugin seleccionado ya se encuentra instalado"); //$NON-NLS-1$ //$NON-NLS-2$
-        
+
 	}
 
 	public static class Request {
