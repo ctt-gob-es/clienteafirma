@@ -25,10 +25,8 @@
 				: window.location.origin;
 		
 		function firmar() {
-			var divMensaje = document.getElementById('divmensaje');
-			divMensaje.innerHTML='';
-			var divguardar = document.getElementById('divguardar');
-			divguardar.innerHTML='';
+			hideResult();
+
 			mostrarDialogoEspera();
 			
 			var params = 	"mode=explicit\n" +
@@ -69,35 +67,48 @@
 				var msg = AutoScript.getErrorMessage();
 				if (msg==undefined || msg==null) msg = excep.message;
 				if (msg==undefined || msg==null) msg = '';
-				divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al firmar</div><br>' + msg + '<br>';
+				
+				showError('Error al firmar', msg);
 			}
 			
+		}
+
+		function hideResult() {
+			document.getElementById('divmensaje').style.display = 'none';
+			document.getElementById('divdetalle').style.display = 'none';
+			document.getElementById('divguardar').style.display = 'none';
+		}
+		
+		function showError(text, detail) {
+			document.getElementById('divmensaje').className = 'iconErrorFirma';
+			document.getElementById('divmensaje').textContent = text;
+			document.getElementById('divmensaje').style.display = 'block';
+			document.getElementById('divdetalle').textContent = !!detail ? detail : '';
+			document.getElementById('divdetalle').style.display = !!detail ? 'block' : 'none';
+			document.getElementById('divguardar').style.display = 'none';
+		}
+		
+		function showSuccess(text, needButton) {
+			document.getElementById('divmensaje').className = 'iconOKFirma';
+			document.getElementById('divmensaje').textContent = text;
+			document.getElementById('divmensaje').style.display = 'block';
+			document.getElementById('divdetalle').style.display = 'none';
+			document.getElementById('divguardar').style.display = needButton ? 'block' : 'none';
 		}
 		
 		function successCallback(signatureB64, certB64) {
 			
 			ocultarDialogoEspera();
 
-			var divMensaje = document.getElementById('divmensaje');
-			divMensaje.innerHTML='<br><div class="iconOKFirma">La firma se ha realizado correctamente</div>';
-			
 			document.getElementById('firmaB64').value = signatureB64;
-			
-			var divguardar = document.getElementById('divguardar');
-			var content = '<br><div class="botoneraCentro">' +
-					'<input class="botonM marginR15" id="botonGuardar" value="Guardar firma" onclick="javascript:guardar();" type="button">' +
-					'</div><br>';
-			
-			divguardar.innerHTML = content;
+			showSuccess('La firma se ha realizado correctamente', true);
 		}
 		
 		function errorCallback(errorType, errorMessage) {
 			
 			ocultarDialogoEspera();
-			
-			var divMensaje = document.getElementById('divmensaje');
-			divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al firmar</div><br>' +
-					'<div style="width: 300pt">' + errorMessage + '</div>' + '<br>';
+
+			showError('Error al firmar', errorMessage);
 		}
 		
 		function guardar() {
@@ -126,17 +137,14 @@
 			
 			ocultarDialogoEspera();
 			
-			var divMensaje = document.getElementById('divmensaje');
-			divMensaje.innerHTML='<br><div class="iconOKFirma">La firma se ha guardado correctamente</div>';
+			showSuccess('La firma se ha guardado correctamente', false);
 		}
 		
 		function guardarErrorCallback(errorType, errorMessage) {
 			
 			ocultarDialogoEspera();
 			
-			var divMensaje = document.getElementById('divmensaje');
-			divMensaje.innerHTML='<br><div class="iconErrorFirma">Error al guardar</div><br>' +
-					'<div style="width: 300pt">' + errorMessage + '</div>' + '<br>';
+			showError('Error al guardar', errorMessage);
 		}
 		
 		function mostrarPantalla() {
@@ -213,6 +221,7 @@
 			document.getElementById("dialogoEspera").style.display = "none";
 		}
 		
+		AutoScript.setForceWSMode(true);
 		AutoScript.cargarAppAfirma();
 		AutoScript.setServlets(servletsBase + "/afirma-signature-storage/StorageService", servletsBase + "/afirma-signature-retriever/RetrieveService");
 	</script>
@@ -253,8 +262,15 @@
  permite asegurar la identidad del firmante y la integridad del mensaje.</p>
 	<div class="separadorSeccion"></div>
 	<fieldset style="background-color: rgb(252,252,252)">
-	<div id="divmensaje"></div>
-	<div id="divguardar"></div>
+	<div id="divmensaje" style="display: none;">
+	</div>
+	<div id="divdetalle" style="display: none;">
+	</div>
+	<div id="divguardar" style="display: none;">
+		<div class="botoneraGuardar">
+			<input class="botonM marginR15" id="botonGuardar" value="Guardar firma" onclick="javascript:guardar();" type="button">
+		</div>
+	</div>
 	<p>Esta p&aacute;gina le permitir&aacute; probar la operaci&oacute;n de firma de Autofirma App al firmar un fichero localizado en su dispositivo m&oacute;vil, datos de ejemplo o un formulario web simple:</p><br/>
 
 	<div class="lblAnchoMaxMB">

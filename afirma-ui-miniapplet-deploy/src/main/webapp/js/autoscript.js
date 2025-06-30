@@ -3849,12 +3849,6 @@ var AutoScript = ( function ( window, undefined ) {
 				defaultKeyStore = keystore;
 			}
 			
-			/** Establece las funciones callback que gestionan el resultado de una operacion. */
-			function setCallbacks(successCallbackFunction, errorCallbackFunction) {
-				successCallback = successCallbackFunction;
-				errorCallback = errorCallbackFunction;
-			}
-
 			/**
 			 * Inicia el proceso de seleccion de certificado.
 			 */
@@ -4425,8 +4419,6 @@ var AutoScript = ( function ( window, undefined ) {
 				// Mostramos el dialogo de carga
 				Dialog.showLoadingDialog();
 
-				setCallbacks(successCallback, errorCallback);
-				
 				wrongInstallation = false;
 
 				// Invocamos al cliente de firma
