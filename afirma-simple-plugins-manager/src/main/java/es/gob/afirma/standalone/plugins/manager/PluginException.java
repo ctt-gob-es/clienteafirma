@@ -16,15 +16,15 @@ public class PluginException extends AOException {
 	 * Construye la excepci&oacute;n.
 	 */
 	public PluginException() {
-		super(ErrorCode.Internal.PLUGIN_ERROR);
+		super(PluginManagerError.Internal.PLUGIN_ERROR);
 	}
 
 	/**
 	 * Construye la excepci&oacute;n con un mensaje.
 	 * @param msg Mensaje descriptivo del error.
 	 */
-	public PluginException(String msg) {
-		super(msg, ErrorCode.Internal.PLUGIN_ERROR);
+	public PluginException(final String msg) {
+		super(msg, PluginManagerError.Internal.PLUGIN_ERROR);
 	}
 
 	/**
@@ -32,43 +32,43 @@ public class PluginException extends AOException {
 	 * @param msg Mensaje descriptivo del error.
 	 * @param cause Causa que origin&oacute; el error.
 	 */
-	public PluginException(String msg, Throwable cause) {
-		super(msg, cause, ErrorCode.Internal.PLUGIN_ERROR);
+	public PluginException(final String msg, final Throwable cause) {
+		super(msg, cause, PluginManagerError.Internal.PLUGIN_ERROR);
 	}
-	
+
 	/**
 	 * Construye la excepci&oacute;n con un mensaje y la causa del error.
 	 * @param errorCode Codigo del error
 	 */
-	public PluginException(ErrorCode errorCode) {
+	public PluginException(final ErrorCode errorCode) {
 		super(errorCode);
 	}
-	
+
 	/**
 	 * Construye la excepci&oacute;n con un mensaje y la causa del error.
 	 * @param msg Mensaje descriptivo del error.
 	 * @param errorCode Codigo del error
 	 */
-	public PluginException(String msg, ErrorCode errorCode) {
+	public PluginException(final String msg, final ErrorCode errorCode) {
 		super(msg, errorCode);
 	}
-	
+
 	/**
 	 * Construye la excepci&oacute;n con un mensaje y la causa del error.
 	 * @param msg Mensaje descriptivo del error.
 	 * @param cause Causa que origin&oacute; el error.
 	 * @param errorCode Codigo del error
 	 */
-	public PluginException(String msg, Throwable cause, ErrorCode errorCode) {
+	public PluginException(final String msg, final Throwable cause, final ErrorCode errorCode) {
 		super(msg, cause, errorCode);
 	}
-	
+
 	/**
 	 * Construye la excepci&oacute;n con un mensaje y la causa del error.
 	 * @param cause Causa que origin&oacute; el error.
 	 * @param errorCode Codigo del error
 	 */
-	public PluginException(Throwable cause, ErrorCode errorCode) {
+	public PluginException(final Throwable cause, final ErrorCode errorCode) {
 		super(cause, errorCode);
 	}
 }

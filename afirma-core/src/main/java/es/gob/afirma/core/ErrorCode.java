@@ -98,8 +98,6 @@ public class ErrorCode {
 		public static final ErrorCode UNSUPPORTED_HASH_ALGORITHM				= new ErrorCode("200118", "No se soporta un algoritmo de hash establecido internamente"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode BUILDING_ASIC_CONTAINER_ERROR				= new ErrorCode("214001", "Error al construir el contenedor ASiC de la nueva firma"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		public static final ErrorCode PLUGIN_ERROR								= new ErrorCode("240000", "Error con el plugin"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static class ThirdParty {
@@ -187,8 +185,6 @@ public class ErrorCode {
 		public static final ErrorCode SMARTCARD_LOCKED							= new ErrorCode("511004", "La tarjeta inteligente esta bloqueada"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode SIGNING_MALFORMED_SIGNATURE				= new ErrorCode("510006", "La firma no es compatible o esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
-	
-        public static final ErrorCode ALREADY_INSTALLED_PLUGIN   				= new ErrorCode("530008", "Ha ocurrido un problema con el directorio de instalacion"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static class Request {

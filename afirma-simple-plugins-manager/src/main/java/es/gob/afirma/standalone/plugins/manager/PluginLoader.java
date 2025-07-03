@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.GenericMenuOption;
 import es.gob.afirma.standalone.plugins.PluginAction;
@@ -72,17 +71,17 @@ public class PluginLoader {
 			}
 			catch (final Error e) {
 				classLoader.close();
-				throw new AOPluginException("Se han encontrado plugins mal definidos en el fichero importado", new ErrorCode("530001")); //$NON-NLS-1$
+				throw new AOPluginException("Se han encontrado plugins mal definidos en el fichero importado", PluginManagerError.Functional.MALFORMED_PLUGIN_SERVICE); //$NON-NLS-1$
 			}
 
 			if (plugins.size() == 0) {
 				classLoader.close();
-				throw new AOPluginException("No se encontro ningun plugin en los archivos", new ErrorCode("530002")); //$NON-NLS-1$
+				throw new AOPluginException("No se encontro ningun plugin en los archivos", PluginManagerError.Functional.NO_PLUGIN_FOUND); //$NON-NLS-1$
 			}
 
 			if (plugins.size() > 1) {
 				classLoader.close();
-				throw new AOPluginException("No se permite la carga simulatea de varios plugins", new ErrorCode("530003")); //$NON-NLS-1$
+				throw new AOPluginException("No se permite la carga simulatea de varios plugins", PluginManagerError.Functional.MULTIPLE_PLUGINS_FOUND); //$NON-NLS-1$
 			}
 
 			loadedPlugin = plugins.get(0);
@@ -101,11 +100,11 @@ public class PluginLoader {
 
 					if (button.getActionClassName() == null) {
 						classLoader.close();
-						throw new AOPluginException(String.format("El plugin '%1s' no ha definido accion para un boton", info.getName()), new ErrorCode("530004")); //$NON-NLS-1$
+						throw new AOPluginException(String.format("El plugin '%1s' no ha definido accion para un boton", info.getName()), PluginManagerError.Functional.BUTTON_NO_ACTION); //$NON-NLS-1$
 					}
 					if (button.getWindow() == null) {
 						classLoader.close();
-						throw new AOPluginException(String.format("El plugin '%1s' no ha definido la ventana en la que debe aparecer un boton", info.getName()), new ErrorCode("530005")); //$NON-NLS-1$
+						throw new AOPluginException(String.format("El plugin '%1s' no ha definido la ventana en la que debe aparecer un boton", info.getName()), PluginManagerError.Functional.BUTTON_NO_WINDOW); //$NON-NLS-1$
 					}
 					try {
 						final PluginAction action = (PluginAction)
@@ -116,7 +115,7 @@ public class PluginLoader {
 					catch (final Exception e) {
 						classLoader.close();
 						throw new AOPluginException(String.format("El plugin '%1s' definio una clase de accion erronea: %2s", //$NON-NLS-1$
-								info.getName(), button.getActionClassName()), e, new ErrorCode("530006"));
+								info.getName(), button.getActionClassName()), e, PluginManagerError.Functional.INVALID_ACTION_CLASS);
 					}
 				}
 			}
@@ -124,12 +123,12 @@ public class PluginLoader {
 			loadedPlugin.setInfo(info);
 		} catch (final AOPluginException e) {
 			classLoader.close();
-			
+
 			throw e;
 		} catch (final Exception e) {
 			classLoader.close();
-			
-			throw new AOPluginException(String.format("Ha ocurrido un error al intentar cargar el plugin"), e, ErrorCode.Internal.PLUGIN_ERROR); //$NON-NLS-1$
+
+			throw new AOPluginException(String.format("Ha ocurrido un error al intentar cargar el plugin"), e, PluginManagerError.Internal.PLUGIN_ERROR); //$NON-NLS-1$
 		}
 
 		return loadedPlugin;

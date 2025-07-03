@@ -20,7 +20,6 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -253,10 +252,10 @@ public final class MainMenu extends JMenuBar {
 				);
         	}
         }
-        
+
         // Crear el JMenu que contendrá las opciones de idioma
         final JMenu languageMenu = new JMenu(SimpleAfirmaMessages.getString("MainMenu.38")); //$NON-NLS-1$
-        
+
         final ButtonGroup langGroup = new ButtonGroup();
 
         // Crear las opciones de idioma
@@ -264,14 +263,14 @@ public final class MainMenu extends JMenuBar {
         		SimpleAfirmaMessages.getString("MainMenu.39"), SimpleAfirmaMessages.getString("MainMenu.41"), //$NON-NLS-1$ //$NON-NLS-2$
         		SimpleAfirmaMessages.getString("MainMenu.42"), SimpleAfirmaMessages.getString("MainMenu.43"), //$NON-NLS-1$ //$NON-NLS-2$
         		SimpleAfirmaMessages.getString("MainMenu.44"),SimpleAfirmaMessages.getString("MainMenu.40") //$NON-NLS-1$ //$NON-NLS-2$
-        		}; 
-        
+        		};
+
         String localeConf = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
         // Si no hay ninguno configurado, por defecto estara seleccionado el espanol
         if (localeConf == null) {
         	localeConf = LanguageManager.AFIRMA_DEFAULT_LOCALES[0].toString();
         }
-        
+
         for (int i = 0; i < defaultLanguages.length; i++) {
             final Locale locale = LanguageManager.AFIRMA_DEFAULT_LOCALES[i];
             final LocaleOption localeOption = new LocaleOption(defaultLanguages[i], locale);
@@ -292,7 +291,7 @@ public final class MainMenu extends JMenuBar {
             langGroup.add(langItem);
             languageMenu.add(langItem);
         }
-        
+
         final Locale [] importedLocales = LanguageManager.getImportedLocales();
         if (importedLocales != null) {
 	        for (int i = 0; i < importedLocales.length; i++) {
@@ -303,7 +302,7 @@ public final class MainMenu extends JMenuBar {
 	        	if (!LanguageManager.isDefaultLocale(locale)) {
 		            final LocaleOption localeOption = new LocaleOption(langName, locale);
 		            final JRadioButtonMenuItem importedLangItem = new JRadioButtonMenuItem(localeOption.toString());
-		            importedLangItem.putClientProperty("localeData", localeOption); //$NON-NLS-1$    
+		            importedLangItem.putClientProperty("localeData", localeOption); //$NON-NLS-1$
 		        	if (localeConf.equals(locale.toString())) {
 		        		importedLangItem.setSelected(true);
 		            }
@@ -321,9 +320,9 @@ public final class MainMenu extends JMenuBar {
 	        	}
 	        }
         }
-        
+
         languageMenu.addSeparator();
-        
+
         final JMenuItem importLanguageMenu = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.45")); //$NON-NLS-1$
         importLanguageMenu.getAccessibleContext().setAccessibleDescription(
         		SimpleAfirmaMessages.getString("MainMenu.45")); //$NON-NLS-1$
@@ -368,7 +367,7 @@ public final class MainMenu extends JMenuBar {
 						e1);
 			}
 		});
-        
+
         languageMenu.add(importLanguageMenu);
         this.add(languageMenu);
 
@@ -586,8 +585,8 @@ public final class MainMenu extends JMenuBar {
 			throws PluginException{
 		PluginLoader.getPluginAction(actionClass).start(parent);
 	}
-	
-	private static void showRestartWarning() {
+
+	static void showRestartWarning() {
 		final List<String> command = DesktopUtil.getResetApplicationCommand();
 		// Actualizamos los mensajes para dialogo con el nuevo locale
 		JSEUIMessages.updateLocale();
@@ -621,19 +620,19 @@ public final class MainMenu extends JMenuBar {
 					JOptionPane.WARNING_MESSAGE);
 		}
 	}
-	
+
 	private static void addNewLocaleToMenu(final Map <String, String> langProps, final ButtonGroup langGroup, final JMenu languageMenu) {
-		
+
 		final String localeProp = langProps.get(LanguageManager.LOCALE_PROP);
 		final String[] parts = localeProp.split("_"); //$NON-NLS-1$
 		final Locale locale = new Locale(parts[0], parts[1]);
-		
-		if (!LanguageManager.isDefaultLocale(locale)) { 
-			
+
+		if (!LanguageManager.isDefaultLocale(locale)) {
+
 			final LocaleOption localeOption = new LocaleOption(langProps.get(LanguageManager.LANGUAGE_NAME_PROP), locale);
 			final JRadioButtonMenuItem newImportedLangItem = new JRadioButtonMenuItem(localeOption.toString());
 			newImportedLangItem.putClientProperty("localeData", localeOption); //$NON-NLS-1$
-			
+
 			newImportedLangItem.addActionListener(new ActionListener() {
 	            @Override
 	            public void actionPerformed(final ActionEvent ae) {
@@ -643,17 +642,17 @@ public final class MainMenu extends JMenuBar {
 	                showRestartWarning();
 	            }
 	        });
-		
-		
+
+
     		langGroup.add(newImportedLangItem);
     		languageMenu.insert(newImportedLangItem, languageMenu.getItemCount() - 2);
 		}
-        
+
 	}
-	
+
 	private static String extractMessageFromException(final Throwable t) {
 		String message = null;
-		
+
 		if (t instanceof AOException) {
 			message = obtainSimpleErrorCodeFromPluginException((AOException) t);
 		} else {
@@ -661,42 +660,21 @@ public final class MainMenu extends JMenuBar {
 		}
 		return message;
 	}
-	
+
 	private static String obtainSimpleErrorCodeFromPluginException(final AOException exception) {
-		ErrorCode errorCode = null;
-		
+
 		//Check again the code received in the AOException
-	    switch (exception.getErrorCode().getCode()) {
-	    	case "230000": errorCode = SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR; break;
-	        case "230001": errorCode = SimpleErrorCode.Internal.CANT_READ_FILE; break;
-	        case "230002": errorCode = SimpleErrorCode.Internal.CANT_CREATE_DIRECTORY; break;
-	        default:       errorCode = SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR; break;
-	    }
-	    
-	    String message = null;
-	    
-	    int index;
-	    try {
-	        final int codeInt = Integer.parseInt(errorCode.getCode());
-	        final int base    = Integer.parseInt(SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR.getCode());
-	        index = codeInt - base;
-	        if (index < 0) {
-	            index = 0;
-	        }
-	    }
-	    catch (final Exception ex) {
-	        index = 0;
-	    }
-	    final String key = "LanguageManagementError." + index;
+		ErrorCode errorCode = null;
+		final ErrorCode currentErrorCode = exception.getErrorCode();
+		if (currentErrorCode == SimpleErrorCode.Internal.CANT_READ_FILE
+				|| currentErrorCode == SimpleErrorCode.Internal.CANT_CREATE_DIRECTORY) {
+			errorCode = currentErrorCode;
+		} else {
+			errorCode = SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR;
+		}
 
-	    // Intentamos obtener el mensaje, si no existe usamos el por defecto (0)
-	    try {
-	        message = SimpleAfirmaMessages.getString(key);
-	    }
-	    catch (final MissingResourceException mre) {
-	        message = SimpleAfirmaMessages.getString("LanguageManagementError.0");
-	    }
+		final String key = "LanguageManagementError." + errorCode.getCode(); //$NON-NLS-1$
 
-	    return message;
+		return SimpleAfirmaMessages.getString(key);
 	}
 }
