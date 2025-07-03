@@ -221,9 +221,9 @@
 			document.getElementById("dialogoEspera").style.display = "none";
 		}
 		
+		AutoScript.setServlets(servletsBase + "/afirma-signature-storage/StorageService", servletsBase + "/afirma-signature-retriever/RetrieveService");
 		AutoScript.setForceWSMode(true);
 		AutoScript.cargarAppAfirma();
-		AutoScript.setServlets(servletsBase + "/afirma-signature-storage/StorageService", servletsBase + "/afirma-signature-retriever/RetrieveService");
 	</script>
 <body onload="mostrarPantalla()">
 	<!-- CONTENEDOR ** -->

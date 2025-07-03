@@ -643,54 +643,29 @@ var AutoScript = ( function ( window, undefined ) {
 			// Si ya se esta mostrando un dialogo quiere decir que ya se ha iniciado alguna operacion,
 			// por lo que no se realizara la validacion de los servicios para evitar confusiones al usuario
 			
-			if (document.getElementById("afirmaSupportDialog") == null) {
-		
-				// Comprobamos la conexion con el servcio de almacenamiento
-				var httpStorageRequest = getHttpRequest();
-				if (!httpStorageRequest) {
-					throw new Error("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
-				}
-				
-				var callOrder = ++counterCallService;
-				
-				httpStorageRequest.open("GET", storageAddress + "?op=check", true);
-				httpStorageRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				
-				httpStorageRequest.onreadystatechange = function() {
-					if (httpStorageRequest.readyState == 4) {
-						if (httpStorageRequest.status == 200) {
-							isErrorCheckingServices = false;
-							isCompatibleProcedure = true;
-							console.log('Conexion correcta con el servicio de almacenamiento');
-						}
-						else if (callOrder == counterCallService) {
-							isErrorCheckingServices = true;
-							if (!!isCheckingCompatibleProcedure) {
-								isCompatibleProcedure = false;
-								Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
-							} else {
-								isCompatibleProcedure = true;
-								Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
-							}
-						}
+			if (!!document.getElementById("afirmaSupportDialog")) {
+				return;
+			}
+			
+			// Comprobamos la conexion con el servcio de almacenamiento
+			var httpStorageRequest = getHttpRequest();
+			if (!httpStorageRequest) {
+				throw new Error("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
+			}
+			
+			var callOrder = ++counterCallService;
+			
+			httpStorageRequest.open("GET", storageAddress + "?op=check", true);
+			httpStorageRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+			httpStorageRequest.onreadystatechange = function() {
+				if (httpStorageRequest.readyState == 4) {
+					if (httpStorageRequest.status == 200) {
+						isErrorCheckingServices = false;
+						isCompatibleProcedure = true;
+						console.log('Conexion correcta con el servicio de almacenamiento');
 					}
-				}
-				try {
-					httpStorageRequest.onerror = function() {
-						if (callOrder == counterCallService) {
-							isErrorCheckingServices = true;
-							if (!!isCheckingCompatibleProcedure) {
-								isCompatibleProcedure = false;
-								Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
-							} else {
-								isCompatibleProcedure = true;
-								Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
-							}
-						}
-					}
-				}
-				catch (e) {
-					if (callOrder == counterCallService) {
+					else if (callOrder == counterCallService) {
 						isErrorCheckingServices = true;
 						if (!!isCheckingCompatibleProcedure) {
 							isCompatibleProcedure = false;
@@ -701,65 +676,38 @@ var AutoScript = ( function ( window, undefined ) {
 						}
 					}
 				}
+			}
+			
+			httpStorageRequest.send("");
 				
-				httpStorageRequest.send("");
-					
-				// Comprobamos la conexion con el servicio de recuperacion
-				var httpRetrieveRequest = getHttpRequest();
-				httpRetrieveRequest.open("GET", retrieverAddress + "?op=check", true);
-				httpRetrieveRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		
-				httpRetrieveRequest.onreadystatechange = function() {
-					if (httpRetrieveRequest.readyState == 4) {
-						if (httpRetrieveRequest.status == 200) {
-							isErrorCheckingServices = false;
-							isCompatibleProcedure = true;
-							console.log('Conexion correcta con el servicio de recuperacion');
-						}
-						else if (callOrder == counterCallService) {
-							isErrorCheckingServices = true;
-							if (!!isCheckingCompatibleProcedure) {
-								isCompatibleProcedure = false;
-								Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
-							} else {
-								isCompatibleProcedure = true;
-								Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
-							}
-						}
-					}
-				}
-				
-				try {
-					httpRetrieveRequest.onerror = function() {
-						isErrorCheckingServices = true;
-						if (callOrder == counterCallService) {
-							if (!!isCheckingCompatibleProcedure) {
-								isCompatibleProcedure = false;
-								Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
-							} else {
-								isCompatibleProcedure = true;
-								Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
-							}
-						}
-					}
-				}
-				catch (e) {
-					if (callOrder == counterCallService) {
-						isErrorCheckingServices = true;
-						if (!!isCheckingCompatibleProcedure) {
-							isCompatibleProcedure = false;
-							Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
-						} else {
-							isCompatibleProcedure = true;
-							Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
-						}
-					}
-				}
+			// Comprobamos la conexion con el servicio de recuperacion
+			var httpRetrieveRequest = getHttpRequest();
+			httpRetrieveRequest.open("GET", retrieverAddress + "?op=check", true);
+			httpRetrieveRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	
-				httpRetrieveRequest.send("");		
-				
-				isCheckedServices = true;			
+			httpRetrieveRequest.onreadystatechange = function() {
+				if (httpRetrieveRequest.readyState == 4) {
+					if (httpRetrieveRequest.status == 200) {
+						isErrorCheckingServices = false;
+						isCompatibleProcedure = true;
+						console.log('Conexion correcta con el servicio de recuperacion');
+					}
+					else if (callOrder == counterCallService) {
+						isErrorCheckingServices = true;
+						if (!!isCheckingCompatibleProcedure) {
+							isCompatibleProcedure = false;
+							Dialog.showErrorDialog(ERROR_NO_COMPATIBLE_PROCEDURE);
+						} else {
+							isCompatibleProcedure = true;
+							Dialog.showErrorDialog(ERROR_CHECKING_SERVICE);
+						}
+					}
+				}
 			}			
+
+			httpRetrieveRequest.send("");		
+			
+			isCheckedServices = true;			
 		}
 
 		/**

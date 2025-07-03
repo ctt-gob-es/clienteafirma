@@ -295,10 +295,10 @@
 	<body>
 		<script>
 			//AutoScript.setMinimumClientVersion("1.8");
-			//AutoScript.setForceWSMode(true);
-			AutoScript.cargarAppAfirma();
 			AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
 					window.location.origin + "/afirma-signature-retriever/RetrieveService");
+			AutoScript.setForceWSMode(true);
+			AutoScript.cargarAppAfirma();
 			//AutoScript.setPortRange(63117);
 		</script>
 
@@ -328,6 +328,10 @@
 		 <option value="PAdEStri">PAdEStri</option>
 		 <option value="XAdES">XAdES</option>
 		 <option value="XAdEStri">XAdEStri</option>
+		 <option value="CAdES-ASiC-S">CAdES-ASiC-S</option>
+		 <option value="CAdES-ASiC-S-tri">CAdES-ASiC-S-tri</option>
+		 <option value="XAdES-ASiC-S">XAdES-ASiC-S</option>
+		 <option value="XAdES-ASiC-S-tri">XAdES-ASiC-S-tri</option>
 		 <option value="FacturaE">FacturaE</option>
 		 <option value="FacturaEtri">FacturaEtri</option>
 		 <option value="CMS/PKCS#7">CMS</option>
