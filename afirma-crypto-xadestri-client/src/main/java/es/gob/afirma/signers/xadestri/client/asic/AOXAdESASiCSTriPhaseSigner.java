@@ -36,6 +36,8 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 
 	/** Identificador de la operaci&oacute;n criptogr&aacute;fica de firma. */
 	private static final String CRYPTO_OPERATION_SIGN = "sign"; //$NON-NLS-1$
+	/** Identificador de la operaci&oacute;n criptogr&aacute;fica de cofirma. */
+	private static final String CRYPTO_OPERATION_COSIGN = "cosign"; //$NON-NLS-1$
 
 	@Override
 	public byte[] sign(final byte[] data,
@@ -60,8 +62,16 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties xParams) {
-		throw new UnsupportedOperationException("No se soportan cofirmas trifasicas XAdES-ASiC-S"); //$NON-NLS-1$
+			             final Properties xParams) throws AOException {
+		return triPhaseOperation(
+			AOSignConstants.SIGN_FORMAT_XADES_ASIC_S,
+			CRYPTO_OPERATION_COSIGN,
+			sign,
+			algorithm,
+			key,
+			certChain,
+			xParams
+		);
 	}
 
 	@Override
@@ -69,8 +79,8 @@ public final class AOXAdESASiCSTriPhaseSigner extends AOXAdESTriPhaseSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties xParams) {
-		throw new UnsupportedOperationException("No se soportan cofirmas trifasicas XAdES-ASiC-S"); //$NON-NLS-1$
+			             final Properties xParams) throws AOException {
+		return cosign(null, sign, algorithm, key, certChain, xParams);
 	}
 
 	@Override

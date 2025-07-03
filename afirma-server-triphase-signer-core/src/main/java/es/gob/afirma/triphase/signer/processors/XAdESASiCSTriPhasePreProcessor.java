@@ -15,9 +15,12 @@ import java.security.cert.X509Certificate;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.asic.ASiCUtil;
+import es.gob.afirma.signers.xades.XAdESConstants;
+import es.gob.afirma.signers.xades.XAdESExtraParams;
 import es.gob.afirma.signers.xades.asic.AOXAdESASiCSSigner;
 
 /** Procesador de firmas trif&aacute;sicas XAdES-ASiC-S.
@@ -36,11 +39,32 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                        final Properties extraParams,
 			                        final boolean checkSignatures) throws IOException,
 			                                                             AOException {
+
+		final Properties xParams = AOXAdESASiCSSigner.setASiCProperties(extraParams, data);
+		xParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
+
+		// Las firmas ASiC siempre son externally detached, lo que obliga a que al firmador XAdES le pasemos
+		// el hash de los datos en lugar de los propios datos
+		xParams.put(XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
+
+		final String digestMethodAlgorithm = xParams.getProperty(
+		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, XAdESConstants.DEFAULT_DIGEST_METHOD);
+		final String externalReferencesHashAlgorithm = xParams.getProperty(
+		        XAdESExtraParams.PRECALCULATED_HASH_ALGORITHM, digestMethodAlgorithm);
+
+		byte[] digestValue;
+		try {
+			digestValue = AOXAdESASiCSSigner.hash(data, externalReferencesHashAlgorithm);
+		}
+		catch (final Exception e) {
+			throw new AOException("No se reconoce el algoritmo de huella digital", e); //$NON-NLS-1$
+		}
+
 		return super.preProcessPreSign(
-			data,
+			digestValue,
 			algorithm,
 			cert,
-			AOXAdESASiCSSigner.setASiCProperties(extraParams, data),
+			xParams,
 			checkSignatures
 		);
 	}
@@ -65,11 +89,19 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                         final TriphaseData triphaseData) throws NoSuchAlgorithmException,
 			                                                      AOException,
 			                                                      IOException {
+
+		final Properties xParams = AOXAdESASiCSSigner.setASiCProperties(extraParams, data);
+		xParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
+
+		// Las firmas ASiC siempre son externally detached, lo que obliga a que al firmador XAdES le pasemos
+		// el hash de los datos en lugar de los propios datos
+		xParams.put(XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
+
 		final byte[] xadesSignature = super.preProcessPostSign(
 			data,
 			algorithm,
 			cert,
-			AOXAdESASiCSSigner.setASiCProperties(extraParams, data),
+			xParams,
 			triphaseData
 		);
 		return ASiCUtil.createSContainer(
@@ -87,7 +119,43 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                          final Properties extraParams,
 			                          final boolean checkSignatures) throws IOException,
 			                                                               AOException {
-		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
+
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiC-S"); //$NON-NLS-1$
+		//TODO: Descomentar cuando se de soporte completo a las multifirmas ASiC
+//		final Map<String, byte[]> signedData = ASiCUtil.getASiCSData(data);
+//		final String signedDataName = signedData.keySet().iterator().next();
+//		final byte[] packagedData = signedData.get(signedDataName);
+//
+//
+//		final Properties xParams = AOXAdESASiCSSigner.setASiCProperties(extraParams, packagedData);
+//		xParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
+//
+//		xParams.put("asicsFilename", signedDataName); //$NON-NLS-1$
+//
+//		// Las firmas ASiC siempre son externally detached, lo que obliga a que al firmador XAdES le pasemos
+//		// el hash de los datos en lugar de los propios datos
+//		xParams.put(XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
+//
+//		final String digestMethodAlgorithm = xParams.getProperty(
+//		        XAdESExtraParams.REFERENCES_DIGEST_METHOD, XAdESConstants.DEFAULT_DIGEST_METHOD);
+//		final String externalReferencesHashAlgorithm = xParams.getProperty(
+//		        XAdESExtraParams.PRECALCULATED_HASH_ALGORITHM, digestMethodAlgorithm);
+//
+//		byte[] digestValue;
+//		try {
+//			digestValue = AOXAdESASiCSSigner.hash(packagedData, externalReferencesHashAlgorithm);
+//		}
+//		catch (final Exception e) {
+//			throw new AOException("No se reconoce el algoritmo de huella digital", e); //$NON-NLS-1$
+//		}
+//
+//		return super.preProcessPreSign(
+//			digestValue,
+//			algorithm,
+//			cert,
+//			xParams,
+//			checkSignatures
+//		);
 	}
 
 	@Override
@@ -98,7 +166,10 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                           final byte[] triphaseDataBytes) throws NoSuchAlgorithmException,
 			                                                        AOException,
 			                                                        IOException {
-		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
+
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiC-S"); //$NON-NLS-1$
+		//TODO: Descomentar cuando se de soporte completo a las multifirmas ASiC
+		//return preProcessPostCoSign(data, algorithm, cert, extraParams, TriphaseData.parser(triphaseDataBytes));
 	}
 
 	@Override
@@ -109,8 +180,86 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                           final TriphaseData triphaseData) throws NoSuchAlgorithmException,
 			                                                        AOException,
 			                                                        IOException {
-		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
+
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiC-S"); //$NON-NLS-1$
+		//TODO: Descomentar cuando se de soporte completo a las multifirmas ASiC
+//		final Map<String, byte[]> signedData = ASiCUtil.getASiCSData(data);
+//		final String signedDataName = signedData.keySet().iterator().next();
+//		final byte[] packagedData = signedData.get(signedDataName);
+//
+//		final Properties xParams = AOXAdESASiCSSigner.setASiCProperties(extraParams, data);
+//		xParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
+//
+//		// Las firmas ASiC siempre son externally detached, lo que obliga a que al firmador XAdES le pasemos
+//		// el hash de los datos en lugar de los propios datos
+//		xParams.put(XAdESExtraParams.FORMAT, AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED);
+//
+//		// Obtenemos la firma XAdES-ASiC original
+//		final byte[] signature = ASiCUtil.getASiCSXMLSignature(data);
+//
+//		// Generamos una nueva firma
+//		final byte[] coSignature = super.preProcessPostSign(
+//			packagedData,
+//			algorithm,
+//			cert,
+//			xParams,
+//			triphaseData
+//		);
+//
+//		// Las unimos dentro del mismo XML y las incluimos en el paquete ASiC
+//		final byte[] mergedSignatures = mergeSignatures(signature, coSignature);
+//
+//		return ASiCUtil.createSContainer(
+//			mergedSignatures,
+//			packagedData,
+//			ASiCUtil.ENTRY_NAME_XML_SIGNATURE,
+//			signedDataName
+//		);
 	}
+
+
+//	/**
+//	 * Incorpora la cofirma al objeto de firma original.
+//	 * @param signature
+//	 * @param coSignature
+//	 * @return
+//	 */
+//	private static byte[] mergeSignatures(final byte[] signature, final byte[] coSignature) throws AOException {
+//
+//		Document signDocument;
+//    	try {
+//    		signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(signature));
+//    	}
+//    	catch (final Exception e) {
+//    		throw new AOException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+//    	}
+//
+//    	// Identificamos alguna de las firmas
+//    	final Element signatureElement = XAdESUtil.getFirstSignatureElement(signDocument.getDocumentElement());
+//    	if (signature == null) {
+//    		throw new AOException("No se han encontrado firmas en el documento"); //$NON-NLS-1$
+//    	}
+//
+//    	// Identificamos de que nodo cuelgan las firmas
+//    	final Node signaturesNode = signatureElement.getParentNode();
+//    	if (signaturesNode == null) {
+//    		throw new AOException("No se encontro el nodo padre del nodo de firma"); //$NON-NLS-1$
+//    	}
+//
+//    	// Cargamos la cofirma
+//    	Document cosignDocument;
+//    	try {
+//    		cosignDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(signature));
+//    	}
+//    	catch (final Exception e) {
+//    		throw new AOException("No se ha podido cargar la firma generada para hacer de cofirma", e); //$NON-NLS-1$
+//    	}
+//
+//    	// Agregamos la cofirma como una firma mas
+//    	signaturesNode.appendChild(cosignDocument);
+//
+//		return Utils.writeXML(signDocument, null, null, null);
+//	}
 
 	@Override
 	public TriphaseData preProcessPreCounterSign(final byte[] sign,
@@ -120,7 +269,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                               final CounterSignTarget targets,
 				                           final boolean checkSignatures) throws IOException,
 			                                                                       AOException {
-		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiC-S"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -132,7 +281,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
 			                                                                        AOException,
 			                                                                        IOException {
-		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiC-S"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -144,7 +293,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			                                final CounterSignTarget targets) throws NoSuchAlgorithmException,
 			                                                                        AOException,
 			                                                                        IOException {
-		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiCS"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("No se soporta la multifirma de firmas XAdES-ASiC-S"); //$NON-NLS-1$
 	}
 
 }

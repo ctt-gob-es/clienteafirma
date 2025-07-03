@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -120,7 +121,10 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 
 	@Override
 	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
-		return ASiCUtil.getASiCSData(sign);
+		// Devolveremos solo los primeros datos que encontremos
+		final Map<String, byte[]> signedData = ASiCUtil.getASiCSData(sign);
+		final String signedDataName = signedData.keySet().iterator().next();
+		return signedData.get(signedDataName);
 	}
 
 	@Override
