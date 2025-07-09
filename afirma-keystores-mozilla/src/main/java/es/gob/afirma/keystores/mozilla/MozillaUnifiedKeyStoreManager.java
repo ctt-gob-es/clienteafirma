@@ -20,6 +20,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AggregatedKeyStoreManager;
 import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
@@ -68,8 +69,14 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		// parte de una operacion de refresco del almacen
 		removeAll();
 
-		final Object parentComponent = this.configParams != null && this.configParams.length > 0 ? this.configParams[0] : null;
-
+		Object parentComponent = null;
+		boolean invocationFromBrowser = false;
+		if (this.configParams != null && this.configParams.length > 0) {
+			parentComponent = this.configParams[0];
+			if (this.configParams.length > 1) {
+				invocationFromBrowser = (boolean) this.configParams[1];
+			}
+		}
 		if (!Boolean.getBoolean(ONLY_PKCS11) && !Boolean.parseBoolean(System.getenv(ONLY_PKCS11_ENV))) {
 			// Primero anadimos el almacen principal NSS
 			final AOKeyStoreManager ksm = getNssKeyStoreManager();
@@ -173,7 +180,19 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		}
 
 		setKeyStoreType(type);
-
+		
+		AOKeyStoreManager windowsKS;
+		if (invocationFromBrowser) {
+			try {
+				windowsKS = AOKeyStoreManagerFactory.getWindowsMyCapiKeyStoreManager(true);
+				addKeyStoreManager(windowsKS);
+			} catch (final Exception e) {
+				LOGGER.severe(
+						"No se ha podido ageregar el almacen de Windows: " + e //$NON-NLS-1$
+					);
+			}
+		}
+				
 		this.initialized = true;
 	}
 

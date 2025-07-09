@@ -514,12 +514,10 @@ final class ProtocolInvocationLauncherSign {
 				&& ProtocolInvocationLauncher.getStickyKeyEntry() != null
 				&& pkeSelected == null) {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
+		} else if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
+			keyStoreLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
 		} else {
-			if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
-				keyStoreLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
-			} else {
-				keyStoreLib = options.getDefaultKeyStoreLib();
-			}
+			keyStoreLib = options.getDefaultKeyStoreLib();
 		}
 
 		final boolean stickySignatory = options.getSticky();
@@ -572,6 +570,7 @@ final class ProtocolInvocationLauncherSign {
 						keyStoreLib, // Lib
 						null, // Description
 						pwc, // PasswordCallback
+						true,// InvocationFromBrowser
 						null // Parent
 						);
 			}
@@ -601,7 +600,8 @@ final class ProtocolInvocationLauncherSign {
 						true, // checkValidity
 						filterManager.getFilters(),
 						filterManager.isMandatoryCertificate(),
-						libName);
+						libName,
+						true); // invocationFromBrowser
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
 
