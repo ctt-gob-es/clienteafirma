@@ -1,5 +1,2 @@
 
-java_x64/**
-java_aarch64/**
-java_old/**
-AutoFirma_Packages/AutoFirma.app/**
+AutoFirma_Packages_*/AutoFirma.app/**

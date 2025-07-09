@@ -494,7 +494,7 @@
 				<key>PREINSTALL_PATH</key>
 				<dict>
 					<key>PATH_TYPE</key>
-					<integer>0</integer>
+					<integer>1</integer>
 				</dict>
 				<key>RESOURCES</key>
 				<array/>
@@ -524,7 +524,7 @@
 				<key>USE_HFS+_COMPRESSION</key>
 				<false/>
 				<key>VERSION</key>
-				<string>1.9</string>
+				<string>1.10</string>
 			</dict>
 			<key>TYPE</key>
 			<integer>0</integer>
@@ -618,6 +618,52 @@
 				<key>LOCALIZATIONS</key>
 				<array/>
 			</dict>
+			<key>LICENSE</key>
+			<dict>
+				<key>LOCALIZATIONS</key>
+				<array>
+					<dict>
+						<key>LANGUAGE</key>
+						<string>English</string>
+						<key>VALUE</key>
+						<dict>
+							<key>PATH</key>
+							<string>../Autofirma_Packages_for_old_systems/resources/licencia_en_US.txt</string>
+							<key>PATH_TYPE</key>
+							<integer>1</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>LANGUAGE</key>
+						<string>Catalan</string>
+						<key>VALUE</key>
+						<dict>
+							<key>PATH</key>
+							<string>../Autofirma_Packages_for_old_systems/resources/licencia_ca_ES.txt</string>
+							<key>PATH_TYPE</key>
+							<integer>1</integer>
+						</dict>
+					</dict>
+					<dict>
+						<key>LANGUAGE</key>
+						<string>Spanish</string>
+						<key>VALUE</key>
+						<dict>
+							<key>PATH</key>
+							<string>../Autofirma_Packages_for_old_systems/resources/licencia_es_ES.txt</string>
+							<key>PATH_TYPE</key>
+							<integer>1</integer>
+						</dict>
+					</dict>
+				</array>
+				<key>MODE</key>
+				<integer>0</integer>
+			</dict>
+			<key>README</key>
+			<dict>
+				<key>LOCALIZATIONS</key>
+				<array/>
+			</dict>
 			<key>TITLE</key>
 			<dict>
 				<key>LOCALIZATIONS</key>
@@ -642,6 +688,19 @@
 		</dict>
 		<key>PROJECT_SETTINGS</key>
 		<dict>
+			<key>ADVANCED_OPTIONS</key>
+			<dict>
+				<key>installer-script.options.platforms.client:arch</key>
+				<array>
+					<string>i386</string>
+					<string>arm64</string>
+				</array>
+				<key>installer-script.options:hostArchitectures</key>
+				<array>
+					<string>i386</string>
+					<string>arm64</string>
+				</array>
+			</dict>
 			<key>BUILD_FORMAT</key>
 			<integer>0</integer>
 			<key>BUILD_PATH</key>
@@ -820,7 +879,7 @@
 				</dict>
 			</array>
 			<key>NAME</key>
-			<string>Autofirma</string>
+			<string>Autofirma_1_10_aarch64</string>
 			<key>PAYLOAD_ONLY</key>
 			<false/>
 			<key>TREAT_MISSING_PRESENTATION_DOCUMENTS_AS_WARNING</key>
