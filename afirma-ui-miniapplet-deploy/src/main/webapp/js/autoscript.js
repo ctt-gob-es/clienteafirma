@@ -25,6 +25,8 @@ var AutoScript = ( function ( window, undefined ) {
 
 		var VERSION = "1.9.0";
 		var VERSION_CODE = 3;
+		
+		var PROTOCOL_VERSION = 5;
 
 		/* ========== DEPRECADO: No se utiliza, pero se mantiene por compatibilidad con los despliegues del MiniApplet. */
 		var JAVA_ARGUMENTS = null;
@@ -1950,8 +1952,6 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		var AppAfirmaWebSocketClient = ( function (window, undefined) {
 			
-			var PROTOCOL_VERSION = 5;
-			
 			var SERVER_HOST = "127.0.0.1";
 
 			var URL_REQUEST_PREFIX = "wss://" + SERVER_HOST + ":";
@@ -2879,8 +2879,6 @@ var AutoScript = ( function ( window, undefined ) {
 			var port = "";
 			
 			var idSession;
-			
-			var PROTOCOL_VERSION = 1;
 			
 			/* Tiempo de retardo para peticiones */
 			var WAITING_TIME = 500;
@@ -3998,9 +3996,6 @@ var AutoScript = ( function ( window, undefined ) {
 
 			/* Longitud maxima que generalmente se permite a una URL. */
 			var MAX_LONG_GENERAL_URL = 2000;
-			
-			/** Version del protocolo utilizada. */
-			var PROTOCOL_VERSION = 3;
 			
 			/** Tiempo de espera entre intentos de obtener el resultado de la operacion. */
 			var WAITING_CYCLE_MILLIS = Platform.isAndroid() || Platform.isIOS() ? 4000 : 3000;
