@@ -70,10 +70,10 @@ public class AutofirmaConfigurator implements ConsoleListener {
 
 	/** Indica la ruta del fichero de actualizaci&oacute;n de preferencias del sistema. */
 	public static final String UPDATE_CONFIG = "-update_config"; //$NON-NLS-1$
-	
+
 	/** Indica la ruta del fichero de idioma a instalar. */
 	public static final String LANGUAGE_PATH = "-language_path"; //$NON-NLS-1$
-	
+
 	/** Indica el idioma a utilizar por defecto en Autofirma. */
 	public static final String DEFAULT_LANGUAGE = "-default_language"; //$NON-NLS-1$
 
@@ -289,7 +289,7 @@ public class AutofirmaConfigurator implements ConsoleListener {
 		final ConfigArgs config = new ConfigArgs(args);
 		final AutofirmaConfigurator configurator = new AutofirmaConfigurator(config);
 		LanguageManager.init(DirectoryUtil.getLanguagesDir());
-		
+
 		if (!config.getLanguagePath().isEmpty()) {
 			final File langFile = new File(config.getLanguagePath());
 			try {
@@ -298,7 +298,7 @@ public class AutofirmaConfigurator implements ConsoleListener {
 				LOGGER.log(Level.SEVERE, "Error al agregar archivo de idioma", e); //$NON-NLS-1$
 			}
 		}
-		
+
 		if (!config.getDefaultLanguage().isEmpty()) {
 			Locale locale = null;
             try {
@@ -307,22 +307,25 @@ public class AutofirmaConfigurator implements ConsoleListener {
             	final String country = parts[1];
                 locale = new Locale(lang, country);
 				final boolean existsLocale = checkExistsLocale(locale);
-				if (!existsLocale) {
-					throw new IllegalArgumentException("El idioma a configurar no esta disponible en Autofirma ni se ha importado"); //$NON-NLS-1$
+				if (existsLocale) {
+					Locale.setDefault(locale);
+		            Messages.updateLocale();
+					PreferencesManager.putSystemPref(PreferencesManager.PREFERENCES_LOCALE, config.getDefaultLanguage());
 				}
-				Locale.setDefault(locale);
-	            Messages.updateLocale();
-				PreferencesManager.putSystemPref(PreferencesManager.PREFERENCES_LOCALE, config.getDefaultLanguage());
+				else {
+					LOGGER.warning("El idioma a configurar no esta disponible en Autofirma ni se ha importado. Se usara el por defecto"); //$NON-NLS-1$
+				}
+
 			} catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, "Error al comprobar idioma a configurar", e); //$NON-NLS-1$
 			}
-            
+
 			try {
 				PreferencesManager.flushSystemPrefs();
 			} catch (final Exception e) {
 				LOGGER.log(Level.WARNING, "Error al guardar la preferencia de idioma", e); //$NON-NLS-1$
 			}
-		}	
+		}
 
        	// Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -362,7 +365,7 @@ public class AutofirmaConfigurator implements ConsoleListener {
 
 		configurator.closeApplication(0, config.isNeedKeep());
 	}
-	
+
 	private static boolean checkExistsLocale(final Locale locale) {
 		boolean existsLocale = false;
 		for (final Locale l : LanguageManager.AFIRMA_DEFAULT_LOCALES) {
@@ -498,11 +501,11 @@ public class AutofirmaConfigurator implements ConsoleListener {
 		public boolean getUpdateConfig() {
 			return this.updateConfig;
 		}
-		
+
 		public String getLanguagePath() {
 			return this.languagePath;
 		}
-		
+
 		public String getDefaultLanguage() {
 			return this.defaultLanguage;
 		}
