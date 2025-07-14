@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Identificamos al usuario
+CURRENT_USER=$USER
+
+# Obtenemos el idioma preferido del usuario
+PRE_LANG=$(sudo -u $CURRENT_USER defaults read .GlobalPreferences AppleLanguages | tr -d "[:blank:]()\"," | tr "-" "_" | sed '/^$/d' | head -n 1)
+
+# Si no lo hemos encontrado, usaremos el idioma actual
+if [ -z ${PRE_LANG+x} ]; then
+    PRE_LANG=$LANG
+fi
+
+# Si no hemos encontrado definido el idioma, es probable que esta 
+if [ -z ${PRE_LANG+x} ]; then
+    AFIRMA_LOCALE="en_US"
+elif [ ${PRE_LANG:0:2} == "en" ]; then
+    AFIRMA_LOCALE="en_US"
+elif [ ${PRE_LANG:0:2} == "ca" ]; then
+    AFIRMA_LOCALE="ca_ES"
+elif [ ${PRE_LANG:0:2} == "eu" ]; then
+    AFIRMA_LOCALE="eu_ES"
+elif [ ${PRE_LANG:0:2} == "gl" ]; then
+    AFIRMA_LOCALE="gl_ES"
+elif [ ${PRE_LANG:0:2} == "va" ]; then
+    AFIRMA_LOCALE="va_ES"
+else
+    AFIRMA_LOCALE="es_ES"
+fi
+
+# se ejecuta el configurador
+sudo /Applications/Autofirma.app/Contents/Resources/Home/bin/java -jar /Applications/Autofirma.app/Contents/Resources/JAR/autofirmaConfigurador.jar -install -default_language "$AFIRMA_LOCALE"
+#sudo find 2>/dev/null /private/var/folders/ -type d -name com.apple.dock.launchpad -exec rm -rf {} +; killall Dock
+exit 0

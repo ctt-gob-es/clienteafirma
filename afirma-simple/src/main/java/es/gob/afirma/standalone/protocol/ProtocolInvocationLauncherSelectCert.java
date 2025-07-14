@@ -185,7 +185,8 @@ final class ProtocolInvocationLauncherSelectCert {
 					true, // checkValidity
 					filters,
 					mandatoryCertificate,
-					libName
+					libName,
+					true
 				);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();

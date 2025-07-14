@@ -54,6 +54,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	private boolean allowExternalStores = true;
 
 	private final String libFileName;
+	
+	private final boolean invocationFromBrowser;
 
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
@@ -147,6 +149,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
 		this.mandatoryCertificate = mandatoryCertificate;
 		this.libFileName = null;
+		this.invocationFromBrowser = false;
 	}
 
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
@@ -184,6 +187,47 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
 		this.mandatoryCertificate = mandatoryCertificate;
 		this.libFileName = libFileName;
+		this.invocationFromBrowser = false;
+	}
+	
+    /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
+     * @param ksm Gestor de los almac&eacute;nes de certificados entre los que se selecciona.
+     * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
+     * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
+     *                         privada o no, para no mostrar aquellos que carezcan de ella.
+     * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
+     *                                aun no v&aacute;lidos.
+     * @param checkValidity Indica si se debe comprobar la validez temporal de un
+     *                      certificado al ser seleccionado.
+     * @param certFilters Filtros sobre los certificados a mostrar.
+     * @param mandatoryCertificate Indica si los certificados disponibles (tras aplicar el
+     *                             filtro) debe ser solo uno.
+     * @param libFileName Nombre del archivo de la librer&iacute;a en caso de que se seleccione un almacen de este tipo.
+     * @param invocationFromBrowser Si se indica a true, quiere decir que se esta llamando desde un navegador.
+     * */
+	public AOKeyStoreDialog(final AOKeyStoreManager ksm,
+			                final Object parentComponent,
+                            final boolean checkPrivateKeys,
+                            final boolean showExpiredCertificates,
+                            final boolean checkValidity,
+                            final List<? extends CertificateFilter> certFilters,
+                            final boolean mandatoryCertificate,
+                            final String libFileName,
+                            final boolean invocationFromBrowser) {
+
+		if (ksm == null) {
+    		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
+    	}
+
+		this.ksm = new AggregatedKeyStoreManager(ksm);
+		this.parentComponent = parentComponent;
+		this.checkPrivateKeys = checkPrivateKeys;
+		this.checkValidity = checkValidity;
+		this.showExpiredCertificates = showExpiredCertificates;
+		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
+		this.mandatoryCertificate = mandatoryCertificate;
+		this.libFileName = libFileName;
+		this.invocationFromBrowser = invocationFromBrowser;
 	}
 
 	@Override
@@ -232,7 +276,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			switch (keyStoreId) {
 			// Almacen de Firefox
 			case KEYSTORE_ID_MOZILLA:
-				newKsm = openMozillaKeyStore(parent);
+				newKsm = openMozillaKeyStore(parent, this.invocationFromBrowser);
 				if (newKsm != null) {
 					KeyStorePreferencesManager.setLastSelectedKeystore(AOKeyStore.MOZ_UNI.getName());
 				}
@@ -435,12 +479,13 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	/**
 	 * Carga el almac&eacute;n de claves del &uacute;ltimo perfil de Mozilla activo.
 	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @param invocationFromBrowser Se indica a true si la invocacion se ha realizado desde el navegador.
 	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra el almac&eacute;n,
 	 * si no se pudo cargar o si se cancel&oacute; la carga.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openMozillaKeyStore(final Object parent) throws Exception {
+	private static AOKeyStoreManager openMozillaKeyStore(final Object parent, final boolean invocationFromBrowser) throws Exception {
 
 		try {
 			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
@@ -448,6 +493,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 				null,
 				null,
 				AOKeyStore.MOZ_UNI.getStorePasswordCallback(parent),
+				invocationFromBrowser,
 				parent
 			);
 		}

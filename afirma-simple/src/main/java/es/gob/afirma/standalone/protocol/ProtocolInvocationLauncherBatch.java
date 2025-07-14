@@ -307,7 +307,8 @@ final class ProtocolInvocationLauncherBatch {
 					true, // checkValidity
 					filterManager.getFilters(),
 					filterManager.isMandatoryCertificate(),
-					libName
+					libName,
+					true
 				);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();

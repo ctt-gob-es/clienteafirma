@@ -303,7 +303,11 @@ final class ProtocolInvocationLauncherErrorManager {
 		if (protocolVersion <= ProtocolVersion.VERSION_4.getVersion()) {
 			final String code = OLD_ERRORS_ASSOCIATION.get(errorCode);
 			if (code != null) {
-				message = code + ": " + ERRORS.get(code); //$NON-NLS-1$
+				if (CANCEL_RESPONSE.equals(code)) {
+					message = code;
+				} else {
+					message = code + ": " + ERRORS.get(code); //$NON-NLS-1$
+				}			
 			}
 		}
 
