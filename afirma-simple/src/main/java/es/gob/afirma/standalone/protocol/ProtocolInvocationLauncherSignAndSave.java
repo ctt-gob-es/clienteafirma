@@ -144,8 +144,7 @@ final class ProtocolInvocationLauncherSignAndSave {
         	final String minimumRequestedVersion = options.getMinimumClientVersion();
         	final Version requestedVersion = new Version(minimumRequestedVersion);
         	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
-				final ErrorCode errorCode = SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED;
-   				throw new SocketOperationException(errorCode);
+   				throw new SocketOperationException(SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED);
         	}
         }
 

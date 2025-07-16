@@ -339,7 +339,7 @@ public final class ProtocolInvocationLauncher {
 
 				String msg;
                 try {
-                    msg = ProtocolInvocationLauncherBatch.processBatch(params, requestedProtocolVersion, bySocket);
+                    msg = ProtocolInvocationLauncherBatch.processBatch(params, requestedProtocolVersion);
 				}
                 catch(final AOCancelledOperationException e) {
                 	LOGGER.severe("Operacion de firma por lotes cancelada por el usuario"); //$NON-NLS-1$
@@ -420,7 +420,7 @@ public final class ProtocolInvocationLauncher {
 
 				String msg;
                 try {
-					msg = ProtocolInvocationLauncherSelectCert.processSelectCert(params, requestedProtocolVersion, bySocket);
+					msg = ProtocolInvocationLauncherSelectCert.processSelectCert(params, requestedProtocolVersion);
 				}
                 catch(final AOCancelledOperationException e) {
                 	LOGGER.severe("Operacion de seleccion de certificado cancelada por el usuario"); //$NON-NLS-1$
@@ -503,7 +503,7 @@ public final class ProtocolInvocationLauncher {
 
                 String msg;
                 try {
-                	msg = ProtocolInvocationLauncherSave.processSave(params, requestedProtocolVersion, bySocket);
+                	msg = ProtocolInvocationLauncherSave.processSave(params, requestedProtocolVersion);
                 }
                 catch(final AOCancelledOperationException e) {
                     LOGGER.severe("Operacion de guardado de datos cancelada por el usuario"); //$NON-NLS-1$
@@ -784,7 +784,7 @@ public final class ProtocolInvocationLauncher {
 
                 String msg;
                 try {
-                    msg = ProtocolInvocationLauncherLoad.processLoad(params, requestedProtocolVersion, bySocket);
+                    msg = ProtocolInvocationLauncherLoad.processLoad(params, requestedProtocolVersion);
                 }
                 catch(final AOCancelledOperationException e) {
                     LOGGER.severe("Operacion de carga de datos cancelada por el usuario"); //$NON-NLS-1$

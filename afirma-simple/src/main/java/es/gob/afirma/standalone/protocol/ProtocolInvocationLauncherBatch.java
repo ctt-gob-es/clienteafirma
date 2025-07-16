@@ -65,26 +65,18 @@ final class ProtocolInvocationLauncherBatch {
 	/** Procesa un lote de firma en invocaci&oacute;n por protocolo.
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
-	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
-	 *                 <code>false</code> para usar servidor intermedio.
 	 * @return XML de respuesta del procesado.
 	 * @throws SocketOperationException Si hay errores en la
 	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
 	static String processBatch(final UrlParametersForBatch options,
-			final int protocolVersion,
-			final boolean bySocket) throws SocketOperationException {
+			final int protocolVersion) throws SocketOperationException {
 
         // Comprobamos si soportamos la version del protocolo indicada
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
 					Integer.valueOf(protocolVersion),
 					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
-			final ErrorCode errorCode = SimpleErrorCode.Request.UNSUPPORED_PROTOCOL_VERSION;
-			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+			throw new SocketOperationException(SimpleErrorCode.Request.UNSUPPORED_PROTOCOL_VERSION);
 		}
 
 		// Comprobamos si se exige una version minima del Cliente
@@ -92,12 +84,7 @@ final class ProtocolInvocationLauncherBatch {
         	final String minimumRequestedVersion = options.getMinimumClientVersion();
         	final Version requestedVersion = new Version(minimumRequestedVersion);
         	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
-    			final ErrorCode errorCode = SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED;
-    			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-    			if (!bySocket){
-    				throw new SocketOperationException(errorCode);
-    			}
-    			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+   				throw new SocketOperationException(SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED);
         	}
         }
 
@@ -134,16 +121,10 @@ final class ProtocolInvocationLauncherBatch {
 			operationResult = sign(options, aoks, useDefaultStore, filterManager, protocolVersion);
 		}
 		catch (final AOCancelledOperationException e) {
-			if (!bySocket){
-				throw e;
-			}
-			return ProtocolInvocationLauncherErrorManager.CANCEL_RESPONSE;
+			throw e;
 		}
 		catch (final SocketOperationException e) {
-			if (!bySocket){
-				throw e;
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, e.getErrorCode());
+			throw e;
 		}
 
 		final StringBuilder result = new StringBuilder();
@@ -155,12 +136,7 @@ final class ProtocolInvocationLauncherBatch {
 				signingCertEncoded = operationResult.getPke().getCertificate().getEncoded();
 			} catch (final CertificateEncodingException e) {
 				LOGGER.log(Level.SEVERE, "No se ha podido codificar el certificado de firma para su devolucion", e); //$NON-NLS-1$
-				final ErrorCode errorCode = ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE;
-				ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-				if (!bySocket){
-					throw new SocketOperationException(e, errorCode);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+				throw new SocketOperationException(e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE);
 			}
 		}
 
@@ -174,12 +150,7 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error en el cifrado del resultado del lote: " + e); //$NON-NLS-1$
-				final ErrorCode errorCode = SimpleErrorCode.Internal.ENCRIPTING_BATCH_RESULT;
-				ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-				if (!bySocket) {
-					throw new SocketOperationException(e, errorCode);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+				throw new SocketOperationException(e, SimpleErrorCode.Internal.ENCRIPTING_BATCH_RESULT);
 			}
 
 			// Ciframos el certificado de firma (si lo hay)
@@ -190,12 +161,7 @@ final class ProtocolInvocationLauncherBatch {
 				}
 				catch (final Exception e) {
 					LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
-					final ErrorCode errorCode = SimpleErrorCode.Internal.ENCRIPTING_BATCH_SIGNING_CERT;
-					ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-					if (!bySocket) {
-						throw new SocketOperationException(e, errorCode);
-					}
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+					throw new SocketOperationException(e, SimpleErrorCode.Internal.ENCRIPTING_BATCH_SIGNING_CERT);
 				}
 			}
 
@@ -231,12 +197,7 @@ final class ProtocolInvocationLauncherBatch {
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-					final ErrorCode errorCode = SimpleErrorCode.Communication.SENDING_RESULT_OPERATION;
-					ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-					if (!bySocket){
-						throw new SocketOperationException(errorCode);
-					}
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+					throw new SocketOperationException(e, SimpleErrorCode.Communication.SENDING_RESULT_OPERATION);
 				}
 			}
 		}

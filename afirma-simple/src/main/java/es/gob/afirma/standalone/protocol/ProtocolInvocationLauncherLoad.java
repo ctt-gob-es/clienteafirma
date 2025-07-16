@@ -47,26 +47,18 @@ final class ProtocolInvocationLauncherLoad {
 	/** Procesa un lote de firma en invocaci&oacute;n por protocolo.
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
-	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
-	 *                 <code>false</code> para usar servidor intermedio.
 	 * @return Datos cargados o mensaje de error.
 	 * @throws SocketOperationException Si hay errores en la
 	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
 	static String processLoad(final UrlParametersToLoad options,
-			final int protocolVersion,
-			final boolean bySocket) throws SocketOperationException {
+			final int protocolVersion) throws SocketOperationException {
 
         // Comprobamos si soportamos la version del protocolo indicada
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
 					Integer.valueOf(protocolVersion),
 					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
-			final ErrorCode errorCode = SimpleErrorCode.Request.UNSUPPORED_PROTOCOL_VERSION;
-			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+			throw new SocketOperationException(SimpleErrorCode.Request.UNSUPPORED_PROTOCOL_VERSION);
 		}
 
         // Comprobamos si se exige una version minima del Cliente
@@ -74,12 +66,7 @@ final class ProtocolInvocationLauncherLoad {
         	final String minimumRequestedVersion = options.getMinimumClientVersion();
         	final Version requestedVersion = new Version(minimumRequestedVersion);
         	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
-        		final ErrorCode errorCode = SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED;
-    			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-    			if (!bySocket){
-    				throw new SocketOperationException(errorCode);
-    			}
-    			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+   				throw new SocketOperationException(SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED);
         	}
         }
 
@@ -103,10 +90,7 @@ final class ProtocolInvocationLauncherLoad {
 					null);
 
 		} catch (final AOCancelledOperationException e) {
-			if (!bySocket) {
-				throw e;
-			}
-			return ProtocolInvocationLauncherErrorManager.CANCEL_RESPONSE;
+			throw e;
 		}
 
 		// Preparamos el buffer para enviar el resultado
@@ -140,12 +124,7 @@ final class ProtocolInvocationLauncherLoad {
 		} catch (final Exception e) {
 			LOGGER.severe("Error en la lectura de los datos a cargar: " + e); //$NON-NLS-1$
 			final ErrorCode errorCode = SimpleErrorCode.Internal.CANT_LOAD_FILE;
-			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
-
+			throw new SocketOperationException(errorCode);
 		}
 
 		return dataToSend.toString();

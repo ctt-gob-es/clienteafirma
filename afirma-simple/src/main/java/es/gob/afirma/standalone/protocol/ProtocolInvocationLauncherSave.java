@@ -10,11 +10,9 @@
 package es.gob.afirma.standalone.protocol;
 
 import java.util.Collections;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -37,26 +35,18 @@ final class ProtocolInvocationLauncherSave {
 	 * por protocolo.
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
-	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
-	 *                 <code>false</code> para usar servidor intermedio.
 	 * @return La cadena OK o una cadena descriptiva con el mensaje de error.
 	 * @throws SocketOperationException Si hay errores en la
 	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
 	static String processSave(final UrlParametersToSave  options,
-			final int protocolVersion,
-			final boolean bySocket) throws SocketOperationException {
+			final int protocolVersion) throws SocketOperationException {
 
         // Comprobamos si soportamos la version del protocolo indicada
 		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
 			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
 					Integer.valueOf(protocolVersion),
 					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
-			final ErrorCode errorCode = SimpleErrorCode.Request.UNSUPPORED_PROTOCOL_VERSION;
-			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+			throw new SocketOperationException(SimpleErrorCode.Request.UNSUPPORED_PROTOCOL_VERSION);
 		}
 
         // Comprobamos si se exige una version minima del Cliente
@@ -64,12 +54,7 @@ final class ProtocolInvocationLauncherSave {
         	final String minimumRequestedVersion = options.getMinimumClientVersion();
         	final Version requestedVersion = new Version(minimumRequestedVersion);
         	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
-				final ErrorCode errorCode = SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED;
-    			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-    			if (!bySocket){
-    				throw new SocketOperationException(errorCode);
-    			}
-    			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
+				throw new SocketOperationException(SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED);
         	}
         }
 
@@ -92,46 +77,10 @@ final class ProtocolInvocationLauncherSave {
 			);
 		}
 		catch(final AOCancelledOperationException e) {
-			LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
-			if (!bySocket){
-				throw e;
-			}
-			return ProtocolInvocationLauncherErrorManager.CANCEL_RESPONSE;
+			throw e;
 		}
 		catch (final Exception e) {
-			LOGGER.severe("Error en el guardado de datos: " + e); //$NON-NLS-1$
-			final ErrorCode errorCode = SimpleErrorCode.Internal.CANT_SAVE_FILE;
-			ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
-		}
-
-		if (options.getStorageServletUrl() != null) {
-			// Detenemos la espera activa
-			final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
-			if (waitingThread != null) {
-				waitingThread.interrupt();
-			}
-			// Esperamos a que termine cualquier otro envio al servidor para que no se pisen
-			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
-				try {
-					LOGGER.info("Enviamos el resultado de la operacion de guardado al servidor intermedio"); //$NON-NLS-1$
-					IntermediateServerUtil.sendData(RESULT_OK, options.getStorageServletUrl().toString(), options.getId());
-				}
-				catch (final Exception e) {
-					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-					final ErrorCode errorCode = SimpleErrorCode.Communication.SENDING_RESULT_OPERATION;
-					ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
-				}
-			}
-		}
-		else {
-			LOGGER.info(
-				"Se omite el envio por red del resultado por no haberse proporcionado una URL de destino" //$NON-NLS-1$
-			);
+			throw new SocketOperationException(e, SimpleErrorCode.Internal.CANT_SAVE_FILE);
 		}
 
 		return RESULT_OK;
