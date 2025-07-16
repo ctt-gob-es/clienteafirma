@@ -396,6 +396,13 @@ SectionEnd
 
 Function .onInit
 
+	StrCpy $PATH "Autofirma"
+
+	; Establecemos los textos del dialogo de seleccion de idioma
+	!define MUI_LANGDLL_WINDOWTITLE "Instalador de $PATH"
+	!define MUI_LANGDLL_INFO "Seleccione el idioma del instalador."
+
+	; Establecemos el idioma por defecto seleccionado
 	StrCpy $Language ${LANG_SPANISH}
     !insertmacro MUI_LANGDLL_DISPLAY
 

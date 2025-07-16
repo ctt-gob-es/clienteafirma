@@ -127,7 +127,7 @@ var AutoScript = ( function ( window, undefined ) {
 				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/home/descargas.html'>Portal de Signatura Electr&ograve;nica</a>",
 				procedure_from_url: "Pot realitzar el tr&agrave;mit des de la següent aplicaci&oacute;:",
 				restore_installation: "Si el t&eacute; instal·lat, pot restaurar la instal·laci&oacute; des d'Autofirma en Eines -> Restaurar instal·laci&oacute;",
-				retry_operation: "Reintentar operaci&oacute;",
+				retry_operation: "Reintentar operaci\u00F3",
 				timeout_receiving_sign: "No s'ha pogut connectar amb el client de signatura. Si no el t&eacute; instal·lat, pot descarregar-ho des de:",
 				warning: "Advertiment:"
 		};
@@ -152,7 +152,7 @@ var AutoScript = ( function ( window, undefined ) {
 				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/home/descargas.html'>Portal de Signatura Electr&ograve;nica</a>",
 				procedure_from_url: "Pot realitzar el tr&agrave;mit des de la següent aplicaci&oacute;:",
 				restore_installation: "Si el t&eacute; instal·lat, pot restaurar la instal·laci&oacute; des d'Autofirma en Eines -> Restaurar instal·laci&oacute;",
-				retry_operation: "Reintentar operaci&oacute;",
+				retry_operation: "Reintentar operaci\u00F3",
 				timeout_receiving_sign: "No s'ha pogut connectar amb el client de signatura. Si no el t&eacute; instal·lat, pot descarregar-ho des de:",
 				warning: "Advertiment:"
 		};

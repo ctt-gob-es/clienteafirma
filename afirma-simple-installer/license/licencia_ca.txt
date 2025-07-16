@@ -1,5 +1,5 @@
  
- Autofirma 1.9
+ Autofirma 1.10
  Copyright 2011, 2025 Govern d'Espanya
  
  Autofirma és Programari Lliure; pots redistribuir-ho i/o modificar-ho

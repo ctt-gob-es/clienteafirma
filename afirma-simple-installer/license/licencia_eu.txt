@@ -1,5 +1,5 @@
 
- 1.9 Autofirma
+ Autofirma 1.10
  Copyright 2011, 2025 Espainiako Gobernua
 
  Autofirma software librea da; birbanatu eta/edo aldatu egin dezakezu
