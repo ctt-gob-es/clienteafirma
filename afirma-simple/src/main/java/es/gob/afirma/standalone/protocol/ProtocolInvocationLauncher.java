@@ -14,7 +14,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.EventObject;
@@ -350,7 +349,6 @@ public final class ProtocolInvocationLauncher {
                 catch (final SocketOperationException e) {
                     LOGGER.log(Level.SEVERE, "Error durante la operacion de firma por lotes", e); //$NON-NLS-1$
                     msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
-                    msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
                 }
 
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
@@ -431,7 +429,6 @@ public final class ProtocolInvocationLauncher {
                 catch (final SocketOperationException e) {
                     LOGGER.log(Level.SEVERE, "Error durante la operacion de seleccion de certificado", e); //$NON-NLS-1$
                     msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
-                    msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
                 }
 
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
@@ -514,7 +511,6 @@ public final class ProtocolInvocationLauncher {
                 catch (final SocketOperationException e) {
                 	LOGGER.log(Level.SEVERE, "Error en la operacion de guardado: " + e, e); //$NON-NLS-1$
                 	msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
-                	msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
                 }
 
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
@@ -611,7 +607,6 @@ public final class ProtocolInvocationLauncher {
                 catch(final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de firma y guardado: " + e); //$NON-NLS-1$
                     msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
-                    msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
                 }
 
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
@@ -705,7 +700,6 @@ public final class ProtocolInvocationLauncher {
                 catch(final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de firma: " + e); //$NON-NLS-1$
                     msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
-                    msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
                 }
 
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
@@ -795,7 +789,6 @@ public final class ProtocolInvocationLauncher {
                 catch(final SocketOperationException e) {
                     LOGGER.severe("Error durante la operacion de carga de fichero: " + e); //$NON-NLS-1$
                     msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
-                    msg = URLEncoder.encode(msg, StandardCharsets.UTF_8.toString());
                 }
 
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
