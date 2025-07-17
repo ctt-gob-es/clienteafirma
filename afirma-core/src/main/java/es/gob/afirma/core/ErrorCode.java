@@ -175,7 +175,8 @@ public class ErrorCode {
 		public static final ErrorCode CERTIFICATE_NEEDED 						= new ErrorCode("501001", "Error en la operacion, no hay certificados"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_FORMAT_FILE						= new ErrorCode("501002", "El formato de fichero no es valido para la operacion que se intenta realizar"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_SMARTCARD_PIN						= new ErrorCode("501003", "El PIN del la tarjeta inteligente es incorrecto"); //$NON-NLS-1$ //$NON-NLS-2$
-
+		public static final ErrorCode XPATH_NOT_FOUND							= new ErrorCode("501011", "Una o varias firmas incluidas en el documento no contienen un algoritmo XPath"); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		public static final ErrorCode DOCUMENT_TOO_LARGE						= new ErrorCode("501005", "El documento supera el tamano maximo permitido"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode COMPATIBLE_SIGNATURE_NOT_FOUND			= new ErrorCode("501006", "La firma no es compatible con el formato de firma utilizado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode SIGNING_LTS								= new ErrorCode("501007", "Se esta intentando firmar una firma longeva que quedara invalidada"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -150,6 +150,9 @@ public final class XMLConstants {
 
     /** URI que define una referencia de tipo OBJECT. */
     public static final String OBJURI = "http://www.w3.org/2000/09/xmldsig#Object"; //$NON-NLS-1$
+    
+    /** URI que el algoritmo de transformacion XPath. */
+    public static final String XPATH_URI = "http://www.w3.org/TR/1999/REC-xpath-19991116"; //$NON-NLS-1$
 
     /** Nombre del nodo de firma ("Signature"). */
     public static final String TAG_SIGNATURE = "Signature"; //$NON-NLS-1$

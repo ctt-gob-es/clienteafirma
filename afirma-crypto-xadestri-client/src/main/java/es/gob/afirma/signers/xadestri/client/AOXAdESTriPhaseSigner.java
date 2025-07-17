@@ -27,10 +27,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.NotFoundXPathException;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -591,6 +592,11 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			final int separatorPos2 = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
 			final String errorCode = msg.substring(separatorPos + 1, separatorPos2);
 			final String errorMsg = msg.substring(separatorPos2 + 1);
+			
+			if (NotFoundXPathException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+				exception = new NotFoundXPathException(errorMsg);
+			}
+			
 			if (SigningLTSException.REQUESTOR_MSG_CODE.equals(errorCode)) {
 				exception = new SigningLTSException(errorMsg);
 			} else if (SigningLTSException.REQUESTOR_POSSIBLE_MSG_CODE.equals(errorCode)) {
