@@ -211,7 +211,7 @@ public final class PdfUtil {
 		// sabemos que no fue forzar las firmas), lanzamos un error definitivo (AOException).
 		if (!signAllowed) {
 			final PdfIsCertifiedException e = new PdfIsCertifiedException("El PDF esta certificado"); //$NON-NLS-1$
-			if (forceSignature == null) {
+			if (forceSignature != null) {
 				e.setDenied(true);
 			}
 			throw e;

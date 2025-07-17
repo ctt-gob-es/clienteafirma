@@ -413,6 +413,12 @@ final class ProtocolInvocationLauncherSignAndSave {
 					} catch (final RuntimeConfigNeededException e) {
 						LOGGER.warning("La validacion de la firma ha revelado una situacion que requiere la intervencion del usuario: " + e); //$NON-NLS-1$
 
+						// Si la operacion ya fue denegada, no es necesario pedir confirmacion
+						if (e.isDenied()) {
+							LOGGER.severe("La operacion no puede realizarse sin permiso expreso del usuario o la aplicacion: " + e); //$NON-NLS-1$
+							throw new SocketOperationException(e);
+						}
+
 						// Si se necesita confirmacion del usuario, pero no hay interfaces graficas
 						if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
 							LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario durante la validacion de la firma. Se abortara la operacion"); //$NON-NLS-1$

@@ -104,7 +104,7 @@ final class ProtocolInvocationLauncherUtil {
 		}
 
 		if (!exceptionClass.isAssignableFrom(RuntimeConfigNeededException.class)) {
-			LOGGER.warning("La clase indicada para pedir confirmacion no es de tipo RuntimeConfigNeededException (" + ex.getServerExceptionClassname() + "): " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("La excepcion indicada no es de tipo RuntimeConfigNeededException (" + ex.getServerExceptionClassname() + "): " + ex); //$NON-NLS-1$ //$NON-NLS-2$
 			return ex;
 		}
 
