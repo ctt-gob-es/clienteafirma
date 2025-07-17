@@ -89,6 +89,9 @@ final class ProtocolInvocationLauncherErrorManager {
 	private static final String ERROR_INCOMPATIBLE_KEY_TYPE = "SAF_51"; //$NON-NLS-1$
 	private static final String ERROR_LOCKED_KEYSTORE = "SAF_52"; //$NON-NLS-1$
 
+	// Error utilizado cuando se deba usar el protocolo antiguo que pero no haya un error definido
+	private static final String ERROR_UNKNOWN = "SAF_53"; //$NON-NLS-1$
+
 	private static final Dictionary<String, String> ERRORS = new Hashtable<>();
 
 	static {
@@ -138,7 +141,8 @@ final class ProtocolInvocationLauncherErrorManager {
 		ERRORS.put(ERROR_PDF_SHADOW_ATTACK, ProtocolMessages.getString("ProtocolLauncher.63")); //$NON-NLS-1$
 		ERRORS.put(ERROR_SIGNING_LTS_SIGNATURE, ProtocolMessages.getString("ProtocolLauncher.64")); //$NON-NLS-1$
 		ERRORS.put(ERROR_INCOMPATIBLE_KEY_TYPE, ProtocolMessages.getString("ProtocolLauncher.66")); //$NON-NLS-1$
-		ERRORS.put(ERROR_LOCKED_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.67")); //$NON-NLS-1$
+		ERRORS.put(ERROR_LOCKED_KEYSTORE, ProtocolMessages.getString("ProtocolLauncher.68")); //$NON-NLS-1$
+		ERRORS.put(ERROR_UNKNOWN, ProtocolMessages.getString("ProtocolLauncher.69")); //$NON-NLS-1$
 	}
 
 	private static final Dictionary<ErrorCode, String> OLD_ERRORS_ASSOCIATION = new Hashtable<>();
@@ -301,19 +305,21 @@ final class ProtocolInvocationLauncherErrorManager {
 		// Si se utiliza el protocolo 4 o anterior y el codigo de error tiene un valor antiguo
 		// asociado, se utiliza el formato de mensaje antiguo
 		if (protocolVersion <= ProtocolVersion.VERSION_4.getVersion()) {
-			final String code = OLD_ERRORS_ASSOCIATION.get(errorCode);
-			if (code != null) {
-				if (CANCEL_RESPONSE.equals(code)) {
-					message = code;
-				} else {
-					message = code + ": " + ERRORS.get(code); //$NON-NLS-1$
-				}			
+			String code = OLD_ERRORS_ASSOCIATION.get(errorCode);
+			if (code == null) {
+				code = ERROR_UNKNOWN;
+			}
+
+			if (CANCEL_RESPONSE.equals(code)) {
+				message = code;
+			} else {
+				message = code + ": " + ERRORS.get(code); //$NON-NLS-1$
 			}
 		}
 
 		// En caso contrario, se utiliza el formato de mensaje nuevo, pero con una cabecera
 		// compatible con el formato antiguo para mantener la compatibilidad
-		if (message == null) {
+		else {
 			// Establecemos una cabecera de error compatible con la usada en versiones anteriores del protocolo.
 			// Aunque no transmite informacion, permite que el receptor del error lo identifique como tal
 			final String code = AUTOFIRMA_ERROR_PREFIX + errorCode.getCode();

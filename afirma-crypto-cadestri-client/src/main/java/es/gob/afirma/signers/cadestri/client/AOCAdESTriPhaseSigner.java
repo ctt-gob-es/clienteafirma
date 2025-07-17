@@ -423,8 +423,15 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 			String intMessage = null;
 			final int internalExceptionPos = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
 			if (internalExceptionPos > 0) {
-				exceptionClassName = msg.substring(separatorPos + 1, internalExceptionPos).trim();
-				intMessage = msg.substring(internalExceptionPos + 1).trim();
+				final int internalExceptionLimitPos = msg.indexOf(":", internalExceptionPos + 1); //$NON-NLS-1$
+				if (internalExceptionLimitPos > 0) {
+					exceptionClassName = msg.substring(internalExceptionPos + 1, internalExceptionLimitPos).trim();
+					intMessage = msg.substring(internalExceptionLimitPos + 1).trim();
+				}
+				else {
+					exceptionClassName = msg.substring(internalExceptionPos + 1).trim();
+					intMessage = msg.substring(separatorPos + 1, internalExceptionPos).trim();
+				}
 			}
 			else {
 				intMessage = msg.substring(separatorPos + 1).trim();

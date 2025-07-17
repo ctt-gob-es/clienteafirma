@@ -27,10 +27,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -610,8 +610,15 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			String intMessage = null;
 			final int internalExceptionPos = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
 			if (internalExceptionPos > 0) {
-				exceptionClassName = msg.substring(separatorPos + 1, internalExceptionPos).trim();
-				intMessage = msg.substring(internalExceptionPos + 1).trim();
+				final int internalExceptionLimitPos = msg.indexOf(":", internalExceptionPos + 1); //$NON-NLS-1$
+				if (internalExceptionLimitPos > 0) {
+					exceptionClassName = msg.substring(internalExceptionPos + 1, internalExceptionLimitPos).trim();
+					intMessage = msg.substring(internalExceptionLimitPos + 1).trim();
+				}
+				else {
+					exceptionClassName = msg.substring(internalExceptionPos + 1).trim();
+					intMessage = msg.substring(separatorPos + 1, internalExceptionPos).trim();
+				}
 			}
 			else {
 				intMessage = msg.substring(separatorPos + 1).trim();

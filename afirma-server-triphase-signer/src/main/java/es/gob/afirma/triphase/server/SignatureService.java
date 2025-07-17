@@ -499,7 +499,7 @@ public final class SignatureService extends HttpServlet {
 				catch (final RuntimeConfigNeededException e) {
 					if (e.isDenied()) {
 						LOGGER.log(Level.SEVERE, "La firma fallo en la prefirma por no obtener permisos/informacion del usuario o la aplicacion", e); //$NON-NLS-1$
-						final String msg = ErrorManager.getErrorMessage(ErrorManager.PRESIGN_ERROR, e.getErrorCode().getCode()) + ": " + e;
+						final String msg = ErrorManager.getErrorMessage(ErrorManager.PRESIGN_ERROR) + ": " + e; //$NON-NLS-1$
 						out.print(msg);
 					}
 					else {

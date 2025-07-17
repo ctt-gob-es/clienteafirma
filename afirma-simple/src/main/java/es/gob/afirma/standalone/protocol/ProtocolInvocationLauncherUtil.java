@@ -109,30 +109,46 @@ final class ProtocolInvocationLauncherUtil {
 		}
 
 		// Buscamos algun constructor que nos permita generar la excepcion
+		Exception internalException = null;
 		try {
-			return exceptionClass.
+			internalException = exceptionClass.
 					getDeclaredConstructor(String.class).
 					newInstance(ex.getMessage());
 		}
 		catch (final Exception e) { /* No hacemos nada */}
-		try {
-			return exceptionClass.
-					getDeclaredConstructor(String.class, Throwable.class).
-					newInstance(ex.getMessage(), null);
+		if (internalException == null) {
+			try {
+				internalException = exceptionClass.
+						getDeclaredConstructor(String.class, Throwable.class).
+						newInstance(ex.getMessage(), null);
+			}
+			catch (final Exception e) { /* No hacemos nada */}
 		}
-		catch (final Exception e) { /* No hacemos nada */}
-		try {
-			return exceptionClass.
-					getDeclaredConstructor(Throwable.class).
-					newInstance((Throwable) null);
+		if (internalException == null) {
+			try {
+				internalException = exceptionClass.
+						getDeclaredConstructor(Throwable.class).
+						newInstance((Throwable) null);
+			}
+			catch (final Exception e) { /* No hacemos nada */}
 		}
-		catch (final Exception e) { /* No hacemos nada */}
-		try {
-			return exceptionClass.
-					getDeclaredConstructor().
-					newInstance();
+		if (internalException == null) {
+			try {
+				internalException = exceptionClass.
+						getDeclaredConstructor().
+						newInstance();
+			}
+			catch (final Exception e) { /* No hacemos nada */}
 		}
-		catch (final Exception e) { /* No hacemos nada */}
+
+		if (internalException != null) {
+			// Si la excepcion interna es de tipo RuntimeConfigNeededException es que se denego la operacion
+			// ya que de lo contrario no hubiese venido encapsulada
+			if (internalException instanceof RuntimeConfigNeededException) {
+				((RuntimeConfigNeededException) internalException).setDenied(true);
+			}
+			return internalException;
+		}
 
 		LOGGER.warning("No se encontro un constructor para reconstruir la excepcion del servidor"); //$NON-NLS-1$
 		return ex;
