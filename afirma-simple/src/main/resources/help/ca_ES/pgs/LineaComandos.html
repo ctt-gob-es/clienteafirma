@@ -414,13 +414,19 @@ Opcions:
    <ul> 
     <li><code>true</code>: Es permet la cosignatura/contrasigna de signatures d&apos;arxiu longeu, a pesar que aquestes no seran vàlides posteriorment. </li> 
     <li><code>false</code> (O un altre valor): No es permet la cosignatura/contrasigna de signatures d&apos;arxiu longeu.</li> 
-   </ul> 
-  </ul> 
+   </ul>  
   <li style="margin-top: 10pt"><code>avoidAGEPolicyIncompatibilities</code>:</li> 
   <ul> 
    <li><code>true</code>: S&apos;evitarà declarar la política de signatura de l&apos;AGE quan el resultat de l&apos;operació vagi a ser incompatible amb aquesta política.</li> 
    <li><code>false</code> (O un altre valor): No es permet la cosignatura amb la políítica de signatura de l&apos;AGE quan el resultat no serà compatible amb la política.</li> 
   </ul> 
+  <li style="margin-top: 10pt"><code>allowXadesEnvelopedWithoutXPath</code>:</li>
+  <ul>
+  	<li><code>true</code>: Permet la cosignatura d'una signatura que no conté una transformació XPath i que per tant quedarà invalidada. En la nova cosignatura sí que s'inclourà la transformació XPath.</li>
+  	<li><code>false</code>:	No es permet la cosignatura de signatures que no continguin una transformació XPath.</li>
+  </ul>
+  </ul>
+  
   <h3>Opcions de configuració de signatures de Factura Electrònica</h3> 
   <p>A continuació es llisten les propietats de configuració admeses per les signatures de factura electrònica (FacturaE).</p> 
   <ul> 

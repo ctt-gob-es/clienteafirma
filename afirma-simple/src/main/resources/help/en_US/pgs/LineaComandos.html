@@ -401,12 +401,16 @@ Options:
   	<li><code> true: </code> Longevo file signatures are allowed to be co-signed/countersigned, even though they will not be valid thereafter.</li>
   	<li><code> false </code> (or other value): Co-signing/counter-signing of longevo file signatures is not permitted.</li>
 	</ul>
-  </ul>
   <li style="margin-top: 10pt"><code>avoidAGEPolicyIncompatibilities</code>:</li>
   	<ul>
   	<li><code> true: </code> The policy of signing the AGE shall be avoided when the result of the operation is to be incompatible with this policy.</li>
   	<li><code> false </code> (or other value): Co-signing with AGE&#39;s signature policy is not allowed when the result will not be compatible with the policy.</li>
 	</ul>
+    <li style="margin-top: 10pt"><code>allowXadesEnvelopedWithoutXPath</code>:</li>
+  <ul>
+  	<li><code>true</code>: Allows the co-signature of a signature that does not contain an XPath transform and will therefore be invalidated. The XPath transformation will be included in the new co-signature.</li>
+  	<li><code>false</code>:	Co-signing of signatures that do not contain an XPath transform is not allowed.</li>
+  </ul>
   </ul>
 
 
