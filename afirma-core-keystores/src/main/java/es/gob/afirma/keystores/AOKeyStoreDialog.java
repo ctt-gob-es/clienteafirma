@@ -276,7 +276,13 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			switch (keyStoreId) {
 			// Almacen de Firefox
 			case KEYSTORE_ID_MOZILLA:
-				newKsm = openMozillaKeyStore(parent, this.invocationFromBrowser);
+				
+				if (!this.invocationFromBrowser) {
+					newKsm = openMozillaKeyStore(parent);
+				} else {
+					newKsm = openMozillaWithOSKeyStore(parent);
+				}
+				
 				if (newKsm != null) {
 					KeyStorePreferencesManager.setLastSelectedKeystore(AOKeyStore.MOZ_UNI.getName());
 				}
@@ -479,13 +485,12 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	/**
 	 * Carga el almac&eacute;n de claves del &uacute;ltimo perfil de Mozilla activo.
 	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
-	 * @param invocationFromBrowser Se indica a true si la invocacion se ha realizado desde el navegador.
 	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra el almac&eacute;n,
 	 * si no se pudo cargar o si se cancel&oacute; la carga.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openMozillaKeyStore(final Object parent, final boolean invocationFromBrowser) throws Exception {
+	private static AOKeyStoreManager openMozillaKeyStore(final Object parent) throws Exception {
 
 		try {
 			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
@@ -493,7 +498,34 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 				null,
 				null,
 				AOKeyStore.MOZ_UNI.getStorePasswordCallback(parent),
-				invocationFromBrowser,
+				parent
+			);
+		}
+		catch (final AOCancelledOperationException e) {
+			throw e;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves de Mozilla: " + e, e); //$NON-NLS-1$
+			throw e;
+		}
+	}
+	
+	/**
+	 * Carga el almac&eacute;n de claves del &uacute;ltimo perfil de Mozilla activo e incluye el propio del sistema.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra el almac&eacute;n,
+	 * si no se pudo cargar o si se cancel&oacute; la carga.
+	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
+	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
+	 */
+	private static AOKeyStoreManager openMozillaWithOSKeyStore(final Object parent) throws Exception {
+
+		try {
+			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.MOZ_UNI_WITH_OS,
+				null,
+				null,
+				AOKeyStore.MOZ_UNI_WITH_OS.getStorePasswordCallback(parent),
 				parent
 			);
 		}

@@ -569,7 +569,6 @@ final class ProtocolInvocationLauncherSign {
 						keyStoreLib, // Lib
 						null, // Description
 						pwc, // PasswordCallback
-						true,// InvocationFromBrowser
 						null // Parent
 						);
 			}

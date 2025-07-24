@@ -41,7 +41,6 @@ public final class AOKeyStoreManagerFactory {
      * posible, por eficiencia. */
     public static final String FORCE_STORE_RESET = "es.gob.afirma.keystores.ForceReset"; //$NON-NLS-1$
 
-    
     /** Obtiene el <code>KeyStoreManager</code> del tipo indicado.
      * @param store Almac&eacute;n de claves
      * @param lib Biblioteca del KeyStore (solo para KeyStoreManager de tipo PKCS#11) o fichero de almac&eacute;n de claves (para
@@ -64,36 +63,6 @@ public final class AOKeyStoreManagerFactory {
                                                                  final String lib,
                                                                  final String description,
                                                                  final PasswordCallback pssCallback,
-                                                                 final Object parentComponent) throws KeystoreAlternativeException,
-                                                                                                      IOException {
-    	
-    	return getAOKeyStoreManager(store, lib, description, pssCallback, false, parentComponent);
-    }
-
-    /** Obtiene el <code>KeyStoreManager</code> del tipo indicado.
-     * @param store Almac&eacute;n de claves
-     * @param lib Biblioteca del KeyStore (solo para KeyStoreManager de tipo PKCS#11) o fichero de almac&eacute;n de claves (para
-     *            PKCS#12, Java KeyStore, JCE KeyStore, X.509, llavero de Mac OS X [opcional] y PKCS#7)
-     * @param description Descripci&oacute;n del KeyStoreManager que se desea obtener,
-     *                    necesario para obtener el n&uacute;mero de z&oacute;calo de los modulos PKCS#11 obtenidos del Secmod de Mozilla / Firefox.
-     *                    Debe seguir el formato definido en el m&eacute;todo <code>toString()</code> de la clase <code>sun.security.pkcs11.Secmod.Module</code>
-     * @param pssCallback <i>Callback</i> que solicita la contrase&ntilde;a del repositorio que deseamos recuperar.
-     * @param invocationFromBrowser Si se indica a true quiere decir que la llamada se realiza desde un navegador.
-     * @param parentComponent Componente padre sobre el que mostrar los di&aacute;logos (normalmente un <code>java.awt.Comonent</code>)
-     *                        modales de ser necesario.
-     * @return <code>KeyStoreManager</code> del tipo indicado
-     * @throws AOCancelledOperationException Cuando el usuario cancela el proceso (por ejemplo, al introducir la contrase&ntilde;a)
-     * @throws KeystoreAlternativeException Cuando ocurre cualquier otro problema durante el proceso
-     * @throws IOException Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
-     * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n &uacute;nicamente disponible para
-     *                                               un sistema operativo distinto del actual
-     * @throws es.gob.afirma.core.MissingLibraryException Cuando no se localice una biblioteca necesaria para el
-     *                                                    uso del almac&eacute;n. */
-    public static AggregatedKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
-                                                                 final String lib,
-                                                                 final String description,
-                                                                 final PasswordCallback pssCallback,
-                                                                 final boolean invocationFromBrowser,
                                                                  final Object parentComponent) throws KeystoreAlternativeException,
                                                                                                       IOException {
     	boolean forceReset;
@@ -158,10 +127,16 @@ public final class AOKeyStoreManagerFactory {
         	return new AggregatedKeyStoreManager(getWindowsAddressBookKeyStoreManager(store, forceReset));
         }
 
-        // Almacen de Mozilla que muestra tanto los certificados del almacemo los de
+        // Almacen de Mozilla que muestra tanto los certificados del almacen los de
         // los dispositivos externos configuramos.
         if (AOKeyStore.MOZ_UNI.equals(store)) {
-        	return getMozillaUnifiedKeyStoreManager(pssCallback, forceReset, invocationFromBrowser, parentComponent);
+        	return getMozillaUnifiedKeyStoreManager(pssCallback, forceReset, parentComponent);
+        }
+        
+        // Almacen de Mozilla que muestra tanto los certificados del almacen, los del almacen del SO
+        // y los dispositivos externos configuramos.
+        if (AOKeyStore.MOZ_UNI_WITH_OS.equals(store)) {
+        	return getMozillaUnifiedWithOSKeyStoreManager(pssCallback, forceReset, parentComponent);
         }
 
         // Almacen NSS compartido (de sistema) que muestra tanto los certificados del almacen
@@ -549,7 +524,6 @@ public final class AOKeyStoreManagerFactory {
     private static AggregatedKeyStoreManager getNssKeyStoreManager(final String KsmClassName,
     		                                                       final PasswordCallback pssCallback,
     		                                                       final boolean forceReset,
-    		                                                       final boolean invocationFromBrowser,
     		                                                       final Object parentComponent) throws KeystoreAlternativeException,
                                                                                                         IOException {
     	final AggregatedKeyStoreManager ksmUni;
@@ -567,7 +541,7 @@ public final class AOKeyStoreManagerFactory {
     	}
     	try {
     		// Proporcionamos el componente padre como parametro
-        	ksmUni.init(AOKeyStore.SHARED_NSS, null, pssCallback, new Object[] { parentComponent, invocationFromBrowser }, forceReset);
+    		ksmUni.init(AOKeyStore.SHARED_NSS, null, pssCallback, new Object[] { parentComponent }, forceReset);
     	}
     	catch (final AOException e) {
     		throw new KeystoreAlternativeException(
@@ -588,7 +562,6 @@ public final class AOKeyStoreManagerFactory {
 			"es.gob.afirma.keystores.mozilla.shared.SharedNssKeyStoreManager",  //$NON-NLS-1$
 			pssCallback,
 			forceReset,
-			false,
 			parentComponent
 		);
     }
@@ -596,16 +569,14 @@ public final class AOKeyStoreManagerFactory {
     private static AggregatedKeyStoreManager mozillaKeyStoreManager = null;
     private static AggregatedKeyStoreManager getMozillaUnifiedKeyStoreManager(final PasswordCallback pssCallback,
     		                                                                  final boolean forceReset,
-    		                                                                  final boolean invocationFromBrowser,
                                                                               final Object parentComponent) throws KeystoreAlternativeException,
     		                                                                                                       IOException {
     	AggregatedKeyStoreManager ksm = mozillaKeyStoreManager;
     	if (ksm == null) {
     		ksm = getNssKeyStoreManager(
-    				"es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager",  //$NON-NLS-1$
+    	    		"es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager",  //$NON-NLS-1$
     	    		pssCallback,
     	    		forceReset,
-    	    		invocationFromBrowser,
     	    		parentComponent
     			);
 
@@ -615,6 +586,27 @@ public final class AOKeyStoreManagerFactory {
     	}
         return ksm;
     }
+    
+    private static AggregatedKeyStoreManager getMozillaUnifiedWithOSKeyStoreManager(final PasswordCallback pssCallback,
+            final boolean forceReset,
+            final Object parentComponent) throws KeystoreAlternativeException,
+                                                 IOException {
+		AggregatedKeyStoreManager ksm = mozillaKeyStoreManager;
+		if (ksm == null) {
+			ksm = getNssKeyStoreManager(
+			"es.gob.afirma.keystores.mozilla.MozillaUnifiedWithOSKeyStoreManager",  //$NON-NLS-1$
+			pssCallback,
+			forceReset,
+			parentComponent
+			);
+			
+			if (!containsDnieJavaKeyStoreManager(ksm)) {
+				mozillaKeyStoreManager = ksm;
+			}
+		}
+		return ksm;
+	}
+    
 
     private static boolean containsDnieJavaKeyStoreManager(final AggregatedKeyStoreManager aggregatedKsm) {
 
@@ -627,7 +619,7 @@ public final class AOKeyStoreManagerFactory {
     	return false;
     }
 
-    private static AggregatedKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store,
+    public static AggregatedKeyStoreManager getMacOSXKeyStoreManager(final AOKeyStore store,
     		                                                          final String lib,
     		                                                          final boolean forceReset,
     		                                                          final Object parentComponent) throws IOException,
