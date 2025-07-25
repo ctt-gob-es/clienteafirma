@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
@@ -333,6 +335,7 @@ public final class MainMenu extends JMenuBar {
             	)
             );
         final String extsDesc = SimpleAfirmaMessages.getString("MainMenu.47") + " (*.zip)";   //$NON-NLS-1$//$NON-NLS-2$
+        // Accion de importar idioma
         importLanguageMenu.addActionListener(ae -> {
 			final File fileToLoad;
 			try {
@@ -359,6 +362,8 @@ public final class MainMenu extends JMenuBar {
 						SimpleAfirmaMessages.getString("MainMenu.52"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("MainMenu.45"), //$NON-NLS-1$
 						JOptionPane.INFORMATION_MESSAGE);
+				
+                showRestartWarning();
 			} catch (final AOException e1) {
 				AOUIFactory.showErrorMessage(
 						extractMessageFromException(e1),
@@ -621,32 +626,55 @@ public final class MainMenu extends JMenuBar {
 		}
 	}
 
+	/**
+	 * Agrega un nuevo idioma el JMenu que incluye los idiomas.
+	 * @param langProps Propiedades del nuevo idioma.
+	 * @param langGroup Conjunto de idiomas.
+	 * @param languageMenu Men&uacute; donde agregar el nuevo idioma.
+	 */
 	private static void addNewLocaleToMenu(final Map <String, String> langProps, final ButtonGroup langGroup, final JMenu languageMenu) {
 
 		final String localeProp = langProps.get(LanguageManager.LOCALE_PROP);
 		final String[] parts = localeProp.split("_"); //$NON-NLS-1$
 		final Locale locale = new Locale(parts[0], parts[1]);
+		
+		// Comprobamos si existia otra version del idioma para evitar que se duplique
+		boolean existsLang = false;
+        final Enumeration<AbstractButton> buttons = langGroup.getElements();
+        while (buttons.hasMoreElements()) {
+            final AbstractButton button = buttons.nextElement();
+            final LocaleOption localeOption = (LocaleOption) button.getClientProperty("localeData"); //$NON-NLS-1$
+            if (locale.equals(localeOption.getLocale())) {
+            	existsLang = true;
+            	button.setSelected(true);
+            }         
+        }
 
-		if (!LanguageManager.isDefaultLocale(locale)) {
+		// Si no se encuentra entre los idiomas de Autofirma lo anadimos al menu
+		if (!LanguageManager.isDefaultLocale(locale) && !existsLang) {
 
-			final LocaleOption localeOption = new LocaleOption(langProps.get(LanguageManager.LANGUAGE_NAME_PROP), locale);
-			final JRadioButtonMenuItem newImportedLangItem = new JRadioButtonMenuItem(localeOption.toString());
-			newImportedLangItem.putClientProperty("localeData", localeOption); //$NON-NLS-1$
+			final LocaleOption newLocaleOption = new LocaleOption(langProps.get(LanguageManager.LANGUAGE_NAME_PROP), locale);
+			final JRadioButtonMenuItem newImportedLangItem = new JRadioButtonMenuItem(newLocaleOption.toString());
+			newImportedLangItem.putClientProperty("localeData", newLocaleOption); //$NON-NLS-1$
 
 			newImportedLangItem.addActionListener(new ActionListener() {
-	            @Override
-	            public void actionPerformed(final ActionEvent ae) {
-	            	Locale.setDefault(locale);
-	                PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
-	                SimpleAfirmaMessages.changeLocale();
-	                showRestartWarning();
-	            }
-	        });
+				@Override
+				public void actionPerformed(final ActionEvent ae) {
+					Locale.setDefault(locale);
+					PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
+					SimpleAfirmaMessages.changeLocale();
+					showRestartWarning();
+				}
+			});
 
-
-    		langGroup.add(newImportedLangItem);
-    		languageMenu.insert(newImportedLangItem, languageMenu.getItemCount() - 2);
+			newImportedLangItem.setSelected(true);
+			langGroup.add(newImportedLangItem);
+			languageMenu.insert(newImportedLangItem, languageMenu.getItemCount() - 2);
 		}
+		
+		Locale.setDefault(locale);
+        PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, localeProp);
+        SimpleAfirmaMessages.changeLocale();
 
 	}
 
@@ -656,7 +684,7 @@ public final class MainMenu extends JMenuBar {
 		if (t instanceof AOException) {
 			message = obtainSimpleErrorCodeFromPluginException((AOException) t);
 		} else {
-			message = SimpleAfirmaMessages.getString("PluginManagementError.0");
+			message = SimpleAfirmaMessages.getString("PluginManagementError.0"); //$NON-NLS-1$
 		}
 		return message;
 	}

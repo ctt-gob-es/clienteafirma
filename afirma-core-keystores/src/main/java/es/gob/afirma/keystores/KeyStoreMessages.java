@@ -98,9 +98,9 @@ final class KeyStoreMessages {
         try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
         	return new PropertyResourceBundle(reader);
         } catch (final FileNotFoundException e) {
-			LOGGER.severe("Recurso para protocolomessages no encontrado: "+ e); //$NON-NLS-1$
+			LOGGER.severe("Recurso para keystoremessages no encontrado: "+ e); //$NON-NLS-1$
 		} catch (final IOException e) {
-			LOGGER.severe("Error al leer el recuso para protocolomessages: "+ e); //$NON-NLS-1$
+			LOGGER.severe("Error al leer el recuso para keystoremessages: "+ e); //$NON-NLS-1$
 		}
         return null;
     }
