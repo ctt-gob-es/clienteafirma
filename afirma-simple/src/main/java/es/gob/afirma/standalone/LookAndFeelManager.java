@@ -59,6 +59,8 @@ public final class LookAndFeelManager {
 
     private static Dimension screenSize = null;
 
+    private static boolean applied = false;
+
     static {
 
     	// Obtenemos el color de la ventanas. Se protege porque puede producir errores en
@@ -105,9 +107,23 @@ public final class LookAndFeelManager {
 
     }
 
-    /** Establece el decorado de la aplicaci&oacute;n. */
+    /** Establece el decorado de la aplicaci&oacute;n si no se ha hecho ya. */
     public static void applyLookAndFeel() {
+    	applyLookAndFeel(false);
+    }
 
+    /**
+     * Establece el decorado de la aplicaci&oacute;n.
+     * @param force {@code true} para aplicar el estilo en cualquier caso,
+     * {@code false} para evitar aplicarlo si ya se hizo anteriormente.
+     */
+    public static void applyLookAndFeel(final boolean force) {
+
+    	// Si ya se aplico el estilo y no se esta forzando a que
+    	// se vuelva a aplicar, no se aplica
+    	if (applied && !force) {
+    		return;
+    	}
     	// Comprobamos si esta activado algun modo de accesibilidad. Si es asi,
     	// usaremos el LookAndFeel del sistema
         final boolean useSystemLookAndFeel = WINDOWS_HIGH_CONTRAST || LARGE_FONT || GNOME_DARK_MODE;
@@ -156,6 +172,8 @@ public final class LookAndFeelManager {
         else {
         	setLookAndFeel("Nimbus"); //$NON-NLS-1$
         }
+
+        applied = true;
     }
 
     //Define el look and feel

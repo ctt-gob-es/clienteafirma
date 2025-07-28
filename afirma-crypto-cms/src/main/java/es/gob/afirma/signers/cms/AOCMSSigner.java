@@ -294,10 +294,11 @@ public final class AOCMSSigner implements AOSigner {
 
         return dataSigned;
     }
-
+    
     /** {@inheritDoc} */
-    @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
     	new SCChecker().checkSpongyCastle();
         final ReadNodesTree rn = new ReadNodesTree();
         try {
@@ -311,13 +312,26 @@ public final class AOCMSSigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public boolean isSign(final byte[] signData) throws IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) 
+			throws AOInvalidFormatException, IOException{
+    	return getSignersStructure(sign, null, asSimpleSignInfo);
+    }
+    
+	/** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params) throws IOException {
         if (signData == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
 
         return ValidateCMSSignedData.isCMSSignedData(signData);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+	public boolean isSign(final byte[] signData) throws IOException {
+        return isSign(signData, null);
     }
 
     /** {@inheritDoc} */
@@ -345,21 +359,27 @@ public final class AOCMSSigner implements AOSigner {
     public void addUnsignedAttribute(final String oid, final byte[] value) {
         this.uatrib.put(oid, value);
     }
-
+    
     /** {@inheritDoc} */
-    @Override
-	public byte[] getData(final byte[] signData) throws AOException, IOException {
-        if (signData == null) {
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws IOException, AOException {
+        if (sign == null) {
             throw new IllegalArgumentException(
         		"Se han introducido datos nulos para su comprobacion" //$NON-NLS-1$
     		);
         }
-        if (!ValidateCMSSignedData.isCMSSignedData(signData)) {
+        if (!ValidateCMSSignedData.isCMSSignedData(sign)) {
             throw new AOInvalidFormatException(
         		"Los datos introducidos no se corresponden con un objeto de firma" //$NON-NLS-1$
     		);
         }
-		return ObtainContentSignedData.obtainData(signData);
+		return ObtainContentSignedData.obtainData(sign);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+	public byte[] getData(final byte[] signData) throws AOException, IOException {
+        return getData(signData, null);
     }
 
     /** {@inheritDoc} */
@@ -367,19 +387,17 @@ public final class AOCMSSigner implements AOSigner {
 	public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".csig";  //$NON-NLS-1$//$NON-NLS-2$
     }
-
-    /** {@inheritDoc}
-     * @throws IOException Si no es posible leer la firma. */
-    @Override
-	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
-
-        if (signData == null) {
+    
+    /** {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+        if (data == null) {
             throw new IllegalArgumentException(
         		"No se han introducido datos para analizar" //$NON-NLS-1$
     		);
         }
 
-        if (!isSign(signData)) {
+        if (!isSign(data)) {
             throw new AOInvalidFormatException(
         		"Los datos introducidos no se corresponden con un objeto de firma" //$NON-NLS-1$
     		);
@@ -392,4 +410,12 @@ public final class AOCMSSigner implements AOSigner {
 
         return signInfo;
     }
+
+    /** {@inheritDoc}
+     * @throws IOException Si no es posible leer la firma. */
+    @Override
+	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
+        return getSignInfo(signData, null);
+    }
+
 }

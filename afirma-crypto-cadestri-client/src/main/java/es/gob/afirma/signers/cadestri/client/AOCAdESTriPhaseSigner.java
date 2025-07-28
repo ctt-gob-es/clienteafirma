@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
@@ -145,6 +146,18 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta la obtencion de estructura de firmas en firma trifasica"); //$NON-NLS-1$
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) {
+		throw new UnsupportedOperationException("No se soporta la obtencion de estructura de firmas en firma trifasica"); //$NON-NLS-1$
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params){
+		throw new UnsupportedOperationException("No se soporta comprobacion de si es firma en modo trifasico"); //$NON-NLS-1$
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -173,10 +186,22 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 	public byte[] getData(final byte[] signData) {
 		throw new UnsupportedOperationException("No se soporta ela obtencion de datos en firma trifasica"); //$NON-NLS-1$
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
+		throw new UnsupportedOperationException("No se soporta ela obtencion de datos en firma trifasica"); //$NON-NLS-1$
+	}
 
 	/** {@inheritDoc} */
 	@Override
 	public AOSignInfo getSignInfo(final byte[] sign) {
+		throw new UnsupportedOperationException("No se soporta la obtencion de informacion de la firma en modo trifasico"); //$NON-NLS-1$
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
 		throw new UnsupportedOperationException("No se soporta la obtencion de informacion de la firma en modo trifasico"); //$NON-NLS-1$
 	}
 
@@ -369,4 +394,6 @@ public class AOCAdESTriPhaseSigner implements AOSigner {
 
 		return exception;
 	}
+
+
 }

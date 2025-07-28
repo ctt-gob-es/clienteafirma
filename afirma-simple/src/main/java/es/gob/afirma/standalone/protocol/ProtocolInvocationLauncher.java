@@ -34,7 +34,6 @@ import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
 import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParserUtil;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
-import es.gob.afirma.core.misc.protocol.UrlParametersToGetCurrentLog;
 import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
@@ -49,7 +48,7 @@ import es.gob.afirma.standalone.ui.AboutDialog;
 import es.gob.afirma.standalone.ui.OSXHandler;
 
 /**
- * Gestiona la ejecuci&oacute;n de AutoFirma en una invocaci&oacute;n por
+ * Gestiona la ejecuci&oacute;n de Autofirma en una invocaci&oacute;n por
  * protocolo y bajo un entorno compatible <code>Swing</code>.
  *
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
@@ -400,7 +399,7 @@ public final class ProtocolInvocationLauncher {
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
 
-                    params = ProtocolInvocationUriParser.getParametersToSelectCert(xmlData);
+                    params = ProtocolInvocationUriParser.getParametersToSelectCert(xmlData, true);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -476,7 +475,7 @@ public final class ProtocolInvocationLauncher {
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
 
-                    params = ProtocolInvocationUriParser.getParametersToSave(xmlData);
+                    params = ProtocolInvocationUriParser.getParametersToSave(xmlData, true);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -503,7 +502,7 @@ public final class ProtocolInvocationLauncher {
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
 			} catch (final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                LOGGER.severe("Se necesita una version mas moderna de Autofirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
 						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
@@ -566,7 +565,7 @@ public final class ProtocolInvocationLauncher {
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
 
-                    params = ProtocolInvocationUriParser.getParametersToSignAndSave(xmlData);
+                    params = ProtocolInvocationUriParser.getParametersToSignAndSave(xmlData, true);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -609,12 +608,13 @@ public final class ProtocolInvocationLauncher {
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
                 // espera activa si se encontraba vigente
                 if (!bySocket) {
+                	LOGGER.info("Enviamos el resultado de la operacion de firma y guardado al servidor intermedio"); //$NON-NLS-1$
                 	sendDataToServer(dataToSend.toString(), params.getStorageServletUrl().toString(), params.getId());
                 }
 
                 return dataToSend.toString();
 			} catch (final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                LOGGER.severe("Se necesita una version mas moderna de Autofirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
 						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
@@ -675,7 +675,7 @@ public final class ProtocolInvocationLauncher {
 						return ProtocolInvocationLauncherErrorManager
 								.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_DECRYPTING_DATA);
                     }
-                    params = ProtocolInvocationUriParser.getParametersToSign(xmlData);
+                    params = ProtocolInvocationUriParser.getParametersToSign(xmlData, true);
                 }
 
                 // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
@@ -717,13 +717,14 @@ public final class ProtocolInvocationLauncher {
                 // Si no es por sockets, se devuelve el resultado al servidor y detenemos la
                 // espera activa si se encontraba vigente
                 if (!bySocket) {
+                	LOGGER.info("Enviamos el resultado de la operacion de firma al servidor intermedio"); //$NON-NLS-1$
                 	sendDataToServer(dataToSend.toString(), params.getStorageServletUrl().toString(), params.getId());
                 }
 
                 return dataToSend.toString();
             }
             catch(final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                LOGGER.severe("Se necesita una version mas moderna de Autofirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
 						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
@@ -808,57 +809,7 @@ public final class ProtocolInvocationLauncher {
                     return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
                 }
 			} catch (final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
-				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP);
-			} catch (final ParameterLocalAccessRequestedException e) {
-                LOGGER.severe("Se ha pedido un acceso a una direccion local (localhost o 127.0.0.1): " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager
-						.showError(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED, e);
-				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_ACCESS_BLOCKED);
-			} catch (final ParameterException e) {
-                LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager
-						.showErrorDetail(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
-				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
-			} catch (final Exception e) {
-                LOGGER.severe("Error en los parametros de carga: " + e); //$NON-NLS-1$
-                ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, e);
-				return ProtocolInvocationLauncherErrorManager
-						.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS);
-            }
-        }
-        // Se solicita una operacion de recuperacion de logs
-        else if (urlString.startsWith("afirma://getLog?") || urlString.startsWith("afirma://getLog/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-			LOGGER.info(
-					"Se invoca a la aplicacion para realizar una operacion de obtencion del log actual de la aplicacion"); //$NON-NLS-1$
-
-            try {
-                final UrlParametersToGetCurrentLog params =
-                		ProtocolInvocationUriParserUtil.getParametersToGetCurrentLog(urlParams);
-
-                if (requestedProtocolVersion == -1) {
-               		requestedProtocolVersion = parseProtocolVersion(params.getMinimumProtocolVersion());
-                }
-
-                // En caso de comunicacion por servidor intermedio, solicitamos, si corresponde,
-                // que se espere activamente hasta el fin de la tarea
-                if (!bySocket && params.isActiveWaiting()) {
-                	requestWait(params.getStorageServletUrl(), params.getId());
-                }
-
-				LOGGER.info("Se inicia la operacion de obtencion de log actual. Version de protocolo: " //$NON-NLS-1$
-						+ requestedProtocolVersion);
-
-				return ProtocolInvocationLauncherGetCurrentLog.processGetCurrentLog(params, requestedProtocolVersion,
-						bySocket);
-
-			} catch (final ParameterNeedsUpdatedVersionException e) {
-                LOGGER.severe("Se necesita una version mas moderna de AutoFirma para procesar la peticion: " + e); //$NON-NLS-1$
+                LOGGER.severe("Se necesita una version mas moderna de Autofirma para procesar la peticion: " + e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager
 						.showError(ProtocolInvocationLauncherErrorManager.ERROR_OBSOLETE_APP, e);
 				return ProtocolInvocationLauncherErrorManager
@@ -917,11 +868,13 @@ public final class ProtocolInvocationLauncher {
 	 * @param id         Identificador del mensaje en el servidor.
 	 */
 	private static void sendDataToServer(final String data, final String serviceUrl, final String id) {
+		// Detenemos la espera activa
+		final Thread waitingThread = getActiveWaitingThread();
+		if (waitingThread != null) {
+			waitingThread.interrupt();
+		}
+		// Esperamos a que termine cualquier otro envio al servidor para que no se pisen
 		synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
-			final Thread waitingThread = getActiveWaitingThread();
-			if (waitingThread != null) {
-				waitingThread.interrupt();
-			}
 			try {
 				IntermediateServerUtil.sendData(data, serviceUrl, id);
 			} catch (final IOException e) {

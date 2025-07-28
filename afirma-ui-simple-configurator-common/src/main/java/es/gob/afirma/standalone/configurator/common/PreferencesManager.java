@@ -388,9 +388,30 @@ public final class PreferencesManager {
 	 * documento. */
 	public static final String PREFERENCE_PADES_STAMP = "padesVisibleStamp"; //$NON-NLS-1$
 
-	/** Si est&aacute; establecido a <code>true</code> se comprobar&aacute;n posibles PDF Shadow Attacks
-	 * si se establece a <code>false</code>, no se realizar&aacute; la comprobaci&oacute;n */
+	/**
+	 * Si est&aacute; establecido a <code>true</code> se comprobar&aacute;n posibles PDF Shadow Attacks
+	 * si se establece a <code>false</code>, no se realizar&aacute; la comprobaci&oacute;n.
+	 */
 	public static final String PREFERENCE_PADES_CHECK_SHADOW_ATTACK = "allowShadowAttack"; //$NON-NLS-1$
+
+	/**
+	 * Si est&aacute; establecido a <code>true</code> se permite generar PDF certificados
+	 * si se establece a <code>false</code>, no se permite generar pdfs certificados.
+	 */
+	public static final String PREFERENCE_PADES_CHECK_ALLOW_CERTIFIED_PDF = "allowCertifiedPDF"; //$NON-NLS-1$
+
+	/**
+	 * Tipos de firma pdf certificadas.
+	 * Esta preferencia debe tener uno de estos valores:
+	 * <ul>
+	 *  <li>0: Sin certificar</li>
+	 *  <li>1: Certificada de autor</li>
+	 *  <li>2: Certificada de autor para formularios</li>
+	 *  <li>3: Certificada com&uacute;n</li>
+	 * </ul>
+	 */
+	public static final String PREFERENCE_PADES_DEFAULT_CERTIFICATION_LEVEL = "padesCertificationLevel"; //$NON-NLS-1$
+
 
 	/** Motivo de la firma en firmas PAdES. */
 	public static final String PREFERENCE_PADES_SIGN_REASON = "padesSignReason"; //$NON-NLS-1$
@@ -601,7 +622,7 @@ public final class PreferencesManager {
 					: null;
 		}
 		catch (final Exception e) {
-			LOGGER.severe("Error al cargar las preferencias establecidas a nivel de sistema: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se pueden cargar las preferencias establecidas a nivel de sistema: " + e); //$NON-NLS-1$
 			configSystemPreferences = null;
 			configUpdatedSystemPreferences = null;
 		}
@@ -711,11 +732,14 @@ public final class PreferencesManager {
 					: defaultValue;
 	}
 
-	/** Recupera la cadena con el valor de una propiedad de configuraci&oacute;n. La propiedad se
-	 * buscar&aacute;, por orden, en las preferencia del usuario, del sistema o en la configuraci&oacute;n
-	 * por defecto.
+	/**
+	 * Recupera la cadena con el valor de una propiedad de configuraci&oacute;n. Si se indica un
+	 * conjunto de preferencias nulo, se obtendr&aacute; por orden el valor indicado en las
+	 * preferencias de usuario, del sistema o el por defecto.
 	 * @param key Clave del valor que queremos recuperar.
-	 * @return El valor almacenado de la propiedad o su valor por defecto si no se encontr&oacute;. */
+	 * @param src Conjunto de preferencias entre el que buscar la propiedad.
+	 * @return El valor almacenado de la propiedad o su valor por defecto si no se encontr&oacute;.
+	 */
 	public static String get(final String key, final PreferencesSource src) {
 
 		if (src == null) {
@@ -747,12 +771,15 @@ public final class PreferencesManager {
 					: defaultValue);
 	}
 
-	/** Recupera el valor {@code true} o {@code false} almacenado en el tipo de preferencia
-	 * indicado de la aplicaci&oacute;n.
-	 * Si se indica una fuente nula, se obtendr&aacute; por orden el valor indicado en las preferencias
-	 * de usuario, del sistema o el por defecto.
+	/**
+	 * Recupera el valor {@code true} o {@code false} almacenado en el tipo de preferencia
+	 * indicado de la aplicaci&oacute;n. Si se indica un conjunto de preferencias nulo, se
+	 * obtendr&aacute; por orden el valor indicado en las preferencias de usuario, del sistema o el
+	 * por defecto.
 	 * @param key Clave del valor que queremos recuperar.
-	 * @return El valor almacenado de la propiedad o {@code false} si no estaba declarado. */
+	 * @param src Conjunto de preferencias entre el que buscar la propiedad.
+	 * @return El valor almacenado de la propiedad o {@code false} si no estaba declarado.
+	 */
 	public static boolean getBoolean(final String key, final PreferencesSource src) {
 
 		if (src == null) {

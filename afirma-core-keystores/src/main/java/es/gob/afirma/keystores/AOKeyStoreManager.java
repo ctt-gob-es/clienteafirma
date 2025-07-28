@@ -32,7 +32,6 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.jmulticard.card.AuthenticationModeLockedException;
 
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
  * crear KeyStores de distintos tipos, utilizando el proveedor JCA apropiado para cada caso
@@ -227,19 +226,19 @@ public class AOKeyStoreManager implements KeyStoreManager {
     				getParentComponent()
 				);
             	break;
-        	case CERES_430:
-                // En el "params" debemos traer los parametros:
-                // [0] -parent: Componente padre para la modalidad
-        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
-        		this.ks = AOKeyStoreManagerHelperFullJava.initCeres430Java(
-    				getParentComponent()
-				);
-            	break;
         	case DNIEJAVA:
                 // En el "params" debemos traer los parametros:
                 // [0] -parent: Componente padre para la modalidad
         		setParentComponent(params != null && params.length > 0 ? params[0] : null);
             	this.ks = AOKeyStoreManagerHelperFullJava.initDnieJava(
+        			getParentComponent()
+    			);
+            	break;
+        	case CERES_430:
+        		// En el "params" debemos traer los parametros:
+                // [0] -parent: Componente padre para la modalidad
+        		setParentComponent(params != null && params.length > 0 ? params[0] : null);
+            	this.ks = AOKeyStoreManagerHelperFullJava.initJMulticard(
         			getParentComponent()
     			);
             	break;
@@ -320,9 +319,6 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     	try {
     		return (X509Certificate) this.ks.getCertificate(alias);
-    	}
-    	catch(final AuthenticationModeLockedException e) {
-			throw new SmartCardLockedException("Tarjeta inteligente bloqueada: " + e, e); //$NON-NLS-1$
     	}
     	catch(final es.gob.jmulticard.CancelledOperationException e) {
     		throw new AOCancelledOperationException("Se cancelo uso de la tarjeta a traves del driver Java: " + e, e); //$NON-NLS-1$

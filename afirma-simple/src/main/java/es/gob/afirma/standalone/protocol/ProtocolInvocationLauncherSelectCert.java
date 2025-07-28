@@ -21,10 +21,10 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
@@ -112,12 +112,12 @@ final class ProtocolInvocationLauncherSelectCert {
 		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
-				aoks = AOKeyStore.getKeyStore(defaultStore);
+				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore);
 			}
 		}
 		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
 		else {
-			aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
+			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore());
 		}
 
 		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
@@ -263,14 +263,15 @@ final class ProtocolInvocationLauncherSelectCert {
 		}
 
 		if (options.getStorageServletUrl() != null) {
-			// Enviamos el certificado al servicio remoto de intercambio y detenemos la espera
-			// activa si se encontraba vigente
+			// Detenemos la espera activa
+			final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
+			if (waitingThread != null) {
+				waitingThread.interrupt();
+			}
+			// Esperamos a que termine cualquier otro envio al servidor para que no se pisen
 			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
-				final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
-				if (waitingThread != null) {
-					waitingThread.interrupt();
-				}
 				try {
+					LOGGER.info("Enviamos el resultado de la operacion de seleccion de certificado al servidor intermedio"); //$NON-NLS-1$
 					IntermediateServerUtil.sendData(dataToSend, options.getStorageServletUrl().toString(), options.getId());
 				}
 				catch (final Exception e) {

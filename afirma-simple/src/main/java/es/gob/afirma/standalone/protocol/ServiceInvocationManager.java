@@ -179,7 +179,7 @@ public final class ServiceInvocationManager {
 		for (final int port : ports) {
 			try {
 				final SSLServerSocket ssocket = (SSLServerSocket) socket.createServerSocket(port);
-				LOGGER.info("Establecido el puerto " + port + " para el servicio Cliente @firma"); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.info("Establecido el puerto " + port + " para el servicio Autofirma"); //$NON-NLS-1$ //$NON-NLS-2$
 				return ssocket;
 			}
 			catch (final BindException e) {

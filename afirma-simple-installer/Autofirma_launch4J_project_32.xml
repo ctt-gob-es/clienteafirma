@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>jar\autofirma.jar</jar>
+  <outfile>Autofirma32\Autofirma.exe</outfile>
+  <errTitle>Error: Se ha superado el tiempo de espera antes de recibir peticiones.</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>ic_launcher.ico</icon>
+  <jre>
+    <path>./jre;%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
+    <initialHeapSize>512</initialHeapSize>
+    <maxHeapSize>1536</maxHeapSize>
+    <opt>-Xms256m -Xmx1g -Djdk.tls.maxHandshakeMessageSize=65536</opt>
+  </jre>
+  <splash>
+    <file>splash.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>10</timeout>
+    <timeoutErr>false</timeoutErr>
+  </splash>
+  <versionInfo>
+    <fileVersion>1.9.0.0</fileVersion>
+    <txtFileVersion>1.9</txtFileVersion>
+    <fileDescription>Autofirma</fileDescription>
+    <copyright>Gobierno de España</copyright>
+    <productVersion>1.9.0.0</productVersion>
+    <txtProductVersion>1.9</txtProductVersion>
+    <productName>Autofirma</productName>
+    <companyName>Gobierno de España</companyName>
+    <internalName>Autofirma</internalName>
+    <originalFilename>Autofirma.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>CASTILIAN_SPANISH</language>
+  </versionInfo>
+  <messages>
+    <startupErr>Ocurrió un error mientras arrancaba la aplicación.</startupErr>
+    <jreNotFoundErr>No se ha encontrado el Java Runtime Environment (JRE) de Autofirma ni ningún otro en el PATH del sistema.</jreNotFoundErr>
+    <jreVersionErr>La aplicación requiere un Java Runtime Environment (JRE)</jreVersionErr>
+    <launcherErr>El registro hace referencia a una instalación de Java Runtime Environment (JRE) que no existe o está corrupta.</launcherErr>
+    <instanceAlreadyExistsMsg>Ya se encuentra corriendo una instancia de esta aplicación.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>

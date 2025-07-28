@@ -14,7 +14,7 @@ import javax.swing.Timer;
 import es.gob.afirma.core.misc.Base64;
 
 /**
- * Hilo para la recepci&oacute;n de peticiones de operaciones de AutoFirma
+ * Hilo para la recepci&oacute;n de peticiones de operaciones de Autofirma
  * a trav&eacute;s de un socket.
  */
 class CommandProcessorThread extends Thread {
@@ -535,7 +535,7 @@ class CommandProcessorThread extends Thread {
 			readingTries = 0;
 			do {
 				readingTries++;
-				int bytesRead = socketIs.read(reqBuffer);
+				final int bytesRead = socketIs.read(reqBuffer);
 				insert = new String(reqBuffer, 0, bytesRead, StandardCharsets.UTF_8);
 			} while (insert.trim().isEmpty() && readingTries <= MAX_READING_BUFFER_TRIES);
 

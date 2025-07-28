@@ -20,10 +20,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 
-/** Pantalla principal de la aplicaci&oacute;n de AutoFirma.
+/** Pantalla principal de la aplicaci&oacute;n de Autofirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class MainScreen extends JFrame {
 
@@ -69,7 +69,7 @@ public final class MainScreen extends JFrame {
         add(this.scrollPane, BorderLayout.CENTER);
 
         try {
-            setIconImages(AutoFirmaUtil.getIconImages());
+            setIconImages(DesktopUtil.getIconImages());
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$

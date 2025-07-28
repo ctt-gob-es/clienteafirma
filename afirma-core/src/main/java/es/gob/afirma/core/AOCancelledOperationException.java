@@ -11,7 +11,7 @@ package es.gob.afirma.core;
 
 /** Excepci&oacute;n que indica una operaci&oacute;n cancelada voluntariamente
  * por el usuario. */
-public final class AOCancelledOperationException extends RuntimeException {
+public class AOCancelledOperationException extends RuntimeException {
 
     private static final long serialVersionUID = 4447842480432712246L;
 

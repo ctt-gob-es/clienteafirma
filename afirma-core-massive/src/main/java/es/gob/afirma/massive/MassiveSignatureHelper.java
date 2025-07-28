@@ -52,10 +52,6 @@ public final class MassiveSignatureHelper {
 
     private static final AOException SIGN_DATA_NOT_GENERATED = new AOException("No se generaron datos de firma"); //$NON-NLS-1$
 
-    /** Algoritmo de huella digital por defecto que se utilizar&aacute;, por ejemplo, para
-     * la generaci&oacute;n de las firmas expl&iacute;citas XAdES. */
-	private static final String DEFAULT_MESSAGE_DIGEST_ALGORITHM = "SHA1"; //$NON-NLS-1$
-
 	/** Generador de huellas digitales utilizado internamente. */
     private static MessageDigest md = null;
 
@@ -397,6 +393,8 @@ public final class MassiveSignatureHelper {
 
         byte[] dataToSign = data;
 
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.getAlgorithm());
+
         // Deteccion del MIMEType u OID del tipo de datos, solo para CAdES, XAdES y XMLDSig
         final String signerClassName = signer.getClass().getName();
         if (CADES_SIGNER.equals(signerClassName) ||
@@ -410,8 +408,8 @@ public final class MassiveSignatureHelper {
         	else if ((XADES_SIGNER.equals(signerClassName) || XMLDSIG_SIGNER.equals(signerClassName))
             		&& AOSignConstants.SIGN_MODE_EXPLICIT.equalsIgnoreCase(config.getProperty(MODE))) {
         		// Forzamos que las firmas XAdES Explicitas firmen el hash de los datos y lo marcamos como tal
-        		dataToSign = digest(dataToSign);
-        		mimeType = ("hash/" + DEFAULT_MESSAGE_DIGEST_ALGORITHM).toLowerCase(); //$NON-NLS-1$
+        		dataToSign = digest(dataToSign, digestAlgorithm);
+        		mimeType = ("hash/" + digestAlgorithm).toLowerCase(); //$NON-NLS-1$
         	}
         	else {
         		final MimeHelper mimeHelper = new MimeHelper(dataToSign);
@@ -684,10 +682,10 @@ public final class MassiveSignatureHelper {
      * {@code DEFAULT_MESSAGE_DIGEST_ALGORITHM}.
      * @param data Datos de la que generar la huella.
      * @return Huella digital. */
-    private static byte[] digest(final byte[] data) {
+    private static byte[] digest(final byte[] data, final String digestAlgorithm) {
     	if (md == null) {
     		try {
-				md = MessageDigest.getInstance(DEFAULT_MESSAGE_DIGEST_ALGORITHM);
+				md = MessageDigest.getInstance(digestAlgorithm);
 			}
     		catch (final NoSuchAlgorithmException e) {
 				LOGGER.severe("Se ha utilizado internamente un algoritmo de huella digital no soportado: " + e); //$NON-NLS-1$

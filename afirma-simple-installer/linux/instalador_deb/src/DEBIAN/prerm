@@ -5,44 +5,44 @@ pkill firefox;
 fi
 
 # Eliminamos los enlaces creados en el script de postinstalacion
-if [ -f /etc/icecat/pref/AutoFirma.js ] ; then
-   rm /etc/icecat/pref/AutoFirma.js
+if [ -f /etc/icecat/pref/Autofirma.js ] ; then
+   rm /etc/icecat/pref/Autofirma.js
 fi
-if [ -f /etc/firefox-esr/pref/AutoFirma.js ] ; then
-   rm /etc/firefox-esr/pref/AutoFirma.js
+if [ -f /etc/firefox-esr/pref/Autofirma.js ] ; then
+   rm /etc/firefox-esr/pref/Autofirma.js
 fi
 
 # damos permisos de desinstalacion de los certificados del almacen de firefox
-if [ -f "/usr/lib/AutoFirma/uninstall.sh" ]; then
-chmod +x /usr/lib/AutoFirma/uninstall.sh
-/usr/lib/AutoFirma/uninstall.sh
+if [ -f "/usr/lib/Autofirma/uninstall.sh" ]; then
+chmod +x /usr/lib/Autofirma/uninstall.sh
+/usr/lib/Autofirma/uninstall.sh
 echo "Se ha borrado el certificado CA de los almacenes de Firefox"
 fi
 
 # borramos los certificados instalados en el almacenamiento del sistema
-if [ -d "/usr/share/ca-certificates/AutoFirma" ];
+if [ -d "/usr/share/ca-certificates/Autofirma" ];
 then
-rm -R /usr/share/ca-certificates/AutoFirma
+rm -R /usr/share/ca-certificates/Autofirma
 fi
 
-if [ -f "/usr/local/share/ca-certificates/AutoFirma_ROOT.crt" ];
+if [ -f "/usr/local/share/ca-certificates/Autofirma_ROOT.crt" ];
 then
-rm /usr/local/share/ca-certificates/AutoFirma_ROOT.crt
+rm /usr/local/share/ca-certificates/Autofirma_ROOT.crt
 fi
 
-if [ -f "/usr/lib/AutoFirma/uninstall.sh" ];
+if [ -f "/usr/lib/Autofirma/uninstall.sh" ];
 then
-rm /usr/lib/AutoFirma/uninstall.sh
+rm /usr/lib/Autofirma/uninstall.sh
 fi
 
-if [ -f "/usr/lib/AutoFirma/autofirma.pfx" ];
+if [ -f "/usr/lib/Autofirma/autofirma.pfx" ];
 then
-rm /usr/lib/AutoFirma/autofirma.pfx
+rm /usr/lib/Autofirma/autofirma.pfx
 fi
 
-if [ -f "/usr/lib/AutoFirma/AutoFirma_ROOT.cer" ];
+if [ -f "/usr/lib/Autofirma/Autofirma_ROOT.cer" ];
 then
-rm /usr/lib/AutoFirma/AutoFirma_ROOT.cer
+rm /usr/lib/Autofirma/Autofirma_ROOT.cer
 fi
 
 update-ca-certificates

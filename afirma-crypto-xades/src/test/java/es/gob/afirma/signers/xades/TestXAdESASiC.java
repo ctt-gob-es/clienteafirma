@@ -83,11 +83,14 @@ public final class TestXAdESASiC {
         		null
 		);
 
+        final File outputFile = File.createTempFile("ASIC-XAdES-cosign-",  ".zip"); //$NON-NLS-1$ //$NON-NLS-2$
         try (
-    		final OutputStream os = new FileOutputStream(File.createTempFile("ASIC-XAdES-",  ".zip")); //$NON-NLS-1$ //$NON-NLS-2$
+    		final OutputStream os = new FileOutputStream(outputFile);
 		) {
         	os.write(coSignature);
         }
+
+        System.out.println("Cofirma XAdES ASiC-S almacenada en: " + outputFile.getAbsolutePath()); //$NON-NLS-1$
     }
 
 }

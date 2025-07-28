@@ -143,7 +143,7 @@ class PseudonymCertificateLine extends CertificateLine {
 		c.gridy++;
 
 		this.propertiesLink = new JLabel(
-				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5")
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.5") //$NON-NLS-1$
 				);
 		if (isHighContrast()) {
 				this.propertiesLink.setForeground(Color.YELLOW);

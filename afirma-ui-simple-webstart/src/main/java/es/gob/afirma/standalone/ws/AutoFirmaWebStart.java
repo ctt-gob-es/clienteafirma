@@ -30,11 +30,11 @@ public class AutoFirmaWebStart {
 	public static void main(final String[] args) {
 
 
-		// Se ha hecho doble-clic sobre un fichero asociado a AutoFirma
+		// Se ha hecho doble-clic sobre un fichero asociado a Autofirma
 		if (args != null && args.length == 2 && PARAM_OPEN.equalsIgnoreCase(args[0])) {
 			openFile(args);
 		}
-		// Uso corriente de AutoFirma
+		// Uso corriente de Autofirma
 		else {
 			openApp(args);
 		}

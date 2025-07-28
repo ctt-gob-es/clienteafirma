@@ -31,7 +31,7 @@ import javax.swing.KeyStroke;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.VisorFirma;
@@ -138,14 +138,14 @@ public final class MainMenu extends JMenuBar {
 						null,
 						false,
 						true,
-						AutoFirmaUtil.getDefaultDialogsIcon(),
+						DesktopUtil.getDefaultDialogsIcon(),
 						MainMenu.this
 					)[0];
 				}
 				catch(final AOCancelledOperationException e) {
 					return;
 				}
-				MainMenu.this.getSimpleAfirma().loadFileToSign(fileToLoad);
+				MainMenu.this.getSimpleAfirma().loadFileToSign(fileToLoad, null);
 			}
 		);
         menuArchivo.add(this.abrirMenuItem);
@@ -286,7 +286,7 @@ public final class MainMenu extends JMenuBar {
               SimpleAfirmaMessages.getString("MainMenu.13") //$NON-NLS-1$
         );
         ayudaMenuItem.addActionListener(
-    		e -> SimpleAfirma.showHelp("AutoFirma.html") //$NON-NLS-1$
+    		e -> SimpleAfirma.showHelp("Autofirma.html") //$NON-NLS-1$
 		);
         menuAyuda.add(ayudaMenuItem);
 

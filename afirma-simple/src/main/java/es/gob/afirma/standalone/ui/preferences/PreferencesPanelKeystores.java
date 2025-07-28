@@ -41,9 +41,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
@@ -117,6 +117,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 	void createUI(final KeyListener keyListener,
 			  final ItemListener modificationListener) {
+
+		getVerticalScrollBar().setUnitIncrement(16);
 
 		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
@@ -214,7 +216,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
             public void actionPerformed(final ActionEvent e) {
 				final AOKeyStoreManager ksm;
 				String lib = null;
-				AOKeyStore ks = AOKeyStore.getKeyStore(((RegisteredKeystore) PreferencesPanelKeystores.this.keystores.getSelectedItem()).getName());
+				AOKeyStore ks = SimpleKeyStoreManager.getKeyStore(((RegisteredKeystore) PreferencesPanelKeystores.this.keystores.getSelectedItem()).getName());
 				if (ks == null) {
 			        final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
 					for (final String key : userRegResult.keySet()) {
@@ -305,6 +307,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
         gbc1.gridy++;
         gbc1.insets = new Insets(5, 0, 0, 0);
 
+        this.callsFromNavigator.setEnabled(!this.blocked);
 		this.callsFromNavigator.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 		);
@@ -346,6 +349,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
         c.weightx = 1.0;
         c.gridy = 0;
 
+        this.showExpiredCerts.setEnabled(!this.blocked);
 		this.showExpiredCerts.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 		);
@@ -891,7 +895,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		PreferencesManager.putBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS, this.callsFromNavigator.isSelected());
 
 		final RegisteredKeystore rks = (RegisteredKeystore) this.keystores.getSelectedItem();
-		AOKeyStore aoks = AOKeyStore.getKeyStore(rks.getName());
+		AOKeyStore aoks = SimpleKeyStoreManager.getKeyStore(rks.getName());
 
 		if (aoks == null && AOKeyStore.PKCS11.getProviderName().equals(rks.getProviderName())) {
 			aoks = AOKeyStore.PKCS11;
@@ -933,7 +937,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 			this.keystores.setSelectedIndex(0);
 		} else {
 
-			final AOKeyStore aoks = AOKeyStore.getKeyStore(ks);
+			final AOKeyStore aoks = SimpleKeyStoreManager.getKeyStore(ks);
 			RegisteredKeystore rks = null;
 
 			if (ks != null) {

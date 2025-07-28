@@ -30,6 +30,11 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.keystores.AOCancelledSMOperationException;
+import es.gob.afirma.core.keystores.AuthenticationException;
+import es.gob.afirma.core.keystores.LockedKeyStoreException;
+import es.gob.afirma.core.keystores.PinException;
 import es.gob.afirma.signers.xml.Utils;
 import es.uji.crypto.xades.jxades.security.xml.WrappedKeyStorePlace;
 import es.uji.crypto.xades.jxades.security.xml.XmlWrappedKeyInfo;
@@ -61,7 +66,8 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
               final List<?> refsIdList,
               final String signatureIdPrefix) throws MarshalException,
                                                      GeneralSecurityException,
-                                                     XMLSignatureException {
+                                                     XMLSignatureException,
+                                                     AOException {
 
       final List<?> referencesIdList = new ArrayList<>(refsIdList);
 
@@ -113,7 +119,35 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
       this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
       this.signContext.setURIDereferencer(new OOXMLURIDereferencer(this.ooXmlDocument));
 
-      this.signature.sign(this.signContext);
+      try {
+    	  this.signature.sign(this.signContext);
+      }
+      catch (final XMLSignatureException e) {
+    	  final Throwable cause = e.getCause() != null ? e.getCause() : null;
+    	  if (cause != null) {
+    		  String causeName = cause.getClass().getName();
+    		  // Si JMulticard informa de un problema de autenticacion durante la firma
+    		  if ("es.gob.jmulticard.jse.provider.SignatureAuthException".equals(causeName)) { //$NON-NLS-1$
+    			  causeName = cause.getCause() != null ? cause.getCause().getClass().getName() : null;
+    			  // Si la tarjeta esta bloqueada
+    			  if ("es.gob.jmulticard.card.AuthenticationModeLockedException".equals(causeName)) { //$NON-NLS-1$
+    				  throw new LockedKeyStoreException("El almacen de claves esta bloqueado", e); //$NON-NLS-1$
+    			  }
+    			  // Si se ha insertado un PIN incorrecto
+    			  if ("es.gob.jmulticard.card.BadPinException".equals(causeName)) { //$NON-NLS-1$
+    				  throw new PinException("La contrasena del almacen o certificado es incorrecta", e); //$NON-NLS-1$
+    			  }
+    			  throw new AuthenticationException("Ocurrio un error de autenticacion al utilizar la clave de firma", cause); //$NON-NLS-1$
+    		  }
+    	  }
+    	  throw e;
+      }
+      catch (final Exception e) {
+    	  if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+    		  throw new AOCancelledSMOperationException("Cancelacion del dialogo de JMulticard"); //$NON-NLS-1$
+    	  }
+    	  throw e;
+      }
     }
 
     private KeyInfo newKeyInfo(final X509Certificate[] certChain, final String keyInfoId) throws KeyException {

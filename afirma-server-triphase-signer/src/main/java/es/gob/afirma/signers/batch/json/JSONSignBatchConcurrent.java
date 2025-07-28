@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -79,7 +81,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 
 		boolean needStop = false;
 
-		final List<TriphaseData> trisigns = new ArrayList<>();
+		final Map<String, TriphaseData> trisigns = new HashMap<>();
 		final List<ResultSingleSign> errors = new ArrayList<>();
 
 		for (int i = 0 ; i < results.size() ; i++) {
@@ -103,7 +105,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 				// Registramos el resultado como exito o error segun corresponda
 				if (preprocessResult.getPresign() != null) {
 					final TriphaseData triphaseData = preprocessResult.getPresign();
-					trisigns.add(triphaseData);
+					trisigns.put(this.signs.get(i).getId(), triphaseData);
 				}
 				else {
 					final ResultSingleSign singleResult = preprocessResult.getSignResult();
@@ -148,7 +150,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		return buildPreBatchJson(trisigns, errors);
 	}
 
-	private JSONObject buildPreBatchJson(final List<TriphaseData> trisigns, final List<ResultSingleSign> errors) {
+	private JSONObject buildPreBatchJson(final Map<String, TriphaseData> trisigns, final List<ResultSingleSign> errors) {
 
 		// Listado de prefirmas y errores
 		final JSONArray trisignsJson = new JSONArray();
@@ -158,10 +160,11 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 		for (final ResultSingleSign error : errors) {
 			errorsJson.put(buildJSONSingleResut(error));
 		}
-		for (final TriphaseData trisign : trisigns) {
+
+		for (String signatureId : trisigns.keySet().toArray(new String[0])) {
+			TriphaseData trisign = trisigns.get(signatureId);
 			trisignsJson.put(TriphaseDataParser.triphaseDataToJson(trisign));
 		}
-
 
 		return buildPreBatch(this.format.toString(), trisignsJson, errorsJson);
 	}

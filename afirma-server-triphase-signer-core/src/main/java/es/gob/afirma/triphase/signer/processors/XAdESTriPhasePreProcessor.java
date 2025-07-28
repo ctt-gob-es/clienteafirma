@@ -29,8 +29,10 @@ import org.xml.sax.SAXException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
+import es.gob.afirma.core.signers.Pkcs1Utils;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
@@ -67,6 +69,9 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 	/** Nombre de la propiedad que guarda la codificaci&oacute;n del XML de firma. */
 	private static final String PROPERTY_NAME_XML_ENCODING = "ENCODING"; //$NON-NLS-1$
+
+	/** Nombre de la propiedad  que indica que el PKCS#1 se debe enviar decodificado. */
+	private static final String PROPERTY_NAME_PKCS1_DECODED = "PK1_DECODED"; //$NON-NLS-1$
 
 	/** Nombre de la propiedad de configuraci&oacute;n que indica qu&eacute; nodos deben
 	 * contrafirmarse. */
@@ -232,6 +237,13 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 				PROPERTY_NAME_PRESIGN,
 				Base64.encode(preSignature.getSignedInfos().get(i))
 			);
+
+			// Las firmas XAdEScon Apache Santuario genera las firmas DSA/ECDSA de tal forma que el
+			// PKCS#1 debe estar decodificado, por lo que el PKCS#1 enciado desde el cliente debe
+			// de estarlo. Insertamos una propiedad para indicarselo al cliente
+			if (AOSignConstants.isDSAorECDSASignatureAlgorithm(algorithm)) {
+				signConfig.put(PROPERTY_NAME_PKCS1_DECODED, Boolean.TRUE.toString());
+			}
 
 			//TODO: Idealmente, la prefirma se deberia tomar en la postfirma del parametro BASE en lugar
 			// de tener que reenviarla directamente. Asi se reduciria la transmision de datos y se evitaria
@@ -419,9 +431,21 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		// Sustituimos los valores dummy de la firma por los reales
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
-			final String pkcs1Base64 = triphaseData.getSign(i).getProperty(PROPERTY_NAME_PKCS1_SIGN);
+			String pkcs1Base64 = triphaseData.getSign(i).getProperty(PROPERTY_NAME_PKCS1_SIGN);
 			if (pkcs1Base64 == null) {
 				throw new IllegalArgumentException("La propiedades adicionales no contienen la firma PKCS#1"); //$NON-NLS-1$
+			}
+
+			// Si desde el servidor nos indican que necesitan el PKCS#1 decodificado, pues lo decodificamos
+			final boolean decodePkcs1 = Boolean.parseBoolean(triphaseData.getSign(i).getProperty(PROPERTY_NAME_PKCS1_DECODED));
+			if (decodePkcs1) {
+				try {
+					byte[] pkcs1sign = Base64.decode(pkcs1Base64);
+					pkcs1sign = Pkcs1Utils.decodeSignature(pkcs1sign);
+					pkcs1Base64 = Base64.encode(pkcs1sign);
+				} catch (final SignatureException e) {
+					LOGGER.warning("No se ha podido decodificar el PKCS#1 del servicio. Se usara el PKCS#1 recibido: " + e);
+				}
 			}
 
 			// Hacemos la sustitucion del PKCS#1 en la firma
@@ -449,7 +473,7 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		}
 		catch (final Exception e) {
 			throw new AOException(
-				"Error recreando los datos a firmar y la cadena de certificados: " + e //$NON-NLS-1$
+				"Error recreando los datos a firmar y la cadena de certificados: " + e, e //$NON-NLS-1$
 			);
 		}
 
@@ -469,5 +493,4 @@ public class XAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 
 		return completeSignature;
 	}
-
 }

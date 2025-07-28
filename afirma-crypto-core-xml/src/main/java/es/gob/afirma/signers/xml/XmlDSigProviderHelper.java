@@ -26,7 +26,14 @@ public class XmlDSigProviderHelper {
     	configureXmlDSigProvider(false, true);
     }
 
-    /** Configura el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso. */
+    /**
+     * Configura el proveedor de firmas XMLDSig para el entorno de ejecuci&oacute;n de Java en uso.
+     * @param forced {@code true} para forzar a que se configure incluso si ya se configur&oacute;
+     * anteriormente, {@code false} en caso contrario.
+     * @param apachePreferred {@code true} para indicar que se configure un proveedor de Apache
+     * Santuario externo (que se habra agregado como dependencia), {@code false} para indicar el
+     * Apache Santuario interno de Java.
+     */
     public static void configureXmlDSigProvider(final boolean forced, final boolean apachePreferred) {
 
     	// Omitimos la configuracion si ya se realizo previamente
@@ -41,7 +48,7 @@ public class XmlDSigProviderHelper {
 			LOGGER.warning("No se encontro un proveedor por defecto para la generacion de firmas XML: " + e); //$NON-NLS-1$
 		}
 
-    	// Correccion al problema insertado a partir de Apache Santuario 2.0.7 (Java 8u272 y Java 11)
+    	// Correccion al problema insertado a partir de Apache Santuario 2.0.7 (Java 8 y Java 11)
     	//
     	// Establecemos la propiedad de Apache Santuario necesaria para que no se agreguen saltos
     	// de linea en los Base64 generados, ya que de hacerlo se utiliza "\r\n" y el "\r" aparece como
@@ -54,24 +61,18 @@ public class XmlDSigProviderHelper {
     	// Esta correccion depende del proveedor de seguridad utilizado, que sera
     	// el de Apache o el por defecto.
 
-    	// OpenJDK 8.0.272 introduce el uso de Apache Santuario 2.1.1. Con esta version,
+    	// Java 8u272 introduce el uso de Apache Santuario 2.1.1. Con esta version,
     	// pueden omitirse los saltos de linea con la siguiente propiedad.
     	System.setProperty("com.sun.org.apache.xml.internal.security.lineFeedOnly", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
     	// A partir de Apache Santuario 2.1.2 se implementa la siguiente propiedad, tambien disponible
-    	// con Java 11.0.5 (que actualiza la version interna de Apache santuario a la 2.1.3).
+    	// con Java 8u281 (Apache Santuario 2.1.4) y 11.0.5 (Apache Santuario 2.1.3)
     	System.setProperty("org.apache.xml.security.ignoreLineBreaks", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
-
-
     	// Si damos preferencia al proveedor de Apache, nos aseguramos de que este el primero de la lista
+    	final String providerName = apachePreferred ? APACHE_PROVIDER_CLASS : SUN_PROVIDER_CLASS;
     	try {
-    		if (apachePreferred) {
-    			installProvider(APACHE_PROVIDER_CLASS);
-    		}
-    		else {
-    			installProvider(SUN_PROVIDER_CLASS);
-    		}
+    		installProvider(providerName);
 	    }
 	    catch (final Throwable e) {
 	    	LOGGER.log(Level.SEVERE, "No se pudo dar preferencia al proveedor configurado", e); //$NON-NLS-1$

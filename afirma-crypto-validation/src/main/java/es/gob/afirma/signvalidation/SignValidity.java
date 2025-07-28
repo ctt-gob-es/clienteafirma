@@ -65,11 +65,13 @@ public final class SignValidity {
 			case SUSPECTED_SIGNATURE:
 				return ret + ": el documento es sospechoso y el usuario debe revisar la firma"; //$NON-NLS-1$
 			case SIGN_PROFILE_NOT_CHECKED:
-				return ret + ": la firma contiene atributos longevos que AutoFirma no puede validar. Para una validaci&oacute;n completa recurra a VALIDe."; //$NON-NLS-1$
+				return ret + ": la firma contiene atributos longevos que Autofirma no puede validar. Para una validaci&oacute;n completa recurra a VALIDe."; //$NON-NLS-1$
 			case CANT_VALIDATE_EXTERNALLY_DETACHED:
 				return ret + ": no se permite la validaci&oacute;n de firmas con referencias externas"; //$NON-NLS-1$
 			case BAD_BUILD_SIGN:
 				return ret + ": la firma no est&aacute; correctamente formada"; //$NON-NLS-1$
+			case CERTIFIED_SIGN_REVISION:
+				return ret + ": El documento certificado no permit&iacute;a nuevas firmas"; //$NON-NLS-1$
 			default:
 				return ret;
 		}
@@ -137,6 +139,8 @@ public final class SignValidity {
         CANT_VALIDATE_EXTERNALLY_DETACHED,
         /** Cuando la firma es inv&aacute;lida porque no est&aacute; formada correctamente */
         BAD_BUILD_SIGN,
+        /** Cuando la firma es inv&aacute;lida porque no es la &uacute;ltima firma*/
+        CERTIFIED_SIGN_REVISION,
     }
 
     /** Validez de la firma. */

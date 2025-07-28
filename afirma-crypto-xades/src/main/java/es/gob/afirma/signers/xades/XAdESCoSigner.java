@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -65,6 +66,29 @@ public final class XAdESCoSigner {
 		// No permitimos la instanciacion
 	}
 
+	/**
+	 * Cofirma datos en formato XAdES.
+	 * <p>
+	 *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
+	 *  ya apunten estas a datos, hojas de estilo o cualquier otro elemento. En cada referencia
+	 *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+	 * </p>
+	 * <p>
+	 *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta
+	 *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto
+	 *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con
+	 *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
+	 *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
+	 *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
+	 * </p>
+	 * @param sign Firma inicial.
+	 * @param algorithm Algoritmo a usar para la firma.
+	 * @param pk Clave privada para la firma
+	 * @param certChain Cadena de certificados del firmante
+	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+	 * @return Cofirma en formato XAdES
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso
+	 */
 	public static byte[] cosign(final byte[] sign,
 			final String algorithm,
 			final PrivateKey pk,
@@ -82,7 +106,40 @@ public final class XAdESCoSigner {
 		return cosign(signDocument, algorithm, pk, certChain, xParams);
 	}
 
-	/** Cofirma datos en formato XAdES.
+
+	/**
+	 * Cofirma datos en formato XAdES.
+	 * <p>
+	 *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
+	 *  ya apunten estas a datos, hojas de estilo o cualquier otro elemento. En cada referencia
+	 *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+	 * </p>
+	 * <p>
+	 *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta
+	 *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto
+	 *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con
+	 *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
+	 *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES,
+	 *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
+	 * </p>
+	 * @param signDocument Documento XML con las firmas iniciales.
+	 * @param algorithm Algoritmo a usar para la firma.
+	 * @param pk Clave privada para la firma
+	 * @param certChain Cadena de certificados del firmante
+	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+	 * @return Cofirma en formato XAdES
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso
+	 */
+	public static byte[] cosign(final Document signDocument,
+			                    final String algorithm,
+			                    final PrivateKey pk,
+			                    final Certificate[] certChain,
+			                    final Properties xParams) throws AOException {
+		return cosign(signDocument, algorithm, pk, certChain, xParams, null);
+	}
+
+	/**
+	 * Cofirma datos en formato XAdES.
 	 * <p>
 	 *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
 	 *  ya apunten estas a datos, hojas de estilo o cualquier otro elemento. En cada referencia
@@ -98,23 +155,19 @@ public final class XAdESCoSigner {
 	 * </p>
 	 * @param signDocument Documento XML con las firmas iniciales.
 	 * @param signAlgorithm Algoritmo a usar para la firma.
-	 * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-	 * <ul>
-	 *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-	 *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-	 *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-	 *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-	 * </ul>
 	 * @param pk Clave privada para la firma
 	 * @param certChain Cadena de certificados del firmante
 	 * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+	 * @param uriDereferencer Derreferenciador a medida.
 	 * @return Cofirma en formato XAdES
-	 * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+	 * @throws AOException Cuando ocurre cualquier problema durante el proceso
+	 */
 	public static byte[] cosign(final Document signDocument,
 			                    final String signAlgorithm,
 			                    final PrivateKey pk,
 			                    final Certificate[] certChain,
-			                    final Properties xParams) throws AOException {
+			                    final Properties xParams,
+			                    final URIDereferencer uriDereferencer) throws AOException {
 
 
 		final String algorithm = signAlgorithm != null ? signAlgorithm : AOSignConstants.DEFAULT_SIGN_ALGO;
@@ -526,7 +579,8 @@ public final class XAdESCoSigner {
 			xades,
 			signedPropertiesType,
 			digestMethodAlgorithm,
-			canonicalizationAlgorithm
+			canonicalizationAlgorithm,
+			uriDereferencer
 		);
 
 		// Si se creo un nuevo objeto para incluir en la firma (caso de las
@@ -569,11 +623,14 @@ public final class XAdESCoSigner {
 		}
 		catch (final NoSuchAlgorithmException e) {
 			throw new IllegalArgumentException(
-				"No se soporta el algoritmo de firma '" + algorithm + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "':" + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
+		catch (final AOException e) {
+			throw e;
+		}
 		catch (final Exception e) {
-			throw new AOException("Error al generar la cofirma", e); //$NON-NLS-1$
+			throw new AOException("Error al generar la cofirma XAdES", e); //$NON-NLS-1$
 		}
 
 		return Utils.writeXML(

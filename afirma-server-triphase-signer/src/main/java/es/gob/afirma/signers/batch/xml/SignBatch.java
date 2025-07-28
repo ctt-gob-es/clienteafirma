@@ -37,7 +37,7 @@ import es.gob.afirma.signers.batch.TempStoreFactory;
  * Un ejemplo de representaci&oacute;n XML de un lote podr&iacute;a ser:
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
- * &lt;signbatch stoponerror="false" algorithm="SHA256withRSA" concurrenttimeout="9223372036854775807" Id="LOTE001"&gt;
+ * &lt;signbatch stoponerror="false" algorithm="SHA256" concurrenttimeout="9223372036854775807" Id="LOTE001"&gt;
  *  &lt;singlesign Id="7725374e-728d-4a33-9db9-3a4efea4cead"&gt;
  *   &lt;datasource&gt;http://google.com&lt;/datasource&gt;
  *   &lt;format&gt;XAdES&lt;/format&gt;
@@ -70,7 +70,7 @@ public abstract class SignBatch {
 	/** Lista de firmas a procesar. */
 	protected final List<SingleSign> signs;
 
-	protected final SingleSignConstants.SignAlgorithm algorithm;
+	protected final SingleSignConstants.DigestAlgorithm algorithm;
 
 	private String id;
 	String getId() {
@@ -86,7 +86,7 @@ public abstract class SignBatch {
 
 	/** Obtiene el algoritmo de firma.
 	 * @return Algoritmo de firma. */
-	public SingleSignConstants.SignAlgorithm getSignAlgorithm() {
+	public SingleSignConstants.DigestAlgorithm getSignAlgorithm() {
 		return this.algorithm;
 	}
 
@@ -150,7 +150,7 @@ public abstract class SignBatch {
 	}
 
 	protected SignBatch(final List<SingleSign> signatures,
-			            final SingleSignConstants.SignAlgorithm algo,
+			            final SingleSignConstants.DigestAlgorithm algo,
 			            final boolean soe) {
 
 		if (signatures == null) {
@@ -176,7 +176,7 @@ public abstract class SignBatch {
 		);
 		sb.append(Boolean.toString(this.stopOnError));
 		sb.append("\" algorithm=\""); //$NON-NLS-1$
-		sb.append(this.algorithm.toString());
+		sb.append(this.algorithm.getName());
 		sb.append("\" concurrenttimeout=\""); //$NON-NLS-1$
 		sb.append(this.concurrentTimeout);
 		sb.append("\" Id=\""); //$NON-NLS-1$

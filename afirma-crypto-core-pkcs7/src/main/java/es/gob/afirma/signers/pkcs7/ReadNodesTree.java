@@ -175,11 +175,11 @@ public final class ReadNodesTree {
     private static String translateEncryptionOid(final ASN1ObjectIdentifier oid) {
 
     	final String oidString = oid.toString();
-    	if (oidString.equals("1.2.840.113549.1.1.1")) {	// Firma RSA //$NON-NLS-1$
+    	if (AOAlgorithmID.isRSAOID(oidString)) {	// Firma RSA
     		return "RSA"; //$NON-NLS-1$
-    	} else if (oidString.equals("1.2.840.10040.4.1")) {	// Firma DSA	//TODO: Sin verificar //$NON-NLS-1$
+    	} else if (AOAlgorithmID.isDSAOID(oidString)) {	// Firma DSA	
     		return "DSA"; //$NON-NLS-1$
-    	} else if (oidString.equals("1.2.840.10045.4")) {	// Firma ECDSA	//TODO: Sin verificar //$NON-NLS-1$
+    	} else if (AOAlgorithmID.isECDSAOID(oidString)) {	// Firma ECDSA	
     		return "ECDSA"; //$NON-NLS-1$
     	}
     	return oidString;
@@ -245,7 +245,9 @@ public final class ReadNodesTree {
     			//id_aa_ets_archiveTimestampV2
     			!attributeType.equals(PKCSObjectIdentifiers.id_aa.branch("48")) && //$NON-NLS-1$
     			//id_aa_ets_archiveTimestampV3
-				!attributeType.equals(new ASN1ObjectIdentifier("0.4.0.1733.2.4"));  //$NON-NLS-1$
+				!attributeType.equals(new ASN1ObjectIdentifier("0.4.0.1733.2.4")) && //$NON-NLS-1$
+				//id_aa_ets_longTermValidation
+				!attributeType.equals(new ASN1ObjectIdentifier("0.4.0.1733.2.2"));  //$NON-NLS-1$
     }
 
     /** Lee los nodos pertenecientes a un firmante.

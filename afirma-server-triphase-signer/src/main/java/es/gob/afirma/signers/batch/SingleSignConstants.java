@@ -126,46 +126,66 @@ public final class SingleSignConstants {
 	}
 
 	/** Algoritmo de firma. */
-	public enum SignAlgorithm {
+	public enum DigestAlgorithm {
 
-		/** SHA1withRSA. */
-		SHA1WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA),
+		/** SHA1. */
+		SHA1(AOSignConstants.DIGEST_ALGORITHM_SHA1),
 
-		/** SHA256withRSA. */
-		SHA256WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA),
+		/** SHA256. */
+		SHA256(AOSignConstants.DIGEST_ALGORITHM_SHA256),
 
-		/** SHA284withRSA. */
-		SHA384WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA),
+		/** SHA284. */
+		SHA384(AOSignConstants.DIGEST_ALGORITHM_SHA384),
 
-		/** SHA512withRSA. */
-		SHA512WITHRSA(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA);
+		/** SHA512. */
+		SHA512(AOSignConstants.DIGEST_ALGORITHM_SHA512);
 
 		private final String name;
 
-		SignAlgorithm(final String n) {
+		DigestAlgorithm(final String n) {
 			this.name = n;
+		}
+
+		/**
+		 * Obtiene el nombre del algoritmo..
+		 * @return Nombre del algoritmo.
+		 */
+		public String getName() {
+			return this.name;
 		}
 
 		@Override
 		public String toString() {
-			return this.name;
+			return getName();
 		}
 
-		/** Obtiene el algoritmo de firma a partir de su nombre.
-		 * @param name Nombre del algoritmo de firma.
-		 * @return Algoritmo firma. */
-		public static SignAlgorithm getAlgorithm(final String name) {
-			if (SHA1WITHRSA.toString().equalsIgnoreCase(name)) {
-				return SHA1WITHRSA;
+		/**
+		 * Obtiene el algoritmo de huella a partir de su nombre.
+		 * @param name Nombre del algoritmo de huella.
+		 * @return Algoritmo de huella o de firma RSA/ECDSA.
+		 */
+		public static DigestAlgorithm getAlgorithm(final String name) {
+			// Ademas del algoritmo de huella, comparamos si nos pasan un algoritmo de firma RSA
+			// por retrocompatibilidad (v1.9 y anteriores)
+			if (SHA1.getName().equalsIgnoreCase(name)
+					|| "SHA1withRSA".equalsIgnoreCase(name) //$NON-NLS-1$
+					|| "SHA1withECDSA".equalsIgnoreCase(name)) { //$NON-NLS-1$
+				return SHA1;
 			}
-			if (SHA256WITHRSA.toString().equalsIgnoreCase(name)) {
-				return SHA256WITHRSA;
+			if (SHA256.getName().equalsIgnoreCase(name)
+					|| "SHA256withRSA".equalsIgnoreCase(name) //$NON-NLS-1$
+					|| "SHA256withECDSA".equalsIgnoreCase(name)) { //$NON-NLS-1$) {
+				return SHA256;
 			}
-			if (SHA384WITHRSA.toString().equalsIgnoreCase(name)) {
-				return SHA384WITHRSA;
+			if (SHA384.getName().equalsIgnoreCase(name)
+					|| "SHA384withRSA".equalsIgnoreCase(name) //$NON-NLS-1$
+					|| "SHA284withECDSA".equalsIgnoreCase(name)) { //$NON-NLS-1$) {
+				return SHA384;
 			}
-			if (SHA512WITHRSA.toString().equalsIgnoreCase(name)) {
-				return SHA512WITHRSA;
+			if (SHA512.getName().equalsIgnoreCase(name)
+					|| "SHA512withRSA".equalsIgnoreCase(name) //$NON-NLS-1$
+					|| "SHA512withECDSA".equalsIgnoreCase(name)) { //$NON-NLS-1$) {
+				return SHA512;
 			}
 			throw new IllegalArgumentException(
 				"Tipo de algoritmo de firma no soportado: " + name //$NON-NLS-1$

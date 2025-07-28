@@ -34,7 +34,6 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.PdfTimestamper;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
-import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
 /** Pruebas del m&oacute;dulo PAdES de Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -44,16 +43,12 @@ public class TestPAdES {
 	private static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
 	private static final Boolean CATCERT_REQUIRECERT = Boolean.TRUE;
 
-    private static final String CERT_PATH = "PruebaEmpleado4Activo.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS = "Giss2016"; //$NON-NLS-1$
-    private static final String CERT_ALIAS = "givenname=prueba4empn+serialnumber=idces-00000000t+sn=p4empape1 p4empape2 - 00000000t+cn=prueba4empn p4empape1 p4empape2 - 00000000t,ou=personales,ou=certificado electronico de empleado publico,o=secretaria de estado de la seguridad social,c=es"; //$NON-NLS-1$
-
     private static final Properties[] PADES_MODES;
 
     private static final String[] TEST_FILES = { "TEST_PDF.pdf", "TEST_PDF_Signed.pdf", "pades_basic.pdf", "firma_CM.pdf" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     //private static final String TEST_FILE_CTF = "TEST_PDF_Certified.pdf"; //$NON-NLS-1$
-    private static final String TEST_FILE_CTF2 = "pruebafirma_certificado.pdf"; //$NON-NLS-1$
+    private static final String TEST_FILE_CTF2 = "PDF_certificado_tipo_1.pdf"; //$NON-NLS-1$
 
     private static final String TEST_FILE_PDFA1B = "PDF-A1B.pdf"; //$NON-NLS-1$
 
@@ -148,11 +143,11 @@ public class TestPAdES {
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         try (
-    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TestContants.CERT_PATH)
 		) {
-        	ks.load(is, CERT_PASS.toCharArray());
+        	ks.load(is, TestContants.CERT_PASS.toCharArray());
         }
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(TestContants.CERT_ALIAS, new KeyStore.PasswordProtection(TestContants.CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
 
@@ -174,7 +169,7 @@ public class TestPAdES {
         extraParams.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
         extraParams.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
         extraParams.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsType", TsaParams.TS_SIGN_DOC); //$NON-NLS-1$
+        extraParams.put("tsType", PdfTimestamper.TS_LEVEL_SIGN_DOC); //$NON-NLS-1$
         //******************************************************************************************
         //********* FIN TSA CATCERT ****************************************************************
 
@@ -236,11 +231,11 @@ public class TestPAdES {
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         try (
-    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TestContants.CERT_PATH)
 		) {
-        	ks.load(is, CERT_PASS.toCharArray());
+        	ks.load(is, TestContants.CERT_PASS.toCharArray());
         }
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(TestContants.CERT_ALIAS, new KeyStore.PasswordProtection(TestContants.CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
 
@@ -262,7 +257,7 @@ public class TestPAdES {
         extraParams.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
         extraParams.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
         extraParams.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsType", TsaParams.TS_DOC); //$NON-NLS-1$
+        extraParams.put("tsType", PdfTimestamper.TS_LEVEL_DOC); //$NON-NLS-1$
         //******************************************************************************************
         //********* FIN TSA CATCERT ****************************************************************
 
@@ -314,7 +309,7 @@ public class TestPAdES {
         extraParams.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
         extraParams.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
         extraParams.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsType", TsaParams.TS_DOC); //$NON-NLS-1$
+        extraParams.put("tsType", PdfTimestamper.TS_LEVEL_DOC); //$NON-NLS-1$
         //******************************************************************************************
         //********* FIN TSA CATCERT ****************************************************************
 
@@ -345,11 +340,11 @@ public class TestPAdES {
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         try (
-    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TestContants.CERT_PATH)
 		) {
-        	ks.load(is, CERT_PASS.toCharArray());
+        	ks.load(is, TestContants.CERT_PASS.toCharArray());
         }
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(TestContants.CERT_ALIAS, new KeyStore.PasswordProtection(TestContants.CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
 
@@ -371,7 +366,7 @@ public class TestPAdES {
         extraParams.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
         extraParams.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
         extraParams.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
-        extraParams.put("tsType", TsaParams.TS_SIGN); //$NON-NLS-1$
+        extraParams.put("tsType", PdfTimestamper.TS_LEVEL_SIGN); //$NON-NLS-1$
         //******************************************************************************************
         //********* FIN TSA CATCERT ****************************************************************
 
@@ -409,11 +404,11 @@ public class TestPAdES {
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         try (
-    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TestContants.CERT_PATH)
 		) {
-        	ks.load(is, CERT_PASS.toCharArray());
+        	ks.load(is, TestContants.CERT_PASS.toCharArray());
         }
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        pke = (PrivateKeyEntry) ks.getEntry(TestContants.CERT_ALIAS, new KeyStore.PasswordProtection(TestContants.CERT_PASS.toCharArray()));
 
         final AOPDFSigner signer = new AOPDFSigner();
 
@@ -491,11 +486,11 @@ public class TestPAdES {
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         try (
-    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TestContants.CERT_PATH)
 		) {
-        	ks.load(is, CERT_PASS.toCharArray());
+        	ks.load(is, TestContants.CERT_PASS.toCharArray());
         }
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        pke = (PrivateKeyEntry) ks.getEntry(TestContants.CERT_ALIAS, new KeyStore.PasswordProtection(TestContants.CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
         final byte[] testPdf;
@@ -589,11 +584,11 @@ public class TestPAdES {
 
         final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         try (
-    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TestContants.CERT_PATH)
 		) {
-        	ks.load(is, CERT_PASS.toCharArray());
+        	ks.load(is, TestContants.CERT_PASS.toCharArray());
         }
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        pke = (PrivateKeyEntry) ks.getEntry(TestContants.CERT_ALIAS, new KeyStore.PasswordProtection(TestContants.CERT_PASS.toCharArray()));
 
         final AOSigner signer = new AOPDFSigner();
 
@@ -674,11 +669,11 @@ public class TestPAdES {
 
     	final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         try (
-    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TestContants.CERT_PATH)
 		) {
-        	ks.load(is, CERT_PASS.toCharArray());
+        	ks.load(is, TestContants.CERT_PASS.toCharArray());
         }
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(TestContants.CERT_ALIAS, new KeyStore.PasswordProtection(TestContants.CERT_PASS.toCharArray()));
 
         final byte[] testPdf;
         try (
@@ -711,11 +706,11 @@ public class TestPAdES {
 
     	final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         try (
-    		final InputStream is = ClassLoader.getSystemResourceAsStream(CERT_PATH)
+    		final InputStream is = ClassLoader.getSystemResourceAsStream(TestContants.CERT_PATH)
 		) {
-        	ks.load(is, CERT_PASS.toCharArray());
+        	ks.load(is, TestContants.CERT_PASS.toCharArray());
         }
-        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(TestContants.CERT_ALIAS, new KeyStore.PasswordProtection(TestContants.CERT_PASS.toCharArray()));
 
         final byte[] testPdf;
         try (

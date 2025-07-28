@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
@@ -47,7 +48,7 @@ final class SingleSignPreProcessor {
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos. */
 	static String doPreProcess(final SingleSign sSign,
 			                   final X509Certificate[] certChain,
-			                   final SingleSignConstants.SignAlgorithm algorithm) throws IOException,
+			                   final SingleSignConstants.DigestAlgorithm algorithm) throws IOException,
 			                                                                             AOException {
 		final TriphaseData td = getPreSign(sSign, certChain, algorithm);
 		final String tmp = td.toString();
@@ -59,7 +60,7 @@ final class SingleSignPreProcessor {
 
 	private static TriphaseData getPreSign(final SingleSign sSign,
 			                               final X509Certificate[] certChain,
-			                               final SingleSignConstants.SignAlgorithm algorithm) throws IOException,
+			                               final SingleSignConstants.DigestAlgorithm digestAlgorithm) throws IOException,
 			                                                                                         AOException {
 		if (certChain == null || certChain.length < 1) {
 			throw new IllegalArgumentException(
@@ -105,13 +106,15 @@ final class SingleSignPreProcessor {
 		// Comprobamos si se ha pedido validar las firmas antes de agregarles una nueva
         final boolean checkSignatures = Boolean.parseBoolean(extraParams.getProperty(EXTRA_PARAM_CHECK_SIGNATURES));
 
+        final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm.getName(), certChain[0].getPublicKey().getAlgorithm());
+
         TriphaseData td;
 
 		switch(sSign.getSubOperation()) {
 			case SIGN:
 				td = prep.preProcessPreSign(
 						docBytes,
-						algorithm.toString(),
+						signAlgorithm,
 						certChain,
 						extraParams,
 						checkSignatures
@@ -120,7 +123,7 @@ final class SingleSignPreProcessor {
 			case COSIGN:
 				td = prep.preProcessPreCoSign(
 						docBytes,
-						algorithm.toString(),
+						signAlgorithm,
 						certChain,
 						extraParams,
 						checkSignatures
@@ -137,7 +140,7 @@ final class SingleSignPreProcessor {
 				}
 				td = prep.preProcessPreCounterSign(
 						docBytes,
-						algorithm.toString(),
+						signAlgorithm,
 						certChain,
 						extraParams,
 						target,

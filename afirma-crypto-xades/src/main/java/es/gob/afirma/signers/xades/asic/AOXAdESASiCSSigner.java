@@ -14,6 +14,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -94,7 +96,6 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 
 	}
 
-
 	/**
 	 * Calcula la huella digital de los datos proporcionados.
 	 * @param data Datos del que calcular el hash.
@@ -102,7 +103,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	 * @return Huella digital de los datos.
 	 * @throws NoSuchAlgorithmException Cuando no se reconozca el algoritmo de hash.
 	 */
-	private static byte[] hash(final byte[] data, final String externalReferencesHashAlgorithm) throws NoSuchAlgorithmException {
+	public static byte[] hash(final byte[] data, final String externalReferencesHashAlgorithm) throws NoSuchAlgorithmException {
 		final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(externalReferencesHashAlgorithm);
 		final MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
 		return md.digest(data);
@@ -116,27 +117,28 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) throws AOException,
-			                                                  IOException {
-		return cosign(sign, algorithm, key, certChain, extraParams);
-	}
-
-	@Override
-	public byte[] cosign(final byte[] sign,
-			             final String algorithm,
-			             final PrivateKey key,
-			             final Certificate[] certChain,
 			             final Properties xParams) throws AOException,
 			                                                  IOException {
+
 		// Extraemos firma y datos del ASiC
-		final byte[] packagedData = ASiCUtil.getASiCSData(sign);
 		final byte[] packagedSign = ASiCUtil.getASiCSXMLSignature(sign);
+		final Map<String, byte[]> signedData = ASiCUtil.getASiCSData(sign);
+		final String signedDataName = signedData.keySet().iterator().next();
+		final byte[] packagedData = signedData.get(signedDataName);
 
 		final Properties extraParams = setASiCProperties(xParams, packagedData);
 		extraParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
 
+
+		final Map<String, byte[]> externalReferences = new HashMap<>();
+
+		externalReferences.put(signedDataName, packagedData);
+
+		final AOXAdESSigner signer = new AOXAdESSigner();
+		signer.setUriDereferencer(new UriAndDataDereferencer(externalReferences ));
+
 		// Creamos la contrafirma
-		final byte[] newCoSign = new AOXAdESSigner().cosign(
+		final byte[] newCoSign = signer.cosign(
 			packagedData,
 			packagedSign,
 			algorithm,
@@ -149,8 +151,19 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			newCoSign,
 			packagedData,
 			ASiCUtil.ENTRY_NAME_XML_SIGNATURE,
-			ASiCUtil.getASiCSDataFilename(sign)
+			signedDataName
 		);
+	}
+
+	@Override
+	public byte[] cosign(final byte[] sign,
+			             final String algorithm,
+			             final PrivateKey key,
+			             final Certificate[] certChain,
+			             final Properties xParams) throws AOException,
+			                                                  IOException {
+
+		return cosign(null, sign, algorithm, key, certChain, xParams);
 	}
 
 	@Override
@@ -163,8 +176,10 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			                  final Properties xParams) throws AOException,
 			                                                   IOException {
 		// Extraemos firma y datos del ASiC
-		final byte[] packagedData = ASiCUtil.getASiCSData(sign);
 		final byte[] packagedSign = ASiCUtil.getASiCSXMLSignature(sign);
+		final Map<String, byte[]> signedData = ASiCUtil.getASiCSData(sign);
+		final String signedDataName = signedData.keySet().iterator().next();
+		final byte[] packagedData = signedData.get(signedDataName);
 
 		final Properties extraParams = setASiCProperties(xParams, packagedData);
 		extraParams.put("keepKeyInfoUnsigned", Boolean.TRUE.toString()); //$NON-NLS-1$
@@ -184,15 +199,20 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			newCounterSign,
 			packagedData,
 			ASiCUtil.ENTRY_NAME_XML_SIGNATURE,
-			ASiCUtil.getASiCSDataFilename(sign)
+			signedDataName
 		);
 
 	}
 
 	@Override
-	public AOTreeModel getSignersStructure(final byte[] sign,
-			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException,
-			                                                                      IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, null, asSimpleSignInfo);
+	}
+
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
 		return new AOXAdESSigner().getSignersStructure(
 			ASiCUtil.getASiCSXMLSignature(sign),
 			asSimpleSignInfo
@@ -200,7 +220,12 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	}
 
 	@Override
-	public boolean isSign(final byte[] is) throws IOException {
+	public boolean isSign(final byte[] is) throws IOException{
+		return isSign(is, null);
+	}
+
+	@Override
+	public boolean isSign(final byte[] is, final Properties params) throws IOException {
 		final byte[] sign;
 		try {
 			sign = ASiCUtil.getASiCSXMLSignature(is);
@@ -226,14 +251,27 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	}
 
 	@Override
-	public byte[] getData(final byte[] signData) throws IOException {
-		return ASiCUtil.getASiCSData(signData);
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign, null);
 	}
 
 	@Override
-	public AOSignInfo getSignInfo(final byte[] signData) throws AOException,
+	public byte[] getData(final byte[] sign, final Properties params) throws IOException {
+		// Devolveremos solo los primeros datos que encontremos
+		final Map<String, byte[]> signedData = ASiCUtil.getASiCSData(sign);
+		final String signedDataName = signedData.keySet().iterator().next();
+		return signedData.get(signedDataName);
+	}
+
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException, IOException {
+		return getSignInfo(data, null);
+	}
+
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException,
 			                                                    IOException {
-		return new AOXAdESSigner().getSignInfo(ASiCUtil.getASiCSXMLSignature(signData));
+		return new AOXAdESSigner().getSignInfo(ASiCUtil.getASiCSXMLSignature(data));
 	}
 
 	/** Establece los par&aacute;metros necesarios (modificando los actuales incompatibles si fuese necesario)

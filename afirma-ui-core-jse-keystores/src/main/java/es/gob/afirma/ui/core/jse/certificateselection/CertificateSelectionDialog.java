@@ -108,20 +108,26 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	JDialog certDialog = null;
 
-	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
+	/**
+	 * Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Alias del certificado seleccionado o {@code null} si el usuario
 	 * cancela el di&aacute;logo o cierra sin seleccionar.
 	 * @throws CertificatesNotFoundException Cuando no el usuario cierra el
-	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido. */
+	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido.
+	 */
 	public String showDialog() throws  CertificatesNotFoundException {
 		return showDialog(true);
 	}
 
-	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
+	/**
+	 * Muestra el di&aacute;logo de selecci&oacute;n de certificados.
+	 * @param alwaysOnTop {@code true} si el di&aacute;logo se debe mantener por encima del resto
+	 * de ventanas, {@code false} en caso contrario.
 	 * @return Alias del certificado seleccionado o {@code null} si el usuario
 	 * cancela el di&aacute;logo o cierra sin seleccionar.
 	 * @throws CertificatesNotFoundException Cuando no el usuario cierra el
-	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido. */
+	 * di&aacute;logo y no hab&iacute;a cargado ning&uacute;n certificado v&aacute;lido.
+	 */
 	public String showDialog(final boolean alwaysOnTop) throws  CertificatesNotFoundException {
 
 		String title = CertificateSelectionDialogMessages.getString(
@@ -249,7 +255,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	/** Cambia el almac&eacute;n de claves actual.
 	 * @param ksType Tipo de almac&eacute;n de claves.
-	 * @param ksName Nombrede almac&eacute;n de claves
+	 * @param ksName Nombre de almac&eacute;n de claves
 	 * @param ksLibPath Librer&iacute;a de almac&eacute;n de claves.  */
 	public void changeKeyStore(final int ksType, final String ksName, final String ksLibPath) {
 
@@ -274,13 +280,14 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 			// Cambiamos el titulo del dialogo
 			this.currentKeyStoreTypeName = this.ksdm.getKeyStoreName();
+			final String name = this.currentKeyStoreTypeName != null ? this.currentKeyStoreTypeName : ksName;
 			this.certDialog.setTitle(CertificateSelectionDialogMessages.getString(
-					"CertificateSelectionDialog.0", this.currentKeyStoreTypeName)); //$NON-NLS-1$
+					"CertificateSelectionDialog.0", name)); //$NON-NLS-1$
 		}
 	}
 
 	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = new Comparator<NameCertificateBean>() {
-		/** {@inheritDoc} */
+
 		@Override
 		public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
 			if (o1 == null && o2 == null) {

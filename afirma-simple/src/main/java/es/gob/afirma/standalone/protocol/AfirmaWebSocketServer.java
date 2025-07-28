@@ -32,12 +32,18 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 	/** Respuesta que se debe enviar ante las peticiones de echo correctas. */
 	private static final String ECHO_OK_RESPONSE = "OK"; //$NON-NLS-1$
 
+	/** Uno de los prefijos que puede presentar el mensaje de invocaci&oacute;n de una firma de lote. Versi&oacute;n 1. */
+	private static final String HEADER_BATCH_1 = "afirma://batch?"; //$NON-NLS-1$
+
+	/** Uno de los prefijos que puede presentar el mensaje de invocaci&oacute;n de una firma de lote. Versi&oacute;n 1. */
+	private static final String HEADER_BATCH_2 = "afirma://batch/?"; //$NON-NLS-1$
+
 	private static int protocolVersion = -1;
 
 	protected String sessionId;
 
 	/**
-	 * Genera un servidor websocket que atiende las peticiones del Cliente @firma.
+	 * Genera un servidor websocket que atiende las peticiones de Autofirma.
 	 * @param port Puerto a trav&eacute;s del que realizar la comunicaci&oacute;n.
 	 * @param sessionId Identificador con el que se deber&aacute; autenticar la web
 	 * para usar el servicio.
@@ -100,6 +106,10 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 		// Si recibimos cualquier cosa distinta de un eco, consideraremos que es una peticion de
 		// operacion y la procesaremos como tal
 		else {
+			// Si se trata de una operacion de firma de lote, incrementamos el tiempo de timeout
+			final boolean batchOperation = message.startsWith(HEADER_BATCH_1) || message.startsWith(HEADER_BATCH_2);
+			setConnectionLostTimeout(batchOperation ? 240 : 60);
+			// Ejecutamos la peticion y devolvemos el resultado
 			broadcast(ProtocolInvocationLauncher.launch(message, protocolVersion, true), Collections.singletonList(ws));
 		}
 	}

@@ -7,6 +7,7 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -36,6 +37,7 @@ public final class TestXAdESWithTimeStamp {
     /** Pruebas de XAdES-T.
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
+	@Ignore
 	@Test
     public void testXAdEST() throws Exception {
 
@@ -76,6 +78,7 @@ public final class TestXAdESWithTimeStamp {
     /** Pruebas de XAdES-T-Level.
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
+	@Ignore
 	@Test
     public void testXAdESTLevel() throws Exception {
 

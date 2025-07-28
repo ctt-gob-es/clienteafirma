@@ -15,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,18 +35,25 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 
-/** Configura la instalaci&oacute;n en Windows para la correcta ejecuci&oacute;n de AutoFirma. */
+/** Configura la instalaci&oacute;n en Windows para la correcta ejecuci&oacute;n de Autofirma. */
 final class ConfiguratorWindows implements Configurator {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
-	private static final String CA_CERT_FILENAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String CA_CERT_FILENAME = "Autofirma_ROOT.cer"; //$NON-NLS-1$
+
+	/**
+	 * N&uacute;mero de veces que se intentar&aacute; desinstalar el certificado del almac&eacute;n
+	 * de Firefox cuando sea necesario hacerlo.
+	 */
+	private static final int UNINSTALL_CERT_RETRIES = 3;
 
 	private final boolean jnlpInstance;
 	private final boolean firefoxSecurityRoots;
@@ -130,6 +136,11 @@ final class ConfiguratorWindows implements Configurator {
 					}
 				}
 
+				// Intentamos desinstalar cualquier certificado nuestro que pueda haber antes de instalar el nuevo
+				window.print(Messages.getString("ConfiguratorWindows.26")); //$NON-NLS-1$
+				ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(appDir, window, UNINSTALL_CERT_RETRIES);
+
+				// Instalamos el certificado de CA en el almacen de confianza de Firefox
 				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
 				try {
 					ConfiguratorFirefoxWindows.installCACertOnMozillaKeyStores(appDir, window);
@@ -166,7 +177,7 @@ final class ConfiguratorWindows implements Configurator {
 		// se puedan crear los ficheros sin permisos especiales
 		if (jnlpDeployment) {
 			final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-			final File appDir = new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+			final File appDir = new File (commonDir, "Autofirma"); //$NON-NLS-1$
 			if (appDir.isDirectory() || appDir.mkdirs()) {
 				return appDir;
 			}
@@ -184,7 +195,7 @@ final class ConfiguratorWindows implements Configurator {
 	@Override
 	public File getAlternativeApplicationDirectory() {
 		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+		return new File (commonDir, "Autofirma"); //$NON-NLS-1$
 	}
 
 	/** Comprueba si ya existe un almac&eacute;n de certificados generado.
@@ -203,7 +214,8 @@ final class ConfiguratorWindows implements Configurator {
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(
 				getApplicationDirectory(this.jnlpInstance),
-				console);
+				console,
+				UNINSTALL_CERT_RETRIES);
 
 		// Listamos los plugins instalados
 		List<AfirmaPlugin> plugins = null;
@@ -211,7 +223,7 @@ final class ConfiguratorWindows implements Configurator {
 			plugins = pluginsManager.getPluginsLoadedList();
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de AutoFirma", e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de Autofirma", e); //$NON-NLS-1$
 		}
 
 		// Desinstalamos los plugins instalados si los hubiese
@@ -233,7 +245,7 @@ final class ConfiguratorWindows implements Configurator {
 			try {
 				Files.walkFileTree(
 						alternativeDir.toPath(),
-						new HashSet<FileVisitOption>(),
+						new HashSet<>(),
 						Integer.MAX_VALUE,
 						new SimpleFileVisitor<Path>() {
 							@Override

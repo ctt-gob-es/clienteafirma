@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.9-SNAPSHOT</version>
+		<version>1.9</version>
 	</parent>
 	
 	<dependencies>
@@ -54,6 +54,14 @@
 						<artifactId>xercesImpl</artifactId>
 					</exclusion>
 	    		</exclusions>
+		</dependency>
+
+		<!-- Biblioteca para la impresion de logs en pruebas -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+	    		<artifactId>slf4j-simple</artifactId>
+	    		<version>1.7.36</version>
+	    		<scope>test</scope>
 		</dependency>
 
 	</dependencies>

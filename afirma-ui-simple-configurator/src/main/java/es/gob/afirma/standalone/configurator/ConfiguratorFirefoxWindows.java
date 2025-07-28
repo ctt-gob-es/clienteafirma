@@ -35,13 +35,14 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
  * @author Carlos Gamuci. */
 final class ConfiguratorFirefoxWindows {
 
-	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String FILE_AUTOFIRMA_CERTIFICATE = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String CERTUTIL_DIR = "certutil"; //$NON-NLS-1$
 	private static final String CERTUTIL_EXE = "certutil.exe"; //$NON-NLS-1$
 	private static final String CERTUTIL_RESOURCE = "/windows/certutil.windows.zip"; //$NON-NLS-1$
@@ -64,6 +65,13 @@ final class ConfiguratorFirefoxWindows {
 	private static final String ENV_VARIABLE_SYSTEMDRIVE = "SystemDrive"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	/**
+	 * A partir de determinado momento CertUtil dejo de reconocer el certificado de confianza
+	 * en Windows con el alias con el que se instalaba (CertUtil.CERT_ALIAS) y lo reconocio por
+	 * su
+	 */
+	private static final String CERT_ALIAS = "Autofirma ROOT"; //$NON-NLS-1$
 
 	private static String PROFILES_INI_RELATIVE_PATH;
 	private static String USERS_PATH;
@@ -151,8 +159,13 @@ final class ConfiguratorFirefoxWindows {
 	 * de Firefox de todos los perfiles de todos los usuarios del sistema.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
+	 * @param iterations N&uacute;mero de veces que se debe repetir el proceso.
 	 */
-	static void uninstallRootCAMozillaKeyStore(final File appDir, final Console console) {
+	static void uninstallRootCAMozillaKeyStore(final File appDir, final Console console, final int iterations) {
+
+		if (iterations <= 0) {
+			return;
+		}
 
 		final File[] mozillaProfileDirs = getAllMozillaProfileDirs();
 		if (mozillaProfileDirs == null || mozillaProfileDirs.length == 0) {
@@ -175,15 +188,27 @@ final class ConfiguratorFirefoxWindows {
 		}
 
 		for (final File profileDir : mozillaProfileDirs) {
-			try {
-				uninstallCACertFromMozillaKeyStore(appDir, profileDir, console);
-			}
-			catch (final Exception e) {
-				LOGGER.log(Level.WARNING, "No se pudo desinstalar el certificado SSL raiz del almacen de Mozilla Firefox", e); //$NON-NLS-1$
+			for (int i = 0; i < iterations; i++) {
+				try {
+					uninstallCACertFromMozillaKeyStore(appDir, profileDir, console);
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "No se pudo desinstalar o no se encontro el certificado SSL raiz del almacen de Mozilla Firefox", e); //$NON-NLS-1$
+				}
 			}
 		}
 
 		//removeCertUtilFromDisk(appDir);
+	}
+
+	/**
+	 * Desinstala un certificado de los almacenes de autoridades de confianza
+	 * de Firefox de todos los perfiles de todos los usuarios del sistema.
+	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
+	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
+	 */
+	static void uninstallRootCAMozillaKeyStore(final File appDir, final Console console) {
+		uninstallRootCAMozillaKeyStore(appDir, console, 1);
 	}
 
 	/** Comprueba si certutil existe y si puede ejecutarse.
@@ -313,21 +338,35 @@ final class ConfiguratorFirefoxWindows {
 		final boolean sqlDb = new File(profileDir, "pkcs11.txt").exists(); //$NON-NLS-1$
 		final String profileReference = (sqlDb ? "sql:" : "") + profileDir.getAbsolutePath(); //$NON-NLS-1$ //$NON-NLS-2$
 
+		try {
+			deleteCertificate(ConfiguratorUtil.CERT_ALIAS, certutilFile, appDir, profileReference, console);
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se encontro o no se pudo borrar el certificado '" + ConfiguratorUtil.CERT_ALIAS //$NON-NLS-1$
+					+ "' de CA en el perfil de Firefox del usuario '" //$NON-NLS-1$
+					+ profileDir.getAbsolutePath() + "'. Se buscara con el alias " + CERT_ALIAS); //$NON-NLS-1$
+
+			try {
+				deleteCertificate(CERT_ALIAS, certutilFile, appDir, profileReference, console);
+			}
+			catch (final Exception e2) {
+				throw new KeyStoreException("No se encontro o no se pudo borrar el certificado de CA en el perfil de usuario de Firefox " + profileDir.getAbsolutePath(), e2); //$NON-NLS-1$
+			}
+		}
+	}
+
+	private static void deleteCertificate(final String alias, final File certutilFile, final File appDir, final String profileReference, final Console console) throws IOException {
+
 		final String[] certutilCommands = new String[] {
 				escapePath(certutilFile.getAbsolutePath()),
 				"-D", //$NON-NLS-1$
 				"-d", //$NON-NLS-1$
 				escapePath(profileReference),
 				"-n", //$NON-NLS-1$
-				"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
+				"\"" + alias + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 		};
 
-		try {
-			execCertUtilCommandLine(appDir, certutilCommands, console);
-		}
-		catch (final Exception e) {
-			throw new KeyStoreException("Error en el borrado del certificado de CA en el perfil de usuario " + profileDir.getAbsolutePath(), e); //$NON-NLS-1$
-		}
+		execCertUtilCommandLine(appDir, certutilCommands, console);
 	}
 
 	/**

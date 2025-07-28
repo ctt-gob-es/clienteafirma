@@ -125,6 +125,8 @@ public final class PreferencesPanelXades extends JScrollPane {
 				  final ModificationListener modificationListener
 				  ) {
 
+		getVerticalScrollBar().setUnitIncrement(16);
+
 		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
         final GridBagConstraints gbc = new GridBagConstraints();

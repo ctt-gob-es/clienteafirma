@@ -8,6 +8,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
+import org.junit.Test;
+
 import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfStamper;
 
@@ -18,10 +20,9 @@ import es.gob.afirma.core.misc.Base64;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class TestAddingXmp {
 
-	/** Main.
-	 * @param args No se usa.
-	 * @throws Exception En cualquier error. */
-	public static void main(final String[] args) throws Exception {
+	@SuppressWarnings("static-method")
+	@Test
+	public void test() throws Exception {
 
 		// PDF de ejemplo
 		final PdfReader reader = new PdfReader(

@@ -2,7 +2,7 @@
 <map version="1.0">
 
 <!-- Pages -->
-	<mapID target="AutoFirma" url="../Spanish.lproj/AutoFirma.html" />
+	<mapID target="Autofirma" url="../Spanish.lproj/Autofirma.html" />
 	<mapID target="PantallaEspera" url="../Spanish.lproj/pgs/PantallaEspera.html" />
 	<mapID target="PantallaFirma" url="../Spanish.lproj/pgs/PantallaFirma.html" />
 	<mapID target="PantallaDetalle" url="../Spanish.lproj/pgs/PantallaDetalle.html" />

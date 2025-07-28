@@ -39,7 +39,7 @@ import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.signers.xml.Utils;
 
 /** Dereferenciador a medida de referencias XML DOM. */
-public final class CustomUriDereferencer implements URIDereferencer {
+public class CustomUriDereferencer implements URIDereferencer {
 
 	private static final String ID = "Id"; //$NON-NLS-1$
 
@@ -186,7 +186,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
     	return getElementById(doc, id);
 	}
 
-	private static Data getStreamData(final Node targetNode) throws IOException {
+	protected static Data getStreamData(final Node targetNode) throws IOException {
 		try {
 			final Class<?> xmlSignatureInputClass = getXmlSignatureInputClass();
 			final Constructor<?> xmlSignatureInputConstructor = xmlSignatureInputClass.getConstructor(Node.class);

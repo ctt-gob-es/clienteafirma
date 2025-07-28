@@ -12,14 +12,15 @@ package es.gob.afirma.standalone;
 import java.awt.Component;
 import java.io.IOException;
 import java.security.UnrecoverableKeyException;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -262,6 +263,41 @@ public final class SimpleKeyStoreManager {
 		return mozProfileDir != null && nssLibDir != null;
     }
 
+    /**
+     * Recupera el repositorio con el nombre indicado. Si no existe un <code>KeyStore</code> con
+     * ese nombre, se devuelve <code>null</code>.
+     * @param name Nombre del repositorio que se desea recuperar.
+     * @return KeyStore Repositorio de certificados.
+     */
+    public static AOKeyStore getKeyStore(final String name) {
+    	if (name == null) {
+    		return null;
+    	}
+        for (final AOKeyStore tempKs : AOKeyStore.values()) {
+            if (tempKs.getName().equalsIgnoreCase(name.trim())) {
+                return tempKs;
+            }
+        }
+        // Buscamos entre los registros de los almacenes de clave PKCS#11
+        final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
+        final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
+        final boolean existSmartCard = userRegResult.containsKey(name) || systemRegResult.containsKey(name);
+        if (existSmartCard) {
+			final AOKeyStore result = AOKeyStore.PKCS11;
+			result.setName(name);
+			return result;
+		}
+
+        try {
+        	return AOKeyStore.valueOf(name);
+        }
+        catch(final Exception e) {
+        	Logger.getLogger("es.gob.afirma").warning("Almacen de claves no reconocido (" + name + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        }
+        return null;
+    }
+
+
     /** Obtiene el almac&eacute;n de claves por defecto de la aplicaci&oacute;n.
      * @return Almac&eacute;n de claves por defecto de la aplicaci&oacute;n. */
     public static AOKeyStore getDefaultKeyStoreType() {
@@ -278,7 +314,7 @@ public final class SimpleKeyStoreManager {
     private static AOKeyStore getValidKeyStoreType(final String keyStoreName) {
     	AOKeyStore ks = null;
     	if (keyStoreName != null && !keyStoreName.isEmpty()) {
-    		ks = AOKeyStore.getKeyStore(keyStoreName);
+    		ks = getKeyStore(keyStoreName);
     		if (ks != null) {
     			final OS os = Platform.getOS();
     			// Si desinstalan Firefox que no se quede una seleccion mala
@@ -309,9 +345,10 @@ public final class SimpleKeyStoreManager {
     }
 
     /**
-     * Obtiene el &uacuteltimo almac&eacute;n de claves seleccionado por el usuario. En caso de que no est&eacute;
+     * Obtiene el &uacute;ltimo almac&eacute;n de claves seleccionado por el usuario. En caso de que no est&eacute;
      * definido o no sea un almac&eacute;n v&aacute;lido, se haya seleccionado.
-     * @return Almac&eacute;n de claves seleccionado por el usuario. */
+     * @return Almac&eacute;n de claves seleccionado por el usuario.
+     */
     public static AOKeyStore getLastSelectedKeystore() {
     	final String savedStoreName = KeyStorePreferencesManager.getLastSelectedKeystore();
     	return getValidKeyStoreType(savedStoreName);

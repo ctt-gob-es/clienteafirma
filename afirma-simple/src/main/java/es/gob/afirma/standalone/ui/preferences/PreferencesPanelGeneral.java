@@ -35,12 +35,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.DataDownloader;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.GenericFileFilter;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.HttpManager;
 import es.gob.afirma.standalone.JMulticardUtilities;
 import es.gob.afirma.standalone.ProxyUtil;
@@ -103,6 +103,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 	private void createUI(final KeyListener keyListener,
 				  final ItemListener modificationListener) {
+
+		getVerticalScrollBar().setUnitIncrement(16);
 
 		final JPanel mainPanel = new JPanel(new GridBagLayout());
 
@@ -175,7 +177,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 							SimpleAfirmaMessages.getString("PreferencesPanel.111"), //$NON-NLS-1$
 							false,
 							false,
-							AutoFirmaUtil.getDefaultDialogsIcon(),
+							DesktopUtil.getDefaultDialogsIcon(),
 							PreferencesPanelGeneral.this
 						)[0].getAbsolutePath();
 					}
@@ -299,6 +301,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		// Solo mostramos el check de buscar actualizaciones si esta habilitado
 		// su uso
 		if (SimpleAfirma.isUpdatesEnabled()) {
+			this.checkForUpdates.setEnabled(!this.blocked);
 			this.checkForUpdates.getAccessibleContext().setAccessibleName(
 					SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 			);
@@ -314,6 +317,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		// En Windows, se dara la posibilidad de configurar el comportamiento de
 		// JMulticard. Para el resto de sistemas, es obligatorio su uso
 		if (Platform.getOS() == Platform.OS.WINDOWS || Platform.getOS() == Platform.OS.LINUX) {
+			this.enableJMulticard.setEnabled(!this.blocked);
 			this.enableJMulticard.getAccessibleContext().setAccessibleName(
 					SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 			);
@@ -417,6 +421,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		c.gridy++;
 
+		this.allowSignInvalidSignatures.setEnabled(!this.blocked);
 		this.allowSignInvalidSignatures.getAccessibleContext().setAccessibleName(
 				SimpleAfirmaMessages.getString("PreferencesPanel.182") //$NON-NLS-1$
 		);
@@ -447,6 +452,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		final JPanel netConfigInnerPanel = new JPanel(new GridBagLayout());
 		netConfigPanel.add(netConfigInnerPanel);
 
+		this.secureConnections.setEnabled(!this.blocked);
 		this.secureConnections.addItemListener(modificationListener);
 		this.secureConnections.addKeyListener(keyListener);
 		this.secureConnections.setToolTipText(

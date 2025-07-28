@@ -32,7 +32,7 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 /**
  * Clase que gestiona los componentes gr&aacute;ficos de las ventanas de restauraci&oacute;n de la
- * configuraci&oacute;n de navegadores de AutoFirma.
+ * configuraci&oacute;n de navegadores de Autofirma.
  *
  */
 public final class RestoreConfigPanel extends JPanel implements KeyListener, DisposableInterface {
@@ -166,7 +166,7 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 			RestoreConfigPanel.this.taskOutput.setText(null);
 			// Deshabilito el boton mientras el proceso se esta ejecutando
 			restoreButton.setEnabled(false);
-			new Thread(() -> new RestoreConfigManager().restoreConfigAutoFirma(RestoreConfigPanel.this)).start();
+			new Thread(() -> new RestoreConfigManager().restoreConfig(RestoreConfigPanel.this)).start();
 
 			restoreButton.setEnabled(true);
 

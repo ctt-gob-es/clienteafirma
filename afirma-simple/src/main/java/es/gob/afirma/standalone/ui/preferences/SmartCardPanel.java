@@ -9,7 +9,6 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -29,8 +28,6 @@ import es.gob.afirma.standalone.SimpleAfirmaMessages;
 final class SmartCardPanel extends JPanel {
 
 	private static final long serialVersionUID = -6040435120676908406L;
-	private static final int PREFERRED_WIDTH = 520;
-	private static final int PREFERRED_HEIGHT = 100;
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -51,11 +48,12 @@ final class SmartCardPanel extends JPanel {
 	 */
 	private void createUI() {
 		setLayout(new GridBagLayout());
-		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
+
 		this.cardnameLbl.setLabelFor(this.cardNameTxt);
 		this.cardNameTxt.setFocusable(true);
 		this.controllerPathLbl.setLabelFor(this.controllerPathTxt);
 		this.controllerPathTxt.setEditable(false);
+		this.controllerPathTxt.setColumns(52);
 
 		final JButton selectFileButton = new JButton(SimpleAfirmaMessages.getString("SmartCardDialog.3")); //$NON-NLS-1$
 		selectFileButton.setFocusable(true);

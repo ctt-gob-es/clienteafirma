@@ -9,7 +9,6 @@
 
 package es.gob.afirma.standalone.ui;
 
-import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
@@ -27,14 +26,11 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 
 /** Di&aacute;logo de espera indeterminada.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class CommonWaitDialog extends JDialog {
-
-	private static final int PREFERRED_WIDTH = 300;
-	private static final int PREFERRED_HEIGHT = 100;
 
 	private static final long serialVersionUID = -6137113502471587689L;
 
@@ -82,13 +78,9 @@ public final class CommonWaitDialog extends JDialog {
 
 		setContentPane(panel);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
-		final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-		setLocation(cp.x - PREFERRED_WIDTH/2, cp.y - PREFERRED_HEIGHT/2);
-		setResizable(false);
-		setTitle(title);
+
         try {
-            setIconImages(AutoFirmaUtil.getIconImages());
+            setIconImages(DesktopUtil.getIconImages());
         }
         catch (final Exception e) {
             LOGGER.warning(
@@ -97,6 +89,10 @@ public final class CommonWaitDialog extends JDialog {
         }
 
         pack();
+
+		final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+		setLocation(cp.x - getWidth()/2, cp.y - getHeight()/2);
+		setResizable(false);
 	}
 
 	/** Establece el mensaje del di&aacute;logo.

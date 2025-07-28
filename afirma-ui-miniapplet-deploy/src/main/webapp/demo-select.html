@@ -14,8 +14,8 @@
 	<meta name="author" content="Dirección General para el impulso de la Administración Electrónica">
 	<meta name="organization" content="Ministerio de Hacienda y Administraciones Públicas">
 	<meta name="locality" content="Madrid, España">
-	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, cliente firma, firma electrónica, certificado electrónico, CMS, CAdES, XAdES, XMLDSig">
-	<meta name="description" content="Firma móvil. Web de pruebas del Cliente @firma móvil ">
+	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, autofirma, firma electrónica, certificado electrónico, CMS, CAdES, XAdES, XMLDSig">
+	<meta name="description" content="Firma móvil. Web de pruebas de Autofirma">
 	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript" defer="defer">
 	<!--
@@ -71,14 +71,14 @@
 			if (AutoScript.isIOS()) {				
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4";
-				storeLink.innerHTML = "Descargue el Cliente @firma iOS";
+				storeLink.innerHTML = "Descargue Autofirma App iOS";
 				
 				document.getElementById("faq_link").style.display = "none";
 			}
 			else if (AutoScript.isAndroid()) {
 				var storeLink = document.getElementById("afirmaStoreLink");
 				storeLink.href="https://play.google.com/store/apps/details?id=es.gob.afirma";
-				storeLink.innerHTML = "Descargue el Cliente @firma Android";
+				storeLink.innerHTML = "Descargue Autofirma App Android";
 
 				document.getElementById("faq_link").style.display = "none";
 			}
@@ -92,8 +92,9 @@
 			document.getElementById("dialogoEspera").style.display = "none";
 		}
 	-->
+		AutoScript.setServlets(servletsBase + "/afirma-signature-storage/StorageService", servletsBase + "/afirma-signature-retriever/RetrieveService");	
+		AutoScript.setForceWSMode(true);
 		AutoScript.cargarAppAfirma();
-		AutoScript.setServlets(servletsBase + "/afirma-signature-storage/StorageService", servletsBase + "/afirma-signature-retriever/RetrieveService");
 	</script>
 <body onload="mostrarPantalla()">
 	<!-- CONTENEDOR ** -->
@@ -102,8 +103,8 @@
 			
 
 <div class="cabecera">
-	<a title="Cliente Afirma" class="floatLeft">
-		<img src="img/logo_cliente.png" alt="Cliente @firma" title="Ciente @firma" style="width: 180px; height: 57px; margin-left: 26px; margin-top: 10px;">
+	<a title="Autofirma" class="floatLeft">
+		<img src="img/logo_autofirma.png" alt="Logo Autofirma" title="Ciente @firma" style="width: 211px; height: 50px; margin-left: 26px; margin-top: 10px;">
 	</a>
 	<a href="https://www.lamoncloa.gob.es/" title="Gobierno de España">
 		<img src="img/logoGobEsp.PNG" alt="www.lamoncloa.gob.es" title="Gobierno de España" class="logoGobEsp">
@@ -139,7 +140,7 @@
 
 	<div class="lblAnchoMaxMB">
 			<span>1. <a id="afirmaStoreLink" href="http://firmaelectronica.gob.es/Home/Descargas.html">Descargue Autofirma</a></span>
-			<span id="faq_link" style="display: block; padding-left: 50px; padding-top: 10px">Si tiene dudas o alg&uacute;n problema durante la instalaci&oacute;n, consulte la <a target="_blank" href="https://github.com/ctt-gob-es/clienteafirma/wiki/Instalaci%C3%B3n-AutoFirma:-Problemas-conocidos">Wiki del proyecto</a></span>
+			<span id="faq_link" style="display: block; padding-left: 50px; padding-top: 10px">Si tiene dudas o alg&uacute;n problema durante la instalaci&oacute;n, consulte la <a target="_blank" href="https://github.com/ctt-gob-es/clienteafirma/wiki/Preguntas-y-respuestas">Wiki del proyecto</a></span>
 	</div><br/>
 	<div class="lb2AnchoMaxMB">
 			<span>2. Pulse el bot&oacute;n "Seleccionar Certificado".</span>
@@ -153,15 +154,6 @@
 	</fieldset>
 </form>
 
-	<div class="nota"><p>
-	Nota: La selecci&oacute;n del certificado se realiza mediante una aplicaci&oacute;n firmada por la D.G. para Impulso de 
-la Administración Electrónica por su seguridad.
-	<a href="https://valide.redsara.es/valide/requisitos.html" class="enlace">
-		Pulsa aquí para ver los requisitos de funcionamiento
-	</a>
-	</p>
-	</div>
-
 </div>
 				</div>
 
@@ -172,7 +164,9 @@ la Administración Electrónica por su seguridad.
 </div>
 
 <div style="float: left; width: 200px; margin-left: 30px; margin-top: 20px;">
-<a href="https://itunes.apple.com/us/app/cliente-firma-movil/id627410001?mt=8&uo=4" target="itunes_store" style="display:inline-block;overflow:hidden;background:url(https://linkmaker.itunes.apple.com/assets/shared/badges/es-es/appstore-lrg.svg) no-repeat;width:135px;height:40px;background-size:contain;"></a>
+<a href="https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200 " style="display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 47px;">
+  <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000" alt="Descarga en la App Store" style="border-radius: 13px; width: 140px; height: 47px;">
+</a>
 </div>
 
 				 <div class="clear"></div>

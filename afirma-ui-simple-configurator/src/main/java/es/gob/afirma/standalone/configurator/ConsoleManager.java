@@ -57,7 +57,7 @@ final class ConsoleManager {
 		if (!headless) {
 			AOUIFactory.showErrorMessage(
 				errorText,
-				Messages.getString("AutoFirmaConfigurator.2"), //$NON-NLS-1$
+				Messages.getString("AutofirmaConfigurator.2"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE,
 				t
 			);

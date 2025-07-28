@@ -88,7 +88,7 @@ public class ConfigManager {
 		}
 
 		if (configDir == null) {
-			LOGGER.warning("No se definio la variable " + CONFIG_FILE + " con el directorio del fichero de configuracion"); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("No se definio la variable " + ENVIRONMENT_VAR_CONFIG_DIR + " con el directorio del fichero de configuracion"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Cargamos la configuracion del servicio

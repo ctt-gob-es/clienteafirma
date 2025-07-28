@@ -31,6 +31,7 @@ import java.util.zip.ZipInputStream;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.so.macos.ShellScript;
 import es.gob.afirma.standalone.so.macos.UnixUtils;
 
@@ -259,7 +260,7 @@ final class RestoreConfigFirefoxMacOS {
 
 		final String certUtilPath = escapePath(certUtilFile.getAbsolutePath());
 		final String profilePath = escapePath(profileDir.getAbsolutePath());
-		final String alias = RestoreConfigUtil.CERT_ALIAS;
+		final String alias = ConfiguratorUtil.CERT_ALIAS;
 
 		// Si en el directorio del perfil existe el fichero pkcs11.txt entonces se trata
 		// de un almacen de certificados compartido SQL
@@ -267,7 +268,7 @@ final class RestoreConfigFirefoxMacOS {
 		final String profileRef = (sqlDb ? "sql:" : "") + profilePath; //$NON-NLS-1$ //$NON-NLS-2$
 
 		return String.format(
-				"max=$(%1$s -L -d %2$s | grep AutoFirma | wc -l);" //$NON-NLS-1$
+				"max=$(%1$s -L -d %2$s | grep Autofirma | wc -l);" //$NON-NLS-1$
 				+ "for ((i=0; i<$max; i++));" //$NON-NLS-1$
 				+ "do %1$s -D -d %2$s -n \"%3$s\";" //$NON-NLS-1$
 				+ "done", //$NON-NLS-1$
@@ -281,7 +282,7 @@ final class RestoreConfigFirefoxMacOS {
 		final String certPath = escapePath(certFile.getAbsolutePath());
 		final String certUtilPath = escapePath(certUtilFile.getAbsolutePath());
 		final String profilePath = escapePath(profileDir.getAbsolutePath());
-		final String alias = RestoreConfigUtil.CERT_ALIAS;
+		final String alias = ConfiguratorUtil.CERT_ALIAS;
 
 		return String.format(
 				"%s -A -d sql:%s -i %s -n \"%s\" -t \"C,,\"", //$NON-NLS-1$

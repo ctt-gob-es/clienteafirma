@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.http.SSLErrorProcessor;
@@ -115,6 +116,12 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 	public final byte[] getData(final byte[] sign) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
+		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+	}
 
 	@Override
 	public byte[] cosign(final byte[] data,
@@ -153,6 +160,18 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 			                                     final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) {
+		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params) {
+		return isSign(signData);
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -179,6 +198,12 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 	/** {@inheritDoc} */
 	@Override
 	public AOSignInfo getSignInfo(final byte[] sign) {
+		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 

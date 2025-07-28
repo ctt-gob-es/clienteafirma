@@ -7,12 +7,12 @@
 	<packaging>jar</packaging>
 	
 	<name>afirma-ui-simpleafirma</name>
-	<description>Aplicacion AutoFirma</description>
+	<description>Aplicacion Autofirma</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.9-SNAPSHOT</version>
+		<version>1.9</version>
 	</parent>
 
 	<properties>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.twelvemonkeys.imageio</groupId>
 			<artifactId>imageio-jpeg</artifactId>
-			<version>3.6</version>
+			<version>3.11.0</version>
 		</dependency>
 		
 		<!-- Incluimos el puente de logs de Java para SLF4J para evitar que se use otro. -->
@@ -52,6 +52,12 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-core</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core-prefs</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
 
@@ -82,6 +88,12 @@
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-keystores-mozilla</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-keystores-jmulticard-ui</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
 		
@@ -209,13 +221,13 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
-			<artifactId>jmulticard-ui</artifactId>
+			<artifactId>jmulticard-jsr268</artifactId>
 		</dependency>
-
+		
 		<dependency>
 		    <groupId>org.java-websocket</groupId>
 			<artifactId>Java-WebSocket</artifactId>
- 			<version>1.5.3</version>
+ 			<version>1.6.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -256,6 +268,13 @@
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
 			<version>5.13.0</version>
+		</dependency>
+		
+		<!--  Dependencias para pruebas -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -304,7 +323,7 @@
 	      </activation>
 
 	      <build>
-	      	<finalName>AutoFirma</finalName>
+	      	<finalName>autofirma</finalName>
        		<plugins>
      			<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -341,9 +360,6 @@
 						</execution>
 					</executions>
 					<configuration>
-						<archive>
-							<addMavenDescriptor>false</addMavenDescriptor>
-						</archive>
 						<filters>
 							<filter>
 								<artifact>*:*</artifact>

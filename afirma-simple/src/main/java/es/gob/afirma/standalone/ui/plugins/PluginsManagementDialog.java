@@ -37,7 +37,6 @@ public final class PluginsManagementDialog extends JDialog {
 		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
 		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(550, screenHeight * 0.8));
 		setSize(preferedFrameSize);
-		setResizable(false);
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}

@@ -36,7 +36,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.misc.http.TrustStoreManager;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.ui.core.jse.certificateselection.CertificateUtils;
 
@@ -67,7 +67,7 @@ final class ConfirmImportCertDialog extends JDialog  {
 
 		setModal(true);
 		setTitle(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.6")); //$NON-NLS-1$
-		setIconImages(AutoFirmaUtil.getIconImages());
+		setIconImages(DesktopUtil.getIconImages());
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));

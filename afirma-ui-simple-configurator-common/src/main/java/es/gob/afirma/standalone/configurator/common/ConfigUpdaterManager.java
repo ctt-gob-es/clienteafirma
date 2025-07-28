@@ -27,8 +27,13 @@ public class ConfigUpdaterManager {
 	}
 
 	/**
-	 * Guarda la configuracion base de la aplicacion a partir de una URL y establece
-	 * la politica de actualizaciones posteriores.
+	 * Guarda la configuraci&oacute;n base de la aplicaci&oacute;n a partir de una URL y establece
+	 * la pol&iacute;tica de actualizaciones posteriores.
+	 * @param url Direcci&oacute;n desde la que descargar la configuraci&oacute;n por defecto de la
+	 * aplicaci&oacute;n.
+	 * @param allowUpdates {@code true} indica que se debe comprobar cuando toque si hay una
+	 * actualizaci&oacute;n de la configuraci&oacute;n en la URL indicada, {@code false} cuando no
+	 * se desee actualizar esta configuraci&oacute;n posteriormente.
 	 */
 	public static void savePrefsConfigFile(final String url, final boolean allowUpdates) {
 		try {

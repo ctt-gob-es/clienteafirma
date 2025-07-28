@@ -41,10 +41,9 @@ public final class RestoreConfigDialog extends JDialog {
 		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
 		final Dimension preferedFrameSize = new Dimension(600, (int) Math.min(550, screenHeight * 0.8));
 		setSize(preferedFrameSize);
-		setResizable(false);
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		this.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("RestoreConfigPanel.4")); //$NON-NLS-1$
+		getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("RestoreConfigPanel.4")); //$NON-NLS-1$
 	}
 
 	/** Muestra el di&aacute;logo.

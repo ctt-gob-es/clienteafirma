@@ -49,6 +49,7 @@ import javax.xml.crypto.dsig.SignatureProperties;
 import javax.xml.crypto.dsig.SignatureProperty;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
+import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
@@ -65,10 +66,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.keystores.AOCancelledSMOperationException;
+import es.gob.afirma.core.keystores.AuthenticationException;
+import es.gob.afirma.core.keystores.LockedKeyStoreException;
+import es.gob.afirma.core.keystores.PinException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
@@ -81,7 +85,6 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
-import nu.xom.canonical.Canonicalizer;
 
 /** Manejador de firmas electr&oacute;nicas XML de ficheros ODF en formato compatible
  * con OpenOffice.org 3.2 y superiores.
@@ -233,7 +236,7 @@ public final class AOODFSigner implements AOSigner {
 	            final List<Transform> transformList = new ArrayList<>(1);
 	            transformList.add(
 	        		fac.newTransform(
-	        			Canonicalizer.CANONICAL_XML,
+	        			CANONICAL_XML_ALGORITHM,
 	    				(TransformParameterSpec) null
 					)
 	    		);
@@ -456,9 +459,37 @@ public final class AOODFSigner implements AOSigner {
 	            		);
 
 	            final DOMSignContext context = new DOMSignContext(key, rootSignatures);
-	            xmlSignature.sign(
-	                 context
-	            );
+	            try {
+	            	xmlSignature.sign(
+	            			context
+	            			);
+	            }
+	            catch (final XMLSignatureException e) {
+	            	final Throwable cause = e.getCause() != null ? e.getCause() : null;
+	            	if (cause != null) {
+	            		String causeName = cause.getClass().getName();
+	            		// Si JMulticard informa de un problema de autenticacion durante la firma
+	            		if ("es.gob.jmulticard.jse.provider.SignatureAuthException".equals(causeName)) { //$NON-NLS-1$
+	            			causeName = cause.getCause() != null ? cause.getCause().getClass().getName() : null;
+	            			// Si la tarjeta esta bloqueada
+	            			if ("es.gob.jmulticard.card.AuthenticationModeLockedException".equals(causeName)) { //$NON-NLS-1$
+	            				throw new LockedKeyStoreException("El almacen de claves esta bloqueado", e); //$NON-NLS-1$
+	            			}
+	            			// Si se ha insertado un PIN incorrecto
+	            			if ("es.gob.jmulticard.card.BadPinException".equals(causeName)) { //$NON-NLS-1$
+	            				throw new PinException("La contrasena del almacen o certificado es incorrecta", e); //$NON-NLS-1$
+	            			}
+	            			throw new AuthenticationException("Ocurrio un error de autenticacion al utilizar la clave de firma", cause); //$NON-NLS-1$
+	            		}
+	            	}
+	    			throw e;
+	            }
+	            catch (final Exception e) {
+	          	  if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
+	          		  throw new AOCancelledSMOperationException("Cancelacion del dialogo de JMulticard"); //$NON-NLS-1$
+	          	  }
+	          	  throw e;
+	            }
 
 	            try (
 		            // crea un nuevo fichero zip
@@ -504,15 +535,14 @@ public final class AOODFSigner implements AOSigner {
             } // try-with-resources de "zf"
 
             return baos.toByteArray();
-
         }
         catch (final SAXException saxex) {
             throw new AOFormatFileException("Estructura de archivo no valida '" + fullPath + "': " + saxex); //$NON-NLS-1$ //$NON-NLS-2$
         }
+        catch (final AOException e) {
+            throw e;
+        }
         catch (final Exception e) {
-        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
-        		throw new AOCancelledOperationException();
-        	}
             throw new AOException("No ha sido posible generar la firma ODF: " + e, e); //$NON-NLS-1$
         }
     }
@@ -585,8 +615,15 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+		return getSignersStructure(sign, null, asSimpleSignInfo);
+	}
+
+    /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
 
     	if (sign.length >= THRESHOLD_FILE_SIZE) {
     		throw new IOException("Los datos tienen un tamano superior al permitido."); //$NON-NLS-1$
@@ -674,8 +711,14 @@ public final class AOODFSigner implements AOSigner {
      * @return Devuelve <code>true</code> si los datos indicados son un documento ODF susceptible de contener una firma
      * electr&oacute;nica, <code>false</code> en caso contrario.
      * @throws IOException Si ocurren problemas durante la lectura de la firma */
-    @Override
+	@Override
 	public boolean isSign(final byte[] signData) throws IOException {
+		return isSign(signData, null);
+	}
+
+	/** {@inheritDoc} */
+    @Override
+	public boolean isSign(final byte[] signData, final Properties params) throws IOException {
 
         if(!isValidDataFile(signData)) {
         	return false;
@@ -762,28 +805,39 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** Si la entrada es un documento ODF, devuelve el mismo documento sin ninguna modificaci&oacute;n.
-     * @param signData Documento ODF
+     * @param sign Documento ODF
      * @return Documento de entrada si este es ODF, <code>null</code> en cualquier otro caso
      * @throws IOException Si ocurren problemas al leer la firma */
+	@Override
+	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+		return getData(sign, null);
+	}
+
     @Override
-	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
 
         // Si no es una firma ODF valida, lanzamos una excepcion
-        if (!isSign(signData)) {
+        if (!isSign(sign)) {
             throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
         }
 
         // TODO: Por ahora, devolveremos el propio ODF firmado.
-        return signData;
+        return sign;
     }
 
     /** {@inheritDoc} */
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException, IOException {
+		return getSignInfo(data, null);
+	}
+
+    /** {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
-        if (signData == null) {
+	public AOSignInfo getSignInfo(final byte[] data, final Properties param) throws AOException, IOException {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
-        if (!isSign(signData)) {
+        if (!isSign(data)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_ODF);
@@ -816,4 +870,5 @@ public final class AOODFSigner implements AOSigner {
 		}
 		return found ? entry : null;
 	}
+
 }

@@ -18,6 +18,7 @@ public class CertificateDetails {
 	private String expirationDate;
 	private Properties validityResult;
 	private final List<CertificateDetails> subCertDetails;
+	private boolean correctValidation;
 
 	public CertificateDetails(final X509Certificate x509Cert) {
 		this.name = AOUtil.getCN(x509Cert);
@@ -25,10 +26,12 @@ public class CertificateDetails {
 		this.expirationDate = new SimpleDateFormat("dd-MM-yyyy").format(x509Cert.getNotAfter()).toString(); //$NON-NLS-1$
 		this.validityResult = new Properties();
 		this.subCertDetails = new ArrayList<CertificateDetails>();
+		this.correctValidation = false;
 		String validationMessage;
 		try {
 			x509Cert.checkValidity();
 			validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.40"); //$NON-NLS-1$
+			this.correctValidation = true;
 		}
 		catch (final CertificateExpiredException e) {
 			validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.2"); //$NON-NLS-1$
@@ -68,6 +71,9 @@ public class CertificateDetails {
 	}
 	public List<CertificateDetails> getSubCertDetails() {
 		return this.subCertDetails;
+	}
+	public boolean isCorrectValidation() {
+		return this.correctValidation;
 	}
 
 }

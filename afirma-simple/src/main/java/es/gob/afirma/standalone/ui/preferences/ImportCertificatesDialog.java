@@ -46,7 +46,7 @@ import javax.swing.event.DocumentListener;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
 final class ImportCertificatesDialog extends JDialog {
@@ -66,12 +66,10 @@ final class ImportCertificatesDialog extends JDialog {
 	void createUI() {
 
 		setTitle(SimpleAfirmaMessages.getString("TrustedCertificatesDialog.6")); //$NON-NLS-1$
-		setIconImages(AutoFirmaUtil.getIconImages());
-		setResizable(false);
+		setIconImages(DesktopUtil.getIconImages());
 
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLayout(new GridBagLayout());
-		//setMinimumSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 
 		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -289,7 +287,7 @@ final class ImportCertificatesDialog extends JDialog {
 				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.21"), //$NON-NLS-1$
 				false,
 				true,
-				AutoFirmaUtil.getDefaultDialogsIcon(),
+				DesktopUtil.getDefaultDialogsIcon(),
 				this
 			);
 		}

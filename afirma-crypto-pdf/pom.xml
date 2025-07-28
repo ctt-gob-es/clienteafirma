@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.9-SNAPSHOT</version>
+		<version>1.9</version>
 	</parent>
 
 	<dependencies>
@@ -49,6 +49,13 @@
 		<dependency>
 			<groupId>es.gob.afirma.lib</groupId>
 			<artifactId>afirma-lib-itext</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-ui-utils</artifactId>
+			<version>${clienteafirma.version}</version>
+			<scope>runtime</scope>
 		</dependency>
 		
 	</dependencies>

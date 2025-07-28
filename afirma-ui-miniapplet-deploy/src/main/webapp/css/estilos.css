@@ -243,6 +243,7 @@ input[type="file"] { margin-bottom:10px; height:21px; font-size:11px; padding:0 
 .botoneraCentrada {float:left;}
 .botoneraCentro{ text-align:center;}
 .botonCentrado{margin-left:auto; margin-right:auto; display:block;}
+.botoneraGuardar{ text-align:center; margin-bottom:15px;}
 
 .botonP{background-color: transparent;  background-image:url("../img/btnP.png"); background-repeat: no-repeat; border: 0 none;  cursor: pointer; height: 24px;  margin-top: 8px;  width: 70px; font-size:12px; font-family:Verdana, Geneva, sans-serif; color:#ffffff; padding-bottom:2px; font-weight:bold;}
 .botonP:hover{background-color: transparent;  background-image:url("../img/btnP_over.png"); background-repeat: no-repeat; }

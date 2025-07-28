@@ -1,2 +1,3 @@
-#!/bin/bash
+#!/bin/sh
 rpmbuild -bb SPECS/autofirma.spec
+

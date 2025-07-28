@@ -69,7 +69,7 @@ import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class CertUtil {
 
-	private static final String CA_CERT_COMMONNAME = "AutoFirma ROOT"; //$NON-NLS-1$
+	private static final String CA_CERT_COMMONNAME = "Autofirma ROOT"; //$NON-NLS-1$
 
 	private static final int KEY_SIZE = 2048;
 

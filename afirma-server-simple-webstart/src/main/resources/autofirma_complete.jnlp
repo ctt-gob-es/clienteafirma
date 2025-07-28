@@ -13,7 +13,7 @@
 		<icon kind="splash" href="splash.gif" width="506" height="289"/>
 		<shortcut>
             <desktop/>
-            <menu submenu="AutoFirma"/>
+            <menu submenu="Autofirma"/>
         </shortcut>
         <association mime-type="application/cms" extensions="csig sig"/>
         <association mime-type="application/xmlsignature" extensions="xsig"/>

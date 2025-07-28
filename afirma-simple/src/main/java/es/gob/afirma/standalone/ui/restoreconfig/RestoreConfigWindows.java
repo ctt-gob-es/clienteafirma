@@ -36,8 +36,9 @@ import com.sun.jna.platform.win32.WinReg;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
 
 /**
@@ -50,7 +51,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String SSL_KEYSTORE_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
-	private static final String CA_CERTIFICATE_FILENAME = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String CA_CERTIFICATE_FILENAME = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
 	private static final String ADMIN_EXECUTOR_BAT = "execute.bat"; //$NON-NLS-1$
@@ -86,7 +87,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			workingDirectory = appDir;
 			usingAlternativeDirectory = false;
 		} else {
-			workingDirectory = AutoFirmaUtil.getWindowsAlternativeAppDir();
+			workingDirectory = DesktopUtil.getWindowsAlternativeAppDir();
 			usingAlternativeDirectory = true;
 		}
 
@@ -148,7 +149,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		// Si no se han creado directamente los certificados en el directorio alternativo
 		// y este existe, los copiamos ahora
 		if (!usingAlternativeDirectory) {
-			final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
+			final File alternativeDir = DesktopUtil.getWindowsAlternativeAppDir();
 			if (alternativeDir.exists()) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.36")); //$NON-NLS-1$
 				try {
@@ -281,8 +282,8 @@ final class RestoreConfigWindows implements RestoreConfig {
 		if (isProcessRunningWindows("firefox.exe").booleanValue()) { //$NON-NLS-1$
 			JOptionPane.showMessageDialog(
 					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.7"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.7"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE);
 		}
 
@@ -292,8 +293,8 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 			option = JOptionPane.showConfirmDialog(
 					parent,
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.12"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreAutoFirma.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.12"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE);
 		}
@@ -301,7 +302,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		return option == JOptionPane.OK_OPTION;
 	}
 
-	/** Instala el certificado ra&iacute;z CA de AutoFirma
+	/** Instala el certificado ra&iacute;z CA de Autofirma
 	 * en el almac&eacute;n ra&iacute;z de Windows.
 	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 * @param certFile El certificado a instalar. */
@@ -374,7 +375,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		while (!installed);
 	}
 
-	/** Instala el certificado ra&iacute;z CA de AutoFirma
+	/** Instala el certificado ra&iacute;z CA de Autofirma
 	 * en el almac&eacute;n ra&iacute;z de Mozilla.
 	 *  @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 *  @param certFile El certificado a instalar.
@@ -450,7 +451,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", installDir + "\\AutoFirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", installDir + "\\Autofirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		} catch (final Exception | Error e) {
 
@@ -495,7 +496,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.5")); //$NON-NLS-1$
 			CertPack certPack;
 			try {
-				certPack = CertUtil.getCertPackForLocalhostSsl(RestoreConfigUtil.CERT_ALIAS, KS_PASSWORD);
+				certPack = CertUtil.getCertPackForLocalhostSsl(ConfiguratorUtil.CERT_ALIAS, KS_PASSWORD);
 				sslRoot = new CertificateFile(certPack.getCaCertificate());
 			}
 			catch (final GeneralSecurityException e) {
@@ -512,7 +513,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			}
 			catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, "No se ha podido guardar en disco los certificados SSL. Los almacenaremos en un directorio alternativo", e); //$NON-NLS-1$
-				final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
+				final File alternativeDir = DesktopUtil.getWindowsAlternativeAppDir();
 				if (!alternativeDir.isDirectory() && !alternativeDir.mkdirs()) {
 					throw new IOException("No se ha podido guardar en disco los certificados SSL. Error al crear el directorio alternativo"); //$NON-NLS-1$
 				}
@@ -535,7 +536,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			try (FileInputStream fis = new FileInputStream(new File(installDir, SSL_KEYSTORE_FILENAME))) {
 				final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 				ks.load(fis, KS_PASSWORD.toCharArray());
-				final Certificate[] chain = ks.getCertificateChain(RestoreConfigUtil.CERT_ALIAS);
+				final Certificate[] chain = ks.getCertificateChain(ConfiguratorUtil.CERT_ALIAS);
 				sslRoot = new CertificateFile(chain[chain.length - 1]);
 			}
 			catch(final Exception e) {
@@ -551,7 +552,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			}
 			catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, "No se ha podido guardar en disco el certificado raiz SSL. Lo extraemos a un directorio alternativo", e); //$NON-NLS-1$
-				final File alternativeDir = AutoFirmaUtil.getWindowsAlternativeAppDir();
+				final File alternativeDir = DesktopUtil.getWindowsAlternativeAppDir();
 				if (!alternativeDir.isDirectory() && !alternativeDir.mkdirs()) {
 					throw new IOException("No se ha podido guardar en disco el certificado raiz SSL. Error al crear el directorio alternativo"); //$NON-NLS-1$
 				}

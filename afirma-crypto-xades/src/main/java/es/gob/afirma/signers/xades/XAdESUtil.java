@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
@@ -115,7 +116,7 @@ public final class XAdESUtil {
 
     /**
      * Comprueba que los nodos de firma proporcionados sean firmas en formato XAdES soportadas. Se
-     * considerar&aacute; que no est&aacute;n soportadas si no hay mezcla de versiones de firmas
+     * considerar&aacute; que est&aacute;n soportadas si no hay mezcla de versiones de firmas
      * XAdES y si la versi&oacute;n declarada est&aacute; soportada. Tambi&eacute;n se comprobara
      * si es una firma de tipo Baseline EN para indicarlo mediante el valor de retorno.
      * @param signNodes Listado de nodos de firma.
@@ -191,7 +192,8 @@ public final class XAdESUtil {
 	static AOXMLAdvancedSignature getXmlAdvancedSignature(final XAdESBase xades,
 			                                              final String signedPropertiesTypeUrl,
 			                                              final String digestMethodAlgorithm,
-			                                              final String canonicalizationAlgorithm) throws AOException {
+			                                              final String canonicalizationAlgorithm,
+			                                              final URIDereferencer uriDereferencer) throws AOException {
 		final AOXMLAdvancedSignature xmlSignature;
 		try {
 			xmlSignature = AOXMLAdvancedSignature.newInstance(xades);
@@ -215,6 +217,8 @@ public final class XAdESUtil {
 		}
 
 		xmlSignature.setCanonicalizationMethod(canonicalizationAlgorithm);
+
+		xmlSignature.setUriDereferencer(uriDereferencer);
 
 		return xmlSignature;
 	}

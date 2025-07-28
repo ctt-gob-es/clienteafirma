@@ -13,17 +13,13 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
-import java.lang.reflect.Method;
 import java.util.EventListener;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -38,30 +34,6 @@ final class PageLabel extends JLabel {
 	}
 
 	private static final long serialVersionUID = 4917110251831788580L;
-
-	private static boolean TRANSLUCENCY_CAPABLE;
-	static {
-		final GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-		// Compatibilidad con Java 9
-		try {
-			final Method isTranslucencyCapableMethod = GraphicsConfiguration.class.getMethod("isTranslucencyCapable"); //$NON-NLS-1$
-			TRANSLUCENCY_CAPABLE = ((Boolean) isTranslucencyCapableMethod.invoke(config)).booleanValue();
-		}
-		catch (final Exception e) {
-			// Compatibilidad con Java 8 y anteriores
-			try {
-				final Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities"); //$NON-NLS-1$
-				final Method isTranslucencyCapableMethod = awtUtilitiesClass.getMethod("isTranslucencyCapable", GraphicsConfiguration.class); //$NON-NLS-1$
-				TRANSLUCENCY_CAPABLE = ((Boolean) isTranslucencyCapableMethod.invoke(null, config)).booleanValue();
-			}
-			catch(final Exception | Error e2) {
-				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-						"No ha sido posible determinar si el sistema sorporta superficies translucidas, se asume que si: " + e //$NON-NLS-1$
-						);
-				TRANSLUCENCY_CAPABLE = true;
-			}
-		}
-	}
 
 	private static final int TRANSPARENCY_LEVEL = 3;
 
@@ -239,13 +211,8 @@ final class PageLabel extends JLabel {
         g2d.fill(fill);
         if (this.selectionBounds != null) {
 	        g2d.setColor(Color.BLUE);
-	        if (TRANSLUCENCY_CAPABLE) {
-		        g2d.setComposite(
-		    		AlphaComposite.getInstance(
-						AlphaComposite.SRC_OVER,TRANSPARENCY_LEVEL * 0.1f
-					)
-				);
-	        }
+	        g2d.setComposite(AlphaComposite.getInstance(
+	        		AlphaComposite.SRC_OVER,TRANSPARENCY_LEVEL * 0.1f));
             g2d.fill(this.selectionBounds);
         }
         g2d.dispose();

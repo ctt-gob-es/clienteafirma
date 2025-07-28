@@ -4,7 +4,7 @@ import java.io.File;
 
 /**
  * Clase con las referencias de los ficheros de los certificados y almacenes de la
- * configuraci&oacute;n SSL de AutoFirma.
+ * configuraci&oacute;n SSL de Autofirma.
  */
 public class CertFilesInfo {
 

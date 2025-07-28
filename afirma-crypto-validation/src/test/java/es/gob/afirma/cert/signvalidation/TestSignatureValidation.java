@@ -1,9 +1,7 @@
 package es.gob.afirma.cert.signvalidation;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -30,21 +28,7 @@ public class TestSignatureValidation {
 			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_IMPLICIT_FILE);
 		) {
 			final byte[] cades = AOUtil.getDataFromInputStream(is);
-			System.out.println(new ValidateBinarySignature().validate(cades));
-		}
-	}
-
-	/** Prueba de validaci&oacute;n de firma CAdES LTA-Level.
-	 * @throws Exception En cualquier error. */
-	@SuppressWarnings("static-method")
-	@Test
-	@Ignore("Ruta local de Gamuci")
-	public void testCadesLTAValidation() throws Exception {
-		try (
-			final InputStream is = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\salida/cades-lta-cosign.csig");
-		) {
-			final byte[] cades = AOUtil.getDataFromInputStream(is);
-			System.out.println(new ValidateBinarySignature().validate(cades));
+			System.out.println(new ValidateBinarySignature().validate(cades, false));
 		}
 	}
 
@@ -52,12 +36,27 @@ public class TestSignatureValidation {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	public void testCadesExplicitValidation() throws Exception {
+	public void testCadesExplicitValidationWithoutData() throws Exception {
 		try (
 			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_EXPLICIT_FILE);
 		) {
 			final byte[] cades = AOUtil.getDataFromInputStream(is);
-			System.out.println(new ValidateBinarySignature().validate(cades));
+			System.out.println(new ValidateBinarySignature().validate(cades, false));
+		}
+	}
+
+	/** Prueba de validaci&oacute;n de firma CAdES expl&iacute;cita con los datos.
+	 * @throws Exception En cualquier error. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testCadesExplicitValidationWithData() throws Exception {
+		try (
+			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_EXPLICIT_FILE);
+			final InputStream dataIs = ClassLoader.getSystemResourceAsStream(DATA_TXT_FILE);
+		) {
+			final byte[] cades = AOUtil.getDataFromInputStream(is);
+			final byte[] data = AOUtil.getDataFromInputStream(dataIs);
+			System.out.println(ValidateBinarySignature.validate(cades, data, false));
 		}
 	}
 
@@ -68,11 +67,9 @@ public class TestSignatureValidation {
 	public void testCadesExplicitValidationWrongData() throws Exception {
 		try (
 			final InputStream is = ClassLoader.getSystemResourceAsStream(CADES_EXPLICIT_FILE);
-			final InputStream dataIs = ClassLoader.getSystemResourceAsStream(DATA_TXT_FILE);
 		) {
 			final byte[] cades = AOUtil.getDataFromInputStream(is);
-			final byte[] data = AOUtil.getDataFromInputStream(dataIs);
-			System.out.println(ValidateBinarySignature.validate(cades, data));
+			System.out.println(ValidateBinarySignature.validate(cades, "dummy2".getBytes(), false));
 		}
 	}
 
@@ -85,7 +82,7 @@ public class TestSignatureValidation {
 			final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_FILE);
 		) {
 			final byte[] pades = AOUtil.getDataFromInputStream(is);
-			System.out.println(SignValiderFactory.getSignValider(pades).validate(pades));
+			System.out.println(SignValiderFactory.getSignValider(pades).validate(pades, false));
 		}
 	}
 
@@ -98,7 +95,7 @@ public class TestSignatureValidation {
 			final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_EPES_FILE);
 		) {
 			final byte[] pades = AOUtil.getDataFromInputStream(is);
-			System.out.println(SignValiderFactory.getSignValider(pades).validate(pades));
+			System.out.println(SignValiderFactory.getSignValider(pades).validate(pades, false));
 		}
 	}
 
@@ -111,7 +108,7 @@ public class TestSignatureValidation {
 			final InputStream is = ClassLoader.getSystemResourceAsStream(XADES_EPES_FILE);
 		) {
 			final byte[] signature = AOUtil.getDataFromInputStream(is);
-			System.out.println(SignValiderFactory.getSignValider(signature).validate(signature));
+			System.out.println(SignValiderFactory.getSignValider(signature).validate(signature, false));
 		}
 	}
 }

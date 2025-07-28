@@ -18,8 +18,10 @@ import org.spongycastle.cms.SignerInformationStore;
 
 import com.aowagie.text.exceptions.BadPasswordException;
 import com.aowagie.text.pdf.AcroFields;
+import com.aowagie.text.pdf.PdfArray;
 import com.aowagie.text.pdf.PdfDictionary;
 import com.aowagie.text.pdf.PdfName;
+import com.aowagie.text.pdf.PdfObject;
 import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfString;
@@ -30,7 +32,10 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.signvalidation.SignatureFormatDetectorPadesCades;
 import es.gob.afirma.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -42,12 +47,12 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 	List <SignDetails> signDetailsList;
 	final AOTreeNode signersTree = new AOTreeNode("Datos"); //$NON-NLS-1$
 
-	private static final String PADES = "PAdES"; //$NON-NLS-1$s
+	public static final String PADES = "PAdES"; //$NON-NLS-1$s
 
 
 	public PAdESSignAnalyzer(final byte [] data) throws Exception {
     	try {
-    		this.signDetailsList = new ArrayList<SignDetails>();
+    		this.signDetailsList = new ArrayList<>();
     		createSignDetails(data);
     	}
     	catch (final Exception e) {
@@ -107,6 +112,8 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
         		throw e;
         	}
 
+        	final int certLevel = pdfReader.getCertificationLevel();
+
 			final String signProfile = SignatureFormatDetectorPadesCades.resolvePDFFormat(data);
 
 			for (final String signatureName : af.getSignatureNames()) {
@@ -119,7 +126,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 					continue;
 				}
 
-				final SignDetails signDetails = buildSignDetails(signatureName, pdfDictionary, af, signProfile);
+				final SignDetails signDetails = buildSignDetails(signatureName, pdfDictionary, af, signProfile, certLevel);
 
 				//Se obtiene la politica en caso de que exista
 				final PdfString contents = pdfDictionary.getAsString(PdfName.CONTENTS);
@@ -138,7 +145,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 							}
 						}
 					} catch (final Exception e) {
-						LOGGER.severe("No se ha podido obtener la informacion de la politica correctamente: " + e); //$NON-NLS-1$
+						LOGGER.log(Level.SEVERE, "No se ha podido obtener la informacion de la politica correctamente", e); //$NON-NLS-1$
 					}
 				}
 
@@ -160,11 +167,24 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 	 * @return Detalles de la firma.
 	 * @throws Exception Error transformando los datos.
 	 */
-	private SignDetails buildSignDetails(final String signName, final PdfDictionary signPdfDictionary, final AcroFields af, final String signProfile) throws Exception {
+	private SignDetails buildSignDetails(final String signName, final PdfDictionary signPdfDictionary, final AcroFields af, final String signProfile, final int certLevel) throws Exception {
 
 		final SignDetails padesSignDetails = new SignDetails();
 
 		padesSignDetails.setSignProfile(signProfile);
+
+		padesSignDetails.setCertificationLevel(certLevel);
+
+		// Comprobamos si la firma es la que certifica el documento
+		if (signPdfDictionary.get(PdfName.REFERENCE) != null) {
+			final PdfArray reference = (PdfArray) signPdfDictionary.get(PdfName.REFERENCE);
+			final ArrayList<PdfObject> p = reference.getArrayList();
+			final PdfDictionary dictionaryReference = (PdfDictionary) p.get(0);
+			padesSignDetails.setCertificationSign(dictionaryReference.get(PdfName.TRANSFORMMETHOD) != null);
+		}
+		else {
+			padesSignDetails.setCertificationSign(Boolean.FALSE);
+		}
 
 		PdfPKCS7 pkcs7 = null;
 		try {
@@ -195,7 +215,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		padesSignDetails.setSigner(certDetails);
 
 		// Metadatos
-		final Map<String, String> metadataMap = new HashMap<String, String>();
+		final Map<String, String> metadataMap = new HashMap<>();
 		final PdfString reason = signPdfDictionary.getAsString(PdfName.REASON);
 		if (reason != null) {
 			metadataMap.put(SignDetailsFormatter.SIGN_REASON_METADATA, reason.toString());
@@ -214,6 +234,23 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		final List<SignValidity> listValidity = ValidatePdfSignature.validateSign(signName, af, signProfile, false);
 		padesSignDetails.setValidityResult(listValidity);
 
+		// Cuando la firma sea certificada de tipo 1, solo la ultima firma sera valida.
+		if(PdfExtraParams.CERTIFICATION_LEVEL_VALUE_TYPE_1.equals(Integer.toString(certLevel))
+				&& padesSignDetails.getValidityResult().get(0).getValidity().equals(SIGN_DETAIL_TYPE.OK)){
+
+			final int rev = af.getRevision(signName);
+			if(!(rev == af.getTotalRevisions())){
+			    final List<SignValidity> listValidityCertifiedSign = padesSignDetails.getValidityResult();
+				listValidityCertifiedSign.clear();
+				listValidityCertifiedSign.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFIED_SIGN_REVISION));
+				padesSignDetails.setValidityResult(listValidityCertifiedSign);
+				padesSignDetails.setLastRevisionSign(Boolean.FALSE);
+			}
+			else{
+				padesSignDetails.setLastRevisionSign(Boolean.TRUE);
+			}
+		}
+
 		return padesSignDetails;
 	}
 
@@ -223,7 +260,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
      */
     private static SignaturePolicy analyzePolicy(final SignerInformation si) {
     	final AttributeTable signedAttrs = si.getSignedAttributes();
-    	final Attribute policyAttr = signedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId);
+    	final Attribute policyAttr = signedAttrs != null ? signedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId): null;
 		if (policyAttr != null && policyAttr.getAttrValues() != null && policyAttr.getAttrValues().size() > 0) {
 			final SignaturePolicyId sigPolId = SignaturePolicyId.getInstance(policyAttr.getAttrValues().getObjectAt(0));
 			final String polId = sigPolId.getSigPolicyId().toString();

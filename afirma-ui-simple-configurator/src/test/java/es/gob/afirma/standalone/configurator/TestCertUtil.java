@@ -64,7 +64,7 @@ public final class TestCertUtil {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testCertGeneration() throws Exception {
-		final CertPack cp = CertUtil.getCertPackForLocalhostSsl("AutoFirma", "654321"); //$NON-NLS-1$ //$NON-NLS-2$
+		final CertPack cp = CertUtil.getCertPackForLocalhostSsl("Autofirma", "654321"); //$NON-NLS-1$ //$NON-NLS-2$
 		System.out.println(AOUtil.getCN((X509Certificate) cp.getCaCertificate()));
 		System.out.println(AOUtil.getCN((X509Certificate) cp.getSslCertificate()));
 		System.out.println();

@@ -16,10 +16,10 @@ import java.security.GeneralSecurityException;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
 /** Interfaz que define los m&eacute;todos necesarios para configurar el sistema operativo tras la
- * instalaci&oacute;n de AutoFirma. */
+ * instalaci&oacute;n de Autofirma. */
 interface Configurator {
 
-	/** Configura el entorno para la ejecuci&oacute;n de AutoFirma.
+	/** Configura el entorno para la ejecuci&oacute;n de Autofirma.
 	 * @param window Ventana padre con consola.
 	 * @throws IOException Cuando no es posible cargar o manipular alg&uacute;n fichero de configuraci&oacute;n o recursos.
 	 * @throws ConfigurationException Cuando falla la generaci&oacute;n del certificados SSL.

@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -32,7 +33,7 @@ final class ConfiguratorFirefoxLinux {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String FILE_AUTOFIRMA_CERTIFICATE = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String CERTUTIL_EXE = "certutil"; //$NON-NLS-1$
 	private static final String CERTUTIL_RELATIVE_PATH = "certutil" + File.separator + CERTUTIL_EXE; //$NON-NLS-1$
 

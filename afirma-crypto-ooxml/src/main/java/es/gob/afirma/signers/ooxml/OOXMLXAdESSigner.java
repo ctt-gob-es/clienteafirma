@@ -39,6 +39,7 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
@@ -71,7 +72,8 @@ final class OOXMLXAdESSigner {
     	// No permitimos la instanciacion
     }
 
-    /** Obtiene el XML de firma XAdES <i>enveloping</i> OOXML.
+    /**
+     * Obtiene el XML de firma XAdES <i>enveloping</i> OOXML.
      * @param ooXmlDocument Documento OOXML original.
      * @param algorithm Algoritmo de firma.
      * @param pk Clave privada para la firma.
@@ -83,7 +85,9 @@ final class OOXMLXAdESSigner {
      * @throws SAXException Si hay problemas en XML SAX.
      * @throws IOException Si hay problemas gen&eacute;ricos en el tratamiento de datos.
      * @throws XMLSignatureException Si hay problemas con la firma XML.
-     * @throws MarshalException Si hay problemas con la envoltura de la firma XML. */
+     * @throws MarshalException Si hay problemas con la envoltura de la firma XML.
+     * @throws AOException Cuando ocurre un error de firma ya identificado.
+     */
     static byte[] getSignedXML(final byte[] ooXmlDocument,
     		                   final String algorithm,
     						   final PrivateKey pk,
@@ -93,7 +97,7 @@ final class OOXMLXAdESSigner {
     								                            IOException,
     								                            SAXException,
     								                            MarshalException,
-    								                            XMLSignatureException {
+    								                            XMLSignatureException, AOException {
 
 		final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {

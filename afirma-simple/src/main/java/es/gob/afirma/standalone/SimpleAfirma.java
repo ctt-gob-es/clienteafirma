@@ -39,6 +39,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -46,6 +47,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.smartcardio.CardTerminal;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -57,12 +59,12 @@ import javax.swing.JPanel;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -70,6 +72,7 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 import es.gob.afirma.signvalidation.SignValider;
@@ -77,6 +80,7 @@ import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.ValidateBinarySignature;
+import es.gob.afirma.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
@@ -93,7 +97,7 @@ import es.gob.afirma.standalone.ui.SignatureResultViewer;
 import es.gob.afirma.standalone.updater.Updater;
 
 /**
- * Aplicaci&oacute;n gr&aacute;fica de AutoFirma.
+ * Aplicaci&oacute;n gr&aacute;fica de Autofirma.
  *
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
@@ -124,9 +128,16 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	private static final String SYSTEM_PROPERTY_DEBUG_LEVEL = "afirma_debug_level"; //$NON-NLS-1$
 
+
+    /**
+     * Propiedad del sistema con la que configurar que se ignoren los lectores de
+     * tarjeta que se reconozcan como lectores virtuales.
+     */
+    private static final String SYSTEM_PROPERTY_IGNORE_VIRTUAL_READERS = "ignoreVirtualReaders"; //$NON-NLS-1$
+
 	/** Directorio de datos de la aplicaci&oacute;n. */
 	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator //$NON-NLS-1$
-			+ "AutoFirma"; //$NON-NLS-1$
+			+ "Autofirma"; //$NON-NLS-1$
 
 	private static final String PLUGINS_DIRNAME = "plugins"; //$NON-NLS-1$
 
@@ -206,6 +217,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		// Indicamos si se debe instalar el proveedor de firma XML de Apache
        XmlDSigProviderHelper.configureXmlDSigProvider();
+
+       // Indicamos que no queremos cargar los lectores de tarjeta virtuales
+       System.setProperty(SYSTEM_PROPERTY_IGNORE_VIRTUAL_READERS, Boolean.TRUE.toString());
     }
 
 	/**
@@ -234,7 +248,14 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         }
     }
 
-	void initGUI(final File preSelectedFile) {
+    /**
+     * Carga la interfaz de firma.
+     * @param preSelectedFile Fichero preseleccionado o {@code null} si no debe preseleccionarse
+     * ning&uacute;n fichero.
+     * @param signConfig Configuraci&oacute;n de firma por defecto o {@code null} si debe aplicarse
+     * la configurada por defecto en la interfaz para el tipo de fichero seleccionado.
+     */
+	void initGUI(final File preSelectedFile, final SignOperationConfig signConfig) {
         // Cargamos las preferencias establecidas
 		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
 		if (defaultLocale == null || defaultLocale.isEmpty()) {
@@ -249,7 +270,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				&& !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN);
         if (showDNIeScreen) {
 	        try {
-	        	if (javax.smartcardio.TerminalFactory.getDefault().terminals().list().isEmpty()) {
+	        	// Si no hay lectores de tarjetas o el unico es el de Windows Hello,
+	        	// ignoraremos el mostrar la pantalla inicial para el uso del DNIe
+	        	final List<CardTerminal> terminals = javax.smartcardio.TerminalFactory.getDefault().terminals().list();
+	        	if (terminals.isEmpty()) {
+	        		showDNIeScreen = false;
+	        	}
+	        	else if (Platform.getOS() == Platform.OS.WINDOWS && terminals.size() == 1 && terminals.get(0).getName().startsWith("Windows Hello")) {
 	        		showDNIeScreen = false;
 	        	}
 			} catch (final Exception e) {
@@ -279,7 +306,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         	configureMenuBar();
 
         	if (preSelectedFile != null) {
-        		loadFileToSign(preSelectedFile);
+        		loadFileToSign(preSelectedFile, signConfig);
         	}
         }
     }
@@ -334,7 +361,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             loadMainApp();
     	}
     	else if (DNIeWaitPanel.PROP_HELP_REQUESTED.equals(evt.getPropertyName())) {
-    		showHelp("AutoFirma.html"); //$NON-NLS-1$
+    		showHelp("Autofirma.html"); //$NON-NLS-1$
     	}
     	else if (DNIeWaitPanel.PROP_DNIE_REQUESTED.equals(evt.getPropertyName())) {
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -608,8 +635,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
-    	List<SignValidity> validityList = new ArrayList<SignValidity>();
-    	List<SignValidity> validityListResult = new ArrayList<SignValidity>();
+    	List<SignValidity> validityList = new ArrayList<>();
+    	List<SignValidity> validityListResult = new ArrayList<>();
     	final SignValider sv = SignValiderFactory.getSignValider(signature);
         if (sv != null) {
         	try {
@@ -624,6 +651,15 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
             	    		validityListResult = ValidateBinarySignature.validate(signature, dataFile);
             	    	}
         			}
+        		} else if (sv instanceof ValidatePdfSignature) {
+        			final Properties params;
+        			if (signConfig.getExtraParams() != null) {
+        				params = signConfig.getExtraParams();
+        			} else {
+        				params = new Properties();
+        			}
+        			params.setProperty(PdfExtraParams.CHECK_CERTIFICATES, Boolean.toString(true));
+        			validityListResult = sv.validate(signature, params);
         		} else {
         			validityListResult = sv.validate(signature);
         		}
@@ -789,11 +825,12 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * permitir su acceso desde la barra de men&uacute;
 	 *
 	 * @param file Fichero a firmar, incluyendo su ruta completa
+	 * @param signConfig Configuraci&oacute;n de firma.
 	 */
-    public void loadFileToSign(final File file) {
+    public void loadFileToSign(final File file, final SignOperationConfig signConfig) {
         if (this.currentPanel instanceof SignPanel) {
             try {
-                ((SignPanel) this.currentPanel).loadFiles(new File[] { file } );
+                ((SignPanel) this.currentPanel).loadFiles(new File[] { file }, signConfig );
 			} catch (final Exception e) {
 				AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.0"), //$NON-NLS-1$
                     SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
@@ -845,7 +882,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		HttpManager.setSecureDomains(
 				PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST));
 
-		// Establecemos los almacenes de claves de Java y de AutoFirma como de confianza para las
+		// Establecemos los almacenes de claves de Java y de Autofirma como de confianza para las
 		// conexiones remotas
 		if (secureConnections) {
 			try {
@@ -903,7 +940,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK)
 					&& !Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
        		if (!updatesEnabled) {
-				LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de AutoFirma" //$NON-NLS-1$
+				LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de Autofirma" //$NON-NLS-1$
        					);
        		}
        	}
@@ -1002,7 +1039,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						final java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass()
 								.getDeclaredField("awtAppClassName"); //$NON-NLS-1$
 						awtAppClassNameField.setAccessible(true);
-						awtAppClassNameField.set(xToolkit, "AutoFirma"); //$NON-NLS-1$
+						awtAppClassNameField.set(xToolkit, "Autofirma"); //$NON-NLS-1$
 					} catch (final Exception e) {
 						LOGGER.warning("No ha sido posible renombrar la ventana AWT para X11: " + e); //$NON-NLS-1$
 					}
@@ -1019,7 +1056,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				}
 
 				LOGGER.info("Iniciando entorno grafico"); //$NON-NLS-1$
-				saf.initGUI(null);
+				saf.initGUI(null, null);
 
 				checkJavaVersion(saf.getMainFrame());
 			} else {
@@ -1210,8 +1247,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	private static void printSystemInfo() {
 
     	// Logs de informacion basica
-		final StringBuilder info = new StringBuilder(390).append("AutoFirma ").append(getVersion()) //$NON-NLS-1$
-		.append("\nResolucion DPI de pantalla: ").append(AutoFirmaUtil.getDPI()) //$NON-NLS-1$
+		final StringBuilder info = new StringBuilder(390).append("Autofirma ").append(getVersion()) //$NON-NLS-1$
+		.append("\nResolucion DPI de pantalla: ").append(DesktopUtil.getDPI()) //$NON-NLS-1$
 		.append("\nSistema operativo: ").append(System.getProperty("os.name")) //$NON-NLS-1$ //$NON-NLS-2$
 		.append("\nVersion del SO: ").append(System.getProperty("os.version")) //$NON-NLS-1$ //$NON-NLS-2$
 		.append("\nVersion de Java: ").append(System.getProperty("java.version")) //$NON-NLS-1$ //$NON-NLS-2$
@@ -1229,7 +1266,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	}
 
 	/**
-	 * Indica si la llamada a AutoFirma se considera llamada por l&iacute;nea de
+	 * Indica si la llamada a Autofirma se considera llamada por l&iacute;nea de
 	 * comandos.
 	 *
 	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
@@ -1241,7 +1278,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	}
 
 	/**
-	 * Indica si la ejecuci&oacute;n de AutoFirma se est&aacute; haciendo en modo
+	 * Indica si la ejecuci&oacute;n de Autofirma se est&aacute; haciendo en modo
 	 * escritorio.
 	 * @param args Argumentos recibidos en la llamada a la aplicaci&oacute;n.
 	 * @return {@code true} si se considera que la aplicaci&oacute;n se ejecuta
@@ -1352,9 +1389,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * @return Directorio de plugins.
      */
     private static File getPluginsDir() {
-		File appDir = AutoFirmaUtil.getAlternativeDirectory();
+		File appDir = DesktopUtil.getAlternativeDirectory();
 		if (appDir == null) {
-			appDir = AutoFirmaUtil.getApplicationDirectory();
+			appDir = DesktopUtil.getApplicationDirectory();
 		}
 		return new File(appDir, PLUGINS_DIRNAME);
 	}

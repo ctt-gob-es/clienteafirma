@@ -69,7 +69,7 @@ final class CertUtil {
 
 	private static final String SIGNATURE_ALGORITHM = "SHA256withRSA"; //$NON-NLS-1$
 
-	static final String ROOT_CERTIFICATE_PRINCIPAL = "CN=AutoFirma ROOT"; //$NON-NLS-1$
+	static final String ROOT_CERTIFICATE_PRINCIPAL = "CN=Autofirma ROOT"; //$NON-NLS-1$
 
 	static final class CertPack {
 

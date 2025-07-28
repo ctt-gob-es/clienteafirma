@@ -189,7 +189,7 @@ final class CAdESCounterSigner {
 
         // Construimos y devolvemos la nueva firma (atributo identificador del signedData mas el propio signedData).
         // Esta firma sera igual a la anterior pero con el conjunto de certificados actualizados con los nuevos y la
-        // nueva estructura de SignerInfos. Tambien eliminamos las CRL ya que no estarian completas.
+        // nueva estructura de SignerInfos. Incluimos el listado de CRLs, aunque este puede no estar completo
         return new ContentInfo(
     		PKCSObjectIdentifiers.signedData,
     		new SignedData(
@@ -368,7 +368,8 @@ final class CAdESCounterSigner {
 
     }
 
-    /** Realiza realmente la operaci&oacute;n criptogr&aacute;fica de firma para generar finalmente el <i>SignerInfo</i>.
+    /**
+     * Realiza realmente la operaci&oacute;n criptogr&aacute;fica de firma para generar finalmente el <i>SignerInfo</i>.
      * @param si SignerInfo a firmar (se obtiene la huella digital almacenada en &eacute;l y se firma).
      * @param signatureAlgorithm Algoritmo de firma.
      * @param key Clave privada a usar para firmar.
@@ -377,16 +378,16 @@ final class CAdESCounterSigner {
      * @return <i>SignerInfo</i> contrafirmado.
      * @throws NoSuchAlgorithmException Si no se soporta alguno de los algoritmos necesarios.
      * @throws java.io.IOException Cuando hay errores de entrada / salida
-     * @throws CertificateException Cuando hay problemas con los certificados proporcionados. */
+     * @throws CertificateException Cuando hay problemas con los certificados proporcionados.
+     * @throws AOException Cuando ocurre un error durante la generacion de PKCS#1 de la firma.
+     */
     private SignerInfo signSignerInfo(
     		final SignerInfo si,
     		final String signatureAlgorithm,
     		final PrivateKey key,
     		final java.security.cert.Certificate[] certChain,
     		final CAdESParameters config
-                                      ) throws NoSuchAlgorithmException,
-                                                                                                   IOException,
-                                                                                                   CertificateException {
+    		) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
     	// Realizamos los cambios de configuracion que corresponden a las contrafirmas
 
@@ -417,21 +418,15 @@ final class CAdESCounterSigner {
 
         final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(signedAttributes));
 
-        final ASN1OctetString signValue;
-        try {
-            signValue = new DEROctetString(
+        final ASN1OctetString signValue = new DEROctetString(
         		pkcs1Sign(
-    				signedAttr.getEncoded(ASN1Encoding.DER),
-    				signatureAlgorithm,
-    				key,
-				    certChain,
-				    config.getExtraParams()
-				)
-    		);
-        }
-        catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma: " + ex, ex); //$NON-NLS-1$
-        }
+        				signedAttr.getEncoded(ASN1Encoding.DER),
+        				signatureAlgorithm,
+        				key,
+        				certChain,
+        				config.getExtraParams()
+        				)
+        		);
 
         // Identificamos el algoritmo
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
@@ -439,8 +434,12 @@ final class CAdESCounterSigner {
         // AlgorithmIdentifier
         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
-        // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
+        final String keyType = certChain[0].getPublicKey().getAlgorithm();
+
+		final String algorithmName = AOSignConstants.composeSignatureAlgorithmName(digestAlgorithm, keyType);
+
+		// digEncryptionAlgorithm
+		final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(algorithmName));
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo

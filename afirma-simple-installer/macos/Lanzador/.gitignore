@@ -27,8 +27,8 @@ xcuserdata/
 *.lock
 
 ## Artefactos Java del proyecto
-AutoFirma.jar
-AutoFirmaConfigurador.jar
+autofirma.jar
+autofirmaConfigurador.jar
 
 ## Contenido del directorio Java incluido en la aplicación
-Cliente @firma para OS X/Home/**
+Autofirma para macOS/Home/**

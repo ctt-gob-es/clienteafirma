@@ -3,7 +3,7 @@ package es.gob.afirma.signers.batch.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
+import es.gob.afirma.signers.batch.SingleSignConstants.DigestAlgorithm;
 
 /**
  * Configuraci&oacute;n para la firma de un lote.
@@ -18,7 +18,7 @@ class SignBatchConfig {
 
 	private boolean stopOnError;
 
-	private SignAlgorithm algorithm;
+	private DigestAlgorithm algorithm;
 
 	private long concurrentTimeout;
 
@@ -55,7 +55,7 @@ class SignBatchConfig {
 	 * Devuelve el algoritmo de firma.
 	 * @return Algoritmo de firma.
 	 */
-	public SignAlgorithm getAlgorithm() {
+	public DigestAlgorithm getAlgorithm() {
 		return this.algorithm;
 	}
 
@@ -89,7 +89,7 @@ class SignBatchConfig {
 	 * Establece el algoritmo de firma para los documentos del lote.
 	 * @param algorithm Algoritmo de firma.
 	 */
-	public void setAlgorithm(SignAlgorithm algorithm) {
+	public void setAlgorithm(DigestAlgorithm algorithm) {
 		this.algorithm = algorithm;
 	}
 

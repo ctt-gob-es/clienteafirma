@@ -9,12 +9,8 @@
 
 package es.gob.afirma.signers.cades;
 
-import java.util.logging.Logger;
-
 /** Par&aacute;metros adicionales aceptados para las firmas CAdES. */
 public final class CAdESExtraParams {
-
-    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Si se establece a <code>true</code> omite la inclusi&oacute;n de la
      * pol&iacute;tica de certificaci&oacute;n en el <i>SigningCertificate</i>,
@@ -107,7 +103,7 @@ public final class CAdESExtraParams {
      *  &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *  <br> Propiedad compartida con XAdES y PAdES)
      */
-    static final String POLICY_IDENTIFIER = "policyIdentifier";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER = "policyIdentifier";//$NON-NLS-1$
 
     /**
      *   Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
@@ -116,19 +112,19 @@ public final class CAdESExtraParams {
      *   <code>policyIdentifier</code> es una URL accesible universalmente, se descargar&aacute; el fichero apuntado por la URL para calcular la huella
      *   digital <i>al vuelo</i>.
      */
-    static final String POLICY_IDENTIFIER_HASH = "policyIdentifierHash";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER_HASH = "policyIdentifierHash";//$NON-NLS-1$
 
     /**
      *  Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro policyIdentifierHash.
      *  Es obligatorio indicarlo cuando se proporciona una huella digital distinta de 0.
      */
-    static final String POLIY_IDENTIFIER_HAS_HALGORITHM = "poliyIdentifierHashAlgorithm";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER_HASH_ALGORITHM = "poliyIdentifierHashAlgorithm";//$NON-NLS-1$
 
     /**
      *  URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
      *  <br> Propiedad compartida con XAdES y PAdES
      */
-    static final String POLICY_QUALIFIER = "policyQualifier";//$NON-NLS-1$
+    public static final String POLICY_QUALIFIER = "policyQualifier";//$NON-NLS-1$
 
     /**
      * Lista de cargos atribuidos al firmante separados por el car&uacute;cter
@@ -141,24 +137,24 @@ public final class CAdESExtraParams {
      *  Ciudad en la que se realiza la firma.
      *  <br> Propiedad compartida con XAdES y PAdES.
      */
-    static final String SIGNATURE_PRODUCTION_CITY = "signatureProductionCity";//$NON-NLS-1$
+    public static final String SIGNATURE_PRODUCTION_CITY = "signatureProductionCity";//$NON-NLS-1$
 
     /**
      * C&oacute;digo postal en el que se realiza la firma.
      * <br> Propiedad compartida con XAdES.
      */
-    static final String SIGNATURE_PRODUCTION_POSTAL_CODE = "signatureProductionPostalCode";//$NON-NLS-1$
+    public static final String SIGNATURE_PRODUCTION_POSTAL_CODE = "signatureProductionPostalCode";//$NON-NLS-1$
 
     /**
      *  Pa&iacute;s en el que se realiza la firma.
      */
-    static final String SIGNATURE_PRODUCTION_COUNTRY = "signatureProductionCountry";//$NON-NLS-1$
+    public static final String SIGNATURE_PRODUCTION_COUNTRY = "signatureProductionCountry";//$NON-NLS-1$
 
     /**
      *  N&uacute;mero de <i>CommitmentTypeIndications</i> a a&ntilde;adir a la firma.<br>
      *  En los par&aacute;metros siguientes, los <i>CommitmentTypeIndications</i> se numeran a partir de 0 (cero).
      */
-    static final String COMMITMENT_TYPE_INDICATIONS = "commitmentTypeIndications";//$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATIONS = "commitmentTypeIndications";//$NON-NLS-1$
 
     /**
      * Prefijo de las claves con las que se indican las propiedades de los <i>Commitment
@@ -170,12 +166,12 @@ public final class CAdESExtraParams {
      *  <li>commitmentTypeIndication<i>n</i>CommitmentTypeQualifiers</li>
      * </ul>
      */
-    static final String COMMITMENT_TYPE_INDICATION_PREFIX = "commitmentTypeIndication";//$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATION_PREFIX = "commitmentTypeIndication";//$NON-NLS-1$
     /**
      * Lista de OID separados por el caracter '<i>|</i>' que se aportan como calificadores adicionales del
      * <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i> (contando desde cero). Atributo opcional.
      */
-    static final String COMMITMENT_TYPE_INDICATION_QUALIFIERS = "CommitmentTypeQualifiers";//$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATION_QUALIFIERS = "CommitmentTypeQualifiers";//$NON-NLS-1$
     /**
      *  Tipo de <i>CommitmentTypeIndication</i> para el <i>CommitmentTypeIndication</i> n&uacute;mero <i>n</i>
      *  (contando desde cero). Atributo obligatorio. Valores:
@@ -188,54 +184,54 @@ public final class CAdESExtraParams {
      *  <li><i>6</i> = Prueba de creaci&oacute;n</li>
      *  </ul>
      */
-    static final String COMMITMENT_TYPE_INDICATION_IDENTIFIER = "Identifier";//$NON-NLS-1$
+    public static final String COMMITMENT_TYPE_INDICATION_IDENTIFIER = "Identifier";//$NON-NLS-1$
 
     /**
      *  URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).
      */
-    static final String TSA_URL = "tsaURL";//$NON-NLS-1$
+    public static final String TSA_URL = "tsaURL";//$NON-NLS-1$
 
     /**
      *  Pol&iacute;tica de sellado de tiempo (obligatoria si se indica tsaURL).
      */
-    static final String TSA_POLICY = "tsaPolicy";//$NON-NLS-1$
+    public static final String TSA_POLICY = "tsaPolicy";//$NON-NLS-1$
 
     /**
      *  Algoritmo de huella digital a usar para el sello de tiempo (si no se establece se usa SHA-1).
      */
-    static final String TSA_HASH_ALGORITHM = "tsaHashAlgorithm";//$NON-NLS-1$
+    public static final String TSA_HASH_ALGORITHM = "tsaHashAlgorithm";//$NON-NLS-1$
 
     /**
      * <code>true</code> si se requiere el certificado de la TSA, false en caso contrario (si no se establece se asume <code>true</code>).
      */
-    static final String TSA_REQUIRE_CERT = "tsaRequireCert";//$NON-NLS-1$
+    public static final String TSA_REQUIRE_CERT = "tsaRequireCert";//$NON-NLS-1$
 
     /**
      *  Nombre de usuario de la TSA.
      */
-    static final String TSA_USR = "tsaUsr";//$NON-NLS-1$
+    public static final String TSA_USR = "tsaUsr";//$NON-NLS-1$
 
     /** Contrase&ntilde;a del usuario de la TSA. Se ignora si no se ha establecido
      * adem&aacute;s <code>tsaUsr</code>. */
-    static final String TSA_PWD_KEY = "tsaPwd";//$NON-NLS-1$
+    public static final String TSA_PWD_KEY = "tsaPwd";//$NON-NLS-1$
 
     /** Nombre del fichero PKCS#12 que contiene el certificado SSL cliente que pedir&aacute;
      * la TSA al establecer la conexi&oacute;n HTTPS.*/
-    static final String TSA_SSL_PKCS12_FILE = "tsaSslPkcs12File";//$NON-NLS-1$
+    public static final String TSA_SSL_PKCS12_FILE = "tsaSslPkcs12File";//$NON-NLS-1$
 
     /** Contrase&ntilde;a del fichero PKCS#12 que contiene el certificado SSL cliente para
      * las conexiones HTTPS. */
-    static final String TSA_SSL_PKCS12_FILE_PASSWORD_KEY = "tsaSslPkcs12FilePassword";//$NON-NLS-1$
+    public static final String TSA_SSL_PKCS12_FILE_PASSWORD_KEY = "tsaSslPkcs12FilePassword";//$NON-NLS-1$
 
     /**
      *  Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si no se establece o se establece a <code>false</code>
      *  act&uacute;a normalmente (puede mostrar di&aacute;logos, por ejemplo, para solicitar las contrase&ntilde;as de los PDF cifrados). &Uacute;til para
      *  los procesos desatendidos y por lotes.
      */
-    static final String HEADLESS = "headless";//$NON-NLS-1$
+    public static final String HEADLESS = "headless";//$NON-NLS-1$
 
     /**
-     * Par&aacute;metro que permite configurar si se permite ka multifirma de firmas de archivo aunque
+     * Par&aacute;metro que permite configurar si se permite la multifirma de firmas de archivo aunque
      * queden invalidadas.
      */
 	public static final String ALLOW_SIGN_LTS_SIGNATURES = "allowSignLTSignature"; //$NON-NLS-1$

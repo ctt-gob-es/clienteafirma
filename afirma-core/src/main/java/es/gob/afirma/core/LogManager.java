@@ -37,9 +37,9 @@ public final class LogManager {
 		MINIAPPLET,
 		/** Applet. */
 		APPLET,
-		/** AutoFirma. */
+		/** Autofirma. */
 		AUTOFIRMA,
-		/** Configurador de la instalaci&oacute;n de AutoFirma. */
+		/** Configurador de la instalaci&oacute;n de Autofirma. */
 		AUTOFIRMA_CONFIGURATOR,
 		/** StandAlone. */
 		STANDALONE,

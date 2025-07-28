@@ -11,15 +11,14 @@ package es.gob.afirma.triphase.signer.xades;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -180,6 +179,19 @@ public final class XAdESTriPhaseSignerServerSide {
 					XMLConstants.TAG_SIGNATURE
 					);
 
+			// Si se ha solicitado una firma y detectamos que el XML ya esta
+			// firmado, devolvemos un error ya que este se puede cofirmar o
+			// contrafirmar, pero no firmar
+			if (op == Op.SIGN) {
+				final boolean rootIsSignature =
+						XMLSignature.XMLNS.equals(xml.getNamespaceURI())
+						&& XMLConstants.TAG_SIGNATURE.equals(xml.getNodeName());
+				if (rootIsSignature || signatureNodeList.getLength() > 0) {
+					LOGGER.severe("El XML ya esta firmado, por lo que no se permite volverlo a firmar (debe cofirmarse o contrafirmarse)");  //$NON-NLS-1$
+					throw new AOException("El XML ya esta firmado, por lo que no se permite volverlo a firmar (debe cofirmarse o contrafirmarse)"); //$NON-NLS-1$
+				}
+			}
+
 			for (int i = 0; i < signatureNodeList.getLength(); i++) {
 
 				final Node currentNode = signatureNodeList.item(i);
@@ -216,8 +228,8 @@ public final class XAdESTriPhaseSignerServerSide {
 		extraParams.setProperty(XAdESExtraParams.INTERNAL_VALIDATE_PKCS1, Boolean.FALSE.toString());
 
 		// Generamos un par de claves para hacer la firma temporal, que despues sustituiremos por la real
-		final PublicKey publicKey = ((X509Certificate)certChain[0]).getPublicKey();
-		final PrivateKey prk = KeyHelperFactory.getKeyHelper(publicKey).getPrivateKey(publicKey);
+		final PublicKey publicKey = certChain[0].getPublicKey();
+		final PrivateKey privateKey = KeyHelperFactory.getKeyHelper(publicKey).getPrivateKey(publicKey);
 
 		final byte[] result;
 		switch (op) {
@@ -225,7 +237,7 @@ public final class XAdESTriPhaseSignerServerSide {
 				result = XAdESSigner.sign(
 					data,
 					algorithm,
-					prk,
+					privateKey,
 					certChain,
 					extraParams
 				);
@@ -234,7 +246,7 @@ public final class XAdESTriPhaseSignerServerSide {
 				result = XAdESCoSigner.cosign(
 					data,
 					algorithm,
-					prk,
+					privateKey,
 					certChain,
 					extraParams
 				);
@@ -249,7 +261,7 @@ public final class XAdESTriPhaseSignerServerSide {
 					algorithm,
 					targets,
 					null,
-					prk,
+					privateKey,
 					certChain,
 					extraParams
 				);
@@ -264,46 +276,42 @@ public final class XAdESTriPhaseSignerServerSide {
 		String xmlResult = new String(result, xmlEncoding);
 
 		// Recuperamos los signed info que se han firmado
-		final List<byte[]> signedInfos = XAdESTriPhaseSignerServerSide.getSignedInfos(
+		final List<SignatureData> signatureDatas = XAdESTriPhaseSignerServerSide.getSignatureData(
 			result,
 			certChain[0].getPublicKey(),
 			previousSignaturesIds // Identificadores de firmas previas, para poder omitirlos
 		);
 
 		// Ponemos un reemplazo en el XML en lugar de los PKCS#1 de las firmas generadas
-		for (int i = 0; i < signedInfos.size(); i++) {
+		final List<byte[]> signedInfos = new ArrayList<>(signatureDatas.size());
+		for (int i = 0; i < signatureDatas.size(); i++) {
 
-			final byte[] signedInfo = signedInfos.get(i);
+			final SignatureData signatureData = signatureDatas.get(i);
 
-			// Calculamos el valor PKCS#1 con la clave privada impostada, para conocer los valores que debemos sustituir
-			final Signature signature = Signature.getInstance(algorithm);
-			signature.initSign(prk);
-			signature.update(signedInfo);
+			final String signatureValueB64 = Base64.encode(signatureData.getSignatureValue());
 
-			final String cleanSignatureValue = cleanBase64(Base64.encode(signature.sign()));
+			// Por seguridad identificamos la posicion del elemento, teniendo cuidado de que si
+			// la cadena es pequena se compruebe que el elemento sea completo
+			String signValuePrefix = ">"; //$NON-NLS-1$
+			if (signatureValueB64.length() < NUM_CHARACTERS_TO_COMPARE) {
+				signValuePrefix += signatureValueB64 + "<"; //$NON-NLS-1$
+			} else {
+				signValuePrefix += signatureValueB64.substring(0, NUM_CHARACTERS_TO_COMPARE);
+			}
+			final int signValueStart = xmlResult.indexOf(signValuePrefix) + 1;
 
-			// Buscamos el PKCS#1 en Base64 en el XML original y lo sustituimos por la cadena de reemplazo
-			if (cleanSignatureValue != null) {
-				final String signValuePrefix = ">" + cleanSignatureValue.substring(0, NUM_CHARACTERS_TO_COMPARE); //$NON-NLS-1$
-				final int signValuePos = xmlResult.indexOf(signValuePrefix) + 1;
-				final int signValueFinalPos = xmlResult.indexOf('<', signValuePos);
-				final String pkcs1String = xmlResult.substring(signValuePos, signValueFinalPos);
-
-				final String cleanPkcs1String = cleanBase64(pkcs1String);
-				if (cleanSignatureValue.equals(cleanPkcs1String)) {
-					xmlResult = xmlResult.replace(
-						pkcs1String,
-						REPLACEMENT_STRING.replace(REPLACEMENT_CODE, Integer.toString(i))
-					);
-				}
+			if (signValueStart > 0) {
+				final int signValueEnd = xmlResult.indexOf('<', signValueStart);
+				final String signatureValue = xmlResult.substring(signValueStart, signValueEnd);
+				xmlResult = xmlResult.replace(signatureValue, REPLACEMENT_STRING.replace(REPLACEMENT_CODE, Integer.toString(i)));
+				signedInfos.add(signatureData.getSignedInfo());
+			}
+			else {
+				LOGGER.warning("No se encontro uno de los PKCS#1 internos para sustitucion"); //$NON-NLS-1$
 			}
 		}
 
 		return new XmlPreSignResult(xmlResult.getBytes(xmlEncoding), signedInfos, xmlEncoding);
-	}
-
-	private static String cleanBase64(final String base64) {
-		return base64 == null ? null : base64.replace("\n", "").replace("\r", "").replace("\t", "").replace(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 	}
 
 	/** Recupera los <code>SignedInfo</code> de una firma XML, excluyendo los de las firmas indicadas a trav&eacute;s
@@ -318,7 +326,7 @@ public final class XAdESTriPhaseSignerServerSide {
 	 * @throws MarshalException Si hay problemas con el empaquetado XML.
 	 * @throws XMLSignatureException Si hay problemas en la propia firma XMLDSig.
 	 * @throws XmlPreSignException Cuando no se ha encontrado ning&uacute;n signedInfo que devolver. */
-	private static List<byte[]> getSignedInfos(final byte[] xmlSign,
+	private static List<SignatureData> getSignatureData(final byte[] xmlSign,
 			                                   final PublicKey pk,
 			                                   final List<String> excludedIds) throws SAXException,
 			                                                                          IOException,
@@ -340,7 +348,7 @@ public final class XAdESTriPhaseSignerServerSide {
 		}
 
 		// Recogemos el signedInfo de cada firma cuyo identificador no este en la lista de excluidos (excludedIds)
-		final List<byte[]> signedInfos = new ArrayList<>();
+		final List<SignatureData> signedInfos = new ArrayList<>();
 		for (int i = 0; i < signatureNodeList.getLength(); i++) {
 
 			final Node currentNode = signatureNodeList.item(i);
@@ -363,11 +371,13 @@ public final class XAdESTriPhaseSignerServerSide {
 			final XMLSignature signature = Utils.getDOMFactory().unmarshalXMLSignature(valContext);
 			signature.validate(valContext);
 
-			signedInfos.add(
-				AOUtil.getDataFromInputStream(
-					signature.getSignedInfo().getCanonicalizedData()
-				)
-			);
+			byte[] signedInfo;
+			try (InputStream is = signature.getSignedInfo().getCanonicalizedData()) {
+				signedInfo = AOUtil.getDataFromInputStream(is);
+			}
+			final byte[] signatureValue = signature.getSignatureValue().getValue();
+
+			signedInfos.add(new SignatureData(signedInfo, signatureValue));
 		}
 
 		if (signedInfos.isEmpty()) {
@@ -375,6 +385,26 @@ public final class XAdESTriPhaseSignerServerSide {
 		}
 
 		return signedInfos;
+	}
+
+	private static class SignatureData {
+
+		private final byte[] signedInfo;
+
+		private final byte[] signatureValue;
+
+		public SignatureData(final byte[] signedInfo, final byte[] signatureValue) {
+			this.signedInfo = signedInfo;
+			this.signatureValue = signatureValue;
+		}
+
+		public byte[] getSignedInfo() {
+			return this.signedInfo;
+		}
+
+		public byte[] getSignatureValue() {
+			return this.signatureValue;
+		}
 	}
 
 	private static class SimpleKeySelector extends KeySelector {

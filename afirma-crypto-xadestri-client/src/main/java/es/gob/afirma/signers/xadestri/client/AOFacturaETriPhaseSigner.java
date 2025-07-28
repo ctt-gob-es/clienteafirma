@@ -79,9 +79,8 @@ public final class AOFacturaETriPhaseSigner extends AOXAdESTriPhaseSigner {
         try {
             final Document doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(is));
             final Element rootNode = doc.getDocumentElement();
-            final String rootNodePrefix = rootNode.getPrefix();
 
-            if (!((rootNodePrefix != null ? rootNodePrefix + ":" : "") + "Facturae").equals(rootNode.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (!"Facturae".equals(rootNode.getLocalName())) { //$NON-NLS-1$
                 return false;
             }
 
@@ -92,7 +91,7 @@ public final class AOFacturaETriPhaseSigner extends AOXAdESTriPhaseSigner {
 
             final NodeList nl = rootNode.getChildNodes();
             for (int i=0;i<nl.getLength();i++) {
-                final String nodeName = nl.item(i).getNodeName();
+                final String nodeName = nl.item(i).getLocalName();
                 if (childs.contains(nodeName)) {
                     childs.remove(nodeName);
                 }

@@ -7,5 +7,5 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-/** Configurador de sistema para el uso de AutoFirma por conexiones HTTPS locales. */
+/** Configurador de sistema para el uso de Autofirma por conexiones HTTPS locales. */
 package es.gob.afirma.standalone.configurator;

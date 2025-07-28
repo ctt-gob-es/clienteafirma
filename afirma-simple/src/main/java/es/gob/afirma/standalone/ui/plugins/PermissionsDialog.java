@@ -21,7 +21,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.plugins.Permission;
@@ -50,7 +50,6 @@ public class PermissionsDialog extends JDialog implements KeyListener {
 		final double screenHeight = LookAndFeelManager.getScreenSize().getHeight();
 		final Dimension preferedFrameSize = new Dimension(400, (int) Math.min(500, screenHeight * 0.8));
 		setSize(preferedFrameSize);
-		setResizable(false);
 		setLocationRelativeTo(parent);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -69,7 +68,7 @@ public class PermissionsDialog extends JDialog implements KeyListener {
 
 	@SuppressWarnings("serial")
 	void createUI() {
-		setIconImages(AutoFirmaUtil.getIconImages());
+		setIconImages(DesktopUtil.getIconImages());
 		getAccessibleContext().setAccessibleDescription(
 				SimpleAfirmaMessages.getString("PermissionsDialog.1") //$NON-NLS-1$
 		);

@@ -113,7 +113,7 @@ public abstract class AfirmaPlugin {
 
 	/**
 	 * Obtiene el procesador para peticiones en linea asociado al plugin.
-	 * @param protocolVersion Versi&oacute;n del protocolo declarado por AutoFirma.
+	 * @param protocolVersion Versi&oacute;n del protocolo declarado por Autofirma.
 	 * @return Procesador de peticiones de firma en l&iacute;nea o {@code null} si el
 	 * plugin no lo establece.
 	 * @throws PluginControlledException Cuando se produce un error durante la carga del
@@ -141,7 +141,7 @@ public abstract class AfirmaPlugin {
 	}
 
 	/**
-	 * Proceso ejecutado al instalar el plugin en AutoFirma. Esto s&oacute;lo se
+	 * Proceso ejecutado al instalar el plugin en Autofirma. Esto s&oacute;lo se
 	 * ejecutar&aacute; una vez a lo largo de vida del plugin. Este proceso s&oacute;lo
 	 * tendr&aacute; permisos de administrador si el usuario ejecut&oacute; Autofirma
 	 * con estos.
@@ -152,7 +152,7 @@ public abstract class AfirmaPlugin {
 	}
 
 	/**
-	 * Proceso ejecutado al desinstalar el plugin de AutoFirma. Este proceso deber&iacute;
+	 * Proceso ejecutado al desinstalar el plugin de Autofirma. Este proceso deber&iacute;
 	 * eliminar cualquier resto o referencia que se haya dejado en el sistema como parte del
 	 * proceso de instalaci&oacute;n o de firma.
 	 * @throws PluginControlledException Cuando ocurre un error durante el proceso.

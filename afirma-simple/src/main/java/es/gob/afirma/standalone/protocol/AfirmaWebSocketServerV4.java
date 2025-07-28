@@ -16,7 +16,7 @@ import org.java_websocket.WebSocket;
 
 /**
  * Servidor para la comunicaci&oacute;n por <i>WebSocket</i> acorde a la versi&oacute;n 4
- * del protocolo de AutoFirma.
+ * del protocolo de Autofirma.
  */
 public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 
@@ -37,8 +37,14 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 	/** IP local. */
 	private static final String LOCALHOST_ADDRESS = "127.0.0.1"; //$NON-NLS-1$
 
+	/** Uno de los prefijos que puede presentar el mensaje de invocaci&oacute;n de una firma de lote. Versi&oacute;n 1. */
+	private static final String HEADER_BATCH_1 = "afirma://batch?"; //$NON-NLS-1$
+
+	/** Uno de los prefijos que puede presentar el mensaje de invocaci&oacute;n de una firma de lote. Versi&oacute;n 1. */
+	private static final String HEADER_BATCH_2 = "afirma://batch/?"; //$NON-NLS-1$
+
 	/**
-	 * Genera un servidor websocket que atiende las peticiones del Cliente @firma.
+	 * Genera un servidor websocket que atiende las peticiones de Autofirma.
 	 * @param port Puerto a trav&eacute;s del que realizar la comunicaci&oacute;n.
 	 * @param sessionId Identificador de sesi&oacute;n con la que deben autenticarse
 	 * las llamadas.
@@ -78,6 +84,10 @@ public final class AfirmaWebSocketServerV4 extends AfirmaWebSocketServer {
 		// Si recibimos cualquier cosa distinta de un eco, consideraremos que es una peticion de
 		// operacion y la procesaremos como tal
 		else {
+			// Si se trata de una operacion de firma de lote, incrementamos el tiempo de timeout
+			final boolean batchOperation = message.startsWith(HEADER_BATCH_1) || message.startsWith(HEADER_BATCH_2);
+			setConnectionLostTimeout(batchOperation ? 240 : 60);
+			// Ejecutamos la peticion y devolvemos el resultado
 			broadcast(ProtocolInvocationLauncher.launch(message, PROTOCOL_VERSION, true), Collections.singletonList(ws));
 		}
 	}

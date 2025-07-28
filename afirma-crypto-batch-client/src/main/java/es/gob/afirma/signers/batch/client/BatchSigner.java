@@ -131,10 +131,10 @@ public final class BatchSigner {
 	 *       &lt;xs:attribute type="xs:string" name="algorithm" use="required"&gt;
 	 *         &lt;xs:simpleType&gt;
 	 *           &lt;xs:restriction base="xs:string"&gt;
-	 *             &lt;xs:enumeration value="SHA1withRSA"/&gt;
-	 *             &lt;xs:enumeration value="SHA256withRSA"/&gt;
-	 *             &lt;xs:enumeration value="SHA384withRSA"/&gt;
-	 *             &lt;xs:enumeration value="SHA512withRSA"/&gt;
+	 *             &lt;xs:enumeration value="SHA1"/&gt;
+	 *             &lt;xs:enumeration value="SHA256"/&gt;
+	 *             &lt;xs:enumeration value="SHA384"/&gt;
+	 *             &lt;xs:enumeration value="SHA512"/&gt;
 	 *           &lt;/xs:restriction&gt;
 	 *         &lt;/xs:simpleType&gt;
 	 *       &lt;xs:attribute&gt;
@@ -146,7 +146,7 @@ public final class BatchSigner {
 	 * este (ejemplo con dos firmas en el lote):
 	 * <pre>
 	 * &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
-	 * &lt;signbatch stoponerror="true" algorithm="SHA1withRSA"&gt;
+	 * &lt;signbatch stoponerror="true" algorithm="SHA1"&gt;
 	 *  &lt;singlesign id="f8526f7b-d30a-4720-9e35-fe3494217944"&gt;
 	 *   &lt;datasource&gt;http://google.com&lt;/datasource&gt;
 	 *   &lt;format&gt;XAdES&lt;/format&gt;

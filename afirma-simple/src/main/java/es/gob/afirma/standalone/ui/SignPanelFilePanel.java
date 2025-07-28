@@ -267,6 +267,10 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
     	return this.configInfoPanel.isPdfStampSignatureSelected();
     }
 
+    String getCertificationLevel() {
+    	return this.configInfoPanel.getPdfSignatureCertificationLevel();
+    }
+
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
 		return getPreferredSize();
@@ -299,6 +303,6 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
 	public void setConfigInfoPanel(final SignatureConfigInfoPanel configInfoPanel) {
 		this.configInfoPanel = configInfoPanel;
 	}
-	
+
 }
 

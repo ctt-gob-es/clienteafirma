@@ -7,12 +7,12 @@
 	<packaging>jar</packaging>
 	
 	<name>afirma-ui-simpleafirma-configurator-common</name>
-	<description>Clases de configuracion compartidas por AutoFirma y su configurador</description>
+	<description>Clases de configuracion compartidas por Autofirma y su configurador</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.9-SNAPSHOT</version>
+		<version>1.9</version>
 	</parent>
 
 	<dependencies>
@@ -27,6 +27,12 @@
 					<artifactId>afirma-lib-jmimemagic</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core-prefs</artifactId>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 		
 		<dependency>

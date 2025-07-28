@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>jar\autofirmaConfigurador.jar</jar>
+  <outfile>Autofirma32\AutofirmaConfigurador.exe</outfile>
+  <errTitle>Error: Se ha superado el tiempo de espera antes de recibir peticiones.</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>true</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest>AutofirmaConfigurator.manifest</manifest>
+  <icon>ic_launcher.ico</icon>
+  <classPath>
+    <mainClass>es.gob.afirma.standalone.configurator.AutofirmaConfiguratorSilent</mainClass>
+  </classPath>
+  <jre>
+    <path>./jre;%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
+    <opt>-Xms256m -Xmx1g</opt>
+  </jre>
+  <versionInfo>
+    <fileVersion>1.9.0.0</fileVersion>
+    <txtFileVersion>1.9</txtFileVersion>
+    <fileDescription>Configurador Autofirma</fileDescription>
+    <copyright>Gobierno de España</copyright>
+    <productVersion>1.9.0.0</productVersion>
+    <txtProductVersion>1.9</txtProductVersion>
+    <productName>Configurador Autofirma</productName>
+    <companyName>Gobierno de España</companyName>
+    <internalName>Configurador Autofirma</internalName>
+    <originalFilename>AutofirmaConfigurador.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>CASTILIAN_SPANISH</language>
+  </versionInfo>
+  <messages>
+    <startupErr>Ocurrió un error mientras arrancaba la aplicación.</startupErr>
+    <jreNotFoundErr>No se ha encontrado el Java Runtime Environment (JRE) de Autofirma ni ningún otro en el PATH del sistema.</jreNotFoundErr>
+    <jreVersionErr>La aplicación requiere un Java Runtime Environment (JRE)</jreVersionErr>
+    <launcherErr>El registro hace referencia a una instalación de Java Runtime Environment (JRE) que no existe o está corrupta.</launcherErr>
+    <instanceAlreadyExistsMsg>Ya se encuentra corriendo una instancia de esta aplicación.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>

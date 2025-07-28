@@ -30,6 +30,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -46,7 +47,6 @@ import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
@@ -73,8 +73,107 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifier;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifierImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdESBase;
 
-/** Firmador simple XAdES.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+/**
+ * Firmador simple XAdES.
+ * <p>
+ * Esta clase, al firmar un XML, firmas tambi&eacute;n sus hojas de
+ * estilo XSL asociadas, siguiendo el siguiente criterio:
+ * <ul>
+ *  <li>Firmas XML <i>Enveloped</i>
+ *   <ul>
+ *    <li>
+ *     Hoja de estilo con ruta relativa
+ *     <ul>
+ *      <li>No se firma.</li>
+ *     </ul>
+ *    </li>
+ *    <li>
+ *     Hola de estilo remota con ruta absoluta
+ *     <ul>
+ *      <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+ *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+ *     </ul>
+ *    </li>
+ *    <li>
+ *     Hoja de estilo empotrada
+ *     <ul>
+ *      <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+ *     </ul>
+ *    </li>
+ *   </ul>
+ *  </li>
+ *  <li>
+ *   Firmas XML <i>Externally Detached</i>
+ *   <ul>
+ *    <li>
+ *     Hoja de estilo con ruta relativa
+ *     <ul>
+ *      <li>No se firma.</li>
+ *     </ul>
+ *    </li>
+ *    <li>
+ *     Hola de estilo remota con ruta absoluta
+ *     <ul>
+ *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+ *     </ul>
+ *    </li>
+ *    <li>
+ *     Hoja de estilo empotrada
+ *     <ul>
+ *      <li>No es necesaria ninguna acci&oacute;n</li>
+ *     </ul>
+ *    </li>
+ *   </ul>
+ *  </li>
+ *  <li>
+ *   Firmas XML <i>Enveloping</i>
+ *   <ul>
+ *    <li>
+ *     Hoja de estilo con ruta relativa
+ *     <ul>
+ *      <li>No se firma.</li>
+ *     </ul>
+ *    </li>
+ *    <li>
+ *     Hola de estilo remota con ruta absoluta
+ *     <ul>
+ *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+ *     </ul>
+ *    </li>
+ *    <li>
+ *     Hoja de estilo empotrada
+ *     <ul>
+ *      <li>No es necesaria ninguna acci&oacute;n</li>
+ *     </ul>
+ *    </li>
+ *   </ul>
+ *  </li>
+ *  <li>
+ *   Firmas XML <i>Internally Detached</i>
+ *   <ul>
+ *    <li>
+ *     Hoja de estilo con ruta relativa
+ *     <ul>
+ *      <li>No se firma.</li>
+ *     </ul>
+ *    </li>
+ *    <li>
+ *     Hola de estilo remota con ruta absoluta
+ *     <ul>
+ *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
+ *     </ul>
+ *    </li>
+ *    <li>
+ *     Hoja de estilo empotrada
+ *     <ul>
+ *      <li>No es necesaria ninguna acci&oacute;n</li>
+ *     </ul>
+ *    </li>
+ *   </ul>
+ *  </li>
+ * </ul>
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
 public final class XAdESSigner {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");	//$NON-NLS-1$
@@ -87,126 +186,43 @@ public final class XAdESSigner {
 		// No permitimos la instanciacion
 	}
 
-    /** Firma datos en formato XAdES.
-     * <p>
-     * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de
-     * estilo XSL asociadas, siguiendo el siguiente criterio:
-     * <ul>
-     *  <li>Firmas XML <i>Enveloped</i>
-     *   <ul>
-     *    <li>
-     *     Hoja de estilo con ruta relativa
-     *     <ul>
-     *      <li>No se firma.</li>
-     *     </ul>
-     *    </li>
-     *    <li>
-     *     Hola de estilo remota con ruta absoluta
-     *     <ul>
-     *      <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
-     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-     *     </ul>
-     *    </li>
-     *    <li>
-     *     Hoja de estilo empotrada
-     *     <ul>
-     *      <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
-     *     </ul>
-     *    </li>
-     *   </ul>
-     *  </li>
-     *  <li>
-     *   Firmas XML <i>Externally Detached</i>
-     *   <ul>
-     *    <li>
-     *     Hoja de estilo con ruta relativa
-     *     <ul>
-     *      <li>No se firma.</li>
-     *     </ul>
-     *    </li>
-     *    <li>
-     *     Hola de estilo remota con ruta absoluta
-     *     <ul>
-     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-     *     </ul>
-     *    </li>
-     *    <li>
-     *     Hoja de estilo empotrada
-     *     <ul>
-     *      <li>No es necesaria ninguna acci&oacute;n</li>
-     *     </ul>
-     *    </li>
-     *   </ul>
-     *  </li>
-     *  <li>
-     *   Firmas XML <i>Enveloping</i>
-     *   <ul>
-     *    <li>
-     *     Hoja de estilo con ruta relativa
-     *     <ul>
-     *      <li>No se firma.</li>
-     *     </ul>
-     *    </li>
-     *    <li>
-     *     Hola de estilo remota con ruta absoluta
-     *     <ul>
-     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-     *     </ul>
-     *    </li>
-     *    <li>
-     *     Hoja de estilo empotrada
-     *     <ul>
-     *      <li>No es necesaria ninguna acci&oacute;n</li>
-     *     </ul>
-     *    </li>
-     *   </ul>
-     *  </li>
-     *  <li>
-     *   Firmas XML <i>Internally Detached</i>
-     *   <ul>
-     *    <li>
-     *     Hoja de estilo con ruta relativa
-     *     <ul>
-     *      <li>No se firma.</li>
-     *     </ul>
-     *    </li>
-     *    <li>
-     *     Hola de estilo remota con ruta absoluta
-     *     <ul>
-     *      <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-     *     </ul>
-     *    </li>
-     *    <li>
-     *     Hoja de estilo empotrada
-     *     <ul>
-     *      <li>No es necesaria ninguna acci&oacute;n</li>
-     *     </ul>
-     *    </li>
-     *   </ul>
-     *  </li>
-     * </ul>
+	/**
+     * Firma datos en formato XAdES.
      * @param data Datos que deseamos firmar.
      * @param signAlgorithm
      *            Algoritmo a usar para la firma.
-     *            <p>
-     *              Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:
-     *            </p>
-     *            <ul>
-     *              <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *              <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *              <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *              <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     *            </ul>
      * @param certChain Cadena de certificados del firmante.
      * @param pk Clave privada del firmante.
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
      * @return Firma en formato XAdES.
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso. */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     */
 	public static byte[] sign(final byte[] data,
 			                  final String signAlgorithm,
 			                  final PrivateKey pk,
 			                  final Certificate[] certChain,
 			                  final Properties xParams) throws AOException {
+		return sign(data, signAlgorithm, pk, certChain, xParams, null);
+	}
+
+    /**
+     * Firma datos en formato XAdES.
+     * @param data Datos que deseamos firmar.
+     * @param signAlgorithm
+     *            Algoritmo a usar para la firma.
+     * @param certChain Cadena de certificados del firmante.
+     * @param pk Clave privada del firmante.
+     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
+     * @param uriDereferencer Derreferenciador a medida.
+     * @return Firma en formato XAdES.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     */
+	public static byte[] sign(final byte[] data,
+			                  final String signAlgorithm,
+			                  final PrivateKey pk,
+			                  final Certificate[] certChain,
+			                  final Properties xParams,
+			                  final URIDereferencer uriDereferencer) throws AOException {
 
 		final String algorithm = signAlgorithm != null ? signAlgorithm : AOSignConstants.DEFAULT_SIGN_ALGO;
 		final Properties extraParams = xParams != null ? xParams : new Properties();
@@ -255,7 +271,6 @@ public final class XAdESSigner {
 		// Algoritmo de huella usado en las referencias externas (manifest)
 		final String externalReferencesHashAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.PRECALCULATED_HASH_ALGORITHM, digestMethodAlgorithm);
-
 
 		String canonicalizationAlgorithm = extraParams.getProperty(
 		        XAdESExtraParams.CANONICALIZATION_ALGORITHM, CanonicalizationMethod.INCLUSIVE);
@@ -452,7 +467,7 @@ public final class XAdESSigner {
 				// como su hermano, tal y como obliga la normativa
 				if (nodeToSign != null) {
 						dataElement = CustomUriDereferencer.getElementById(docum, nodeToSign);
-						if (!CustomUriDereferencer.getElementById(docum, nodeToSign).isSameNode(docum.getDocumentElement())) {
+						if (!dataElement.isSameNode(docum.getDocumentElement())) {
 
 							// El documento de firma es este mismo
 							docSignature = docum;
@@ -665,24 +680,9 @@ public final class XAdESSigner {
 			canonicalizationTransform = null;
 		}
 
-		// Solo canonicalizo si es XML
-		if (!isBase64) {
-			// Las facturas electronicas no se canonicalizan
-			if (!facturaeSign && canonicalizationTransform != null) {
-				try {
-					// Transformada para la canonicalizacion inclusiva
-					transformList.add(canonicalizationTransform);
-				}
-				catch (final Exception e) {
-					throw new AOException(
-						"No se puede encontrar el algoritmo de canonicalizacion: " + e, e //$NON-NLS-1$
-					);
-				}
-			}
-		}
-		// Si no era XML y tuve que convertir a Base64 yo mismo declaro la
-		// transformacion
-		else if (wasEncodedToBase64 && !avoidBase64Transforms) {
+		// Si es Base 64 porque tuvimos que convertirlo y no se ha pedido evitar la transformacion,
+		// la declaramos
+		if (isBase64 && wasEncodedToBase64 && !avoidBase64Transforms) {
 			try {
 				transformList.add(
 					fac.newTransform(
@@ -708,6 +708,13 @@ public final class XAdESSigner {
 		XMLObject envelopingStyleObject = null;
 
 		if (AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING.equals(format)) {
+
+			// Si los datos son XML, y tenemos configurada la canicalizacion de los datos,
+			// agregamos la transformacion
+			if (!isBase64 && canonicalizationTransform != null) {
+				transformList.add(canonicalizationTransform);
+			}
+
 			try {
 				// crea el nuevo elemento Object que contiene el documento a firmar
 				final List<XMLStructure> structures = new ArrayList<>(1);
@@ -815,6 +822,13 @@ public final class XAdESSigner {
 		// crea una referencia al documento mediante la URI hacia el
 		// identificador del nodo CONTENT o el de datos si ya tenia Id
 		else if (AOSignConstants.SIGN_FORMAT_XADES_DETACHED.equals(format)) {
+
+			// Si los datos son XML, y tenemos configurada la canicalizacion de los datos,
+			// agregamos la transformacion
+			if (!isBase64 && canonicalizationTransform != null) {
+				transformList.add(canonicalizationTransform);
+			}
+
 			try {
 				if (dataElement != null) {
 					// Inserta en el nuevo documento de firma el documento a firmar
@@ -1036,6 +1050,12 @@ public final class XAdESSigner {
 					);
 				}
 
+				// Canonicalizamos el XML salvo que sea una factura o que se haya establecido que
+				// no se canonicalice
+				if (!facturaeSign && canonicalizationTransform != null) {
+					transformList.add(canonicalizationTransform);
+				}
+
 				// Establecemos que es lo que se firma
 				// 1.- Si se especifico un nodo, se firma ese nodo
 				// 2.- Si el raiz tiene Id, se firma ese Id
@@ -1179,7 +1199,8 @@ public final class XAdESSigner {
 			xades,
 			signedPropertiesTypeUrl,
 			digestMethodAlgorithm,
-			canonicalizationAlgorithm != null ? canonicalizationAlgorithm : CanonicalizationMethod.INCLUSIVE
+			canonicalizationAlgorithm != null ? canonicalizationAlgorithm : CanonicalizationMethod.INCLUSIVE,
+			uriDereferencer
 		);
 
 		// en el caso de formato enveloping se inserta el elemento Object con el
@@ -1268,10 +1289,10 @@ public final class XAdESSigner {
 				"Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "':" + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
+		catch (final AOException e) {
+			throw e;
+		}
 		catch (final Exception e) {
-        	if ("es.gob.jmulticard.CancelledOperationException".equals(e.getClass().getName())) { //$NON-NLS-1$
-        		throw new AOCancelledOperationException();
-        	}
 			throw new AOException("Error al generar la firma XAdES: " + e, e); //$NON-NLS-1$
 		}
 

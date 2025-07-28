@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
@@ -35,7 +36,7 @@ final class ConfiguratorFirefoxMac {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+	private static final String FILE_AUTOFIRMA_CERTIFICATE = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 	private static final String CERTUTIL_RESOURCE = "/osx/certutil.osx.zip"; //$NON-NLS-1$
 	private static final String CERTUTIL_RELATIVE_PATH = "certutil/certutil"; //$NON-NLS-1$
 	private static final String PROFILES_INI_RELATIVE_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
@@ -74,7 +75,7 @@ final class ConfiguratorFirefoxMac {
 			certutilFile = prepareCertUtil(appDir, scriptFile);
 		}
 		catch (final Exception e) {
-			LOGGER.warning("No se pudo preparar CertUtil para la instalacion del certificado SSL en Mozilla Firefox. Se aborta la operacion: " + e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo preparar CertUtil para la instalacion del certificado SSL en Mozilla Firefox. Se aborta la operacion", e); //$NON-NLS-1$
 			return;
 		}
 
@@ -268,11 +269,11 @@ final class ConfiguratorFirefoxMac {
 				.append(escapePath(certUtilFile.getAbsolutePath()))
 				.append(" -L -d ") //$NON-NLS-1$
 				.append(escapePath(profileRef))
-				.append(" | grep AutoFirma | wc -l);for ((i=0; i<$max; i++));do ") //$NON-NLS-1$
+				.append(" | grep Autofirma | wc -l);for ((i=0; i<$max; i++));do ") //$NON-NLS-1$
 				.append(escapePath(certUtilFile.getAbsolutePath()))
 				.append(" -D -d ") //$NON-NLS-1$
 				.append(escapePath(profileRef))
-				.append(" -n \"SocketAutoFirma\";done"); //$NON-NLS-1$
+				.append(" -n \"" + ConfiguratorUtil.CERT_ALIAS + "\";done"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		ConfiguratorMacUtils.writeScriptFile(uninstallScript, scriptFile, true);
 	}

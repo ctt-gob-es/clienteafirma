@@ -281,7 +281,7 @@ public class SingleSign {
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos. */
 	String doPreProcess(final X509Certificate[] certChain,
-			            final SingleSignConstants.SignAlgorithm algorithm) throws IOException,
+			            final SingleSignConstants.DigestAlgorithm algorithm) throws IOException,
 			                                                                      AOException {
 		return SingleSignPreProcessor.doPreProcess(this, certChain, algorithm);
 	}
@@ -291,7 +291,7 @@ public class SingleSign {
 	 * @param algorithm Algoritmo de firma.
 	 * @return Tarea de preproceso de firma para ser ejecutada en paralelo. */
 	Callable<String> getPreProcessCallable(final X509Certificate[] certChain,
-                                                  final SingleSignConstants.SignAlgorithm algorithm) {
+                                                  final SingleSignConstants.DigestAlgorithm algorithm) {
 		return new PreProcessCallable(this, certChain, algorithm);
 	}
 
@@ -317,7 +317,7 @@ public class SingleSign {
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
 	void doPostProcess(final X509Certificate[] certChain,
 			                  final TriphaseData td,
-			                  final SingleSignConstants.SignAlgorithm algorithm,
+			                  final SingleSignConstants.DigestAlgorithm algorithm,
 			                  final String batchId) throws IOException,
 			                                               AOException,
 			                                               NoSuchAlgorithmException {
@@ -346,7 +346,7 @@ public class SingleSign {
 	 * @return Tarea de postproceso de firma para ser ejecutada en paralelo. */
 	Callable<CallableResult> getPostProcessCallable(final X509Certificate[] certChain,
 			                                                          final TriphaseData td,
-			                                                          final SingleSignConstants.SignAlgorithm algorithm,
+			                                                          final SingleSignConstants.DigestAlgorithm algorithm,
 			                                                          final String batchId) {
 		return new PostProcessCallable(this, certChain, td, algorithm, batchId);
 	}
@@ -433,7 +433,9 @@ public class SingleSign {
 	}
 
 	public ProcessResult getProcessResult() {
-		this.processResult.setId(getId());
+		if (this.processResult != null) {
+			this.processResult.setId(getId());
+		}
 		return this.processResult;
 	}
 
@@ -472,10 +474,10 @@ public class SingleSign {
 	static class PreProcessCallable implements Callable<String> {
 		private final SingleSign ss;
 		private final X509Certificate[] certChain;
-		private final SingleSignConstants.SignAlgorithm algorithm;
+		private final SingleSignConstants.DigestAlgorithm algorithm;
 
 		public PreProcessCallable(final SingleSign ss, final X509Certificate[] certChain,
-                final SingleSignConstants.SignAlgorithm algorithm) {
+                final SingleSignConstants.DigestAlgorithm algorithm) {
 			this.ss = ss;
 			this.certChain = certChain;
 			this.algorithm = algorithm;
@@ -492,11 +494,11 @@ public class SingleSign {
 		private final SingleSign ss;
 		private final X509Certificate[] certChain;
 		private final TriphaseData td;
-		private final SingleSignConstants.SignAlgorithm algorithm;
+		private final SingleSignConstants.DigestAlgorithm algorithm;
 		private final String batchId;
 
 		public PostProcessCallable(final SingleSign ss, final X509Certificate[] certChain,
-                final TriphaseData td, final SingleSignConstants.SignAlgorithm algorithm,
+                final TriphaseData td, final SingleSignConstants.DigestAlgorithm algorithm,
                 final String batchId) {
 			this.ss = ss;
 			this.certChain = certChain;
@@ -538,7 +540,6 @@ public class SingleSign {
 				this.signSaver.saveSign(this.ss, dataToSave);
 			}
 			catch(final Exception e) {
-				LOGGER.warning("No se puede recuperar para su guardado como firma el recurso: " + this.ss.getId()); //$NON-NLS-1$
 				return new CallableResult(this.ss.getId(), e);
 			}
 			return new CallableResult(this.ss.getId());

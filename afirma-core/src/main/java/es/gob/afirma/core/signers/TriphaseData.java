@@ -40,12 +40,16 @@ public final class TriphaseData {
 
 		private final Map<String,String> dict;
 		private final String id;
+		private final String signatureId;
 
-		/** Constructor de copia. Crea una firma trif&aacute;sica individual a partir
+		/**
+		 * Constructor de copia. Crea una firma trif&aacute;sica individual a partir
 		 * de otra, de forma completamente inmutable.
-		 * @param ts Firma trif&aacute;sica original. */
+		 * @param ts Firma trif&aacute;sica original.
+		 */
 		public TriSign(final TriSign ts) {
 			this.id = ts.getId();
+			this.signatureId = ts.getSignatureId();
 			this.dict = new ConcurrentHashMap<>(ts.getDict().size());
 			final Set<String> keys = ts.getDict().keySet();
 			for (final String key : keys) {
@@ -57,6 +61,17 @@ public final class TriphaseData {
 		 * @param d Propiedades de la firma.
 		 * @param i Identificador de la firma. Si es {@code null} se genera uno aleatorio. */
 		public TriSign(final Map<String, String> d, final String i) {
+			this(d, i, null);
+		}
+
+		/**
+		 * Crea los datos de una firma trif&aacute;sica individual.
+		 * @param d Propiedades de la firma.
+		 * @param i Identificador de la firma individual. Si es {@code null} se genera uno aleatorio.
+		 * @param signatureId Identificador de la firma global. S&oacute;lo es necesario si varias
+		 * firmas individuales pertenecen a la misma firma y es relevante.
+		 */
+		public TriSign(final Map<String, String> d, final String i, final String signatureId) {
 			if (d == null) {
 				throw new IllegalArgumentException(
 					"El diccionario de propiedades de la firma no puede ser nulo" //$NON-NLS-1$
@@ -64,6 +79,7 @@ public final class TriphaseData {
 			}
 			this.dict = d;
 			this.id = i != null ? i : UUID.randomUUID().toString();
+			this.signatureId = signatureId;
 		}
 
 		@Override
@@ -71,10 +87,20 @@ public final class TriphaseData {
 			return "Firma trifasica individual con identificador " + getId(); //$NON-NLS-1$
 		}
 
-		/** Obtiene el identificador de la firma.
-		 * @return Identificador de la firma. */
+		/**
+		 * Obtiene el identificador individual de la firma.
+		 * @return Identificador individual de la firma.
+		 */
 		public String getId() {
 			return this.id;
+		}
+
+		/**
+		 * Obtiene el identificador de la firma.
+		 * @return Identificador de la firma.
+		 */
+		public String getSignatureId() {
+			return this.signatureId;
 		}
 
 		/** Obtiene una propiedad de la firma.
@@ -110,31 +136,35 @@ public final class TriphaseData {
 	private final List<TriSign> signs;
 	private String format;
 
-	/** Obtiene el formato de las firmas.
-	 * @return Formato de la firma. */
+	/**
+	 * Obtiene el formato de las firmas.
+	 * @return Formato de la firma.
+	 */
 	public String getFormat() {
 		return this.format;
 	}
 
-	/** Establece el formato de las firmas.
-	 * @param fmt Formato de las firmas. */
+	/**
+	 * Establece el formato de las firmas.
+	 * @param fmt Formato de las firmas.
+	 */
 	public void setFormat(final String fmt) {
 		this.format = fmt;
 	}
 
-	/** Devuelve una firma individual con el identificador dado o <code>null</code> si no hay ninguna
+	/**
+	 * Devuelve una firma individual con el identificador dado o <code>null</code> si no hay ninguna
 	 * firma con ese identificador.
 	 * Si hubiese varias firmas con el mismo identificador se devuleve el primero en encontrarse.
 	 * @param signId Identificador de la firma.
-	 * @return Firma individual con el identificador dado. */
+	 * @return Firma individual con el identificador dado.
+	 */
 	public TriSign getTriSign(final String signId) {
 		if (signId == null) {
-			throw new IllegalArgumentException(
-				"El ID de la firma no puede ser nulo" //$NON-NLS-1$
-			);
+			throw new IllegalArgumentException("El ID de la firma no puede ser nulo"); //$NON-NLS-1$
 		}
 		for (final TriSign ts : this.signs) {
-			if (signId.equals(ts.getId())) {
+			if (belongToSignature(signId, ts)) {
 				return ts;
 			}
 		}
@@ -147,13 +177,11 @@ public final class TriphaseData {
 	 * @return Listado de firmas con el identificador dado. */
 	public List<TriSign> getTriSigns(final String signId) {
 		if (signId == null) {
-			throw new IllegalArgumentException(
-				"El ID de la firma no puede ser nulo" //$NON-NLS-1$
-			);
+			throw new IllegalArgumentException("El ID de la firma no puede ser nulo"); //$NON-NLS-1$
 		}
 		final List<TriSign> tsl = new ArrayList<>();
 		for (final TriSign ts : this.signs) {
-			if (signId.equals(ts.getId())) {
+			if (belongToSignature(signId, ts)) {
 				tsl.add(new TriSign(ts));
 			}
 		}
@@ -163,6 +191,17 @@ public final class TriphaseData {
 		}
 
 		return tsl;
+	}
+
+	/**
+	 * Comprueba si unos datos trif&aacute;sicos pertenecen a una firma con un ID dado.
+	 * @param signId Identificador de la firma.
+	 * @param ts Datos trif&aacute;sicos.
+	 * @return {@code true} si pertenecen a la firma, {@code false} en caso contrario.
+	 */
+	private static boolean belongToSignature(final String signId, final TriSign ts) {
+		// El identificadordebe ser el de la firma trifasica general o el de la particular
+		return signId.equals(ts.getSignatureId()) || signId.equals(ts.getId());
 	}
 
 	/** Obtiene todas las firmas de la sesi&oacute;n.
@@ -308,18 +347,24 @@ public final class TriphaseData {
 			final Node currentNode = childNodes.item(idx);
 
 			String id = null;
+			String signId = null;
 
 			final NamedNodeMap nnm = currentNode.getAttributes();
 			if (nnm != null) {
-				final Node tmpNode = nnm.getNamedItem("Id"); //$NON-NLS-1$
+				Node tmpNode = nnm.getNamedItem("Id"); //$NON-NLS-1$
 				if (tmpNode != null) {
 					id = tmpNode.getNodeValue();
+				}
+				tmpNode = nnm.getNamedItem("signid"); //$NON-NLS-1$
+				if (tmpNode != null) {
+					signId = tmpNode.getNodeValue();
 				}
 			}
 			signs.add(
 				new TriSign(
 					parseParamsListNode(currentNode),
-					id
+					id,
+					signId
 				)
 			);
 			idx = nextNodeElementIndex(childNodes, idx + 1);
@@ -390,6 +435,11 @@ public final class TriphaseData {
 			if (signConfig.getId() != null) {
 				builder.append(" Id=\""); //$NON-NLS-1$
 				builder.append(signConfig.getId());
+				builder.append("\""); //$NON-NLS-1$
+			}
+			if (signConfig.getSignatureId() != null) {
+				builder.append(" signid=\""); //$NON-NLS-1$
+				builder.append(signConfig.getSignatureId());
 				builder.append("\""); //$NON-NLS-1$
 			}
 

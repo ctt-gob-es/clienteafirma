@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='ISO-8859-1'  ?>
 <!DOCTYPE index>
 <index version="1.0">
-	<indexitem text="AutoFirma" target="AutoFirma" />
+	<indexitem text="Autofirma" target="Autofirma" />
 	<indexitem text="Pantalla de espera" target="PantallaEspera"/>
 	<indexitem text="Pantalla de firma" target="PantallaFirma" />
 	<indexitem text="Pantalla de detalle de firma" target="PantallaDetalle" />

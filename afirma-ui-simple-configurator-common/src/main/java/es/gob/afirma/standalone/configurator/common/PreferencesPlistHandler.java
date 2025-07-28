@@ -21,9 +21,9 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
@@ -234,10 +234,11 @@ public final class PreferencesPlistHandler {
 	}
 
 	/**
-	 * Se importan las preferencias del usuario desde un XML
-	 * @param xml XML con la informaci&oacute;n
-	 * @param unprotected Indica si las preferencias est&aacute;n protegidas o no
-	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido
+	 * Se cargan las preferencias del usuario desde un XML.
+	 * @param xml XML con la informaci&oacute;n.
+	 * @param unprotected Indica si las preferencias est&aacute;n protegidas o no.
+	 * @return Mapa de preferencias cargadas.
+	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido.
 	 */
 	public static Map<String, Object> loadPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
 		final Map<String, Object> properties;

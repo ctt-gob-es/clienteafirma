@@ -7,12 +7,12 @@
 	<packaging>jar</packaging>
 	
 	<name>afirma-ui-simpleafirma-plugins</name>
-	<description>Base para la construccion de plugins de AutoFirma</description>
+	<description>Base para la construccion de plugins de Autofirma</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.9-SNAPSHOT</version>
+		<version>1.9</version>
 	</parent>
 
 	<dependencies>

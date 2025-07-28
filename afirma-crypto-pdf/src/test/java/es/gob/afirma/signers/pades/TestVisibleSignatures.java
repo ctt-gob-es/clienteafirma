@@ -25,11 +25,11 @@ public final class TestVisibleSignatures {
 	public void testObfuscateText() {
 
 		final PdfTextMask mask = new PdfTextMask();
-		Assert.assertEquals("***4567**", PdfVisibleAreasUtils.obfuscate("12345678X", mask)); //$NON-NLS-1$ //$NON-NLS-2$
-		Assert.assertEquals("****4567*", PdfVisibleAreasUtils.obfuscate("L1234567X", mask)); //$NON-NLS-1$ //$NON-NLS-2$
-		Assert.assertEquals("*****3456", PdfVisibleAreasUtils.obfuscate("ABC123456", mask)); //$NON-NLS-1$ //$NON-NLS-2$
-		Assert.assertEquals("*****4567***", PdfVisibleAreasUtils.obfuscate("XY12345678AB", mask)); //$NON-NLS-1$ //$NON-NLS-2$
-		Assert.assertEquals("*****23XY", PdfVisibleAreasUtils.obfuscate("ABCD123XY", mask)); //$NON-NLS-1$ //$NON-NLS-2$
+		Assert.assertEquals("***4567**", PdfVisibleAreasUtils.obfuscateIds("12345678X", mask)); //$NON-NLS-1$ //$NON-NLS-2$
+		Assert.assertEquals("****4567*", PdfVisibleAreasUtils.obfuscateIds("L1234567X", mask)); //$NON-NLS-1$ //$NON-NLS-2$
+		Assert.assertEquals("*****3456", PdfVisibleAreasUtils.obfuscateIds("ABC123456", mask)); //$NON-NLS-1$ //$NON-NLS-2$
+		Assert.assertEquals("*****4567***", PdfVisibleAreasUtils.obfuscateIds("XY12345678AB", mask)); //$NON-NLS-1$ //$NON-NLS-2$
+		Assert.assertEquals("*****23XY", PdfVisibleAreasUtils.obfuscateIds("ABCD123XY", mask)); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 }

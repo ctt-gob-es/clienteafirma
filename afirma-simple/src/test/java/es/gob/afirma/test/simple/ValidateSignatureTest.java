@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
@@ -50,7 +49,6 @@ public class ValidateSignatureTest {
 	 * @throws RuntimeConfigNeededException No deberia ocurrir nunca. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
 	public void testValidateXMLSign() throws IOException, RuntimeConfigNeededException {
 
 			final String signaturePath = XMLDSIG_ENVELOPED;
@@ -64,9 +62,18 @@ public class ValidateSignatureTest {
 					"La firma del fichero no se puede comprobar" //$NON-NLS-1$
 				);
 			}
-			final List<SignValidity> validity = valider.validate(signature);
-			System.out.println(signaturePath + ":\n\t" + validity + "\n====================");  //$NON-NLS-1$//$NON-NLS-2$
-			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.OK, validity.get(0).getValidity()); //$NON-NLS-1$
+			final List<SignValidity> validityList = valider.validate(signature, false);
+			Assert.assertNotNull("El listado de resultado de validacion es nulo", validityList); //$NON-NLS-1$
+			Assert.assertFalse("No se han devuelto resultados de validacion", validityList.isEmpty()); //$NON-NLS-1$
+
+			boolean isValid = false;
+			for (final SignValidity validity : validityList) {
+				if (validity.getValidity() == SIGN_DETAIL_TYPE.OK) {
+					isValid = true;
+				}
+			}
+
+			Assert.assertTrue("No es valida la firma XAdES: " + signaturePath, isValid); //$NON-NLS-1$
 	}
 
 	/** Prueba de validaci&oacute;n de firmas.
@@ -87,8 +94,17 @@ public class ValidateSignatureTest {
 					"La firma del fichero no se puede comprobar" //$NON-NLS-1$
 				);
 			}
-			final List<SignValidity> validity = valider.validate(signature);
-			System.out.println(signaturePath + ":\n\t" + validity + "\n===================="); //$NON-NLS-1$ //$NON-NLS-2$
-			Assert.assertEquals("No es valida la firma " + signaturePath, SIGN_DETAIL_TYPE.UNKNOWN, validity.get(0).getValidity()); //$NON-NLS-1$
+			final List<SignValidity> validityList = valider.validate(signature, true);
+			Assert.assertNotNull("El listado de resultado de validacion es nulo", validityList); //$NON-NLS-1$
+			Assert.assertFalse("No se han devuelto resultados de validacion", validityList.isEmpty()); //$NON-NLS-1$
+
+			boolean isIndeterminate = false;
+			for (final SignValidity validity : validityList) {
+				if (validity.getValidity() == SIGN_DETAIL_TYPE.UNKNOWN) {
+					isIndeterminate = true;
+				}
+			}
+
+			Assert.assertTrue("La validacion de firmas CAdES explicitas deberia dar un resultado indeterminado: " + signaturePath, isIndeterminate); //$NON-NLS-1$
 	}
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * C&oacute;digo de vers&oacute;n de AutoFirma con el que comparar versiones.
+ * C&oacute;digo de vers&oacute;n de Autofirma con el que comparar versiones.
  */
 public class Version {
 

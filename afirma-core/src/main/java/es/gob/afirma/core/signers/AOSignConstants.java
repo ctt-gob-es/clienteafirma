@@ -210,10 +210,21 @@ public final class AOSignConstants {
 	/** Filtro para firma PAdES-BES. */
 	public static final String PADES_SUBFILTER_BES = "ETSI.CAdES.detached"; //$NON-NLS-1$
 
-
 	// ************************************************************
 	// ************* ALGORITMOS DE FIRMA **************************
 	// ************************************************************
+
+	/** Algoritmo de huella digital SHA1. */
+	public static final String DIGEST_ALGORITHM_SHA1 = "SHA1"; //$NON-NLS-1$
+
+	/** Algoritmo de huella digital SHA256. */
+	public static final String DIGEST_ALGORITHM_SHA256 = "SHA256"; //$NON-NLS-1$
+
+	/** Algoritmo de huella digital SHA384. */
+	public static final String DIGEST_ALGORITHM_SHA384 = "SHA384"; //$NON-NLS-1$
+
+	/** Algoritmo de huella digital SHA512. */
+	public static final String DIGEST_ALGORITHM_SHA512 = "SHA512"; //$NON-NLS-1$
 
 	/** Algoritmo de firma SHA1withRSA. */
 	public static final String SIGN_ALGORITHM_SHA1WITHRSA = "SHA1withRSA"; //$NON-NLS-1$
@@ -253,20 +264,6 @@ public final class AOSignConstants {
 	 * digital (NONEwithEDSSA). */
 	public static final String SIGN_ALGORITHM_NONEWITHECDSA = "NONEwithECDSA"; //$NON-NLS-1$
 
-	/** Algoritmos de firma soportados. */
-	public static final String[] SUPPORTED_SIGN_ALGOS = new String[] {
-		SIGN_ALGORITHM_SHA1WITHRSA,
-		SIGN_ALGORITHM_NONEWITHRSA,
-		SIGN_ALGORITHM_SHA256WITHRSA,
-		SIGN_ALGORITHM_SHA384WITHRSA,
-		SIGN_ALGORITHM_SHA512WITHRSA,
-		SIGN_ALGORITHM_SHA1WITHECDSA,
-		SIGN_ALGORITHM_SHA256WITHECDSA,
-		SIGN_ALGORITHM_SHA384WITHECDSA,
-		SIGN_ALGORITHM_SHA512WITHECDSA,
-		SIGN_ALGORITHM_NONEWITHECDSA
-	};
-
 	/** Algoritmo de firma por defecto. */
 	public static final String DEFAULT_SIGN_ALGO = SIGN_ALGORITHM_SHA512WITHRSA;
 
@@ -300,9 +297,9 @@ public final class AOSignConstants {
 			);
 		}
 		final String upperPseudoName = pseudoName.toUpperCase(Locale.US);
-		if (upperPseudoName.equals("SHA")  //$NON-NLS-1$
+		if ("SHA".equals(upperPseudoName)  //$NON-NLS-1$
 				|| upperPseudoName.equals("http://www.w3.org/2000/09/xmldsig#sha1".toUpperCase(Locale.US)) //$NON-NLS-1$
-				|| upperPseudoName.equals("1.3.14.3.2.26") //$NON-NLS-1$
+				|| "1.3.14.3.2.26".equals(upperPseudoName) //$NON-NLS-1$
 				|| upperPseudoName.startsWith("SHA1") //$NON-NLS-1$
 				|| upperPseudoName.startsWith("SHA-1")) //$NON-NLS-1$
 		{
@@ -310,20 +307,20 @@ public final class AOSignConstants {
 		}
 
 		if (upperPseudoName.equals("http://www.w3.org/2001/04/xmlenc#sha256".toUpperCase(Locale.US))  //$NON-NLS-1$
-				|| upperPseudoName.equals("2.16.840.1.101.3.4.2.1") //$NON-NLS-1$
+				|| "2.16.840.1.101.3.4.2.1".equals(upperPseudoName) //$NON-NLS-1$
 				|| upperPseudoName.startsWith("SHA256") //$NON-NLS-1$
 				|| upperPseudoName.startsWith("SHA-256")) { //$NON-NLS-1$
 			return "SHA-256"; //$NON-NLS-1$
 		}
 
 		if (upperPseudoName.startsWith("SHA384") //$NON-NLS-1$
-				|| upperPseudoName.equals("2.16.840.1.101.3.4.2.2") //$NON-NLS-1$
+				|| "2.16.840.1.101.3.4.2.2".equals(upperPseudoName) //$NON-NLS-1$
 				|| upperPseudoName.startsWith("SHA-384")) { //$NON-NLS-1$
 			return "SHA-384"; //$NON-NLS-1$
 		}
 
 		if (upperPseudoName.equals("http://www.w3.org/2001/04/xmlenc#sha512".toUpperCase(Locale.US))  //$NON-NLS-1$
-				|| upperPseudoName.equals("2.16.840.1.101.3.4.2.3") //$NON-NLS-1$
+				|| "2.16.840.1.101.3.4.2.3".equals(upperPseudoName) //$NON-NLS-1$
 				|| upperPseudoName.startsWith("SHA512") //$NON-NLS-1$
 				|| upperPseudoName.startsWith("SHA-512")) { //$NON-NLS-1$
 			return "SHA-512"; //$NON-NLS-1$
@@ -335,13 +332,22 @@ public final class AOSignConstants {
 			return "RIPEMD160"; //$NON-NLS-1$
 		}
 
+		// Comprobamos si el nombre del algoritmo tiene un formato conocido de algoritmo de firma
+		// e intentamos obtener el nombre del algoritmo de huella del mismo
+
+		// Nombre estandar de algoritmo de firma
 		if (pseudoName.contains("with")) { //$NON-NLS-1$
-			return pseudoName.substring(
-				0,
-				pseudoName.indexOf("with") //$NON-NLS-1$
-			);
+			final String subname = pseudoName.substring(0, pseudoName.indexOf("with")); //$NON-NLS-1$
+			return getDigestAlgorithmName(subname);
+		}
+		if (pseudoName.startsWith("http://www.w3.org/2001/04/xmldsig-more#") //$NON-NLS-1$
+				|| pseudoName.startsWith("http://www.w3.org/2000/09/xmldsig#") //$NON-NLS-1$
+				|| pseudoName.startsWith("http://www.w3.org/2009/xmldsig11#")) { //$NON-NLS-1$
+			final String subname = pseudoName.substring(pseudoName.lastIndexOf('-') + 1);
+			return getDigestAlgorithmName(subname);
 		}
 
+		// No se ha podido extraer el nombre del algoritmo
 		Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 			"Algoritmo de huella desconocido, no se normalizara su nombre: " + pseudoName //$NON-NLS-1$
 		);
@@ -349,10 +355,46 @@ public final class AOSignConstants {
 		return pseudoName;
 	}
 
-	/** Comprueba si un algoritmo de firma utiliza un algoritmo de huella digital
+	/**
+	 * Compone el nombre del algoritmo de firma que utiliza un algoritmo de huella concreto y emplea un determinado tipo
+	 * de clave de cifrado. El algoritmo de huella se extrae del algoritmo proporcionado, que puede ser de huella, de firma
+	 * o una referencia al algoritmo (OID o URL).
+	 * @param algorithm Algoritmo de huella digital o firma.
+	 * @param keyType Tipo de clave de firma.
+	 * @return Nombre del algoritmo de firma. */
+	public static String composeSignatureAlgorithmName(final String algorithm, final String keyType) {
+		if (algorithm == null) {
+			throw new IllegalArgumentException(
+					"El nombre del algoritmo no puede ser nulo"); //$NON-NLS-1$
+		}
+		if (keyType == null) {
+			throw new IllegalArgumentException(
+					"El tipo de clave de certificado no puede ser nulo"); //$NON-NLS-1$
+		}
+
+		// Limpiamos el nombre del algorithm de huella
+		final String digestAlgorithm = getDigestAlgorithmName(algorithm).replace("-", ""); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Agregamos el algoritmo de cifrado correspondiente al tipo de clave del certificado
+		String suffix;
+		if ("RSA".equals(keyType)) { //$NON-NLS-1$
+			suffix = "withRSA"; //$NON-NLS-1$
+		} else if ("DSA".equals(keyType)) { //$NON-NLS-1$
+			suffix = "withDSA"; //$NON-NLS-1$
+		} else if (keyType.startsWith("EC")) { //$NON-NLS-1$
+			suffix = "withECDSA"; //$NON-NLS-1$
+		} else {
+			throw new IllegalArgumentException("Tipo de clave de firma no soportado: " + keyType); //$NON-NLS-1$
+		}
+		return digestAlgorithm + suffix;
+	}
+
+	/**
+	 * Comprueba si un algoritmo de firma utiliza un algoritmo de huella digital
 	 * perteneciente a la familia de algoritmos SHA-2.
 	 * @param algorithm Algoritmo de firma.
-	 * @return {@code true} cuando el algoritmo es un SHA-2, {@code false} en caso contrario. */
+	 * @return {@code true} cuando el algoritmo es un SHA-2, {@code false} en caso contrario.
+	 */
 	public static boolean isSHA2SignatureAlgorithm(final String algorithm) {
 		return SIGN_ALGORITHM_SHA256WITHRSA.equals(algorithm)   ||
 			   SIGN_ALGORITHM_SHA384WITHRSA.equals(algorithm)   ||
@@ -362,13 +404,29 @@ public final class AOSignConstants {
 			   SIGN_ALGORITHM_SHA512WITHECDSA.equals(algorithm);
 	}
 
-	/** Comprueba si un algoritmo de firma utiliza el algoritmo de huella digital
+	/**
+	 * Comprueba si un algoritmo de firma utiliza el algoritmo de huella digital
 	 * SHA-1.
 	 * @param algorithm Algoritmo de firma.
-	 * @return {@code true} cuando el algoritmo es SHA-1, {@code false} en caso contrario. */
+	 * @return {@code true} cuando el algoritmo es SHA-1, {@code false} en caso contrario.
+	 */
 	public static boolean isSHA1SignatureAlgorithm(final String algorithm) {
 		return SIGN_ALGORITHM_SHA1WITHRSA.equals(algorithm)   ||
 			   SIGN_ALGORITHM_SHA1WITHDSA.equals(algorithm)   ||
 			   SIGN_ALGORITHM_SHA1WITHECDSA.equals(algorithm);
+	}
+
+	/**
+	 * Comprueba si un algoritmo de firma utiliza el cifrade ECDSA o DSA.
+	 * @param algorithm Algoritmo de firma.
+	 * @return {@code true} cuando el algoritmo usa cidrado ECDSA o DSA,
+	 * {@code false} en caso contrario.
+	 */
+	public static boolean isDSAorECDSASignatureAlgorithm(final String algorithm) {
+		return algorithm != null &&
+				(algorithm.endsWith("withECDSA") //$NON-NLS-1$
+						|| algorithm.endsWith("withECDSAinP1363Format") //$NON-NLS-1$
+						|| algorithm.endsWith("withDSA") //$NON-NLS-1$
+						|| algorithm.endsWith("withDSAinP1363Format")); //$NON-NLS-1$
 	}
 }

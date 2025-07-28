@@ -88,6 +88,18 @@ public class LocalBatchSigner {
 		final Operation cryptoOperation = singleConfig.getCryptoOperation();
 		final byte[] data = singleConfig.getData();
 		final String algorithm = singleConfig.getAlgorithm();
+    	final String keyType = pke.getPrivateKey().getAlgorithm();
+
+    	// Seleccionamos el algoritmo de firma
+		String signatureAlgorithm;
+		try {
+			signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
+		}
+		catch (final Exception e) {
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INCOMPATIBLE_KEY_TYPE;
+			throw new SocketOperationException(errorCode, e);
+		}
+
 		final String format = singleConfig.getFormat();
 		final Properties extraParams = singleConfig.getExtraParams();
 
@@ -131,7 +143,7 @@ public class LocalBatchSigner {
 				case SIGN:
 					sign = signer.sign(
 							data,
-							algorithm,
+							signatureAlgorithm,
 							pke.getPrivateKey(),
 							pke.getCertificateChain(),
 							extraParamsCopy
@@ -140,7 +152,7 @@ public class LocalBatchSigner {
 				case COSIGN:
 					sign = signer.cosign(
 							data,
-							algorithm,
+							signatureAlgorithm,
 							pke.getPrivateKey(),
 							pke.getCertificateChain(),
 							extraParamsCopy
@@ -149,7 +161,7 @@ public class LocalBatchSigner {
 				case COUNTERSIGN:
 					sign = signer.countersign(
 							data,
-							algorithm,
+							signatureAlgorithm,
 							CounterSignTarget.getTarget(extraParamsCopy.getProperty(AfirmaExtraParams.TARGET)) == CounterSignTarget.TREE ?
 									CounterSignTarget.TREE : CounterSignTarget.LEAFS,
 									null, // Targets

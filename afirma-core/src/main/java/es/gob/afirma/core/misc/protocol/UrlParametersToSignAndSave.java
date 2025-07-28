@@ -66,6 +66,10 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 	/** Algoritmos de firma soportados. */
 	private static final Set<String> SUPPORTED_SIGNATURE_ALGORITHMS = new HashSet<>();
 	static {
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA1"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA256"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA384"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA512"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA1withRSA"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA256withRSA"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA384withRSA"); //$NON-NLS-1$
@@ -258,7 +262,8 @@ public final class UrlParametersToSignAndSave extends UrlParameters {
 				}
 				setStorageServletUrl(storageServletUrl);
 			}
-			else {
+			// Si no se encuentra a pesar de tener todos los parametros, falla la operacion
+			else if (params.containsKey(ID_PARAM)) {
 				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion"); //$NON-NLS-1$
 			}
 		}

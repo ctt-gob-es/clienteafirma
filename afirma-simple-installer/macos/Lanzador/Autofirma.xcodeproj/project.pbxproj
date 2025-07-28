@@ -1,0 +1,435 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		04DC316B29C07B2F00D75160 /* Home in Resources */ = {isa = PBXBuildFile; fileRef = 04DC316A29C07B2F00D75160 /* Home */; };
+		C337344D1962C4340083201C /* JAR in Resources */ = {isa = PBXBuildFile; fileRef = C337344C1962C4340083201C /* JAR */; };
+		C337344F1962C43F0083201C /* AfirmaHelp in Resources */ = {isa = PBXBuildFile; fileRef = C337344E1962C43F0083201C /* AfirmaHelp */; };
+		C374E92C195D847D00D0A5F5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C374E92B195D847D00D0A5F5 /* main.m */; };
+		C374E92F195D847D00D0A5F5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C374E92E195D847D00D0A5F5 /* AppDelegate.m */; };
+		C374E931195D847D00D0A5F5 /* icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C374E930195D847D00D0A5F5 /* icons.xcassets */; };
+		C374E934195D847D00D0A5F5 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = C374E932195D847D00D0A5F5 /* MainMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C374E93A195D847D00D0A5F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C374E91E195D847D00D0A5F5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C374E925195D847D00D0A5F5;
+			remoteInfo = "Cliente @firma para OS X";
+		};
+		C374E949195D849700D0A5F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C374E91E195D847D00D0A5F5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C374E925195D847D00D0A5F5;
+			remoteInfo = "Cliente @firma para OS X";
+		};
+		C374E94B195D849700D0A5F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C374E91E195D847D00D0A5F5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C374E925195D847D00D0A5F5;
+			remoteInfo = "Cliente @firma para OS X";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		04DC316A29C07B2F00D75160 /* Home */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Home; sourceTree = "<group>"; };
+		C337344C1962C4340083201C /* JAR */ = {isa = PBXFileReference; lastKnownFileType = folder; path = JAR; sourceTree = "<group>"; };
+		C337344E1962C43F0083201C /* AfirmaHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = AfirmaHelp; sourceTree = "<group>"; };
+		C374E926195D847D00D0A5F5 /* Autofirma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Autofirma.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C374E92A195D847D00D0A5F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C374E92B195D847D00D0A5F5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		C374E92D195D847D00D0A5F5 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		C374E92E195D847D00D0A5F5 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		C374E930195D847D00D0A5F5 /* icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = icons.xcassets; sourceTree = "<group>"; };
+		C374E933195D847D00D0A5F5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		C374E939195D847D00D0A5F5 /* AutofirmaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AutofirmaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C374E923195D847D00D0A5F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C374E936195D847D00D0A5F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C374E91D195D847D00D0A5F5 = {
+			isa = PBXGroup;
+			children = (
+				C374E928195D847D00D0A5F5 /* Autofirma para macOS */,
+				C374E927195D847D00D0A5F5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C374E927195D847D00D0A5F5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C374E926195D847D00D0A5F5 /* Autofirma.app */,
+				C374E939195D847D00D0A5F5 /* AutofirmaTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C374E928195D847D00D0A5F5 /* Autofirma para macOS */ = {
+			isa = PBXGroup;
+			children = (
+				04DC316A29C07B2F00D75160 /* Home */,
+				C337344E1962C43F0083201C /* AfirmaHelp */,
+				C337344C1962C4340083201C /* JAR */,
+				C374E92D195D847D00D0A5F5 /* AppDelegate.h */,
+				C374E92E195D847D00D0A5F5 /* AppDelegate.m */,
+				C374E930195D847D00D0A5F5 /* icons.xcassets */,
+				C374E932195D847D00D0A5F5 /* MainMenu.xib */,
+				C374E929195D847D00D0A5F5 /* Supporting Files */,
+			);
+			path = "Autofirma para macOS";
+			sourceTree = "<group>";
+		};
+		C374E929195D847D00D0A5F5 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				C374E92A195D847D00D0A5F5 /* Info.plist */,
+				C374E92B195D847D00D0A5F5 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C374E925195D847D00D0A5F5 /* Autofirma */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C374E943195D847D00D0A5F5 /* Build configuration list for PBXNativeTarget "Autofirma" */;
+			buildPhases = (
+				C374E922195D847D00D0A5F5 /* Sources */,
+				C374E923195D847D00D0A5F5 /* Frameworks */,
+				C374E924195D847D00D0A5F5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Autofirma;
+			productName = "Cliente @firma para OS X";
+			productReference = C374E926195D847D00D0A5F5 /* Autofirma.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C374E938195D847D00D0A5F5 /* AutofirmaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C374E946195D847D00D0A5F5 /* Build configuration list for PBXNativeTarget "AutofirmaTests" */;
+			buildPhases = (
+				C374E935195D847D00D0A5F5 /* Sources */,
+				C374E936195D847D00D0A5F5 /* Frameworks */,
+				C374E937195D847D00D0A5F5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C374E93B195D847D00D0A5F5 /* PBXTargetDependency */,
+				C374E94A195D849700D0A5F5 /* PBXTargetDependency */,
+				C374E94C195D849700D0A5F5 /* PBXTargetDependency */,
+			);
+			name = AutofirmaTests;
+			productName = "Cliente @firma para OS XTests";
+			productReference = C374E939195D847D00D0A5F5 /* AutofirmaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C374E91E195D847D00D0A5F5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+				ORGANIZATIONNAME = "Gobierno de España";
+				TargetAttributes = {
+					C374E925195D847D00D0A5F5 = {
+						CreatedOnToolsVersion = 6.0;
+					};
+					C374E938195D847D00D0A5F5 = {
+						CreatedOnToolsVersion = 6.0;
+						TestTargetID = C374E925195D847D00D0A5F5;
+					};
+				};
+			};
+			buildConfigurationList = C374E921195D847D00D0A5F5 /* Build configuration list for PBXProject "Autofirma" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C374E91D195D847D00D0A5F5;
+			productRefGroup = C374E927195D847D00D0A5F5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C374E925195D847D00D0A5F5 /* Autofirma */,
+				C374E938195D847D00D0A5F5 /* AutofirmaTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C374E924195D847D00D0A5F5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C337344D1962C4340083201C /* JAR in Resources */,
+				C337344F1962C43F0083201C /* AfirmaHelp in Resources */,
+				C374E931195D847D00D0A5F5 /* icons.xcassets in Resources */,
+				04DC316B29C07B2F00D75160 /* Home in Resources */,
+				C374E934195D847D00D0A5F5 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C374E937195D847D00D0A5F5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C374E922195D847D00D0A5F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C374E92F195D847D00D0A5F5 /* AppDelegate.m in Sources */,
+				C374E92C195D847D00D0A5F5 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C374E935195D847D00D0A5F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C374E93B195D847D00D0A5F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C374E925195D847D00D0A5F5 /* Autofirma */;
+			targetProxy = C374E93A195D847D00D0A5F5 /* PBXContainerItemProxy */;
+		};
+		C374E94A195D849700D0A5F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C374E925195D847D00D0A5F5 /* Autofirma */;
+			targetProxy = C374E949195D849700D0A5F5 /* PBXContainerItemProxy */;
+		};
+		C374E94C195D849700D0A5F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C374E925195D847D00D0A5F5 /* Autofirma */;
+			targetProxy = C374E94B195D849700D0A5F5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		C374E932195D847D00D0A5F5 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C374E933195D847D00D0A5F5 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C374E941195D847D00D0A5F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				METAL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		C374E942195D847D00D0A5F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				METAL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		C374E944195D847D00D0A5F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "Autofirma para macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = es.gob.afirma.simpleafirma.osx;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C374E945195D847D00D0A5F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "Autofirma para macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = es.gob.afirma.simpleafirma.osx;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		C374E947195D847D00D0A5F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Autofirma para macOS.app/Contents/MacOS/Autofirma para macOS";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Autofirma para macOS XTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				METAL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+			};
+			name = Debug;
+		};
+		C374E948195D847D00D0A5F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Autofirma para macOS.app/Contents/MacOS/Autofirma para macOS";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Autofirma para macOS XTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				METAL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C374E921195D847D00D0A5F5 /* Build configuration list for PBXProject "Autofirma" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C374E941195D847D00D0A5F5 /* Debug */,
+				C374E942195D847D00D0A5F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C374E943195D847D00D0A5F5 /* Build configuration list for PBXNativeTarget "Autofirma" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C374E944195D847D00D0A5F5 /* Debug */,
+				C374E945195D847D00D0A5F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C374E946195D847D00D0A5F5 /* Build configuration list for PBXNativeTarget "AutofirmaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C374E947195D847D00D0A5F5 /* Debug */,
+				C374E948195D847D00D0A5F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C374E91E195D847D00D0A5F5 /* Project object */;
+}

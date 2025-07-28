@@ -62,7 +62,6 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -86,6 +85,7 @@ import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.EmptyBorder;
@@ -100,10 +100,10 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.ui.EditorFocusManager;
-import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
+import es.gob.afirma.standalone.ui.EditorFocusManager;
+import es.gob.afirma.standalone.ui.pdf.SignPdfUiPanel.SignPdfUiPanelListener;
 
 final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
@@ -114,7 +114,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private static final int PREFERRED_WIDTH = 470;
 	private static final int PREFERRED_HEIGHT = 720;
 	private static final int VIEWLABEL_PREFERRED_WIDTH = 475;
-	private static final int VIEWLABEL_PREFERRED_HEIGHT = 140;
+	private static final int VIEWLABEL_PREFERRED_HEIGHT = 200;
 	private static final int MAX_TEXT_SIZE = 50;
 	private static final int MIN_TEXT_SIZE = 1;
 	private static final int STEP_TEXT_SIZE = 1;
@@ -139,15 +139,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	// Imagen con la previsualizacion (base + rubrica) sin texto
 	private BufferedImage signImage;
-	BufferedImage getSignImage() {
-		return this.signImage;
-	}
 
 	private final SignPdfUiPanelListener listener;
 	SignPdfUiPanelListener getListener() {
 		return this.listener;
 	}
-	private DropTarget dropTarget;
 
 	private final Properties prop;
 
@@ -253,11 +249,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return this.signatureText;
 	}
 
-	private JPanel previewPanel;
-	JPanel getPreviewPanel() {
-		return this.previewPanel;
-	}
-
 	SignPdfUiPanelPreview (final SignPdfUiPanelListener spul,
 						   final Properties p,
 						   final BufferedImage im) {
@@ -274,7 +265,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		this.baseImage = im;
 		this.rubricImage = null;
 		this.signImage = cloneImage(im);
-		this.previewPanel = new JPanel();
 
 		createUI();
 
@@ -303,8 +293,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		gbc.gridy++;
 		add(createConfigurationPanel(), gbc);
 		gbc.gridy++;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weighty = 0.0;
 		add(this.saveConfig, gbc);
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1.0;
@@ -312,7 +300,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		gbc.gridy++;
 		add(new JPanel(), gbc);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weighty = 0.0;
 		gbc.gridy++;
 		add(createButtonsPanel(), gbc);
 		showPreview();
@@ -322,97 +309,12 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	private JPanel createPreviewPanel() {
 
 		final JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setLayout(new GridBagLayout());
 		panel.setBorder(BorderFactory.createTitledBorder(
 			SignPdfUiMessages.getString("SignPdfUiPreview.0")) //$NON-NLS-1$
 		);
 
-		this.dropTarget = new DropTarget(panel, DnDConstants.ACTION_COPY, new DropTargetListener() {
-
-            @Override
-            public void dropActionChanged(final DropTargetDragEvent dtde) { /* No implementado */}
-
-            @Override
-            public void dragEnter(final DropTargetDragEvent dtde) { /* No implementado */ }
-
-            @Override
-            public void dragOver(final DropTargetDragEvent dtde) { /* No implementado */ }
-
-            @Override
-            public void dragExit(final DropTargetEvent dte) { /* No implementado */ }
-
-            @Override
-            public void drop(final DropTargetDropEvent dtde) {
-
-            	final Transferable tr = dtde.getTransferable();
-            	dtde.acceptDrop(DnDConstants.ACTION_COPY);
-            	final Object transData;
-            	try {
-            		transData = tr.getTransferData(DataFlavor.javaFileListFlavor);
-            	}
-            	catch (final Exception e) {
-            		LOGGER.warning(
-            				"Ha fallado la operacion de arrastrar y soltar: " + e //$NON-NLS-1$
-            				);
-            		dtde.dropComplete(false);
-            		return;
-            	}
-            	if (transData instanceof List) {
-            		dtde.getDropTargetContext().dropComplete(true);
-            		final List<?> fileList = (List<?>) transData;
-            		if (fileList.isEmpty()) {
-            			dtde.dropComplete(false);
-            			return;
-            		}
-            		if (fileList.size() > 1) {
-            			AOUIFactory.showErrorMessage(
-            					SignPdfUiPanelPreview.this.getDialogParent(),
-            					SimpleAfirmaMessages.getString("SignPanel.18"), //$NON-NLS-1$
-            					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
-            					JOptionPane.WARNING_MESSAGE,
-            					null);
-            		}
-            		File file = null;
-            		final String filename = fileList.get(0).toString();
-            		if (filename.startsWith("http://") || //$NON-NLS-1$
-            				filename.startsWith("https://") || //$NON-NLS-1$
-            				filename.startsWith("ftp://") //$NON-NLS-1$
-            				) {
-            			AOUIFactory.showErrorMessage(
-            					SignPdfUiPanelPreview.this.getDialogParent(),
-            					SimpleAfirmaMessages.getString("SignPanel.24"), //$NON-NLS-1$
-            					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-            					JOptionPane.ERROR_MESSAGE,
-            					null);
-            			dtde.dropComplete(false);
-            			return;
-            		}
-            		else if (filename.startsWith("file://")) { //$NON-NLS-1$
-            			try {
-            				file = new File(new URI(filename));
-            			}
-            			catch (final Exception e) {
-            				LOGGER.warning(
-            						"Ha fallado la operacion de arrastrar y soltar al obtener la ruta del fichero arrastrado: " + e //$NON-NLS-1$
-            						);
-            				dtde.dropComplete(false);
-            				return;
-            			}
-            		}
-            		try {
-            			loadRubricFile(file != null ? file : new File(filename));
-            		}
-            		catch (final Exception e) {
-            			LOGGER.warning(
-            					"Ha fallado la operacion de arrastrar y soltar al cargar el fichero arrastrado: " + e //$NON-NLS-1$
-            					);
-            			dtde.dropComplete(false);
-            		}
-            	}
-            }
-        }, true);
-
-		panel.setDropTarget(this.dropTarget);
+		panel.setDropTarget(buildDropPerformance(panel));
 
 		if (this.prop.getProperty(PdfExtraParams.SIGNATURE_PAGE) != null &&
 				this.prop.getProperty(PdfExtraParams.SIGNATURE_PAGE).equals("append")) { //$NON-NLS-1$
@@ -421,12 +323,15 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 		this.viewLabel = new JLabel();
 		this.viewLabel.setPreferredSize(new Dimension(VIEWLABEL_PREFERRED_WIDTH, VIEWLABEL_PREFERRED_HEIGHT));
+		this.viewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
+		// Redimensionamos la imagen base para ajustarla al espacio de previsualizacion
 		if (this.baseImage.getHeight() > VIEWLABEL_PREFERRED_HEIGHT || this.baseImage.getWidth() > VIEWLABEL_PREFERRED_WIDTH) {
-			resizeBaseImage(this.viewLabel);
+			resizeBaseImageToPreferredSize(this.viewLabel);
 		}
 
-		this.viewLabel.setIcon(new ImageIcon(this.baseImage));
+		// Componemos el aspecto de firma en base a la nueva imagen base
+		compoundSignImage();
 
 		this.viewLabel.setToolTipText(SignPdfUiMessages.getString("SignPdfUiPreview.26")); //$NON-NLS-1$
 		this.viewLabel.addMouseListener(
@@ -451,10 +356,13 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		);
 		this.viewLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-		panel.add(this.viewLabel);
-		panel.add(createPreviewHintLabel());
-
-		this.previewPanel = panel;
+		final GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridy = 0;
+		panel.add(this.viewLabel, c);
+		c.weightx = 1.0;
+		c.gridy++;
+		panel.add(createPreviewHintLabel(), c);
 
 		return panel;
 
@@ -746,9 +654,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		return signatureImagePanel;
 	}
 
-	/** Crea el panel con los botones de aceptar y cancelar.
-	 * @return Panel de botones. */
-	private Component createPreviewHintLabel() {
+
+	private JComponent createPreviewHintLabel() {
 
 
 		final JEditorPane helpLabel = new JEditorPane();
@@ -1474,7 +1381,7 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 	 * previsualizaci&oacute;n.
 	 * @param panel Panel de previsualizaci&oacute;n.
 	 */
-	private void resizeBaseImage(final JComponent panel) {
+	private void resizeBaseImageToPreferredSize(final JComponent panel) {
 		int newWidth = this.baseImage.getWidth();
 		int newHeight = this.baseImage.getHeight();
 
@@ -1862,8 +1769,8 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 		DEGREES_180(180, "RotationModel.2"), //$NON-NLS-1$
 		DEGREES_270(270, "RotationModel.3"); //$NON-NLS-1$
 
-		private int degrees;
-		private String text;
+		private final int degrees;
+		private final String text;
 
 		RotationAngles(final int degrees, final String text) {
 			this.degrees = degrees;
@@ -1908,5 +1815,98 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 
 	JDialog getDialogParent() {
 		return this.dialogParent;
+	}
+
+	/**
+	 * Configura el comportamiento a seguir cuando se arrastre una imagen sobre un componente.
+	 * @param panel Componente al que se asocia el comportamiento.
+	 * @return Comportamiento del componente.
+	 */
+	private DropTarget buildDropPerformance(final Component panel) {
+
+		 return new DropTarget(panel, DnDConstants.ACTION_COPY, new DropTargetListener() {
+
+	            @Override
+	            public void dropActionChanged(final DropTargetDragEvent dtde) { /* No implementado */}
+
+	            @Override
+	            public void dragEnter(final DropTargetDragEvent dtde) { /* No implementado */ }
+
+	            @Override
+	            public void dragOver(final DropTargetDragEvent dtde) { /* No implementado */ }
+
+	            @Override
+	            public void dragExit(final DropTargetEvent dte) { /* No implementado */ }
+
+	            @Override
+	            public void drop(final DropTargetDropEvent dtde) {
+
+	            	final Transferable tr = dtde.getTransferable();
+	            	dtde.acceptDrop(DnDConstants.ACTION_COPY);
+	            	final Object transData;
+	            	try {
+	            		transData = tr.getTransferData(DataFlavor.javaFileListFlavor);
+	            	}
+	            	catch (final Exception e) {
+	            		LOGGER.warning(
+	            				"Ha fallado la operacion de arrastrar y soltar: " + e //$NON-NLS-1$
+	            				);
+	            		dtde.dropComplete(false);
+	            		return;
+	            	}
+	            	if (transData instanceof List) {
+	            		dtde.getDropTargetContext().dropComplete(true);
+	            		final List<?> fileList = (List<?>) transData;
+	            		if (fileList.isEmpty()) {
+	            			dtde.dropComplete(false);
+	            			return;
+	            		}
+	            		if (fileList.size() > 1) {
+	            			AOUIFactory.showErrorMessage(
+	            					SignPdfUiPanelPreview.this.getDialogParent(),
+	            					SimpleAfirmaMessages.getString("SignPanel.18"), //$NON-NLS-1$
+	            					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+	            					JOptionPane.WARNING_MESSAGE,
+	            					null);
+	            		}
+	            		File file = null;
+	            		final String filename = fileList.get(0).toString();
+	            		if (filename.startsWith("http://") || //$NON-NLS-1$
+	            				filename.startsWith("https://") || //$NON-NLS-1$
+	            				filename.startsWith("ftp://") //$NON-NLS-1$
+	            				) {
+	            			AOUIFactory.showErrorMessage(
+	            					SignPdfUiPanelPreview.this.getDialogParent(),
+	            					SimpleAfirmaMessages.getString("SignPanel.24"), //$NON-NLS-1$
+	            					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+	            					JOptionPane.ERROR_MESSAGE,
+	            					null);
+	            			dtde.dropComplete(false);
+	            			return;
+	            		}
+	            		else if (filename.startsWith("file://")) { //$NON-NLS-1$
+	            			try {
+	            				file = new File(new URI(filename));
+	            			}
+	            			catch (final Exception e) {
+	            				LOGGER.warning(
+	            						"Ha fallado la operacion de arrastrar y soltar al obtener la ruta del fichero arrastrado: " + e //$NON-NLS-1$
+	            						);
+	            				dtde.dropComplete(false);
+	            				return;
+	            			}
+	            		}
+	            		try {
+	            			loadRubricFile(file != null ? file : new File(filename));
+	            		}
+	            		catch (final Exception e) {
+	            			LOGGER.warning(
+	            					"Ha fallado la operacion de arrastrar y soltar al cargar el fichero arrastrado: " + e //$NON-NLS-1$
+	            					);
+	            			dtde.dropComplete(false);
+	            		}
+	            	}
+	            }
+	        }, true);
 	}
 }

@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.crypto.URIDereferencer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -47,6 +48,10 @@ import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
  *  Debido a errores en algunas versiones del entorno de ejecuci&oacute;n de Java, esta clase puede generar ocasionalmente
  *  mensajes en consola del tipo: <code>[Fatal Error] :1:1: Content is not allowed in prolog.</code>. Estos
  *  deben ignorarse, ya que no indican ninguna condici&oacute;n de error ni malfuncionamiento.
+ * </p>
+ * <p>
+ * Los algoritmos de firma utilizados por esta son los admitidos por Apache Santuario, que tienen la misma forma que los
+ * algoritmos admitidos por los proveedores por defecto de Java. Por ejemplo, SHA256withRSA.
  * </p>
  * <p>
  *  Los atributos espec&iacute;ficos XAdES implementados por esta clase (adem&aacute;s de los
@@ -266,6 +271,8 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     static final String XMLDSIG_ATTR_MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
     static final String XMLDSIG_ATTR_ENCODING_STR = "Encoding"; //$NON-NLS-1$
 
+    private URIDereferencer uriDereferencer = null;
+
     // Instalamos el proveedor de Apache. Esto es necesario para evitar problemas con los saltos de linea
     // de los Base 64
     static {
@@ -371,13 +378,6 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * </ul>
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del cliente
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
@@ -401,7 +401,8 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     					algorithm,
     					key,
     					certChain,
-    					extraParams
+    					extraParams,
+    					this.uriDereferencer
     					),
     			extraParams
     			);
@@ -562,8 +563,14 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     }
 
     /** {@inheritDoc} */
-    @Override
+	@Override
 	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+		return getData(sign, null);
+	}
+
+    /** {@inheritDoc} */
+    @Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
 
     	// Construimos el arbol DOM
         Document doc;
@@ -800,27 +807,30 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param data No se utiliza.
      * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del cliente.
-     * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Cofirma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     @Override
-	public byte[] cosign(final byte[] data,
-                         final byte[] sign,
-                         final String algorithm,
-                         final PrivateKey key,
-                         final Certificate[] certChain,
-                         final Properties xParams) throws AOException {
+    public byte[] cosign(final byte[] data,
+    		final byte[] sign,
+    		final String algorithm,
+    		final PrivateKey key,
+    		final Certificate[] certChain,
+    		final Properties extraParams) throws AOException {
 
-    		return cosign(sign, algorithm, key, certChain, xParams);
+    	Document signDocument;
+    	try {
+    		signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+    	}
+    	catch (final Exception e) {
+    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    	}
+
+    	final Properties newExtraParams = getExtraParams(extraParams);
+
+    	return cosign(signDocument, algorithm, key, certChain, newExtraParams, this.uriDereferencer);
     }
 
     /** Cofirma datos en formato XAdES.
@@ -839,13 +849,6 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * </p>
      * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
@@ -858,32 +861,25 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     		final Certificate[] certChain,
     		final Properties extraParams) throws AOException {
 
-    	Document signDocument;
-    	try {
-    		signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
-    	}
-    	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
-    	}
-
-    	final Properties newExtraParams = getExtraParams(extraParams);
-
-    	return cosign(signDocument, algorithm, key, certChain, newExtraParams);
+    	return cosign(null, sign, algorithm, key, certChain, extraParams);
     }
 
-    /** Cofirma datos en formato XAdES.
+    /**
+     * Cofirma datos en formato XAdES.
      * @param signDocument Documento XML con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Cofirma en formato XAdES
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     */
 	private static byte[] cosign(final Document signDocument,
                          final String algorithm,
                          final PrivateKey key,
                          final Certificate[] certChain,
-                         final Properties extraParams) throws AOException {
+                         final Properties extraParams,
+                         final URIDereferencer dereferencer) throws AOException {
 
 		if (!isSign(signDocument)) {
 			throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
@@ -895,22 +891,16 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
 		XAdESUtil.checkSignProfile(extraParams, isBaselineENSign);
 
-		return XAdESCoSigner.cosign(signDocument, algorithm, key, certChain, extraParams);
+		return XAdESCoSigner.cosign(signDocument, algorithm, key, certChain, extraParams, dereferencer);
     }
 
-    /** Contrafirma firmas en formato XAdES.
+    /**
+     * Contrafirma firmas en formato XAdES.
      * <p>
      * Este m&eacute;todo contrafirma los nodos de firma indicados de un documento de firma.
      * </p>
      * @param sign Documento con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
      * @param targetType Mecanismo de selecci&oacute;n de los nodos de firma que se deben
      * contrafirmar.
      * <p>Las distintas opciones son:</p>
@@ -927,7 +917,8 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param certChain Cadena de certificados del firmante.
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
      * @return Contrafirma en formato XAdES.
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     */
     @Override
 	public byte[] countersign(final byte[] sign,
                               final String algorithm,
@@ -953,10 +944,11 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
 		XAdESUtil.checkSignProfile(newExtraParams, isBaselineENSign);
 
-    	return countersign(signDocument, algorithm, targetType, targets, key, certChain, newExtraParams);
+    	return countersign(signDocument, algorithm, targetType, targets, key, certChain, newExtraParams, this.uriDereferencer);
     }
 
-    /** Contrafirma firmas en formato XAdES.
+    /**
+     * Contrafirma firmas en formato XAdES.
      * @param signDocument Documento XML con las firmas iniciales.
      * @param algorithm Algoritmo a usar para la firma.
      * @param targetType Mecanismo de selecci&oacute;n de los nodos de firma que se deben
@@ -966,15 +958,18 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>)
+     * @param dereferencer Derreferenciador a medida.
      * @return Contrafirma en formato XAdES.
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     */
 	private static byte[] countersign(final Document signDocument,
                               final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKey key,
                               final Certificate[] certChain,
-                              final Properties extraParams) throws AOException {
+                              final Properties extraParams,
+                              final URIDereferencer dereferencer) throws AOException {
 	    	if (!isSign(signDocument)) {
 	    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para contrafirmar"); //$NON-NLS-1$
 	    	}
@@ -986,14 +981,22 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 	    			targets,
 	    			key,
 	    			certChain,
-	    			extraParams
+	    			extraParams,
+					dereferencer
 	    			);
     }
 
+	/** {@inheritDoc} */
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException {
+		return getSignersStructure(sign, null, asSimpleSignInfo);
+	}
+
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign,
-			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException {
 
         // Obtenemos el arbol del documento
         final Document signDoc;
@@ -1132,8 +1135,14 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     }
 
     /** {@inheritDoc} */
+	@Override
+	public boolean isSign(final byte[] sign){
+		return isSign(sign, null);
+	}
+
+    /** {@inheritDoc} */
     @Override
-	public boolean isSign(final byte[] sign) {
+	public boolean isSign(final byte[] sign, final Properties params) {
 
         if (sign == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -1226,17 +1235,22 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         return docAfirma;
     }
 
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data) throws AOException {
+		return getSignInfo(data, null);
+	}
+
     /** {@inheritDoc} */
     @Override
-	public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
-        if (sign == null) {
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
         // Cargamos el arbol DOM del documento
         Document signDocument;
         try {
-        	signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        	signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(data));
         }
         catch (final Exception e) {
             LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$
@@ -1357,4 +1371,8 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         }
         return isBaselineSign;
     }
+
+	public void setUriDereferencer(final URIDereferencer uriDereferencer) {
+		this.uriDereferencer = uriDereferencer;
+	}
 }

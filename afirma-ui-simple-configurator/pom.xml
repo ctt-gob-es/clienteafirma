@@ -7,12 +7,12 @@
 	<packaging>jar</packaging>
 	
 	<name>afirma-ui-simpleafirma-configurator</name>
-	<description>Aplicacion auxiliar de instalacion de AutoFirma</description>
+	<description>Aplicacion auxiliar de instalacion de Autofirma</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.9-SNAPSHOT</version>
+		<version>1.9</version>
 	</parent>
 
 	<dependencies>
@@ -29,6 +29,12 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+		    <groupId>es.gob.afirma</groupId>
+		    <artifactId>afirma-core-prefs</artifactId>
+		    <version>${clienteafirma.version}</version>
+		</dependency>
+		
 		<dependency>
 		    <groupId>es.gob.afirma</groupId>
 		    <artifactId>afirma-ui-simpleafirma-plugins-manager</artifactId>
@@ -123,7 +129,7 @@
 			</activation>
 		  
 			<build>
-				<finalName>AutoFirmaConfigurador</finalName>
+				<finalName>autofirmaConfigurador</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -162,7 +168,7 @@
 									<transformers>
 										<transformer
 											implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-											<mainClass>es.gob.afirma.standalone.configurator.AutoFirmaConfigurator</mainClass>
+											<mainClass>es.gob.afirma.standalone.configurator.AutofirmaConfigurator</mainClass>
 										</transformer>
 									</transformers>
 								</configuration>

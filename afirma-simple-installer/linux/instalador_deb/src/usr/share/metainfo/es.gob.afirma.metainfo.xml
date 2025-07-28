@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <id>es.gob.afirma</id>
+  <name>Autofirma</name>
+  <summary>Aplicación de firma electrónica.</summary>
+  <description>Autofirma proporciona una interfaz gráfica para la firma electrónica de documentos y puede ser ejecutada desde el navegador para la firma de procedimientos administrativos web de Administración Electrónica.</description>
+  <url type="homepage">https://firmaelectronica.gob.es/Home/Descargas.html</url>
+  <project_license>EUPL-1.1 OR GPL-2.0-only</project_license>
+  <icon type="local" width="128" height="128">/usr/share/Autofirma/Autofirma.svg</icon>
+  <provides>
+    <binary>autofirma</binary>
+  </provides>
+  <releases>
+    <release version="1.9" date="2025-01-27" />
+  </releases>
+  <categories>
+    <category>Office</category>
+    <category>Utilities</category>
+    <category>Signature</category>
+    <category>Java</category>
+  </categories>
+  <launchable type="desktop-id">afirma.desktop</launchable>
+  <requires>
+    <id>libnss3-tools</id>
+  </requires>
+</component>
+

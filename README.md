@@ -1,25 +1,20 @@
-# Cliente @firma (Autofirma)
+# Autofirma
 
-El Cliente @firma es un subconjunto de productos de la Suite @firma, dentro del que se encuentra Autofirma, los clientes de firma móvil, AutoScript y algunos servicios auxiliares para su funcionamiento. El Cliente @firma se proporciona a las Administraciones Públicas para que dispongan de los instrumentos necesarios para implementar la autenticación y firma electrónica avanzada de una forma rápida y efectiva.
+Autofirma es uno de los productos de la Suite @firma de soluciones de identificación y firma electrónica. Se proporciona de a las Administraciones Públicas para que dispongan de los instrumentos necesarios para implementar la autenticación y firma electrónica avanzada de una forma rápida y efectiva.
 
-En este repositorio se encuentran todos los módulos comunes usados de forma general por los proyectos del Cliente @firma, además de los proyectos de los siguientes artefactos principales:
-* **Autofirma** (`afirma-ui-simple`): Herramienta para la firma electrónica en entornos PC y componente de firma dentro de un flujo de firma web.
-* **AutoScript** (`afirma-ui-miniapplet-deploy`): JavaScript para la integración de la operación de firma con Autofirma en un proceso de firma web.
-* **Servicio de firma trifásica**(`afirma-server-triphase-signer`): WAR con el servicio para la generación de firmas trifásicas.
-* **Servicio de recuperación** (`afirma-signature-retriever`): WAR con el servicio de recuperación de datos del servidor intermedio.
-* **Servicio de guardado** (`afirma-signature-storage`): WAR con el servicio de guardado de datos en el servidor intermedio.
+Autofirma es una herramienta de firma electrónica en entornos de escritorio y dispositivos móviles, que funciona en forma de Applet de Java integrado en una página Web mediante JavaScript, como aplicación de escritorio, o como aplicación móvil, dependiendo del entorno del usuario.
 
-El contenido de este repositorio es software libre con licencia GPL 2+ y EUPL 1.1. Puede consular más información y el código del producto en la forja del CTT.
+Es software libre con licencia GPL 2+ y EUPL 1.1. Puede consular más información y el código del producto en la forja del CTT.
 
-## Construcción de Autofirma y otros artefactos
+## Construcción de Autofirma
 
-Los módulos del Cliente @firma se encuentran preparados para su compilación y empaquetado mediante Apache Maven. A continuación se indican los distintos parámetros a utilizar para construir sus artefactos según el uso que se desee dar.
+Los módulos de Autofirma se encuentran preparados para su compilación y empaquetado mediante Apache Maven. Los módulos básicos del Cliente son compatibles con Java 1.7. Sin embargo, las bibliotecas JUnit que se importan ya requieren el uso de Java 1.8 o superior, por lo que deberemos tener configurado una JDK 1.8 o superior para compilar el proyecto. La aplicación Autofirma se compila directamente para Java 1.8.
 
-A cualquiera de los comandos que se indican se le puede agregar el parámetro `-DskipTests` para omitir los tests JUnit.
+A continuación se indican los distintos parámetros a utilizar para construir sus artefactos según el uso que se desee dar. A cualquiera de los comandos que se indican se le puede agregar el parámetro `-DskipTests` para omitir los tests JUnit.
 
 ### Módulos básicos
 
-Los módulos del Cliente @firma incluidos en este repositorio se pueden construir mediante el siguiente comando de Maven.
+Los módulos de Autofirma incluidos en este repositorio se pueden construir mediante el siguiente comando de Maven.
 
 `mvn clean install`
 
@@ -33,11 +28,11 @@ Para la construcción de Autofirma (JAR) y los servicios que utiliza será neces
 
 Con esto, se podrán construir los artefactos:
 
-* `afirma-simple`: JAR autoejecutable de Autofirma (`autofirma.jar`).
-* `afirma-ui-simple-configurator`: JAR autoejecutable del configurador necesario para la instalación de Autofirma (`autofirmaConfigurador.jar`).
 * `afirma-server-triphase-signer`: WAR con el servicio para la generación de firmas trifásicas.
 * `afirma-signature-retriever`: WAR con el servicio de recuperación de datos del servidor intermedio.
 * `afirma-signature-storage`: WAR con el servicio de guardado de datos en el servidor intermedio.
+* `afirma-simple`: JAR autoejecutable de Autofirma (`Autofirma.jar`).
+* `afirma-ui-simple-configurator`: JAR autoejecutable del configurador necesario para la instalación de Autofirma (`AutofirmaConfigurador.jar`).
 
 ### Despliegue en repositorio de artefactos
 
@@ -47,7 +42,7 @@ Para el despliegue de los distintos módulos en un repositorio de artefactos, ad
 
 ## Módulos del proyecto
 
-El proyecto está formado por múltiples módulos, algunos de los cuales se utilizan en varias de las aplicaciones del Cliente @firma. Otros son los módulos de las propias aplicaciones o con recursos necesarios para su construcción o su uso.
+El proyecto está formado por múltiples módulos, algunos de los cuales se utilizan en varias de las aplicaciones de Autofirma. Otros son los módulos de las propias aplicaciones o con recursos necesarios para su construcción o su uso.
 
 ### Módulos vigentes
 
@@ -86,7 +81,7 @@ A continuación, se muestra un listado de los distintos módulos actualmente en 
 * `afirma-simple-plugin-hash-exe`: Módulo de la aplicación EXE para el registro de las entradas de generación y validación de hashes en el menú contextual de Windows.
 * `afirma-simple-plugin-validatecerts`: Módulo con el plugin de Autofirma para validación de firmas.
 * `afirma-simple-plugins`: Módulo con los recursos base para la implementación de plugins de Autofirma.
-* `afirma-ui-core-jse`: Módulo con las interfaces gráficas genéricas usadas por las distintas aplicaciones del Cliente @firma.
+* `afirma-ui-core-jse`: Módulo con las interfaces gráficas genéricas usadas por las distintas aplicaciones de Autofirma.
 * `afirma-ui-core-jse-keystores`: Módulo con la interfaz gráfica del diálogo de selección de certificados.
 * `afirma-ui-miniapplet-deploy`: Módulo principal para el desarrollo de AutoScript.
 * `afirma-ui-simple-configurator`: Módulo principal de la aplicación de configuración ejecutada durante la instalación de Autofirma.
@@ -111,7 +106,7 @@ La lista de módulos obsoletos y/o sin soporte que se conservan en el repositori
 * `afirma-ui-applet`: __Obsoleto.__ Módulo principal del antiguo Applet de @firma.
 * `afirma-ui-applet-deploy`: __Obsoleto.__ Módulo con el JavaScript de despliegue del antiguo Applet de @firma.
 * `afirma-ui-miniapplet`: __Obsoleto.__ Módulo principal del antiguo MiniApplet.
-* `afirma-ui-simple-webstart`: __Obsoleto.__ Módulo principal del antiguo empaquetado de Autofirma como aplicación WebStart.
+* `afirma-ui-simple-webstart`: __Obsoleto.__ Módulo principal del antiguo empaquetado de Autofirma como aplicación WebStart,
 * `afirma-windows-store`: __Obsoleto.__ Módulo principal del antiguo cliente de firma para Windows 8.
 
 No se ofrece ningún tipo de mantenimiento ni soporte sobre estos módulos.

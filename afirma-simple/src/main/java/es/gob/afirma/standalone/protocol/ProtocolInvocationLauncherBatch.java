@@ -10,9 +10,11 @@
 package es.gob.afirma.standalone.protocol;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateEncodingException;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,12 +25,15 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
+import es.gob.afirma.core.keystores.LockedKeyStoreException;
+import es.gob.afirma.core.keystores.PinException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.HttpError;
+import es.gob.afirma.core.misc.protocol.ParameterException;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
@@ -36,6 +41,7 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.keystores.filters.CertFilterManager;
+import es.gob.afirma.keystores.filters.EncodedCertificateFilter;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
@@ -107,12 +113,12 @@ final class ProtocolInvocationLauncherBatch {
 		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
-				aoks = AOKeyStore.getKeyStore(defaultStore);
+				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore);
 			}
 		}
 		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
 		else {
-			aoks = AOKeyStore.getKeyStore(options.getDefaultKeyStore());
+			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore());
 		}
 
 		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
@@ -121,10 +127,108 @@ final class ProtocolInvocationLauncherBatch {
 		}
 
 		final CertFilterManager filterManager = new CertFilterManager(options.getExtraParams());
-		final List<CertificateFilter> filters = filterManager.getFilters();
-		final boolean mandatoryCertificate = filterManager.isMandatoryCertificate();
-		final PrivateKeyEntry pke;
 
+		SignOperationResult operationResult;
+		try {
+			operationResult = sign(options, aoks, useDefaultStore, filterManager);
+		}
+		catch (final AOCancelledOperationException e) {
+			if (!bySocket){
+				throw new SocketOperationException(RESULT_CANCEL);
+			}
+			return RESULT_CANCEL;
+		}
+		catch (final SocketOperationException e) {
+			if (!bySocket){
+				throw e;
+			}
+			return ProtocolInvocationLauncherErrorManager.getErrorMessage(e.getErrorCode());
+		}
+
+		final StringBuilder result = new StringBuilder();
+
+		// Si se nos ha indicado en la llamadada que devolvamos el certificado de firma, lo adjuntamos al resultado con un separador
+		byte[] signingCertEncoded = null;
+		if (options.isCertNeeded()) {
+			try {
+				signingCertEncoded = operationResult.getPke().getCertificate().getEncoded();
+			} catch (final CertificateEncodingException e) {
+				LOGGER.log(Level.SEVERE, "No se ha podido codificar el certificado de firma para su devolucion", e); //$NON-NLS-1$
+					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
+					ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+					if (!bySocket){
+						throw new SocketOperationException(errorCode);
+					}
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			}
+		}
+
+		// Si hay clave de cifrado, ciframos
+		if (options.getDesKey() != null) {
+			try {
+				result.append(CypherDataManager.cipherData(operationResult.getResult(), options.getDesKey()));
+				if (signingCertEncoded != null) {
+					result.append(RESULT_SEPARATOR)
+						.append(CypherDataManager.cipherData(signingCertEncoded, options.getDesKey()));
+				}
+			}
+			catch (final Exception e) {
+				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
+				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA;
+				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+				if (!bySocket){
+					throw new SocketOperationException(errorCode);
+				}
+				return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			}
+		}
+		else {
+			LOGGER.warning(
+				"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
+			);
+			result.append(Base64.encode(operationResult.getResult()));
+			if (signingCertEncoded != null) {
+				result.append(RESULT_SEPARATOR).append(Base64.encode(signingCertEncoded));
+			}
+		}
+
+		// Si hay servidor intermedio, se envia
+		if (options.getStorageServletUrl() != null) {
+			// Detenemos la espera activa
+			final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
+			if (waitingThread != null) {
+				waitingThread.interrupt();
+			}
+			// Esperamos a que termine cualquier otro envio al servidor para que no se pisen
+			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
+				try {
+					LOGGER.info("Enviamos el resultado de la operacion de firma de lote al servidor intermedio"); //$NON-NLS-1$
+					IntermediateServerUtil.sendData(result, options.getStorageServletUrl().toString(), options.getId());
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
+					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT;
+					ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+					if (!bySocket){
+						throw new SocketOperationException(errorCode);
+					}
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+				}
+			}
+		}
+		else {
+			LOGGER.info(
+				"Se omite el envio por red de los datos resultantes por no haberse proporcionado una URL de destino" //$NON-NLS-1$
+			);
+		}
+
+		return result.toString();
+	}
+
+	private static SignOperationResult sign(final UrlParametersForBatch options, final AOKeyStore aoks, final boolean useDefaultStore, final CertFilterManager filterManager)
+			throws AOCancelledOperationException, SocketOperationException {
+
+		final PrivateKeyEntry pke;
 		if (options.getSticky() && !options.getResetSticky() && ProtocolInvocationLauncher.getStickyKeyEntry() != null) {
 
 			LOGGER.info("Se usa Sticky Signature y tenemos valor de clave privada"); //$NON-NLS-1$
@@ -154,10 +258,7 @@ final class ProtocolInvocationLauncherBatch {
 				LOGGER.log(Level.SEVERE, "Error obteniendo el AOKeyStoreManager", e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
     			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-    			if (!bySocket){
-    				throw new SocketOperationException(errorCode);
-    			}
-    			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+    			throw new SocketOperationException(errorCode);
 			}
 
 			try {
@@ -175,8 +276,8 @@ final class ProtocolInvocationLauncherBatch {
 					true,
 					true, // showExpiredCertificates
 					true, // checkValidity
-					filters,
-					mandatoryCertificate,
+					filterManager.getFilters(),
+					filterManager.isMandatoryCertificate(),
 					libName
 				);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
@@ -197,110 +298,87 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			catch (final AOCancelledOperationException e) {
 				LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
-				if (!bySocket){
-					throw new SocketOperationException(RESULT_CANCEL);
-				}
-				return RESULT_CANCEL;
+				throw e;
 			}
 			catch(final AOCertificatesNotFoundException e) {
 				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE;
     			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-    			if (!bySocket){
-    				throw new SocketOperationException(errorCode);
-    			}
-    			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+    			throw new SocketOperationException(errorCode);
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
 				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
     			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-    			if (!bySocket){
-    				throw new SocketOperationException(errorCode);
-    			}
-    			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+    			throw new SocketOperationException(errorCode);
 			}
 		}
 
-		String batchResult;
+		final byte[] batchResult;
 		try {
-			if (options.isJsonBatch()) {
-				if(options.isLocalBatchProcess()) {
-					final BatchSignOperation batchConfig =
-							JSONBatchManager.parseBatchConfig(options.getData());
-					batchResult = LocalBatchSigner.signLocalBatch(batchConfig, pke);
-				} else {
-					batchResult = BatchSigner.signJSON(
-							Base64.encode(options.getData(), true),
-							options.getBatchPresignerUrl(),
-							options.getBatchPostSignerUrl(),
-							pke.getCertificateChain(),
-							pke.getPrivateKey(),
-							options.getExtraParams());
-				}
-			} else {
-				batchResult = BatchSigner.signXML(
-						Base64.encode(options.getData(), true),
-						options.getBatchPresignerUrl(),
-						options.getBatchPostSignerUrl(),
-						pke.getCertificateChain(),
-						pke.getPrivateKey(),
-						options.getExtraParams());
+			batchResult = signBatch(options, pke);
+		}
+		catch (final PinException e) {
+			// Si falla la operacion por culpa del PIN, configuramos el uso del mismo certificado, pero obligamos al
+			// almacen a cargarse de nuevo
+			List<CertificateFilter> filters;
+			try {
+				final byte[] certEncoded = pke.getCertificate().getEncoded();
+				final CertificateFilter filter = new EncodedCertificateFilter(Base64.encode(certEncoded));
+				filters = Collections.singletonList(filter);
 			}
+			catch (final Exception ex) {
+				filters = null;
+			}
+			final CertFilterManager newFilterManager = new CertFilterManager(filters, filters != null, true);
+			ProtocolInvocationLauncher.setStickyKeyEntry(null);
+			return sign(options, aoks, useDefaultStore, newFilterManager);
 		}
 		catch (final AOCancelledOperationException e) {
-			LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
-			if (!bySocket){
-				throw new SocketOperationException(RESULT_CANCEL);
-			}
-			return RESULT_CANCEL;
+			LOGGER.info("Operacion cancelada por el usuario: " + LoggerUtil.getTrimStr(e.toString())); //$NON-NLS-1$
+			throw e;
 		}
 		catch (final IllegalArgumentException e) {
-			LOGGER.info("Los parametros de la peticion no eran validos: " + e); //$NON-NLS-1$
+			LOGGER.info("Los parametros de la peticion no eran validos: " + LoggerUtil.getTrimStr(e.toString())); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			throw new SocketOperationException(errorCode);
 		}
 		catch (final CertificateEncodingException e) {
 			LOGGER.info("Error en la codificacion del certificado: " + LoggerUtil.getTrimStr(e.toString())); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			throw new SocketOperationException(errorCode);
+		}
+		catch (final LockedKeyStoreException e) {
+			LOGGER.info("El almacen de claves esta bloqueado: " + LoggerUtil.getTrimStr(e.toString())); //$NON-NLS-1$
+
+			// En este caso no dejamos prefijado el certificado
+			ProtocolInvocationLauncher.setStickyKeyEntry(null);
+
+			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_LOCKED_KEYSTORE;
+			throw new SocketOperationException(errorCode);
 		}
 		catch (final HttpError e) {
 			String errorCode;
 			if (e.getResponseCode() == 400) {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
-				LOGGER.severe("Error en los parametros enviados al servicio: " + e.toString());  //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+				LOGGER.severe("Error en los parametros enviados al servicio: " + LoggerUtil.getTrimStr(e.toString()));  //$NON-NLS-1$
 			}
 			else if (e.getResponseCode() / 100 == 4) {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CONTACT_BATCH_SERVICE;
-				LOGGER.severe("Error en la comunicacion con el servicio de firma de lotes: " + e);//$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+				LOGGER.log(Level.SEVERE, "Error en la comunicacion con el servicio de firma de lotes", LoggerUtil.getTrimStr(e.toString()));//$NON-NLS-1$
 			}
 			else {
 				errorCode = ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
-				LOGGER.severe("Error en el servicio de firma de lotes: " + e); //$NON-NLS-1$
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
+				LOGGER.log(Level.SEVERE, "Error en el servicio de firma de lotes", e); //$NON-NLS-1$
 			}
+			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
 
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			throw new SocketOperationException(errorCode);
 		}
 		catch (final AOException e) {
 			LOGGER.info("Error durante la firma del lote: " + e); //$NON-NLS-1$
 			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			throw new SocketOperationException(errorCode);
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error en el proceso del lote de firmas", e); //$NON-NLS-1$
@@ -308,89 +386,41 @@ final class ProtocolInvocationLauncherBatch {
 					? ProtocolInvocationLauncherErrorManager.ERROR_LOCAL_BATCH_SIGN
 					: ProtocolInvocationLauncherErrorManager.ERROR_BATCH_SIGNATURE;
 			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			throw new SocketOperationException(errorCode);
 		}
 
-		final StringBuilder result = new StringBuilder();
+		return new SignOperationResult(batchResult, pke);
+	}
 
-		// Si se nos ha indicado en la llamadada que devolvamos el certificado de firma, lo adjuntamos al resultado con un separador
-		byte[] signingCertEncoded = null;
-		if (options.isCertNeeded()) {
-			try {
-				signingCertEncoded = pke.getCertificate().getEncoded();
-			} catch (final CertificateEncodingException e) {
-				LOGGER.log(Level.SEVERE, "No se ha podido codificar el certificado de firma para su devolucion", e); //$NON-NLS-1$
-					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
-					ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-					if (!bySocket){
-						throw new SocketOperationException(errorCode);
-					}
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
-			}
-		}
+	private static byte[] signBatch(final UrlParametersForBatch options, final PrivateKeyEntry pke)
+			throws AOCancelledOperationException, PinException, IllegalArgumentException,
+			CertificateEncodingException, AOException, ParameterException, IOException {
 
-		// Si hay clave de cifrado, ciframos
-		if (options.getDesKey() != null) {
-			try {
-				result.append(CypherDataManager.cipherData(batchResult.getBytes(StandardCharsets.UTF_8), options.getDesKey()));
-				if (signingCertEncoded != null) {
-					result.append(RESULT_SEPARATOR)
-						.append(CypherDataManager.cipherData(signingCertEncoded, options.getDesKey()));
-				}
+		String batchResult;
+		if (options.isJsonBatch()) {
+			if(options.isLocalBatchProcess()) {
+				final BatchSignOperation batchConfig =
+						JSONBatchManager.parseBatchConfig(options.getData());
+				batchResult = LocalBatchSigner.signLocalBatch(batchConfig, pke);
+			} else {
+				batchResult = BatchSigner.signJSON(
+						Base64.encode(options.getData(), true),
+						options.getBatchPresignerUrl(),
+						options.getBatchPostSignerUrl(),
+						pke.getCertificateChain(),
+						pke.getPrivateKey(),
+						options.getExtraParams());
 			}
-			catch (final Exception e) {
-				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-				if (!bySocket){
-					throw new SocketOperationException(errorCode);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
-			}
+		} else {
+			batchResult = BatchSigner.signXML(
+					Base64.encode(options.getData(), true),
+					options.getBatchPresignerUrl(),
+					options.getBatchPostSignerUrl(),
+					pke.getCertificateChain(),
+					pke.getPrivateKey(),
+					options.getExtraParams());
 		}
-		else {
-			LOGGER.warning(
-				"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
-			);
-			result.append(Base64.encode(batchResult.getBytes(StandardCharsets.UTF_8)));
-			if (signingCertEncoded != null) {
-				result.append(RESULT_SEPARATOR).append(Base64.encode(signingCertEncoded));
-			}
-		}
-
-		// Si hay servidor intermedio, se envia
-		if (options.getStorageServletUrl() != null) {
-			// Enviamos la firma cifrada al servicio remoto de intercambio y detenemos la espera
-			// activa si se encontraba vigente
-			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
-				final Thread waitingThread = ProtocolInvocationLauncher.getActiveWaitingThread();
-				if (waitingThread != null) {
-					waitingThread.interrupt();
-				}
-				try {
-					IntermediateServerUtil.sendData(result.toString(), options.getStorageServletUrl().toString(), options.getId());
-				}
-				catch (final Exception e) {
-					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT;
-					ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-					if (!bySocket){
-						throw new SocketOperationException(errorCode);
-					}
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
-				}
-			}
-		}
-		else {
-			LOGGER.info(
-				"Se omite el envio por red de los datos resultantes por no haberse proporcionado una URL de destino" //$NON-NLS-1$
-			);
-		}
-
-		return result.toString();
+		return batchResult.getBytes(StandardCharsets.UTF_8);
 	}
 
 	public static String getResultCancel() {

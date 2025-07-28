@@ -47,14 +47,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextPane;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.keystores.KeyStorePreferencesManager;
 import es.gob.afirma.core.keystores.NameCertificateBean;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
 final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
@@ -488,6 +489,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certListPanel.setBorder(null);
 
 		this.certList = new JList<>();
+		this.certList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.certList.setCellRenderer(new CertListCellRendered(windowColor, CertificateSelectionPanel.highContrast));
 
 		updateCertListInfo(this.certificateBeans);
@@ -863,7 +865,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 	}
 
-	private class ChangeViewActionListener implements ActionListener {
+	private static class ChangeViewActionListener implements ActionListener {
 
 		private final CertificateSelectionPanel panel;
 		private final CertificateSelectionDialog dialog;

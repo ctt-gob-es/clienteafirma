@@ -73,9 +73,11 @@ public final class TriphaseDataSigner {
 				throw new AOException("Error decodificando la prefirma: " + e, e); //$NON-NLS-1$
 			}
 
+			final String signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, key.getAlgorithm());
+
 			final byte[] pkcs1sign = signer.sign(
 				preSign,
-				algorithm,
+				signatureAlgorithm,
 				key,
 				certChain,
 				extraParams // Parametros para PKCS#1

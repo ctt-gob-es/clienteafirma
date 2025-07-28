@@ -30,7 +30,7 @@ import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
-import es.gob.afirma.standalone.AutoFirmaUtil;
+import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
@@ -99,15 +99,17 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 
 	private void createUI() {
 		setTitle(SignPdfUiMessages.getString("SignPdfDialog.3")); //$NON-NLS-1$
-		setIconImages(AutoFirmaUtil.getIconImages());
+		setIconImages(DesktopUtil.getIconImages());
 		getAccessibleContext().setAccessibleDescription(SignPdfUiMessages.getString("SignPdfDialog.2") //$NON-NLS-1$
 		);
 		setModalityType(ModalityType.TOOLKIT_MODAL);
 		setLocationRelativeTo(this.parent);
 
 		this.scrollPanel = new JScrollPane();
-		this.scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		this.scrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.scrollPanel.getHorizontalScrollBar().setUnitIncrement(16);
 		this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+		this.scrollPanel.getVerticalScrollBar().setUnitIncrement(16);
 		add(this.scrollPanel);
 
 		addWindowListener(new java.awt.event.WindowAdapter() {
@@ -153,7 +155,6 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 		dialog.setLocation(cp.x - (int) dialog.getPreferredSize().getWidth() / 2,
 				cp.y - (int) dialog.getPreferredSize().getHeight() / 2);
-		dialog.setResizable(false);
 
 		PdfLoader.loadPdf(isSign, isMassiveSign, pdf, (PdfLoaderListener) dialog);
 	}
@@ -194,7 +195,6 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 		final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 		dialog.setLocation(cp.x - (int) dialog.getPreferredSize().getWidth() / 2,
 				cp.y - (int) dialog.getPreferredSize().getHeight() / 2);
-		dialog.setResizable(false);
 
 		PdfLoader.loadPdf(isSign, isMassiveSign, pdf, (PdfLoaderListener) dialog);
 		return dialog;

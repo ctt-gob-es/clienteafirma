@@ -53,6 +53,10 @@ public final class TestXAdES {
     private static final String CERT_PASS = "1234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "eidas_certificado_pruebas___99999999r"; //$NON-NLS-1$
 
+    private static final String CERT_EC_PATH = "ciudadanohw_ecc_2023v1.p12"; //$NON-NLS-1$
+    private static final String CERT_EC_PASS = "ciudadanohw_ecc_2023v1"; //$NON-NLS-1$
+    private static final String CERT_EC_ALIAS = "manuela blanco vidal - nif:10000322z"; //$NON-NLS-1$
+
     private static final Properties[] XADES_MODES;
 
     static {
@@ -100,10 +104,18 @@ public final class TestXAdES {
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-//            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-//            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+    };
+
+    /** Algoritmos de firma a probar. */
+    private final static String[] ALGOS_EC = new String[] {
+            AOSignConstants.SIGN_ALGORITHM_SHA1WITHECDSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA512WITHECDSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA256WITHECDSA,
+            AOSignConstants.SIGN_ALGORITHM_SHA384WITHECDSA
     };
 
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
@@ -870,4 +882,69 @@ public final class TestXAdES {
     		}
     	}
     }
+
+    /**
+     * Prueba de firma con certificado de curva el&iacute;ptica.
+     * @throws Exception en cualquier error
+     */
+    @SuppressWarnings("static-method")
+	@Test
+    public void testSignatureWithECDSA() throws Exception {
+
+    	System.out.println("Prueba de firma de curva eliptica con JAVA: " + System.getProperty("java.vendor") + " " + System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        PrivateKeyEntry pke;
+
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_EC_PATH), CERT_EC_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_EC_ALIAS, new KeyStore.PasswordProtection(CERT_EC_PASS.toCharArray()));
+
+        final AOSigner signer = new AOXAdESSigner();
+
+        String prueba;
+
+        for (final Properties extraParams : XADES_MODES) {
+        	for (final String algo : ALGOS_EC) {
+        		for (final String filename : TEST_FILES_DATA) {
+
+        			// Omitimos la firma de binarios en modo enveloped
+        			if ("XAdES Enveloped".equals(extraParams.getProperty("format")) && !filename.toLowerCase().endsWith(".xml")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        				continue;
+        			}
+
+        			prueba = "Firma XAdES en modo '" +  //$NON-NLS-1$
+        					extraParams.getProperty("mode") +  //$NON-NLS-1$
+        					", formato '" + //$NON-NLS-1$
+        					extraParams.getProperty("format") +  //$NON-NLS-1$
+        					"' con el algoritmo ': " + //$NON-NLS-1$
+        					algo +
+        					"' y el fichero '" + //$NON-NLS-1$
+        					filename + "'"; //$NON-NLS-1$
+
+        			System.out.println();
+        			System.out.println(prueba);
+
+
+        			final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
+
+        			final byte[] result = signer.sign(
+        					data,
+        					algo,
+        					pke.getPrivateKey(),
+        					pke.getCertificateChain(),
+        					extraParams
+        					);
+
+        			final File f = File.createTempFile("Firma_" + algo, ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
+        			try (final java.io.FileOutputStream fos = new java.io.FileOutputStream(f)) {
+        				fos.write(result);
+        				fos.flush();
+        			}
+        			System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+        		}
+        	}
+        }
+    }
+
 }

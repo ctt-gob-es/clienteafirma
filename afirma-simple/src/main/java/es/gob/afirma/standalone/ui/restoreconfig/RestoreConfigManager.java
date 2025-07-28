@@ -48,21 +48,23 @@ public class RestoreConfigManager {
 		}
 	}
 
-	/** Repara la configuraci&oacute;n de navegadores para permitir la correcta ejecuci&oacute;n de AutoFirma.
-	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n. */
-	public void restoreConfigAutoFirma(final RestoreConfigPanel configPanel) {
+	/**
+	 * Repara la configuraci&oacute;n de navegadores para permitir la comunicacion con la aplicaci&oacute;n.
+	 * @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
+	 */
+	public void restoreConfig(final RestoreConfigPanel configPanel) {
 
 		if (this.configurator == null) {
 			LOGGER.warning("No se realizara ninguna accion"); //$NON-NLS-1$
 			return;
 		}
 
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreAutoFirma.13")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreApplication.13")); //$NON-NLS-1$
 		LOGGER.info("Inicio de la restauracion de la instalacion" ); //$NON-NLS-1$
 
 		this.configurator.restore(configPanel);
 
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreAutoFirma.14")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreApplication.14")); //$NON-NLS-1$
 		LOGGER.info("Fin de la restauracion de la instalacion" ); //$NON-NLS-1$
 	}
 

@@ -20,7 +20,7 @@ public class Test_PAdES_Inc475804 {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public void testValidarPadesGeneradaSinAutoFirma() throws Exception {
+	public void testValidarPadesGeneradaSinAutofirma() throws Exception {
 		try (
 				final InputStream is = ClassLoader.getSystemResourceAsStream(PADES_NO_GENERADA_POR_AUTOFIRMA);
 			) {

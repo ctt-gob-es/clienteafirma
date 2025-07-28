@@ -9,12 +9,13 @@
 
 package es.gob.afirma.standalone.configurator;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,21 +31,22 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
-/** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de AutoFirma. */
+/** Configura la instalaci&oacute;n en Linux para la correcta ejecuci&oacute;n de la aplicaci&oacute;n. */
 final class ConfiguratorLinux implements Configurator {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String ALTERNATIVE_APP_SUBDIR = ".afirma/AutoFirma"; //$NON-NLS-1$
+	private static final String ALTERNATIVE_APP_SUBDIR = ".afirma/Autofirma"; //$NON-NLS-1$
 
 	private static final String UNINSTALL_SCRIPT_NAME = "uninstall.sh"; //$NON-NLS-1$
 	private static final String INSTALL_SCRIPT_NAME = "script.sh"; //$NON-NLS-1$
 
     private static final String KS_FILENAME = "autofirma.pfx"; //$NON-NLS-1$
-    private static final String FILE_AUTOFIRMA_CERTIFICATE = "AutoFirma_ROOT.cer"; //$NON-NLS-1$
+    private static final String FILE_AUTOFIRMA_CERTIFICATE = "Autofirma_ROOT.cer"; //$NON-NLS-1$
     private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
 	private final boolean jnlpInstance;
@@ -54,7 +56,7 @@ final class ConfiguratorLinux implements Configurator {
 	}
 
     @Override
-    public void configure(final Console window) throws IOException, GeneralSecurityException {
+    public void configure(final Console window) throws IOException, GeneralSecurityException, HeadlessException {
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.2")); //$NON-NLS-1$
 
@@ -112,6 +114,11 @@ final class ConfiguratorLinux implements Configurator {
         }
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.8")); //$NON-NLS-1$
+
+        // Si se necesita interfaz grafica, comprobamos que la JRE lo soporte
+        if (isHeadlessJre()) {
+        	LOGGER.warning("La JVM con la que se ha ejecutado el instalador no soporta interfaces graficas (headless). Esta JVM no es compatible con la interfaz grafica de Autofirma. Instale una JRE completa para poder ejecutarla."); //$NON-NLS-1$
+        }
     }
 
     /** Comprueba si ya existe un almac&eacute;n de certificados generado.
@@ -165,7 +172,7 @@ final class ConfiguratorLinux implements Configurator {
 	@Override
 	public File getAlternativeApplicationDirectory() {
 		final String userHome = System.getProperty("user.home"); //$NON-NLS-1$
-		return new File(userHome, ".afirma/AutoFirma"); //$NON-NLS-1$
+		return new File(userHome, ".afirma/Autofirma"); //$NON-NLS-1$
 	}
 
     /** Obtiene los directorios de usuarios del sistema.
@@ -221,7 +228,7 @@ final class ConfiguratorLinux implements Configurator {
     		plugins = pluginsManager.getPluginsLoadedList();
     	}
     	catch (final Exception e) {
-    		LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de AutoFirma", e); //$NON-NLS-1$
+    		LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de Autofirma", e); //$NON-NLS-1$
     	}
 
     	// Desinstalamos los plugins instalados si los hubiese
@@ -243,7 +250,7 @@ final class ConfiguratorLinux implements Configurator {
     		try {
     			Files.walkFileTree(
     					alternativeDir.toPath(),
-    					new HashSet<FileVisitOption>(),
+    					new HashSet<>(),
     					Integer.MAX_VALUE,
     					new SimpleFileVisitor<Path>() {
     						@Override
@@ -272,4 +279,20 @@ final class ConfiguratorLinux implements Configurator {
     		}
     	}
     }
+
+	/**
+	 * Identifica si la JRE carece de las bibliotecas necesarias para la ejecuci&oacute;n de las
+	 * interfaces gr&aacute;ficas de Autofirma.
+	 * @return {@code true} si la JRE es headless, {@code false} en caso contrario.
+	 */
+	private static boolean isHeadlessJre() {
+		boolean headless = false;
+		try {
+			GraphicsEnvironment.getLocalGraphicsEnvironment();
+		}
+		catch (final UnsatisfiedLinkError e) {
+			headless = true;
+		}
+		return headless;
+	}
 }

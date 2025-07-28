@@ -94,6 +94,6 @@ public final class HashUtil {
 	 */
 	public static File getWindowsAlternativeAppDir() {
 		final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-		return new File (commonDir, "AutoFirma"); //$NON-NLS-1$
+		return new File (commonDir, "Autofirma"); //$NON-NLS-1$
 	}
 }

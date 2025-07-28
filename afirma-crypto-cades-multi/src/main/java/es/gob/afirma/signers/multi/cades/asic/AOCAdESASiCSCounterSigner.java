@@ -12,6 +12,7 @@ package es.gob.afirma.signers.multi.cades.asic;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.util.Map;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
@@ -35,8 +36,23 @@ public final class AOCAdESASiCSCounterSigner implements AOCounterSigner {
 			                  final Properties extraParams) throws AOException,
 			                                                       IOException {
 		// Extraemos firma y datos del ASiC
-		final byte[] packagedData = ASiCUtil.getASiCSData(sign);
-		final byte[] packagedSign = ASiCUtil.getASiCSBinarySignature(sign);
+		byte[] packagedSign;
+		try {
+			packagedSign = ASiCUtil.getASiCSBinarySignature(sign);
+		} catch (final IOException e) {
+			throw new AOException("No se encontro la firma CAdES dentro del contenedor ASiC", e); //$NON-NLS-1$
+		}
+
+		// Utilizarmos solo los primeros datos que encontremos
+		String signedDataName;
+		byte[] packagedData;
+		try {
+			final Map<String, byte[]> signedData = ASiCUtil.getASiCSData(sign);
+			signedDataName = signedData.keySet().iterator().next();
+			packagedData = signedData.get(signedDataName);
+		} catch (final IOException e) {
+			throw new AOException("No se encontraron los datos firmados dentro del contenedor CAdES-ASiC", e); //$NON-NLS-1$
+		}
 
 		// Creamos la contrafirma
 		final byte[] newCounterSign = new AOCAdESCounterSigner().countersign(
@@ -53,7 +69,7 @@ public final class AOCAdESASiCSCounterSigner implements AOCounterSigner {
 		return ASiCUtil.createSContainer(
 			newCounterSign,
 			packagedData,
-			ASiCUtil.getASiCSDataFilename(sign),
+			signedDataName,
 			ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE
 		);
 	}

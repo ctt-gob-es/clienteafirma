@@ -34,7 +34,7 @@ public final class TestMacCaInstall {
 	@Ignore // Necesita macOS. Este modo de uso deja de funciona con macOS Big Sur
 	public void testInstallRootCAWithScript() throws Exception {
 
-		final File f = new File(TestMacCaInstall.class.getResource("/AutoFirma_ROOT.cer").toURI()); //$NON-NLS-1$
+		final File f = new File(TestMacCaInstall.class.getResource("/Autofirma_ROOT.cer").toURI()); //$NON-NLS-1$
 		final String cmd = OSX_SEC_COMMAND.replace("%KEYCHAIN%", KEYCHAIN_PATH).replace("%CERT%", f.getAbsolutePath().replace(" ", "\\ ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		System.out.println(cmd);
 		System.out.println();
@@ -69,7 +69,7 @@ public final class TestMacCaInstall {
 	@Ignore
 	public void testInstallRootCaWithProcess() throws Exception {
 
-		final File f = new File(TestMacCaInstall.class.getResource("/AutoFirma_ROOT.cer").toURI()); //$NON-NLS-1$
+		final File f = new File(TestMacCaInstall.class.getResource("/Autofirma_ROOT.cer").toURI()); //$NON-NLS-1$
 
 		final List<String> params = new ArrayList<>();
 		params.add("sudo"); //$NON-NLS-1$

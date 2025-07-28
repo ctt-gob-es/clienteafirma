@@ -28,9 +28,9 @@ import javax.swing.JPanel;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.VisorPanel;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Ventana para la visualizaci&oacute;n de datos de firma.
  * @author Carlos Gamuci. */
@@ -115,7 +115,7 @@ public class VisorFirma extends JApplet implements WindowListener {
             	}
             	dialog.setModalityType(ModalityType.APPLICATION_MODAL);
             	dialog.setSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
-            	dialog.setResizable(false);
+
             	final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
         		dialog.setLocation(cp.x - DEFAULT_WINDOW_WIDTH/2, cp.y - DEFAULT_WINDOW_WIDTH/2);
         		dialog.add(this.currentPanel);
@@ -210,7 +210,7 @@ public class VisorFirma extends JApplet implements WindowListener {
 				null,
 				false,
 				false,
-				AutoFirmaUtil.getDefaultDialogsIcon(),
+				DesktopUtil.getDefaultDialogsIcon(),
 				VisorFirma.this.window
 			)[0];
     	}

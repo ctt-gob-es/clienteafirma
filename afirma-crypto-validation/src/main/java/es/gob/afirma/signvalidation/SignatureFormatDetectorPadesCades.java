@@ -647,8 +647,7 @@ public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetect
 	 * @param signatureDictionary Parameter that represents the signature
 	 *                            dictionary.
 	 * @return an object that represents the <code>SignedData</code>.
-	 * @throws Exception
-	 * @throws SigningException If the method fails.
+	 * @throws Exception If the method fails.
 	 */
 	public static CMSSignedData getCMSSignature(final PDFSignatureDictionary signatureDictionary) throws Exception {
 
@@ -793,7 +792,7 @@ public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetect
 
 	/**
 	 * Method that obtains the concrete format of an ASN.1 signature.
-	 *
+	 * @param signedData ASN.1 signature.
 	 * @param signature Parameter that represents the ASN.1 signature.
 	 * @return the format of the signature. The format will have one of these
 	 *         values:

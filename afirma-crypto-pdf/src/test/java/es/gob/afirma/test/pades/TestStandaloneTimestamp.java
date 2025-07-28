@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.pades.PdfTimestamper;
-import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
 /** Pruebas de sellos de tiempo de forma independiente a las firmas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -28,7 +27,7 @@ public final class TestStandaloneTimestamp {
 	    EXTRAPARAMS.put("tsaPolicy", CATCERT_POLICY); //$NON-NLS-1$
 	    EXTRAPARAMS.put("tsaRequireCert", CATCERT_REQUIRECERT); //$NON-NLS-1$
 	    EXTRAPARAMS.put("tsaHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
-	    EXTRAPARAMS.put("tsType", TsaParams.TS_SIGN_DOC); //$NON-NLS-1$
+	    EXTRAPARAMS.put("tsType", PdfTimestamper.TS_LEVEL_SIGN_DOC); //$NON-NLS-1$
     }
 
     /** Prueba de sello a nivel de documento de un PDF cofirmado.

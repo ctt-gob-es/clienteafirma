@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
 import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
@@ -63,7 +64,7 @@ final class SingleSignPostProcessor {
 	static void doPostProcess(final SingleSign sSign,
 			                  final X509Certificate[] certChain,
 			                  final TriphaseData tdata,
-			                  final SingleSignConstants.SignAlgorithm algorithm,
+			                  final SingleSignConstants.DigestAlgorithm algorithm,
 			                  final String batchId) throws IOException,
 			                                                                            AOException,
 			                                                                            NoSuchAlgorithmException {
@@ -74,13 +75,6 @@ final class SingleSignPostProcessor {
 		}
 
 		final TriphaseData td = cleanTriphaseData(tdata, sSign.getId());
-
-		try {
-			TriPhaseHelper.checkSignaturesIntegrity(td, certChain[0]);
-		}
-		catch (final Exception e) {
-			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
-		}
 
 		// Instanciamos el preprocesador adecuado
 		final TriPhasePreProcessor prep = TriPhaseHelper.getTriPhasePreProcessor(sSign);
@@ -117,12 +111,27 @@ final class SingleSignPostProcessor {
 			}
 		}
 
+		//TODO: Dado que las cofirmas y las contrafirmas no se han realizado sobre los datos aqui
+		// disponibles sino de los extraidos de la firma, indicamos que en las firmas se valide el
+		// PKCS#1. En las cofirmas y contrafirmas solo se comprobara la integridad. Habria que buscar
+		// un modo de mejorar esto
+		final boolean needVerifyPkcs1 = sSign.getSubOperation() == SignSubOperation.SIGN;
+		try {
+			TriPhaseHelper.checkSignaturesIntegrity(td, docBytes, certChain[0], algorithm, needVerifyPkcs1);
+		}
+		catch (final Exception e) {
+			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
+		}
+
+		// Identificamos el algoritmo de firma apropiado la clave del certificado seleccionado
+        final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm.getName(), certChain[0].getPublicKey().getAlgorithm());
+
 		final byte[] signedDoc;
 		switch(sSign.getSubOperation()) {
 			case SIGN:
 				signedDoc = prep.preProcessPostSign(
 					docBytes,
-					algorithm.toString(),
+					signAlgorithm,
 					certChain,
 					extraParams,
 					td.toString().getBytes()
@@ -131,7 +140,7 @@ final class SingleSignPostProcessor {
 			case COSIGN:
 				signedDoc = prep.preProcessPostCoSign(
 					docBytes,
-					algorithm.toString(),
+					signAlgorithm,
 					certChain,
 					extraParams,
 					td.toString().getBytes()
@@ -148,7 +157,7 @@ final class SingleSignPostProcessor {
 				}
 				signedDoc = prep.preProcessPostCounterSign(
 					docBytes,
-					algorithm.toString(),
+					signAlgorithm,
 					certChain,
 					extraParams,
 					td,

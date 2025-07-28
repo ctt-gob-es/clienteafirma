@@ -60,6 +60,14 @@ public final class BatchPresigner extends HttpServlet {
 			               final HttpServletResponse response) throws ServletException,
 			                                                          IOException {
 
+		// Si no se ha podido cargar el fichero de configuracion de la firma de lotes XML, se considera que
+		// el servicio no esta inicializado
+		if (!BatchConfigManager.isInitialized()) {
+			LOGGER.severe("No se ha inicializado el servicio"); //$NON-NLS-1$
+			response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "No se ha inicializado el servicio"); //$NON-NLS-1$
+			return;
+		}
+
 		final Map<String, String> parametes = RequestParameters.extractParameters(request);
 
 		final String xml = parametes.get(BATCH_XML_PARAM);

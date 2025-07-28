@@ -260,7 +260,7 @@ public class TestCAdESTriCounterSign {
 		final AOTreeNode rootNode = (AOTreeNode) tree.getRoot();
 		Assert.assertEquals("No se interpreto correctamente la estructura de la contrafirma", "Datos", rootNode.getUserObject()); //$NON-NLS-1$ //$NON-NLS-2$
 
-		Assert.assertTrue("El resultado no tiene la estructura espera de una firma con una contrafirma", //$NON-NLS-1$
+		Assert.assertTrue("El resultado no tiene la estructura que se espera de una firma con una contrafirma", //$NON-NLS-1$
 				rootNode.getChildCount() == 1 && rootNode.getChildAt(0).getChildCount() == 1);
 
 		final AOSimpleSignInfo counterSignInfo = (AOSimpleSignInfo) rootNode.getChildAt(0).getChildAt(0).getUserObject();

@@ -300,7 +300,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			forceWSMode = force;
 		}
 		
-		/** Permite establecer que la invocación con AutoFirma sea a traves
+		/** Permite establecer que la invocación con Autofirma sea a traves
 		 * del protocolo afirma:// */
 		var setForceAFirma = function (force) {
 			forceAFirma = force;
@@ -311,7 +311,7 @@ var MiniApplet = ( function ( window, undefined ) {
 			tryMiniapplet = tryLoad;
 		}
 		
-		/** Devuelve true si el applet de firma está cargado, si no devuelve false y se usará Autofirma */
+		/** Devuelve true si el applet de firma está cargado, si no devuelve false y se usará AutoFirma */
 		var isAppletLoaded = function (useForceLoad) {
 			if(useForceLoad) {
 				forceLoad();
@@ -736,7 +736,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		}
 		
 		/** JUNTA DE ANDALUCIA **/
-		/** Método centralizado para la firma simple y masiva, utilizando Autofirma o Miniapplet según si se ha cargado o no el Applet de firma **/
+		/** Método centralizado para la firma simple y masiva, utilizando AutoFirma o Miniapplet según si se ha cargado o no el Applet de firma **/
 		/** Parámetros: **/
 		/** operationArray: Define la operación a realizar ('sign, 'cosign' o 'countersign') **/
 		/** dataArray: Define los datos a firmar, pudiendo ser datos o hashes ('sign'), o firmas ('cosign' y 'countersign') **/
@@ -824,7 +824,7 @@ var MiniApplet = ( function ( window, undefined ) {
 		
 		var multiModeErrorFunction = function (type, message, errorCallback) {
 			try {
-				// Informar de error Autofirma
+				// Informar de error AutoFirma
 				clienteFirma.setErrorType(type);
 				clienteFirma.setErrorMessage(message);
 			} catch (e) {

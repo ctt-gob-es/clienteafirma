@@ -1,6 +1,7 @@
 package es.gob.afirma.standalone.ui;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -20,6 +21,7 @@ public final class SignOperationConfig {
 	private String signatureFormatName;
 	private List<SignValidity> signValidity;
 	private String invalidSignatureText;
+	private String digestAlgorithm;
 
 	/** Construye la configuraci&oacute;n de firma. */
 	public SignOperationConfig() {
@@ -155,21 +157,61 @@ public final class SignOperationConfig {
 		this.signatureFile = file;
 	}
 
-	/** Recupera la operaci&oacute;n criptogr&aacute;fica de firma que se va a utilizar.
-	 * @return Operaci&oacute;n criptogr&aacute;fica de firma. */
+	/**
+	 * Recupera la operaci&oacute;n criptogr&aacute;fica de firma que se va a utilizar.
+	 * @return Operaci&oacute;n criptogr&aacute;fica de firma.
+	 */
 	public CryptoOperation getCryptoOperation() {
 		return this.cryptoOperation;
 	}
 
-	/** Establece la operaci&oacute;n criptogr&aacute;fica de firma que se va a utilizar.
-	 * @param cryptoOperation Operaci&oacute;n criptogr&aacute;fica de firma. */
+	/**
+	 * Establece la operaci&oacute;n criptogr&aacute;fica de firma que se va a utilizar.
+	 * @param cryptoOperation Operaci&oacute;n criptogr&aacute;fica de firma.
+	 */
 	public void setCryptoOperation(final CryptoOperation cryptoOperation) {
 		this.cryptoOperation = cryptoOperation;
 	}
 
+	/**
+	 * Recupera el algoritmo de huella usado como parte del algoritmo de firma.
+	 * @return Algoritmo de huella usado como parte del algoritmo de firma.
+	 */
+	public String getDigestAlgorithm() {
+		return this.digestAlgorithm;
+	}
+
+	/**
+	 * Establece el algoritmo de huella usado como parte del algoritmo de firma.
+	 * @param signatureAlgorithm Algoritmo de huella usado como parte del algoritmo de firma.
+	 */
+	public void setDigestAlgorithm(final String signatureAlgorithm) {
+		this.digestAlgorithm = signatureAlgorithm;
+	}
+
+	@Override
+	protected SignOperationConfig clone() {
+
+		// La copia contendra los mismos elementos, ha excepcion de
+		// los extraParams, que sera una copia de ellos
+		final SignOperationConfig config = new SignOperationConfig();
+		config.setFileType(this.fileType);
+		config.setDataFile(this.dataFile);
+		config.setSignatureFile(this.signatureFile);
+		config.setCryptoOperation(this.cryptoOperation);
+		config.setSigner(this.signer);
+		config.setExtraParams(this.extraParams != null ? (Properties) this.extraParams.clone() : null);
+		config.setSignatureFormatName(this.signatureFormatName);
+		config.setSignValidity(this.signValidity != null ? Collections.unmodifiableList(this.signValidity) : null);
+		config.setInvalidSignatureText(this.invalidSignatureText);
+		config.setDigestAlgorithm(this.digestAlgorithm);
+
+		return config;
+	}
+
 	/** Operaci&oacute;n criptogr&aacute;fica que debe aplicarse durante
 	 * un proceso de firma. */
-	enum CryptoOperation {
+	public enum CryptoOperation {
 		/** Firma electr&oacute;nica simple. */
 		SIGN,
 		/** Cofirma. */

@@ -3,6 +3,7 @@
   <head>
 	<title>Ejemplo de despliegue del Cliente @firma</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript">
 	
@@ -49,7 +50,7 @@
 			showLog("Type: " + errorType + "\nMessage: " + errorMessage);
 		}
 
-		function doSign() {			
+		function doSign() {
 			try {
 				var data = document.getElementById("data").value;
 				AutoScript.sign(
@@ -223,28 +224,13 @@
 		 * El uso del metodo de carga no sera compatible con el Cliente movil.
 		 */
 		function browseFirma(title) {
-/* 			try {
+ 			try {
 				AutoScript.getFileNameContentBase64(
 						title,
 						"csig,xsig,sig,pdf,xml",
 						"Fichero de firma electrónica",
 						null,
 						showLoadFirmaResultCallback, showErrorCallback);
-
-			} catch (e) {
-				showLog("Type: " + AutoScript.getErrorType() + "\nMessage: "
-						+ AutoScript.getErrorMessage());
-			} */
-			
-			
-			
-			try {
-				AutoScript.getMultiFileNameContentBase64(
-						title,
-						"csig,xsig,sig,pdf,xml",
-						"Fichero de firma electrónica",
-						null,
-						showLoadFirmasResultCallback, showErrorCallback);
 
 			} catch (e) {
 				showLog("Type: " + AutoScript.getErrorType() + "\nMessage: "
@@ -257,10 +243,7 @@
 			dataFilename.innerHTML = fileName;
 			data.value = dataB64;
 		}
-		
-		
-		
-		
+			
 		
 		function showLoadFirmasResultCallback(fileNames, datasB64) {
 
@@ -270,10 +253,6 @@
 			}
 			showLog(buffer);
 		}
-		
-		
-		
-		
 		
 
 		function showLoadFirmaResultCallback(fileName, dataB64) {
@@ -309,19 +288,17 @@
 		}
 
 		function showLog(newLog) {
-			document.getElementById('console').value = document
-					.getElementById('console').value
-					+ "\n" + newLog;
+			document.getElementById('console').value += "\n" + newLog;
 		}
 	</script>
   </head>
 	<body>
 		<script>
 			//AutoScript.setMinimumClientVersion("1.8");
-			//AutoScript.setForceWSMode(true);
-			AutoScript.cargarAppAfirma();
 			AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
 					window.location.origin + "/afirma-signature-retriever/RetrieveService");
+			AutoScript.setForceWSMode(true);
+			AutoScript.cargarAppAfirma();
 			//AutoScript.setPortRange(63117);
 		</script>
 
@@ -347,10 +324,14 @@
 		 <select id="format">
 		 <option value="CAdES" selected>CAdES</option>
 		 <option value="CAdEStri">CAdEStri</option>
-		 <option value="Adobe PDF">PAdES</option>
+		 <option value="PAdES">PAdES</option>
 		 <option value="PAdEStri">PAdEStri</option>
 		 <option value="XAdES">XAdES</option>
 		 <option value="XAdEStri">XAdEStri</option>
+		 <option value="CAdES-ASiC-S">CAdES-ASiC-S</option>
+		 <option value="CAdES-ASiC-S-tri">CAdES-ASiC-S-tri</option>
+		 <option value="XAdES-ASiC-S">XAdES-ASiC-S</option>
+		 <option value="XAdES-ASiC-S-tri">XAdES-ASiC-S-tri</option>
 		 <option value="FacturaE">FacturaE</option>
 		 <option value="FacturaEtri">FacturaEtri</option>
 		 <option value="CMS/PKCS#7">CMS</option>
@@ -366,9 +347,9 @@
 		<div>
 		 <label for="algorithm">Algoritmo</label>
 		 <select id="algorithm">
-		 <option value="SHA1withRSA">SHA1 con RSA</option>
-		 <option value="SHA256withRSA">SHA256 con RSA</option>
-		 <option value="SHA512withRSA" selected>SHA512 con RSA</option>
+		 <option value="SHA1">SHA1</option>
+		 <option value="SHA256">SHA256</option>
+		 <option value="SHA512withRSA" selected>SHA512</option>
 		 </select>
 		</div>
 

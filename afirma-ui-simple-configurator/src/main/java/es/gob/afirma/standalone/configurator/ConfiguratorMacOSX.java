@@ -18,7 +18,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,18 +38,17 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.keystores.mozilla.apple.ShellScript;
 import es.gob.afirma.standalone.configurator.CertUtil.CertPack;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 
-/** Configura la instalaci&oacute;n en Mac para la correcta ejecuci&oacute;n de
- * AutoFirma. */
+/** Configura la instalaci&oacute;n en Mac para la correcta ejecuci&oacute;n de la aplicaci&oacute;n. */
 final class ConfiguratorMacOSX implements Configurator {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -59,10 +57,11 @@ final class ConfiguratorMacOSX implements Configurator {
 	private static final String SSL_CER_FILENAME = "/autofirma.cer"; //$NON-NLS-1$
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 	private static final String CERT_CN = "127.0.0.1"; //$NON-NLS-1$
-	private static final String CERT_CN_ROOT = "AutoFirma ROOT"; //$NON-NLS-1$
-	private static final String MACOSX_CERTIFICATE = "/AutoFirma_ROOT.cer";//$NON-NLS-1$
+	private static final String CERT_CN_ROOT = "Autofirma ROOT"; //$NON-NLS-1$
+	private static final String MACOSX_CERTIFICATE = "/Autofirma_ROOT.cer";//$NON-NLS-1$
 	private static final String GET_USERS_COMMAND = "dscacheutil -q user"; //$NON-NLS-1$
-	private final static String USER_DIR_LINE_PREFIX = "dir: "; //$NON-NLS-1$
+	private static final String USER_DIR_LINE_HEADER = "dir: "; //$NON-NLS-1$
+	private static final String USER_DIR_LINE_PREFIX = USER_DIR_LINE_HEADER + "/Users/"; //$NON-NLS-1$
 	private static final String GET_USER_SCRIPTS_NAME = "scriptGetUsers";//$NON-NLS-1$
 	private static final String SCRIPT_EXT = ".sh";//$NON-NLS-1$
 	private static final String MAC_SCRIPT_NAME = "installCerScript"; //$NON-NLS-1$
@@ -183,11 +182,22 @@ final class ConfiguratorMacOSX implements Configurator {
 		closeFirefox();
 
 		// Obtenemos del usuario y probamos la contrasena del Llavero
-		final byte[] keyChainPhrase = getKeyChainPhrase(console);
+		byte[] keyChainPhrase = getKeyChainPhrase(console, false);
 
 		// Desinstalamos de los almacenes cualquier certificado anterior generado para este proposito
 		console.print(Messages.getString("ConfiguratorMacOSX.15")); //$NON-NLS-1$
-		uninstallProcess(appDir, keyChainPhrase);
+
+		boolean passwordValidated;
+		do {
+			passwordValidated = true;
+			try {
+				uninstallProcess(appDir, keyChainPhrase);
+			}
+			catch (final InvalidPasswordException e) {
+				keyChainPhrase = getKeyChainPhrase(console, true);
+				passwordValidated = false;
+			}
+		} while (!passwordValidated);
 
 		// Se instalan los certificados en el almacen de Apple
 		final JLabel msgLabel = new JLabel("<html>" + Messages.getString("ConfiguratorMacOSX.20") + "</html>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -231,9 +241,10 @@ final class ConfiguratorMacOSX implements Configurator {
 	/**
 	 * Obtiene la contrase&ntilde;a del llavero y lo desbloquea para comprobarla.
 	 * @param console Consola en la que mostrar los mensajes al usuario.
+	 * @param force Indica si se debe forzar que se introduzca una contrase&ntilde;a.
 	 * @return Contrase&ntilde;a del llavero.
 	 */
-	private static byte[] getKeyChainPhrase(final Console console) {
+	private static byte[] getKeyChainPhrase(final Console console, final boolean force) {
 
 		byte[] phrase = null;
 		boolean passwordError = false;
@@ -241,7 +252,7 @@ final class ConfiguratorMacOSX implements Configurator {
 		do {
 
 			// La contrasena solo hace falta si no estamos ya en modo administrador, asi que la primera vez probaremos con una generica
-			if (phrase == null) {
+			if (!force && phrase == null) {
 				phrase = DUMMY;
 			}
 			else {
@@ -314,7 +325,6 @@ final class ConfiguratorMacOSX implements Configurator {
 		params.add("-p"); //$NON-NLS-1$
 		params.add(new String(phrase, StandardCharsets.UTF_8));
 
-
 		final ProcessBuilder builder = new ProcessBuilder(params);
 		final Process process = builder.start();
 
@@ -342,7 +352,6 @@ final class ConfiguratorMacOSX implements Configurator {
 				throw new IOException("Error al desbloquear el llavero"); //$NON-NLS-1$
 			}
 		}
-
 	}
 
 	/**
@@ -447,9 +456,19 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 
 		// Obtenemos del usuario y probamos la contrasena del Llavero
-		final byte[] keyChainPhrase = getKeyChainPhrase(console);
+		byte[] keyChainPhrase = getKeyChainPhrase(console, false);
 
-		uninstallProcess(resourcesDir, keyChainPhrase);
+		boolean passwordValidated;
+		do {
+			passwordValidated = true;
+			try {
+				uninstallProcess(resourcesDir, keyChainPhrase);
+			}
+			catch (final InvalidPasswordException e) {
+				keyChainPhrase = getKeyChainPhrase(console, true);
+				passwordValidated = false;
+			}
+		} while (!passwordValidated);
 
 		// Listamos los plugins instalados
 		List<AfirmaPlugin> plugins = null;
@@ -457,7 +476,7 @@ final class ConfiguratorMacOSX implements Configurator {
 			plugins = pluginsManager.getPluginsLoadedList();
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de AutoFirma", e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "No se pudo obtener el listado de plugins de Autofirma", e); //$NON-NLS-1$
 		}
 
 		// Desinstalamos los plugins instalados si los hubiese
@@ -479,7 +498,7 @@ final class ConfiguratorMacOSX implements Configurator {
 			try {
 				Files.walkFileTree(
 						alternativeDir.toPath(),
-						new HashSet<FileVisitOption>(),
+						new HashSet<>(),
 						Integer.MAX_VALUE,
 						new SimpleFileVisitor<Path>() {
 							@Override
@@ -509,38 +528,55 @@ final class ConfiguratorMacOSX implements Configurator {
 		}
 	}
 
-	/** Ejecuta el proceso de desinstalaci&oacute;n. Durante el mismo se desinstalan los certificados
+	/**
+	 * Ejecuta el proceso de desinstalaci&oacute;n. Durante el mismo se desinstalan los certificados
 	 * de confianza SSL de los almacenes del sistema.
-	 * @param appDir Directorio de instalaci&oacute;n. */
-	private static void uninstallProcess(final File appDir, final byte[] keyChainPhrase) {
+	 * @param appDir Directorio de instalaci&oacute;n.
+	 * @throws InvalidPasswordException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
+	 */
+	private static void uninstallProcess(final File appDir, final byte[] keyChainPhrase) throws InvalidPasswordException {
 
 		// Desinstalamos los anteriores certificados SSL del Llavero
 		uninstallRootCAMacOSXKeyStore(keyChainPhrase);
 
+		// Identificamos los directorios de los usuarios
+		final String[] usersHomes = getSystemUsersHomes();
+
+		// Desinstalamos los certificados del almacen de confianza de firefox de los usuarios localizados
+		if (usersHomes != null) {
+			try {
+				ConfiguratorFirefoxMac.uninstallFromMozillaKeyStore(appDir, usersHomes, scriptFile);
+			}
+			catch (final MozillaProfileNotFoundException e) {
+				LOGGER.info("No se han encontrado perfiles de Mozilla de los que desinstalar: " + e); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "Se ha producido un error durante la desinstalacion: " + e, e); //$NON-NLS-1$
+			}
+		}
+		// Si no hay directorios de usuario, se cancela la desinstalacion de los certificados de firefox
+		else {
+			LOGGER.info("No se han encontrado directorios de usuario y se cancela la carga de perfiles de firefox de los que deinstalar certificados"); //$NON-NLS-1$
+		}
 		// Desinstalamos los anteriores certificados SSL del almacen de confianza de Firefox
-		try {
-			final String[] usersHomes = getSystemUsersHomes();
-			ConfiguratorFirefoxMac.uninstallFromMozillaKeyStore(appDir, usersHomes, scriptFile);
-		}
-		catch (final MozillaProfileNotFoundException e) {
-			LOGGER.info("No se han encontrado perfiles de Mozilla de los que desinstalar: " + e); //$NON-NLS-1$
-		}
-		catch (final IOException e) {
-			LOGGER.log(Level.SEVERE, "Se ha producido un error durante la desinstalacion: " + e, e); //$NON-NLS-1$
-		}
+
 	}
 
 	/**
 	 * Desinstala del Llavero de macOS los certificados de confianza de la aplicaci&oacute;n.
 	 * @param keyChainPhrase Contrase&ntilde;a del Llavero.
+	 * @throws InvalidPasswordException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
 	 */
-	private static void uninstallRootCAMacOSXKeyStore(final byte[] keyChainPhrase) {
+	private static void uninstallRootCAMacOSXKeyStore(final byte[] keyChainPhrase) throws InvalidPasswordException {
 
 		LOGGER.info("Desinstalamos los anteriores certificados del almacen"); //$NON-NLS-1$
 
 		// Eliminamos el certificados SSL
 		try {
 			uninstallTrustedCertFromAppleKeyChain(CERT_CN, keyChainPhrase);
+		}
+		catch (final InvalidPasswordException e) {
+			throw e;
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se pudo eliminar el anterior certificado " +  CERT_CN + " del Llavero", e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -549,6 +585,9 @@ final class ConfiguratorMacOSX implements Configurator {
 		// Eliminamos el certificado raiz
 		try {
 			uninstallTrustedCertFromAppleKeyChain(CERT_CN_ROOT, keyChainPhrase);
+		}
+		catch (final InvalidPasswordException e) {
+			throw e;
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se pudo eliminar el anterior certificado " +  CERT_CN_ROOT + " del Llavero", e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -562,10 +601,11 @@ final class ConfiguratorMacOSX implements Configurator {
 	 * @throws IOException Cuando ocurre un error al leer el fichero
 	 * @throws InterruptedException Si se interrumpe el proceso de instalaci&oacute;n.
 	 * @throws KeyChainException Cuando ocurra un error al insertar el certificado en el almac&eacute;n.
-	 * @throws SecurityException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
+	 * @throws SecurityException Cuando no se pueda identificar el resultado de la operaci&oacute;n.
+	 * @throws InvalidPasswordException Cuando la contrase&ntilde;a introducida de administraci&oacute;n no sea correcta.
 	 */
 	private static void uninstallTrustedCertFromAppleKeyChain(final String commonName, final byte[] phrase)
-			throws IOException, InterruptedException, KeyChainException, SecurityException {
+			throws IOException, InterruptedException, KeyChainException, SecurityException, InvalidPasswordException {
 
 		// El comando para la eliminacion de certificados exige que se identifique univocamente
 		// el certificado a eliminar. Como puede que haya mas de un certificado con el mismo CN,
@@ -635,14 +675,21 @@ final class ConfiguratorMacOSX implements Configurator {
 				}
 				if (errorOutput != null) {
 					String errorMsg = new String(errorOutput);
-					// El texto de solicitud de contrasena inicial puede haberse agregado a la salida de error,
-					// asi que lo omitimos
-					if (errorMsg.startsWith("Password:")) { //$NON-NLS-1$
-						errorMsg = errorMsg.substring("Password:".length()); //$NON-NLS-1$
+
+					// No se encontraron mas instanceias del certificado en el almacen
+					if (errorMsg.contains("SecKeychainSearchCopyNext")) { //$NON-NLS-1$
+						certFound = false;
 					}
-					LOGGER.severe("Salida de error: " + errorMsg); //$NON-NLS-1$
-					if (errorMsg.toLowerCase().contains("password")) { //$NON-NLS-1$
-						throw new SecurityException("Contrasena incorrecta"); //$NON-NLS-1$
+					else {
+						// El texto de solicitud de contrasena inicial puede haberse agregado a la salida de error,
+						// asi que lo omitimos
+						if (errorMsg.startsWith("Password:")) { //$NON-NLS-1$
+							errorMsg = errorMsg.substring("Password:".length()); //$NON-NLS-1$
+						}
+						if (errorMsg.toLowerCase().contains("password")) { //$NON-NLS-1$
+							throw new InvalidPasswordException();
+						}
+						LOGGER.info("Salida de error: " + errorMsg); //$NON-NLS-1$
 					}
 				}
 			}
@@ -708,7 +755,7 @@ final class ConfiguratorMacOSX implements Configurator {
 
 	private static File getResourcesDirectory() {
 		final String userDir = System.getenv("HOME"); //$NON-NLS-1$
-		return new File (userDir, "Library/Application Support/AutoFirma"); //$NON-NLS-1$
+		return new File (userDir, "Library/Application Support/Autofirma"); //$NON-NLS-1$
 	}
 
 	private static File getResourcesDirectory(final boolean create) throws IOException {
@@ -786,11 +833,8 @@ final class ConfiguratorMacOSX implements Configurator {
 			String line;
 			try (
 					final InputStream resIs = ps.getInputStream();
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							256, // Maximo 256 lineas de salida
-							1024 // Maximo 1024 caracteres por linea
-							);
+					final BufferedReader resReader = new BufferedReader(
+							new InputStreamReader(resIs));
 					) {
 				while ((line = resReader.readLine()) != null) {
 					if (line.contains("Firefox.app") //$NON-NLS-1$
@@ -808,9 +852,11 @@ final class ConfiguratorMacOSX implements Configurator {
 		return false;
 	}
 
-    /** Devuelve un listado con todos los directorios de usuario del sistema.
-	 * @return Listado de directorios. */
-	private static String[] getSystemUsersHomes() {
+    /**
+     * Devuelve un listado con todos los directorios de usuario del sistema.
+	 * @return Listado de directorios o {@code null} si no se ha podido cargar.
+	 */
+	static String[] getSystemUsersHomes() {
 
 		if (userDirs != null) {
 			return userDirs;
@@ -820,25 +866,25 @@ final class ConfiguratorMacOSX implements Configurator {
 			final File getUsersScriptFile = createGetUsersScript();
 			final Object o = executeScriptFile(getUsersScriptFile, false, true);
 			final Set<String> dirs = new HashSet<>();
-			try (
-					final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
-					final BufferedReader resReader = new BoundedBufferedReader(
-							new InputStreamReader(resIs),
-							2048, // Maximo 2048 lineas de salida (256 perfiles)
-							2048 // Maximo 2048 caracteres por linea
-							);
-					) {
+
+			// Leemos de la salida del comando el listado completo de usuarios y determinamos
+			// cuales son los usuarios reales. A partir de macOS Sequoia 15.1 se identifican
+			// las aplicaciones como usuarios, lo que requiere que se diferencien y nos impiden
+			// establecen un tamano de salida razonable para el comando.
+			try (	final InputStream resIs = new ByteArrayInputStream(o.toString().getBytes());
+					final InputStreamReader isReader = new InputStreamReader(resIs);
+					final BufferedReader resReader = new BufferedReader(isReader); ) {
 				String line;
 				while ((line = resReader.readLine()) != null) {
 					if (line.startsWith(USER_DIR_LINE_PREFIX)){
-						dirs.add(line.substring(USER_DIR_LINE_PREFIX.length()));
+						dirs.add(line.substring(USER_DIR_LINE_HEADER.length()));
 					}
 				}
 			}
 			userDirs = dirs.toArray(new String[dirs.size()]);
 		}
-		catch (final IOException | InterruptedException e) {
-			LOGGER.severe("Error al generar el listado perfiles de Firefox del sistema: " + e); //$NON-NLS-1$
+		catch (final Exception e) {
+			LOGGER.log(Level.SEVERE, "Error al obtener el listado de usuarios del sistema", e); //$NON-NLS-1$
 			userDirs = null;
 		}
 
@@ -854,7 +900,7 @@ final class ConfiguratorMacOSX implements Configurator {
 		try {
 			ConfiguratorMacUtils.writeScriptFile(script, usersScriptFile, true);
 		} catch (final IOException e) {
-			LOGGER.log(Level.WARNING, "Ha ocurrido un error al generar el script de obtencion de usuarios: " + e, e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "Ha ocurrido un error al escribir en disco el script de obtencion de usuarios: " + e, e); //$NON-NLS-1$
 		}
 		ConfiguratorMacUtils.addExexPermissionsToFile(usersScriptFile);
 
@@ -876,5 +922,13 @@ final class ConfiguratorMacOSX implements Configurator {
 	@Override
 	public File getAlternativeApplicationDirectory() {
 		return getResourcesDirectory();
+	}
+
+	static class InvalidPasswordException extends SecurityException {
+
+		/** Serial Id. */
+		private static final long serialVersionUID = -9058805499745499488L;
+
+		// Unicamente usaremos el constructor por defecto
 	}
 }

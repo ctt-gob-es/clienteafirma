@@ -52,6 +52,10 @@ final class PdfVisibleAreasUtils {
 	static final String LAYERTEXT_TAG_DATE_PREFIX = LAYERTEXT_TAG_DELIMITER + "SIGNDATE"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_DATE_DELIMITER = "="; //$NON-NLS-1$
 	static final String LAYERTEXT_TAG_SUBJECTCN = "$$SUBJECTCN$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_PSEUDONYM = "$$PSEUDONYM$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_OU = "$$OU$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_OUS = "$$OUS$$"; //$NON-NLS-1$
+	static final String LAYERTEXT_TAG_TITLE = "$$TITLE$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_SUBJECTDN = "$$SUBJECTDN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_ISSUERCN = "$$ISSUERCN$$"; //$NON-NLS-1$
 	private static final String LAYERTEXT_TAG_CERTSERIAL = "$$CERTSERIAL$$"; //$NON-NLS-1$
@@ -118,7 +122,7 @@ final class PdfVisibleAreasUtils {
 
 		try {
 			Class<?> colorClass;
-			if (Platform.getOS() == OS.ANDROID) {
+			if (Platform.getOS() == OS.ANDROID || Platform.getOS() == OS.OTHER) {
 				colorClass = Class.forName("harmony.java.awt.Color"); //$NON-NLS-1$
 			}
 			else {
@@ -257,8 +261,9 @@ final class PdfVisibleAreasUtils {
 
 			final PdfTextMask mask = prepareMask(obfuscate, maskConfig);
 			String cn = AOUtil.getCN(cert);
+
 			if (cn != null && mask != null) {
-				cn = obfuscate(cn, mask);
+				cn = obfuscateIds(cn, mask);
 			}
 			ret = ret.replace(LAYERTEXT_TAG_SUBJECTCN, cn)
 					.replace(LAYERTEXT_TAG_ISSUERCN, AOUtil.getCN(cert.getIssuerX500Principal().getName()))
@@ -266,9 +271,33 @@ final class PdfVisibleAreasUtils {
 
 			// Se mapea el principal del subject del certificado
 			String subjectPrincipal = cert.getSubjectX500Principal().toString();
-			if (subjectPrincipal != null && mask != null) {
-				subjectPrincipal = obfuscate(subjectPrincipal, mask);
+
+			final String pseudonym = AOUtil.getRDNvalueFromLdapName("OID.2.5.4.65", subjectPrincipal); //$NON-NLS-1$
+			if (pseudonym != null) {
+				ret = ret.replace(LAYERTEXT_TAG_PSEUDONYM, pseudonym);
 			}
+
+			final String [] ous = AOUtil.getOUS(subjectPrincipal);
+			if (ous.length > 0) {
+				ret = ret.replace(LAYERTEXT_TAG_OU, ous[0]);
+				String ousResult = ous[0];
+				for (int i = 1 ; i < ous.length ; i++) {
+					ousResult += ", " + ous[i]; //$NON-NLS-1$
+				}
+				ret = ret.replace(LAYERTEXT_TAG_OUS, ousResult);
+			}
+			else {
+				ret = ret.replace(LAYERTEXT_TAG_OU, ""); //$NON-NLS-1$
+				ret = ret.replace(LAYERTEXT_TAG_OUS, ""); //$NON-NLS-1$
+			}
+
+			final String title = AOUtil.getRDNvalueFromLdapName("t", subjectPrincipal); //$NON-NLS-1$
+			ret = ret.replace(LAYERTEXT_TAG_TITLE, title != null ? title : ""); //$NON-NLS-1$
+
+			if (subjectPrincipal != null && mask != null) {
+				subjectPrincipal = obfuscateIds(subjectPrincipal, mask);
+			}
+
 			ret = ret.replace(LAYERTEXT_TAG_SUBJECTDN, subjectPrincipal);
 
 			// Se mapea el nombre declarado en el subject del certificado
@@ -277,9 +306,6 @@ final class PdfVisibleAreasUtils {
 
 			// Se mapea el apellido declarado en el subject del certificado
 			final String surname = AOUtil.getRDNvalueFromLdapName("SURNAME", subjectPrincipal); //$NON-NLS-1$
-			if (subjectPrincipal != null && obfuscate) {
-				subjectPrincipal = obfuscate(subjectPrincipal, mask);
-			}
 			ret = ret.replace(LAYERTEXT_TAG_SURNAME, surname != null ? surname : ""); //$NON-NLS-1$
 
 			// Se mapea la organizacion declarada en el subject del certificado
@@ -332,7 +358,7 @@ final class PdfVisibleAreasUtils {
 	 * @param obfuscate Indica si se debe ofuscar texto o no.
 	 * @param maskConfig Configuraci&oacute;n de la mascara a aplicar o {@code null}
 	 * si se quiere usar la por defecto.
-	 * @return M&aacute;scara de ofuscaci&oacute;n.
+	 * @return M&aacute;scara de ofuscaci&oacute;n o {@code null} si no se desea ofuscar.
 	 */
 	private static PdfTextMask prepareMask(final boolean obfuscate, final String maskConfig) {
 
@@ -631,7 +657,7 @@ final class PdfVisibleAreasUtils {
      * @param mask Configuraci&oacute;n con la m&aacute;scara a aplicar.
      * @return Texto ofuscado.
      */
-    static String obfuscate(final String text, final PdfTextMask mask) {
+    static String obfuscateIds(final String text, final PdfTextMask mask) {
 
     	final char[] chars = text.toCharArray();
 

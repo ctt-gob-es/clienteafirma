@@ -10,12 +10,15 @@
 package es.gob.afirma.signers.cades;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -31,8 +34,6 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 import es.gob.afirma.signers.pkcs7.SCChecker;
-import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
-import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 
 /** Manejador de firmas binarias CADES.
  * Soporta CAdES-BES, CAdES-EPES, CAdES-T y CAdES B-Level. Implementa los m&eacute;todos declarados
@@ -56,7 +57,7 @@ import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
  *
  *   // Realizamos la firma CAdES
  *   final AOSigner signer = new AOCAdESSigner();
- *   final byte[] firma = signer.sign("Texto a firmar".getBytes(), "SHA1withRSA", pke, extraParams);
+ *   final byte[] firma = signer.sign("Texto a firmar".getBytes(), "SHA256withRSA", pke, extraParams);
  *
  * </pre>
  * @version 0.4 */
@@ -97,7 +98,7 @@ public final class AOCAdESSigner implements AOSigner {
     	// el algoritmo y los parametros adicionales
         final CAdESParameters cadesConfig = CAdESParameters.load(data, algorithm, extraParams);
 
-        final byte[] cadesSignedData;
+        byte[] cadesSignedData;
         try {
 			cadesSignedData = GenCAdESEPESSignedData.generateSignedData(
 					algorithm,
@@ -108,36 +109,20 @@ public final class AOCAdESSigner implements AOSigner {
         catch (final AOCancelledOperationException e) {
         	throw e;
         }
+        catch (final AOException e) {
+            throw e;
+        }
         catch (final Exception e) {
             throw new AOException("Error al generar la firma CAdES: " + e, e); //$NON-NLS-1$
         }
 
-        //***************** SELLO DE TIEMPO ****************
-        TsaParams tsaParams;
-        try {
-        	tsaParams = new TsaParams(extraParams);
-        }
-        catch(final Exception e) {
-        	tsaParams = null;
-        }
-        if (tsaParams != null) {
-        	try {
-				return new CMSTimestamper(tsaParams).addTimestamp(
-					cadesSignedData,
-					tsaParams.getTsaHashAlgorithm(),
-					new GregorianCalendar()
-				);
-			}
-        	catch (final Exception e) {
-        		LOGGER.severe("No se ha podido aplicar el sello de tiempo: " + e); //$NON-NLS-1$
-			}
-        }
-        //************** FIN SELLO DE TIEMPO ****************
+        // Si corresponde, aplicamos un sello de tiempo
+        cadesSignedData = applyTimeStamp(cadesSignedData, extraParams);
 
         return cadesSignedData;
     }
 
-    /** Cofirma datos en formato CAdES a&ntilde;adiendo la nueva firma a una CAdES o CMS ya existente. Para realizar la
+	/** Cofirma datos en formato CAdES a&ntilde;adiendo la nueva firma a una CAdES o CMS ya existente. Para realizar la
      * cofirma se necesitan los datos originales (que este m&eacute;todo
      * firmar&aacute; normalmente) y la firma sobre la que se realiza la cofirma
      * (a los que se agregar&aacute; el resultado de la nueva firma).
@@ -351,6 +336,22 @@ public final class AOCAdESSigner implements AOSigner {
 
     }
 
+	@Override
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
+			throws AOInvalidFormatException, IOException {
+    	new SCChecker().checkSpongyCastle();
+    	if (!CAdESValidator.isCAdESValid(sign, false)) {
+    		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma CAdES"); //$NON-NLS-1$
+    	}
+    	try {
+            return new ReadNodesTree().readNodesTree(sign, asSimpleSignInfo);
+        }
+        catch (final Exception ex) {
+            LOGGER.severe("No se ha podido obtener el arbol de firmantes de la firma, se devolvera null: " + ex); //$NON-NLS-1$
+        }
+        return null;
+    }
+
     /** Recupera el &aacute;rbol de nodos de firma de una firma
      * electr&oacute;nica CAdES.
      * Los nodos del &aacute;rbol ser&aacute;n cadena de texto con el CommonName (CN X.500)
@@ -372,17 +373,21 @@ public final class AOCAdESSigner implements AOSigner {
      * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
     @Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) throws AOInvalidFormatException, IOException {
-    	new SCChecker().checkSpongyCastle();
-    	if (!CAdESValidator.isCAdESValid(sign, false)) {
-    		throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma CAdES"); //$NON-NLS-1$
-    	}
-    	try {
-            return new ReadNodesTree().readNodesTree(sign, asSimpleSignInfo);
+    	return getSignersStructure(sign, null, asSimpleSignInfo);
+    }
+
+    /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
+     * @param data Datos que deseamos comprobar.
+     * @param params Par&aacute;metros de firma
+     * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario. */
+	@Override
+	public boolean isSign(final byte[] data, final Properties params){
+        if (data == null) {
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+            return false;
         }
-        catch (final Exception ex) {
-            LOGGER.severe("No se ha podido obtener el arbol de firmantes de la firma, se devolvera null: " + ex); //$NON-NLS-1$
-        }
-        return null;
+        new SCChecker().checkSpongyCastle();
+		return CAdESValidator.isCAdESSignedData(data, true);
     }
 
     /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
@@ -390,12 +395,7 @@ public final class AOCAdESSigner implements AOSigner {
      * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario. */
     @Override
 	public boolean isSign(final byte[] data) {
-        if (data == null) {
-            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
-            return false;
-        }
-        new SCChecker().checkSpongyCastle();
-		return CAdESValidator.isCAdESSignedData(data, true);
+    	return isSign(data, null);
     }
 
     /** Comprueba si unos datos sos susceptibles de ser firmados por esta clase.
@@ -423,14 +423,19 @@ public final class AOCAdESSigner implements AOSigner {
      * @throws IllegalArgumentException Si la firma introducida es nula. */
     @Override
 	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
-        if (signData == null) {
+        return getData(signData, null);
+    }
+
+	@Override
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
+        if (sign == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
         new SCChecker().checkSpongyCastle();
-        if (!CAdESValidator.isCAdESValid(signData, false)) {
+        if (!CAdESValidator.isCAdESValid(sign, false)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
-		return ObtainContentSignedData.obtainData(signData);
+		return ObtainContentSignedData.obtainData(sign);
     }
 
     /** Devuelve el nombre de fichero de firma predeterminado que se recomienda usar para
@@ -458,10 +463,15 @@ public final class AOCAdESSigner implements AOSigner {
      * @throws IllegalArgumentException Si La firma introducida es nula. */
     @Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException {
-        if (signData == null) {
+        return getSignInfo(signData, null);
+    }
+
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOInvalidFormatException {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
-        if (!isSign(signData)) {
+        if (!isSign(data)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_CADES);
@@ -516,4 +526,59 @@ public final class AOCAdESSigner implements AOSigner {
 		   extraParams.remove(CAdESExtraParams.SIGNING_CERTIFICATE_V2);
 	   }
     }
+
+    /**
+     * Aplica un sello de tiempo a la firma si se ha configurado y si se encuentran
+     * las dependencias necesarias para ello.
+     * @param signature Firma CAdES.
+     * @param extraParams Configuraci&oacute;n de la operaci&oacute;n.
+     * @return La firma con el sello de tiempo o, si no se configur&oacute; o no se
+     * encontraron las dependencias necesarias, la misma firma que se recibi&oacute;.
+     */
+    private static byte[] applyTimeStamp(final byte[] signature, final Properties extraParams) {
+
+        // Si encontramos las clases de sello de tiempo, comprobamos si se ha solicitado y
+        // se hace en tal caso
+
+        Object tsaParams;
+        Class<?> tsaParamsClass;
+        try {
+        	tsaParamsClass = Class.forName("es.gob.afirma.signers.tsp.pkcs7.TsaParams"); //$NON-NLS-1$
+            final Constructor<?> tsaParamsConstructor = tsaParamsClass.getConstructor(Properties.class);
+        	tsaParams = tsaParamsConstructor.newInstance(extraParams);
+        }
+        catch(final ClassNotFoundException e) {
+        	LOGGER.info("No se han encontrado las bibliotecas de sello de tiempo, por lo que no se comprobara si se requeria agregar"); //$NON-NLS-1$
+        	return signature;
+        }
+        catch(final Exception e) {
+        	// No se configuro la actualizacion de la firma
+        	return signature;
+        }
+
+        byte[] upgradedSignature = null;
+        try {
+        	final Class<?> cmsTimestamperClass = Class.forName("es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper"); //$NON-NLS-1$
+        	final Constructor<?> cmsTimestamperConstructor = cmsTimestamperClass.getConstructor(tsaParamsClass);
+        	final Object cmsTimestamper = cmsTimestamperConstructor.newInstance(tsaParams);
+
+        	final Method getTsaHashAlgorithmMethod = cmsTimestamperClass.getMethod("getTsaHashAlgorithm"); //$NON-NLS-1$
+        	final String tsaHashAlgorithm = (String) getTsaHashAlgorithmMethod.invoke(tsaParams);
+
+        	final Method addTimestampMethod = cmsTimestamperClass.getMethod("addTimestamp", //$NON-NLS-1$
+        			byte[].class,
+        			String.class,
+        			GregorianCalendar.class);
+        	upgradedSignature = (byte[]) addTimestampMethod.invoke(cmsTimestamper,
+        			signature,
+        			tsaHashAlgorithm,
+        			new GregorianCalendar());
+        }
+        catch (final Exception e) {
+        	LOGGER.log(Level.SEVERE, "No se ha podido aplicar el sello de tiempo", e); //$NON-NLS-1$
+        }
+
+        return upgradedSignature != null ? upgradedSignature : signature;
+	}
+
 }

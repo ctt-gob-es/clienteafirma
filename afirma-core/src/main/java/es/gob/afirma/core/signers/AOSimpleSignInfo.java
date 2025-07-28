@@ -127,7 +127,7 @@ public final class AOSimpleSignInfo {
     public String toString() {
         String desc = AOUtil.getCN(this.certs[0]);
         if (this.timestampingTime != null && this.timestampingTime.length > 0 && this.timestampingTime[0] != null) {
-            desc += " (TimeStamp: " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(this.signingTime) + ")";  //$NON-NLS-1$//$NON-NLS-2$
+            desc += " (TimeStamp: " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(this.timestampingTime[0]) + ")";  //$NON-NLS-1$//$NON-NLS-2$
         }
         else if (this.signingTime != null) {
             desc += " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(this.signingTime) + ")";  //$NON-NLS-1$//$NON-NLS-2$

@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>afirma-keystores-jmulticard-ui</artifactId>
+	<name>afirma-keystores-jmulticard-ui</name>
+
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.9</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>es.gob.afirma.jmulticard</groupId>
+			<artifactId>jmulticard</artifactId>
+			<version>${jmulticard.version}</version>
+		</dependency>
+	</dependencies>
+</project>

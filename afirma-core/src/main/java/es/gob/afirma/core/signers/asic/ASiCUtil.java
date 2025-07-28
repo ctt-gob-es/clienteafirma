@@ -11,7 +11,10 @@ package es.gob.afirma.core.signers.asic;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -45,9 +48,11 @@ public final class ASiCUtil {
 		// No instanciable
 	}
 
-	/** Obtiene el nombre por defecto a asignar al objeto de datos dentro de un contenedor ASiC-S.
+	/**
+	 * Obtiene el nombre por defecto a asignar al objeto de datos dentro de un contenedor ASiC-S.
 	 * @param data Contenido del objeto de datos.
-	 * @return Nombre por defecto del objeto de datos dentro de un contenedor ASiC-S. */
+	 * @return Nombre por defecto del objeto de datos dentro de un contenedor ASiC-S.
+	 */
 	public static String getASiCSDefaultDataFilename(final byte[] data) {
 		String extension;
 		try {
@@ -59,14 +64,16 @@ public final class ASiCUtil {
 		return "dataobject." + (extension != null && !extension.isEmpty() ? extension : DEFAULT_DATAOBJECT_EXTENSION); //$NON-NLS-1$
 	}
 
-	/** Crea un contenedor ASiC-S.
+	/**
+	 * Crea un contenedor ASiC-S.
 	 * @param signature Objeto de firmas
 	 * @param data Objeto de datos
 	 * @param signatureFilename Nombre del objeto de firmas (debe contener la ruta, por ejemplo <code>"META-INF/signature.p7s"</code>).
 	 * @param dataFilename Nombre Nombre del objeto de datos (no debe contener ninguna ruta). Si se proporciona <code>null</code> se usa el
 	 *                     nombre por defecto.
 	 * @return Contenedor ASiC-S.
-	 * @throws IOException Si hay errores en el tratamiento de datos. */
+	 * @throws IOException Si hay errores en el tratamiento de datos.
+	 */
 	public static byte[] createSContainer(final byte[] signature,
 			                              final byte[] data,
 			                              final String signatureFilename,
@@ -118,27 +125,33 @@ public final class ASiCUtil {
 		return baos.toByteArray();
 	}
 
-	/** Obtiene la firma de un contenedor CAdES ASiC-S.
+	/**
+	 * Obtiene la firma de un contenedor CAdES ASiC-S.
 	 * @param asic Contendor CAdES ASiC-S.
 	 * @return Firma de un contenedor CAdES ASiC-S.
-	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos.
+	 */
 	public static byte[] getASiCSBinarySignature(final byte[] asic) throws IOException {
 		return getASiCSSignature(asic, ENTRY_NAME_BINARY_SIGNATURE);
 	}
 
-	/** Obtiene la firma de un contenedor XAdES ASiC-S.
+	/**
+	 * Obtiene la firma de un contenedor XAdES ASiC-S.
 	 * @param asic Contendor XAdES ASiC-S.
 	 * @return Firma de un contenedor XAdES ASiC-S.
-	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos.
+	 */
 	public static byte[] getASiCSXMLSignature(final byte[] asic) throws IOException {
 		return getASiCSSignature(asic, ENTRY_NAME_XML_SIGNATURE);
 	}
 
-	/** Obtiene la firma de un contenedor ASiC-S.
+	/**
+	 * Obtiene la firma de un contenedor ASiC-S.
 	 * @param asic Contendor ASiC-S.
 	 * @param signatureFilename Nombre de la entrada del ZIP con las firmas a obtener.
 	 * @return Firma de un contenedor ASiC-S.
-	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos.
+	 */
 	private static byte[] getASiCSSignature(final byte[] asic, final String signatureFilename) throws IOException {
 		if (asic == null || asic.length < 1) {
 			throw new IllegalArgumentException(
@@ -168,39 +181,49 @@ public final class ASiCUtil {
 		);
 	}
 
-	/** Obtiene los datos de un contenedor ASiC-S.
+	/**
+	 * Obtiene los datos de un contenedor ASiC-S.
 	 * @param asic Contendor ASiC-S.
 	 * @return Datos firmados de un contenedor ASiC-S.
-	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
-	public static byte[] getASiCSData(final byte[] asic) throws IOException {
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos.
+	 */
+	public static Map<String, byte[]> getASiCSData(final byte[] asic) throws IOException {
 		if (asic == null || asic.length < 1) {
 			throw new IllegalArgumentException(
-				"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
-			);
+					"La firma ASiC proporcionada no puede ser nula ni vacia" //$NON-NLS-1$
+					);
 		}
-    	if (asic.length >= THRESHOLD_FILE_SIZE) {
-    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
-    	}
+		if (asic.length >= THRESHOLD_FILE_SIZE) {
+			throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
+		}
+
+
+		final Map<String, byte[]> signedContent = new HashMap<>();
 		try (
-			final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
-		) {
+				final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(asic));
+				) {
 			ZipEntry entry;
 			while((entry = zis.getNextEntry()) != null) {
-				if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entry.getName()) &&
-					!ENTRY_NAME_XML_SIGNATURE.equals(entry.getName()) &&
-					!ENTRY_NAME_MIMETYPE.equals(entry.getName())
-				) {
-					return AOUtil.getDataFromInputStream(zis);
+				final String entryName = entry.getName();
+				if (isDataEntry(entryName)) {
+					final String name = new File(entryName).getName();
+					final byte[] content = AOUtil.getDataFromInputStream(zis);
+					signedContent.put(name, content);
 				}
 			}
 		}
-		throw new IOException("Los datos proporcionados no son una firma ASiC-S"); //$NON-NLS-1$
+		if (signedContent.isEmpty()) {
+			throw new IOException("Los datos proporcionados no son una firma ASiC-S"); //$NON-NLS-1$
+		}
+		return signedContent;
 	}
 
-	/** Obtiene el nombre del objeto de datos de un contenedor ASiC-S.
+	/**
+	 * Obtiene el nombre del objeto de datos de un contenedor ASiC-S.
 	 * @param asic Contendor ASiC-S.
 	 * @return Nombre del objeto de datos de un contenedor ASiC-S.
-	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos. */
+	 * @throws IOException Si hay alg&uacute;n error en el tratamiento de datos.
+	 */
 	public static String getASiCSDataFilename(final byte[] asic) throws IOException {
 		if (asic == null || asic.length < 1) {
 			throw new IllegalArgumentException(
@@ -217,13 +240,22 @@ public final class ASiCUtil {
 	    		throw new IOException("El archivo tiene un tamano superior al permitido."); //$NON-NLS-1$
 	    	}
 			final String entryName = entry.getName();
-			if (!ENTRY_NAME_BINARY_SIGNATURE.equals(entryName) &&
-				!ENTRY_NAME_XML_SIGNATURE.equals(entryName) &&
-				!ENTRY_NAME_MIMETYPE.equals(entryName)
-			) {
+			if (isDataEntry(entryName)) {
 				return entryName;
 			}
 		}
 		throw new IOException("Los datos proporcionados no son una firma ASiC-S"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Indica si una entrada de la firma ASiC corresponder&oacute;a con un dato firmado. No se verifica
+	 * contra la firma que el dato realmente est&eacute;firmado.
+	 * @param entryName Nombre de la entrada.
+	 * @return {@code true} si la entrada se corresponder&iacute;a con una de datos firmados.
+	 */
+	public static boolean isDataEntry(final String entryName) {
+		return !ENTRY_NAME_BINARY_SIGNATURE.equals(entryName) &&
+				!ENTRY_NAME_XML_SIGNATURE.equals(entryName) &&
+				!ENTRY_NAME_MIMETYPE.equals(entryName);
 	}
 }

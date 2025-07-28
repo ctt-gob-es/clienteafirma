@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -37,13 +38,6 @@ public final class AOCAdESASiCSSigner implements AOSigner {
     /** Firma datos en formato CAdES devolviendo el resultado empaquetado como ASiC-S.
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
      * @param key Clave privada a usar para firmar.
      * @param certChain Cadena de certificados del firmante.
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams-asic-s.html">detalle</a>).<br>
@@ -81,22 +75,34 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	public AOTreeModel getSignersStructure(final byte[] sign,
 			                               final boolean asSimpleSignInfo) throws AOInvalidFormatException,
 			                                                                      IOException {
-		return new AOCAdESSigner().getSignersStructure(
-			ASiCUtil.getASiCSBinarySignature(sign),
-			asSimpleSignInfo
-		);
+		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
 	@Override
-	public boolean isSign(final byte[] is) throws IOException {
+	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params,
+											final boolean asSimpleSignInfo) throws AOInvalidFormatException,
+																					IOException {
+		return new AOCAdESSigner().getSignersStructure(
+				ASiCUtil.getASiCSBinarySignature(sign),
+				asSimpleSignInfo
+			);
+	}
+
+	@Override
+	public boolean isSign(final byte[] signData, final Properties params) throws IOException {
 		final byte[] sign;
 		try {
-			sign = ASiCUtil.getASiCSBinarySignature(is);
+			sign = ASiCUtil.getASiCSBinarySignature(signData);
 		}
 		catch(final Exception e) {
 			return false;
 		}
 		return new AOCAdESASiCSSigner().isSign(sign);
+	}
+
+	@Override
+	public boolean isSign(final byte[] is) throws IOException {
+		return isSign(is, null);
 	}
 
 	@Override
@@ -114,13 +120,26 @@ public final class AOCAdESASiCSSigner implements AOSigner {
 	}
 
 	@Override
-	public byte[] getData(final byte[] signData) throws IOException {
-		return ASiCUtil.getASiCSData(signData);
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException {
+		// Devolveremos solo los primeros datos que encontremos
+		final Map<String, byte[]> signedData = ASiCUtil.getASiCSData(sign);
+		final String signedDataName = signedData.keySet().iterator().next();
+		return signedData.get(signedDataName);
+	}
+
+	@Override
+	public byte[] getData(final byte[] signData) throws AOInvalidFormatException, IOException {
+		return getData(signData, null);
+	}
+
+	@Override
+	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
+		return new AOCAdESSigner().getSignInfo(ASiCUtil.getASiCSBinarySignature(data));
 	}
 
 	@Override
 	public AOSignInfo getSignInfo(final byte[] signData) throws AOException, IOException {
-		return new AOCAdESSigner().getSignInfo(ASiCUtil.getASiCSBinarySignature(signData));
+		return getSignInfo(signData, null);
 	}
 
     /** Cofirma en formato CAdES los datos encontrados en un contenedor ASiC-S que ya tuviese una firma CAdES o CMS,
@@ -147,10 +166,10 @@ public final class AOCAdESASiCSSigner implements AOSigner {
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512</i></li>
      * </ul>
      * @param key Clave privada a usar para firmar
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams-asic-s.html">detalle</a>).<br>
@@ -222,13 +241,6 @@ public final class AOCAdESASiCSSigner implements AOSigner {
      * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.multi.cades.asic.AOCAdESASiCSCoSigner</code> en el CLASSPATH</b></p>
      * @param sign Contenedor ASiC-S (con un fichero de firmas CAdES o CMS).
      * @param algorithm Algoritmo a usar para la firma.
-     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
-     * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-     * </ul>
      * @param key Clave privada a usar para firmar
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams-asic-s.html">detalle</a>).<br>
      *                    Adicionalmente, se pueden usar tambi&eacute;n los <a href="doc-files/extraparams.html">par&aacute;metros
@@ -289,4 +301,6 @@ public final class AOCAdESASiCSSigner implements AOSigner {
         	throw new AOException("No se ha podido instanciar la clase de cofirmas CAdES ASiC por motivos de seguridad: " + e, e); //$NON-NLS-1$
 		}
 	}
+
+
 }

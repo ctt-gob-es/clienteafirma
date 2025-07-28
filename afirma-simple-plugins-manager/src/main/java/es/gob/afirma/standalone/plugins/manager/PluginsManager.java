@@ -321,7 +321,7 @@ public class PluginsManager {
 	}
 
 	/**
-	 * Agrega la referencia a un plugin instalado en la relaci&oacute;n de plugins de AutoFirma para
+	 * Agrega la referencia a un plugin instalado en la relaci&oacute;n de plugins de Autofirma para
 	 * que lo cargue a partir de ahora.
 	 * @param info Informaci&oacute;n del plugin necesaria para el registro.
 	 * @throws IOException Cuando no se pueda agregar la referencia.

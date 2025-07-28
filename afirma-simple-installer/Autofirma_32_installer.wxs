@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+   <?define VersionNumber="1.9" ?>
+   <?define Platform="x86" ?>
+   <?define ProjectDir ="" ?>
+   <?define ProjectName ="Autofirma" ?>
+   <?define ManufacturerName = "Gobierno de España" ?>
+   <?define UpgradeCode="{A6D90EBF-E089-4281-9269-AE5D20BA74D2}" ?>
+   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+	  
+   <Product Codepage="1252" Id="*" Name="$(var.ProjectName)" Language="1033" Version="$(var.VersionNumber)" Manufacturer="$(var.ManufacturerName)" UpgradeCode="$(var.UpgradeCode)" >
+ 
+		<Package Id="*" Compressed="yes" Description="$(var.ProjectName)" InstallerVersion="200" Languages="1033" Manufacturer="$(var.ManufacturerName)" Platform="$(var.Platform)" />
+       
+	   	<!-- Detecta versiones anteriores ya instaladas en el equipo -->
+	    <MajorUpgrade AllowDowngrades="yes" />
+		
+		<Property Id="CREATE_ICON" Value="true" Secure="yes" Admin="yes" />
+		<Property Id="FIREFOX_SECURITY_ROOTS" Value="false" Secure="yes" Admin="yes" />
+		<Property Id="CERTIFICATE_PATH" Value="false" Secure="yes" Admin="yes" />
+		<Property Id="KEYSTORE_PATH" Value="false" Secure="yes" Admin="yes" />
+		<Property Id="CONFIG_PATH" Value="false" Secure="yes" Admin="yes" />
+		<Property Id="UPDATE_CONFIG" Value="false" Secure="yes" Admin="yes" />
+		<Property Id="USE_SYSTEM_JRE" Value="false" Secure="yes" Admin="yes" />
+		
+		<!-- Ejecucion del instalador -->
+		<CustomAction Id='QtExecInstall'
+					  FileKey='$(var.ProjectName)Generator.exe'
+					  ExeCommand='/S /FIREFOX_SECURITY_ROOTS=[FIREFOX_SECURITY_ROOTS] /CREATE_ICON=[CREATE_ICON] /CERTIFICATE_PATH=[CERTIFICATE_PATH] /KEYSTORE_PATH=[KEYSTORE_PATH] /CONFIG_PATH=[CONFIG_PATH] /UPDATE_CONFIG=[UPDATE_CONFIG] /USE_SYSTEM_JRE=[USE_SYSTEM_JRE]' 
+                      Execute="deferred"
+                      Return="check"
+					  Impersonate="no" />
+
+		<!-- Ejecucion del desinstalador -->
+		<CustomAction Id='QtExecUninstall'
+					  FileKey='no_ejecutar_$(var.Platform).exe'
+					  ExeCommand='/S'
+                      Execute="deferred"
+                      Return="check"
+					  Impersonate="no" />
+
+        <!-- Paso 1: Definición de estructura del directorio -->
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="$(var.PlatformProgramFilesFolder)">
+                <Directory Id="$(var.ProjectName)" Name="$(var.ProjectName)"/>
+            </Directory>
+        </Directory>
+		<Icon Id="ic_launcher.ico" SourceFile="ic_launcher.ico"/>
+		<Property Id="ARPPRODUCTICON" Value="ic_launcher.ico" />
+		
+        <!-- Paso 2: Añade los ficheros al paquete de instalación -->
+		<Media Id="1"
+		   Cabinet="media1.cab"
+		   EmbedCab="yes" />
+		<DirectoryRef Id="$(var.ProjectName)">
+            <Component Id="$(var.ProjectName)Generator.exe" Guid="*">
+                <File Id="$(var.ProjectName)Generator.exe" Source="Autofirma32\$(var.ProjectName)Generator.exe" KeyPath="yes" Checksum="yes"/>
+            </Component>
+			<!-- no_ejecutar es el desinstalador. Se le asigna ese nombre para que los usuarios no lo ejecuten manualmente.
+			Lo hacemos permanente para asegurarnos de que no se elimina antes de que la CustomAction de desinstalacion lo ejecute -->
+			<Component Id="no_ejecutar_$(var.Platform).exe" Guid="*" Win64="no" Permanent="yes">
+				<File Id="no_ejecutar_$(var.Platform).exe" Source="no_ejecutar_$(var.Platform).exe" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+		
+        <!--Paso 3: Componentes a ejecutar -->
+        <Feature Id="MainApplication" Title="Main Application" Level="1">
+            <ComponentRef Id="$(var.ProjectName)Generator.exe" />	
+			<ComponentRef Id="no_ejecutar_$(var.Platform).exe" />	
+        </Feature>
+
+		<!-- Exits successfully in the case newer version are already installed -->
+		<CustomActionRef Id="WixExitEarlyWithSuccess"/>
+        <Property Id="ALLUSERS" Value="1" />
+        <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" /> 
+		<Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
+		<InstallExecuteSequence>
+	
+			<!--  Ejecuta el $(var.ProjectName)Generator.exe al instalar -->
+		    <Custom Action="QtExecInstall" Before="InstallFinalize">
+				NOT REMOVE
+			</Custom>
+			
+			<!-- Ejecuta el no_ejecutar_$(var.Platform).exe al desinstalar -->
+			<Custom Action="QtExecUninstall" After='InstallFiles'>
+				(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")
+			</Custom>
+
+		</InstallExecuteSequence>
+    </Product>
+</Wix>

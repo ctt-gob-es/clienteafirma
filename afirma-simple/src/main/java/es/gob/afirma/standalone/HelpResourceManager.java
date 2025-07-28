@@ -170,7 +170,7 @@ public final class HelpResourceManager {
 	 */
     public static String createHelpFileLauncher(final String targetUrl) throws Exception {
         final File launcherTempFile = new File(System.getProperty("java.io.tmpdir"), "local_launcher.html");  //$NON-NLS-1$//$NON-NLS-2$
-        final String helpPageUrl = targetUrl.replace("\\", "/");
+        final String helpPageUrl = targetUrl.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
         try(PrintWriter writer = new PrintWriter(launcherTempFile, "UTF-8")) { //$NON-NLS-1$
         	// Redirigira automaticamente a la pagina de ayuda
             writer.println("<meta http-equiv=\"refresh\" content=\"0; url=" + helpPageUrl + "\" />");  //$NON-NLS-1$//$NON-NLS-2$

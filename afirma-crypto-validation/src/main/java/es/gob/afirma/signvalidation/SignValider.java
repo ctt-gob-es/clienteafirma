@@ -75,12 +75,12 @@ public abstract class SignValider {
 
     /**
      * Reordena la lista de validaciones para que en caso de que una firma sea logeva y solo se encuentren errores de
-     * certificados caducados, se le de prioridad a la validación de tipo UNKNOWN.
+     * certificados caducados, se le de prioridad a la validaci&oacute;n de tipo UNKNOWN.
      * @param validityList Lista de validaciones.
      * @return Lista de validaciones reordenada.
      */
     protected static List<SignValidity> checkLongStandingValiditySign(final List<SignValidity> validityList) {
-		final List<SignValidity> validityListResult = new ArrayList<SignValidity>(validityList);
+		final List<SignValidity> validityListResult = new ArrayList<>(validityList);
 		int certKOIndex = -1;
 		int longStandingWarningIndex = -1;
 		boolean isAnotherKOType = false;
@@ -114,7 +114,7 @@ public abstract class SignValider {
      * @return Lista con las prioridades KO e incompletas ordenadas.
      */
 	protected static List<SignValidity> checkValidityKOPriority(final List<SignValidity> validityList) {
-		final List<SignValidity> signValidityResult = new ArrayList<SignValidity>();
+		final List<SignValidity> signValidityResult = new ArrayList<>();
 		for (final SignValidity sv : validityList) {
 			if (!signValidityResult.contains(sv)) {
 				if (SIGN_DETAIL_TYPE.KO.equals(sv.getValidity())) {

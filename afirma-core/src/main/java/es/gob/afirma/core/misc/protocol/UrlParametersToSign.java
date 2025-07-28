@@ -53,16 +53,24 @@ public final class UrlParametersToSign extends UrlParameters {
 			FORMAT_PARAM, ALGORITHM_PARAM, ID_PARAM, VER_PARAM, STICKY_PARAM, RESET_STICKY_PARAM,
 			PROPERTIES_PARAM, DATA_PARAM, GZIPPED_DATA_PARAM, RETRIEVE_SERVLET_PARAM,
 			STORAGE_SERVLET_PARAM, KEY_PARAM, FILE_ID_PARAM, KEYSTORE_OLD_PARAM, KEYSTORE_PARAM,
-			ACTIVE_WAITING_PARAM, MINIMUM_CLIENT_VERSION_PARAM
+			ACTIVE_WAITING_PARAM, MINIMUM_CLIENT_VERSION_PARAM, APP_NAME_PARAM
 	};
 
 	/** Algoritmos de firma soportados. */
 	private static final Set<String> SUPPORTED_SIGNATURE_ALGORITHMS = new HashSet<>();
 	static {
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA1"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA256"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA384"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA512"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA1withRSA"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA256withRSA"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA384withRSA"); //$NON-NLS-1$
 		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA512withRSA"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA1withECDSA"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA256withECDSA"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA384withECDSA"); //$NON-NLS-1$
+		SUPPORTED_SIGNATURE_ALGORITHMS.add("SHA512withECDSA"); //$NON-NLS-1$
 	}
 
 	private String operation;
@@ -85,6 +93,9 @@ public final class UrlParametersToSign extends UrlParameters {
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe ignorar
 	 * cualquier certificado prefijado. */
 	private boolean resetSticky;
+	
+	/** Nombre de aplicaci&oacute;n o dominio desde que se realiza la llamada. */
+	private String appName;
 
 	/** Colecci&oacute;n con los par&aacute;metros no reconocidos (podr&iacute;an reconocerlos los plugins. */
 	private final Map<String, String> anotherParams = new HashMap<>();
@@ -183,6 +194,15 @@ public final class UrlParametersToSign extends UrlParameters {
 	public boolean getResetSticky() {
 		return this.resetSticky;
 	}
+	
+	public void setAppName(final String appName) {
+		this.appName = appName;
+	}
+
+	public String getAppName() {
+		return this.appName;
+	}
+
 
 	public void setSignParameters(final Map<String, String> params) throws ParameterException {
 
@@ -217,6 +237,10 @@ public final class UrlParametersToSign extends UrlParameters {
 		else {
 			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
+		
+		if (params.containsKey(APP_NAME_PARAM)) {
+			this.appName = params.get(APP_NAME_PARAM);
+		}
 
 		// Tomamos el tipo de operacion
 		final String op = params.get(ProtocolConstants.OPERATION_PARAM);
@@ -245,7 +269,8 @@ public final class UrlParametersToSign extends UrlParameters {
 				}
 				setStorageServletUrl(storageServletUrl);
 			}
-			else {
+			// Si no se encuentra a pesar de tener todos los parametros, falla la operacion
+			else if (params.containsKey(ID_PARAM)) {
 				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion"); //$NON-NLS-1$
 			}
 		}

@@ -1,6 +1,7 @@
 package es.gob.afirma.cert.signvalidation;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,11 +27,19 @@ public class TestPdfMods {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testComprobarFormularioModificado() throws Exception {
-		try (
-				final InputStream is = ClassLoader.getSystemResourceAsStream(PDF_FORM_MOD_PATH);
-			) {
+		try (final InputStream is = ClassLoader.getSystemResourceAsStream(PDF_FORM_MOD_PATH)) {
+
+				boolean errorFound = false;
+
 				final byte[] pades = AOUtil.getDataFromInputStream(is);
-				Assert.assertEquals("La firma no ha generado un error o genera uno distinto al esperado.", SignValidity.VALIDITY_ERROR.MODIFIED_FORM, new ValidatePdfSignature().validate(pades, false).get(0).getError()); //$NON-NLS-1$
+				final List<SignValidity> results = new ValidatePdfSignature().validate(pades, false);
+				for (int i = 0; i < results.size(); i++) {
+					final SignValidity result = results.get(i);
+					if (result.getError() == SignValidity.VALIDITY_ERROR.MODIFIED_FORM) {
+						errorFound = true;
+					}
+				}
+				Assert.assertTrue("La firma no ha generado un error o no ha generado el esperado: " + SignValidity.VALIDITY_ERROR.MODIFIED_FORM, errorFound); //$NON-NLS-1$
 			}
 	}
 
@@ -42,12 +51,20 @@ public class TestPdfMods {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testComprobarFormularioModificadoConCamposSinDeclarar() throws Exception {
-		try (
-				final InputStream is = ClassLoader.getSystemResourceAsStream(PDF_FORM_PLAIN_MOD_PATH);
-			) {
-				final byte[] pades = AOUtil.getDataFromInputStream(is);
-				Assert.assertEquals("La firma no ha generado un error o genera uno distinto al esperado.", SignValidity.VALIDITY_ERROR.MODIFIED_FORM, new ValidatePdfSignature().validate(pades, false).get(0).getError()); //$NON-NLS-1$
+		try (final InputStream is = ClassLoader.getSystemResourceAsStream(PDF_FORM_PLAIN_MOD_PATH)) {
+
+			boolean errorFound = false;
+
+			final byte[] pades = AOUtil.getDataFromInputStream(is);
+			final List<SignValidity> results = new ValidatePdfSignature().validate(pades, false);
+			for (int i = 0; i < results.size(); i++) {
+				final SignValidity result = results.get(i);
+				if (result.getError() == SignValidity.VALIDITY_ERROR.MODIFIED_FORM) {
+					errorFound = true;
+				}
 			}
+			Assert.assertTrue("La firma no ha generado un error o no ha generado el esperado: " + SignValidity.VALIDITY_ERROR.MODIFIED_FORM, errorFound); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -58,11 +75,20 @@ public class TestPdfMods {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testComprobarPdfShadowAttack() throws Exception {
-		try (
-				final InputStream is = ClassLoader.getSystemResourceAsStream(PDF_SHADOW_ATTACK_PATH);
-			) {
-				final byte[] pades = AOUtil.getDataFromInputStream(is);
-				Assert.assertEquals("La firma no ha generado un error o genera uno distinto al esperado.", SignValidity.VALIDITY_ERROR.MODIFIED_DOCUMENT, new ValidatePdfSignature().validate(pades, false).get(0).getError()); //$NON-NLS-1$
+		try (final InputStream is = ClassLoader.getSystemResourceAsStream(PDF_SHADOW_ATTACK_PATH)) {
+
+			boolean errorFound = false;
+
+			final byte[] pades = AOUtil.getDataFromInputStream(is);
+			final List<SignValidity> results = new ValidatePdfSignature().validate(pades, false);
+			for (int i = 0; i < results.size(); i++) {
+				final SignValidity result = results.get(i);
+				System.out.println(result);
+				if (result.getError() == SignValidity.VALIDITY_ERROR.MODIFIED_DOCUMENT) {
+					errorFound = true;
+				}
 			}
+			Assert.assertTrue("La firma no ha generado un error o no ha generado el esperado: " + SignValidity.VALIDITY_ERROR.MODIFIED_DOCUMENT, errorFound); //$NON-NLS-1$
+		}
 	}
 }

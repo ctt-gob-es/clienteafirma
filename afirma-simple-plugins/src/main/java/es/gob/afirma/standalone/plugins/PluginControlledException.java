@@ -2,7 +2,7 @@ package es.gob.afirma.standalone.plugins;
 
 /**
  * Excepci&oacute;n utilizada por los plugins cuando ocurre un error en alguna de sus operaciones. Este tipo
- * de excepci&oacute;n siempre ser&aacute;a controlada por AutoFirma.
+ * de excepci&oacute;n siempre ser&aacute;a controlada por Autofirma.
  */
 public class PluginControlledException extends Exception {
 

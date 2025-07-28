@@ -100,7 +100,7 @@ public class DropDataFileListener implements DropTargetListener {
             	 }
 
             	 // Llamamos al metodo para la carga de los ficheros seleccionados
-            	 this.listener.loadFiles(files.toArray(new File[files.size()]));
+            	 this.listener.loadFiles(files.toArray(new File[files.size()]), null);
              }
          }
          else {

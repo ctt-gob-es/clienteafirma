@@ -166,7 +166,8 @@ public final class VisorPanel extends JPanel implements KeyListener, PluginButto
     		sign,
     		null,
     		cert, // Certificado
-    		this
+    		this, 
+    		null
 		);
 
         final JPanel bottonPanel = new JPanel(true);

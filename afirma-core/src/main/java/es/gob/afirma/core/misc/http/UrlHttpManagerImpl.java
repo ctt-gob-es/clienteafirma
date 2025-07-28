@@ -20,7 +20,6 @@ import java.net.InetAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -28,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -58,9 +56,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	private static final String PROT_SEPARATOR = URN_SEPARATOR + "//"; //$NON-NLS-1$
 
 	private static final String ACCEPT = "Accept"; //$NON-NLS-1$
-
-	private static KeyStore sslKeyStore = null;
-	private static PasswordCallback sslKeyStorePasswordCallback = null;
 
 	static {
 		final CookieManager cookieManager = new CookieManager();
@@ -94,6 +89,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			              final String contentType,
 			              final String accept,
 			              final UrlHttpMethod method) throws IOException {
+		final Properties headers = buildHeaders(contentType, accept);
+		return readUrl(urlToRead, timeout, method, headers);
+	}
+
+	private static Properties buildHeaders(final String contentType, final String accept) {
 		final Properties headers = new Properties();
 		if (contentType != null) {
 			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
@@ -101,7 +101,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		if (accept != null) {
 			headers.setProperty(ACCEPT, accept);
 		}
-		return readUrl(urlToRead, timeout, method, headers);
+		return headers;
 	}
 
 	@Override
@@ -111,15 +111,10 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			final String accept,
 			final UrlHttpMethod method,
 			final HttpErrorProcessor httpProcessor) throws IOException {
-		final Properties headers = new Properties();
-		if (contentType != null) {
-			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
-		}
-		if (accept != null) {
-			headers.setProperty(ACCEPT, accept);
-		}
+		final Properties headers = buildHeaders(contentType, accept);
 		return readUrl(urlToRead, timeout, method, headers, httpProcessor);
 	}
+
 
 	@Override
 	public byte[] readUrl(final String urlToRead,
@@ -143,13 +138,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	@Override
 	public byte[] readUrl(final String url, final int timeout, final String contentType, final String accept, final UrlHttpMethod method,
 			final HttpErrorProcessor httpProcessor, final SSLConfig sslConfig) throws IOException {
-		final Properties headers = new Properties();
-		if (contentType != null) {
-			headers.setProperty("Content-Type", contentType); //$NON-NLS-1$
-		}
-		if (accept != null) {
-			headers.setProperty(ACCEPT, accept);
-		}
+		final Properties headers = buildHeaders(contentType, accept);
 		return readUrl(url, timeout, method, headers, httpProcessor, sslConfig);
 	}
 
@@ -339,25 +328,6 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			LOGGER.warning("Error comprobando si una URL es el bucle local: " + e); //$NON-NLS-1$
 			return false;
 		}
-	}
-
-	/** Establece el almac&eacute;n de claves a usar en SSL.
-	 * Esto permite usar un almac&eacute;n de claves que necesite una inicializaci&oacute;n a medida
-	 * y que por lo tanto no baste con indicarlo en las variables de entorno.
-	 * El almac&eacute;n debe proporcionarse inicializado y cargado.
-	 * Si se especifica aqu&iacute; un almac&eacute;n de claves se ignoran las variables de entorno
-	 * que pudiesen estar establecidas.
-	 * @param ks Almac&eacute;n de claves a usar en SSL. */
-	public static void setSslKeyStore(final KeyStore ks) {
-		sslKeyStore = ks;
-	}
-
-	/** Establece el <code>PasswordCallback</code> a usar cuando se establece directamente un
-	 * almac&eacute;n de claves a usar en SSL.
-	 * @param pwc <code>PasswordCallback</code> a usar cuando se establece directamente un
-	 * almac&eacute;n de claves a usar en SSL. */
-	public static void setSslKeyStorePasswordCallback(final PasswordCallback pwc) {
-		sslKeyStorePasswordCallback = pwc;
 	}
 
 	/**

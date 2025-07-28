@@ -25,7 +25,7 @@ import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchConfigManager;
 import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.ProcessResult;
-import es.gob.afirma.signers.batch.SingleSignConstants.SignAlgorithm;
+import es.gob.afirma.signers.batch.SingleSignConstants.DigestAlgorithm;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.signers.batch.xml.SingleSign.CallableResult;
@@ -48,7 +48,7 @@ public final class SignBatchConcurrent extends SignBatch {
 	 *            <code>false</code> si se deben intentar las firmas restantes del lote aun
 	 *            cuando una previa ha resultado en error. */
 	public SignBatchConcurrent(final List<SingleSign> signs,
-			                   final SignAlgorithm algo,
+			                   final DigestAlgorithm algo,
 			                   final boolean soe) {
 		super(signs, algo, soe);
 	}
@@ -277,6 +277,7 @@ public final class SignBatchConcurrent extends SignBatch {
 			}
 			else {
 				error = true;
+				LOGGER.warning("No se pudo guardar la firma '" + result.getSignatureId() + "': " + result.getError()); //$NON-NLS-1$ //$NON-NLS-2$
 				getSingleSignById(result.getSignatureId()).setProcessResult(
 					new ProcessResult(
 						ProcessResult.Result.DONE_BUT_ERROR_SAVING,
