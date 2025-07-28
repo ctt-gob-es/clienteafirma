@@ -2,7 +2,7 @@ Package: autofirma
 Architecture: all
 Section: utils
 Priority: optional
-Depends: libnss3-tools
+Depends: libnss3-tools, java-runtime
 Recomends: openjdk-17-jre 
 Description: Autofirma - Cliente @firma
 Version: 1.9.0
