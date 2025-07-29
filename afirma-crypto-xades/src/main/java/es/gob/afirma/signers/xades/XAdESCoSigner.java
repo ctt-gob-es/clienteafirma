@@ -48,12 +48,12 @@ import org.w3c.dom.NodeList;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.ErrorCode;
-import es.gob.afirma.core.NotFoundXPathException;
 import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicyPropertiesManager;
+import es.gob.afirma.signers.xml.NotFoundXPathException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.signers.xml.XMLErrorCode;
@@ -414,10 +414,22 @@ public final class XAdESCoSigner {
 					}
 					
 					boolean xPathIncluded = false;
+					
 					for (final Transform t : currentTransformList) {
 						final String transformAlgorithm = t.getAlgorithm();
-						if (XMLConstants.XPATH_URI.equals(transformAlgorithm)) {
-							xPathIncluded = true;
+						
+						if (Transform.XPATH.equals(transformAlgorithm)) {
+							
+							if (t.getParameterSpec() != null 
+								&& t.getParameterSpec() instanceof XPathFilterParameterSpec) {
+								
+								final XPathFilterParameterSpec xPathParam = (XPathFilterParameterSpec) t.getParameterSpec();
+								final String xPath = xPathParam.getXPath();
+								
+								if (xPath.contains("Signature")) { //$NON-NLS-1$
+									xPathIncluded = true;
+								}
+							}					
 						}
 					}
 					
@@ -427,16 +439,22 @@ public final class XAdESCoSigner {
 							final NotFoundXPathException e = new NotFoundXPathException("Se ha encontrado alguna firma que no contiene el algoritmo XPath"); //$NON-NLS-1$
 							throw e;
 						} else if (!Boolean.parseBoolean(allowXPathNotFoundSigns)) {
-							throw new AOException(ErrorCode.Functional.XPATH_NOT_FOUND);
+							throw new AOException(XMLErrorCode.Functional.XPATH_NOT_FOUND);
 						}
 						try {
+							String signatureSuffix = "Signature"; //$NON-NLS-1$
+							String prefix = ""; //$NON-NLS-1$
+							if (xmlsigPrefix != null && !xmlsigPrefix.isEmpty()) {
+								prefix = xmlsigPrefix;
+								signatureSuffix = prefix + ":Signature"; //$NON-NLS-1$
+							}
 							currentTransformList.add(
 									fac.newTransform(
 										Transform.XPATH,
 										new XPathFilterParameterSpec(
-											"not(ancestor-or-self::" + XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
+											"not(ancestor-or-self::" + signatureSuffix + ")", //$NON-NLS-1$ //$NON-NLS-2$
 											Collections.singletonMap(
-													XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX,
+												prefix,
 												XMLSignature.XMLNS
 											)
 										)

@@ -7,7 +7,9 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.core;
+package es.gob.afirma.signers.xml;
+
+import es.gob.afirma.core.RuntimeConfigNeededException;
 
 /** Indica que al realizar una cofirma, una de las firmas ya existente no incluye algoritmo XPath. */
 
@@ -24,7 +26,7 @@ public final class NotFoundXPathException extends RuntimeConfigNeededException {
 	 * @param msg Mensaje de error.
 	 */
 	public NotFoundXPathException(final String msg) {
-		super(msg, RequestType.CONFIRM, REQUESTOR_MSG_CODE, EXTRA_PARAM_NEEDED, ErrorCode.Functional.XPATH_NOT_FOUND);
+		super(msg, RequestType.CONFIRM, REQUESTOR_MSG_CODE, EXTRA_PARAM_NEEDED, XMLErrorCode.Functional.XPATH_NOT_FOUND);
 	}
 
 }

@@ -30,7 +30,6 @@ import org.w3c.dom.NodeList;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.ErrorCode;
-import es.gob.afirma.core.NotFoundXPathException;
 import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -53,6 +52,7 @@ import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
 import es.gob.afirma.core.signers.TriphaseUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.xml.NotFoundXPathException;
 
 /** Manejador de firmas XAdES trif&aacute;sicas. Mediante este manejador un usuario puede firmar un documento remoto
  * indicando el identificador del documento. Este manejador requiere de un servicio remoto que genere la estructura
@@ -595,9 +595,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			
 			if (NotFoundXPathException.REQUESTOR_MSG_CODE.equals(errorCode)) {
 				exception = new NotFoundXPathException(errorMsg);
-			}
-			
-			if (SigningLTSException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+			} else if (SigningLTSException.REQUESTOR_MSG_CODE.equals(errorCode)) {
 				exception = new SigningLTSException(errorMsg);
 			} else if (SigningLTSException.REQUESTOR_POSSIBLE_MSG_CODE.equals(errorCode)) {
 				exception = new SigningLTSException(errorMsg, true);

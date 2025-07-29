@@ -25,5 +25,10 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-core-xml</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
 	</dependencies>
 </project>
