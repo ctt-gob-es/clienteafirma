@@ -26,8 +26,8 @@ import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeystoreAlternativeException;
 import es.gob.afirma.keystores.KeyStoreErrorCode;
+import es.gob.afirma.keystores.KeystoreAlternativeException;
 import es.gob.afirma.keystores.SmartCardLockedException;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
@@ -273,14 +273,35 @@ public final class SimpleKeyStoreManager {
      * @return KeyStore Repositorio de certificados.
      */
     public static AOKeyStore getKeyStore(final String name) {
+    	return getKeyStore(name, false);
+    }
+
+    /**
+     * Recupera el repositorio con el nombre indicado teniendo en cuenta que, si la operaci&oacute;n
+     * se inici&oacute; desde un navegador, es posible que se deba ejecutar un almacen alternativo
+     * al indicado. Si no existe un <code>KeyStore</code> con ese nombre, se devuelve <code>null</code>.
+     * @param name Nombre del repositorio que se desea recuperar.
+     * @param invokedFromBrowser Indica si la operacion se inici&oacute; desde un navegador web.
+     * @return KeyStore Repositorio de certificados.
+     */
+    public static AOKeyStore getKeyStore(final String name, final boolean invokedFromBrowser) {
     	if (name == null) {
     		return null;
     	}
-        for (final AOKeyStore tempKs : AOKeyStore.values()) {
+
+    	// Comprobamos si es un almacen que conozcamos y lo devolvemos. En caso de ser el de Mozilla,
+    	// si la operacion se ejecuta desde el navegador web, usamos la version del almacen que agrega
+    	// los certificados del sistema
+    	for (final AOKeyStore tempKs : AOKeyStore.values()) {
             if (tempKs.getName().equalsIgnoreCase(name.trim())) {
-                return tempKs;
+            	AOKeyStore result = tempKs;
+            	if (invokedFromBrowser && tempKs == AOKeyStore.MOZ_UNI) {
+            		result = AOKeyStore.MOZ_UNI_WITH_OS;
+            	}
+            	return result;
             }
         }
+
         // Buscamos entre los registros de los almacenes de clave PKCS#11
         final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
         final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
@@ -292,7 +313,11 @@ public final class SimpleKeyStoreManager {
 		}
 
         try {
-        	return AOKeyStore.valueOf(name);
+        	AOKeyStore result = AOKeyStore.valueOf(name);
+        	if (invokedFromBrowser && result == AOKeyStore.MOZ_UNI) {
+        		result = AOKeyStore.MOZ_UNI_WITH_OS;
+        	}
+        	return result;
         }
         catch(final Exception e) {
         	Logger.getLogger("es.gob.afirma").warning("Almacen de claves no reconocido (" + name + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -341,7 +366,6 @@ public final class SimpleKeyStoreManager {
     				}
     				return AOKeyStore.getDefaultKeyStoreTypeByOs(os);
     			}
-    			return ks;
     		}
     	}
     	return ks;

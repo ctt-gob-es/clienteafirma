@@ -96,12 +96,12 @@ final class ProtocolInvocationLauncherSelectCert {
 		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
-				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore);
+				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore, true);
 			}
 		}
 		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
 		else {
-			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore());
+			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore(), true);
 		}
 
 		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo

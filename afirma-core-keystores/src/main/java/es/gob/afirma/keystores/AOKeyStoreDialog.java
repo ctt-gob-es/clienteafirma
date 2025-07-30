@@ -38,7 +38,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String[] EXTS = new String[] { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String[] EXTS = { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String EXTS_DESC = " (*.p12, *.pfx)"; //$NON-NLS-1$
 
 	private final AggregatedKeyStoreManager ksm;
@@ -54,7 +54,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	private boolean allowExternalStores = true;
 
 	private final String libFileName;
-	
+
 	private final boolean invocationFromBrowser;
 
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
@@ -189,7 +189,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.libFileName = libFileName;
 		this.invocationFromBrowser = false;
 	}
-	
+
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm Gestor de los almac&eacute;nes de certificados entre los que se selecciona.
      * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
@@ -276,13 +276,13 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			switch (keyStoreId) {
 			// Almacen de Firefox
 			case KEYSTORE_ID_MOZILLA:
-				
+
 				if (!this.invocationFromBrowser) {
 					newKsm = openMozillaKeyStore(parent);
 				} else {
 					newKsm = openMozillaWithOSKeyStore(parent);
 				}
-				
+
 				if (newKsm != null) {
 					KeyStorePreferencesManager.setLastSelectedKeystore(AOKeyStore.MOZ_UNI.getName());
 				}
@@ -331,7 +331,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 					boolean stopOperation = false;
 					while (!stopOperation) {
 						try {
-							if (changeKeyStoreManager(keyStoreId, parent) == false) {
+							if (!changeKeyStoreManager(keyStoreId, parent)) {
 								stopOperation = true;
 							}
 						} catch (final AOCancelledOperationException aoce) {
@@ -392,7 +392,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 					boolean stopOperation = false;
 					while (!stopOperation) {
 						try {
-							if (changeKeyStoreManagerToPKCS11(parent, ksName, ksLibPath) == false) {
+							if (!changeKeyStoreManagerToPKCS11(parent, ksName, ksLibPath)) {
 								stopOperation = true;
 							}
 						} catch (final AOCancelledOperationException aoce) {
@@ -509,7 +509,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * Carga el almac&eacute;n de claves del &uacute;ltimo perfil de Mozilla activo e incluye el propio del sistema.
 	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.

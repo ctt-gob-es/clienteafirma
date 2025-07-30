@@ -26,7 +26,7 @@ import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de Firefox accedidos
- *  v&iacute;a NSS en el que se tratan de forma unificada los m&oacute;dulos internos y externos. 
+ *  v&iacute;a NSS en el que se tratan de forma unificada los m&oacute;dulos internos y externos.
  *  Se a&ntilde;de tambi&eacute;n el almac&eacute;n de claves del sistema operativo que se est&eacute; utilizando */
 public class MozillaUnifiedWithOSKeyStoreManager extends AggregatedKeyStoreManager {
 
@@ -141,23 +141,21 @@ public class MozillaUnifiedWithOSKeyStoreManager extends AggregatedKeyStoreManag
 				}
 				catch (final Exception ex) {
 					// En ciertos sistemas Linux fallan las inicializaciones la primera vez por culpa de PC/SC, reintentamos
-					if (Platform.OS.LINUX.equals(Platform.getOS())) {
-						try {
-							internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
-						}
-						catch (final AOCancelledOperationException exc) {
-							LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + exc); //$NON-NLS-1$ //$NON-NLS-2$
-							continue;
-						}
-						catch(final Exception e) {
-							LOGGER.warning(
-								"No se ha podido inicializar el PKCS#11 '" + descr + "' tras haberlo intentado dos veces: " + ex + ", " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							);
-							continue;
-						}
-					}
-					else {
+					if (!Platform.OS.LINUX.equals(Platform.getOS())) {
 						LOGGER.warning("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+						continue;
+					}
+					try {
+						internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
+					}
+					catch (final AOCancelledOperationException exc) {
+						LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + exc); //$NON-NLS-1$ //$NON-NLS-2$
+						continue;
+					}
+					catch(final Exception e) {
+						LOGGER.warning(
+							"No se ha podido inicializar el PKCS#11 '" + descr + "' tras haberlo intentado dos veces: " + ex + ", " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						);
 						continue;
 					}
 				}
@@ -176,29 +174,33 @@ public class MozillaUnifiedWithOSKeyStoreManager extends AggregatedKeyStoreManag
 			);
 		}
 
-		setKeyStoreType(type);
-		
+
 		//Agregamos el almacen del SO
 		AOKeyStoreManager osKeystore;
-		
+
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			LOGGER.info("Agregamos las entradas del almacen de claves de Windows");
 			try {
 				osKeystore = AOKeyStoreManagerFactory.getWindowsMyCapiKeyStoreManager(true);
 				addKeyStoreManager(osKeystore);
 			} catch (final Exception e) {
-				LOGGER.severe("No se ha podido ageregar el almacen de Windows: " + e //$NON-NLS-1$
+				LOGGER.severe("No se ha podido agregar el almacen de Windows: " + e //$NON-NLS-1$
 				);
 			}
 		} else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			LOGGER.info("Agregamos las entradas del almacen de claves del llavero de macOS");
 			try {
 				osKeystore = AOKeyStoreManagerFactory.getMacOSXKeyStoreManager(AOKeyStore.APPLE, null, true,
 						parentComponent);
 				addKeyStoreManager(osKeystore);
 			} catch (final Exception e) {
-				LOGGER.severe("No se ha podido ageregar el almacen de MacOS: " + e //$NON-NLS-1$
+				LOGGER.severe("No se ha podido agregar el almacen de MacOS: " + e //$NON-NLS-1$
 				);
 			}
 		}
+
+		setKeyStoreType(type);
+
 
 		this.initialized = true;
 	}

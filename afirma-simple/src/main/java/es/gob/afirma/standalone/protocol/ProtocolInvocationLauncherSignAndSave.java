@@ -271,12 +271,12 @@ final class ProtocolInvocationLauncherSignAndSave {
 		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
-				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore);
+				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore, true);
 			}
 		}
 		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
 		else {
-			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore());
+			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore(), true);
 		}
 
 		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
@@ -377,7 +377,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se
 		// abandone el soporte de XAdES explicitas)
 		if (cryptoOperation == Operation.SIGN && isXadesExplicitConfigurated(format, extraParams)
-				&& !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_TRI)) {
+				&& !AOSignConstants.SIGN_FORMAT_XADES_TRI.equalsIgnoreCase(format)) {
 			LOGGER.warning(
 				"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
 			);
@@ -429,13 +429,11 @@ final class ProtocolInvocationLauncherSignAndSave {
 						if (e.getRequestType() == RequestType.CONFIRM) {
 							final int result = AOUIFactory.showConfirmDialog(null, SimpleAfirmaMessages.getString(e.getRequestorText()),
 									SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
-							if (result == JOptionPane.YES_OPTION) {
-								extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
-							}
-							else {
+							if (result != JOptionPane.YES_OPTION) {
 								LOGGER.log(Level.SEVERE, "El usuario ha cancelado la operacion despues de la advertencia: " + SimpleAfirmaMessages.getString(e.getRequestorText())); //$NON-NLS-1$
 								throw new AOCancelledOperationException();
 							}
+							extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
 						}
 						// Se requiere ua contrasena por parte del usuario
 						else if (e.getRequestType() == RequestType.PASSWORD) {
@@ -977,8 +975,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 			final String visibleSignature = extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE) != null
 					? extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE).toString()
 					: null;
-			final boolean want = PdfExtraParams.VISIBLE_SIGNATURE_VALUE_WANT.equalsIgnoreCase(visibleSignature)
-						? true : false;
+			final boolean want = PdfExtraParams.VISIBLE_SIGNATURE_VALUE_WANT.equalsIgnoreCase(visibleSignature) == true;
 
 			// Comprobamos si se han indicado la lista de atributos del area de firma
 			// visible.
