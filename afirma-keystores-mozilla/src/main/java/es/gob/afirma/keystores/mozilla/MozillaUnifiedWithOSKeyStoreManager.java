@@ -36,15 +36,6 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 			               final PasswordCallback pssCallBack,
 			               final Object[] params,
 			               final boolean forceReset) {
-
-		LOGGER.info("Inicializamos el almacen de tipo: " + type); //$NON-NLS-1$
-
-		this.passwordCallback = pssCallBack;
-		this.configParams = params != null ? params.clone() : null;
-
-		// Vaciamos el listado de almacenes agregados ya que esta llamada puede realizarse como
-		// parte de una operacion de refresco del almacen
-		removeAll();
 		
 		super.init(type, store, pssCallBack, params, forceReset);
 
