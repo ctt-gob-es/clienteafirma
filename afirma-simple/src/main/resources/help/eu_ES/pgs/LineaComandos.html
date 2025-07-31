@@ -171,14 +171,14 @@ Aukerak:
   </ul>
   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li>
   	<ul>
-  	<li><code> true: </code> Sinaduran SigningCertificateV2 atributua sartuko da.</li>
-  	<li><code> faltsua </code> (edo beste balioren bat): Sinaduran SigningCertificate atributua sartuko da.</li>
+  	<li><code>true</code>: Sinaduran SigningCertificateV2 atributua sartuko da.</li>
+  	<li><code>false</code>: (edo beste balioren bat): Sinaduran SigningCertificate atributua sartuko da.</li>
   	<li>Zehaztu gabe: SigningCertificate sartuko da sinadurak SHA1 sinadura-algoritmo bat erabiltzen badu, eta SigningCertificateV2 gainerako algoritmoetarako.</li>
 	</ul>
   <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li>
   	<ul>
-  	<li><code> true: </code> Longevo artxiboko sinadurak berrestea/berrestea onartzen da, nahiz eta sinadura horiek ez diren baliozkoak izango gerora.</li>
-  	<li><code> faltsua </code> (edo beste balioren bat): Ez da onartzen longevo artxiboko sinadurak berrestea/baieztatzea.</li>
+  	<li><code>true</code>: Longevo artxiboko sinadurak berrestea/berrestea onartzen da, nahiz eta sinadura horiek ez diren baliozkoak izango gerora.</li>
+  	<li><code>false</code>: (edo beste balioren bat): Ez da onartzen longevo artxiboko sinadurak berrestea/baieztatzea.</li>
 	</ul>
   </ul>
   
@@ -398,15 +398,19 @@ Aukerak:
   </ul>
   <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li>
   	<ul>
-  	<li><code> true: </code> Longevo artxiboko sinadurak berrestea/berrestea onartzen da, nahiz eta sinadura horiek ez diren baliozkoak izango gerora.</li>
-  	<li><code> faltsua </code> (edo beste balioren bat): Ez da onartzen longevo artxiboko sinadurak berrestea/baieztatzea.</li>
-	</ul>
+  	<li><code>true</code>: Longevo artxiboko sinadurak berrestea/berrestea onartzen da, nahiz eta sinadura horiek ez diren baliozkoak izango gerora.</li>
+  	<li><code>false</code>: (edo beste balioren bat): Ez da onartzen longevo artxiboko sinadurak berrestea/baieztatzea.</li>
   </ul>
   <li style="margin-top: 10pt"><code>avoidAGEPolicyIncompatibilities</code>:</li>
   	<ul>
-  	<li><code> true: </code> EAOren sinadura-politika ez da deklaratuko eragiketaren emaitza politika horrekin bateraezina izango bada.</li>
-  	<li><code> faltsua </code> (edo beste balioren bat): Emaitza politikarekin bateragarria ez denean, ezin da Estatuko Administrazio Orokorraren sinadura-politikarekin berretsi.</li>
+  	<li><code>true</code>: EAOren sinadura-politika ez da deklaratuko eragiketaren emaitza politika horrekin bateraezina izango bada.</li>
+  	<li><code>false</code>: (edo beste balioren bat): Emaitza politikarekin bateragarria ez denean, ezin da Estatuko Administrazio Orokorraren sinadura-politikarekin berretsi.</li>
 	</ul>
+  <li style="margin-top: 10pt"><code>allowXadesEnvelopedWithoutXPath</code>:</li>
+  <ul>
+  	<li><code>true</code>: XPath transformaziorik ez duen eta, beraz, baliogabetuta geratuko den sinadura bat sinatzeko aukera ematen du. Sinadura berrian, ordea, XPath eraldaketa txertatuko da.</li>
+  	<li><code>false</code>:	Ezin dira sinatu XPath transformaziorik ez duten sinadurak..</li>
+  </ul>
   </ul>
 
 

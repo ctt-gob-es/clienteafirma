@@ -413,11 +413,15 @@ Opciones:
   	<li><code>true</code>:	Se permite la cofirma/contrafirma de firmas de archivo longevo, a pesar de que estas no serán v&aacute;lidas posteriormente. </li>
   	<li><code>false</code> (U otro valor):	No se permite la cofirma/contrafirma de firmas de archivo longevo.</li>
 	</ul>
-  </ul>
   <li style="margin-top: 10pt"><code>avoidAGEPolicyIncompatibilities</code>:</li>
   	<ul>
   	<li><code>true</code>:	Se evitar&aacute; declarar la pol&iacute;tica de firma de la AGE cuando el resultado de la operaci&oacute;n vaya a ser incompatible con esta pol&iacute;tica.</li>
   	<li><code>false</code> (U otro valor):	No se permite la cofirma con la polí¡&iacute;tica de firma de la AGE cuando el resultado no ser&aacute; compatible con la pol&iacute;tica.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>allowXadesEnvelopedWithoutXPath</code>:</li>
+  	<ul>
+  	<li><code>true</code>:	Permite la cofirma de una firma que no contiene una transformaci&oacute;n XPath y que por lo tanto quedar&aacute; invalidada. En la nueva cofirma s&iacute; se incluir&aacute; la transformaci&oacute;n XPath.</li>
+  	<li><code>false</code>:	No se permite la cofirma de firmas que no contengan una transformación XPath.</li>
 	</ul>
   </ul>
 

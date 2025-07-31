@@ -438,6 +438,11 @@ public final class XAdESExtraParams {
      * de firma o, en caso de no pode o que se establezca a {@code false}, que se cancele la operaci&oacute;n.
      */
 	public static final String AVOID_AGE_POLICY_INCOMPATIBILITIES = "avoidAGEPolicyIncompatibilities"; //$NON-NLS-1$
+	
+    /**
+     * Par&aacute;metro que permite indicar si se permiten cofirmas cuando no se ha encontrad un algoritmo XPath
+     */
+	public static final String ALLOW_XADES_ENV_WITHOUT_XPATH = "allowXadesEnvelopedWithoutXPath"; //$NON-NLS-1$
 
     /**
      * Constructor vac&iacute;o privado para que no se pueda instanciar la clase

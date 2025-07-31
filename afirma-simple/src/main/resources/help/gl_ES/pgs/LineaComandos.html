@@ -415,12 +415,18 @@ Opcións:
     <li><code>true</code>: Permítese a cofirma/contrafirma de firmas de arquivo lonxevo, a pesar de que estas non serán válidas posteriormente. </li> 
     <li><code>false</code> (Ou outro valor): Non se permite a cofirma/contrafirma de firmas de arquivo lonxevo.</li> 
    </ul> 
-  </ul> 
   <li style="margin-top: 10pt"><code>avoidAGEPolicyIncompatibilities</code>:</li> 
   <ul> 
    <li><code>true</code>: Evitarase declarar a política de sinatura da AGE cando o resultado da operación vaia ser incompatible con esta política.</li> 
    <li><code>false</code> (Ou outro valor): Non se permite a cofirma coa políítica de sinatura da AGE cando o resultado non será compatible coa política.</li> 
   </ul> 
+  <li style="margin-top: 10pt"><code>allowXadesEnvelopedWithoutXPath</code>:</li>
+  <ul>
+  	<li><code>true</code>: Permite a cofirma dunha firma que non contén unha transformación XPath e que por tanto quedará invalidada. Na nova cofirma si se incluirá a transformación XPath.</li>
+  	<li><code>false</code>:	Non se permite a cofirma de firmas que non conteñan unha transformación XPath.</li>
+  </ul>
+  </ul>
+  
   <h3>Opcións de configuración de firmas de Factura Electrónica</h3> 
   <p>A seguir se listan as propiedades de configuración admitidas polas firmas de factura electrónica (Facturae).</p> 
   <ul> 

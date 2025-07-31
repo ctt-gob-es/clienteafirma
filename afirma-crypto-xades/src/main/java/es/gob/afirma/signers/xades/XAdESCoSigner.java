@@ -19,6 +19,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -34,7 +35,9 @@ import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLObject;
+import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,14 +45,15 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicyPropertiesManager;
+import es.gob.afirma.signers.xml.NotFoundXPathException;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
 import es.gob.afirma.signers.xml.XMLErrorCode;
@@ -333,13 +337,15 @@ public final class XAdESCoSigner {
 		boolean isEnveloping = false;
 		String referenceId = null;
 		final List<Element> dataReferencesList = XAdESUtil.getSignatureDataReferenceList(signatureElement);
+		// Obtenemos el prefijo del elemento de la primera firma para copiarlo en la nueva
+		final String xmlsigPrefix = signaturesList.item(0).getPrefix();
 		for (final Element currentReference : dataReferencesList) {
 
 			// Buscamos las transformaciones declaradas en la Referencia,
 			// para anadirlas tambien en la nueva
 			final List<Transform> currentTransformList;
 			try {
-				currentTransformList = Utils.getObjectReferenceTransforms(currentReference, XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX);
+				currentTransformList = Utils.getObjectReferenceTransforms(currentReference, xmlsigPrefix);
 			}
 			catch (final NoSuchAlgorithmException e) {
 				throw new AOException("Se ha declarado una transformacion personalizada de un tipo no soportado", e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI); //$NON-NLS-1$
@@ -397,162 +403,210 @@ public final class XAdESCoSigner {
 
 				// Agregamos al listado de formatos de datos los del nuevo manifest
 				objectFormats.addAll(dataObjectFormats);
-			}
+			} else {
 
-			// Firmas enveloped
-			else if ("".equals(referenceUri)) { //$NON-NLS-1$
+				//Firmas enveloped
+				if ("".equals(referenceUri)) { //$NON-NLS-1$
 
-				// Si no se declaro un mimetype, se usara el de XML
-				if (mimeType == null) {
-					mimeType = "text/xml"; //$NON-NLS-1$
-				}
+					// Si no se declaro un mimetype, se usara el de XML
+					if (mimeType == null) {
+						mimeType = "text/xml"; //$NON-NLS-1$
+					}
 
-				// Creamos la referencia a los datos con las transformaciones de la original
-				referenceList.add(
-						fac.newReference(
-								referenceUri, // Aqui siempre vale ""
-								digestMethod,
-								currentTransformList,
-								XMLConstants.OBJURI,
-								referenceId
-								)
-						);
+					boolean xPathIncluded = false;
 
-				// Agregamos a la firma el tipo de los datos de esta referencia (DataObjectFormat)
-				addReferenceDataObjectFormat(objectFormats, referenceId, mimeType, oid, encoding);
-			}
+					for (final Transform t : currentTransformList) {
+						final String transformAlgorithm = t.getAlgorithm();
 
-			// Firmas enveloping y detached
-			else {
+						if (Transform.XPATH.equals(transformAlgorithm)) {
 
-				final String dataNodeId = referenceUri.substring(referenceUri.startsWith("#") ? 1 : 0); //$NON-NLS-1$
-				Element dataObjectElement = null;
-				final Element docElement = docSig.getDocumentElement();
+							if (t.getParameterSpec() != null
+								&& t.getParameterSpec() instanceof XPathFilterParameterSpec) {
 
-				// Comprobamos si el nodo raiz o sus hijos inmediatos son el nodo de datos
-				Node nodeAttributeId = docElement.getAttributes() != null ?
-						docElement.getAttributes().getNamedItem(XAdESConstants.ID_IDENTIFIER) : null;
-				if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
-					dataObjectElement = docElement;
-				}
-				else {
-					// Recorremos los hijos al reves para acceder antes a los datos y las firmas
-					final NodeList rootChildNodes = docElement.getChildNodes();
-					for (int j = rootChildNodes.getLength() - 1; j >= 0; j--) {
+								final XPathFilterParameterSpec xPathParam = (XPathFilterParameterSpec) t.getParameterSpec();
+								final String xPath = xPathParam.getXPath();
 
-						nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ?
-								rootChildNodes.item(j).getAttributes().getNamedItem(XAdESConstants.ID_IDENTIFIER) :
-									null;
-								if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
-									dataObjectElement = (Element) rootChildNodes.item(j);
-									break;
+								if (xPath.contains(XMLConstants.TAG_SIGNATURE)) {
+									xPathIncluded = true;
 								}
+							}
+						}
+					}
 
-								// Si es un nodo de firma tambien miramos en sus nodos hijos
-								if (XMLConstants.TAG_SIGNATURE.equals(rootChildNodes.item(j).getLocalName())) {
-									final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
-									for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
-										nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ?
-												subChildsNodes.item(k).getAttributes().getNamedItem(XAdESConstants.ID_IDENTIFIER) :
-													null;
-												if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
-													dataObjectElement = (Element) subChildsNodes.item(k);
-													break;
-												}
-									}
-									if (dataObjectElement != null) {
+					if (!xPathIncluded) {
+						final String allowXPathNotFoundSigns = extraParams.getProperty(XAdESExtraParams.ALLOW_XADES_ENV_WITHOUT_XPATH);
+						if (allowXPathNotFoundSigns == null) {
+							throw new NotFoundXPathException("Se ha encontrado una firma sin transformacion XPath que permita cofirmas"); //$NON-NLS-1$
+						} else if (!Boolean.parseBoolean(allowXPathNotFoundSigns)) {
+							throw new AOException(XMLErrorCode.Functional.XPATH_NOT_FOUND);
+						}
+						try {
+							String signatureNodeName = XMLConstants.TAG_SIGNATURE;
+							String prefix = ""; //$NON-NLS-1$
+							if (xmlsigPrefix != null && !xmlsigPrefix.isEmpty()) {
+								prefix = xmlsigPrefix;
+								signatureNodeName = prefix + ":" + signatureNodeName; //$NON-NLS-1$
+							}
+							currentTransformList.add(
+									fac.newTransform(
+										Transform.XPATH,
+										new XPathFilterParameterSpec(
+											"not(ancestor-or-self::" + signatureNodeName + ")", //$NON-NLS-1$ //$NON-NLS-2$
+											Collections.singletonMap(
+												prefix,
+												XMLSignature.XMLNS
+											)
+										)
+									)
+								);
+						} catch (final Exception e) {
+							throw new AOException("No se ha podido agregar la transformacion XPath correctamente", e, XMLErrorCode.Request.INVALID_TRANSFORMATION); //$NON-NLS-1$
+						}
+					}
+
+					// Creamos la referencia a los datos con las transformaciones de la original
+					referenceList.add(
+							fac.newReference(
+									referenceUri, // Aqui siempre vale ""
+									digestMethod,
+									currentTransformList,
+									XMLConstants.OBJURI,
+									referenceId
+									)
+							);
+				}
+
+				// Firmas enveloping y detached
+				else {
+
+					final String dataNodeId = referenceUri.substring(referenceUri.startsWith("#") ? 1 : 0); //$NON-NLS-1$
+					Element dataObjectElement = null;
+					final Element docElement = docSig.getDocumentElement();
+
+					// Comprobamos si el nodo raiz o sus hijos inmediatos son el nodo de datos
+					Node nodeAttributeId = docElement.getAttributes() != null ?
+							docElement.getAttributes().getNamedItem(XAdESConstants.ID_IDENTIFIER) : null;
+					if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
+						dataObjectElement = docElement;
+					}
+					else {
+						// Recorremos los hijos al reves para acceder antes a los datos y las firmas
+						final NodeList rootChildNodes = docElement.getChildNodes();
+						for (int j = rootChildNodes.getLength() - 1; j >= 0; j--) {
+
+							nodeAttributeId = rootChildNodes.item(j).getAttributes() != null ?
+									rootChildNodes.item(j).getAttributes().getNamedItem(XAdESConstants.ID_IDENTIFIER) :
+										null;
+									if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
+										dataObjectElement = (Element) rootChildNodes.item(j);
 										break;
 									}
-								}
-					}
-				}
-				if (dataObjectElement != null) {
-					if (mimeType == null) {
-						mimeType = dataObjectElement.getAttribute("MimeType"); //$NON-NLS-1$
-					}
-					if (encoding == null) {
-						encoding = dataObjectElement.getAttribute("Encoding"); //$NON-NLS-1$
-					}
-				}
 
-				final NodeList signatureChildNodes = docSig.getElementsByTagNameNS(
-						XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE
-						).item(0).getChildNodes();
-				for (int j = 0; j < signatureChildNodes.getLength(); j++) {
-					final Node subNode = signatureChildNodes.item(j);
-					final NamedNodeMap nnm = subNode.getAttributes();
-					if (nnm != null) {
-						final Node idAttrNode = nnm.getNamedItem(XAdESConstants.ID_IDENTIFIER);
-						if (idAttrNode != null && dataNodeId.equals(idAttrNode.getNodeValue())) {
-							isEnveloping = true;
+									// Si es un nodo de firma tambien miramos en sus nodos hijos
+									if (XMLConstants.TAG_SIGNATURE.equals(rootChildNodes.item(j).getLocalName())) {
+										final NodeList subChildsNodes = rootChildNodes.item(j).getChildNodes();
+										for (int k = subChildsNodes.getLength() - 1; k >= 0; k--) {
+											nodeAttributeId = subChildsNodes.item(k).getAttributes() != null ?
+													subChildsNodes.item(k).getAttributes().getNamedItem(XAdESConstants.ID_IDENTIFIER) :
+														null;
+													if (nodeAttributeId != null && dataNodeId.equals(nodeAttributeId.getNodeValue())) {
+														dataObjectElement = (Element) subChildsNodes.item(k);
+														break;
+													}
+										}
+										if (dataObjectElement != null) {
+											break;
+										}
+									}
 						}
 					}
-				}
-
-				// Firma enveloping
-				if (isEnveloping && dataObjectElement != null) {
-
-					// Si se declara la politica de firma de la AGE, debemos tener en cuenta
-					// que esta no es compatible con las firmas enveloping, asi que debemos
-					// establecer un comportamiento alternativo:
-					//  - Si no se indica que hacer, lanzaremos una excepcion indicando la incompatiblidad. Esto
-					//    puede conllevar que las aplicaciones adapten el comportamiento.
-					//  - Si se indico que se evitasen las incompatibilidades, se adapta la configuraci&oacute;n
-					//    segun lo establecido por la excepcion para generar una firma valida.
-					//  - Se se indico que no se evitasen la incompatibilidades, indicaremos que la operacion
-					//    fallo.
-					final String policyId = extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER);
-					if (AdESPolicyPropertiesManager.isAgePolicyConfigurated(policyId)) {
-						final String avoidAgePolicyIncompatibilities = extraParams.getProperty(XAdESExtraParams.AVOID_AGE_POLICY_INCOMPATIBILITIES);
-						if (avoidAgePolicyIncompatibilities == null) {
-							throw new SignaturePolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping", SignaturePolicyIncompatibilityException.OP_COSIGN); //$NON-NLS-1$
+					if (dataObjectElement != null) {
+						if (mimeType == null) {
+							mimeType = dataObjectElement.getAttribute("MimeType"); //$NON-NLS-1$
 						}
-						else if (Boolean.parseBoolean(avoidAgePolicyIncompatibilities)) {
-							new SignaturePolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping") //$NON-NLS-1$
-								.prepareOperationWithConfirmation(extraParams);
-						}
-						else {
-							throw new AOException("La politica de la AGE no soporta la cofirma XAdES Enveloping", ErrorCode.Functional.SIGNING_WITH_POLICY_INCOMPATIBILITY); //$NON-NLS-1$
+						if (encoding == null) {
+							encoding = dataObjectElement.getAttribute("Encoding"); //$NON-NLS-1$
 						}
 					}
 
-					// crea el nuevo elemento Object que con el documento afirmar
-					final List<XMLStructure> structures = new ArrayList<>(1);
-					structures.add(new DOMStructure(dataObjectElement.getFirstChild().cloneNode(true)));
+					final NodeList signatureChildNodes = docSig.getElementsByTagNameNS(
+							XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE
+							).item(0).getChildNodes();
+					for (int j = 0; j < signatureChildNodes.getLength(); j++) {
+						final Node subNode = signatureChildNodes.item(j);
+						final NamedNodeMap nnm = subNode.getAttributes();
+						if (nnm != null) {
+							final Node idAttrNode = nnm.getNamedItem(XAdESConstants.ID_IDENTIFIER);
+							if (idAttrNode != null && dataNodeId.equals(idAttrNode.getNodeValue())) {
+								isEnveloping = true;
+							}
+						}
+					}
 
-					final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-					newInternalObject = fac.newXMLObject(
-							structures,
-							objectId,
-							mimeType,
-							encoding
-							);
+					// Firma enveloping
+					if (isEnveloping && dataObjectElement != null) {
 
-					// Agregamos la referencia al nuevo objeto de datos
-					referenceList.add(
-							fac.newReference(
-									"#" + objectId, //$NON-NLS-1$
-									digestMethod,
-									currentTransformList,
-									referenceType,
-									referenceId
-									)
-							);
+						// Si se declara la politica de firma de la AGE, debemos tener en cuenta
+						// que esta no es compatible con las firmas enveloping, asi que debemos
+						// establecer un comportamiento alternativo:
+						//  - Si no se indica que hacer, lanzaremos una excepcion indicando la incompatiblidad. Esto
+						//    puede conllevar que las aplicaciones adapten el comportamiento.
+						//  - Si se indico que se evitasen las incompatibilidades, se adapta la configuraci&oacute;n
+						//    segun lo establecido por la excepcion para generar una firma valida.
+						//  - Se se indico que no se evitasen la incompatibilidades, indicaremos que la operacion
+						//    fallo.
+						final String policyId = extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER);
+						if (AdESPolicyPropertiesManager.isAgePolicyConfigurated(policyId)) {
+							final String avoidAgePolicyIncompatibilities = extraParams.getProperty(XAdESExtraParams.AVOID_AGE_POLICY_INCOMPATIBILITIES);
+							if (avoidAgePolicyIncompatibilities == null) {
+								throw new SignaturePolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping", SignaturePolicyIncompatibilityException.OP_COSIGN); //$NON-NLS-1$
+							}
+							else if (Boolean.parseBoolean(avoidAgePolicyIncompatibilities)) {
+								new SignaturePolicyIncompatibilityException("La politica de la AGE no soporta la cofirma XAdES Enveloping") //$NON-NLS-1$
+									.prepareOperationWithConfirmation(extraParams);
+							}
+							else {
+								throw new AOException("La politica de la AGE no soporta la cofirma XAdES Enveloping", ErrorCode.Functional.SIGNING_WITH_POLICY_INCOMPATIBILITY); //$NON-NLS-1$
+							}
+						}
+
+						// crea el nuevo elemento Object que con el documento afirmar
+						final List<XMLStructure> structures = new ArrayList<>(1);
+						structures.add(new DOMStructure(dataObjectElement.getFirstChild().cloneNode(true)));
+
+						final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+						newInternalObject = fac.newXMLObject(
+								structures,
+								objectId,
+								mimeType,
+								encoding
+								);
+
+						// Agregamos la referencia al nuevo objeto de datos
+						referenceList.add(
+								fac.newReference(
+										"#" + objectId, //$NON-NLS-1$
+										digestMethod,
+										currentTransformList,
+										referenceType,
+										referenceId
+										)
+								);
+					}
+					// Firma detached
+					else {
+						// Agregamos la referencia a los datos ya existentes
+						referenceList.add(
+								fac.newReference(
+										referenceUri,
+										digestMethod,
+										currentTransformList,
+										referenceType,
+										referenceId
+										)
+								);
+					}
 				}
-				// Firma detached
-				else {
-					// Agregamos la referencia a los datos ya existentes
-					referenceList.add(
-							fac.newReference(
-									referenceUri,
-									digestMethod,
-									currentTransformList,
-									referenceType,
-									referenceId
-									)
-							);
-				}
-
 				// Agregamos a la firma el tipo de los datos de esta referencia (DataObjectFormat)
 				addReferenceDataObjectFormat(objectFormats, referenceId, mimeType, oid, encoding);
 			}
@@ -564,7 +618,7 @@ public final class XAdESCoSigner {
 				profile,
 				xadesNamespace,
 				XAdESConstants.DEFAULT_XADES_SIGNATURE_PREFIX,
-				XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX,
+				xmlsigPrefix,
 				digestMethodAlgorithm,
 				root.getOwnerDocument(),
 				root,

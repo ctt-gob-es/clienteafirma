@@ -18,6 +18,7 @@ public class XMLErrorCode {
 	}
 
 	public static class Functional {
+		public static final ErrorCode XPATH_NOT_FOUND			= new ErrorCode("501011", "Una o varias firmas incluidas en el documento no contienen un algoritmo XPath"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode XML_DOCUMENT_NEEDED 		= new ErrorCode("510002", "La firma requiere que los datos sean un documento XML"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode TRI_SIGNING_SIGNATURE 	= new ErrorCode("510007", "No se permite firmar una firma XML en el modo de firma trifasica"); //$NON-NLS-1$ //$NON-NLS-2$
 
