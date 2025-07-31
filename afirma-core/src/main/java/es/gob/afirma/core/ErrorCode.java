@@ -86,7 +86,7 @@ public class ErrorCode {
 		public static final ErrorCode ERROR_IMPORT_LANGUAGE						= new ErrorCode("200006", "Error al importar idioma"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode LOADING_LOCAL_FILE_ERROR					= new ErrorCode("200102", " Error al cargar el fichero local para realizar la firma"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode SIGNINIG_KEY_AUTHENTICATION_ERROR			= new ErrorCode("200108", "No se pudo acceder a la clave de firma"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode SIGNING_KEY_AUTHENTICATION_ERROR			= new ErrorCode("200108", "No se pudo acceder a la clave de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		//public static final ErrorCode INVALID_SIGNATURE_ALGORITHM				= new ErrorCode("200109", "Algoritmo de firma no soportado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_SIGNING_KEY						= new ErrorCode("200110", "La clave de firma no es valida o no es compatible con el algoritmo seleccionado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode SIGNING_PKCS1_ERROR						= new ErrorCode("200111", "Error al generar la firma PKCS#1"); //$NON-NLS-1$ //$NON-NLS-2$

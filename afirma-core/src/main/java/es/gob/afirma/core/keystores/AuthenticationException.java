@@ -16,7 +16,7 @@ public class AuthenticationException extends AOException {
 	 * @param message Descripci&oacute;n del error.
 	 */
 	public AuthenticationException(final String message) {
-		super(message, ErrorCode.Internal.SIGNINIG_KEY_AUTHENTICATION_ERROR);
+		super(message, ErrorCode.Internal.SIGNING_KEY_AUTHENTICATION_ERROR);
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class AuthenticationException extends AOException {
 	 * @param cause Causa del error.
 	 */
 	public AuthenticationException(final Throwable cause) {
-		super(cause, ErrorCode.Internal.SIGNINIG_KEY_AUTHENTICATION_ERROR);
+		super(cause, ErrorCode.Internal.SIGNING_KEY_AUTHENTICATION_ERROR);
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class AuthenticationException extends AOException {
 	 * @param cause Causa del error.
 	 */
 	public AuthenticationException(final String message, final Throwable cause) {
-		super(message, cause, ErrorCode.Internal.SIGNINIG_KEY_AUTHENTICATION_ERROR);
+		super(message, cause, ErrorCode.Internal.SIGNING_KEY_AUTHENTICATION_ERROR);
 	}
 
 	/**
