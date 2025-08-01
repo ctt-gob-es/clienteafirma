@@ -69,11 +69,11 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		removeAll();
 
 		Object parentComponent = null;
-		
+
 		if (this.configParams != null && this.configParams.length > 0) {
 			parentComponent = this.configParams[0];
 		}
-		
+
 		if (!Boolean.getBoolean(ONLY_PKCS11) && !Boolean.parseBoolean(System.getenv(ONLY_PKCS11_ENV))) {
 			// Primero anadimos el almacen principal NSS
 			final AOKeyStoreManager ksm = getNssKeyStoreManager();
@@ -175,7 +175,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		}
 
 		setKeyStoreType(type);
-				
+
 		this.initialized = true;
 	}
 
@@ -191,7 +191,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
      * @throws IOException Si se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *                     almac&eacute;n de certificados.
      * @throws AOCancelledOperationException Cuando se cancela el di&aacute;logo de inserci&oacute;n de PIN. */
-	private static void internalInitStore(final AOKeyStoreManager tmpKsm,
+	protected static void internalInitStore(final AOKeyStoreManager tmpKsm,
 			                              final String descr,
 			                              final Object parentComponent,
 			                              final boolean forceReset,

@@ -198,6 +198,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.UNSUPPORTED_SIGNATURE_FORMAT, ERROR_UNSUPPORTED_FORMAT);
 		OLD_ERRORS_ASSOCIATION.put(KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR, ERROR_CANNOT_ACCESS_KEYSTORE);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Internal.UNKNOWN_SIGNING_ERROR, ERROR_SIGNATURE_FAILED);
+		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Internal.SIGNING_PKCS1_ERROR, ERROR_SIGNATURE_FAILED);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.UNKNOWN_SIGNING_BY_SOCKETS_ERROR, ERROR_SIGNATURE_FAILED);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Communication.SENDING_RESULT_OPERATION, ERROR_SENDING_RESULT);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Communication.SENDING_RESULT_OPERATION_BY_SOCKET, ERROR_SENDING_RESULT);
@@ -302,32 +303,51 @@ final class ProtocolInvocationLauncherErrorManager {
 
 		String message = null;
 
+
+		LOGGER.info(" ========== Codigo de error resultante: " + errorCode);
+
+
 		// Si se utiliza el protocolo 4 o anterior y el codigo de error tiene un valor antiguo
 		// asociado, se utiliza el formato de mensaje antiguo
 		if (protocolVersion <= ProtocolVersion.VERSION_4.getVersion()) {
+
+			LOGGER.info(" ========== Formato de mensaje antiguo");
+
 			String code = OLD_ERRORS_ASSOCIATION.get(errorCode);
 			if (code == null) {
 				code = ERROR_UNKNOWN;
 			}
+
+			LOGGER.info(" ========== Codigo de error antiguo: " + code);
 
 			if (CANCEL_RESPONSE.equals(code)) {
 				message = code;
 			} else {
 				message = code + ": " + ERRORS.get(code); //$NON-NLS-1$
 			}
+
+			LOGGER.info(" ========== Mensaje de la respuesta: " + message);
 		}
 
 		// En caso contrario, se utiliza el formato de mensaje nuevo, pero con una cabecera
 		// compatible con el formato antiguo para mantener la compatibilidad
 		else {
+
+			LOGGER.info(" ========== Formato de mensaje nuevo");
+
 			// Establecemos una cabecera de error compatible con la usada en versiones anteriores del protocolo.
 			// Aunque no transmite informacion, permite que el receptor del error lo identifique como tal
 			final String code = AUTOFIRMA_ERROR_PREFIX + errorCode.getCode();
+
+			LOGGER.info(" ========== Codigo de error nuevo: " + code);
+
 			final String prefix = errorCode.equals(ErrorCode.Functional.CANCELLED_OPERATION)
 					? CANCELLATION_ERROR_PREFIX
 					: DEFAULT_ERROR_PREFIX;
 
 			message = prefix + code + " - " + errorCode.getDescription(); //$NON-NLS-1$
+
+			LOGGER.info(" ========== Mensaje de la respuesta: " + message);
 		}
 		return message;
 	}
