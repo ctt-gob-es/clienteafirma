@@ -2521,7 +2521,8 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 
 				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
-				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {		
+				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {
+					var errorType;		
 					if (data.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
 						errorType = "es.gob.afirma.core.AOCancelledOperationException";
 					} else {
@@ -2529,8 +2530,6 @@ var AutoScript = ( function ( window, undefined ) {
 					}
 
 					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
-					var errorMessage;
-					var errorCode;
 					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
 					if (errorCodeAndMessage.indexOf(" - ") != 8) {
 						errorMessage = errorCodeAndMessage;
@@ -3623,6 +3622,27 @@ var AutoScript = ( function ( window, undefined ) {
 					return;
 				}
 
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {		
+					if (data.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					errorCallback(errorType, errorMessage, errorCode);
+					return;
+				}
+				
 				// Se ha producido un error
 				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
 					errorCallback("java.lang.Exception", data);
@@ -3651,6 +3671,28 @@ var AutoScript = ( function ( window, undefined ) {
 				if (data == undefined || data == null || data == "CANCEL") {
 					errorCode = ErrorCode.Functional.CANCELLED_OP.code;
 					errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, errorCode);
+					return;
+				}
+				
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {		
+					var errorType;
+					if (data.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					errorCallback(errorType, errorMessage, errorCode);
 					return;
 				}
 				
@@ -3772,6 +3814,28 @@ var AutoScript = ( function ( window, undefined ) {
 				if (data == undefined || data == null || data == "CANCEL") {
 					errorCode = ErrorCode.Functional.CANCELLED_OP.code;
 					errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, errorCode);
+					return;
+				}
+				
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {
+					var errorType;
+					if (data.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					errorCallback(errorType, errorMessage, errorCode);
 					return;
 				}
 				
@@ -4759,12 +4823,14 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				// Si se obtiene otro mensaje de error, se deja de intentar y se ejecuta la funcion callback de error
-				if (html.substr(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {		
+				if (html.substr(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {
+					var errorType;		
 					if (html.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
 						errorType = "es.gob.afirma.core.AOCancelledOperationException";
 					} else {
 						errorType = "java.lang.Exception";
 					}
+
 					var errorCodeAndMessage = html.substring(html.indexOf(":=") + 2);
 					// Se comprueba si la respuesta viene de modo codigo-mensaje o no
 					if(errorCodeAndMessage.indexOf(" - ") != -1) {
