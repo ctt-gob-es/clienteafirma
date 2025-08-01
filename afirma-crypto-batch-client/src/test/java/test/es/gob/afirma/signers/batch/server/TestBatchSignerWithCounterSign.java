@@ -6,7 +6,6 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 
 /** Pruebas del cliente de firma por lote.
@@ -43,12 +42,7 @@ public final class TestBatchSignerWithCounterSign {
 			)
 		) {
 			res = BatchSigner.signXML(
-				Base64.encode(
-					AOUtil.getDataFromInputStream(
-						is
-					),
-					true
-				),
+				AOUtil.getDataFromInputStream(is),
 				"http://localhost:8080/afirma-server-triphase-signer/BatchPresigner", //$NON-NLS-1$
 				"http://localhost:8080/afirma-server-triphase-signer/BatchPostsigner", //$NON-NLS-1$
 				pke.getCertificateChain(),

@@ -12,35 +12,48 @@ package es.gob.afirma.standalone.ui;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractButton;
 import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.LanguageManager;
 import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.VisorFirma;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.GenericMenuOption;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginLoader;
 import es.gob.afirma.standalone.ui.plugins.PluginsManagementDialog;
 import es.gob.afirma.standalone.ui.preferences.PreferencesDialog;
 import es.gob.afirma.standalone.ui.restoreconfig.RestoreConfigDialog;
+import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
 /** Barra de men&uacute; para toda la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -50,7 +63,6 @@ public final class MainMenu extends JMenuBar {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private final JMenuItem firmarMenuItem;
     private final JMenuItem abrirMenuItem;
 
     private final JFrame parent;
@@ -70,7 +82,6 @@ public final class MainMenu extends JMenuBar {
      *  <li>
      *   <ul>
      *    <li>Ctrl+B = Abrir archivo</li>
-     *    <li>Ctrl+I = Firmar archivo</li>
      *    <li>Ctrl+V = Ver firma</li>
      *    <li>Alt+F4 = Salir del programa</li>
      *   </ul>
@@ -97,7 +108,6 @@ public final class MainMenu extends JMenuBar {
         this.saf = s;
         this.parent = p;
 
-        this.firmarMenuItem = new JMenuItem();
         this.abrirMenuItem = new JMenuItem();
 
         // Importante: No cargar en un invokeLater, da guerra
@@ -149,19 +159,6 @@ public final class MainMenu extends JMenuBar {
 			}
 		);
         menuArchivo.add(this.abrirMenuItem);
-
-        this.firmarMenuItem.setText(SimpleAfirmaMessages.getString("MainMenu.5")); //$NON-NLS-1$
-        this.firmarMenuItem.setAccelerator(
-    		KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
-		);
-        this.firmarMenuItem.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString("MainMenu.6") //$NON-NLS-1$
-        );
-        this.firmarMenuItem.setEnabled(false);
-        this.firmarMenuItem.addActionListener(
-    		e -> MainMenu.this.getSimpleAfirma().signLoadedFile()
-		);
-        menuArchivo.add(this.firmarMenuItem);
 
         final JMenuItem validateSignMenu = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.34")); //$NON-NLS-1$
         validateSignMenu.setAccelerator(
@@ -258,6 +255,127 @@ public final class MainMenu extends JMenuBar {
         	}
         }
 
+        // Crear el JMenu que contendrá las opciones de idioma
+        final JMenu languageMenu = new JMenu(SimpleAfirmaMessages.getString("MainMenu.38")); //$NON-NLS-1$
+
+        final ButtonGroup langGroup = new ButtonGroup();
+
+        // Crear las opciones de idioma
+        final String[] defaultLanguages = {
+        		SimpleAfirmaMessages.getString("MainMenu.39"), SimpleAfirmaMessages.getString("MainMenu.41"), //$NON-NLS-1$ //$NON-NLS-2$
+        		SimpleAfirmaMessages.getString("MainMenu.42"), SimpleAfirmaMessages.getString("MainMenu.43"), //$NON-NLS-1$ //$NON-NLS-2$
+        		SimpleAfirmaMessages.getString("MainMenu.44"),SimpleAfirmaMessages.getString("MainMenu.40") //$NON-NLS-1$ //$NON-NLS-2$
+        		};
+
+        String localeConf = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
+        // Si no hay ninguno configurado, por defecto estara seleccionado el espanol
+        if (localeConf == null) {
+        	localeConf = LanguageManager.AFIRMA_DEFAULT_LOCALES[0].toString();
+        }
+
+        for (int i = 0; i < defaultLanguages.length; i++) {
+            final Locale locale = LanguageManager.AFIRMA_DEFAULT_LOCALES[i];
+            final LocaleOption localeOption = new LocaleOption(defaultLanguages[i], locale);
+            final JRadioButtonMenuItem langItem = new JRadioButtonMenuItem(localeOption.toString());
+            langItem.putClientProperty("localeData", localeOption); //$NON-NLS-1$
+            if (localeConf.equals(locale.toString())) {
+            	langItem.setSelected(true);
+            }
+            langItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent ae) {
+                	Locale.setDefault(locale);
+                    PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
+                    SimpleAfirmaMessages.changeLocale();
+                    showRestartWarning();
+                }
+            });
+            langGroup.add(langItem);
+            languageMenu.add(langItem);
+        }
+
+        final Locale [] importedLocales = LanguageManager.getImportedLocales();
+        if (importedLocales != null) {
+	        for (int i = 0; i < importedLocales.length; i++) {
+	        	final String langName = LanguageManager.getLanguageName(importedLocales[i]);
+	        	final Locale locale = importedLocales[i];
+	        	// Se comprueba si el idioma importado no se trata de una version actualizada
+	        	// de un idioma proporcionado por Autofirma para que no se duplique en el menu
+	        	if (!LanguageManager.isDefaultLocale(locale)) {
+		            final LocaleOption localeOption = new LocaleOption(langName, locale);
+		            final JRadioButtonMenuItem importedLangItem = new JRadioButtonMenuItem(localeOption.toString());
+		            importedLangItem.putClientProperty("localeData", localeOption); //$NON-NLS-1$
+		        	if (localeConf.equals(locale.toString())) {
+		        		importedLangItem.setSelected(true);
+		            }
+		        	importedLangItem.addActionListener(new ActionListener() {
+		                @Override
+		                public void actionPerformed(final ActionEvent ae) {
+		                	Locale.setDefault(locale);
+		                    PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
+		                    SimpleAfirmaMessages.changeLocale();
+		                    showRestartWarning();
+		                }
+		            });
+		        	langGroup.add(importedLangItem);
+		            languageMenu.add(importedLangItem);
+	        	}
+	        }
+        }
+
+        languageMenu.addSeparator();
+
+        final JMenuItem importLanguageMenu = new JMenuItem(SimpleAfirmaMessages.getString("MainMenu.45")); //$NON-NLS-1$
+        importLanguageMenu.getAccessibleContext().setAccessibleDescription(
+        		SimpleAfirmaMessages.getString("MainMenu.45")); //$NON-NLS-1$
+        importLanguageMenu.setAccelerator(
+            	KeyStroke.getKeyStroke(
+            		KeyEvent.VK_I,
+            		Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
+            	)
+            );
+        final String extsDesc = SimpleAfirmaMessages.getString("MainMenu.47") + " (*.zip)";   //$NON-NLS-1$//$NON-NLS-2$
+        // Accion de importar idioma
+        importLanguageMenu.addActionListener(ae -> {
+			final File fileToLoad;
+			try {
+				fileToLoad = AOUIFactory.getLoadFiles(
+					SimpleAfirmaMessages.getString("MainMenu.46"), //$NON-NLS-1$
+					null,
+					null,
+					new String [] {"zip"}, //$NON-NLS-1$
+					extsDesc,
+					false,
+					true,
+					DesktopUtil.getDefaultDialogsIcon(),
+					MainMenu.this
+				)[0];
+			}
+			catch(final AOCancelledOperationException e) {
+				return;
+			}
+			try {
+				final Map <String, String> langProps = LanguageManager.addLanguage(fileToLoad);
+				addNewLocaleToMenu(langProps, langGroup, languageMenu);
+				AOUIFactory.showMessageDialog(
+						null,
+						SimpleAfirmaMessages.getString("MainMenu.52"), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("MainMenu.45"), //$NON-NLS-1$
+						JOptionPane.INFORMATION_MESSAGE);
+				
+                showRestartWarning();
+			} catch (final AOException e1) {
+				AOUIFactory.showErrorMessage(
+						extractMessageFromException(e1),
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE,
+						e1);
+			}
+		});
+
+        languageMenu.add(importLanguageMenu);
+        this.add(languageMenu);
+
         // Comprobamos si existen menus adicionales de plugins que deben ser anadidos a la
         // barra de menu principal
         final List<GenericMenuOption> menus = PluginsUiComponentsBuilder.getPluginsMenus();
@@ -309,7 +427,6 @@ public final class MainMenu extends JMenuBar {
         if (!isMac) {
             this.abrirMenuItem.setMnemonic(KeyEvent.VK_B);
             ayudaMenuItem.setMnemonic(KeyEvent.VK_U);
-            this.firmarMenuItem.setMnemonic(KeyEvent.VK_F);
         }
         // Acciones especificas de Mac OS X
         else {
@@ -368,14 +485,6 @@ public final class MainMenu extends JMenuBar {
         }
     }
 
-    /** Habilita o deshabilita el elemento de men&uacute; de firma de fichero.
-     * @param en <code>true</code> para habilitar el elemento de men&uacute; de firma de fichero, <code>false</code> para deshabilitarlo */
-    public void setEnabledSignCommand(final boolean en) {
-        if (this.firmarMenuItem != null) {
-            this.firmarMenuItem.setEnabled(en);
-        }
-    }
-
 
     /**
      * M&eacute;todo para hacer aparecer el di&aacute;logo de preferencias en macOS mediante la opci&oacute;n
@@ -428,6 +537,13 @@ public final class MainMenu extends JMenuBar {
     	}
     	if (file != null && file.length > 0 && file[0] != null && file[0].isFile()) {
     		new VisorFirma(false, null).initialize(false, file[0]);
+    	} else {
+    		AOUIFactory.showErrorMessage(
+			        SimpleAfirmaMessages.getString("SignPanel.123"), //$NON-NLS-1$
+			        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			        AOUIFactory.ERROR_MESSAGE,
+			        new AOException(SimpleErrorCode.Internal.LOAD_FILE_TO_VIEW)
+			    );
     	}
     }
 
@@ -473,5 +589,120 @@ public final class MainMenu extends JMenuBar {
 	public static void doMenuAction(final String actionClass, final Frame parent)
 			throws PluginException{
 		PluginLoader.getPluginAction(actionClass).start(parent);
+	}
+
+	static void showRestartWarning() {
+		final List<String> command = DesktopUtil.getResetApplicationCommand();
+		// Actualizamos los mensajes para dialogo con el nuevo locale
+		JSEUIMessages.updateLocale();
+		// Ejecutamos una nueva instancia de la aplicacion
+		if (command != null) {
+			// Consultamos si se desea reiniciar la aplicacion
+			final int option = AOUIFactory.showConfirmDialog(
+					null,
+					SimpleAfirmaMessages.getString("MainMenu.51"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("MainMenu.50"), //$NON-NLS-1$
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE);
+			if (option == JOptionPane.YES_OPTION) {
+				try {
+					new ProcessBuilder(command).start();
+				}
+				catch (final Exception e) {
+					LOGGER.log(Level.WARNING, "No se ha podido arrancar la nueva instancia de la aplicacion", e); //$NON-NLS-1$
+				}
+
+				// Salimos de la aplicacion antes de que se llegue a cargar la nueva instancia
+				System.exit(0);
+			}
+		}
+		// Pedimos al usuario que reinicie la aplicacion
+		else {
+			AOUIFactory.showMessageDialog(
+					null,
+					SimpleAfirmaMessages.getString("MainMenu.49"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("MainMenu.50"), //$NON-NLS-1$
+					JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
+	/**
+	 * Agrega un nuevo idioma el JMenu que incluye los idiomas.
+	 * @param langProps Propiedades del nuevo idioma.
+	 * @param langGroup Conjunto de idiomas.
+	 * @param languageMenu Men&uacute; donde agregar el nuevo idioma.
+	 */
+	private static void addNewLocaleToMenu(final Map <String, String> langProps, final ButtonGroup langGroup, final JMenu languageMenu) {
+
+		final String localeProp = langProps.get(LanguageManager.LOCALE_PROP);
+		final String[] parts = localeProp.split("_"); //$NON-NLS-1$
+		final Locale locale = new Locale(parts[0], parts[1]);
+		
+		// Comprobamos si existia otra version del idioma para evitar que se duplique
+		boolean existsLang = false;
+        final Enumeration<AbstractButton> buttons = langGroup.getElements();
+        while (buttons.hasMoreElements()) {
+            final AbstractButton button = buttons.nextElement();
+            final LocaleOption localeOption = (LocaleOption) button.getClientProperty("localeData"); //$NON-NLS-1$
+            if (locale.equals(localeOption.getLocale())) {
+            	existsLang = true;
+            	button.setSelected(true);
+            }         
+        }
+
+		// Si no se encuentra entre los idiomas de Autofirma lo anadimos al menu
+		if (!LanguageManager.isDefaultLocale(locale) && !existsLang) {
+
+			final LocaleOption newLocaleOption = new LocaleOption(langProps.get(LanguageManager.LANGUAGE_NAME_PROP), locale);
+			final JRadioButtonMenuItem newImportedLangItem = new JRadioButtonMenuItem(newLocaleOption.toString());
+			newImportedLangItem.putClientProperty("localeData", newLocaleOption); //$NON-NLS-1$
+
+			newImportedLangItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent ae) {
+					Locale.setDefault(locale);
+					PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, locale.toString());
+					SimpleAfirmaMessages.changeLocale();
+					showRestartWarning();
+				}
+			});
+
+			newImportedLangItem.setSelected(true);
+			langGroup.add(newImportedLangItem);
+			languageMenu.insert(newImportedLangItem, languageMenu.getItemCount() - 2);
+		}
+		
+		Locale.setDefault(locale);
+        PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, localeProp);
+        SimpleAfirmaMessages.changeLocale();
+
+	}
+
+	private static String extractMessageFromException(final Throwable t) {
+		String message = null;
+
+		if (t instanceof AOException) {
+			message = obtainSimpleErrorCodeFromPluginException((AOException) t);
+		} else {
+			message = SimpleAfirmaMessages.getString("PluginManagementError.0"); //$NON-NLS-1$
+		}
+		return message;
+	}
+
+	private static String obtainSimpleErrorCodeFromPluginException(final AOException exception) {
+
+		//Check again the code received in the AOException
+		ErrorCode errorCode = null;
+		final ErrorCode currentErrorCode = exception.getErrorCode();
+		if (currentErrorCode == SimpleErrorCode.Internal.CANT_READ_FILE
+				|| currentErrorCode == SimpleErrorCode.Internal.CANT_CREATE_DIRECTORY) {
+			errorCode = currentErrorCode;
+		} else {
+			errorCode = SimpleErrorCode.Internal.GENERIC_LANGUAGE_IMPORT_ERROR;
+		}
+
+		final String key = "LanguageManagementError." + errorCode.getCode(); //$NON-NLS-1$
+
+		return SimpleAfirmaMessages.getString(key);
 	}
 }

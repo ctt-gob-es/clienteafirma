@@ -26,7 +26,7 @@ import com.aowagie.text.pdf.PdfPKCS7;
 import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfString;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
@@ -56,7 +56,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
     		createSignDetails(data);
     	}
     	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 	}
 
@@ -154,7 +154,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 
 		}
     	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 	}
 

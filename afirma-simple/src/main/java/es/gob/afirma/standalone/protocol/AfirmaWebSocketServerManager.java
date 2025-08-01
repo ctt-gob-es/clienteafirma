@@ -16,6 +16,7 @@ import javax.net.ssl.SSLContext;
 
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Gestor de la invocaci&oacute;n por <i>WebSocket</i>. */
@@ -29,11 +30,14 @@ public class AfirmaWebSocketServerManager {
 	/** Versi&oacute;n de protocolo con varios puertos y comprobaci&oacute;n de ID de sesi&oacute;n. */
 	private static final int PROTOCOL_VERSION_4 = 4;
 
+	/** Versi&oacute;n de protocolo que usa los nuevos codigos de error. */
+	private static final int PROTOCOL_VERSION_5 = 5;
+
 	/** Versi&oacute;n de protocolo actual. */
-	private static final int CURRENT_PROTOCOL_VERSION = PROTOCOL_VERSION_4;
+	private static final int CURRENT_PROTOCOL_VERSION = PROTOCOL_VERSION_5;
 
 	/** Listado de versiones de protocolo soportadas. */
-	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { PROTOCOL_VERSION_3, PROTOCOL_VERSION_4 };
+	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { PROTOCOL_VERSION_3, PROTOCOL_VERSION_4, PROTOCOL_VERSION_5 };
 
     /** Propiedad del sistema para configurar la optimizacion de WebSockets para VDI. */
 	private static final String SYSTEM_PROPERTY_OPTIMIZED_FOR_VDI = "websockets.optimizedForVdi"; //$NON-NLS-1$
@@ -68,7 +72,8 @@ public class AfirmaWebSocketServerManager {
 			try {
 				switch (protocolVersion) {
 				case PROTOCOL_VERSION_4:
-					instance = new AfirmaWebSocketServerV4(ports[i], channelInfo.getIdSession());
+				case PROTOCOL_VERSION_5:
+					instance = new AfirmaWebSocketServerV4Sup(ports[i], channelInfo.getIdSession(), protocolVersion);
 					break;
 
 				default:
@@ -89,7 +94,7 @@ public class AfirmaWebSocketServerManager {
 		while (instance == null && i < ports.length);
 
 		if (instance == null) {
-			throw new SocketOperationException("No se ha podido abrir ningun socket. Se aborta la comunicacion."); //$NON-NLS-1$
+			throw new SocketOperationException("No se ha podido abrir ningun socket. Se aborta la comunicacion.", SimpleErrorCode.Internal.SOCKET_INITIALIZING_ERROR); //$NON-NLS-1$
 		}
 	}
 

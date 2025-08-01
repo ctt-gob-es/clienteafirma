@@ -9,13 +9,16 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.standalone.SimpleErrorCode;
+
 /**
  * Excepci&oacute;n con la que se indica si una versi&oacute;n de protocolo de comunicaci&oacute;n
  * no esta soportado y si es necesario actualizar la aplicaci&oacute;n para soportarlo (protocolo
  * m&aacute;s avanzada que el soportado por la aplicaci&oacute;n) o si se trata de un protocolo
  * obsoleto.
  */
-public class UnsupportedProtocolException extends Exception {
+public class UnsupportedProtocolException extends AOException {
 
 	/** Serial Id. */
 	private static final long serialVersionUID = -7429271911165454430L;
@@ -31,7 +34,7 @@ public class UnsupportedProtocolException extends Exception {
 	}
 
 	UnsupportedProtocolException(final int version, final boolean newVersionNeeded) {
-		super("Version del protocolo no soportada"); //$NON-NLS-1$
+		super("Version del protocolo no soportada", SimpleErrorCode.Request.UNSUPPORED_PROTOCOL_VERSION); //$NON-NLS-1$
 		this.version = version;
 		this.newVersionNeeded = newVersionNeeded;
 	}

@@ -13,6 +13,8 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
 
+import es.gob.afirma.core.ErrorCode;
+
 
 /** Par&aacute;metros para el guardado de datos. */
 public final class UrlParametersToSave extends UrlParameters {
@@ -139,7 +141,7 @@ public final class UrlParametersToSave extends UrlParameters {
 		// para descargar los datos y la ruta del servicio remoto para el
 		// fichero
 		if (!params.containsKey(FILE_ID_PARAM) && !params.containsKey(DATA_PARAM)) {
-			throw new ParameterException("No se ha proporcionado el identificador de fichero ni los datos a guardar"); //$NON-NLS-1$
+			throw new ParameterException("No se ha proporcionado el identificador de fichero ni los datos a guardar", ErrorCode.Request.DATA_TO_SAVE_NOT_FOUND); //$NON-NLS-1$
 		}
 
 		// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
@@ -153,13 +155,13 @@ public final class UrlParametersToSave extends UrlParameters {
 
 		if (sessionId != null) {
 			if (sessionId.length() > MAX_ID_LENGTH) {
-				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres.", ErrorCode.Request.INVALID_SESSION_ID_TO_SAVE); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
 			for (final char c : sessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
 				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
-					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
+					throw new ParameterException("El identificador de la firma debe ser alfanumerico.", ErrorCode.Request.INVALID_SESSION_ID_TO_SAVE); //$NON-NLS-1$
 				}
 			}
 
@@ -184,17 +186,17 @@ public final class UrlParametersToSave extends UrlParameters {
 				try {
 					storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
 				}
-				catch (final ParameterLocalAccessRequestedException e) {
-					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e); //$NON-NLS-1$
+				catch (final LocalAccessRequestException e) {
+					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e, ErrorCode.Request.LOCAL_STORAGE_URL_TO_SAVE); //$NON-NLS-1$
 				}
-				catch (final ParameterException e) {
-					throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e); //$NON-NLS-1$
+				catch (final IllegalArgumentException e) {
+					throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e, ErrorCode.Request.INVALID_STORAGE_URL_TO_SAVE); //$NON-NLS-1$
 				}
 				setStorageServletUrl(storageServletUrl);
 			}
 			// Si no se encuentra a pesar de tener todos los parametros, falla la operacion
 			else if (params.containsKey(ID_PARAM)) {
-				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion"); //$NON-NLS-1$
+				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion", ErrorCode.Request.STORAGE_URL_TO_SAVE_NOT_FOUND); //$NON-NLS-1$
 			}
 		}
 
@@ -211,7 +213,7 @@ public final class UrlParametersToSave extends UrlParameters {
 			// Determinamos si el nombre tiene algun caracter que no consideremos valido para un nombre de fichero
 			for (final char invalidChar : "\\/:*?\"<>|".toCharArray()) { //$NON-NLS-1$
 				if (filename.indexOf(invalidChar) != -1) {
-					throw new ParameterException("Se ha indicado un nombre de fichero con el caracter invalido: " + invalidChar); //$NON-NLS-1$
+					throw new ParameterException("Se ha indicado un nombre de fichero con el caracter invalido: " + invalidChar, ErrorCode.Request.FILENAME_TO_SAVE_NOT_FOUND); //$NON-NLS-1$
 				}
 			}
 		}
@@ -225,7 +227,7 @@ public final class UrlParametersToSave extends UrlParameters {
 			// Determinamos si el nombre tiene algun caracter que no consideremos valido para un nombre de fichero
 			for (final char invalidChar : "\\/:*?\"<>|; ".toCharArray()) { //$NON-NLS-1$
 				if (extensions.indexOf(invalidChar) != -1) {
-					throw new ParameterException("Se ha indicado una lista de extensiones de nombre de fichero con caracteres invalidos: " + invalidChar); //$NON-NLS-1$
+					throw new ParameterException("Se ha indicado una lista de extensiones de nombre de fichero con caracteres invalidos: " + invalidChar, ErrorCode.Request.FILE_EXTENSION_TO_SAVE_NOT_FOUND); //$NON-NLS-1$
 				}
 			}
 		}

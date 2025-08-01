@@ -43,7 +43,7 @@ import org.spongycastle.operator.bc.BcDigestCalculatorProvider;
 import org.spongycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.spongycastle.util.Store;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
@@ -76,7 +76,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
     		createSignDetails(data);
     	}
     	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 	}
 
@@ -352,7 +352,7 @@ public class CAdESSignAnalyzer implements SignAnalyzer {
 			}
 
 			if (validationMessage != null) {
-				details.getSigner().getValidityResult().put("Validacion", validationMessage); //$NON-NLS-1$
+				details.getSigner().getValidityResult().put(SimpleAfirmaMessages.getString("ValidationInfoDialog.68"), validationMessage); //$NON-NLS-1$
 			}
     	}
     }

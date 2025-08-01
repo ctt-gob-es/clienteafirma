@@ -19,6 +19,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONException;
@@ -59,14 +60,14 @@ public final class BatchSigner {
 		// No instanciable
 	}
 
-	public static String signXML(final String batchB64,
+	public static String signXML(final byte[] batch,
 			final String batchPresignerUrl,
 			final String batchPostSignerUrl,
 			final Certificate[] certificates,
 			final PrivateKey pk) throws CertificateEncodingException,
 										IOException,
 										AOException {
-		return signXML(batchB64, batchPresignerUrl, batchPostSignerUrl, certificates, pk, null);
+		return signXML(batch, batchPresignerUrl, batchPostSignerUrl, certificates, pk, null);
 	}
 
 	/** Procesa un lote de firmas.
@@ -169,8 +170,8 @@ public final class BatchSigner {
 	 *  &lt;/singlesign&gt;
 	 * &lt;/signbatch&gt;
 	 * </pre>
-	 * @param batchB64 XML de definici&oacute;n del lote de firmas.
-	 * @param batchPresignerUrl URL del servicio remoto de preproceso de lotes de firma.
+	 * @param batch XML de definici&oacute;n del lote de firmas.
+	 * @param batchPreSignerUrl URL del servicio remoto de preproceso de lotes de firma.
 	 * @param batchPostSignerUrl URL del servicio remoto de postproceso de lotes de firma.
 	 * @param certificates Cadena de certificados del firmante.
 	 * @param pk Clave privada para realizar las firmas cliente.
@@ -209,8 +210,8 @@ public final class BatchSigner {
 	 * @throws CertificateEncodingException Si los certificados proporcionados no son v&aacute;lidos.
 	 * @throws AOException Si hay errores en las firmas cliente.
 	 */
-	public static String signXML(final String batchB64,
-			final String batchPresignerUrl,
+	public static String signXML(final byte[] batch,
+			final String batchPreSignerUrl,
 			final String batchPostSignerUrl,
 			final Certificate[] certificates,
 			final PrivateKey pk,
@@ -218,10 +219,10 @@ public final class BatchSigner {
 										IOException,
 										AOException {
 
-		if (batchB64 == null || batchB64.isEmpty()) {
+		if (batch == null || batch.length == 0) {
 			throw new IllegalArgumentException("El lote de firma no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
-		if (batchPresignerUrl == null || batchPresignerUrl.isEmpty()) {
+		if (batchPreSignerUrl == null || batchPreSignerUrl.isEmpty()) {
 			throw new IllegalArgumentException(
 					"La URL de preproceso de lotes no puede se nula ni vacia" //$NON-NLS-1$
 					);
@@ -237,29 +238,47 @@ public final class BatchSigner {
 					);
 		}
 
+		// Obtenemos informacion del lote
+		String algorithm;
+		try {
+			algorithm = getAlgorithmForXML(batch);
+		}
+		catch (final Exception e) {
+			throw new AOException("El lote proporcionado no es un JSON bien formado o no tiene la estructura correcta", e, BatchErrorCode.Request.MALFORMED_XML_BATCH); //$NON-NLS-1$
+		}
 
 		byte[] ret;
 		final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
-		final String batchUrlSafe = batchB64.replace("+", "-").replace("/",  "_");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
+		final String batchUrlSafe = Base64.encode(batch, true);
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
-					batchPresignerUrl + "?" + //$NON-NLS-1$
+					batchPreSignerUrl + "?" + //$NON-NLS-1$
 							BATCH_XML_PARAM + EQU + batchUrlSafe + AMP +
 							BATCH_CRT_PARAM + EQU + getCertChainAsBase64(certificates),
 							UrlHttpMethod.POST, errorProcessor
 					);
 		}
 		catch (final HttpError e) {
-			LOGGER.warning("El servicio de firma devolvio un error durante la prefirma del lote XML: " + e); //$NON-NLS-1$
-			throw e;
+			LOGGER.log(Level.WARNING, "El servicio de firma devolvio un error durante la prefirma del lote XML: " + e, e); //$NON-NLS-1$
+			final AOException ex;
+			if (e.getResponseCode() == 400) {
+				ex = new AOException("Error en los parametros enviados al servicio de prefirma del lote XML", e, BatchErrorCode.Request.INVALID_PARAMS_TO_PRESIGN_XML_BATCH);  //$NON-NLS-1$
+			}
+			else if (e.getResponseCode() / 100 == 4) {
+				ex = new AOException("Error en la comunicacion con el servicio de firma de prefirma del lote XML", e, BatchErrorCode.Communication.XML_BATCH_PRESIGN_COMMUNICATION_ERROR);  //$NON-NLS-1$
+			}
+			else {
+				ex = new AOException("El servicio de prefirma de lotes XML devolvio un error", e, BatchErrorCode.ThirdParty.XML_BATCH_PRESIGN_ERROR);  //$NON-NLS-1$
+			}
+			throw ex;
 		}
 		catch (final IOException e) {
 			if (errorProcessor.isCancelled()) {
 				LOGGER.info(
-						"El usuario no permite la importacion del certificado SSL de confianza del servicio de firma de lote: " //$NON-NLS-1$
-						+ LoggerUtil.getTrimStr(batchPresignerUrl));
+						"El usuario no permite la importacion del certificado SSL de confianza del servicio de prefirma de lote XML: " //$NON-NLS-1$
+						+ LoggerUtil.getTrimStr(batchPreSignerUrl));
 			}
-			throw e;
+			throw new AOException("No se ha podido conectar con el servicio de prefirma de lote XML", e, BatchErrorCode.Communication.XML_BATCH_PRESIGN_CONNECTION_ERROR); //$NON-NLS-1$
 		}
 
 		final TriphaseData td1 = TriphaseData.parser(ret);
@@ -267,7 +286,7 @@ public final class BatchSigner {
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
 		final TriphaseData td2 = TriphaseDataSigner.doSign(
 				new AOPkcs1Signer(),
-				getAlgorithmForXML(batchB64),
+				algorithm,
 				pk,
 				certificates,
 				td1,
@@ -285,8 +304,26 @@ public final class BatchSigner {
 					);
 		}
 		catch (final HttpError e) {
-			LOGGER.warning("El servicio de firma devolvio un  error durante la postfirma: " + e.getResponseDescription()); //$NON-NLS-1$
-			throw e;
+			LOGGER.log(Level.WARNING, "El servicio de firma devolvio un error durante la postfirma del lote XML: " + e, e); //$NON-NLS-1$
+			final AOException ex;
+			if (e.getResponseCode() == 400) {
+				ex = new AOException("Error en los parametros enviados al servicio de postfirma del lote XML", e, BatchErrorCode.Request.INVALID_PARAMS_TO_POSTSIGN_XML_BATCH);  //$NON-NLS-1$
+			}
+			else if (e.getResponseCode() / 100 == 4) {
+				ex = new AOException("Error en la comunicacion con el servicio de firma de postfirma del lote XML", e, BatchErrorCode.Communication.XML_BATCH_POSTSIGN_COMMUNICATION_ERROR);  //$NON-NLS-1$
+			}
+			else {
+				ex = new AOException("El servicio de postfirma de lotes XML devolvio un error", e, BatchErrorCode.ThirdParty.XML_BATCH_POSTSIGN_ERROR);  //$NON-NLS-1$
+			}
+			throw ex;
+		}
+		catch (final IOException e) {
+			if (errorProcessor.isCancelled()) {
+				LOGGER.info(
+						"El usuario no permite la importacion del certificado SSL de confianza del servicio de postfirma de lote XML: " //$NON-NLS-1$
+						+ LoggerUtil.getTrimStr(batchPreSignerUrl));
+			}
+			throw new AOException("No se ha podido conectar con el servicio de postfirma de lote XML", e, BatchErrorCode.Communication.XML_BATCH_POSTSIGN_CONNECTION_ERROR); //$NON-NLS-1$
 		}
 
 		return new String(ret, DEFAULT_CHARSET);
@@ -297,7 +334,7 @@ public final class BatchSigner {
 	 * Los lotes deben proporcionase definidos en un fichero JSON con un determinado esquema.
 	 * Puede ver dicho esquema y un ejemplo de petici&oacute;n
 	 * <a href="doc-files/batch-scheme.html">aqu&iacute;</a>.
-	 * @param batchB64 JSON de definici&oacute;n del lote de firmas.
+	 * @param batch JSON de definici&oacute;n del lote de firmas.
 	 * @param batchPreSignerUrl URL del servicio remoto de preproceso de lotes de firma.
 	 * @param batchPostSignerUrl URL del servicio remoto de postproceso de lotes de firma.
 	 * @param certificates Cadena de certificados del firmante.
@@ -308,14 +345,14 @@ public final class BatchSigner {
 	 * @throws CertificateEncodingException Si los certificados proporcionados no son v&aacute;lidos.
 	 * @throws AOException Si hay errores en las firmas cliente.
 	 */
-	public static String signJSON(final String batchB64,
+	public static String signJSON(final byte[] batch,
 			                  final String batchPreSignerUrl,
 			                  final String batchPostSignerUrl,
 			                  final Certificate[] certificates,
 			                  final PrivateKey pk) throws CertificateEncodingException,
 			                                              IOException,
 			                                              AOException {
-		return signJSON(batchB64, batchPreSignerUrl, batchPostSignerUrl, certificates, pk, null);
+		return signJSON(batch, batchPreSignerUrl, batchPostSignerUrl, certificates, pk, null);
 	 }
 
 	/**
@@ -323,7 +360,7 @@ public final class BatchSigner {
 	 * Los lotes deben proporcionase definidos en un fichero JSON con un determinado esquema.
 	 * Puede ver dicho esquema y un ejemplo de petici&oacute;n
 	 * <a href="doc-files/batch-scheme.html">aqu&iacute;</a>.
-	 * @param batchB64 JSON de definici&oacute;n del lote de firmas.
+	 * @param batch JSON de definici&oacute;n del lote de firmas.
 	 * @param batchPreSignerUrl URL del servicio remoto de preproceso de lotes de firma.
 	 * @param batchPostSignerUrl URL del servicio remoto de postproceso de lotes de firma.
 	 * @param certificates Cadena de certificados del firmante.
@@ -333,19 +370,17 @@ public final class BatchSigner {
 	 * la operaci&oacute;n.
 	 * @return Cadena JSON con el resultado de la firma del lote. La estructura presentar&aacute;
 	 * la estructura indicada <a href="doc-files/resultlog-scheme.html">aqu&iacute;</a>.
-	 * @throws IOException Si hay problemas de red o en el tratamiento de datos.
 	 * @throws CertificateEncodingException Si los certificados proporcionados no son v&aacute;lidos.
 	 * @throws AOException Si hay errores en las firmas cliente.
 	 * */
-	public static String signJSON(final String batchB64,
+	public static String signJSON(final byte[] batch,
 			                  final String batchPreSignerUrl,
 			                  final String batchPostSignerUrl,
 			                  final Certificate[] certificates,
 			                  final PrivateKey pk,
 			                  final Properties extraParams) throws CertificateEncodingException,
-			                                              IOException,
 			                                              AOException {
-		if (batchB64 == null || batchB64.isEmpty()) {
+		if (batch == null || batch.length == 0) {
 			throw new IllegalArgumentException("El lote de firma no puede ser nulo ni vacio"); //$NON-NLS-1$
 		}
 		if (batchPreSignerUrl == null || batchPreSignerUrl.isEmpty()) {
@@ -364,8 +399,17 @@ public final class BatchSigner {
 			);
 		}
 
+		// Obtenemos informacion del lote
+		String algorithm;
+		try {
+			algorithm = getAlgorithmForJSON(batch);
+		}
+		catch (final Exception e) {
+			throw new AOException("El lote proporcionado no es un JSON bien formado o no tiene la estructura correcta", e, BatchErrorCode.Request.MALFORMED_JSON_BATCH); //$NON-NLS-1$
+		}
+
 		byte[] ret;
-		String batchUrlSafe = batchB64.replace("+", "-").replace("/",  "_");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
+		String batchUrlSafe = Base64.encode(batch, true);
 		final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
 		try {
 			ret = UrlHttpManagerFactory.getInstalledManager().readUrl(
@@ -376,16 +420,26 @@ public final class BatchSigner {
 			);
 		}
 		catch (final HttpError e) {
-			LOGGER.warning("El servicio de firma devolvio un error durante la prefirma del lote JSON: " + e); //$NON-NLS-1$
-			throw e;
+			LOGGER.log(Level.WARNING, "El servicio de firma devolvio un error durante la prefirma del lote JSON: " + e, e); //$NON-NLS-1$
+			final AOException ex;
+			if (e.getResponseCode() == 400) {
+				ex = new AOException("Error en los parametros enviados al servicio de prefirma del lote JSON", e, BatchErrorCode.Request.INVALID_PARAMS_TO_PRESIGN_JSON_BATCH);  //$NON-NLS-1$
+			}
+			else if (e.getResponseCode() / 100 == 4) {
+				ex = new AOException("Error en la comunicacion con el servicio de firma de prefirma del lote JSON", e, BatchErrorCode.Communication.JSON_BATCH_PRESIGN_COMMUNICATION_ERROR);  //$NON-NLS-1$
+			}
+			else {
+				ex = new AOException("El servicio de prefirma de lotes JSON devolvio un error", e, BatchErrorCode.ThirdParty.JSON_BATCH_PRESIGN_ERROR);  //$NON-NLS-1$
+			}
+			throw ex;
 		}
 		catch (final IOException e) {
 			if (errorProcessor.isCancelled()) {
 				LOGGER.info(
-						"El usuario no permite la importacion del certificado SSL de confianza del servicio de firma de lote: " //$NON-NLS-1$
+						"El usuario no permite la importacion del certificado SSL de confianza del servicio de prefirma de lote JSON: " //$NON-NLS-1$
 						+ LoggerUtil.getTrimStr(batchPreSignerUrl));
 			}
-			throw e;
+			throw new AOException("No se ha podido conectar con el servicio de prefirma de lote JSON", e, BatchErrorCode.Communication.JSON_BATCH_PRESIGN_CONNECTION_ERROR); //$NON-NLS-1$
 		}
 
 		// Obtenemos el resultado de la prefirma del lote
@@ -405,9 +459,11 @@ public final class BatchSigner {
 			return JSONBatchInfoParser.buildResult(presignErrors).toString();
 		}
 
+
+
 		// Si hubo errores, actualizamos la informacion del lote con ellos
 		if (presignErrors != null) {
-			final BatchInfo batchInfo = JSONBatchInfoParser.parse(Base64.decode(batchB64));
+			final BatchInfo batchInfo = JSONBatchInfoParser.parse(batch);
 			batchInfo.updateResults(presignErrors);
 			final byte[] batchInfoEncode = batchInfo.getInfoString().getBytes(StandardCharsets.UTF_8);
 			batchUrlSafe = Base64.encode(batchInfoEncode, true);
@@ -416,7 +472,7 @@ public final class BatchSigner {
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
 		td = TriphaseDataSigner.doSign(
 				new AOPkcs1Signer(),
-				getAlgorithmForJSON(batchB64),
+				algorithm,
 				pk,
 				certificates,
 				td,
@@ -435,9 +491,28 @@ public final class BatchSigner {
 					);
 		}
 		catch (final HttpError e) {
-			LOGGER.warning("El servicio de firma devolvio un  error durante la postfirma: " + e); //$NON-NLS-1$
-			throw e;
+			LOGGER.log(Level.WARNING, "El servicio de firma devolvio un error durante la postfirma del lote JSON: " + e, e); //$NON-NLS-1$
+			final AOException ex;
+			if (e.getResponseCode() == 400) {
+				ex = new AOException("Error en los parametros enviados al servicio de postfirma del lote JSON", e, BatchErrorCode.Request.INVALID_PARAMS_TO_POSTSIGN_JSON_BATCH);  //$NON-NLS-1$
+			}
+			else if (e.getResponseCode() / 100 == 4) {
+				ex = new AOException("Error en la comunicacion con el servicio de firma de postfirma del lote JSON", e, BatchErrorCode.Communication.JSON_BATCH_POSTSIGN_COMMUNICATION_ERROR);  //$NON-NLS-1$
+			}
+			else {
+				ex = new AOException("El servicio de postfirma de lotes JSON devolvio un error", e, BatchErrorCode.ThirdParty.JSON_BATCH_POSTSIGN_ERROR);  //$NON-NLS-1$
+			}
+			throw ex;
 		}
+		catch (final IOException e) {
+			if (errorProcessor.isCancelled()) {
+				LOGGER.info(
+						"El usuario no permite la importacion del certificado SSL de confianza del servicio de postfirma de lote JSON: " //$NON-NLS-1$
+						+ LoggerUtil.getTrimStr(batchPreSignerUrl));
+			}
+			throw new AOException("No se ha podido conectar con el servicio de postfirma de lote JSON", e, BatchErrorCode.Communication.JSON_BATCH_POSTSIGN_CONNECTION_ERROR); //$NON-NLS-1$
+		}
+
 
 		return new String(ret, DEFAULT_CHARSET);
 	}
@@ -460,8 +535,8 @@ public final class BatchSigner {
 	 * @return algoritmo a usar
 	 * @throws IOException error en caso de que no se lea correctamente la petici&oacute;n
 	 */
-	private static String getAlgorithmForXML(final String batch) throws IOException {
-		final byte[] xml =  Base64.decode(batch.replace("-", "+").replace("_", "/")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	private static String getAlgorithmForXML(final byte[] xml) throws IOException {
+
 		final Document doc;
 		try (
 			final InputStream is = new ByteArrayInputStream(xml);
@@ -498,14 +573,14 @@ public final class BatchSigner {
 
 	/**
 	 * Obtiene el algoritmo para la petici&oacute;n de formato JSON
-	 * @param batch datos de la petici&oacute;n
+	 * @param batch Lotes de firma.
 	 * @return algoritmo a usar
-	 * @throws IOException error en caso de que no se lea correctamente la petici&oacute;n
+	 * @throws IOException Cuando no se lee correctamente la petici&oacute;n
 	 */
-	private static String getAlgorithmForJSON(final String batch) throws IOException  {
+	private static String getAlgorithmForJSON(final byte[] batch) {
 
 		JSONObject jsonObject = null;
-		final String convertedJson = new String(Base64.decode(batch), DEFAULT_CHARSET);
+		final String convertedJson = new String(batch, DEFAULT_CHARSET);
 		try {
 			jsonObject = new JSONObject(convertedJson);
 		}

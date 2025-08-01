@@ -23,8 +23,8 @@ SetCompressor lzma
   
 ;Definimos el valor de la variable VERSION, en caso de no definirse en el script
 ;podria ser definida en el compilador
-!define VERSION "1.9"
-!define FILE_VERSION "1.9.0.0"
+!define VERSION "1.10"
+!define FILE_VERSION "1.10.0.0"
 
 VIProductVersion "${FILE_VERSION}"
 VIFileVersion "${FILE_VERSION}"
@@ -40,7 +40,7 @@ VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
   ;Mostramos la pagina de bienvenida
   !insertmacro MUI_PAGE_WELCOME
   ;Pagina donde mostramos el contrato de licencia 
-  !insertmacro MUI_PAGE_LICENSE "licencia.txt"
+  !insertmacro MUI_PAGE_LICENSE $(LICENSE)
   ;Pagina donde se selecciona el directorio donde instalar nuestra aplicacion
   !insertmacro MUI_PAGE_DIRECTORY
   ;Pagina personalizada con las opciones de configuracion
@@ -76,7 +76,7 @@ Var INSTALL_JRE
 !define SECTION_ON ${SF_SELECTED} # 0x1
 
 Function createConfigPage
-  !insertmacro MUI_HEADER_TEXT "Opciones de integración avanzadas" "Seleccione las opciones de integración que desee que configure Autofirma"
+  !insertmacro MUI_HEADER_TEXT $(ADV_OPTIONS) $(INT_OPTIONS)
   
   nsDialogs::Create 1018
   Pop $0
@@ -86,13 +86,13 @@ Function createConfigPage
   ${EndIf}
 
   ; Creamos los elementos de interfaz
-  ${NSD_CreateCheckbox} 0 0 100% 10u "Agregar al menú inicio."
+  ${NSD_CreateCheckbox} 0 0 100% 10u $(ADD_HOME_MENU)
   Pop $StartMenu_Integration_Checkbox
   
-  ${NSD_CreateCheckbox} 0 17u 100% 10u "Crear acceso directo en el escritorio."
+  ${NSD_CreateCheckbox} 0 17u 100% 10u $(CREATE_SHORTCUT)
   Pop $Shorcut_Integration_Checkbox
 
-  ${NSD_CreateCheckbox} 0 34u 100% 10u "Configurar Firefox para que confíe en los certificados raíz del sistema."
+  ${NSD_CreateCheckbox} 0 34u 100% 10u $(CONF_FIREFOX_CERT)
   Pop $Firefox_Integration_Checkbox
   
   ; Restablecemos el valor por si hubiese cambio de pantalla
@@ -123,20 +123,38 @@ FunctionEnd
 
 ;--------------------------------
 ;Idiomas
- 
-  !insertmacro MUI_LANGUAGE "Spanish"
 
 ; Para generar instaladores en diferentes idiomas podemos escribir lo siguiente:
 ;  !insertmacro MUI_LANGUAGE ${LANGUAGE}
 ; De esta forma pasando la variable LANGUAGE al compilador podremos generar
 ; paquetes en distintos idiomas sin cambiar el script
 
+ !insertmacro MUI_LANGUAGE "Spanish"
+ !insertmacro MUI_LANGUAGE "English"
+ !insertmacro MUI_LANGUAGE "Catalan"
+ !insertmacro MUI_LANGUAGE "Basque"
+ !insertmacro MUI_LANGUAGE "Galician"
+ !insertmacro MUI_LANGUAGE "Valencian"
+ 
+;Incluimos el archivo con los literales multidioma
+  !include "lang_strings.nsh"
+
+;Licencias
+ LicenseLangString LICENSE ${LANG_SPANISH} "license\licencia_es.txt"
+ LicenseLangString LICENSE ${LANG_ENGLISH} "license\licencia_en.txt"
+ LicenseLangString LICENSE ${LANG_CATALAN} "license\licencia_ca.txt"
+ LicenseLangString LICENSE ${LANG_GALICIAN} "license\licencia_gl.txt"
+ LicenseLangString LICENSE ${LANG_BASQUE} "license\licencia_eu.txt"
+ LicenseLangString LICENSE ${LANG_VALENCIAN} "license\licencia_va.txt"
+ 
+ LicenseData $(LICENSE)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Configuration General ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;Nuestro instalador se llamara si la version fuera la 1.0: Ejemplo-1.0.exe
-OutFile Autofirma32/Autofirma_32_v1_9_installer.exe
+OutFile Autofirma32/Autofirma_32_v1_10_installer.exe
 
 ;Aqui comprobamos que en la version Inglesa se muestra correctamente el mensaje:
 ;Welcome to the $Name Setup Wizard
@@ -145,7 +163,7 @@ OutFile Autofirma32/Autofirma_32_v1_9_installer.exe
 ; Bienvenido al Asistente de Instalacion de Aplicacion $Name
 ; no se ve el contenido de la variable $Name si el tamano es muy grande
 Name "Autofirma"
-Caption "Instalador de Autofirma"
+Caption $(INST_CAPTION)
 Icon ic_launcher.ico
 
 ;Comprobacion de integridad del fichero activada
@@ -164,7 +182,7 @@ Var PATH
 InstallDir "$PROGRAMFILES\Autofirma"
 
 ;Mensaje que mostraremos para indicarle al usuario que seleccione un directorio
-DirText "Elija un directorio donde instalar la aplicación:"
+DirText $(CHOOSE_DIR)
 
 ;Indicamos que cuando la instalacion se complete no se cierre el instalador automaticamente
 AutoCloseWindow false
@@ -177,7 +195,7 @@ SetDatablockOptimize on
 ;Habilitamos la compresion de nuestro instalador
 SetCompress auto
 ;Personalizamos el mensaje de desinstalacion
-UninstallText "Desinstalador de Autofirma."
+UninstallText $(UNINST_CAPTION)
 
 !macro MVersionCheck Ver1 Ver2 OutVar
  Push "${Ver1}"
@@ -204,10 +222,10 @@ Section "Autofirma" sPrograma
 		; Si es la misma version o superior, detenemos el proceso. Si no, se elimina.
 		${VersionCheckNew} $R1 ${VERSION} "$R2"
 		${If} $R2 = 0
-		  MessageBox MB_OK "Esta versión de Autofirma ya está instalada." 
+		  MessageBox MB_OK $(INSTALLED_VERSION)
 		  Quit
 		${ElseIf} $R2 <> 2
-		  MessageBox MB_OK "La versión actual de Autofirma es más nueva que la que se quiere instalar."
+		  MessageBox MB_OK $(NEWEST_VERSION)
 		  Quit
 		${EndIf}
 		Call RemoveOldVersions
@@ -230,7 +248,12 @@ Section "Autofirma" sPrograma
 	File  Autofirma32\Autofirma.exe
 	File  Autofirma32\AutofirmaConfigurador.exe
 	File  Autofirma32\AutofirmaCommandLine.exe
-	File  licencia.txt
+	File  license\licencia_es.txt
+	File  license\licencia_en.txt
+	File  license\licencia_ca.txt
+	File  license\licencia_va.txt
+	File  license\licencia_eu.txt
+	File  license\licencia_gl.txt
 	File  ic_firmar.ico
 
 	;Copiamos la JRE en caso de que no se vaya usar el JRE instalado en el sistema
@@ -246,7 +269,7 @@ Section "Autofirma" sPrograma
 	loopFirefox:
 	${nsProcess::FindProcess} "firefox.exe" $R2
 	StrCmp $R2 0 0 +2
-		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la instalación de Autofirma.' IDOK loopFirefox
+		MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION $(CLOSE_FIREFOX) IDOK loopFirefox
 
 	${nsProcess::Unload}
 	
@@ -281,22 +304,22 @@ Section "Autofirma" sPrograma
 
 	;Registro
 	;CascadeAfirma.reg
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" "Firmar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" $(SIGN_WITH_AUTOFIRMA)
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\Autofirma.exe"
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\Autofirma.exe sign -gui -i "%1"'
 
 	;Verify
 	; .csig
-	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" "Firma binaria CMS/CAdES"
+	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" $(BINARY_SIGNATURE)
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" $(VERIFY_WITH_AUTOFIRMA)
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
 
 	;Verify
 	; .xsig
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" "Firma XMLDSig/XAdES"
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" $(XADES_SIGNATURE)
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con Autofirma"
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" $(VERIFY_WITH_AUTOFIRMA)
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
 	
 	;Protocolo afirma
@@ -316,7 +339,26 @@ Section "Autofirma" sPrograma
 	${If} $Firefox_Integration_Checkbox_State == ${BST_CHECKED}
 		StrCpy $R0 "-firefox_roots"
 	${Endif}
-	ExecWait '"$INSTDIR\$PATH\AutofirmaConfigurador.exe" $R0 /passive'
+	
+	StrCpy $R1 ""
+
+	${If} $LANGUAGE == 3082
+		StrCpy $R1 "-default_language es_ES"
+	${ElseIf} $LANGUAGE == 1027
+		StrCpy $R1 "-default_language ca_ES"
+	${ElseIf} $LANGUAGE == 2051
+		StrCpy $R1 "-default_language va_ES"
+	${ElseIf} $LANGUAGE == 1110
+		StrCpy $R1 "-default_language gl_ES"
+	${ElseIf} $LANGUAGE == 1069
+		StrCpy $R1 "-default_language eu_ES"
+	${ElseIf} $LANGUAGE == 1033
+		StrCpy $R1 "-default_language en_US"
+	${Else}
+		StrCpy $R1 "-default_language es_ES"
+	${EndIf}
+	
+	ExecWait '"$INSTDIR\$PATH\AutofirmaConfigurador.exe" $R0 $R1 /passive'
 	
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall
@@ -342,11 +384,21 @@ Section "Java Runtime Environment" sJRE
 SectionEnd
 
 	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-	!insertmacro MUI_DESCRIPTION_TEXT ${sPrograma} "Archivos necesarios para la ejecución del programa"
-	!insertmacro MUI_DESCRIPTION_TEXT ${sJRE} "Entorno de ejecución de Java. Obligatorio cuando no se encuentra Java en el equipo"
+	!insertmacro MUI_DESCRIPTION_TEXT ${sPrograma} $(NECESSARY_FILES)
+	!insertmacro MUI_DESCRIPTION_TEXT ${sJRE} $(JAVA_ENV)
 	!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Function .onInit
+
+	StrCpy $PATH "Autofirma"
+
+	; Establecemos los textos del dialogo de seleccion de idioma
+	!define MUI_LANGDLL_WINDOWTITLE "Instalador de $PATH"
+	!define MUI_LANGDLL_INFO "Seleccione el idioma del instalador."
+
+	; Establecemos el idioma por defecto seleccionado
+	StrCpy $Language ${LANG_SPANISH}
+    !insertmacro MUI_LANGDLL_DISPLAY
 
 	StrCpy $StartMenu_Integration_Checkbox_State ${BST_CHECKED}
 	StrCpy $Shorcut_Integration_Checkbox_State ${BST_CHECKED}
@@ -364,6 +416,15 @@ Function .onInit
 		SectionSetFlags ${sJRE} 17
 
 FunctionEnd
+
+
+Function un.onInit
+
+  StrCpy $Language ${LANG_SPANISH}
+  !insertmacro MUI_UNGETLANGUAGE
+  
+FunctionEnd
+
 
 ; Desactivamos la instalacion de la JRE si el usuario deselecciona
 ; esta opcion
@@ -521,17 +582,17 @@ Function AddCertificateToStore
         i ${CERT_STORE_ADD_ALWAYS}, i 0) i .R0"
       System::Call "crypt32::CertFreeCertificateContext(i r0)"
       ${If} $R0 = 0
-        StrCpy $0 "Unable to add certificate to certificate store"
+        StrCpy $0 $(CANT_OPEN_KEYSTORE)
       ${Else}
         StrCpy $0 "success"
       ${EndIf}
       System::Call "crypt32::CertCloseStore(i r1, i 0)"
     ${Else}
       System::Call "crypt32::CertFreeCertificateContext(i r0)"
-      StrCpy $0 "No fue posible abrir el almacén de certificados"
+      StrCpy $0 $(CANT_OPEN_KEYSTORE)
     ${EndIf}
   ${Else}
-    StrCpy $0 "No fue posible abrir el fichero de certificados"
+    StrCpy $0 $(CANT_OPEN_CERT_FILE)
   ${EndIf}
 
   Pop $R0
@@ -792,7 +853,7 @@ Section "uninstall"
 	loopFirefox:
 		${nsProcess::FindProcess} "firefox.exe" $R2
 		StrCmp $R2 0 0 +2
-			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION 'Cierre el navegador Mozilla Firefox para continuar con la desinstalación de Autofirma.' IDOK loopFirefox
+			MessageBox MB_OK|MB_DEFBUTTON1|MB_ICONEXCLAMATION $(CLOSE_FIREFOX) IDOK loopFirefox
 	
 	; ==== Desinstalador EXE - FIN ====
 		
@@ -931,7 +992,7 @@ Function RemoveOldVersions
 	${If} $R2 = 2
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "La instalación de Autofirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO $(UNINSTALL_OLDER) /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 	${EndIf}
 
@@ -965,7 +1026,7 @@ Function RemoveOldVersions
 		StrCmp $3 "Autofirma" 0 End
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
 		; instalador si no se quiere desinstalar
-		MessageBox MB_YESNO "La instalación de Autofirma requiere desinstalar la versión anterior encontrada en el equipo. No se realizará la nueva instalación sin desinstalar la anterior. ¿Desea continuar?" /SD IDYES IDNO Exit
+		MessageBox MB_YESNO $(UNINSTALL_OLDER) /SD IDYES IDNO Exit
 			Goto UninstallOlderVersion
 
 	; No se encontro Autofirma instalado, asi que finalizamos el proceso
@@ -1005,6 +1066,7 @@ Function RemoveOldVersions
 
 	; Iniciamos la desinstalacion
 	InitUninstall:
+	
 		; Tomamos la ruta de instalacion de la version anterior y la eliminamos del PATH. Si el desinstalador
 		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
 		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
@@ -1220,11 +1282,11 @@ Function AddToPath
   System::Call "advapi32::RegQueryValueEx(i $3, t'PATH', i 0, i 0, t.r1, *i ${NSIS_MAX_STRLEN} r2) i.r4"
   System::Call "advapi32::RegCloseKey(i $3)"
   IntCmp $4 234 0 +3 +3 ; $4 == ERROR_MORE_DATA
-    DetailPrint "El PATH es demasiado largo. No se le agregará la ruta de Autofirma."
+    DetailPrint $(PATH_TOO_LONG)
     Goto done
   IntCmp $4 0 +5 ; $4 != NO_ERROR
     IntCmp $4 2 +3 ; $4 != ERROR_FILE_NOT_FOUND
-      DetailPrint "Error inesperado al agregar la ruta al PATH: $4"
+      DetailPrint "$(PATH_ERROR) $4"
       Goto done
     StrCpy $1 ""
   ; Check if already in PATH
@@ -1244,10 +1306,10 @@ Function AddToPath
   IntOp $2 $2 + $3
   IntOp $2 $2 + 2 ; $2 = strlen(dir) + strlen(PATH) + sizeof(";")
   IntCmp $2 ${NSIS_MAX_STRLEN} +3 +3 0
-    DetailPrint "La ruta de Autofirma hace que el PATH sea demasiado largo. No se agregará"
+    DetailPrint $(AUTOFIRMA_PATH_TOO_LONG)
     Goto done
   ; Append dir to PATH
-  DetailPrint "Agregamos al PATH: $0"
+  DetailPrint "$(ADD_TO_PATH) $0"
   StrCpy $2 $1 1 -1
   StrCmp $2 ";" 0 +2
     StrCpy $1 $1 -1 ; remove trailing ';'
@@ -1285,7 +1347,7 @@ Function RemoveFromPath
   Call StrStr
   Pop $2 ; pos of our dir
   StrCmp $2 "" done
-  DetailPrint "Eliminamos del PATH: $0"
+  DetailPrint "$(DELETE_FROM_PATH) $0"
   StrLen $3 "$0;"
   StrLen $4 $2
   StrCpy $5 $1 -$4 ; $5 is now the part before the path to remove

@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,9 +75,13 @@ public class TestCosignInterversion {
 
 		final String algorithm = AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA;
 
+
+		final Properties extraParams = new Properties();
+		extraParams.setProperty(XAdESExtraParams.ALLOW_XADES_ENV_WITHOUT_XPATH, Boolean.TRUE.toString());
+
 		final byte[] result = this.signer.cosign(
 				this.xades_122_facturae, algorithm, this.pke.getPrivateKey(), this.pke.getCertificateChain(),
-				null);
+				extraParams);
 
 		final File saveFile = saveTempFile(result);
 		System.out.println("Prueba " + new TestCosignInterversion() { /* Vacio */ }.getClass().getEnclosingMethod().getName() + ": " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -93,9 +98,18 @@ public class TestCosignInterversion {
 
 		final String algorithm = AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA;
 
+		final Properties extraParams = new Properties();
+		this.baselineParams.forEach(new BiConsumer<Object, Object>() {
+			@Override
+			public void accept(final Object key, final Object value) {
+				extraParams.setProperty(key.toString(), value.toString());
+			}
+		});
+		extraParams.setProperty(XAdESExtraParams.ALLOW_XADES_ENV_WITHOUT_XPATH, Boolean.TRUE.toString());
+
 		final byte[] result = this.signer.cosign(
 				this.xades_122_facturae, algorithm, this.pke.getPrivateKey(), this.pke.getCertificateChain(),
-				this.baselineParams);
+				extraParams);
 
 		final File saveFile = saveTempFile(result);
 		System.out.println("Prueba " + new TestCosignInterversion() { /* Vacio */ }.getClass().getEnclosingMethod().getName() + ": " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$

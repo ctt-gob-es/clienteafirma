@@ -384,7 +384,7 @@ public final class SignatureService extends HttpServlet {
 				}
 				catch (final Throwable e) {
 					LOGGER.log(Level.WARNING, "Error al recuperar el documento", e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(14) + ": " + new AOTriphaseException(e.toString(), e)); //$NON-NLS-1$
+					out.print(AOTriphaseException.parsePresignException(ErrorManager.RECOVERING_DOCUMENT_ERROR, e.getMessage(), e).toString());
 					out.flush();
 					return;
 				}
@@ -491,14 +491,21 @@ public final class SignatureService extends HttpServlet {
 						);
 					}
 					else {
-						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
+						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation, TriServiceErrorCode.Request.CRYPTO_OPERATION_NOT_FOUND); //$NON-NLS-1$
 					}
 
 					LOGGER.info("Se ha calculado el resultado de la prefirma y se devuelve"); //$NON-NLS-1$
 				}
 				catch (final RuntimeConfigNeededException e) {
-					LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la prefirma de los datos", e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED, e.getRequestorText()) + ": " + e); //$NON-NLS-1$
+					if (e.isDenied()) {
+						LOGGER.log(Level.SEVERE, "La firma fallo en la prefirma por no obtener permisos/informacion del usuario o la aplicacion", e); //$NON-NLS-1$
+						final String msg = ErrorManager.getErrorMessage(ErrorManager.PRESIGN_ERROR) + ": " + e; //$NON-NLS-1$
+						out.print(msg);
+					}
+					else {
+						LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la prefirma de los datos", e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED, e.getRequestorText()) + ": " + e); //$NON-NLS-1$
+					}
 					out.flush();
 					return;
 				}
@@ -619,12 +626,19 @@ public final class SignatureService extends HttpServlet {
 						);
 					}
 					else {
-						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation); //$NON-NLS-1$
+						throw new AOException("No se reconoce el codigo de sub-operacion: " + subOperation, TriServiceErrorCode.Request.UNSUPPORTED_CRYPTO_OPERATION); //$NON-NLS-1$
 					}
 				}
 				catch (final RuntimeConfigNeededException e) {
-					LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la postfirma de los datos", e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED) + ":" + e.getRequestorText() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					if (e.isDenied())
+					{
+						LOGGER.log(Level.SEVERE, "La firma fallo en la postfirma por no obtener permisos/informacion del usuario o la aplicacion", e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.PRESIGN_ERROR) + ": " + e); //$NON-NLS-1$
+					}
+					else {
+						LOGGER.log(Level.SEVERE, "Se requiere intervencion del usuario para la postfirma de los datos", e); //$NON-NLS-1$
+						out.print(ErrorManager.getErrorMessage(ErrorManager.CONFIGURATION_NEEDED, e.getRequestorText()) + ": " + e); //$NON-NLS-1$
+					}
 					out.flush();
 					return;
 				}

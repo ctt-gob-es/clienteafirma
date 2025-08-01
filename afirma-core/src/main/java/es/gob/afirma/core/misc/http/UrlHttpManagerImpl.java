@@ -207,8 +207,9 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				conn = (HttpURLConnection) uri.openConnection();
 			}
 
-			final boolean needDisableSslChecks = sslConfig == null && Boolean.parseBoolean(
-					System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "false")); //$NON-NLS-1$
+
+			final String defaultSslCheck = System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, Boolean.FALSE.toString());
+			final boolean needDisableSslChecks = sslConfig == null && Boolean.parseBoolean(defaultSslCheck);
 			final boolean isSecureDomain = checkIsSecureDomain(uri);
 
 			// Si se trata de una conexion SSL:

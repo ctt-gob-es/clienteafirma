@@ -20,20 +20,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.AGEPolicyIncompatibilityException;
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.http.SSLErrorProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
@@ -49,6 +52,7 @@ import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
 import es.gob.afirma.core.signers.TriphaseUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.xml.NotFoundXPathException;
 
 /** Manejador de firmas XAdES trif&aacute;sicas. Mediante este manejador un usuario puede firmar un documento remoto
  * indicando el identificador del documento. Este manejador requiere de un servicio remoto que genere la estructura
@@ -168,7 +172,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 	}
 
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidSignatureFormatException, IOException, AOException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
@@ -241,7 +245,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
+			throws AOInvalidSignatureFormatException, IOException {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
@@ -386,7 +390,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			cerChainParamContent = TriphaseUtil.prepareCertChainParam(certChain, xParams);
 		}
 		catch (final CertificateEncodingException e) {
-			throw new AOException("Error decodificando la cadena de certificados: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error decodificando la cadena de certificados", e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		}
 
 		// ---------
@@ -423,39 +427,50 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 				append(AOUtil.properties2Base64(xParams));
 			}
 
-			final String postUrl = urlBuffer.toString();
-
 			final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
 			try {
-				preSignResult = urlManager.readUrl(postUrl, UrlHttpMethod.POST, errorProcessor);
+				preSignResult = urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST, errorProcessor);
 			} catch (final IOException e) {
 				if (errorProcessor.isCancelled()) {
 					LOGGER.info(
 							"El usuario no permite la importacion del certificado SSL de confianza del servicio de firma trifasica: " //$NON-NLS-1$
 							+ LoggerUtil.getTrimStr(signServerUrl.toString()));
 				}
-				throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
+				throw e;
 			}
 
 			urlBuffer.setLength(0);
 		}
+		catch (final HttpError e) {
+			LOGGER.log(Level.WARNING, "El servicio de firma devolvio un error durante la prefirma: " + e, e); //$NON-NLS-1$
+			final AOException ex;
+			if (e.getResponseCode() == 400) {
+				ex = new AOException("Error en los parametros enviados al servicio de prefirma", e, ErrorCode.Request.INVALID_PARAMS_TO_PRESIGN);  //$NON-NLS-1$
+			}
+			else if (e.getResponseCode() / 100 == 4) {
+				ex = new AOException("Error en la comunicacion con el servicio de firma de prefirma", e, ErrorCode.Communication.PRESIGN_SERVICE_COMMUNICATION_ERROR);  //$NON-NLS-1$
+			}
+			else {
+				ex = new AOException("El servicio de prefirma devolvio un error", e, ErrorCode.ThirdParty.PRESIGN_HTTP_ERROR);  //$NON-NLS-1$
+			}
+			throw ex;
+		}
 		catch (final IOException e) {
-			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
+			throw new AOException("No se ha podido conectar con el servicio de prefirma", e, ErrorCode.Communication.PRESIGN_SERVICE_CONNECTION_ERROR); //$NON-NLS-1$
 		}
 
 		// Comprobamos que no se trate de un error
-		if (preSignResult.length > 8) {
-			final String headMsg = new String(Arrays.copyOf(preSignResult, 8), StandardCharsets.UTF_8);
-			if (headMsg.startsWith(ERROR_PREFIX)) {
-				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
-				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
-				throw buildInternalException(msg, extraParams);
-			}
-		}
-		else {
+		if (preSignResult.length <= 8) {
 			final String msg = new String(preSignResult, StandardCharsets.UTF_8);
 			LOGGER.warning("No se han obtenido datos de la prefirma: " + msg); //$NON-NLS-1$
-			throw new AOException("No se han obtenido datos de la prefirma"); //$NON-NLS-1$
+			throw new AOException("No se han obtenido datos de la prefirma", ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE); //$NON-NLS-1$
+		}
+
+		final String headMsg = new String(Arrays.copyOf(preSignResult, 8), StandardCharsets.UTF_8);
+		if (headMsg.startsWith(ERROR_PREFIX)) {
+			final String msg = new String(preSignResult, StandardCharsets.UTF_8);
+			LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
+			throw buildInternalException(msg, extraParams, true);
 		}
 
 
@@ -472,7 +487,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
-			throw new AOException("Error al analizar la prefirma enviada por el servidor: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error al analizar la prefirma enviada por el servidor", e, ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE); //$NON-NLS-1$
 		}
 
 		final String preResultAsBase64 = Base64.encode(
@@ -515,24 +530,41 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			postSignResult = urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST);
 
 		}
+		catch (final HttpError e) {
+			LOGGER.log(Level.WARNING, "El servicio de firma devolvio un error durante la postfirma: " + e, e); //$NON-NLS-1$
+			final AOException ex;
+			if (e.getResponseCode() == 400) {
+				ex = new AOException("Error en los parametros enviados al servicio de postfirma", e, ErrorCode.Request.INVALID_PARAMS_TO_POSTSIGN);  //$NON-NLS-1$
+			}
+			else if (e.getResponseCode() / 100 == 4) {
+				ex = new AOException("Error en la comunicacion con el servicio de firma de postfirma", e, ErrorCode.Communication.POSTSIGN_SERVICE_COMMUNICATION_ERROR);  //$NON-NLS-1$
+			}
+			else {
+				ex = new AOException("El servicio de postfirma devolvio un error", e, ErrorCode.ThirdParty.POSTSIGN_HTTP_ERROR);  //$NON-NLS-1$
+			}
+			throw ex;
+		}
 		catch (final IOException e) {
-			throw new AOException("Error en la llamada de postfirma al servidor: " + e, e); //$NON-NLS-1$
+			throw new AOException("No se ha podido conectar con el servicio de postfirma", e, ErrorCode.Communication.POSTSIGN_SERVICE_CONNECTION_ERROR); //$NON-NLS-1$
 		}
 
 		// Comprobamos que no se trate de un error
-		if (postSignResult.length > 8) {
-			final String headMsg = new String(Arrays.copyOf(postSignResult, 8), StandardCharsets.UTF_8);
-			if (headMsg.startsWith(CONFIG_NEEDED_ERROR_PREFIX)) {
-				final String msg = new String(postSignResult, StandardCharsets.UTF_8);
-				LOGGER.warning("Error durante la postfirma: " + msg); //$NON-NLS-1$
-				throw buildInternalException(msg, extraParams);
-			}
+		if (postSignResult.length <= 8) {
+			final String msg = new String(postSignResult, StandardCharsets.UTF_8);
+			LOGGER.warning("No se han obtenido datos de la postfirma: " + msg); //$NON-NLS-1$
+			throw new AOException("No se han obtenido datos de la postfirma", ErrorCode.ThirdParty.MALFORMED_POSTSIGN_RESPONSE); //$NON-NLS-1$
+		}
+		final String headPostMsg = new String(Arrays.copyOf(postSignResult, 8), StandardCharsets.UTF_8);
+		if (headPostMsg.startsWith(ERROR_PREFIX)) {
+			final String msg = new String(postSignResult, StandardCharsets.UTF_8);
+			LOGGER.warning("Error durante la prostirma: " + msg); //$NON-NLS-1$
+			throw buildInternalException(msg, extraParams, false);
 		}
 
 		// Analizamos la respuesta del servidor
 		final String stringTrimmedResult = new String(postSignResult).trim();
 		if (!stringTrimmedResult.startsWith(SUCCESS)) {
-			throw new AOException("La firma trifasica no ha finalizado correctamente: " + new String(postSignResult)); //$NON-NLS-1$
+			throw new AOException("La firma trifasica no ha finalizado correctamente: " + stringTrimmedResult, ErrorCode.ThirdParty.POSTSIGN_ERROR); //$NON-NLS-1$
 		}
 
 		// Los datos no se devuelven, se quedan en el servidor
@@ -541,7 +573,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 		}
 		catch (final IOException e) {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
-			throw new AOException("El resultado devuelto por el servidor no es correcto: " + e, e); //$NON-NLS-1$
+			throw new AOException("El resultado devuelto por el servidor no es correcto", e, ErrorCode.ThirdParty.MALFORMED_POSTSIGN_RESPONSE); //$NON-NLS-1$
 		}
 	}
 
@@ -552,7 +584,7 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 	 * @param extraParams Configuraci&oacute;n aplicada en la operaci&oacute;n.
 	 * @return Excepci&oacute;n construida.
 	 */
-	private static AOException buildInternalException(final String msg, final Properties extraParams) {
+	private static AOException buildInternalException(final String msg, final Properties extraParams, final boolean presign) {
 
 		AOException exception = null;
 		final int separatorPos = msg.indexOf(":"); //$NON-NLS-1$
@@ -560,27 +592,46 @@ public class AOXAdESTriPhaseSigner implements AOSigner, OptionalDataInterface {
 			final int separatorPos2 = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
 			final String errorCode = msg.substring(separatorPos + 1, separatorPos2);
 			final String errorMsg = msg.substring(separatorPos2 + 1);
-			if (SigningLTSException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+			
+			if (NotFoundXPathException.REQUESTOR_MSG_CODE.equals(errorCode)) {
+				exception = new NotFoundXPathException(errorMsg);
+			} else if (SigningLTSException.REQUESTOR_MSG_CODE.equals(errorCode)) {
 				exception = new SigningLTSException(errorMsg);
 			} else if (SigningLTSException.REQUESTOR_POSSIBLE_MSG_CODE.equals(errorCode)) {
 				exception = new SigningLTSException(errorMsg, true);
-			} else if (AGEPolicyIncompatibilityException.REQUESTOR_SIGN_MSG_CODE.equals(errorCode)) {
-				exception = new AGEPolicyIncompatibilityException(errorMsg, AGEPolicyIncompatibilityException.OP_SIGN);
-			} else if (AGEPolicyIncompatibilityException.REQUESTOR_COSIGN_MSG_CODE.equals(errorCode)) {
-				exception = new AGEPolicyIncompatibilityException(errorMsg, AGEPolicyIncompatibilityException.OP_COSIGN);
-			} else if (AGEPolicyIncompatibilityException.REQUESTOR_COUNTERSIGN_MSG_CODE.equals(errorCode)) {
-				exception = new AGEPolicyIncompatibilityException(errorMsg, AGEPolicyIncompatibilityException.OP_COUNTERSIGN);
+			} else if (SignaturePolicyIncompatibilityException.REQUESTOR_SIGN_MSG_CODE.equals(errorCode)) {
+				exception = new SignaturePolicyIncompatibilityException(errorMsg, SignaturePolicyIncompatibilityException.OP_SIGN);
+			} else if (SignaturePolicyIncompatibilityException.REQUESTOR_COSIGN_MSG_CODE.equals(errorCode)) {
+				exception = new SignaturePolicyIncompatibilityException(errorMsg, SignaturePolicyIncompatibilityException.OP_COSIGN);
+			} else if (SignaturePolicyIncompatibilityException.REQUESTOR_COUNTERSIGN_MSG_CODE.equals(errorCode)) {
+				exception = new SignaturePolicyIncompatibilityException(errorMsg, SignaturePolicyIncompatibilityException.OP_COUNTERSIGN);
 			}
 		}
 
 		if (exception == null) {
+			final String triphaseErrorCode = msg.substring(0, separatorPos);
+			String exceptionClassName = null;
+			String intMessage = null;
 			final int internalExceptionPos = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
 			if (internalExceptionPos > 0) {
-				final String intMessage = msg.substring(internalExceptionPos + 1).trim();
-				exception = AOTriphaseException.parseException(intMessage);
+				final int internalExceptionLimitPos = msg.indexOf(":", internalExceptionPos + 1); //$NON-NLS-1$
+				if (internalExceptionLimitPos > 0) {
+					exceptionClassName = msg.substring(internalExceptionPos + 1, internalExceptionLimitPos).trim();
+					intMessage = msg.substring(internalExceptionLimitPos + 1).trim();
+				}
+				else {
+					exceptionClassName = msg.substring(internalExceptionPos + 1).trim();
+					intMessage = msg.substring(separatorPos + 1, internalExceptionPos).trim();
+				}
 			}
 			else {
-				exception = new AOException(msg);
+				intMessage = msg.substring(separatorPos + 1).trim();
+			}
+			if (presign) {
+				exception = AOTriphaseException.parsePresignException(triphaseErrorCode, intMessage, exceptionClassName);
+			}
+			else {
+				exception = AOTriphaseException.parsePostsignException(triphaseErrorCode, intMessage, exceptionClassName);
 			}
 		}
 

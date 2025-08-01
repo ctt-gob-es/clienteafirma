@@ -165,6 +165,11 @@
 		dataField.value = null;
 	}
 
+	function setStickySignatory() {
+		var isSticky = document.getElementById("sticky").checked;
+		AutoScript.setStickySignatory(isSticky);
+	}
+	
 	function addExtraParam(newParamId, listParamsId) {
 		var paramsList = document.getElementById(listParamsId);
 		paramsList.value = paramsList.value
@@ -251,7 +256,8 @@
 		<legend>Configuraci&oacute;n de la operaci&oacute;n</legend>
 
 		<div>
-			<input type="checkbox" id="stopOnError" />Parar en caso de error
+			<input type="checkbox" id="stopOnError" />Parar en caso de error<br>
+			<input id="sticky" type="checkbox" onchange="setStickySignatory();" />Cachear certificado
 		</div>
 	</fieldset>
 

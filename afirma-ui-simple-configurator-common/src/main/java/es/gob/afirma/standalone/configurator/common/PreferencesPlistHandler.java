@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
@@ -137,11 +137,11 @@ public final class PreferencesPlistHandler {
 
 		if (!AOFileUtils.isXML(configData)) {
 			LOGGER.severe("El fichero de preferencias no es XML"); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(
+			AOUIFactory.showMessageDialog(
+					null,
 					ConfiguratorCommonMessages.getString("PreferencesPlistHandler.9"), //$NON-NLS-1$
 					ConfiguratorCommonMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE,
-					null
+					AOUIFactory.WARNING_MESSAGE
 				);
 			return;
 		}
@@ -164,7 +164,7 @@ public final class PreferencesPlistHandler {
 				//						null);
 				//			}
 			}
-			catch (final AOInvalidFormatException e) {
+			catch (final AOInvalidSignatureFormatException e) {
 				LOGGER.log(Level.SEVERE, "No se ha podido extraer la informacion de la firma del fichero de configuracion", e); //$NON-NLS-1$
 				AOUIFactory.showErrorMessage(
 						ConfiguratorCommonMessages.getString("PreferencesPlistHandler.7"), //$NON-NLS-1$
@@ -174,7 +174,7 @@ public final class PreferencesPlistHandler {
 				return;
 			}
 		}
-		catch (final AOInvalidFormatException e) {
+		catch (final AOInvalidSignatureFormatException e) {
 			LOGGER.severe("El fichero de configuracion no esta firmado"); //$NON-NLS-1$
 			signMessage = ConfiguratorCommonMessages.getString("PreferencesPlistHandler.3"); //$NON-NLS-1$
 		}
@@ -357,7 +357,7 @@ public final class PreferencesPlistHandler {
 		}
 	}
 
-	/** Error de a&aacute;lisis del fichero de preferencias. */
+	/** Error de an&aacute;lisis del fichero de preferencias. */
 	public static class InvalidPreferencesFileException extends Exception {
 
 		private static final long serialVersionUID = 1L;

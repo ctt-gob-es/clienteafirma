@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Autofirma</title> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+  <meta name="KEYWORDS" content="firmar, CAdES, XAdES, PAdES, ODF, OOXML formato" /> 
+  <meta name="description" content="Firma electrónica de ficheros." /> 
+  <style>
+	
+	.bold {
+		font-weight: bold;
+	}
+
+  
+  
+  </style> 
+ </head> 
+ <body> 
+  <h2>Pantalla de firma</h2> 
+  <p> Desde esta pantalla pode selecionar os documentos ou directorios que desexa asinar. </p> 
+  <p align="center"> <img src="../gfx/pantallafirma1_mini.png" alt="Pantalla para la selección y firma de documentos" /> </p> 
+  <p> Pode seleccionar un ou varios documentos pulsando o botón &quot;Seleccionar ficheiros a asinar&quot; ou arrástrando os documentos e/ou directorios á área indicada (o recuadro de cor gris escuro). </p> 
+  <p> Ao cargar os documentos a asinar, mostraránselle certos detalles sobre estes, que variarán segundo selecciónese un único ficheiro ou varios: </p> 
+  <p align="center"> <img src="../gfx/pantallafirma4_mini.png" alt="Pantalla para la selección y firma de documentos con un fichero cargado" /> <img src="../gfx/pantallafirma3_mini.png" alt="Pantalla para la selección y firma con múltiples ficheros cargados" /> </p> 
+  <p> No recuadro habilitado para arrastrar os documentos que desexaban asinar apareceulle a información do ficheiro ou ficheiros que seleccionase. </p> 
+  <p> Se só seleccionou un ficheiro e dispón dunha aplicación predeterminada para este tipo de documentos, apareceralle o botón &quot;Ver ficheiro&quot; co que poderá abrir. Ademais, apareceralle a información relativa ao ficheiro e á firma que se vai a xerar (formato, atributos de firma e opcións de firma). No caso de configurar datos para o formato de firma seleccionado que se vaia a incluír na propia firma, como a política de firma, mostrarase unha ligazón &quot;Ver todos...&quot; desde a que se poderán visualizar todos os atributos de sinatura definidos. </p> 
+  <p> Se se seleccionaron varios ficheiros ou directorios, pode facer dobre clic sobre eles para abrilos ou pulsar co botón secundario do rato para ver as opcións de &quot;Ver ficheiro&quot; e &quot;Ver os atributos de firma&quot;. </p> 
+  <p> O botón &quot;Asinar&quot; situado no lado inferior da pantalla permitiralle asinar o documento. Se o almacén de certificados do seu sistema operativo aínda non terminase de cargarse, o botón aparecerá deshabilitado e cunha imaxe animada de espera. Nese caso, por favor, espere a que esta desapareza e habilítese o botón. </p> 
+  <p> Unha vez pulsado o botón, o programa xerará unha firma para cada documento seleccionado. Para cada tipo de documento xerarase a firma co formato establecido a desde o <a href="MenuPreferencias.html">panel de preferencias</a>. </p> 
+  <p> No caso de que se desexe asinar noutro formato distinto o ficheiro xa seleccionado, permitirase modificar seleccionando a ligazón &quot;(Cambiar)&quot; que se atopa xunto á información sobre o formato. Ao seleccionar, abrirase a seguinte xanela onde se permite elixir o formato desexado: </p> 
+  <p align="center"> <img src="../gfx/dialogocambioformato.png" alt="Pantalla para la selección del formato de firma" /> </p> 
+  <p> Os tipos de documento que se distinguen e os formatos de firma que admiten móstranse na seguinte táboa: </p> 
+  <table> 
+   <tbody> 
+    <tr> 
+     <th>Tipo de documento</th> 
+     <th>Icona</th> 
+     <th>Formatos de firma (resaltado o por defecto)</th> 
+    </tr> 
+    <tr> 
+     <td>PDF</td> 
+     <td><img src="../../shrd/icon_pdf.png" alt="Icono de documento Adobe PDF" /></td> 
+     <td><strong>PAdES</strong>, CAdES e XAdES.</td> 
+    </tr> 
+    <tr> 
+     <td>XML</td> 
+     <td><img src="../../shrd/icon_xml.png" alt="Icono de documento XML" /></td> 
+     <td><strong>XAdES</strong> e CAdES.</td> 
+    </tr> 
+    <tr> 
+     <td>Factura electrónica</td> 
+     <td><img src="../../shrd/icon_facturae.png" alt="Icono de factura electrónica" /></td> 
+     <td><strong>Facturae</strong>, CAdES e XAdES.</td> 
+    </tr> 
+    <tr> 
+     <td>OOXML</td> 
+     <td><img src="../../shrd/icon_office_win.png" alt="Icono de documento OOXML" /></td> 
+     <td><strong>CAdES</strong>, XAdES e OOXML (Office Open XML).</td> 
+    </tr> 
+    <tr> 
+     <td>ODF</td> 
+     <td><img src="../../shrd/icon_openoffice.png" alt="Icono de documento ODF" /></td> 
+     <td><strong>CAdES</strong>, XAdES e ODF (Open Document Format).</td> 
+    </tr> 
+    <tr> 
+     <td>Resto de documentos</td> 
+     <td><img src="../../shrd/icon_binary.png" alt="Icono de documento binario" /></td> 
+     <td><strong>CAdES</strong> e XAdES.</td> 
+    </tr> 
+    <tr> 
+     <td>Firma electrónica</td> 
+     <td><img src="../../shrd/icon_sign.png" alt="Icono de firma electrónica" /></td> 
+     <td>O mesmo da firma orixinal.</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+  <p> Como excepción a este último caso, non se pode volver asinar unha factura electrónica xa asinada en formato Factura-e. </p> 
+  <p> Ao asinar ficheiros, mostrarase unha xanela para o gardado da firma xerada se só se seleccionou un documento ou un diálogo para seleccionar o directorio de saída se se seleccionaron varios. Tras gardar as firmas, mostrarase a <a href="PantallaDetalle.html">pantalla de detalle de firma</a>. </p> 
+  <p> O proceso de firma pode verse alterado polos plugins instalados en Autofirma. Consulte o apartado de <a href="MenuPlugins.html">xestión de plugins</a> para saber máis sobre eles. </p> 
+  <p> De forma complementaria aos botóns e elementos gráficos, pode usar tamén a barra de menú ou os seguintes aceleradores de teclado: </p> 
+  <ul> 
+   <li><code>Control (⌘ en macOS) + S</code> : Seleccionar ficheiro.</li> 
+   <li><code>Control (⌘ en macOS) + F</code> : Asinar o ficheiro seleccionado.</li> 
+  </ul> 
+  <h3>Configuración dos formatos de firma</h3> 
+  <p> Pode configurar o formato de firma a utilizar por cada tipo de ficheiro e as particularidades destes formatos, así como o comportamento xeral da aplicación, a partir do <a href="MenuPreferencias.html">panel de preferencias</a> dispoñible a través do menú Opcións. </p> 
+  <p> Algúns formatos ou opcións de firma poden facer aparecer opcións de configuración adicionais na propia xanela de firma: </p> 
+  <ul> 
+   <li> <h4>Opcións de firma PDF:</h4> <p> A firma PDF dun único documento permite configurar o que a firma se mostre no documento. Para iso será necesario marcar a casa &quot;Facer a firma visible dentro do PDF&quot;. </p> <p> Tamén é posible inserir unha marca visible no PDF ao tempo de realizar a firma. Esta opción modificará o PDF agregándolle a imaxe seleccionada e, seguidamente, asinarao. Para usar esta función será necesario marcar a casa &quot;Inserir marca visible no PDF&quot;. Esta casa estará deshabilitada se o documento PDF xa está asinado, xa que a inserción dunha marca invalidaría as firmas anteriores. </p> <p> Outra opción dispoñible sería a de xerar un PDF certificado, será posible se a firma a realizar é formato PAdES e o documento non está previamente asinado. Realízase ao marcar a casa &quot;Xerar PDF certificado&quot;, e aplícase ao documento o nivel de certificación seleccionado na lista de opcións baixo a esta casa. A listaxe de opcións estará deshabilitado se a casa &quot;Xerar PDF certificado&quot; non está habilitada. </p> <p> Estas opciónes aparecerán marcadas ou non por defecto segundo estableceuse no <a href="MenuPreferencias.html">panel de preferencias</a>. Ao seleccionar calquera destas casas, mostrarásenos o panel de <a href="VentanaPdfVisible.html">Propiedades de elementos visibles en PDF</a>. </p> </li> 
+   <li> <h4>Agregar unha nova firma a un documento:</h4> <p> Ao agregar unha nova firma binaria ou XML a un documento de firma, permítese configurar se a nova firma realizarase sobre o propio documento (cofirma) ou sobre as firmas xa introducidas (contrafirma). Esta opción pode configurarse desde o panel de preferencias dos formatos CAdES e XAdES. Cando aplique, Autofirma mostrará ao usuario un botón &quot;Opcións Avanzadas&quot; desde o que poder acceder directamente a estas opcións de configuración. </p> </li> 
+  </ul> 
+  <p> Nos procesos de sinatura de múltiples documentos se omite calquera configuración que obrigue a deter o proceso de firma. Así, por exemplo, se omitirá a solicitude de contrasinal dos PDF e a configuración de firma visible e marca visible pedirase unha única vez e aplicarase a todos os documentos coa mesma configuración. </p>  
+ </body>
+</html>

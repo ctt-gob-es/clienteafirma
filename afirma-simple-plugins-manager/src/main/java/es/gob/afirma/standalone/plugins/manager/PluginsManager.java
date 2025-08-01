@@ -90,7 +90,7 @@ public class PluginsManager {
 					final AfirmaPlugin plugin = loadPlugin(info);
 					list.add(plugin);
 				}
-				catch (final PluginException e) {
+				catch (final AOPluginException e) {
 					LOGGER.log(Level.WARNING, String.format("No se ha podido cargar la informacion del plugin %s. Se eliminara del listado", info.getInternalName()), e); //$NON-NLS-1$
 				}
 			}
@@ -131,16 +131,16 @@ public class PluginsManager {
 		return list.toArray(new MinimalPluginInfo[list.size()]);
 	}
 
-	private AfirmaPlugin loadPlugin(final MinimalPluginInfo info) throws PluginException {
+	private AfirmaPlugin loadPlugin(final MinimalPluginInfo info) throws AOPluginException {
 
 		final File pluginDir = new File(this.pluginsDir, info.getInternalName());
 		if (!pluginDir.isDirectory()) {
-			throw new PluginException("No se ha encontrado el plugin " + info.getInternalName()); //$NON-NLS-1$
+			throw new AOPluginException("No se ha encontrado el plugin " + info.getInternalName(), PluginManagerError.Internal.INSTALLED_PLUGIN_NOT_FOUND); //$NON-NLS-1$
 		}
 
 		final File[] pluginFiles = pluginDir.listFiles((FileFilter) pathname -> pathname.isFile() && pathname.canRead());
 		if (pluginFiles == null || pluginFiles.length == 0) {
-			throw new PluginException("No se han encontrado los ficheros del plugin " + info.getInternalName()); //$NON-NLS-1$
+			throw new AOPluginException("No se han encontrado los ficheros del plugin " + info.getInternalName(), PluginManagerError.Internal.INSTALLED_PLUGIN_NOT_FOUND); //$NON-NLS-1$
 		}
 
 		return loadPluginFromFiles(pluginFiles);
@@ -180,15 +180,19 @@ public class PluginsManager {
 	 * @return Plugins cargados desde los archivos indicados.
 	 * @throws PluginException Cuando no se ha podido cargar el plugin.
 	 */
-	public static AfirmaPlugin loadPluginFromFiles(final File[] files) throws PluginException {
+	public static AfirmaPlugin loadPluginFromFiles(final File[] files) throws AOPluginException {
 
 		AfirmaPlugin plugin;
 		try {
 			plugin = PluginLoader.loadPlugin(files);
 		} catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Error en la carga de un conjunto de ficheros de plugin", e); //$NON-NLS-1$
-			throw new PluginException("Error en la carga de un conjunto de ficheros de plugin",  e); //$NON-NLS-1$
-		} catch (final PluginException e) {
+			throw new AOPluginException(
+					"Error en la carga de un conjunto de ficheros de plugin", //$NON-NLS-1$
+					e,
+					PluginManagerError.Internal.PLUGIN_ERROR
+					);
+		} catch (final AOPluginException e) {
 			LOGGER.log(Level.SEVERE, "El plugin importado no es valido", e); //$NON-NLS-1$
 			throw e;
 		}
@@ -222,8 +226,9 @@ public class PluginsManager {
 	 * del directorio de plugins.
 	 * @throws PluginControlledException Cuando se produce un error en la instalaci&oacute;n
 	 * emitido por el propio plugin.
+	 * @throws AOPluginException Cuando ocurre un error en la instalaci&oacute;n del plugin.
 	 */
-	public AfirmaPlugin installPlugin(final File pluginFile, final String pluginName) throws PluginInstalledException, PluginException, IOException, PluginControlledException {
+	public AfirmaPlugin installPlugin(final File pluginFile, final String pluginName) throws PluginInstalledException, PluginException, IOException, PluginControlledException, AOPluginException {
 
 		// Copiamos el plugin al directorio de plugins
 		final File outPluginFile = copyPluginToDirectory(pluginFile, pluginName, this.pluginsDir);
@@ -233,9 +238,9 @@ public class PluginsManager {
 		try {
 			plugin = loadPluginFromFiles(new File[] { outPluginFile });
 		}
-		catch (final Exception e) {
+		catch (final AOPluginException e) {
 			deleteDirectoryAndContent(outPluginFile.getParentFile());
-			throw new PluginException("No se pudo cargar el plugin recien importado", e); //$NON-NLS-1$
+			throw e;
 		}
 
 		final PluginInfo info = plugin.getInfo();
@@ -257,7 +262,7 @@ public class PluginsManager {
 				if (e instanceof PluginControlledException) {
 					throw (PluginControlledException) e;
 				}
-				throw new PluginException("Ocurrio un error al instalar el plugin", e); //$NON-NLS-1$
+				throw new PluginException("Ocurrio un error al instalar el plugin", e, PluginManagerError.Internal.PLUGIN_ERROR); //$NON-NLS-1$
 			}
 		}
 
@@ -302,7 +307,7 @@ public class PluginsManager {
 		// Creamos un directorio para el nuevo plugin
 		final File pluginDir = new File(pluginsDir, pluginName);
 		if (pluginDir.exists()) {
-			throw new PluginInstalledException("El plugin seleccionado ya se encuentra instalado"); //$NON-NLS-1$
+			throw new PluginInstalledException("El plugin seleccionado ya se encuentra instalado", PluginManagerError.Functional.ALREADY_INSTALLED_PLUGIN); //$NON-NLS-1$
 		}
 		try {
 			createDirWithPermissions(pluginDir);

@@ -10,30 +10,45 @@
 package es.gob.afirma.keystores;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 
-/** Excepci&oacute;n para notificar un error en la inicializacion o en el acceso
- * a un almac&eacute;n de certificados. */
+/**
+ * Excepci&oacute;n para notificar un error en la inicializacion o en el acceso
+ * a un almac&eacute;n de certificados.
+ */
 public final class AOKeyStoreManagerException extends AOException {
 
     private static final long serialVersionUID = 2896862509190263027L;
 
-    /** Crea la excepci&oacute;n con un mensaje determinado.
-     * @param msg Mensaje descriptivo de la excepci&oacute;n. */
-    public AOKeyStoreManagerException(final String msg) {
-        super(msg);
-    }
-
-    /** Crea la excepci&oacute;n con un mensaje determinado y una excepci&oacute;n de origen.
+    /**
+     * Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg Mensaje descriptivo de la excepci&oacute;n.
-     * @param e Excepci&oacute;n que ha causado el lanzamiento de esta. */
-    public AOKeyStoreManagerException(final String msg, final Exception e) {
-        super(msg, e);
+     * @param errorCode C&oacute;digo de error que proporciona m&acute;s informaci&oacute;n
+     * sobre el error o el almac&eacute;n que no se pudo inicializar.
+     */
+    public AOKeyStoreManagerException(final String msg, final ErrorCode errorCode) {
+        super(msg, errorCode);
     }
 
-    /** Crea la excepci&oacute;n con una excepci&oacute;n de origen.
-     * @param e Excepci&oacute;n que ha causado el lanzamiento de esta. */
-    public AOKeyStoreManagerException(final Exception e) {
-    	super(e);
+    /**
+     * Crea la excepci&oacute;n con un mensaje determinado y una excepci&oacute;n de origen.
+     * @param msg Mensaje descriptivo de la excepci&oacute;n.
+     * @param e Excepci&oacute;n que ha causado el lanzamiento de esta.
+     * @param errorCode C&oacute;digo de error que proporciona m&acute;s informaci&oacute;n
+     * sobre el error o el almac&eacute;n que no se pudo inicializar.
+     */
+    public AOKeyStoreManagerException(final String msg, final Exception e, final ErrorCode errorCode) {
+        super(msg, e, errorCode);
+    }
+
+    /**
+     * Crea la excepci&oacute;n con una excepci&oacute;n de origen.
+     * @param e Excepci&oacute;n que ha causado el lanzamiento de esta.
+     * @param errorCode C&oacute;digo de error que proporciona m&acute;s informaci&oacute;n
+     * sobre el error o el almac&eacute;n que no se pudo inicializar.
+     */
+    public AOKeyStoreManagerException(final Exception e, final ErrorCode errorCode) {
+    	super(e, errorCode);
     }
 
 }

@@ -153,7 +153,7 @@ public final class Utils {
      * @param xmlSignaturePrefix Prefijo XMLDSig. */
     public static void addCustomTransforms(final List<Transform> transforms, final Properties xParams, final String xmlSignaturePrefix) {
 
-        final List<Transform> transformList = transforms != null ? transforms : new ArrayList<Transform>();
+        final List<Transform> transformList = transforms != null ? transforms : new ArrayList<>();
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
         // primero compruebo si hay transformaciones a medida
@@ -235,7 +235,8 @@ public final class Utils {
         }
     }
 
-    /** Obtiene, de un nodo de referencia de tipo <i>Object</i>, la lista de
+    /**
+     * Obtiene, de un nodo de referencia de tipo <i>Object</i>, la lista de
      * transformaciones definidas. Si no tiene transformaciones definidas
      * devuelve {@code null}.
      * @param referenceNode Nodo de tipo referencia.
@@ -243,7 +244,8 @@ public final class Utils {
      * @return Listado de transformaciones.
      * @throws InvalidAlgorithmParameterException Cuando se encuentre un par&aacute;metro inv&aacute;lido para
      *                                            el algoritmo de transformaci&oacute;n.
-     * @throws NoSuchAlgorithmException Cuando se encuentre un algoritmo de transformaci&oacute;n no soportado. */
+     * @throws NoSuchAlgorithmException Cuando se encuentre un algoritmo de transformaci&oacute;n no soportado.
+     */
     public static List<Transform> getObjectReferenceTransforms(final Node referenceNode,
     		                                                   final String namespacePrefix) throws NoSuchAlgorithmException,
                                                                                                     InvalidAlgorithmParameterException {
@@ -293,7 +295,8 @@ public final class Utils {
         return algorithm;
     }
 
-    /** Recupera los par&aacute;metros de una transformaci&oacute;n. En el caso
+    /**
+     * Recupera los par&aacute;metros de una transformaci&oacute;n. En el caso
      * de las transformaciones XPATH y XPATH2 se devolver&aacute;n los
      * par&aacute;metros especificados y en las transformaciones Base64,
      * Enveloped y de Canonicalizaci&oacute;n (que no reciben par&aacute;metros)
@@ -303,7 +306,8 @@ public final class Utils {
      * @param namespacePrefix Prefijo del espacio de nombres XML.
      * @return Par&aacute;metros de la transformaci&oacute;n.
      * @throws InvalidAlgorithmParameterException Cuando no se especifiquen correctamente los
-     *                                            par&aacute;mnetros de las transformaciones XPATH y XPATH2. */
+     *                                            par&aacute;metros de las transformaciones XPATH y XPATH2.
+     */
     private static TransformParameterSpec getTransformParameterSpec(final Node transformNode,
     		                                                        final String namespacePrefix) throws InvalidAlgorithmParameterException {
 
@@ -496,7 +500,7 @@ public final class Utils {
      * @return Cadena de texto con el XML en forma de array de octetos. */
     public static byte[] writeXML(final Node node, final Map<String, String> props, final String styleHref, final String styleType) {
 
-        final Map<String, String> xmlProps = props != null ? props : new Hashtable<String, String>(0);
+        final Map<String, String> xmlProps = props != null ? props : new Hashtable<>(0);
 
         // La codificacion por defecto sera UTF-8
         final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ?
@@ -593,7 +597,7 @@ public final class Utils {
 
         byte[] pkcs1;
         try {
-            pkcs1 = Base64.decode(((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0)).getTextContent()); //$NON-NLS-1$
+            pkcs1 = Base64.decode(signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0).getTextContent()); //$NON-NLS-1$
         }
         catch (final Exception e) {
             LOGGER.log(Level.WARNING, "No se pudo extraer el PKCS#1 de una firma", e); //$NON-NLS-1$

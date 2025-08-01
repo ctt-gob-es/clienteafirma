@@ -9,6 +9,9 @@
 
 package es.gob.afirma.signvalidation;
 
+import es.gob.afirma.core.AOControlledException;
+import es.gob.afirma.core.ErrorCode;
+
 /**
  * Indica si la firma es v&aacute;lida o no.
  * @author Carlos Gamuci
@@ -25,53 +28,53 @@ public final class SignValidity {
 
 		switch (this.error) {
 			case NO_DATA:
-				return ret + ": no se puede comprobar la validez por no tener los datos firmados"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.4"); //$NON-NLS-1$ //$NON-NLS-2$
 			case CORRUPTED_SIGN:
-				return ret + ": la informaci&oacute;n contenida en la firma no es consistente (certificados corruptos, etc.)"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.5"); //$NON-NLS-1$ //$NON-NLS-2$
 			case NO_MATCH_DATA:
-				return ret + ": la firma no se corresponde con los datos firmados"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.6"); //$NON-NLS-1$ //$NON-NLS-2$
 			case NO_SIGN:
-				return ret + ": no se encuentra la firma dentro del documento"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.7"); //$NON-NLS-1$ //$NON-NLS-2$
 			case CERTIFICATE_PROBLEM:
-				return ret + ": no se puede extraer un certificado o este no es v&aacute;lido"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.8"); //$NON-NLS-1$ //$NON-NLS-2$
 			case CERTIFICATE_EXPIRED:
-				return ret + ": existe un certificado de firma caducado"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.9"); //$NON-NLS-1$ //$NON-NLS-2$
 			case CERTIFICATE_NOT_VALID_YET:
-				return ret + ": existe un certificado de firma que aun no es v&aacute;lido"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.10"); //$NON-NLS-1$ //$NON-NLS-2$
 			case CANT_VALIDATE_CERT:
-				return ret + ": no se ha podido validar el certificado correctamente"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.11"); //$NON-NLS-1$ //$NON-NLS-2$
 			case ALGORITHM_NOT_SUPPORTED:
-				return ret + ": la firma contiene un algoritmo no reconocido o no soportado"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.12"); //$NON-NLS-1$ //$NON-NLS-2$
 			case CA_NOT_SUPPORTED:
-				return ret + ": no se soporta la CA de expedici&oacute;n"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.13"); //$NON-NLS-1$ //$NON-NLS-2$
 			case CRL_PROBLEM:
-				return ret + ": existe algun problema con las CRLs incrustadas en la firma"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.14"); //$NON-NLS-1$ //$NON-NLS-2$
 			case PDF_UNKOWN_VALIDITY:
-				return ret + ": no se puede comprobar la validez de la firma PDF"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.15"); //$NON-NLS-1$ //$NON-NLS-2$
 			case OOXML_UNKOWN_VALIDITY:
-				return ret + ": no se puede comprobar la validez de la firma OOXML"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.16"); //$NON-NLS-1$ //$NON-NLS-2$
 			case ODF_UNKOWN_VALIDITY:
-				return ret + ": no se puede comprobar la validez de la firma ODF"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.17"); //$NON-NLS-1$ //$NON-NLS-2$
 			case UNKOWN_ERROR:
-				return ret + ": no se puede comprobar la validez de la firma"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.18"); //$NON-NLS-1$ //$NON-NLS-2$
 			case UNKOWN_SIGNATURE_FORMAT:
-				return ret + ": los datos proporcionados no se corresponden con ning&uacute;n formato de firma reconocido"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.19"); //$NON-NLS-1$ //$NON-NLS-2$
 			case MODIFIED_DOCUMENT:
-				return ret + ": el documento PDF es sospechoso de haberse modificado tras la firma"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.20"); //$NON-NLS-1$ //$NON-NLS-2$
 			case OVERLAPPING_SIGNATURE:
-				return ret + ": las firmas del documento se solapan pudiendo ocultar informaci&oacute;n"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.21"); //$NON-NLS-1$ //$NON-NLS-2$
 			case MODIFIED_FORM:
-				return ret + ": un formulario del documento fue modificado tras la firma"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.22"); //$NON-NLS-1$ //$NON-NLS-2$
 			case SUSPECTED_SIGNATURE:
-				return ret + ": el documento es sospechoso y el usuario debe revisar la firma"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.23"); //$NON-NLS-1$ //$NON-NLS-2$
 			case SIGN_PROFILE_NOT_CHECKED:
-				return ret + ": la firma contiene atributos longevos que Autofirma no puede validar. Para una validaci&oacute;n completa recurra a VALIDe."; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.24"); //$NON-NLS-1$ //$NON-NLS-2$
 			case CANT_VALIDATE_EXTERNALLY_DETACHED:
-				return ret + ": no se permite la validaci&oacute;n de firmas con referencias externas"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.25"); //$NON-NLS-1$ //$NON-NLS-2$
 			case BAD_BUILD_SIGN:
-				return ret + ": la firma no est&aacute; correctamente formada"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.26"); //$NON-NLS-1$ //$NON-NLS-2$
 			case CERTIFIED_SIGN_REVISION:
-				return ret + ": El documento certificado no permit&iacute;a nuevas firmas"; //$NON-NLS-1$
+				return ret + ": " + ValidationMessages.getString("SignValidationMessage.27"); //$NON-NLS-1$ //$NON-NLS-2$
 			default:
 				return ret;
 		}
@@ -140,7 +143,7 @@ public final class SignValidity {
         /** Cuando la firma es inv&aacute;lida porque no est&aacute; formada correctamente */
         BAD_BUILD_SIGN,
         /** Cuando la firma es inv&aacute;lida porque no es la &uacute;ltima firma*/
-        CERTIFIED_SIGN_REVISION,
+        CERTIFIED_SIGN_REVISION;
     }
 
     /** Validez de la firma. */
@@ -152,56 +155,96 @@ public final class SignValidity {
     /** Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n. */
     private final Exception errorException;
 
-    /** Identifica la validez de una firma.
+    /** C&oacute;digo de error asociado al problema en la validaci&oacute;n. */
+    private final ErrorCode errorCode;
+
+
+    /**
+     * Identifica la validez de una firma.
      * @param type Validez de la firma.
      * @param error Error que invalida o impide comprobar la firma.
      * @param ex Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
-     *           Si la validaci&oacute;n fue correcta, puede indicarse <code>null</code>. */
+     *           Si la validaci&oacute;n fue correcta, puede indicarse <code>null</code>.
+     */
     public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error, final Exception ex) {
         this.validity = type;
         this.error = error;
         this.errorException = ex;
+        this.errorCode = ex instanceof AOControlledException ? ((AOControlledException) ex).getErrorCode() : null;
     }
 
-    /** Identifica la validez de una firma.
+    /**
+     * Identifica la validez de una firma.
      * @param type Validez de la firma.
-     * @param error Error que invalida o impide comprobar la firma. */
-    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error) {
-    	this(type, error, null);
+     * @param error Error que invalida o impide comprobar la firma.
+     * @param errorCode C&oacute;digo de error asociado al problema en la validaci&oacute;n.
+     */
+    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error, final ErrorCode errorCode) {
+        this.validity = type;
+        this.error = error;
+        this.errorException = null;
+        this.errorCode = errorCode;
     }
 
-    /** Recupera la validez de la firma.
-     * @return Validez de la firma. */
+    /**
+     * Identifica la validez de una firma.
+     * @param type Validez de la firma.
+     * @param error Error que invalida o impide comprobar la firma.
+     */
+    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error) {
+    	this(type, error, (Exception) null);
+    }
+
+    /**
+     * Recupera la validez de la firma.
+     * @return Validez de la firma.
+     */
     public SIGN_DETAIL_TYPE getValidity() {
         return this.validity;
     }
 
-    /** Recupera el error que invalida la firma. Si no existe ning&uacute;n error o este es desconocido,
+    /**
+     * Recupera el error que invalida la firma. Si no existe ning&uacute;n error o este es desconocido,
      * se devolver&aacute; {@code null}.
-     * @return Error que invalida la firma o impide comprobar su validez. */
+     * @return Error que invalida la firma o impide comprobar su validez.
+     */
     public VALIDITY_ERROR getError() {
         return this.error;
     }
 
-    /** Recupera la excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
+    /**
+     * Recupera la excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
      * Devuelve <code>null</code> en una validaci&oacute;n sin errores.
-     * @return Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n. */
+     * @return Excepci&oacute;n por la que se detect&oacute; el error de validaci&oacute;n.
+     */
     public Exception getErrorException() {
     	return this.errorException;
     }
 
+    /**
+     * Obtiene el codigo de error asociado al error de la validaci&oacute;n.
+     * @return C&oacute;digo de error o {@code null} si no se conoce.
+     */
+    public ErrorCode getErrorCode() {
+		return this.errorCode != null
+				? this.errorCode
+				: this.errorException instanceof AOControlledException
+					? ((AOControlledException) this.errorException).getErrorCode()
+					: null;
+	}
+
     public String validityTypeToString() {
 		if (this.validity.equals(SIGN_DETAIL_TYPE.OK) || this.validity.equals(SIGN_DETAIL_TYPE.GENERATED)) {
-			return "Firma valida"; //$NON-NLS-1$
+			return ValidationMessages.getString("SignValidationMessage.0"); //$NON-NLS-1$
 		}
 		if (this.validity.equals(SIGN_DETAIL_TYPE.UNKNOWN)) {
-			return "Validaci\u00F3n incompleta"; //$NON-NLS-1$
+			return ValidationMessages.getString("SignValidationMessage.1"); //$NON-NLS-1$
 		}
 		if (this.validity.equals(SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER)) {
-			return "Validez a confirmar por el usuario"; //$NON-NLS-1$
+			return ValidationMessages.getString("SignValidationMessage.2"); //$NON-NLS-1$
 		}
 		if (this.validity.equals(SIGN_DETAIL_TYPE.KO)) {
-			return "Firma no valida"; //$NON-NLS-1$
+			return ValidationMessages.getString("SignValidationMessage.3"); //$NON-NLS-1$
 		}
 		return null;
     }

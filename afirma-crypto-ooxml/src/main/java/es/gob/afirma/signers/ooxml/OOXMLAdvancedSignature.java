@@ -31,6 +31,7 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.keystores.AOCancelledSMOperationException;
 import es.gob.afirma.core.keystores.AuthenticationException;
 import es.gob.afirma.core.keystores.LockedKeyStoreException;
@@ -131,11 +132,11 @@ final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
     			  causeName = cause.getCause() != null ? cause.getCause().getClass().getName() : null;
     			  // Si la tarjeta esta bloqueada
     			  if ("es.gob.jmulticard.card.AuthenticationModeLockedException".equals(causeName)) { //$NON-NLS-1$
-    				  throw new LockedKeyStoreException("El almacen de claves esta bloqueado", e); //$NON-NLS-1$
+    				  throw new LockedKeyStoreException("El almacen de claves esta bloqueado", e, ErrorCode.Functional.SMARTCARD_LOCKED); //$NON-NLS-1$
     			  }
     			  // Si se ha insertado un PIN incorrecto
     			  if ("es.gob.jmulticard.card.BadPinException".equals(causeName)) { //$NON-NLS-1$
-    				  throw new PinException("La contrasena del almacen o certificado es incorrecta", e); //$NON-NLS-1$
+    				  throw new PinException("La contrasena del almacen o certificado es incorrecta", e, ErrorCode.Functional.INVALID_SMARTCARD_PIN); //$NON-NLS-1$
     			  }
     			  throw new AuthenticationException("Ocurrio un error de autenticacion al utilizar la clave de firma", cause); //$NON-NLS-1$
     		  }

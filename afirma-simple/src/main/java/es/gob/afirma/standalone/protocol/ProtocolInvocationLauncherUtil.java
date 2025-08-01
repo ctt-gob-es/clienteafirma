@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.protocol.UrlParameters;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -20,6 +21,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.standalone.DataAnalizerUtil;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.plugins.SignOperation.Operation;
 
@@ -31,21 +33,21 @@ final class ProtocolInvocationLauncherUtil {
 		// No instanciable
 	}
 
-	static final class InvalidEncryptedDataLengthException extends Exception {
+	static final class InvalidEncryptedDataLengthException extends AOException {
 
 		private static final long serialVersionUID = 1L;
 
 		InvalidEncryptedDataLengthException(final String msg) {
-			super(msg);
+			super(msg, SimpleErrorCode.Internal.ERROR_RECIVED_FROM_CLIENT);
 		}
 	}
 
-	static final class DecryptionException extends Exception {
+	static final class DecryptionException extends AOException {
 
 		private static final long serialVersionUID = 1L;
 
 		DecryptionException(final String msg, final Throwable e) {
-			super(msg, e);
+			super(msg, e, SimpleErrorCode.Internal.DECRYPTING_PARAMS_ERROR);
 		}
 	}
 
@@ -102,35 +104,51 @@ final class ProtocolInvocationLauncherUtil {
 		}
 
 		if (!exceptionClass.isAssignableFrom(RuntimeConfigNeededException.class)) {
-			LOGGER.warning("La clase indicada para pedir confirmacion no es de tipo RuntimeConfigNeededException (" + ex.getServerExceptionClassname() + "): " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.warning("La excepcion indicada no es de tipo RuntimeConfigNeededException (" + ex.getServerExceptionClassname() + "): " + ex); //$NON-NLS-1$ //$NON-NLS-2$
 			return ex;
 		}
 
 		// Buscamos algun constructor que nos permita generar la excepcion
+		Exception internalException = null;
 		try {
-			return exceptionClass.
+			internalException = exceptionClass.
 					getDeclaredConstructor(String.class).
 					newInstance(ex.getMessage());
 		}
 		catch (final Exception e) { /* No hacemos nada */}
-		try {
-			return exceptionClass.
-					getDeclaredConstructor(String.class, Throwable.class).
-					newInstance(ex.getMessage(), null);
+		if (internalException == null) {
+			try {
+				internalException = exceptionClass.
+						getDeclaredConstructor(String.class, Throwable.class).
+						newInstance(ex.getMessage(), null);
+			}
+			catch (final Exception e) { /* No hacemos nada */}
 		}
-		catch (final Exception e) { /* No hacemos nada */}
-		try {
-			return exceptionClass.
-					getDeclaredConstructor(Throwable.class).
-					newInstance((Throwable) null);
+		if (internalException == null) {
+			try {
+				internalException = exceptionClass.
+						getDeclaredConstructor(Throwable.class).
+						newInstance((Throwable) null);
+			}
+			catch (final Exception e) { /* No hacemos nada */}
 		}
-		catch (final Exception e) { /* No hacemos nada */}
-		try {
-			return exceptionClass.
-					getDeclaredConstructor().
-					newInstance();
+		if (internalException == null) {
+			try {
+				internalException = exceptionClass.
+						getDeclaredConstructor().
+						newInstance();
+			}
+			catch (final Exception e) { /* No hacemos nada */}
 		}
-		catch (final Exception e) { /* No hacemos nada */}
+
+		if (internalException != null) {
+			// Si la excepcion interna es de tipo RuntimeConfigNeededException es que se denego la operacion
+			// ya que de lo contrario no hubiese venido encapsulada
+			if (internalException instanceof RuntimeConfigNeededException) {
+				((RuntimeConfigNeededException) internalException).setDenied(true);
+			}
+			return internalException;
+		}
 
 		LOGGER.warning("No se encontro un constructor para reconstruir la excepcion del servidor"); //$NON-NLS-1$
 		return ex;

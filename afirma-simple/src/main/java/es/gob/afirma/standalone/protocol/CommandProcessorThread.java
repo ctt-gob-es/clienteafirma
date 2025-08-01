@@ -11,7 +11,10 @@ import java.util.logging.Logger;
 
 import javax.swing.Timer;
 
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.protocol.ProtocolVersion;
+import es.gob.afirma.standalone.SimpleErrorCode;
 
 /**
  * Hilo para la recepci&oacute;n de peticiones de operaciones de Autofirma
@@ -31,6 +34,8 @@ class CommandProcessorThread extends Thread {
 
 	/** N&uacute;mero m&aacute;ximo de intentos de lectura consecutivos en el <i>buffer</i> sin que se encuentren datos. */
 	private static final int MAX_READING_BUFFER_TRIES = 10;
+
+	private static final int PROTOCOL_VERSION = ProtocolVersion.VERSION_3.getVersion();
 
 	private static final String MEMORY_ERROR = "MEMORY_ERROR";//$NON-NLS-1$
 	// ip locales para que no nos vengan peticiones externas
@@ -107,13 +112,13 @@ class CommandProcessorThread extends Thread {
 		}
 		catch(final IllegalArgumentException e) {
 			LOGGER.severe("Se proporciono un ID de sesion erroneo. Se rechaza la conexion: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, this.localSocket, "ID de sesion erroneo"); //$NON-NLS-1$
+			sendError(SimpleErrorCode.Request.INVALID_SESSION_ID);
 			closeSocket(this.localSocket);
 			return;
 		}
 		catch(final Exception e) {
 			LOGGER.severe("Error en la lectura de datos del socket: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, this.localSocket, "No se pudieron leer los datos del socket"); //$NON-NLS-1$
+			sendError(SimpleErrorCode.Communication.READING_FROM_SOCKET);
 			closeSocket(this.localSocket);
 			return;
 		}
@@ -132,11 +137,11 @@ class CommandProcessorThread extends Thread {
 		}
 		catch (final IllegalArgumentException e) {
 			LOGGER.severe("Los parametros recibidos a traves del socket no son validos: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.ERROR_PARAMS, this.localSocket, "Parametros incorrectos"); //$NON-NLS-1$
+			sendError(SimpleErrorCode.Request.MALFORMED_REQUEST_TO_SOCKET);
 		}
 		catch(final IOException e) {
 			LOGGER.severe("Error en el envio a traves del socket: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT, this.localSocket, "Envio del resultado a la aplicacion"); //$NON-NLS-1$
+			sendError(SimpleErrorCode.Communication.SENDING_RESULT_OPERATION);
 		}
 		catch (final OutOfMemoryError e){
 			LOGGER.severe("Se ha producido un error por falta memoria de la maquina virtual: " + e); //$NON-NLS-1$
@@ -144,7 +149,7 @@ class CommandProcessorThread extends Thread {
 		}
 		catch(final Exception e) {
 			LOGGER.severe("Error al procesar el comando enviado: " + e); //$NON-NLS-1$
-			sendError(ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED, this.localSocket, "Error al procesar el comando"); //$NON-NLS-1$
+			sendError(SimpleErrorCode.Internal.UNKNOWN_SIGNING_BY_SOCKETS_ERROR);
 		}
 
 		closeSocket(this.localSocket);
@@ -462,13 +467,13 @@ class CommandProcessorThread extends Thread {
 
 	/**
 	 * Manda como respuesta a la aplicacion uno de los mensajes de error registrados.
-	 * @param safError C&oacute;digo SAF del error.
+	 * @param errorCode C&oacute;digo de error generado.
 	 * @param socket Socket a trav&eacute;s del que enviar el mensaje.
 	 * @param petition Descripcion del mensaje que se trato de enviar.
 	 */
-	private void sendError(final String safError, final Socket socket, final String petition) {
+	private void sendError(final ErrorCode errorCode) {
 		try {
-			sendData(createHttpResponse(true, ProtocolInvocationLauncherErrorManager.getErrorMessage(safError)), this.localSocket, "ID de sesion erroneo"); //$NON-NLS-1$
+			sendData(createHttpResponse(true, ProtocolInvocationLauncherErrorManager.getErrorMessage(PROTOCOL_VERSION, errorCode)), this.localSocket, "ID de sesion erroneo"); //$NON-NLS-1$
 		} catch (final IOException ex) {
 			LOGGER.warning("No se ha podido informar a la aplicacion del error producido: " + ex); //$NON-NLS-1$
 		}

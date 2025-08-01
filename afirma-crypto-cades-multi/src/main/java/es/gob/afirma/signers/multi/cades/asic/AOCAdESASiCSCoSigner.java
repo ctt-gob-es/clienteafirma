@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.asic.ASiCUtil;
 import es.gob.afirma.signers.multi.cades.AOCAdESCoSigner;
@@ -31,7 +33,7 @@ public final class AOCAdESASiCSCoSigner implements AOCoSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) throws AOException, IOException {
+			             final Properties extraParams) throws AOException {
 		return cosign(sign, algorithm, key, certChain, extraParams);
 	}
 
@@ -41,16 +43,14 @@ public final class AOCAdESASiCSCoSigner implements AOCoSigner {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
-			             final Properties extraParams) throws AOException,
-			                                                  IOException {
+			             final Properties extraParams) throws AOException {
 		// Extraemos firma y datos del ASiC
 		byte[] packagedSign;
 		try {
 			packagedSign = ASiCUtil.getASiCSBinarySignature(sign);
 		} catch (final IOException e) {
-			throw new AOException("No se encontro la firma CAdES dentro del contenedor ASiC", e); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("No se encontro la firma CAdES dentro del contenedor ASiC", e); //$NON-NLS-1$
 		}
-
 		// Utilizarmos solo los primeros datos que encontremos
 		String signedDataName;
 		byte[] packagedData;
@@ -59,19 +59,23 @@ public final class AOCAdESASiCSCoSigner implements AOCoSigner {
 			signedDataName = signedData.keySet().iterator().next();
 			packagedData = signedData.get(signedDataName);
 		} catch (final IOException e) {
-			throw new AOException("No se encontraron los datos firmados dentro del contenedor CAdES-ASiC", e); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("No se encontraron los datos firmados dentro del contenedor CAdES-ASiC", e); //$NON-NLS-1$
 		}
 
 		// Creamos la cofirma
 		final byte[] newSign = new AOCAdESCoSigner().cosign(packagedData, packagedSign, algorithm, key, certChain, extraParams);
 
 		// Devolvemos un nuevo ASiC
+		try {
 		return ASiCUtil.createSContainer(
 			newSign,
 			packagedData,
 			signedDataName,
 			ASiCUtil.ENTRY_NAME_BINARY_SIGNATURE
 		);
+		} catch (final IOException e) {
+			throw new AOException("No se ha podido construir el contenedor CAdES-ASiC", e, ErrorCode.Internal.BUILDING_ASIC_CONTAINER_ERROR); //$NON-NLS-1$
+	}
 	}
 
 }

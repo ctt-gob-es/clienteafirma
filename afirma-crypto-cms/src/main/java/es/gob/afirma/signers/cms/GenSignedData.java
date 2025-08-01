@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Signature;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -48,6 +47,7 @@ import org.spongycastle.asn1.x509.Certificate;
 import org.spongycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -203,10 +203,10 @@ final class GenSignedData {
     		);
         }
         catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e, e); //$NON-NLS-1$
+            throw new AOException("Algoritmo de firma no soportado: " + e, e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
         }
 
-        final ASN1OctetString sign2 = firma(signatureAlgorithm, key);
+        final ASN1OctetString sign2 = CmsUtil.firma(signatureAlgorithm, key, this.signedAttr2);
         signerInfos.add(
     		new SignerInfo(
 				identifier,
@@ -344,52 +344,4 @@ final class GenSignedData {
         return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
 
     }
-
-    /** Realiza la firma usando los atributos del firmante.
-     * @param signatureAlgorithm Algoritmo para la firma.
-     * @param key Clave para firmar.
-     * @return Firma de los atributos.
-     * @throws AOException Si ocurre cualquier problema durante el proceso. */
-    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKey key) throws AOException {
-
-        final Signature sig;
-        try {
-            sig = Signature.getInstance(signatureAlgorithm);
-        }
-        catch (final Exception e) {
-            throw new AOException(
-        		"Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e //$NON-NLS-1$
-    		);
-        }
-
-        // Indicar clave privada para la firma
-        try {
-            sig.initSign(key);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
-        }
-
-        // Actualizamos la configuracion de firma
-        try {
-            sig.update(this.signedAttr2.getEncoded(ASN1Encoding.DER));
-        }
-        catch (final Exception e) {
-            throw new AOException(
-        		"Error al configurar la informacion de firma o al obtener los atributos a firmar", e //$NON-NLS-1$
-    		);
-        }
-
-        // firmamos.
-        final byte[] realSig;
-        try {
-            realSig = sig.sign();
-        }
-        catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
-        }
-
-        return new DEROctetString(realSig);
-    }
-
 }

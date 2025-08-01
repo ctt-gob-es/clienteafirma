@@ -22,12 +22,14 @@ import java.util.logging.Logger;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.pkcs7.BinaryErrorCode;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
@@ -95,10 +97,10 @@ public final class AOCMSSigner implements AOSigner {
 		    );
 		}
         catch (final NoSuchAlgorithmException e) {
-			throw new AOException("Error en el algoritmo de firma: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en el algoritmo de firma: " + e, e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
 		}
         catch (final CertificateException e) {
-        	throw new AOException("Error en el certificado de firma: " + e, e); //$NON-NLS-1$
+        	throw new AOException("Error en el certificado de firma: " + e, e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		}
 
     }
@@ -139,11 +141,14 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 return new CoSigner().coSigner(csp, sign, omitContent, this.dataType, key, certChain, this.atrib, this.uatrib, messageDigest);
             }
+            catch (final AOException e) {
+                throw e;
+            }
             catch (final Exception e) {
-                throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
+                throw new AOException("Error generando la Cofirma PKCS#7", e, BinaryErrorCode.Internal.UNKWNON_BINARY_SIGNING_ERROR); //$NON-NLS-1$
             }
         }
-        throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
+        throw new AOInvalidSignatureFormatException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
     }
 
     /** {@inheritDoc} */
@@ -178,11 +183,14 @@ public final class AOCMSSigner implements AOSigner {
 					null
 				);
 			}
+            catch (final AOException e) {
+            	throw e;
+			}
             catch (final Exception e) {
-            	throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
+            	throw new AOException("Error generando la Cofirma PKCS#7", e, BinaryErrorCode.Internal.UNKWNON_BINARY_SIGNING_ERROR); //$NON-NLS-1$
 			}
         }
-        throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
+        throw new AOInvalidSignatureFormatException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
     }
 
     /** {@inheritDoc} */
@@ -284,21 +292,24 @@ public final class AOCMSSigner implements AOSigner {
 
                 }
             }
+            catch (final AOException e) {
+            	throw e;
+			}
             catch (final Exception e) {
-                throw new AOException("Error generando la Contrafirma PKCS#7", e); //$NON-NLS-1$
+                throw new AOException("Error generando la Contrafirma PKCS#7", e, BinaryErrorCode.Internal.UNKWNON_BINARY_SIGNING_ERROR); //$NON-NLS-1$
             }
         }
         else {
-            throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
         }
 
         return dataSigned;
     }
-    
+
     /** {@inheritDoc} */
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
+			throws AOInvalidSignatureFormatException, IOException {
     	new SCChecker().checkSpongyCastle();
         final ReadNodesTree rn = new ReadNodesTree();
         try {
@@ -312,11 +323,11 @@ public final class AOCMSSigner implements AOSigner {
 
     /** {@inheritDoc} */
     @Override
-	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) 
-			throws AOInvalidFormatException, IOException{
+	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
+			throws AOInvalidSignatureFormatException, IOException{
     	return getSignersStructure(sign, null, asSimpleSignInfo);
     }
-    
+
 	/** {@inheritDoc} */
 	@Override
 	public boolean isSign(final byte[] signData, final Properties params) throws IOException {
@@ -359,7 +370,7 @@ public final class AOCMSSigner implements AOSigner {
     public void addUnsignedAttribute(final String oid, final byte[] value) {
         this.uatrib.put(oid, value);
     }
-    
+
     /** {@inheritDoc} */
 	@Override
 	public byte[] getData(final byte[] sign, final Properties params) throws IOException, AOException {
@@ -369,7 +380,7 @@ public final class AOCMSSigner implements AOSigner {
     		);
         }
         if (!ValidateCMSSignedData.isCMSSignedData(sign)) {
-            throw new AOInvalidFormatException(
+            throw new AOInvalidSignatureFormatException(
         		"Los datos introducidos no se corresponden con un objeto de firma" //$NON-NLS-1$
     		);
         }
@@ -387,7 +398,7 @@ public final class AOCMSSigner implements AOSigner {
 	public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".csig";  //$NON-NLS-1$//$NON-NLS-2$
     }
-    
+
     /** {@inheritDoc} */
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
@@ -398,7 +409,7 @@ public final class AOCMSSigner implements AOSigner {
         }
 
         if (!isSign(data)) {
-            throw new AOInvalidFormatException(
+            throw new AOInvalidSignatureFormatException(
         		"Los datos introducidos no se corresponden con un objeto de firma" //$NON-NLS-1$
     		);
         }

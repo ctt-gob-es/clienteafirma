@@ -147,12 +147,14 @@ public final class JSONSingleSign extends SingleSign {
 		return JSONSingleSignPreProcessor.doPreProcess(this, certChain, algorithm, docManager, docCacheManager);
 	}
 
-	/** Obtiene la tarea de preproceso de firma para ser ejecutada en paralelo.
+	/**
+	 * Obtiene la tarea de preproceso de firma para ser ejecutada en paralelo.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param algorithm Algoritmo de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @param docCacheManager Gestor para el guardado de datos en cach&eacute;.
-	 * @return Tarea de preproceso de firma para ser ejecutada en paralelo. */
+	 * @return Tarea de preproceso de firma para ser ejecutada en paralelo.
+	 */
 	Callable<PreprocessResult> getPreProcessCallable(final X509Certificate[] certChain,
                                                   final SingleSignConstants.DigestAlgorithm algorithm,
                                                   final DocumentManager docManager,
@@ -160,7 +162,8 @@ public final class JSONSingleSign extends SingleSign {
 		return new PreProcessCallable(this, certChain, algorithm, docManager, docCacheManager);
 	}
 
-	/** Realiza el proceso de postfirma, incluyendo la subida o guardado de datos.
+	/**
+	 * Realiza el proceso de postfirma, incluyendo la subida o guardado de datos.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param td Datos trif&aacute;sicos relativos <b>&uacute;nicamente</b> a esta firma.
 	 *           Debe serializarse como un JSON con esta forma (ejemplo):
@@ -194,7 +197,9 @@ public final class JSONSingleSign extends SingleSign {
 	 * @param docCacheManager Gestor para la carga de datos desde cach&eacute;.
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos.
-	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
+	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
+	 * @throws SaveDataException Si no se puede guardar la firma.
+	 */
 	void doPostProcess(final X509Certificate[] certChain,
 			                  final TriphaseData td,
 			                  final SingleSignConstants.DigestAlgorithm algorithm,
@@ -202,13 +207,14 @@ public final class JSONSingleSign extends SingleSign {
 			                  final DocumentManager docManager,
 			                  final DocumentCacheManager docCacheManager) throws IOException,
 			                                               AOException,
-			                                               NoSuchAlgorithmException {
+			                                               NoSuchAlgorithmException, SaveDataException {
 		JSONSingleSignPostProcessor.doPostProcess(
 			this, certChain, td, algorithm, batchId, docManager, docCacheManager
 		);
 	}
 
-	/** Obtiene la tarea de postproceso de firma para ser ejecutada en paralelo.
+	/**
+	 * Obtiene la tarea de postproceso de firma para ser ejecutada en paralelo.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param td Datos trif&aacute;sicos relativos <b>&uacute;nicamente</b> a esta firma.
 	 *           Debe serializarse como un JSON con esta forma (ejemplo):
@@ -234,7 +240,8 @@ public final class JSONSingleSign extends SingleSign {
 	 * @param batchId Identificador del lote de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @param docCacheManager Gestor para la carga de datos desde cach&eacute;.
-	 * @return Tarea de postproceso de firma para ser ejecutada en paralelo. */
+	 * @return Tarea de postproceso de firma para ser ejecutada en paralelo.
+	 */
 	Callable<ResultSingleSign> getPostProcessCallable(final X509Certificate[] certChain,
 			                                                          final TriphaseData td,
 			                                                          final SingleSignConstants.DigestAlgorithm algorithm,

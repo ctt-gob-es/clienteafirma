@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
@@ -564,13 +564,13 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 
     /** {@inheritDoc} */
 	@Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign) throws AOInvalidSignatureFormatException {
 		return getData(sign, null);
 	}
 
     /** {@inheritDoc} */
     @Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidSignatureFormatException {
 
     	// Construimos el arbol DOM
         Document doc;
@@ -578,7 +578,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             doc = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception ex) {
-            throw new AOInvalidFormatException("Error al leer el fichero de firmas: " + ex, ex); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("Error al leer el fichero de firmas: " + ex, ex); //$NON-NLS-1$
         }
 
         return getData(doc);
@@ -592,14 +592,14 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * devuelve <code>null</code>.
      * @param signDocument Documento XML de firma.
      * @return Datos originalmente firmados.
-     * @throws es.gob.afirma.core.AOInvalidFormatException
+     * @throws es.gob.afirma.core.AOInvalidSignatureFormatException
      *         Si no se ha introducido un fichero de firma v&aacute;lido o no
      *         ha podido leerse la firma. */
-    public static byte[] getData(final Document signDocument) throws AOInvalidFormatException {
+    public static byte[] getData(final Document signDocument) throws AOInvalidSignatureFormatException {
 
         // Comprueba que sea una documento de firma valido
         if (!isSign(signDocument)) {
-            throw new AOInvalidFormatException("El documento no es un documento de firmas valido."); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("El documento no es un documento de firmas valido."); //$NON-NLS-1$
         }
 
         // Obtenemos la primera firma encontrada en el elemento XML
@@ -687,7 +687,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             }
         }
         catch (final Exception ex) {
-            throw new AOInvalidFormatException("Error al leer el fichero de firmas: " + ex, ex); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("Error al leer el fichero de firmas: " + ex, ex); //$NON-NLS-1$
         }
 
         // si no se ha recuperado ningun dato se devuelve null
@@ -825,7 +825,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     		signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
     	}
     	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 
     	final Properties newExtraParams = getExtraParams(extraParams);
@@ -882,7 +882,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                          final URIDereferencer dereferencer) throws AOException {
 
 		if (!isSign(signDocument)) {
-			throw new AOInvalidFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("No se ha indicado una firma XAdES para cofirmar"); //$NON-NLS-1$
 		}
 
 		// Se comprueba si las firmas que ya contiene el documento tienen una version valida
@@ -933,7 +933,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
     		signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
     	}
     	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 
     	final Properties newExtraParams = getExtraParams(extraParams);
@@ -971,7 +971,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
                               final Properties extraParams,
                               final URIDereferencer dereferencer) throws AOException {
 	    	if (!isSign(signDocument)) {
-	    		throw new AOInvalidFormatException("No se ha indicado una firma XAdES para contrafirmar"); //$NON-NLS-1$
+	    		throw new AOInvalidSignatureFormatException("No se ha indicado una firma XAdES para contrafirmar"); //$NON-NLS-1$
 	    	}
 
 	    	return XAdESCounterSigner.countersign(
@@ -989,14 +989,14 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
 	/** {@inheritDoc} */
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException {
+			throws AOInvalidSignatureFormatException {
 		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
     /** {@inheritDoc} */
     @Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException {
+			throws AOInvalidSignatureFormatException {
 
         // Obtenemos el arbol del documento
         final Document signDoc;
@@ -1027,13 +1027,13 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      *        mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code> un &aacute;rbol con los nombres (CN X.500) de los
      *        titulares de los certificados.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error.
-     * @throws AOInvalidFormatException
+     * @throws AOInvalidSignatureFormatException
      *         Si no se ha introducido un fichero de firma v&aacute;lido del formato correspondiente. */
     public static AOTreeModel getSignersStructure(final Document signDocument, final boolean asSimpleSignInfo)
-    		throws AOInvalidFormatException {
+    		throws AOInvalidSignatureFormatException {
 
     	if (!isSign(signDocument)) {
-    		throw new AOInvalidFormatException(
+    		throw new AOInvalidSignatureFormatException(
     				"Los datos indicados no son una firma XAdES compatible" //$NON-NLS-1$
     				);
     	}
@@ -1216,11 +1216,13 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         return originalName + (inText != null ? inText : "") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    /** Devuelve un nuevo documento con ra&iacute;z "AFIRMA" del que cuelga el
+    /**
+     * Devuelve un nuevo documento con ra&iacute;z "AFIRMA" del que cuelga el
      * documento especificado.
      * @param docu Documento que estar&aacute; contenido en el nuevo documento.
      * @return Documento con ra&iacute;z "AFIRMA".
-     * @throws ParserConfigurationException Cuando se produce un error al analizar el XML. */
+     * @throws ParserConfigurationException Cuando se produce un error al analizar el XML.
+     */
     static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Crea un nuevo documento con la raiz "AFIRMA"
@@ -1254,7 +1256,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         }
         catch (final Exception e) {
             LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un documento XML", e); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("Los datos introducidos no se corresponden con un documento XML", e); //$NON-NLS-1$
         }
 
         return getSignInfo(signDocument);
@@ -1275,7 +1277,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
         }
 
         if (!isSign(signDocument)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
         // Tomamos la raiz del documento
@@ -1332,10 +1334,10 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
      * @param signDocument Documento que contiene las firmas y datos.
      * @return Devuelve true en caso de que se trate de una firma de tipo Baseline EN,
      * y false en caso contrario.
-     * @throws AOInvalidFormatException Devuelve esta excepcion en caso de que la version de la firma
+     * @throws AOInvalidSignatureFormatException Devuelve esta excepcion en caso de que la version de la firma
      * no sea correcta
      */
-    public static boolean checkCompatibility(final Document signDocument) throws AOInvalidFormatException {
+    public static boolean checkCompatibility(final Document signDocument) throws AOInvalidSignatureFormatException {
 
     	boolean isBaselineSign = false;
 
@@ -1362,7 +1364,7 @@ public final class AOXAdESSigner implements AOSigner, OptionalDataInterface {
             	isBaselineSign = true;
             }
         }
-        catch (final AOInvalidFormatException aoife) {
+        catch (final AOInvalidSignatureFormatException aoife) {
         	throw aoife;
         }
         catch (final Exception e) {

@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.util.concurrent.ExecutionException;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.plugin.hash.CheckHashDirDialog;
 import es.gob.afirma.plugin.hash.CheckHashFileDialog;
 import es.gob.afirma.plugin.hash.CorruptedDocumentException;
@@ -68,10 +67,10 @@ public class CheckHashCommand extends PluginCommandAction {
 	 * @return {@code true} si la operaci&oacute;n termino correctamente, {@code false} en caso contrario.
 	 * @throws IllegalArgumentException Cuando falta algun par&aacute;metro necesario.
 	 * @throws IOException Cuando No se pueden leer los datos de entrada.
-	 * @throws AOException Cuando falla el c&aacute;lculo del hash.
+	 * @throws HashCommandException Cuando falla el c&aacute;lculo del hash.
 	 */
 	private static boolean checkHashByCommandLine(final HashParameters params)
-			throws IllegalArgumentException, IOException, AOException {
+			throws IllegalArgumentException, IOException, HashCommandException {
 
 		final File dataFile = params.getMainFile();
 		if (dataFile == null) {
@@ -105,9 +104,9 @@ public class CheckHashCommand extends PluginCommandAction {
 			} catch (final IOException e) {
 				throw new IOException(Messages.getString("CommandLine.101"), e); //$NON-NLS-1$
 			} catch (final DocumentException e) {
-				throw new AOException(Messages.getString("CommandLine.102"), e); //$NON-NLS-1$
+				throw new HashCommandException(Messages.getString("CommandLine.102"), e); //$NON-NLS-1$
 			} catch (final CorruptedDocumentException e) {
-				throw new AOException(Messages.getString("CommandLine.103"), e); //$NON-NLS-1$
+				throw new HashCommandException(Messages.getString("CommandLine.103"), e); //$NON-NLS-1$
 			}
 			result = !report.hasErrors();
 
@@ -116,7 +115,7 @@ public class CheckHashCommand extends PluginCommandAction {
 				try {
 					reportData = CheckHashDirDialog.generateXMLReport(report).getBytes(report.getCharset());
 				} catch (final Exception e) {
-					throw new AOException(Messages.getString("CommandLine.104"), e); //$NON-NLS-1$
+					throw new HashCommandException(Messages.getString("CommandLine.104"), e); //$NON-NLS-1$
 				}
 				try (final OutputStream fos = new FileOutputStream(params.getOutputFile());) {
 					fos.write(reportData);
@@ -134,7 +133,7 @@ public class CheckHashCommand extends PluginCommandAction {
 				result = CheckHashFileDialog.checkHash(hashFile, dataFile, null);
 			}
 			catch (final InterruptedException | ExecutionException e) {
-				throw new AOException(Messages.getString("CommandLine.94"), e); //$NON-NLS-1$
+				throw new HashCommandException(Messages.getString("CommandLine.94"), e); //$NON-NLS-1$
 			}
 		}
 

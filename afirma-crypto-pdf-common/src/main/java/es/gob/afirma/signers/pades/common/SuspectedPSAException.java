@@ -14,6 +14,6 @@ public class SuspectedPSAException extends RuntimeConfigNeededException {
 	public static final String REQUESTOR_MSG_CODE = "pdfShadowAttackSuspect"; //$NON-NLS-1$
 
 	public SuspectedPSAException(final String msg) {
-		super(msg, RequestType.CONFIRM, REQUESTOR_MSG_CODE, PdfExtraParams.ALLOW_SHADOW_ATTACK);
+		super(msg, RequestType.CONFIRM, REQUESTOR_MSG_CODE, PdfExtraParams.ALLOW_SHADOW_ATTACK, PdfErrorCode.Internal.SIGNING_PDF_WITH_SUSPICION_OF_PSA);
 	}
 }

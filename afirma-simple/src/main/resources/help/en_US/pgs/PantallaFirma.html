@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Autofirma</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="sign, CAdES, XAdES, PAdES, ODF, OOXML format">
+  <meta name="description" content="Electronic signature of files.">
+  <style>
+	
+	.bold {
+		font-weight: bold;
+	}
+
+  </style>
+ </head>
+ <body> 
+  <h2>Signature screen</h2>
+  <p>From this screen you can select the documents or directories you want to sign.</p>
+  <p align="center"><img src="../gfx/pantallafirma1_mini.png" alt="Screen for the selection and signing of documents"></p>
+  <p>You can select one or more documents by pressing the &quot;Select Files to Sign&quot; button or by clamping the documents and/or directories to the indicated area (the dark gray box).</p>
+  <p>When loading the documents to be signed, you will be shown certain details about them, which will vary depending on whether a single or multiple file is selected:</p>
+  <p align="center"><img src="../gfx/pantallafirma4_mini.png" alt="Screen for the selection and signing of documents with a loaded file"> <img src="../gfx/pantallafirma3_mini.png" alt="Screen for selection and signature with multiple uploaded files"></p>
+  <p>In the box enabled to drag the documents that you wish to sign, the information of the file(s) you selected will have appeared.</p>
+  <p>If you only select a file and have a default application for this type of document, you will see the &quot;View file&quot; button with which you can open it. In addition, you will be provided with information regarding the file and the signature to be generated (format, signature attributes and signature options). If you have set up data for the selected signature format to be included in the signature itself, such as the signature policy, a &quot;See all...&quot; link will be displayed from which you will be able to visualize all defined signature attributes.</p>
+  <p>If multiple files or directories were selected, you can double-click them to open or press with the secondary mouse button to view the options of &quot;View File&quot; and &quot;View Signature Attributes&quot;.</p>
+  <p>The &quot;Sign&quot; button at the bottom of the screen will allow you to sign the document. If your operating system’s certificate store has not yet finished charging, the button will be disabled and with an animated waiting image. In that case, please wait for it to disappear and the button is enabled.</p>
+  <p>Once the button is pressed, the program will generate a signature for each selected document. For each type of document, the signature will be generated in the format established from the <a href="MenuPreferencias.html"> preferences panel. </a></p>
+   <p>If you want to sign in a different format the file already selected, you will be allowed to modify by selecting the &quot;(Change)&quot; link next to the format information. Selecting it will open the following window where you can choose the desired format:</p>
+   <p align="center"><img src="../gfx/dialogocambioformato.png" alt="Screen for selecting the signature format"></p>
+   <p>The types of document distinguished and the signature formats supported are shown in the table below:</p>
+  <table>
+   <tr><th>Type of document</th><th>Icon</th><th>Signature formats (highlighted by default)</th></tr>
+   <tr><td>PDF</td><td><img src="../../shrd/icon_pdf.png" alt="Adobe PDF document icon"></td><td><strong> PAdES, </strong> CAdES and XAdES.</td></tr>
+   <tr><td>XML</td><td><img src="../../shrd/icon_xml.png" alt="XML document icon"></td><td><strong> XAdES </strong> and CAdES.</td></tr>
+   <tr><td>Electronic invoice</td><td><img src="../../shrd/icon_facturae.png" alt="Electronic invoice icon"></td><td><strong> Invoice E, </strong> CAdES and XAdES.</td></tr>
+   <tr><td>OOXML</td><td><img src="../../shrd/icon_office_win.png" alt="OOXML document icon"></td><td><strong> CAdES, </strong> XAdES and OOXML (Office Open XML)</td></tr>
+   <tr><td>ODF</td><td><img src="../../shrd/icon_openoffice.png" alt="ODF document icon"></td><td><strong> CAdES, </strong> XAdES and ODF (Open document format).</td></tr>
+   <tr><td>Other documents</td><td><img src="../../shrd/icon_binary.png" alt="Binary Document Icon"></td><td><strong> CAdES </strong> and XAdES.</td></tr>
+   <tr><td>Electronic signature</td><td><img src="../../shrd/icon_sign.png" alt="Electronic signature icon"></td><td>Same as the original signature.</td></tr>
+  </table>
+  <p>As an exception to the latter case, an electronic invoice already signed in Invoice E format cannot be re-signed.</p>
+  <p>When signing files, a window will be displayed for the saved of the generated signature if only one document or dialogue was selected to select the exit directory if several were selected. After saving the signatures, the <a href="PantallaDetalle.html"> signature detail screen will be displayed. </a></p>
+  <p>The signature process can be altered by the plugins installed in Autofirma. See the <a href="MenuPlugins.html"> plugins management </a> section to learn more about them.</p>
+  <p>In addition to the buttons and graphics elements, you can also use the menu bar or the following keyboard accelerators:</p>
+  <ul>
+   <li><code> Control (in macOS) + S: </code> Select file.</li>
+   <li><code> Control (in macOS) + F: </code> Sign the selected file.</li>
+  </ul>
+
+  <h3>Configuration of signature formats</h3>
+  <p>You can set the signature format to use for each type of file and the particularities of these formats, as well as the overall application behavior, from the <a href="MenuPreferencias.html"> preferences panel </a> available through the Options menu.</p>
+  <p>Some signature formats or options may give rise to additional configuration options in the signature window itself:</p>
+  <ul>
+    <li><h4>PDF signature options:</h4>
+     <p>The PDF signature of a single document allows the signature to be displayed in the document. To do this, it will be necessary to check the box &quot;Make the signature visible within the PDF&quot;.</p>
+     <p>It is also possible to insert a mark visible in the PDF at the time of signing. This option will modify the PDF by adding the selected image and then sign it. To use this function you will need to check the &quot;Insert visible mark in the PDF&quot; box. This box will be disabled if the PDF document is already signed, as the insertion of a mark would invalidate previous signatures.</p>
+     <p>Another option available would be to generate a certified PDF, it will be possible if the signature to be made is PAdES format and the document is not previously signed. It is done by ticking the &quot;Generate certified PDF&quot; box, and the certification level selected in the list of options under that box applies to the document. The list of options will be disabled if the &quot;Generate certified PDF&quot; box is not enabled.</p>
+     <p>These options will be marked or not by default as set out in the <a href="MenuPreferencias.html"> preferences panel. </a> When selecting any of these boxes, we will be shown the <a href="VentanaPdfVisible.html"> Properties panel visible in PDF. </a></p>
+    </li>
+    <li><h4>Add a new signature to a document:</h4>
+     <p>By adding a new binary or XML signature to a signature document, you can configure whether the new signature will be made on the document itself (co-signature) or on the already introduced signatures (counter-affirms). This option can be configured from the preferences panel of the CAdES and XAdES formats. When you apply, Autofirma will show the user a &quot;Advanced Options&quot; button from which you can directly access these settings.</p>
+   </li>
+  </ul>
+  <p>In the process of signing multiple documents, any configuration that requires a halt to the signing process is omitted. Thus, for example, the PDF password request will be omitted and the visible signature and mark configuration will be ordered only once and will apply to all documents with the same configuration.</p>
+ </body>
+</html>

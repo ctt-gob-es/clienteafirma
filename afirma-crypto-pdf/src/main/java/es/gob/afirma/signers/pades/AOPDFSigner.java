@@ -33,7 +33,8 @@ import com.aowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOConfigurableContext;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
@@ -45,6 +46,8 @@ import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.SignEnhancer;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
+import es.gob.afirma.signers.pades.common.PdfErrorCode;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
 
@@ -139,7 +142,8 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 		return enhancerConfig != null ? (Properties) enhancerConfig.clone() : null;
 	}
 
-    /** Firma un documento PDF en formato PAdES.
+    /**
+     * Firma un documento PDF en formato PAdES.
      * <p>
      *  Notas sobre documentos <i>certificados</i>:<br>
      *  Si un PDF firmado se ha certificado (por ejemplo, a&ntilde;adiendo una firma electr&oacute;nica usando Adobe Acrobat), cualquier
@@ -164,7 +168,8 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * @param xParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
      * @return Documento PDF firmado en formato PAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
-     * @throws IOException Cuando hay errores en el tratamiento de datos. */
+     * @throws IOException Cuando hay errores en el tratamiento de datos.
+     */
     @Override
 	public byte[] sign(final byte[] inPDF,
 			           final String signAlgorithm,
@@ -187,7 +192,12 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
         // Sello de tiempo
         byte[] data = inPDF;
         if (PdfTimestamper.isAvailable()) {
-       		data = PdfTimestamper.timestampPdf(data, extraParams, signTime);
+        	try {
+        		data = PdfTimestamper.timestampPdf(data, extraParams, signTime);
+        	}
+        	catch (final IOException e) {
+				throw new AOException("Error en la composicion del sello de tiempo de la firma", e, PdfErrorCode.Internal.INTERNAL_PADES_SIGNING_ERROR); //$NON-NLS-1$
+			}
         }
 
 		// Prefirma
@@ -223,9 +233,6 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
         catch (final AOException e) {
         	throw e;
         }
-        catch (final Exception e) {
-            throw new AOException("Error al generar la firma PKCS#1 de la firma PAdES: " + e, e); //$NON-NLS-1$
-        }
 
         // Postfirma
         try {
@@ -241,12 +248,13 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 			);
 		}
         catch (final NoSuchAlgorithmException e) {
-			throw new AOException("Error el en algoritmo de firma: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error el en algoritmo de firma: " + e, e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
 		}
 
     }
 
-    /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
+    /**
+     * A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
      * puesto que las multifirmas en los ficheros PDF se limitan a firmas independientes "en serie", pero no implementando los mecanismos de
      * cofirma o contrafirma de CAdES.
      * <p>
@@ -275,7 +283,8 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
      * @return Documento PDF firmado en formato PAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
-     * @throws IOException En caso de errores de entrada / salida. */
+     * @throws IOException Cuando hay errores en el tratamiento de datos.
+     */
     @Override
 	public byte[] cosign(final byte[] data,
                          final byte[] sign,
@@ -286,7 +295,8 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
         return sign(sign, algorithm, key, certChain, extraParams);
     }
 
-    /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
+    /**
+     * A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
      * puesto que las multifirmas en los ficheros PDF se limitan a firmas independientes "en serie", pero no implementando los mecanismos de
      * cofirma o contrafirma de CAdES.
      * <p>
@@ -314,7 +324,8 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * @param extraParams Par&aacute;metros adicionales para la firma (<a href="doc-files/extraparams.html">detalle</a>).
      * @return Documento PDF firmado en formato PAdES.
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
-     * @throws IOException En caso de errores de entrada / salida. */
+     * @throws IOException Cuando hay errores en el tratamiento de datos.
+     */
     @Override
 	public byte[] cosign(final byte[] sign,
 			             final String algorithm,
@@ -410,7 +421,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
     		}
 			pdfReader = PdfUtil.getPdfReader(sign, params, headLessProp);
     	}
-    	catch (final BadPasswordException e) {
+    	catch (final BadPdfPasswordException e) {
     		LOGGER.info(
 				"El PDF necesita contrasena. Se devolvera el arbol vacio: " + e //$NON-NLS-1$
 			);
@@ -418,7 +429,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
     	}
     	catch (final PdfIsPasswordProtectedException e) {
     		LOGGER.info(
-				"El PDF necesita contrasena." + e //$NON-NLS-1$
+				"El PDF necesita contrasena. Se devolvera el arbol vacio: " + e //$NON-NLS-1$
 			);
     		return new AOTreeModel(root);
     	}
@@ -611,12 +622,12 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
      * @param sign Documento PDF
      * @param params Par&aacute;metros de la firma.
      * @return Mismo documento PDF de entrada, sin modificar en ning&uacute; aspecto.
-     * @throws AOInvalidFormatException Si los datos de entrada no son un documento PDF. */
+     * @throws AOInvalidSignatureFormatException Si los datos de entrada no son un documento PDF. */
     @Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidSignatureFormatException {
         // Si no es una firma PDF valida, lanzamos una excepcion
         if (!isSign(sign, params)) {
-            throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
         }
 
         // TODO: Devolver el PDF sin firmar
@@ -627,13 +638,13 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
     /** Si la entrada es un documento PDF, devuelve el mismo documento PDF.
      * @param sign Documento PDF
      * @return Mismo documento PDF de entrada, sin modificar en ning&uacute; aspecto.
-     * @throws AOInvalidFormatException Si los datos de entrada no son un documento PDF. */
+     * @throws AOInvalidSignatureFormatException Si los datos de entrada no son un documento PDF. */
     @Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign) throws AOInvalidSignatureFormatException {
 
         // Si no es una firma PDF valida, lanzamos una excepcion
         if (!isSign(sign)) {
-            throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
         }
 
         // TODO: Devolver el PDF sin firmar
@@ -664,7 +675,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
         }
 
         if (!isSign(data, params)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+            throw new AOInvalidSignatureFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
         // Aqui podria venir el analisis de la firma buscando alguno de los

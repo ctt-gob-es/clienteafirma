@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Ikus daitezkeen sinadura eta marken propietateak PDF</title>
+  <meta name="AppleTitle" content="Ayuda de Autofirma">
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png">
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+ </head>
+ <body> 
+  <h2>Ikus daitezkeen sinaduren propietateak PDF</h2>
+  <p>PDF sinadura ikusgarriak sortzea gaituz gero, PAdES formatuan sinatuko duen PDFaren gainean sinatzeko eremu bat hautatzeko aukera emango zaio erabiltzaileari.</p>
+  <p align="center"><img src="../gfx/menufirmaspadesvisible1_mini.png" alt="Sinadura-posizioa hautatzeko leihoa"></p>
+  <p>Menu honen bidez, sagua erabil dezakezu PDFko orrietako baten eremu angeluzuzena hautatzeko.</p>
+  <ul>
+  	<li><b> X: </b> Sinadura-eremuaren hasierako X ardatzeko pixel-kopurua.</li>
+  	<li><b> Eta: </b> Sinadura-eremua hasten den Y ardatzeko pixel-kopurua.</li>
+  	<li><b> Zabalera: </b> Sinadura-eremuan horizontalean zabaltzen den pixel-kopurua.</li>
+  	<li><b> Altuera: </b> Sinadura-eremuan bertikalean zabaltzen den pixel-kopurua.</li>
+  	<li><b> (PDF orriaren aurrebista): </b> Erabiltzaileak klik egin behar du, eta sagua arrastatu eremu horren gainean, ikus daitekeen sinadura-eremua hautatzeko. Sinadura-eremuaren posizioak eta tamaina pixeletan adierazten dira, orriaren irudia erakusten den eskalarekiko.</li>
+  	<li><b> &lt;&lt;: </b> Bistaratzea PDFko lehen orrira eramateko botoia.</li>
+  	<li><b> &lt;: </b> Bistaratzea PDFaren aurreko orrira eramateko botoia. Teklatuko &quot;ezkerreko kurtsorea&quot; tekla sakatuta erreproduzi daiteke portaera hori.</li>
+  	<li><b> >: </b> Bistaratzea PDFko hurrengo orrira eramateko botoia. Teklatuko &quot;eskuineko kurtsorea&quot; tekla sakatuta erreproduzi daiteke portaera hori. PDFko azken orrialdean baldin bagaude, aukera honek dokumentuaren amaieran orri zuri bat sortzeko aukera emango digu, eta bertan sinadura sartu ahal izango da.</li>
+  	<li><b> >>: </b> Bistaratzea PDFko azken orrira eramateko botoia.</li>
+  </ul>
+  <p>Leiho horretan bertan, behealdean, sinadura ikusgai zein orrialdetan agertu behar duen adieraz daiteke. Aukera hauek onartzen dira:</p>
+  <ul>
+  	<li><b> Uneko orria: </b> Ikusteko moduko sinadura goiko posizioaren hautatzailean hautatutako orrian agertuko da.</li>
+  	<li><b> Orrialde guztiak: </b> Ageriko sinadura dokumentuaren orri guztietan agertuko da.</li>
+  	<li><b> Orrialdeak hautatzea: </b> Aukera honetan, sinadura ikusgai agertuko den orria edo orri-tartea hauta daiteke. Sinadura ikusgai jartzeko orrialde bat edo gehiago adierazi nahi izanez gero, orri batetik bestera komak bereizita adieraz daiteke (1,4,7: <code> </code> 1., 4. eta 7. orrialdeetan estanpatzen da, edo orri-tarte bat adierazten da gidoi baten bidez (1-8: <code> </code> Orrialdeetan estanpatzen da, 1etik 8ra). Orrialdeak dokumentuaren amaieratik duten kokapenaren arabera ere adieraz daitezke. Horretarako, (-2 balio negatiboa duen posizioa erabiliko da: <code> </code> Sinadura azkenaurreko orrialdean estanpatuko du). Mekanismo horiek konbinatu egin daitezke. Adibidez:<ul>
+  			<li><i> 3-6, 8, 10--1: </i> Orri hauetan estanpatuko dela adierazten du: 3tik 6ra, 8an eta 10etik azken orrira.</li>
+  		</ul>
+  	</li>
+  </ul>
+  <p>Galdera-ikurra duen botoia (?) sinadura ikusgarrirako laguntza-orria irekitzeko. <b> </b></p>
+  <p>Sinadura-eremua desagertu egingo da PDFaren pantaila aldatzean. Hautatu PDFa ikusteko moduan sinatzeko eremua, eta, ondoren, sakatu <b> Hurrengoa botoia. </b></p>
+  <p>Ondoren, leiho berri bat agertuko da, eta erabiltzaileak sinaduraren itxura konfiguratu ahal izango du.</p>
+  <p align="center"><img src="../gfx/menufirmaspadesvisible2_mini.png" alt="Sinaduraren itxura konfiguratzeko leihoa"></p>
+  <p>Interfaze horri esker, propietate hauek konfigura daitezke sinadura ikusgarrirako:</p>
+	<ul>
+	<li><b> Aurrebista. </b> Irudi-fitxategia konfiguratzeko, sakatu sinaduraren aurrebista. Ez da onartzen gardenkiak dituen irudirik.</li>
+	<li><b> Sinadura konfiguratzea: </b></li>
+	<ul>
+	  <li><b> Sinaduraren irudia: </b> Irudiaren bidea sinaduraren errubrikarekin. <b> Arakatu </b> botoiaren bidez hauta daiteke, eta <b> Garbitu botoiaren bidez ezabatu. </b> Irudian ez da gardenkiarik onartzen, eta, egonez gero, kendu egingo dira.</li>
+	  <li><b> Sinaduraren testua: PDFaren sinaduran erakutsi beharreko </b> testua. Sinaduran erakutsi nahi den testua konfiguratzeko, gako-hitz batzuk erabil daitezke, eta, horien ordez, sinadura-ziurtagiriaren titularraren edo igorlearen testu egokiak erabil daitezke sinatzean. Hauek dira:</li>
+	  <ul>
+	  	<p><li><b> $$SUBJECTCN$$ </b><ul><li>Izen arrunta (CN, Common Name) sinadura-ziurtagiriaren titularraren X.500 nagusiaren barruan.</li></ul></li></p>
+	  	<p><li><b> $$ISSUERCN$$ </b><ul><li>Izen arrunta (CN, Common Name) X.500 Sinadura-ziurtagiriaren jaulkitzailearen izen nagusiaren barruan.</li></ul></li></p>
+	  	<p><li><b> $$CERTSERIAL$$ </b><ul><li>Sinadura-ziurtagiriaren serie-zenbakia.</li></ul></li></p>
+	  	<p><li><b> $$SIGNDATE=PATROIA$$ </b><ul><li>Sinaduraren data; PATROk data zer formatutan bistaratu behar den adierazi behar du, Oracle-k Simple DateFormat klaserako definitutako eskemari jarraituz.</li></ul></li></p>
+	  	<p><li><b> $$GIVENNAME$$ </b><ul><li>Ziurtagirian aitortutako titularraren izena (G, Given Name). Baliteke balio hori ziurtagirian ez agertzea; kasu horretan, patroiaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+		<p><li><b> $$SURNAME$$ </b><ul><li>Ziurtagirian aitortutako titularraren deiturak (SN, Surname). Baliteke balio hori ziurtagirian ez agertzea; kasu horretan, patroiaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+		<p><li><b> $$ORGANIZATION$$ </b><ul><li>Ziurtagirian aitortutako titularraren antolakuntza (O, Organization). Baliteke balio hori ziurtagirian ez agertzea; kasu horretan, patroiaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+		<p><li><b> $$PSEUDONYM$$ </b><ul><li>Ziurtagiriaren ezizena. Baliteke balio hori ziurtagirian ez agertzea; kasu horretan, patroiaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+	 	<p><li><b> $$OU$$ </b><ul><li>Ziurtagiriaren antolamendu-unitatea (OU, Organization Unit). Baliteke balio hori ziurtagirian ez agertzea; kasu horretan, patroiaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+	 	<p><li><b> $$OUS$$ </b><ul><li>Ziurtagiriaren antolamendu-unitateen zerrenda. Bat baino gehiago egonez gero, denak &quot;, &quot;-z bereizita aurkeztuko dira. Baliteke ziurtagiriak antolamendu-unitaterik definituta ez izatea; kasu horretan, ereduaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+	 	<p><li><b> $$TITLE$$ </b><ul><li>Ziurtagiriaren titularraren lanpostuari edo rolari buruzko informazioa. Baliteke balio hori ziurtagirian ez agertzea; kasu horretan, patroiaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+	 	<p><li><b> $$REASON$$ </b><ul><li>Horregatik sinatu da PDFa, sinatze-eragiketa &quot;signatureReason&quot; propietatearen bidez konfiguratuta. Balio hori ezarri ez bada, patroiaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+		<p><li><b> $$LOCATION$$ </b><ul><li>PDFa sinatzen den hiria, sinatze-eragiketa &quot;signatureProductionCity&quot; propietatearen bidez konfiguratuta. Balio hori ezarri ez bada, patroiaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+		<p><li><b> $$CONTACT$$ </b><ul><li>PDFaren sinatzailearen harremanetarako informazioa, sinatze-eragiketa &quot;signatureContact&quot; propietatearen bidez konfiguratuta. Balio hori ezarri ez bada, patroiaren ordez kate hutsa erabiliko da.</li></ul></li></p>
+	  </ul>
+	  <li>Testuari formatu-aukera hauek aplika dakizkioke:</li>
+	  <ul>
+		<li>Letra-iturria.</li>
+		<li>Letra-tamaina.</li>
+		<li>Testuaren errotazioa.</li>
+		<li>Letra-estiloa (lodia, etzana, azpimarratua edo marratua).</li>
+		<li>Testuaren kolorea.</li>
+	  </ul>
+	  <p>&quot;Gogoratu konfigurazioa&quot; laukian, ezarritako konfigurazioa (testua, irudia eta estiloak) gorde daiteke, sinadura hauetan erabiltzeko. &quot;Lehenetsitako konfigurazioa leheneratu&quot; botoiak panelaren konfigurazioa lehenetsitako balioetara itzuliko du.</p>
+	</ul>
+  <p>PDFari sinadura ikusgarririk gehitu nahi ez badiozu, sinaduraren pantailan sinatu botoia sakatu aurretik, ziurtatu ez dagoela hautatuta &quot;Egin sinadura ikusgai PDFaren barruan&quot; laukia.</p><br><h2>Ikus daitezkeen marken propietateak</h2>
+  <p>PDFan marka ikusgarriak sartzea gaituz gero, erabiltzaileari eremu bat hautatzeko aukera emango zaio sinatu behar duen PDFan.</p>
+  <p align="center"><img src="../gfx/menufirmaspadesvisible3_mini.png" alt="Markaren posizioa hautatzeko leihoa"></p>
+  <p>Menu honen bidez, sagua erabil dezakezu PDFko orrialde batean edo guztietan eremu angeluzuzena hautatzeko.</p>
+  <ul>
+  	<li>Hautatu <b> irudia: </b> Botoi hau sakatzean, leiho bat irekiko da, eta markaren irudia hautatu ahal izango duzu. Irudian ez da gardenkiarik onartzen, eta ez dira agertuko baldin eta</li>
+  	<li><b> X: </b> Marka kokatzeko X ardatzean dagoen pixel-kopurua.</li>
+  	<li><b> Eta: </b> Marka kokatzeko Y ardatzean dagoen pixel-kopurua.</li>
+  	<li><b> Zabalera: </b> Marka horizontalean zabaldu behar den pixel-kopurua.</li>
+  	<li><b> Altuera: </b> Marka bertikalean zabaldu behar den pixel-kopurua.</li>
+  	<li><b> (PDF orriaren aurrebista): </b> Erabiltzaileak klik egin behar du modu iraunkorrean, eta sagua arrastatu eremu horren gainean, marka jarriko den eremua hautatzeko.</li>
+  	<li><b> &lt;&lt;: </b> Bistaratzea PDFko lehen orrira eramateko botoia.</li>
+  	<li><b> &lt;: </b> Bistaratzea PDFaren aurreko orrira eramateko botoia. Teklatuko &quot;ezkerreko kurtsorea&quot; tekla sakatuta erreproduzi daiteke portaera hori.</li>
+  	<li><b> >: </b> Bistaratzea PDFko hurrengo orrira eramateko botoia. Teklatuko &quot;eskuineko kurtsorea&quot; tekla sakatuta erreproduzi daiteke portaera hori.</li>
+  	<li><b> >>: </b> Bistaratzea PDFko azken orrira eramateko botoia.</li>
+  	<li><b> Sartu irudia orrialde guztietan: </b> Marka PDFko orri guztietan sartzea hautatzeko laukia.</li>
+  </ul>
+  <p>Markaren eremua desagertu egingo da PDFaren orrialdea aldatzean. Hautatu orrialdea, irudia eta eremua PDFan ikus daitekeen markarako, eta, ondoren, sakatu <b> Ados botoia. </b></p>
+  
+  <p>PDFan ageriko markarik gehitu nahi ez baduzu, sinadura-pantailan sinatu botoia sakatu aurretik, ziurtatu ez dagoela hautatuta &quot;Txertatu marka ikusgai bat PDFan&quot; laukia. <b> </b></p>
+  
+ </body>
+</html>

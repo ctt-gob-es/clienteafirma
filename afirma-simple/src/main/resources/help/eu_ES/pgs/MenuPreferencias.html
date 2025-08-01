@@ -1,0 +1,201 @@
+<html>
+ <head>
+  <title>Lehentasunen menua</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="sinatu, CAdES, XAdES, PAdES, OOXML, ODF, formatua">
+  <meta name="description" content="Lehentasunak menua.">
+ </head>
+ <body> 
+  <h2>Lehentasunak menua</h2>
+  <p>Tresnak sortutako sinadurak konfiguratzeko, sartu konfigurazio-menura aplikazioaren menu-barrako &quot;Tresnak&quot; -> &quot;Hobespenak&quot; aukeraren bidez. Menu honen bidez, aplikazioaren portaera orokorra eta formatu-mota bakoitzerako sortutako sinadurak konfigura ditzakezu.</p>
+  <p>Menuko edozein fitxategitatik &quot;Utzi&quot; botoia sakatzen baduzu, aldaketa oro alde batera utzita itxi egingo da; &quot;Ados&quot; botoia sakatzen baduzu, menua itxi egingo da eta menuan definitutako aukerak konfiguratuta geratuko dira; &quot;Aplikatu orain&quot; botoia sakatzen baduzu, menua itxi gabe egindako aldaketak aplikatuko dira.</p>
+  <h3>Orokorra menua</h3>
+  <p align="center"><img src="../gfx/menugeneral_mini.png" alt="Aplikazioaren portaera orokorra konfiguratzeko pantaila"></p>
+  <ul>
+   <li><b> Aukera orokorrak: </b><ul>
+     <li><b> Inportatu aplikazioaren konfigurazio orokorra: </b> Administratzaile batek emandako konfigurazio-fitxategi bat inportatzeko aukera.</li>
+     <li><b> Leheneratu aplikazioaren konfigurazio orokorra: </b> Aplikazioaren konfigurazio lehenetsia berrezartzeko aukera.</li>
+     <li><b> Ez eskatu berrespenik aplikazioa ixtean: </b> Aplikaziotik irteteko aukera ematen du, erabiltzailearen berrespenik gabe.</li>
+     <li><b> Bilatu eguneratzeak hasieran: </b> Aplikazioa abiaraztean eguneratzerik badagoen bilatu behar den konfiguratzeko aukera ematen du.</li>
+     <li><b> Gaitu JMulticard, FNMT eta NANe txarteletarako: </b> Windows eta Linux-en bakarrik. Autofirman integratutako kontrolatzailea FNMT eta NANe txartelak erabiltzeko erabili behar den konfiguratzen du. Desaktibatuz gero, sisteman aurkitutako kontrolatzaileak erabiliko dira. Funtzio hau erabilita, txartel bateragarriak erabil daitezke erabiltzaileak kontrolagailua instalatuta ez duenean edo harekin bateraezintasunen bat duenean. Funtzio horren ondorioz, hainbat aldiz eska dakioke erabiltzaileari txartelaren PINa sinadura masiboko prozesuetan sartzeko. Konfigurazio horrek ez du eraginik izango aplikazioa irekitzen den hurrengo arte.</li>
+     <li><b> VDIrentzako funtzionamendu optimizatua: </b> Windowsen bakarrik. Konfiguratu WebScokets bidezko komunikazioa nabigatzailearekin, VDI ingurune batean Autofirma erabiltzean blokeoak saihesteko. Hala ere, konfigurazio horrek komunikazioa moteltzen du transmititu beharreko datu-kopurua handia denean, eta, beraz, ez da gomendatzen beste ingurune batzuetan.</li>
+    </ul>
+   </li>
+   <li><b> Sinatzeko aukerak: </b><ul>
+     <li><b> Sinadura-algoritmoa: </b> Aplikazioak sinadura elektronikoak sortzeko erabiltzen duen sinaduraren algoritmo lehenetsia.</li>
+     <li><b> Sinadura-formatuak: </b> Dokumentu-mota jakin bat ematean zer sinadura-formatu aplikatu behar den konfiguratzen du. &quot;Konfiguratu formatuak&quot; botoia sakatzean, elkarrizketa bat agertzen da sinadura-formatu jakin bat konfigura daitekeen dokumentu-motekin:<ul>
+       <li>PDF dokumentuak</li>
+       <li>Microsoft Office-ren OOXML dokumentuak</li>
+       <li>Faktura elektronikoak</li>
+       <li>XML fitxategi generikoak</li>
+       <li>LibreOffice edo OpenOffice-ko ODF fitxategiak</li>
+       <li>Gainerako fitxategiak</li>
+      </ul>
+      <p>Fitxategi-mota horietako edozein CAdES eta XAdES formatuekin (dagozkien fitxetan ezarritako konfigurazioaren arabera) sina daiteke, eta horietako batzuk formatu espezifikoetan sina daitezke.&quot;Gainerako fitxategiak&quot; <br> dokumentu-motak aurreko kategorietan ez dagoen edozein dokumenturi egiten dio erreferentzia.</p>
+	  <p><b> <u> OHARRA: </u> </b> Ez da gomendatzen faktura elektronikoak faktura elektronikoaren formatua ez den beste formatu batean sinatzea.</p>
+	 <li><b> Sinatzeko berrespena eskatu: </b> Aukera hori aktibatuta dagoenean, sinatu aurretik berrespena eskatzen zaio erabiltzaileari.</li>
+	 <li><b> Sinadura ez-baliozkoak dituzten dokumentuei sinadura berriak gehitzeko aukera ematea: </b> Aukera hau gaituz gero, Autofirmak ez du eragotziko sinadura berriak gehitzea (sinadura edo kontrbaieztapena) dagoeneko sinadurak dauden eta baliozkoak ez diren dokumentuei (ustelak edo iraungitako ziurtagiriak dituztenak).</li>
+     <li><b> Irteerako direktorioan fitxategiak gainidatzi: </b> Sinadura masiboko prozesu baten ondoriozko sinadura-direktorioen egitura sortzean eta sinadura gordetzeko izen bereko fitxategi bat aurkituz gero, lehendik dagoen fitxategia sinadura-fitxategi berrian gainidatzi nahi den edo sinadura izen berri bat erabiliz gorde nahi den konfiguratzeko aukera.</li>
+    </ul>
+   </li>
+   <li><b> Sarearen konfigurazioa: </b><ul>
+     <li><b> Gune seguruekin egindako konexioak bakarrik onartu (Gomendatua): </b> Aukera hau aktibatuta badago, aplikazioa konektatu behar den web guneen SSL ziurtagiriaren konfiantza egiaztatuko da. SSL ziurtagiri ezezaguna duten webguneetan lan eginez gero, litekeena da aukera hori desgaitu behar izatea.</li>
+    </ul>
+	<ul>
+     <li><b> Domeinu seguruak: </b> SSLren bidez konektatzean Autofirmak aseguru gisa erabiliko dituen domeinuen zerrenda konfiguratzeko aukera. Gehiago jakiteko, ikus <a href="VentanaListaBlancaDominios.html"> Domeinuen zerrenda zuriaren konfigurazioa orria. </a></li>
+    </ul>
+    <ul>
+     <li><b> Konfiguratu proxya: </b> Autofirmaren sare-konexio guztietarako proxya konfiguratzeko aukera. Gehiago jakiteko, ikus <a href="VentanaConfigurarProxy.html"> Sare-proxyaren konfigurazioa orria. </a></li>
+    </ul>
+	<ul>
+     <li><b> Konfiantza-ziurtagiriak: </b> Sare-konexioetan konfiantza-ziurtagiriak konfiguratzeko aukera. Gehiago jakiteko, ikus <a href="VentanaCertificadosConfianza.html"> Konfiantzazko ziurtagiriak orria. </a></li>
+    </ul>
+   </li>
+  </ul>
+  <h3>&quot;PAdES sinadurak (PDF)&quot; menua</h3>
+  <p align="center"><img src="../gfx/menufirmaspades_mini.png" alt="PDF dokumentuen sinadurak konfiguratzeko pantaila"></p>
+  <ul>
+   <li><b> Sinadura-politikaren konfigurazioa: </b> PAdES sinaduretan jarraitzen den sinadura-politika adierazteko aukera ematen du.<p>Hauek dira konfigurazio-panelaren bidez eskura daitezkeen balioak:</p>
+    <ul>
+     <li>Ez dago politikarik: Sortutako PDF sinadurek ez dute sinadura politikarik adieraziko.</li>
+     <li>EAO 1.9 sinatzeko politika: EAO sinatzeko politika v1.9 deklaratzen da.</li>
+     <li>Neurrira egindako politika: Politikaren propietateak eskuz konfiguratzeko aukera ematen du.</li>
+      <ul>
+       <li>Politikaren identifikatzailea.</li>
+       <li>Politikaren identifikatzailearen aztarna digitala.</li>
+       <li>Politikaren identifikatzailearen hatz-marka digitalaren algoritmoa.</li>
+       <li>Politikaren kalifikatzailea</li>
+      </ul>
+    </ul>
+    </li>
+    <li><b> Sinatzeko aukerak: </b> PAdESFsinaduraren oinarrizko aukerak.<ul>
+      <li>Sinaduraren oinarrizko formatua: PAdES sinaduren oinarrizko formatua konfiguratzeko aukera ematen du:<ul>
+        <li>PAdES Oinarrizkoa: Adobe Acrobatek sortutako PAdES sinadura-formatua da, eta Autofirmak lehenespenez erabiltzen duena.</li>
+        <li>PAdES-BES: PAdES estandarrari gehien egokitzen zaion formatua da, baina Adobe Reader/Acrobatek ez ditu behar bezala baliozkotzen hortik sortutako multifirmak.</li>
+       </ul>
+      </li>
+      <li>PDF sinadura ikusgarriak lehenespenez egitea: Aukera hau gaituz gero eta PAdES formatuko dokumentu bat sinatuz gero, PDFaren eremua hautatzeko leiho bat agertuko zaio erabiltzaileari, sinadura ikusgai jartzeko. Xehetasun gehiago nahi izanez gero, ikus <a href="VentanaPdfVisible.html"> PDF sinadura ikusgarriak </a> atala.</li>
+      <li>Ikus daitezkeen sinaduren ziurtagirien erabiltzaile-identifikatzaileak erregistratzea: Aukera hau gaituz gero, ziurtagiri bateko datuak hartzean, PDF testu ikusgarrietan sartutako erabiltzaile-identifikatzaileak erregistratuko dira. Izenpetzea ez da egingo sinaduraren ziurtagiria izengoitiaren ziurtagiria denean.</li>
+      <li>Aplikatu ageriko marka PDF dokumentuei: Aukera hau gaitutakoan eta PAdES formatuko dokumentu bat sinatzean, erabiltzaileari leiho bat agertuko zaio PDFko eremua eta orriak hautatzeko, eta hor marka ikusgai bat gehituko zaio. Xehetasun gehiago nahi izanez gero, ikus <a href="VentanaPdfVisible.html"> PDF marka ikusgarriak </a> atala.</li>
+      <li>Sortu PDF ziurtatua: Aukera hau gaituz gero, erabiltzaileak PDF ziurtatu bat sortu ahal izango du, ondoren dagoen zerrendan aukeratutako ziurtatze-mailarekin.</li>
+       <ul>
+        <li>Ziurtatu gabe: Ez da dokumentuaren sinadura ziurtaturik egiten; sortu PAdES sinadura.</li>
+        <li>Egile-ziurtagiria: Ez da aldaketarik onartzen.</li>
+        <li>Formularioetarako egile-ziurtagiria: Formularioak betetzeko, sinatzeko eta orriak gehitzeko ekintzak baino ez dira onartzen.</li>
+        <li>Egiaztagiri arrunta: Iruzkin-ekintzak, formularioak betetzea, sinatzea eta orriak gehitzea baino ez dira onartzen.</li>
+       </ul>
+     </ul>
+    </li>
+    <li><b> PAdES sinadura-metadatuak: </b><ul>
+      <li>Dokumentua sinatzeko arrazoia: Sinaduraren arrazoiaren deskribapen laburra.</li>
+      <li>Zein hiritan sinatzen den: Sinatzen den unean sinatzailea zein hiritan dagoen.</li>
+      <li>Sinatzailearen kontaktua: Helbide elektronikoa.</li>
+     </ul>
+    </li>
+   </ul> 
+  <h3>&quot;CAdES sinadurak (bitarrak)&quot; menua</h3>
+  <p align="center"><img src="../gfx/menufirmascades_mini.png" alt="Dokumentu bitarren sinadurak konfiguratzeko pantaila"></p>
+  <ul>
+   <li><b> Sinadura-politikaren konfigurazioa: </b> CAdES sinaduretan jarraitzen den sinadura-politika adierazteko aukera ematen du:<p>Hauek dira konfigurazio-panelaren bidez eskura daitezkeen balioak:</p>
+    <ul>
+     <li>Ez dago politikarik: Sortutako sinadurek ez dute sinadura-politikarik deklaratuko.</li>
+     <li>EAO 1.9 sinatzeko politika: EAO sinatzeko politika deklaratzen da v1.9</li>
+     <li>Neurrira egindako politika: Politikaren propietateak eskuz konfiguratzeko aukera ematen du.</li>
+      <ul>
+       <li>Politikaren identifikatzailea.</li>
+       <li>Politikaren identifikatzailearen aztarna digitala.</li>
+       <li>Politikaren identifikatzailearen hatz-marka digitalaren algoritmoa.</li>
+       <li>Politikaren kalifikatzailea</li>
+      </ul>
+    </ul>
+    </li>
+    <li><b> Sinatzeko aukerak: </b><ul>
+      <li>Sinaduran bertan sinatutako datuen kopia bat sartu: Sinadura elektronikoak sinatutako datuak barruan gorde behar dituen konfiguratzen du.</li>
+     </ul>
+    </li>
+    <li><b> Multifirmetako eragiketa: </b> Sarrerako fitxategia CAdES sinadura denean egin beharreko eragiketa konfiguratzeko aukera ematen du.<ul>
+      <li>Sinadura: Berretsi sarrera-sinadura.</li>
+      <li>Kontrbaieztapena (hosto nodoena bakarrik): Sarrerako sinaduraren orriaren nodoak baieztatzen ditu.</li>
+      <li>Uzkurdura (zuhaitz osoarena): Sarrerako sinaduraren sinaduraren nodo guztiak berresten ditu.</li>
+     </ul>
+    </li>
+   </ul>
+   <h3>&quot;XAdES sinadurak (XML)&quot; menua</h3>
+  <p align="center"><img src="../gfx/menufirmasxades_mini.png" alt="XML dokumentuen sinadurak konfiguratzeko pantaila"></p>
+  <ul>
+   <li><b> Sinadura-politikaren konfigurazioa: </b> XAdES sinaduretan jarraitzen den sinadura-politika adierazteko aukera ematen du:<p>Hauek dira konfigurazio-panelaren bidez eskura daitezkeen balioak:</p>
+    <ul>
+     <li>Ez dago politikarik: Sortutako XML sinadurek ez dute sinadura-politikarik adieraziko.</li>
+     <li>EAO 1.9 sinatzeko politika: EAO sinatzeko politika deklaratzen da v1.9</li>
+     <li>Neurrira egindako politika: Politikaren propietateak eskuz konfiguratzeko aukera ematen du.</li>
+      <ul>
+       <li>Politikaren identifikatzailea.</li>
+       <li>Politikaren identifikatzailearen aztarna digitala.</li>
+       <li>Politikaren identifikatzailearen hatz-marka digitalaren algoritmoa.</li>
+       <li>Politikaren kalifikatzailea</li>
+      </ul>
+    </ul>
+   </li>
+   <li><b> Sinatzeko aukerak: </b><ul>
+	 <li><b> Sinaduren formatua: </b><ul>
+       <li>XAdES Enveloping: Enveloping modua konfiguratzen da (sinadurak sinatutako datuak biltzen ditu).</li>
+       <li>XAdES Detached: Detached modua konfiguratzen da (sinadura eta datuak XML super-egitura batean).</li>
+       <li>XAdES Enveloped: Enveloped modua konfiguratzen da (sinadura XML datuen barruan sartzen da).</li>
+      </ul>
+     </li>
+    </ul>
+    <p><b> <u> OHARRA: </u> </b> AGEren sinadura-politikari esker, Enveloped eta Internally Detached formatuetan soilik egin daitezke sinadurak (hemen Detached gisa aipatzen da). Hala, EAOren sinadura-politika deklaratzen denean soilik konfigura daitezke sinadura-formatu horiek.</p>
+   </li>
+   <li><b> XAdES sinaduren metadatuak: </b><ul>
+     <li>Zein hiritan sinatzen den: Sinatzen den unean sinatzailea zein hiritan dagoen.</li>
+     <li>Zein probintziatan sinatzen den: Sinatzen den unean sinatzailea zein probintziatan dagoen.</li>
+     <li>Sinaduraren posta-kodea: Sinatzailea sinatzen den unean agertzen den posta-kodea.</li>
+     <li>Zein herrialdetan sinatzen den: Sinatzen den unean sinatzailea zein herrialdetan dagoen.</li>
+     <li>Sinatzailearen kargua: Sinadura egiten duenaren kargua.</li>
+    </ul>
+   </li>
+  </ul>
+   <h3>&quot;Faktura elektronikoa&quot; menua</h3>
+   <p align="center"><img src="../gfx/menufirmasfacturae_mini.png" alt="Faktura elektronikoen sinadurak konfiguratzeko pantaila"></p>
+   <ul>
+    <li><b> Sinadura-politikaren konfigurazioa: </b> Erabili behar den faktura elektronikoaren sinadura-politikaren bertsioa adierazteko aukera ematen du.</li>
+    <li><b> Sinatzeko aukerak: </b><ul>
+      <li>Faktura elektronikoaren sinatzailearen zeregina: Sinatzaileak fakturaren bizi-zikloan betetzen duen rola konfiguratzeko aukera ematen du.</li>
+     </ul>
+    </li>
+    <li><b> Faktura elektronikoen metadatuak: </b><ul>
+      <li>Zein hiritan sinatzen den: Sinatzen den unean sinatzailea zein hiritan dagoen.</li>
+      <li>Zein probintziatan sinatzen den: Sinatzen den unean sinatzailea zein probintziatan dagoen.</li>
+      <li>Sinaduraren posta-kodea: Sinatzailea sinatzen den unean agertzen den posta-kodea.</li>
+      <li>Zein herrialdetan sinatzen den: Sinatzen den unean sinatzailea zein herrialdetan dagoen.</li>
+     </ul>
+    </li>
+   </ul>
+      <h3>&quot;Gako-biltegiak&quot; menua</h3>
+   <p align="center"><img src="../gfx/menualmacenesclaves_mini.png" alt="Faktura elektronikoen sinadurak konfiguratzeko pantaila"></p>
+   <ul>
+    <li><b> Biltegi lehenetsia: </b><ul>
+      <li>Mahaigaineko interfazean lehenespenez kargatuko den gako-biltegia hautatzeko aukera ematen du.</li>
+      <li>Ikusi <b> edukia: </b> Hautatutako biltegiak dituen ziurtagiriak ikusteko aukera ematen du.</li>
+      <li><b> Nabigatzailetik egindako autofirma-deietan ere erabili: </b> Konfiguratutako biltegia lehenespenez kargatzea nahi duzun adierazten du, baita nabigatzailetik Autofirma-ra deitzean ere.</li>
+	 </ul>
+	</li>
+    <li><b> Ziurtagirien iragazkiak: </b><ul>
+      <li><b> NANaren hasierako pantaila ez erakustea eta beti biltegiarekin lan egitea lehenespenez: </b> Ez jarri hasierako pantaila NANa detektatzean, eta konfiguratuta dagoen biltegi lehenetsia erabiliko da.</li>
+	  <li><b> Iraungitako ziurtagiriak erabiltzen uztea: </b> Aukera hori gaituta dagoenez, iraungitako ziurtagiriak sinadura-ziurtagiriak hautatzeko elkarrizketan agertuko dira, eta, hala, haiekin sinatu ahal izango da.</li>
+	  <li><b> Sinadura elektronikoetan sinatzeko ziurtagiri espezifikoak bakarrik erabili (errefusatu gabeko atributua): </b> Aukera hau hautatuta badago, sinadurakoak direla berariaz adierazten duten ziurtagiriak bakarrik erakutsiko dira.</li>
+	  <li><b> Izengoiti-ziurtagiriak bakarrik erabili, hauek eskuragarri daudenean: </b> Izengoiti-ziurtagiriak erabilgarri daudenean bakarrik erabili ahal izatea mugatzen du.</li>
+	  <li><b> NANaren autentifikazio-ziurtagiririk ez erabili: </b> NANerako gakoen biltegietan dagoen kautotze-ziurtagiria ezkutatzen du.</li>
+     </ul>
+    </li>
+    <li><b> Txartel adimendunak: </b><ul>
+      <li>Txartel adimendunei alta emateko aukera ematen du, PKCS#11 kontrolatzailetik abiatuta, zuzenean gakoen biltegi irisgarri gisa erabili ahal izateko, ziurtagirien hautaketako elkarrizketatik. Hemen gehitutako txartel adimendunak biltegi lehenetsi gisa konfigura daitezke lehen ataleko goitibeherako menuan.</li>
+      <li><b> Konektatzea: </b> Egin konexio-proba bat hautatutako txartel adimendunaren gako-biltegiarekin.</li>
+      <li>Gehitu <b> txartela: </b> Gehitu txartel adimendun berri bat. Txartel adimendunarentzako izena eta PKCS#11 kontrolatzailea dagoen bidea sartzeko elkarrizketa bat irekiko da.</li>
+      <li><b> Aldatu: </b> Hautatutako txartel adimendunaren kontrolatzailearen izena eta ibilbidea aldatzeko aukera ematen du.</li>
+	  <li><b> Ezabatu: </b> Goitibeherako menuan hautatutako txartel adimenduna ezabatzen du.</li>
+     </ul>
+    </li>
+   </ul>
+ </body>
+</html>

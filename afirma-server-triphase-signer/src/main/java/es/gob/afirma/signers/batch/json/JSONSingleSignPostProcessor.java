@@ -19,10 +19,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
-import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.batch.LegacyFunctions;
@@ -46,7 +47,8 @@ final class JSONSingleSignPostProcessor {
 		// No instanciable
 	}
 
-	/** Realiza el proceso de postfirma, incluyendo la subida o guardado de datos.
+	/**
+	 * Realiza el proceso de postfirma, incluyendo la subida o guardado de datos.
 	 * @param sSign Firma sobre la que hay que hacer el postproceso.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param tdata Datos trif&aacute;sicos relativos <b>&uacute;nicamente</b> a esta firma.
@@ -73,10 +75,11 @@ final class JSONSingleSignPostProcessor {
 	 * @param batchId Identificador del lote de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @param docCacheManager Gestor para la carga de datos desde cach&eacute;.
-	 * @throws AOSaveDataException Cuando no se puede guardar la firma generada.
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos.
-	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
+	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
+	 * @throws SaveDataException Si no se puede guardar la firma.
+	 */
 	public static void doPostProcess(final JSONSingleSign sSign,
 			                  final X509Certificate[] certChain,
 			                  final TriphaseData tdata,
@@ -84,9 +87,9 @@ final class JSONSingleSignPostProcessor {
 			                  final String batchId,
 			                  final DocumentManager docManager,
 			                  final DocumentCacheManager docCacheManager) throws IOException,
-																						AOSaveDataException,
 			                                                                            AOException,
-			                                                                            NoSuchAlgorithmException {
+			                                                                            NoSuchAlgorithmException,
+			                                                                            SaveDataException {
 		if (certChain == null || certChain.length < 1) {
 			throw new IllegalArgumentException(
 				"La cadena de certificados del firmante no puede ser nula ni vacia" //$NON-NLS-1$
@@ -128,14 +131,14 @@ final class JSONSingleSignPostProcessor {
 			TriPhaseHelper.checkSignaturesIntegrity(td, docBytes, certChain[0], digestAlgorithm, needVerifyPkcs1);
 		}
 		catch (final Exception e) {
-			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
+			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e, ErrorCode.Internal.INVALID_PKCS1_VALUE); //$NON-NLS-1$
 		}
 
 		Properties extraParams;
 		try {
 			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), docBytes, sSign.getSignFormat().name());
 		}
-		catch (final IncompatiblePolicyException e) {
+		catch (final SignaturePolicyIncompatibilityException e) {
 			LOGGER.log(
 					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica: " + e, e); //$NON-NLS-1$
 			extraParams = sSign.getExtraParams();
@@ -216,7 +219,7 @@ final class JSONSingleSignPostProcessor {
 				docManager.storeDocument(sSign.getDataRef(), certChain, signedDoc, singleSignProps);
 			}
 		} catch (final Exception e) {
-			throw new AOSaveDataException("No se pudo guardar la firma", e); //$NON-NLS-1$
+			throw new SaveDataException("No se pudo guardar la firma", e); //$NON-NLS-1$
 		}
 	}
 

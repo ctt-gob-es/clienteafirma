@@ -22,6 +22,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
 
 /** Utilidades para en an&aacute;lisis de URL de invocaci&oacute;n por protocolo. */
@@ -84,11 +86,13 @@ public final class ProtocolInvocationUriParserUtil {
 		return ret;
 	}
 
-	/** Analiza un XML de entrada para obtener la lista de par&aacute;metros asociados
+	/**
+	 * Analiza un XML de entrada para obtener la lista de par&aacute;metros asociados
 	 * @param xml XML con el listado de par&aacute;metros.
 	 * @return Devuelve una tabla <i>hash</i> con cada par&aacute;metro asociado a un valor
-	 * @throws ParameterException Cuando el XML de entrada no es v&acute;lido. */
-	public static Map<String, String> parseXml(final byte[] xml) throws ParameterException {
+	 * @throws AOException Cuando el XML de entrada no es v&acute;lido.
+	 */
+	public static Map<String, String> parseXml(final byte[] xml) throws AOException {
 		final Map<String, String> params = new HashMap<>();
 		final NodeList elems;
 
@@ -105,19 +109,19 @@ public final class ProtocolInvocationUriParserUtil {
 			elems = docElement.getChildNodes();
 		}
 		catch (final Exception e) {
-			throw new ParameterException("Error grave durante el analisis del XML: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error grave durante el analisis del XML: " + e, e, ErrorCode.ThirdParty.INVALID_OPERATION_XML); //$NON-NLS-1$
 		}
 
 		for (int i = 0; i < elems.getLength(); i++) {
 			final Node element = elems.item(i);
 			if (!"e".equals(element.getNodeName())) { //$NON-NLS-1$
-				throw new ParameterException("El XML no tiene la forma esperada"); //$NON-NLS-1$
+				throw new AOException("El XML no tiene la forma esperada", ErrorCode.ThirdParty.INVALID_OPERATION_XML); //$NON-NLS-1$
 			}
 			final NamedNodeMap attrs = element.getAttributes();
 			final Node keyNode = attrs.getNamedItem("k"); //$NON-NLS-1$
 			final Node valueNode = attrs.getNamedItem("v"); //$NON-NLS-1$
 			if (keyNode == null || valueNode == null) {
-				throw new ParameterException("El XML no tiene la forma esperada"); //$NON-NLS-1$
+				throw new AOException("El XML no tiene la forma esperada", ErrorCode.ThirdParty.INVALID_OPERATION_XML); //$NON-NLS-1$
 			}
 			try {
 				params.put(keyNode.getNodeValue(), URLDecoder.decode(valueNode.getNodeValue(), DEFAULT_URL_ENCODING));

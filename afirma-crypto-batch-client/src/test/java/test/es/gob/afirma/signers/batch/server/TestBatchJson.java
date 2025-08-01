@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivateKey;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.signers.batch.client.BatchSigner;
 
 public class TestBatchJson {
@@ -50,32 +52,40 @@ public class TestBatchJson {
 		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$
 		final String batchPostSignerUrl = BASE_URL + "postsign"; //$NON-NLS-1$
 
-//		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"RW50cmFkYS50eHQ=\"}]}";
-//		final String batchB64 = Base64.encode(batch.getBytes(StandardCharsets.UTF_8));
-		final String batchB64 = "eyJhbGdvcml0aG0iOiJTSEEyNTYiLCJmb3JtYXQiOiJDQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJzaW5nbGVzaWducyI6W3siaWQiOiI5YzAyNjY5Ny03MTI0LTRkMGItOGMyOS1kNDllNjJmZjUzMzEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaCJ9LHsiaWQiOiJkNzcwMjI4Zi1jMDMyLTQxMTktODYwNS0wYTQzOTcyMjExMDEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaElEST0iLCJmb3JtYXQiOiJYQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJleHRyYXBhcmFtcyI6IlptOXliV0YwUFZoQlpFVlRJRVJsZEdGamFHVmtDbVY0Y0ZCdmJHbGplVDFHYVhKdFlVRkhSUT09In1dLCJzdG9wb25lcnJvciI6ZmFsc2V9"; //$NON-NLS-1$
+//		final byte[] batchEncoded = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"RW50cmFkYS50eHQ=\"}]}".getBytes(StandardCharsets.UTF_8);
+//		final byte[] batchEncoded = batch.getBytes(StandardCharsets.UTF_8);
+		final byte[] batchEncoded = Base64.decode("eyJhbGdvcml0aG0iOiJTSEEyNTYiLCJmb3JtYXQiOiJDQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJzaW5nbGVzaWducyI6W3siaWQiOiI5YzAyNjY5Ny03MTI0LTRkMGItOGMyOS1kNDllNjJmZjUzMzEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaCJ9LHsiaWQiOiJkNzcwMjI4Zi1jMDMyLTQxMTktODYwNS0wYTQzOTcyMjExMDEiLCJkYXRhcmVmZXJlbmNlIjoiU0c5c1lTQk5kVzVrYnlFaElEST0iLCJmb3JtYXQiOiJYQWRFUyIsInN1Ym9wZXJhdGlvbiI6InNpZ24iLCJleHRyYXBhcmFtcyI6IlptOXliV0YwUFZoQlpFVlRJRVJsZEdGamFHVmtDbVY0Y0ZCdmJHbGplVDFHYVhKdFlVRkhSUT09In1dLCJzdG9wb25lcnJvciI6ZmFsc2V9"); //$NON-NLS-1$
 
-		final String result = BatchSigner.signJSON(batchB64, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
+		final String result = BatchSigner.signJSON(batchEncoded, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
 
 		System.out.println("Resultado:\n" + result); //$NON-NLS-1$
 	}
 
 	@Test
 	@Ignore
-	public void testBatchWithCounterSigns() throws CertificateEncodingException, IOException, AOException {
+	public void testBatchWithCounterSigns() throws CertificateEncodingException, IOException, AOException, GeneralSecurityException {
 
 		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$
 		final String batchPostSignerUrl = BASE_URL + "postsign"; //$NON-NLS-1$
 
 
 		//final byte[] dataRef = readFile(new File("C:\\Users\\carlos.gamuci\\Desktop\\Entrada\\cofirma.csig"));
-		final byte[] dataRef = "cofirma.csig".getBytes();
-		final String dataRefB64 = Base64.encode(dataRef);
+		final String cosignRefB64 = Base64.encode("cofirma.csig".getBytes()); //$NON-NLS-1$
+//		final String signRefB64 = Base64.encode("firma.csig".getBytes()); //$NON-NLS-1$
+//		final String docxRefB64 = Base64.encode("Entrada.docx".getBytes()); //$NON-NLS-1$
+//		final String facturaRefB64 = Base64.encode("factura.xml".getBytes()); //$NON-NLS-1$
 
-		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"suboperation\":\"countersign\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"" + dataRefB64 + "\"}, "
-				+ "{\"id\":\"2\", \"datareference\":\"" + dataRefB64 + "\", \"format\":\"XAdES\", \"suboperation\":\"sign\", \"extraParams\":\"format=XAdES Detached\"}]}";
-		final String batchB64 = Base64.encode(batch.getBytes(StandardCharsets.UTF_8));
 
-		final String result = BatchSigner.signJSON(batchB64, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
+		final String batch = "{\"algorithm\":\"SHA256\", \"format\":\"CAdES\", \"suboperation\":\"countersign\", \"singlesigns\":[{\"id\":\"1\", \"datareference\":\"" + cosignRefB64 + "\"}, " //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "{\"id\":\"2\", \"datareference\":\"" + docxRefB64 + "\", \"format\":\"XAdES\", \"suboperation\":\"sign\", \"extraParams\":\"format=XAdES Detached\"}, "
+//				+ "{\"id\":\"3\", \"datareference\":\"" + signRefB64 + "\"}, "
+//				+ "{\"id\":\"4\", \"datareference\":\"" + facturaRefB64 + "\", \"format\":\"CAdES\", \"suboperation\":\"sign\"}"
+				+ "]}"; //$NON-NLS-1$
+		final byte[] batchEncoded = batch.getBytes(StandardCharsets.UTF_8);
+
+		SslSecurityManager.disableSslChecks();
+
+		final String result = BatchSigner.signJSON(batchEncoded, batchPreSignerUrl, batchPostSignerUrl, this.certChain, this.pk);
 
 		System.out.println("Resultado:\n" + result); //$NON-NLS-1$
 	}

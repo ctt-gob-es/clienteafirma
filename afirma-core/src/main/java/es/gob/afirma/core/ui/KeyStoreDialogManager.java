@@ -122,7 +122,7 @@ public interface KeyStoreDialogManager {
 	 * @return Nombre del tipo de almac&eacute;n o {@code null} si no se conoce. */
 	String getKeyStoreName();
 
-	/** Obtiene el nombre dde la librer&iacute;a en caso de que se utilice.
+	/** Obtiene el nombre de la librer&iacute;a en caso de que se utilice.
 	 * @return Nombre de la librer&iacute;a o {@code null} si no se conoce. */
 	String getLibName();
 

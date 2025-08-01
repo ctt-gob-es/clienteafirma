@@ -17,6 +17,8 @@ public class RuntimeConfigNeededException extends AOException {
 
 	private final String param;
 
+	private boolean denied = false;
+
 	/**
 	 * Construye la excepcion con la informaci&oacute;n necesaria para poder solicitar la
 	 * configuraci&oacute;n que se necesite.
@@ -25,9 +27,16 @@ public class RuntimeConfigNeededException extends AOException {
 	 * @param requestorText Mensaje o c&oacute;digo de mensaje para la solicitud de la informaci&oacute;n.
 	 * @param param Identificador del par&aacute;metro que se configurar&aacute; con la informaci&oacute;n.
 	 * proporcionada.
+	 * @param errorCode C&oacute;digo de error.
+	 * @throws NullPointerException Si el par&aacute;metro {@code #requestType} es nulo.
 	 */
-	public RuntimeConfigNeededException(final String msg, final RequestType requestType, final String requestorText, final String param) {
-		super(msg);
+	protected RuntimeConfigNeededException(final String msg, final RequestType requestType, final String requestorText, final String param, final ErrorCode errorCode) {
+		super(msg, errorCode);
+
+		if (requestType == null) {
+			throw new NullPointerException("El tipo de datos solicitados no puede ser nulo"); //$NON-NLS-1$
+		}
+
 		this.requestType = requestType;
 		this.requestorText = requestorText;
 		this.param = param;
@@ -41,10 +50,17 @@ public class RuntimeConfigNeededException extends AOException {
 	 * @param requestorText Mensaje o c&oacute;digo de mensaje para la solicitud de la informaci&oacute;n.
 	 * @param param Identificador del par&aacute;metro que se configurar&aacute; con la informaci&oacute;n.
 	 * proporcionada.
+	 * @param errorCode C&oacute;digo de error.
 	 * @param e Error que origin&oacute; la excepci&oacute;n.
+	 * @throws NullPointerException Si el par&aacute;metro {@code #requestType} es nulo.
 	 */
-	public RuntimeConfigNeededException(final String msg, final RequestType requestType, final String requestorText, final String param, final Throwable e) {
-		super(msg, e);
+	protected RuntimeConfigNeededException(final String msg, final RequestType requestType, final String requestorText, final String param, final ErrorCode errorCode, final Throwable e) {
+		super(msg, e, errorCode);
+
+		if (requestType == null) {
+			throw new NullPointerException("El tipo de datos solicitados no puede ser nulo"); //$NON-NLS-1$
+		}
+
 		this.requestType = requestType;
 		this.requestorText = requestorText;
 		this.param = param;
@@ -75,9 +91,27 @@ public class RuntimeConfigNeededException extends AOException {
 	}
 
 	/**
+	 * Establece si se ha denegado la posibilidad de configurar o permitir la operaci&oacute;n.
+	 * @param denied {@code true} si la operaci&oacute;n debe bloquearse, {@code false} en caso
+	 * de que se pueda obtener a&uacute;n la configuraci&oacute;n necesaria.
+	 */
+	public void setDenied(final boolean denied) {
+		this.denied = denied;
+	}
+
+	/**
+	 * Indica si se ha denegado la posibilidad de configurar o permitir la operaci&oacute;n.
+	 * @return {@code true} si la operaci&oacute;n debe bloquearse, {@code false} en caso
+	 * de que se pueda obtener a&uacute;n la configuraci&oacute;n necesaria.
+	 */
+	public boolean isDenied() {
+		return this.denied;
+	}
+
+	/**
 	 * Tipos de configuraci&oacute;n necesaria.
 	 */
-	public static enum RequestType {
+	public enum RequestType {
 		/** Requiere confirmaci&oacute;n. */
 		CONFIRM,
 		/** Requiere que se proporcione una contrase&tilde;a. */

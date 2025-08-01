@@ -54,7 +54,7 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
         	ks = KeyStore.getInstance(getType().getProviderName());
         }
         catch (final Exception e) {
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen de tipo " + getType(), e); //$NON-NLS-1$
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen de tipo " + getType(), e, KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR); //$NON-NLS-1$
         }
 
         this.cachePasswordCallback = pssCallBack != null ? new CachePasswordCallback(pssCallBack.getPassword()) : NullPasswordCallback.getInstance();
@@ -71,12 +71,12 @@ abstract class FileKeyStoreManager extends AOKeyStoreManager {
         }
         catch (final CertificateException e) {
             throw new AOKeyStoreManagerException(
-        		"No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado", e //$NON-NLS-1$
+        		"No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado", e, KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR //$NON-NLS-1$
     		);
         }
         catch (final NoSuchAlgorithmException e) {
             throw new AOKeyStoreManagerException(
-        		"No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado", e //$NON-NLS-1$
+        		"No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado", e, KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR //$NON-NLS-1$
     		);
 		}
         try {

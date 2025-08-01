@@ -213,19 +213,17 @@ public class TestCoSignWithModes {
 	/**
 	 * Esta firma no debe ser posible. Cofirma expl&iacute;cita con algoritmo SHA512withRSA sobre firma expl&iacute;cita
 	 * con algoritmo de SHA256withRSA.
-	 * @throws Exception en cualquier error.
-	 */
 	@Test(expected = ContainsNoDataException.class)
 	public void testCofirmaExplicitaSHA512SobreFirmaExplicitaSHA256() throws Exception {
 
 		final String algorithm = AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA;
+		try {
+			this.signer.cosign(
+					this.explicitSHA256Signature, algorithm,
+					this.pke.getPrivateKey(), this.pke.getCertificateChain(), this.explicitParams);
 
-		this.signer.cosign(
-				this.explicitSHA256Signature, algorithm,
-				this.pke.getPrivateKey(), this.pke.getCertificateChain(), this.explicitParams);
-
-		Assert.fail("Se debio haber lanzado una excepcion de tipo ContainsNoDataException al no poderse cofirmar una firma sin los datos desde los que calcular el hash o el hash ya calculado con el mismo algoritmo"); //$NON-NLS-1$
-	}
+			Assert.fail("Se debio haber lanzado una excepcion de tipo ContainsNoDataException al no poderse cofirmar una firma sin los datos desde los que calcular el hash o el hash ya calculado con el mismo algoritmo"); //$NON-NLS-1$
+		}
 
 	/** Cofirma expl&iacute;cita con algoritmo SHA512withRSA sobre firma impl&iacute;cita
 	 * con algoritmo de SHA256withRSA.

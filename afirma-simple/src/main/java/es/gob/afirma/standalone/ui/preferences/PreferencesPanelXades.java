@@ -29,13 +29,19 @@ import java.awt.Insets;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -49,11 +55,17 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import org.ietf.jgss.GSSException;
+import org.ietf.jgss.Oid;
+
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 public final class PreferencesPanelXades extends JScrollPane {
@@ -73,7 +85,7 @@ public final class PreferencesPanelXades extends JScrollPane {
 		final ResourceBundle policyBundle = ResourceBundle
 				.getBundle(POLICY_BUNDLE_NAME, Locale.getDefault());
 
-		POLICY_XADES_AGE_1_9  = new AdESPolicy(
+		POLICY_XADES_AGE_1_9  = new AdESPolicy(true,
 				policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE19.policyIdentifierHash.XAdES"), //$NON-NLS-1$
 				"SHA1", //$NON-NLS-1$
@@ -678,19 +690,78 @@ public final class PreferencesPanelXades extends JScrollPane {
 	}
 
 	void checkPreferences() throws AOException {
+	    loadXadesPolicy();        
+	    
+	     if (!this.xadesPolicyDlg.isNoPolicySelected()) {
+	    	final String identifier = this.xadesPolicyDlg.getIdentifierField().getText().trim();
+	 	    final String hash       = this.xadesPolicyDlg.getHashField().getText().trim();
+	 	    final String algo       = this.xadesPolicyDlg.getHashAlgorithmField().getSelectedItem().toString().trim();
+	 	    final String qualifier  = this.xadesPolicyDlg.getQualifierField().getText().trim();
 
-		loadXadesPolicy();
+	         // 1) Identificador no nulo ni vacio
+	         if (identifier == null || identifier.isEmpty()) {
+	             throw new AOException(SimpleErrorCode.Functional.INVALID_POLICY_IDENTIFIER);
+	         }
 
-		final AdESPolicy p = this.xadesPolicyDlg.getSelectedPolicy();
-		if (p != null) {
-			// No nos interesa el resultado, solo si construye sin excepciones
-			try {
-				new URI(p.getPolicyIdentifier());
-			}
-			catch (final URISyntaxException e) {
-				throw new AOException("El identificador debe ser una URI", e); //$NON-NLS-1$
-			}
-		}
+	         // 2) Identificador debe ser URI valida
+	         try {
+	             new URI(identifier);
+	         }
+	         catch (final URISyntaxException e) {
+	             throw new AOException(e, SimpleErrorCode.Functional.INVALID_POLICY_IDENTIFIER_URI);
+	         }
+	         
+	         if (!isValidOid(identifier)) {
+	             throw new AOException(SimpleErrorCode.Functional.INVALID_POLICY_IDENTIFIER_OID);
+	         }
+	         
+	         // 3) Debe haber un valor en hash
+	         if (hash== null || hash.isEmpty()) {
+	             throw new AOException(SimpleErrorCode.Functional.EMPTY_POLICY_HASH);
+	         }
+
+	         // 4) Huella y algoritmo
+	         if ("0".equals(hash)) {
+	             // Sin huella: URI debe ser accesible y calcular digest
+	             try (InputStream is = new URI(identifier).toURL().openStream()) {
+	                 final String algorithm = (algo == null || algo.isEmpty())
+	                     ? "SHA-512"
+	                     : AOSignConstants.getDigestAlgorithmName(algo);
+	                 MessageDigest.getInstance(algorithm)
+	                              .digest(AOUtil.getDataFromInputStream(is));
+	             }
+	             catch (final Exception e) {
+	                 throw new AOException(e, 
+	                 		SimpleErrorCode.Functional.UNREACHABLE_POLICY_IDENTIFIER_URI);
+	             }
+	         }
+	         else {
+	             // Con huella: algoritmo obligatorio
+	             if (algo == null || algo.isEmpty()) {
+	                 throw new AOException(SimpleErrorCode.Functional.MISSING_DIGEST_ALGORITHM);
+	             }
+	             // Huella en Base64
+	             if (!Base64.isBase64(hash.getBytes())) {
+	                 throw new AOException(
+	                     SimpleErrorCode.Functional.INVALID_POLICY_IDENTIFIER_HASH_BASE64);
+	             }
+	         }
+
+	         // 4) Calificador opcional: URI valida
+	         if (qualifier != null && !qualifier.isEmpty()) {
+	            try {
+	                // Esto valida esquema, host, sintaxis URL
+	                new URL(qualifier);
+	            }
+	            catch (final MalformedURLException e) {
+	                // Aqui lanzas tu AOException con el codigo adecuado
+	                throw new AOException(
+	                    e,
+	                    SimpleErrorCode.Functional.INVALID_POLICY_QUALIFIER_URL
+	                );
+	            }
+	        }
+	     }
 	}
 
 	/**
@@ -796,15 +867,40 @@ public final class PreferencesPanelXades extends JScrollPane {
 
 				this.xadesPolicyDlg.saveCurrentPolicy();
 
-			} catch (final Exception e) {
+			} catch (final AOException e) {
+			    String code = e.getErrorCode().getCode();
+			    int index;
+			    try {
+			        int codeInt = Integer.parseInt(code);
+			        int base    = Integer.parseInt(SimpleErrorCode.Functional.POLICY_DEFAULT_ERROR.getCode());
+			        index = codeInt - base;
+			        if (index < 0) {
+			            index = 0;
+			        }
+			    }
+			    catch (final Exception ex) {
+			        index = 0;
+			    }
+			    String key = "PreferencesPanelPolicy." + index;
 
-				AOUIFactory.showErrorMessage(
-						"<p>" + SimpleAfirmaMessages.getString("PreferencesPanel.6") + "</p>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE, e);
-				changeXadesPolicyDlg(container);
+			    // Intentamos obtener el mensaje, si no existe usamos el por defecto (0)
+			    String message;
+			    try {
+			        message = SimpleAfirmaMessages.getString(key);
+			    }
+			    catch (final MissingResourceException mre) {
+			        message = SimpleAfirmaMessages.getString("PreferencesPanelPolicy.0");
+			    }
 
+			    AOUIFactory.showErrorMessage(
+			        message,
+			        SimpleAfirmaMessages.getString("SimpleAfirma.7"),
+			        AOUIFactory.ERROR_MESSAGE,
+			        e
+			    );
+			    changeXadesPolicyDlg(container);
 			}
+
 
 		}
 
@@ -812,4 +908,19 @@ public final class PreferencesPanelXades extends JScrollPane {
 		this.xadesPolicyDlg = null;
 	}
 
+	private boolean isValidOid(final String input) {
+        String oid = input;
+        if (input.toLowerCase().startsWith("urn:oid:")) {
+            oid = input.substring("urn:oid:".length());
+        }
+        
+        try {
+			new Oid(oid.replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (final GSSException e) {
+			return false;
+		}
+        
+        return true;
+    }
 }

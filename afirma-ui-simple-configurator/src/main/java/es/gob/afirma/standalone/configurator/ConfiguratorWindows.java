@@ -139,7 +139,7 @@ final class ConfiguratorWindows implements Configurator {
 				// Intentamos desinstalar cualquier certificado nuestro que pueda haber antes de instalar el nuevo
 				window.print(Messages.getString("ConfiguratorWindows.26")); //$NON-NLS-1$
 				ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(appDir, window, UNINSTALL_CERT_RETRIES);
-
+				
 				// Instalamos el certificado de CA en el almacen de confianza de Firefox
 				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
 				try {

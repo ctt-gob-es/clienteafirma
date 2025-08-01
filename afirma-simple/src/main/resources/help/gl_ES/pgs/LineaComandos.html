@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Uso por liña de comandos</title> 
+  <meta name="AppleTitle" content="Ayuda de Autofirma" /> 
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png" /> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+ </head> 
+ <body> 
+  <h2>Uso por liña de comandos</h2> 
+  <p>Autofirma permite o seu uso a través de liña de comandos, proporcionando funcionalidades de firma, sinatura de lotes e creación e verificación de hashes. </p> 
+  <p>O executable ou script a utilizar para a execución de Autofirma por liña de comandos varía en función do sistema: </p> 
+  <ul> 
+   <li>Windows</li> 
+   <ul> 
+    <li>O proceso de instalación copia no directorio de Autofirma o executable &quot;AutofirmaCommandLine&quot;&quot; e, se lle é posible, inclúe o directorio no <i>path</i>. Utilice este executable desde liña de comandos para realizar as distintas operacións que se soportan.</li> 
+   </ul> 
+   <li>Linux</li> 
+   <ul> 
+    <li>O proceso de instalación xera no directorio &quot;/usr/bin&quot; o script &quot;autofirma&quot;. Utilice este script para executar a aplicación proporcionándolle directamente os parámetros da operación que desexe.</li> 
+   </ul> 
+   <li>macOS</li> 
+   <ul> 
+    <li>Para o uso da aplicación por liña de comandos créase dentro da aplicación un script &quot;AutofirmaCommandLine&quot; no directorio da aplicación. Pódese executar este script accedendo ao directorio interno &quot;Resources&quot; da aplicación (comunmente, &quot;/Applications/Autofirma.app/Contents/MacOS&quot;). É importante que <b>os parámetros que poidan conter espazos pásense no comando entre comiñas simples</b>.</li> 
+   </ul> 
+  </ul> 
+  <p>Por exemplo, pódese executar Autofirma e listar as distintas operacións dispoñibles a través da liña de comandos co comando &quot;-help&quot; da seguinte maneira:</p> 
+  <span>En Windows:</span> 
+  <ul> 
+   <li><code>AutofirmaCommandLine –help</code></li> 
+  </ul> 
+  <span>En Linux:</span> 
+  <ul> 
+   <li><code>/usr/bin/Autofirma –help</code></li> 
+  </ul> 
+  <span>En Mac:</span> 
+  <ul> 
+   <li><code>/Applications/Autofirma.app/Contents/MacOS/AutofirmaCommandLine –help</code></li> 
+  </ul> 
+  <p>Isto daría como resultado:</p> 
+  <div style="background-color: black; color: white; width: 50%"> 
+   <code><pre>
+Ferramenta de sinatura de documentos.
+
+Sintaxe: Autofirma cmd [options...]
+
+Comandos cmd:
+
+  sign           (sinatura de ficheiro)
+  cosign         (cofirma de ficheiro)
+  countersign    (contrafirma de ficheiro)
+  listaliases    (lista os alias dispoñibles no almacen)
+  verify         (abre un panel coa informacion de validacion dunha firma ou certificado)
+  batchsign      (asina/multisinatura de lotes de ficheiros)
+  createdigest   (creacion de pegada dixitais con interface grafica)
+  checkdigest    (comprobacion de pegada dixitais con interface grafica)
+
+Utilice &quot;Autofirma cmd -help&quot; para ver a sintaxe do comando &quot;cmd&quot;
+    </pre></code> 
+  </div> 
+  <p>Para listar as opcións de configuración dalgunha das operacións, pode utilizar o comando &quot;-help&quot; sobre calquera delas. Por exemplo:</p> 
+  <ul> 
+   <li><code>AutofirmaCommandLine sign –help</code></li> 
+  </ul> 
+  <p>Isto daría como resultado:</p> 
+  <div style="background-color: black; color: white; width: 50%"> 
+   <code><pre>
+Sintaxe: Autofirma sign [opcións...]
+
+Opcións:
+  -gui                   (Realiza a operacion con contorna grafico. Ten prioridade sobre -certgui)
+  -certgui               (Usa un dialogo grafico para a seleccion do certificado de firma)
+  -i inputfile           (Ruta do ficheiro de entrada)
+  -ou outputfile          (Ruta do ficheiro de saída)
+  -algorithm algo        (Algoritmo de firma)
+  -format                (Establece o formato de firma)
+         auto            (Seleccion de formato en base ao ficheiro de entrada)
+         cades           (Formato CAdES)
+         pades           (Formato PAdES)
+         xades           (Formato XAdES)
+         facturae        (Sinatura de factura electronica)
+  -config extraParams    (Properties en texto plano coa configuracion da operacion)
+  -store                 (Establece o almacen de claves. Por defecto, o do sistema)
+         auto            (Almacen de claves do sistema)
+         windows         (Almacen de claves de Windows)
+         mac             (Almacen de claves de macOS)
+         mozilla         (Almacen de claves de Mozilla Firefox)
+         dni             (DNI electronico)
+         pkcs12:p12file  (Almacen PKCS#12. &quot;p12file&quot; é a ruta do almacen)
+         pkcs11:p11file  (Almacen PKCS#11. &quot;p11file&quot; é a ruta do controlador)
+
+  -contrasinal contrasinal     (Establece a contrasena do almacen)
+  -alias alias           (Alias do certificado de firma)
+  -filter filter         (Filtro para seleccionar o certificado de firma)
+  -xml                   (Formatea a resposta como XML)
+    </pre></code> 
+  </div> 
+  <p>O parámetro de configuración <code>-config</code> permite que se lle proporcione unha listaxe de propiedades de configuración concatenadas por &quot;\n&quot;. Cada unha destas propiedades terá o formato crave=valor.</p> 
+  <p>Un exemplo de parámetro de configuración sería:</p> 
+  <ul> 
+   <li><code>-config &quot;format=XAdES Enveloping\nsignerClaimedRoles=Director\nxadesNamespace=http://uri.etsi.org/01903/v1.4.1#</code></li> 
+  </ul> 
+  <p>As opcións de configuración varían dun formato de firma a outro. A seguir de describen as opcións de configuración para cada formato de firma.</p> 
+  <h3>Opcións de configuración de firmas CAdES</h3> 
+  <p>A seguir se listan as propiedades de configuración admitidas polas firmas CAdES. Algunhas destas opcións poden non ter efecto en casos de firma nas que non apliquen, como no caso das contrafirmas.</p> 
+  <ul> 
+   <li style="margin-top: 15pt"><code>mode</code>:</li> 
+   <ul> 
+    <li><code>explicit</code>: A firma resultante non incluirá os datos asinados. Se non se indica o a propiedade <code>mode</code> configúrase automaticamente este comportamento.</li> 
+    <li><code>implicit</code>: A firma resultante non incluirá os datos asinados. A firma resultante incluirá internamente unha copia dos datos asinados. O uso deste valor podería xerar firmas de gran tamaño. Nas cofirmas, esta propiedade ignorarase se os datos xa estaban contidos na firma orixinal ou se non se proporcionan os datos.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>contentTypeOid</code>:</li> 
+   <ul> 
+    <li>Identificador do tipo de dato asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>contentDescription</code>:</li> 
+   <ul> 
+    <li>Descrición textual do tipo de datos asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>includeMimeTypeAttribute</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Inclúe na firma o atributo ide-aa-ets-mimeType definido en CAdES v2.1.1 e superiores (válido en firmas baseline). O valor de mimetype tomarase da propiedade <code>mimetype</code> ou, se non se inclúo, se extrapolará da propiedade <code>contentTypeOid</code>. Se tampouco fose posible, trataranse de obter estes valores dalgunha das firmas previas (en caso de cofirmas). Se tampouco fose posible, obterase o tipo da análise dos datos (que podería non ser correcto ou concreto). No caso de que non se poida obter o tipo de ningunha maneira, usarase o mimetype application/octet-stream.</li> 
+    <li><code>false</code>: Non inclúe o atributo ide-aa-ets-mimeType na firma. Valor por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>mimeType</code>:</li> 
+   <ul> 
+    <li>CONSINTA-Type dos datos a asinar. Só se inclúe cando se indica a propiedade <code>includeMimeTypeAttribute</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifier</code>:</li> 
+   <ul> 
+    <li>Identificador da política de firma, necesario para xerar asinas CAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li> 
+   <ul> 
+    <li>Cadea Base 64 coa pegada dixital da política de firma. É obrigatorio indicar este paráesta propiedade se de indicou tamén policyIdentifier, do mesmo xeito que é obrigatorio tamén dar valor ao á propiedade <code>policyIdentifierHashAlgorithm</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>XA1</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA1.</li> 
+    <li><code>XA-256</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-256.</li> 
+    <li><code>XA-384</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-384.</li> 
+    <li><code>XA-512</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-512.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li> 
+   <ul> 
+    <li>URL accesible cara ao documento (normalmente PDF) que contén unha descrición textual da política de firma. Esta propiedade é opcional mesmo se se desexa xerar asinas CAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>includeOnlySignningCertificate</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Indica que debe incluírse na firma unicamente o certificado do asinante.</li> 
+    <li><code>false</code>: Indica que debe incluírse na firma toda a cadea de certificación do certificado asinante. Valor por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li> 
+   <ul> 
+    <li>URL accesible cara ao documento (normalmente PDF) que contén unha descrición textual da política de firma. Esta propiedade é opcional mesmo se se desexa xerar asinas CAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo coa cidade na que se realiza a firma. A codificación debe ser UTF-8.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionPostalCode</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo co código postal onde se realiza a firma. A codificación debe ser UTF-8.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCountry</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo co país na que se realiza a firma. A codificación debe ser UTF-8.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li> 
+   <ul> 
+    <li>Agrega á firma campos cos cargos atribuídos ao asinante. Deben separarse os cargos co carácter &quot;|&quot; (e este non pode estar no propio texto de ningún cargo).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndications</code>:</li> 
+   <ul> 
+    <li>Número de CommitmentTypeIndications que se van a declarar. Estes son os motivos que se declaran para a firma. Os valores concretos especifícanse con commitmentTypeIndicationnIdentifier e commitmentTypeIndicationnDescription, onde ‘n’ vai desde 0 ata o valor indicado nesta propiedade menos 1.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li> 
+   <ul> 
+    <li><code>1</code>: Establece que o CommitmentTypeIndications número n (contando desde cero) é &quot;Proba de orixe&quot;.</li> 
+    <li><code>2</code>: Establece que o CommitmentTypeIndications número n (contando desde cero) é &quot;Proba de recepción&quot;.</li> 
+    <li><code>3</code>: Establece que o CommitmentTypeIndications número n (contando desde cero) é &quot;Proba de entrega&quot;.</li> 
+    <li><code>4</code>: Establece que o CommitmentTypeIndications número n (contando desde cero) é &quot;Proba de envío&quot;.</li> 
+    <li><code>5</code>: Establece que o CommitmentTypeIndications número n (contando desde cero) é &quot;Proba de aprobación&quot;.</li> 
+    <li><code>6</code>: Establece que o CommitmentTypeIndications número n (contando desde cero) é &quot;Proba de creación&quot;.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>CommitmentTypeQualifiers</code>:</li> 
+   <ul> 
+    <li>Lista de indicadores textuais separados polo carácter &apos;|&apos; que se achegan como calificadores adicionais do CommitmentTypeIndication número n (atributo opcional). Normalmente son OID. Os elementos da lista non poden conter o carácter &apos;|&apos; (xa que este úsase como separador).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Incluirase o atributo SigningCertificateV2 na firma.</li> 
+    <li><code>false</code> (Ou outro valor): Incluirase o atributo SigningCertificate na firma.</li> 
+    <li>Sen especificar: Incluirase SigningCertificate se a firma utiliza un algoritmo de firma XA1 e SigningCertificateV2 para o resto de algoritmos.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permítese a cofirma/contrafirma de firmas de arquivo lonxevo, a pesar de que estas non serán válidas posteriormente. </li> 
+    <li><code>false</code> (Ou outro valor): Non se permite a cofirma/contrafirma de firmas de arquivo lonxevo.</li> 
+   </ul> 
+  </ul> 
+  <h3>Opcións de configuración de firmas XAdES</h3> 
+  <p>A seguir se listan as propiedades de configuración admitidas polas firmas XAdES. Algunhas destas opcións poden non ter efecto en casos de firma nas que non apliquen, como no caso das contrafirmas.</p> 
+  <ul> 
+   <li style="margin-top: 10pt"><code>insertEnvelopedSignatureOnNodeByXPath</code>:</li> 
+   <ul> 
+    <li>Expresión XPath (v1) que indica o nodo baixo o cal debe inserirse o nodo de firma no caso dunha firma Enveloped. Se a expresión devolve máis dun nodo, úsase só o primeiro. Se a expresión non devolve nodos ou está mal construída lanzarase unha excepción. Esta propiedade só ten efecto en firmas Enveloped.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>useManifest</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Usa un Manifest de XMLDSig coas referencias de firma no canto de asinar directamente estas referencias. Ignórase na operación de cofirma. Isto permite que sexa opcional a comprobación do destino e pegadas dixitais das referencias.</li> 
+    <li><code>false</code>: Xera as firmas normalmente, sen Manifest (comportamento por defecto).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>uri<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>URI que referencia aos datos que se desexan sinatura dentro dunha firma manifest. ‘n’ indica o número de referencia de entre as que se queren asinar, empezando en ‘1’.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>precalculatedHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>XA1</code>: Indica que as pegadas dixitais dos datos referenciados no manifest calculáronse mediante o algoritmo XA1.</li> 
+    <li><code>XA-256</code>: Indica que as pegadas dixitais dos datos referenciados no manifest calculáronse mediante o algoritmo XA-256.</li> 
+    <li><code>XA-384</code>: Indica que as pegadas dixitais dos datos referenciados no manifest calculáronse mediante o algoritmo XA-284.</li> 
+    <li><code>XA-512</code>: Indica que as pegadas dixitais dos datos referenciados no manifest calculáronse mediante o algoritmo XA-512.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>md<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>Base 64 coa pegada dixital dos datos asociados á referencia ‘n’. O algoritmo de pegada será o indicado en <code>precalculatedHashAlgorithm</code></li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>mimetype<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>CONSINTA-Type dos datos asociados á referencia ‘n’ nunha firma manifest. Se non se indica esta propiedade, utilizarase o tipo ‘application/octet-stream’.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>contentTypeOid<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>OID ou URN do tipo de dato asinado para a referencia número ‘n’ nunha firma manifest. Esta propiedade é complementaria (que non excluínte) á propiedade <code>mimetype<i><b>n</b></i></code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>encoding<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>Codificación dos datos asociados á referencia número ‘n’ nunha firma manifest. Un uso incorrecto desta propiedade pode provocar a xeración dunha firma inválida.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>addKeyInfoKeyValue</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Inclúe o nodo KeyValue dentro de KeyInfo de XAdES (comportamento por defecto).</li> 
+    <li><code>false</code>: Non inclúe o nodo KeyValue dentro de KeyInfo de XAdES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>addKeyInfoKeyName</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Inclúe o nodo KeyName dentro de KeyInfo de XAdES.</li> 
+    <li><code>false</code>: Non inclúe o nodo KeyName dentro de KeyInfo de XAdES (comportamento por defecto).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>avoidXpathExtraTransformsOnEnveloped</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Evita a inclusión da transformación XPATH2 que normalmente se engade para posibilitar as cofirmas e que elimina todas as firmas do documento para deixar unicamente o contido. ADVERTENCIA: A cofirma dun documento no que polo menos unha das firmas non inclúe a transformación XPATH, dará lugar a un documento de firma que potencialmente será validado incorrectamente polos validadores de firma. Por este motivo, só se permite o uso desta propiedade na operación de firma (non na de cofirma).</li> 
+    <li><code>false</code>: Inclúe a transformación XPATH2 posibilita as cofirmas eliminando todas as firmas do documento para deixar unicamente o contido (comportamento por defecto).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>format</code>:</li> 
+   <ul> 
+    <li><code>XAdES Enveloping</code>: Xera firmas en formato Enveloping. Este é o formato que se utiliza por defecto cando non se indica ningún.</li> 
+    <li><code>XAdES Enveloped</code>: Xera firmas en formato Enveloped.</li> 
+    <li><code>XAdES Detached</code>: Xera firmas en formato Internally Detached.</li> 
+    <li><code>XAdES Externally Detached</code>:Xera firmas en formato Externally Detached.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>includeOnlySignningCertificate</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Indica que debe incluírse na firma unicamente o certificado do asinante.</li> 
+    <li><code>false</code>: Indica que debe incluírse na firma toda a cadea de certificación do certificado asinante. Valor por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifier</code>:</li> 
+   <ul> 
+    <li>Identificador da política de firma (normalmente un URL cara á política en formato XML procesable), necesario para xerar asinas XAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li> 
+   <ul> 
+    <li>Cadea Base 64 coa pegada dixital da política de firma. É obrigatorio indicar esta propiedade se de indicou tamén policyIdentifier, do mesmo xeito que é obrigatorio tamén dar valor á propiedade <code>policyIdentifierHashAlgorithm</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>XA1</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA1.</li> 
+    <li><code>XA-256</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-256.</li> 
+    <li><code>XA-384</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-384.</li> 
+    <li><code>XA-512</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-512.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li> 
+   <ul> 
+    <li>URL accesible cara ao documento (normalmente PDF) que contén unha descrición textual da política de firma. Esta propiedade é opcional mesmo se se desexa xerar asinas XAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyDescription</code>:</li> 
+   <ul> 
+    <li>Descrición textual da política de firma. No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado. Esta propiedade é opcional mesmo se se desexa xerar asinas XAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li> 
+   <ul> 
+    <li>Agrega á firma campos cos cargos atribuídos ao asinante. Deben separarse os cargos co carácter &quot;|&quot; (e este non pode estar no propio texto de ningún cargo). No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo coa cidade na que se realiza a firma. No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionProvince</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo coa provincia na que se realiza a firma. No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionPostalCode</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo co código postal no que se realiza a firma. No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCountry</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo co país no que se realiza a firma. No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>referencesDigestMethod</code>:</li> 
+   <ul> 
+    <li><code>http://www.w3.org/2000/09/xmldsig#xa1</code>: Usa o algoritmo XA1 para o cálculo das pegadas dixitais das referencias XML asinadas.</li> 
+    <li><code>http://www.w3.org/2001/04/xmlenc#xa256</code>: Usa o algoritmo XA-256 para o cálculo das pegadas dixitais das referencias XML asinadas.</li> 
+    <li><code>http://www.w3.org/2001/04/xmlenc#xa512</code>: Usa o algoritmo XA-512 para o cálculo das pegadas dixitais das referencias XML asinadas. Este é o comportamento por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>mimeType</code>:</li> 
+   <ul> 
+    <li>CONSINTA-Type dos datos a asinar. Se non se indica esta propiedade o sistema tenta auto-detectar o tipo, establecendo o máis aproximado (que pode non ser o estritamente correcto).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>encoding</code>:</li> 
+   <ul> 
+    <li>URI coa codificación dos datos a asinar (ver a documentación do elemento Object de XMLDSig para máis información). Un uso incorrecto desta propiedade pode provocar a xeración dunha firma inválida. Se se proporcionan datos a asinar previamente codificados en Base64 pero se desexa sexan considerados como a súa forma descodificada, debe establecerse este valor a http://www.w3.org/2000/09/xmldsig#base64 e especificarse o tipo real na propiedade <code>mimeType</code>. Por exemplo, para asinar unha imaxe PNG facendo que a firma se refira á súa forma binaria directa, pode proporcionarse a imaxe directamente codificada en Base64 indicando o encoding como http://www.w3.org/2000/09/xmldsig#base64 e o mimeType como image/png. O valor debe ser sempre un URI.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>outputXmlEncoding</code>:</li> 
+   <ul> 
+    <li>Codificación do XML de saída. Se non se indica este valor téntase auto-detectar a partir do XML de entrada (se os datos a asinar son un XML).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>contentTypeOid</code>:</li> 
+   <ul> 
+    <li>OID ou URN de tipo OID co identificador do tipo de dato asinado. Esta propiedade é complementaria (que non excluínte) á propiedade <code>mimeType</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>canonicalizationAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>http://www.w3.org/tr/2001/rec-xml-c14n-20010315</code>: Asínase o XML con canonizado XML 1.0 inclusivo (valor por defecto). </li> 
+    <li><code>http://www.w3.org/tr/2001/rec-xml-c14n-20010315#WithComments</code>: Asínase o XML con canonizado XML 1.0 inclusivo con comentarios.</li> 
+    <li><code>http://www.w3.org/2001/10/xml-exc-c14n#</code>: Asínase o XML con canonizado XML 1.0 exclusivo.</li> 
+    <li><code>http://www.w3.org/2001/10/xml-exc-c14n#WithComments</code>: Asínase o XML con canonizado XML 1.0 exclusivo con comentarios.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xadesNamespace</code>:</li> 
+   <ul> 
+    <li><code>http://uri.etsi.org/01903/v1.3.2#</code>: URL de definición do espazo de nomes de XAdES correspondente á versión 1.3.2 de XAdES. Este é o valor por defecto.</li> 
+    <li><code>http://uri.etsi.org/01903/v1.4.1#</code>: URL de definición do espazo de nomes de XAdES correspondente á versión 1.4.1 de XAdES. Se se establece esta propiedade é posible que se necesite establecer tamén a propiedade <code>signedPropertiesTypeUrl</code> para evitar incoherencias na versión de XAdES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl</code>:</li> 
+   <ul> 
+    <li><code>http://uri.etsi.org/01903#SignedProperties</code>: URL de definición do tipo das propiedades asinadas (Signed Properties) de XAdES. Este é o valor por defecto.</li> 
+    <li><code>http://uri.etsi.org/01903/1.3.2#SignedProperties</code>: URL de definición do tipo das propiedades asinadas (Signed Properties) de XAdES v1.3.2.</li> 
+    <li><code>http://uri.etsi.org/01903/1.4.1#SignedProperties</code>: URL de definición do tipo das propiedades asinadas (Signed Properties) de XAdES v1.4.1. Se se establece esta propiedade é posible que se necesite establecer tamén a propiedade <code>xadesNamespace</code> para evitar incoherencias na versión de XAdES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>ignoreStyleSheets</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Se se asina un XML con follas de estilo, ignora estas deixándoas sen asinar.</li> 
+    <li><code>false</code>: Se se asina un XML con follas de estilo, firma tamén as follas de estilo (valor por defecto, consultar notas adicionais sobre sinatura de follas de estilo).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>avoidBase64Transforms</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Non declara transformacións Base64 mesmo se son necesarias.</li> 
+    <li><code>false</code>: Declara as transformacións Base64 cando se codificaron internamente os datos a asinar en Base64 (valor por defecto).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>headless</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Evita que se mostren diálogos gráficos adicionais ao usuario (como por exemplo, para a dereferenciación de follas de estilo enlazadas con rutas relativas).</li> 
+    <li><code>false</code>: Permite que se mostren diálogos gráficos adicionais ao usuario.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xmlTransforms</code>:</li> 
+   <ul> 
+    <li>Número de transformacións a aplicar ao contido asinado. Debe indicarse posteriormente igual número de parámetros xmlTransformnType, substituíndo n por un ordinal consecutivo, comezando en 0 (ver notas adicionais sobre indicación de transformacións adicionais).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xmlTransformnType</code>:</li> 
+   <ul> 
+    <li><code>http://www.w3.org/2000/09/xmldsig#base64</code>: Indica que os datos que se proporcionan para asinar xa están codificados en Base64 e débese declarar esta transformación adicional para que se decodifiquen antes de asinalos. Esta transformación Base64 é adicional á transformación necesaria para pasar os datos a través dos métodos de sinatura do cliente.</li> 
+    <li><code>http://www.w3.org/tr/1999/rec-xpath-19991116</code>: O contido débese procesar mediante esta transformación XPATH antes de ser asinado. unicamente é aplicable cando se asina contido XML.</li> 
+    <li><code>http://www.w3.org/2002/06/xmldsig-filter2</code>: O contido débese procesar mediante esta transformación XPATH2 antes de ser asinado. unicamente é aplicable cando se asina contido XML.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xmlTransformnSubtype</code>:</li> 
+   <ul> 
+    <li>Subtipo da transformación n. Os valores aceptados e as súas funcionalidades dependen do valor indicado en xmlTransformnType.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xmlTransformnBody</code>:</li> 
+   <ul> 
+    <li>Corpo da transformación n. Os valores aceptados e as súas funcionalidades dependen dos valores indicados en xmlTransformnType e en xmlTransformnSubtype.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>nodeToSign</code>:</li> 
+   <ul> 
+    <li>Identificador do nodo (establecido mediante o atributo &quot;Ide&quot;) que se desexa asinar dentro dun XML.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndications</code>:</li> 
+   <ul> 
+    <li>Número de CommitmentTypeIndications que se van a declarar. Estes son os motivos que se declaran para a firma. Os valores concretos especifícanse con commitmentTypeIndicationnIdentifier e commitmentTypeIndicationnDescription, onde ‘n’ vai desde 0 ata o valor menos 1 indicado nesta propiedade.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li> 
+   <ul> 
+    <li><code>1</code>: Establece que o CommitmentTypeIndications número <i><b>n</b></i> (contando desde cero) é &quot;Proba de orixe&quot;.</li> 
+    <li><code>2</code>: Establece que o CommitmentTypeIndications número <i><b>n</b></i> (contando desde cero) é &quot;Proba de recepción&quot;.</li> 
+    <li><code>3</code>: Establece que o CommitmentTypeIndications número <i><b>n</b></i> (contando desde cero) é &quot;Proba de entrega&quot;.</li> 
+    <li><code>4</code>: Establece que o CommitmentTypeIndications número <i><b>n</b></i> (contando desde cero) é &quot;Proba de envío&quot;.</li> 
+    <li><code>5</code>: Establece que o CommitmentTypeIndications número <i><b>n</b></i> (contando desde cero) é &quot;Proba de aprobación&quot;.</li> 
+    <li><code>6</code>: Establece que o CommitmentTypeIndications número <i><b>n</b></i> (contando desde cero) é &quot;Proba de creación&quot;.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Description</code>:</li> 
+   <ul> 
+    <li>Establece a descrición do CommitmentTypeIndications número <i><b>n</b></i>. Este atributo é opcional.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>DocumentationReferences</code>:</li> 
+   <ul> 
+    <li>Lista de URL separadas polo carácter &apos;|&apos; que se achegan como referencias documentais do CommitmentTypeIndication número <i><b>n</b></i> (atributo opcional). O URL da lista non poden conter o carácter &apos;|&apos; (xa que este úsase como separador).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>CommitmentTypeQualifiers</code>:</li> 
+   <ul> 
+    <li>Lista de indicadores textuais separados polo carácter &apos;|&apos; que se achegan como calificadores adicionais do CommitmentTypeIndication número <i><b>n</b></i> (atributo opcional). Normalmente son OID. Os elementos da lista non poden conter o carácter &apos;|&apos; (xa que este úsase como separador).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permítese a cofirma/contrafirma de firmas de arquivo lonxevo, a pesar de que estas non serán válidas posteriormente. </li> 
+    <li><code>false</code> (Ou outro valor): Non se permite a cofirma/contrafirma de firmas de arquivo lonxevo.</li> 
+   </ul> 
+  <li style="margin-top: 10pt"><code>avoidAGEPolicyIncompatibilities</code>:</li> 
+  <ul> 
+   <li><code>true</code>: Evitarase declarar a política de sinatura da AGE cando o resultado da operación vaia ser incompatible con esta política.</li> 
+   <li><code>false</code> (Ou outro valor): Non se permite a cofirma coa políítica de sinatura da AGE cando o resultado non será compatible coa política.</li> 
+  </ul> 
+  <li style="margin-top: 10pt"><code>allowXadesEnvelopedWithoutXPath</code>:</li>
+  <ul>
+  	<li><code>true</code>: Permite a cofirma dunha firma que non contén unha transformación XPath e que por tanto quedará invalidada. Na nova cofirma si se incluirá a transformación XPath.</li>
+  	<li><code>false</code>:	Non se permite a cofirma de firmas que non conteñan unha transformación XPath.</li>
+  </ul>
+  </ul>
+  
+  <h3>Opcións de configuración de firmas de Factura Electrónica</h3> 
+  <p>A seguir se listan as propiedades de configuración admitidas polas firmas de factura electrónica (Facturae).</p> 
+  <ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo coa cidade na que se realiza a firma. No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionProvince</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo coa provincia na que se realiza a firma. No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionPostalCode</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo co código postal no que se realiza a firma. No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCountry</code>:</li> 
+   <ul> 
+    <li>Agrega á firma un campo co país no que se realiza a firma. No caso de que se asine un XML, a codificación do texto usado debe adecuarse ao XML asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xadesNamespace</code>:</li> 
+   <ul> 
+    <li>URL de definición do espazo de nomes de XAdES (o uso desta propiedade pode condicionar a declaración de versión de XAdES). Se se establece esta propiedade é posible que se necesite establecer tamén a propiedade signedPropertiesTypeUrl para evitar incoherencias na versión de XAdES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl</code>:</li> 
+   <ul> 
+    <li>URL de definición do tipo das propiedades asinadas (Signed Properties) de XAdES. Se se establece esta propiedade é posible que se necesite establecer tamén a propiedade <code>xadesNamespace</code> para evitar incoherencias na versión de XAdES. Se non se establece úsase o valor por defecto: http://uri.etsi.org/01903#SignedProperties.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li> 
+   <ul> 
+    <li><code>emisor</code>: Declara que o asinante é o emisor da factura. Este é o valor por defecto.</li> 
+    <li><code>receptor</code>: Declara que o asinante é o receptor da factura.</li> 
+    <li><code>terceiro</code>: Declara que o asinante é un terceiro con respecto á factura.</li> 
+    <li><code>supplier</code>: Declara que o asinante é o emisor da factura.</li> 
+    <li><code>customer</code>: Declara que o asinante é o receptor da factura.</li> 
+    <li><code>third party</code>: Declara que o asinante é un terceiro con respecto á factura.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifier</code>:</li> 
+   <ul> 
+    <li><code>http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf</code>: Identificador da política de firma 3.1. Este é o valor por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li> 
+   <ul> 
+    <li><code>Ohixl6upD6av8N7pEvDABhEL6hM=</code>: Pegada dixital para configurar a política de firma 3.1. Este é o valor por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>XA1</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA1.</li> 
+    <li><code>XA-256</code>: Indica que a pegada dixital indicada na propiedade <code> policyIdentifierHash</code> calculouse mediante o algoritmo XA-256.</li> 
+    <li><code>XA-384</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-384.</li> 
+    <li><code>XA-512</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-512.</li> 
+   </ul> 
+  </ul> 
+  <h3>Opcións de configuración de firmas PAdES</h3> 
+  <p>A seguir se listan as propiedades de configuración admitidas polas firmas PAdES.</p> 
+  <ul> 
+   <li style="margin-top: 10pt"><code>includeOnlySignningCertificate</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Indica que debe incluírse na firma unicamente o certificado do asinante.</li> 
+    <li><code>false</code>: Indica que debe incluírse na firma toda a cadea de certificación do certificado asinante. Valor por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>alwaysCreateRevision</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Sempre creará unha revisión ao asinar. Require que o documento cumpra a especificación PDF 1.7 (ISO 32000-1:2008)</li> 
+    <li><code>false</code>: Non creará revisión na primeira firma e si nas seguintes.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureField</code>:</li> 
+   <ul> 
+    <li>Nome do campo de firma preexistente no que inserir a firma.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePages</code>:</li> 
+   <ul> 
+    <li>Indica as páxinas nas que debe aparecer visible a firma.</li> 
+    <li>Admite os seguintes valores:</li> 
+    <ul> 
+     <li><code>all</code>: Para indicar que a firma visible apareza en todas as páxinas do documento, deberáselle de dar este valor. </li> 
+     <li><code>append</code>: Se a firma visible debe de aparecer nunha nova páxina en branco engadida ao final do documento, deberáselle de dar este valor.</li> 
+     <li>Páxina ou listaxe de páxinas: Nesta opción permítese seleccionar a páxina ou rango de páxinas onde aparecerá a firma visible. Se se desexa indicar unha páxina ou varias páxinas onde estampar a firma visible, é posible indicando páxina a páxina cunha separación de comas (<code>1,4,7</code>: Estámpase nas páxinas 1, 4 e 7) ou indicando un rango de páxinas a través dun guión (<code>1-8</code>: Estámpase nas páxinas desde a 1 ata a 8). Tal e como se explica no parágrafo anterior, permítese indicar as páxinas cun valor negativo, onde se comezará desde o final (<code>1,-1</code>: Estamparase na primeira e última páxina).</li> 
+    </ul> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePositionOnPageLowerLeftX</code>:</li> 
+   <ul> 
+    <li>Número enteiro coa coordenada horizontal desde a esquina inferior esquerda da páxina á esquina inferior esquerda do campo de firma visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePositionOnPageLowerLeftY</code>:</li> 
+   <ul> 
+    <li>Número enteiro coa coordenada vertical desde a esquina inferior esquerda da páxina á esquina inferior esquerda do campo de firma visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePositionOnPageUpperRightX</code>:</li> 
+   <ul> 
+    <li>Número enteiro coa coordenada horizontal desde a esquina inferior esquerda da páxina á esquina superior dereita do campo de firma visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePositionOnPageUpperRightY</code>:</li> 
+   <ul> 
+    <li>Número enteiro coa coordenada vertical desde a esquina inferior esquerda da páxina á esquina superior dereita do campo de firma visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureRubricImage</code>:</li> 
+   <ul> 
+    <li>Ruta do ficheiro coa imaxe JPEG da imaxe a mostrar aplicar na firma visible PDF. Tamén pode indicarse directamente a Base 64 da imaxe.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2Text</code>:</li> 
+   <ul> 
+    <li>Texto que mostrar no campo de firma visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2FontFamily</code>:</li> 
+   <ul> 
+    <li><code>0</code>: O texto da firma visible mostrarase con fonte Courier. Este é o valor por defecto.</li> 
+    <li><code>1</code>: O texto da firma visible mostrarase con fonte Helvética.</li> 
+    <li><code>2</code>: O texto da firma visible mostrarase con fonte Times Roman.</li> 
+    <li><code>3</code>: O texto da firma visible mostrarase con fonte Symbol.</li> 
+    <li><code>4</code>: O texto da firma visible mostrarase con fonte ZapfDingBats.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2FontSize</code>:</li> 
+   <ul> 
+    <li>Tamaño de fonte do texto da firma visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2FontStyle</code>:</li> 
+   <ul> 
+    <li><code>0</code>: Texto da firma visible sen estilo. Valor por defecto.</li> 
+    <li><code>1</code>: Texto da firma visible en negrita.</li> 
+    <li><code>2</code>: Texto da firma visible en cursiva.</li> 
+    <li><code>4</code>: Texto da firma visible subliñado.</li> 
+    <li><code>8</code>: Texto da firma visible tachado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2FontColor</code>:</li> 
+   <ul> 
+    <li><code>black</code>: Texto da firma visible sen estilo. Valor por defecto.</li> 
+    <li><code>white</code>: O texto da firma visible será de cor branca.</li> 
+    <li><code>gray</code>: O texto da firma visible será de cor gris.</li> 
+    <li><code>lightGray</code>: O texto da firma visible será de cor gris claro.</li> 
+    <li><code>darkGray</code>: O texto da firma visible será de cor gris escuro.</li> 
+    <li><code>rede</code>: O texto da firma visible será de cor vermella.</li> 
+    <li><code>pink</code>: O texto da firma visible será de cor rosa.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>obfuscateCertText</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Se ofuscan os identificadores de usuario extraídos do CN ou DN do certificado e mostrados na firma visible PDF. Non se ofuscan os datos dos certificados de pseudónimo. Este é o valor por defecto.</li> 
+    <li><code>false</code>: Non se ofusca a información dos certificados.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>obfuscationMask</code>:</li> 
+   <ul> 
+    <li>Criterios de ofuscación dos identificadores de usuario nas firmas visibles PDF. Debe mostrar o seguinte patrón:</li> 
+    <ul> 
+     <li><code>carácter;longitudDigitos;posicións;desprazamento</code></li> 
+    </ul> 
+    <li>Neste patrón:</li> 
+    <ul> 
+     <li><code>carácter</code>: É o carácter que usar para ofuscar caracteres.</li> 
+     <li><code>longitudDigitos</code>: Número mínimo de díxitos que debe ter unha cadea de texto para que se considere que debe ofuscarse.</li> 
+     <li><code>posicións</code>: Listaxe de posicións que indica que caracteres deben mostrarse. A listaxe exprésase cunha sucesión de <code>true/false</code> separados por comas (&apos;,&apos;), onde <code>true</code> indica que o carácter debe mostrarse e <code>false</code> que non.</li> 
+     <li><code>desprazamento</code>: Indica se se admite o desprazamento de posicións da máscara para mostrar todos os caracteres indicados (<code>true</code>) ou se esta debe respectarse (<code>false</code>).</li> 
+    </ul> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>visibleSignature</code>:</li> 
+   <ul> 
+    <li><code>default</code>: Realizarase firma visible PDF se se proporcionaron os parámetros coa área e a páxina de firma. Este é o valor por defecto.</li> 
+    <li><code>want</code>: O usuario debe seleccionar a área de firma visible. En caso de cancelar o proceso:</li> 
+    <ul> 
+     <li>Se o pedimento tamén inclúe os parámetros de área de firma visible (posición e páxina), usaranse estes parámetros e continuarase co proceso de firma.</li> 
+     <li>Se o pedimento non inclúe os parámetros de área de firma visible, cancelarase o proceso de firma.</li> 
+    </ul> 
+    <li><code>optional</code>: O usuario poderá elixir se desexa incluír ou non a área de firma visible. En caso de cancelar o proceso:</li> 
+    <ul> 
+     <li>Se o pedimento tamén inclúe os parámetros de área de firma visible (posición e páxina), usaranse estes parámetros e continuarase co proceso de firma.</li> 
+     <li>Se o pedimento non inclúe os parámetros de área de firma visible, realizarase unha firma non visible.</li> 
+    </ul> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>visibleAppearance</code>:</li> 
+   <ul> 
+    <li><code>default</code>: Aplicarase o aspecto por defecto para a firma visible PDF ou, se se proporcionaron os parámetros de aspecto, o aspecto configurado. Este é o valor por defecto.</li> 
+    <li><code>custom</code>: O usuario pode elixir o aspecto da firma visible. En caso de cancelar o proceso, usarase o aspecto por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureRotation</code>:</li> 
+   <ul> 
+    <li><code>0</code>: Non rota o texto do campo de firma. Este é o valor por defecto.</li> 
+    <li><code>90</code>: Rota 90 graos en sentido horario o texto do campo de firma. Ignorarase calquera configuración de imaxe de firma.</li> 
+    <li><code>180</code>: Rota 180 graos en sentido horario o texto do campo de firma. Ignorarase calquera configuración de imaxe de firma.</li> 
+    <li><code>270</code>: Rota 270 graos en sentido horario o texto do campo de firma. Ignorarase calquera configuración de imaxe de firma.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>includeQuestionMark</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permitirse ao lector de PDF mostrar xunto á firma visible unha marca que índique o resultado obtido ao validala. A aparencia desta marca depende completamente do lector de PDF utilizado e é este o que decide se se mostra. Por exemplo, a marca podería non mostrarse cando se definise unha imaxe de fondo na firma.</li> 
+    <li><code>false</code>: Non permite mostrar a marca co resultado da validación. Este é o valor por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>image</code>:</li> 
+   <ul> 
+    <li>Ruta do ficheiro de imaxe JPEG que inserir no documento antes de asinalo. Tamén pode indicarse directamente a Base 64 da imaxe. Esta propiedade só se pode utilizar na primeira sinatura do documento.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePage</code>:</li> 
+   <ul> 
+    <li>Número da páxina do documento PDF na que inserir a imaxe.</li> 
+    <li><code>0</code>: Inserir en todas as páxinas</li> 
+    <li><code>-1</code>: Inserir imaxe na última páxina.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePositionOnPageLowerLeftX</code>:</li> 
+   <ul> 
+    <li>Número enteiro coa coordenada horizontal desde a esquina inferior esquerda da páxina á esquina inferior esquerda da imaxe.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePositionOnPageLowerLeftY</code>:</li> 
+   <ul> 
+    <li>Número enteiro coa coordenada vertical desde a esquina inferior esquerda da páxina á esquina inferior esquerda da imaxe.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePositionOnPageUpperRightX</code>:</li> 
+   <ul> 
+    <li>Número enteiro coa coordenada horizontal desde a esquina inferior esquerda da páxina á esquina superior dereita da imaxe.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePositionOnPageUpperRightY</code>:</li> 
+   <ul> 
+    <li>Número enteiro coa coordenada vertical desde a esquina inferior esquerda da páxina á esquina superior dereita da imaxe.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>attach</code>:</li> 
+   <ul> 
+    <li>Ruta do ficheiro co contido a engadir como adxunto ao PDF. Tamén pode indicarse directamente a Base 64 dos datos. Require establecer attachFileName.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>attachFileName</code>:</li> 
+   <ul> 
+    <li>Nome do que asignar ao ficheiro adxunto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>attachDescription</code>:</li> 
+   <ul> 
+    <li>Descrición do documento adxunto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>certificationLevel</code>:</li> 
+   <ul> 
+    <li><code>0</code>: Firma sen certificar. Esta sería unha sinatura de aprobación. É o valor por defecto.</li> 
+    <li><code>1</code>: Firma certificada de autor. Tras este tipo de firma certificada, non se permite ningún cambio posterior no documento (non se poden agregar firmas, nin encher formularios).</li> 
+    <li><code>2</code>: Firma certificada de autor para formularios. Tras este tipo de firma certificada, só se permite o recheo dos campos de formulario (non se poden agregar firmas).</li> 
+    <li><code>3</code>: Firma certificada común. Tras este tipo de firma certificada, só se permite o recheo dos campos de formulario e a creación de firmas de aprobación.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>compressPdf</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Comprime o PDF asinado para que ocupe menos tamaño. Só se aplica se se trata dun PDF v4 ou superior. Este é o valor por defecto.</li> 
+    <li><code>false</code>: Nunca se comprime o PDF asinado.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>pdfVersion</code>:</li> 
+   <ul> 
+    <li><code>-1</code>: Declárase que se respecte a versión do PDF que se asine.</li> 
+    <li><code>2</code>: Declárase que a versión do PDF de saída é 1.2.</li> 
+    <li><code>3</code>: Declárase que a versión do PDF de saída é 1.3.</li> 
+    <li><code>4</code>: Declárase que a versión do PDF de saída é 1.4.</li> 
+    <li><code>5</code>: Declárase que a versión do PDF de saída é 1.5.</li> 
+    <li><code>6</code>: Declárase que a versión do PDF de saída é 1.6.</li> 
+    <li><code>7</code>: Declárase que a versión do PDF de saída é 1.7.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureSubFilter</code>:</li> 
+   <ul> 
+    <li>Subfiltro declarado. Por defecto utilízase o das firmas básicas (adbe.pkcs7.detached). Pode usarse a cadea &quot;ETSI.CAdES.detached&quot; para crear asinas BES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signReason</code>:</li> 
+   <ul> 
+    <li>Razón pola que se realiza a firma.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li> 
+   <ul> 
+    <li>Cidade na que se realiza a firma.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerContact</code>:</li> 
+   <ul> 
+    <li>Información de contacto do asinante.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li> 
+   <ul> 
+    <li>Listaxe de roles declarados polo asinante (separados por &quot;|&quot;).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifier</code>:</li> 
+   <ul> 
+    <li>Identificador da política de firma (normalmente un URL cara á política en formato XML procesable), necesario para xerar asinas XAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li> 
+   <ul> 
+    <li>Texto Base 64 coa pegada dixital da política de firma. É obrigatorio indicar esta propiedade se o valor indicado en policyIdentifier non é universalmente accesible. Se se dá valor a esta propiedade é obrigatorio tamén dar valor á propiedade <code>policyIdentifierHashAlgorithm</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>XA1</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA1.</li> 
+    <li><code>XA-256</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-256.</li> 
+    <li><code>XA-384</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-384.</li> 
+    <li><code>XA-512</code>: Indica que a pegada dixital indicada na propiedade <code>policyIdentifierHash</code> calculouse mediante o algoritmo XA-512.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li> 
+   <ul> 
+    <li>URL cara ao documento que contén unha descrición textual da política de firma.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>ownerPassword</code>:</li> 
+   <ul> 
+    <li>Contrasinal de apertura do PDF. Non se soporta a sinatura de documentos PDF cifrados con certificados ou algoritmo AES-256.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>headless</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Non interrompe o proceso de firma solicitando interacción do usuario.</li> 
+    <li><code>false</code>: Mostra diálogos ao usuario se require da súa autorización ou algún dato adicional para asinar. Este é o valor por defecto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowSigningCertifiedPdfs</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permite a sinatura de documentos PDF certificados. O resultado podería invalidar firmas anteriores do PDF.</li> 
+    <li><code>false</code>: Produce un erro ao asinar documentos PDF certificados.</li> 
+    <li>Se omite: En caso de detectar que o documento PDF de entrada está certificado, advertirase ao usuario de que a firma podería invalidar firmas anteriores e permitiráselle elixir se asinar ou cancelar a operación.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowSigningCertifiedPdfs</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permite a sinatura de documentos PDF certificados. O resultado podería invalidar firmas anteriores do PDF.</li> 
+    <li><code>false</code>: Produce un erro ao asinar documentos PDF certificados.</li> 
+    <li>Se omite: En caso de detectar que o documento PDF de entrada está certificado, advertirase ao usuario de que a firma podería invalidar firmas anteriores e permitiráselle elixir se asinar ou cancelar a operación.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowCosigningUnregisteredSignatures</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permite asinar documentos PDF con firmas previas non rexistradas.</li> 
+    <li><code>false</code>: Non permite asinar documentos PDF con firmas previas non rexistradas.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signingCertificateV2</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Utilízase o atributo signingCertificateV2 nas firmas.</li> 
+    <li><code>false</code>: Utilízase o atributo signingCertificateV1 nas firmas.</li> 
+    <li>Se omite: Utilízase o atributo signingCertificateV1 nas firmas XA1withRSA e signingCertificateV2 no resto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signReservedSize</code>:</li> 
+   <ul> 
+    <li>Tamaño máximo en bytes da firma que se incorporará ao PDF. Por defecto, 27000.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signingCertificateV2</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Utilízase o atributo signingCertificateV2 nas firmas.</li> 
+    <li><code>false</code>: Utilízase o atributo signingCertificateV1 nas firmas.</li> 
+    <li>Se omite: Utilízase o atributo signingCertificateV1 nas firmas XA1withRSA e signingCertificateV2 no resto.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowShadowAttack</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Non se realizará a comprobación de PDF Xadow Attack durante a validación das firmas previas.</li> 
+    <li><code>false</code>: Realizarase a comprobación de PDF Xadow Attack durante a validación das firmas previas e, en caso de detectarse, darase a firma por inválida.</li> 
+    <li>Se omite: Realizarase a comprobación de PDF Xadow Attack durante a validación das firmas previas e, en caso de detectarse, consultarase ao usuario se se debe continuar coa operación.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowModifiedForm</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Non se realizará a comprobación de cambios nos formularios do documento nin PDF Xadow Attack durante a validación das firmas previas.</li> 
+    <li><code>false</code>: Realizarase a comprobación de cambios nos formularios do documento durante a validación das firmas previas e, en caso de detectarse, darase a firma por inválida.</li> 
+    <li>Se omite: Realizarase a comprobación de cambios nos formularios do documento durante a validación das firmas previas e, en caso de detectarse, consultarase ao usuario se se debe continuar coa operación.</li> 
+   </ul> 
+  </ul>  
+ </body>
+</html>

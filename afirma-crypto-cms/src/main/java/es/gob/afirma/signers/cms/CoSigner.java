@@ -51,6 +51,7 @@ import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.Certificate;
 import org.spongycastle.asn1.x509.TBSCertificate;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -58,15 +59,18 @@ import es.gob.afirma.signers.pkcs7.ContainsNoDataException;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
-/** Clase que implementa la cofirma digital PKCS#7/CMS SignedData La
+/**
+ * Clase que implementa la cofirma digital PKCS#7/CMS SignedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
  * crear un mensaje SignedData de SpongyCastle pero con la
- * peculiaridad de que es una Cofirma. */
+ * peculiaridad de que es una Cofirma.
+ */
 final class CoSigner {
 
     private ASN1Set signedAttr2;
 
-    /** Constructor de la clase. Se crea una cofirma a partir de los datos del
+    /**
+     * Constructor de la clase. Se crea una cofirma a partir de los datos del
      * firmante, el archivo que se firma y del archivo que contiene las firmas.
      * @param parameters par&aacute;metros necesarios que contienen tanto la firma del
      *                   archivo a firmar como los datos del firmante.
@@ -84,7 +88,9 @@ final class CoSigner {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella digital
      * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con
-     *                                                 los certificados de firma. */
+     *                                                 los certificados de firma.
+     * @throws AOException Cuando no se ha podido generar la firma PKCS#1 de la cofirma.
+     */
     byte[] coSigner(final P7ContentSignerParameters parameters,
                     final byte[] sign,
                     final boolean omitContent,
@@ -95,7 +101,7 @@ final class CoSigner {
                     final Map<String, byte[]> uatrib,
                     final byte[] messageDigest) throws IOException,
                                                        NoSuchAlgorithmException,
-                                                       CertificateException {
+                                                       CertificateException, AOException {
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
     	final ASN1Sequence dsq;
     	try (
@@ -204,13 +210,7 @@ final class CoSigner {
             signerInfos.add(si);
         }
 
-        final ASN1OctetString sign2;
-        try {
-            sign2 = CmsUtil.firma(signatureAlgorithm, key, this.signedAttr2);
-        }
-        catch (final Exception ex) {
-            throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
-        }
+        final ASN1OctetString sign2 = CmsUtil.firma(signatureAlgorithm, key, this.signedAttr2);
 
         // Creamos los signerInfos del SignedData
         signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr
@@ -256,7 +256,8 @@ final class CoSigner {
                     final byte[] digest) throws IOException,
                                                 NoSuchAlgorithmException,
                                                 CertificateException,
-                                                ContainsNoDataException {
+                                                ContainsNoDataException,
+                                                AOException {
 
         byte[] messageDigest = digest != null ? digest.clone() : null;
 
@@ -393,13 +394,7 @@ final class CoSigner {
             throw new ContainsNoDataException("No se puede crear la cofirma ya que no se han encontrado ni los datos firmados ni una huella digital compatible con el algoritmo de firma"); //$NON-NLS-1$
         }
 
-        final ASN1OctetString sign2;
-        try {
-            sign2 = CmsUtil.firma(signatureAlgorithm, key, this.signedAttr2);
-        }
-        catch (final Exception ex) {
-            throw new IOException("Error al generar la firma: " + ex, ex); //$NON-NLS-1$
-        }
+        final ASN1OctetString sign2 = CmsUtil.firma(signatureAlgorithm, key, this.signedAttr2);
 
         // Creamos los signerInfos del SignedData
         signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr

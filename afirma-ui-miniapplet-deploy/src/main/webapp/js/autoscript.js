@@ -26,6 +26,8 @@ var AutoScript = ( function ( window, undefined ) {
 		var VERSION = "1.9.0";
 		var VERSION_CODE = 3;
 
+		var PROTOCOL_VERSION = 5;
+
 		/* ========== DEPRECADO: No se utiliza, pero se mantiene por compatibilidad con los despliegues del MiniApplet. */
 		var JAVA_ARGUMENTS = null;
 		var SYSTEM_PROPERTIES = null;
@@ -72,7 +74,7 @@ var AutoScript = ( function ( window, undefined ) {
 		    ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store'></a>",
 		    loading: "Cargando",
 		    no_compatible_procedure: "Esta aplicaci&oacute;n no permite firmar desde el navegador en dispositivos m&oacute;viles. ",
-		    pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Firma Electr&oacute;nica</a>",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/ciudadanos/descargas'>Portal de Firma Electr&oacute;nica</a>",
 		    procedure_from_url: "Puede realizar el tr&aacute;mite desde la siguiente aplicaci&oacute;n:",
 		    restore_installation: "Si lo tiene instalado, puede restaurar la instalaci&oacute;n desde Autofirma en Herramientas -> Restaurar instalaci&oacute;n",
 		    retry_operation: "Reintentar operaci\u00F3n",
@@ -97,13 +99,113 @@ var AutoScript = ( function ( window, undefined ) {
 		    ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga na App Store'></a>",
 		    loading: "Cargando",
 		    no_compatible_procedure: "Esta aplicaci&oacute;n non permite asinar desde o navegador en dispositivos m&oacute;biles.",
-		    pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Sinatura Electr&oacute;nica</a>",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/gl/ciudadanos/descargas'>Portal de Sinatura Electr&oacute;nica</a>",
 		    procedure_from_url: "Podes realizar o tr&aacute;mite dende a seguinte aplicaci&oacute;n:",
 		    restore_installation: "Se o tes instalado, podes restaurar a instalaci&oacute;n desde Autofirma en Ferramentas -> Restaurar instalaci&oacute;n.",
 		    retry_operation: "Reintento a operaci\u00F3n",
 		    timeout_receiving_sign: "Non se puido conectar co cliente que asina. Se non o tes instalado, podes descargalo desde:",
 		    warning: "Aviso:"
 	  	};
+		LOCALIZED_STRINGS["va_ES"] = {
+				access_from_pc: "Accedisca des d'un PC per a realitzar el tr&agrave;mit.",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descarrega-ho de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				checktime_warn: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Es recomana que es corregisca abans de polsar Acceptar per a continuar.",
+				checktime_err: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Ha de corregir l'hora del seu sistema i recarregar esta p&agrave;gina abans de continuar.",
+				checktime_local_time: "Hora del seu sistema",
+				checktime_server_time: "Hora del servidor",
+				close: "Tancar",
+				contact_admin: "Per favor, informe de l'error si el problema persisteix: ",
+				error_connecting_autofirma: "No &eacute;s possible connectar amb Autofirma a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tindre-ho instal·lat, pot descarregar-se des del següent enllaç:",
+				error_connecting_client: "No &eacute;s possible connectar amb el client de signatura a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tindre-ho instal·lat, pot descarregar-se des del següent enllaç:",
+				error_connecting_service: "No s'ha pogut connectar amb el servei de l'aplicaci&oacute; de signatura. &eacute;s probable que no puga completar signatures electr&ograve;niques des d'esta p&agrave;gina.",
+				error_connecting_server_recovering: "No es va poder connectar amb el servei de l'aplicaci&oacute; per a recuperar el resultat de l'operaci&oacute;.",
+				firefox_reinstall_message: "Instal·lar o restaurar Autofirma requerir&agrave; tancar el navegador i reiniciar el tr&agrave;mit.",
+				install_client: "<br>Si el t&eacute; instal·lat o l'acaba d'instal·lar, polse el bot&oacute; per a reintentar l'operaci&oacute;.",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Desc&agrave;rrega en l'App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				loading: "Carregant",
+				no_compatible_procedure: "Esta aplicaci&oacute; no permet signar des del navegador en dispositius m&ograve;bils. ",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/va/ciudadanos/descargas'>Portal de Signatura Electr&ograve;nica</a>",
+				procedure_from_url: "Pot realitzar el tr&agrave;mit des de la següent aplicaci&oacute;:",
+				restore_installation: "Si el t&eacute; instal·lat, pot restaurar la instal·laci&oacute; des d'Autofirma en Eines -> Restaurar instal·laci&oacute;",
+				retry_operation: "Reintentar operaci\u00F3",
+				timeout_receiving_sign: "No s'ha pogut connectar amb el client de signatura. Si no el t&eacute; instal·lat, pot descarregar-ho des de:",
+				warning: "Advertiment:"
+		};
+		LOCALIZED_STRINGS["ca_ES"] = {
+				access_from_pc: "Accedeixi des d'un PC per a realitzar el tr&agrave;mit.",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descarrega-ho de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				checktime_warn: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Es recomana que es corregeixi abans de pr&eacute;mer Acceptar per a continuar.",
+				checktime_err: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Ha de corregir l'hora del seu sistema i recarregar aquesta p&agrave;gina abans de continuar.",
+				checktime_local_time: "Hora del seu sistema",
+				checktime_server_time: "Hora del servidor",
+				close: "Tancar",
+				contact_admin: "Si us plau, informe de l'error si el problema persisteix: ",
+				error_connecting_autofirma: "No &eacute;s possible connectar amb Autofirma a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tenir-ho instal·lat, pot descarregar-se des del següent enllaç:",
+				error_connecting_client: "No &eacute;s possible connectar amb el client de signatura a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tenir-ho instal·lat, pot descarregar-se des del següent enllaç:",
+				error_connecting_service: "No s'ha pogut connectar amb el servei de l'aplicaci&oacute; de signatura. &eacute;s probable que no pugui completar signatures electr&ograve;niques des d'aquesta p&agrave;gina.",
+				error_connecting_server_recovering: "No es va poder connectar amb el servei de l'aplicaci&oacute; per a recuperar el resultat de l'operaci&oacute;.",
+				firefox_reinstall_message: "Instal·lar o restaurar Autofirma requerir&agrave; tancar el navegador i reiniciar el tr&agrave;mit.",
+				install_client: "<br>Si el t&eacute; instal·lat o l'acaba d'instal·lar, premi el bot&oacute; per a reintentar l'operaci&oacute;.",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Desc&agrave;rrega en l'App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				loading: "Carregant",
+				no_compatible_procedure: "Aquesta aplicaci&oacute; no permet signar des del navegador en dispositius m&ograve;bils. ",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/ca/ciudadanos/descargas'>Portal de Signatura Electr&ograve;nica</a>",
+				procedure_from_url: "Pot realitzar el tr&agrave;mit des de la següent aplicaci&oacute;:",
+				restore_installation: "Si el t&eacute; instal·lat, pot restaurar la instal·laci&oacute; des d'Autofirma en Eines -> Restaurar instal·laci&oacute;",
+				retry_operation: "Reintentar operaci\u00F3",
+				timeout_receiving_sign: "No s'ha pogut connectar amb el client de signatura. Si no el t&eacute; instal·lat, pot descarregar-ho des de:",
+				warning: "Advertiment:"
+		};
+		LOCALIZED_STRINGS["eu_ES"] = {
+				access_from_pc: "Sartu PC batetik tramitea egiteko. ",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Deskargatu Google Playtik' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				checktime_warn: "Zure sistemaren eta zerbitzariaren arteko ordu-desfasea detektatu da. Jarraitzeko, Ados sakatu aurretik zuzentzea gomendatzen da. ",
+				checktime_err: "Zure sistemaren eta zerbitzariaren artean ordu-desfase bat detektatu da. Zure sistemaren ordua zuzendu behar duzu, eta orri hau kargatu jarraitu aurretik. ",
+				checktime_local_time: "Zure sistemaren ordua",
+				checktime_server_time: "Zerbitzariaren ordua",
+				close: "Itxi",
+				contact_admin: "Mesedez, eman akatsaren berri, arazoak bere horretan jarraitzen badu: ",
+				error_connecting_autofirma: "Ezin da Autofirma-rekin konektatu, bezeroaren komunikazio- edo instalazio-arazo bat dela eta. Instalatuta ez baduzu, esteka honetatik deskarga dezakezu:",
+				error_connecting_client: "Ezin da bezeroarekin konektatu, komunikazio- edo instalazio-arazo bat dela eta. Instalatuta ez baduzu, esteka honetatik deskarga dezakezu:",
+				error_connecting_service: "Ezin izan da sinadura-aplikazioaren zerbitzuarekin konektatu. Litekeena da orrialde honetatik sinadura elektronikorik ezin osatzea. ",
+				error_connecting_server_recovering: "Ezin izan da aplikazioaren zerbitzuarekin konektatu eragiketaren emaitza berreskuratzeko. ",
+				firefox_reinstall_message: "Autofirma instalatu edo berrezartzeko, nabigatzailea itxi eta izapidea berrabiarazi behar da. ",
+				install_client: "<br>Instalatuta baduzu edo instalatu berri baduzu, sakatu botoia eragiketa berriro saiatzeko. ",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Deskargatu App Store-n' style='border-radius: 13px'; height: 140px></40px>",
+				loading: "Kargatzen",
+				no_compatible_procedure: "Aplikazio honek ez du uzten nabigatzailetik gailu mugikorretan sinatzen. ",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/eu/ciudadanos/descargas'>Sinadura elektronikoaren ataria</a>",
+				procedure_from_url: "Tramitea aplikazio honetatik egin dezakezu:",
+				restore_installation: "Instalatuta baduzu, instalazioa Autofirma-tik berrezar dezakezu Tresnak aukeran -> Instalazioa leheneratu",
+				retry_operation: "Saiatu berriro",
+				timeout_receiving_sign: "Ezin izan da konektatu sinadura-bezeroarekin. Instalatuta ez baduzu, hemendik deskarga dezakezu:",
+				warning: "Oharra:"
+		};
+		LOCALIZED_STRINGS["en_US"] = {
+				access_from_pc: "Access from a PC to perform the procedure. ",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Download Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				checktime_warn: "A time lag between your system and the server has been detected. It is recommended that it be corrected before pressing OK to continue. ",
+				checktime_err: "A time lag between your system and the server has been detected. You must correct the time of your system and recharge this page before continuing. ",
+				checktime_local_time: "Time of your system",
+				checktime_server_time: "Server time",
+				close: "Close",
+				contact_admin: "Please report the error if the problem persists:",
+				error_connecting_autofirma: "It is not possible to connect with Autofirma due to a communication or installation problem of the client. If you do not have it installed, you can download it from the following link:",
+				error_connecting_client: "It is not possible to connect with the signature client due to a communication or installation problem of the client. If you do not have it installed, you can download it from the following link:",
+				error_connecting_service: "It has not been possible to connect with the service of the signature application. You may not be able to complete electronic signatures from this page. ",
+				error_connecting_server_recovering: "It was not possible to connect with the application service to recover the result of the operation. ",
+				firefox_reinstall_message: "Installing or restoring Autofirma will require closing the browser and restarting the process. ",
+				install_client: "<br>If you have it installed or just installed, press the button to retry the operation. ",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Download from App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				loading: "Loading",
+				no_compatible_procedure: "This application does not allow you to sign from your browser on mobile devices. ",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/en/ciudadanos/descargas'>Electronic Signature Portal</a>",
+				procedure_from_url: "You can complete the procedure from the following application:",
+				restore_installation: "If you have it installed, you can restore the installation from Autofirma on Tools -> Restore Installation",
+				retry_operation: "Retry operation",
+				timeout_receiving_sign: "It was not possible to connect with the signature client. If you don't have it installed, you can download it from:",
+				warning: "Warning:"
+		};
 
 		var DEFAULT_LOCALE = LOCALIZED_STRINGS["es_ES"];
 
@@ -213,6 +315,100 @@ var AutoScript = ( function ( window, undefined ) {
 		var ERROR_NO_COMPATIBLE_PROCEDURE = 2;
 		var ERROR_CONNECTING_SERVICE = 3;
 		var ERROR_CHECKING_SERVICE = 4;
+		
+		/* Codigos de error */
+		var ErrorCode = {
+		  Internal: {
+		    BROWSER_CANT_PREPROCESS: {
+		      code: "AS220005", message: "Su navegador no permite preprocesar los datos que desea tratar"
+		    },
+		    WEBSOCKET_INVALID_RESP: {
+		      code: "AS220006", message: "Respuesta no valida"
+		    },
+		    BROWSER_CANT_RECOVER_RESULT: {
+		      code: "AS220007", message: "Su navegador no permite obtener el resultado de la operacion"
+		    }
+		  },
+		  ThirdParty: {
+		    UPLOADING_TO_SERVER: {
+		      code: "AS300302", message: "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa"
+		    }
+		  },
+		  Communication: {
+		    CANT_CONNECT_SERVER: {
+		      code: "AS400003",
+		      message: "No se pudo conectar con el servidor remoto"
+		    },
+		    WEBSOCKET_CLOSE: {
+		      code: "AS420002", message: "Autofirma se ha cerrado o ha cerrado el websocket de comunicacion"
+		    },
+		    SOCKET_CONNECTING_APP: {
+		      code: "AS420503", message: "Se ha perdido la conexion con la aplicacion Autofirma"
+		    },
+		    SOCKET_NETWORK_ERROR: {
+		      code: "AS420504", message: "Ocurrio un error de red en la llamada al servicio de firma"
+		    },
+		    WEBSERVER_NETWORK_ERROR: {
+		      code: "AS420505", message: "Ocurrio un error de red en la llamada al servicio de firma"
+		    }
+		  },
+		  Functional: {
+		    CANCELLED_OP: {
+		      code: "AS500001", message: "Operacion cancelada por el usuario"
+		    },
+		    UPLOAD_FILE_SERVER: {
+		      code: "AS500008", message: "La operacion de carga de fichero no esta disponible por servidor intermedio"
+		    },
+		    UPLOAD_MULTIPLE_FILE_SERVER : {
+		      code: "AS500009", message: "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio"
+		    },
+		    NON_OPERATIVE_JS_METHOD : {
+		      code: "AS500010", message: "El metodo JavaScript no se encuentra operativo"
+		    }
+		  },
+		  Request: {
+		    RETRIEVE_URL_NOT_FOUND: {
+		      code: "AS600101", message: "No se ha indicado la direccion del servlet para la recuperacion de datos"
+		    },
+		    STORAGE_URL_NOT_FOUND: {
+		      code: "AS600102", message: "No se ha indicado la direccion del servlet para el guardado de datos"
+		    },
+		    TOO_LONG_URL : {
+		      code: "AS620014", message: "La URL de invocacion al servicio de firma es demasiado larga"
+		    },
+		    UPLOADING_TO_APP : {
+		      code: "AS620015", message: "Ocurrio un error al enviar los datos a la aplicacion nativa"
+		    },
+		    WEBSOCKET_INVOICE_APP : {
+		      code: "AS620017", message: "Ha ocurrido un error al intentar invocar a la aplicacion nativa mediante websocket"
+		    },
+		    WEBSOCKET_MEMORY_ERROR : {
+		      code: "AS620018", message: "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion"
+		    },
+		    WEBSOCKET_UNKNOWN_ERROR : {
+		      code: "AS620019", message: "Error desconocido"
+		    },
+		    SOCKET_INVOICE_APP : {
+		      code: "AS620020", message: "Ha ocurrido un error al intentar invocar a la aplicacion nativa mediante socket"
+		    },
+		    SOCKET_MEMORY_ERROR : {
+		      code: "AS620021", message: "Problema de memoria en servidor"
+		    },
+		    SOCKET_UNKNOWN_ERROR : {
+		      code: "AS620022", message: "Error desconocido"
+		    },
+		    WEBSERVER_INVOICE_APP : {
+		      code: "AS620023", message: "Ha ocurrido un error al intentar invocar a la aplicacion nativa mediante servidor intermedio"
+		    },
+		    WEBSERVER_INVOICE_APP_TIMEOUT : {
+		      code: "AS620024", message: "El tiempo para la recepcion de la firma por la pagina web ha expirado"
+		    },
+		    WEBSERVER_ERROR_CONNECTING_SERVICE : {
+		      code: "AS620025", message: "Error al conectar con el servicio de la aplicacion para recuperar el resultado de la operacion"
+		    }
+		  }
+		};
+		
 		
 		/**
 		 * Realiza la descarga de datos de una URL y, una vez termina, llama al metodo
@@ -577,7 +773,7 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		var getCurrentLog = function (successCallback, errorCallback) {
 			if (!!errorCallback) {
-				errorCallback("java.lang.NoSuchMethodException", "El metodo getCurrentLog no se encuentra operativo");
+				errorCallback("java.lang.UnsupportedOperationException", ErrorCode.Functional.NON_OPERATIVE_JS_METHOD.message, ErrorCode.Functional.NON_OPERATIVE_JS_METHOD.code);
 				return;
 			}
 		}
@@ -606,7 +802,11 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 
 		var setLocale = function (locale) {
-			currentLocale = (locale == null || LOCALIZED_STRINGS[locale] == null ? DEFAULT_LOCALE : LOCALIZED_STRINGS[locale]); 
+			currentLocale = (!locale || !LOCALIZED_STRINGS[locale]) ? DEFAULT_LOCALE : LOCALIZED_STRINGS[locale]; 
+		}
+
+		var setLocaleMessages = function (localeMessages) {
+			currentLocale = !localeMessages ? DEFAULT_LOCALE : localeMessages; 
 		}
 
 		var getErrorMessage = function () {
@@ -615,6 +815,14 @@ var AutoScript = ( function ( window, undefined ) {
 
 		var getErrorType = function () {
 			return clienteFirma.getErrorType();
+		}
+		
+		var getErrorCode = function () {
+			return clienteFirma.getErrorCode();
+		}
+		
+		var getErrorCodeNumber = function () {
+			return clienteFirma.getErrorCodeNumber();
 		}
 		
 		var setServlets = function(storageServlet, retrieverServlet) {
@@ -1778,8 +1986,6 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		var AppAfirmaWebSocketClient = ( function (window, undefined) {
 			
-			var PROTOCOL_VERSION = 4;
-			
 			var SERVER_HOST = "127.0.0.1";
 
 			var URL_REQUEST_PREFIX = "wss://" + SERVER_HOST + ":";
@@ -1799,6 +2005,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/** Informacion de error. */
 			var errorMessage = '';
 			var errorType = '';
+			var errorCode = '';
 		
 			
 			/** WebSocket para la comunicacion con la aplicacion. Antes de crearlo
@@ -2148,11 +2355,12 @@ var AutoScript = ( function ( window, undefined ) {
 						console.log("Tratamos de conectar con el cliente a traves de WebSockets en los puertos " + ports);
 						setTimeout(waitAppAndProcessRequest, 3000, ports, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, url, successCB, errorCB);
 					} catch (e) {
+						errorCode = ErrorCode.Request.WEBSOCKET_INVOICE_APP.code;
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA, 
 																		function (){execAppIntent(url, successCB, errorCB)} , 
-																		function (){errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," ")); });
+																		function (){errorCB("java.lang.IOException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode); });
 						if(!enabled) {
-							errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+							errorCB("java.lang.IOException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);
 						}
 					}
 				}
@@ -2210,11 +2418,13 @@ var AutoScript = ( function ( window, undefined ) {
 	
 						ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
 						
+						errorCode = ErrorCode.Request.WEBSOCKET_INVOICE_APP.code;
+						
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 															function (){execAppIntent(url, successCB, errorCB)}, 
-															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);});
 						if (!enabled) {
-							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);
 						}
 					}			
 				}
@@ -2252,7 +2462,7 @@ var AutoScript = ( function ( window, undefined ) {
 						connected = false;
 						ws = null;
 						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
-						processErrorResponse("java.lang.InterruptedException", "Autofirma se ha cerrado o ha cerrado el websocket de comunicacion");
+						processErrorResponse("java.lang.InterruptedException", ErrorCode.Communication.WEBSOCKET_CLOSE);
 					}
 				};
 
@@ -2308,9 +2518,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (retries <= 0) {
 					var enabled =  Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																function (){sendEcho(ws, idSession, 1)}, 
-																function (){processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+																function (){processErrorResponse("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSOCKET_INVOICE_APP);});
 					if (!enabled) {
-						processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+						processErrorResponse("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSOCKET_INVOICE_APP);
 					}
 					return;
 				}
@@ -2336,15 +2546,39 @@ var AutoScript = ( function ( window, undefined ) {
 			 * el tipo de operacion que la envie.
 			 */
 			function processResponse (data) {
+				
+				
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP);
+					return;
+				}
+				
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {
+					var errorType;		
+					if (data.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					processErrorResponse(errorType, errorCode, errorMessage);
 					return;
 				}
 				
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
-					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
+					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", ErrorCode.Request.WEBSOCKET_MEMORY_ERROR);
 					return;
 				}
 				
@@ -2356,7 +2590,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					processErrorResponse("java.lang.Exception", "Error desconocido");
+					processErrorResponse("java.lang.Exception", ErrorCode.Request.WEBSOCKET_UNKNOWN_ERROR);
 					return;
 				}
 
@@ -2395,13 +2629,22 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Procesa la respuesta cuando se detecta un error.
 			 */
-			function processErrorResponse(exception, message) {
+			function processErrorResponse(exception, errCode, errMessage) {
 				errorType = exception;
-				errorMessage = message;
+				if (!!errMessage) {
+					errorMessage = errMessage;
+				} else {
+					errorMessage = errCode.message;
+				}
+				if (!!errCode.code) {
+					errorCode = errCode.code;
+				} else {
+					errorCode = errCode;
+				}		
 				if (!!errorCallback) {
 					var responseErrorCallback = errorCallback;
 					setCallbacks(null, null);
-					responseErrorCallback(exception, message);
+					responseErrorCallback(exception, errorMessage, errorCode);
 				}
 			}
 			
@@ -2417,7 +2660,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// pudiendo obtener cada dato del par teniendo en cuenta el
 				// separador ":"
 				if (data.indexOf(":") <= 0) {
-					processErrorResponse("java.lang.Exception", "Respuesta no valida");
+					processErrorResponse("java.lang.Exception", ErrorCode.Internal.WEBSOCKET_INVALID_RESP);
 					return;
 				}
 
@@ -2485,7 +2728,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				// Termina mal
 				else {
-					processErrorResponse("java.lang.Exception", "Error desconocido al procesar los datos");
+					processErrorResponse("java.lang.Exception", ErrorCode.Request.WEBSOCKET_UNKNOWN_ERROR);
 				}
 			}
 
@@ -2613,6 +2856,20 @@ var AutoScript = ( function ( window, undefined ) {
 				return errorType;
 			}
 
+			/**
+			 * Recupera el codigo completo del ultimo error capturado.
+			 */
+			function getErrorCode () {
+				return errorCode;
+			}
+			
+			/**
+			 * Recupera el numero de codigo del ultimo error capturado.
+			 */
+			function getErrorCodeNumber () {
+				return !!errorCode ? errorCode.substring(2) : null;
+			}
+
 			/* Metodos que publicamos del objeto AppAfirmaWebSocketClient */
 			return {
 				echo : echo,
@@ -2630,8 +2887,11 @@ var AutoScript = ( function ( window, undefined ) {
 				getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
+				setLocaleMessages : setLocaleMessages,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType	
+				getErrorType : getErrorType,
+				getErrorType : getErrorCode,
+				getErrorCodeNumber : getErrorCodeNumber
 			}
 		});
 
@@ -2646,13 +2906,12 @@ var AutoScript = ( function ( window, undefined ) {
 			 */
 			var errorMessage = '';
 			var errorType = '';
+			var errorCode = '';
 
 			/** Puerto a traves del que se ha conectado con la aplicacion nativa. */
 			var port = "";
 			
 			var idSession;
-			
-			var PROTOCOL_VERSION = 1;
 			
 			/* Tiempo de retardo para peticiones */
 			var WAITING_TIME = 500;
@@ -2932,9 +3191,9 @@ var AutoScript = ( function ( window, undefined ) {
 					} catch (e){
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																	function (){execAppIntent(url);}, 
-																	function (){errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+																	function (){errorServiceResponseFunction("java.lang.IOException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);});
 						if (!enabled) {
-							errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+							errorServiceResponseFunction("java.lang.IOException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);
 						}
 					}
 				}
@@ -3094,9 +3353,9 @@ var AutoScript = ( function ( window, undefined ) {
 								}
 								var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																			function (){execAppIntent(url)},
-																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);});
 								if (!enabled) {
-									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);
 								}
 							}
 							return;
@@ -3150,7 +3409,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// El envio no se fragmenta
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
+						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 					}
 					// Las operaciones que no requieren respuesta, llaman directamente a la funcion de exito 
 					if (isSaveOperation) {
@@ -3163,7 +3422,7 @@ var AutoScript = ( function ( window, undefined ) {
 					else {
 						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
 							if (Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
-								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor", ErrorCode.Request.SOCKET_MEMORY_ERROR);
 								return;
 							}
 							// Juntamos los fragmentos
@@ -3180,11 +3439,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) {
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0) {
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						}
 						// error desconocido 
 						else {
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ErrorCode.Communication.SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3207,7 +3466,7 @@ var AutoScript = ( function ( window, undefined ) {
 				var urlToSend = url.substring(((i-1) * URL_MAX_SIZE), Math.min(URL_MAX_SIZE * i, url.length));
 				httpRequest.onreadystatechange = function () {
 					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						return;
 					}
 					// Respuesta afirmativa, hay que mandar mas fragmentos
@@ -3242,11 +3501,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) { 
 						// Status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0){
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						}
 						// Error desconocido 
 						else{
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ErrorCode.Communication.SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3269,7 +3528,7 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 
 					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 					}
 
 					// Se ha realizado la operacion save, no controlamos reintentos ni el exito de la peticion
@@ -3300,11 +3559,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) { 
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0){
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						}
 						// error desconocido 
 						else{
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ErrorCode.Communication.SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3324,7 +3583,7 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
 						if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
-							errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+							errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor", ErrorCode.Request.SOCKET_MEMORY_ERROR);
 							return;
 						}
 						//console.log("recibida la parte " + part);
@@ -3365,11 +3624,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) { 
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0){
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						}
 						// error desconocido 
 						else{
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ErrorCode.Communication.SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3392,10 +3651,32 @@ var AutoScript = ( function ( window, undefined ) {
 			function successSelectCertServiceResponseFunction (data) {
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					errorCode = ErrorCode.Functional.CANCELLED_OP.code;
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, errorCode);
 					return;
 				}
 
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {		
+					if (data.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					errorCallback(errorType, errorMessage, errorCode);
+					return;
+				}
+				
 				// Se ha producido un error
 				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
 					errorCallback("java.lang.Exception", data);
@@ -3404,7 +3685,8 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					errorCallback("java.lang.Exception", "Error desconocido");
+					errorCode = ErrorCode.Request.SOCKET_UNKNOWN_ERROR.code;
+					errorCallback("java.lang.Exception", ErrorCode.Request.SOCKET_UNKNOWN_ERROR.message, errorCode);
 					return;
 				}
 
@@ -3418,9 +3700,33 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param data Resultado obtenido.
 			 */
 			function successServiceResponseFunction (data) {
+				
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					errorCode = ErrorCode.Functional.CANCELLED_OP.code;
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, errorCode);
+					return;
+				}
+				
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {		
+					var errorType;
+					if (data.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					errorCallback(errorType, errorMessage, errorCode);
 					return;
 				}
 				
@@ -3437,7 +3743,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
-					errorCallback("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
+					errorCallback("es.gob.afirma.core.OutOfMemoryError", ErrorCode.Request.SOCKET_MEMORY_ERROR.message, ErrorCode.Request.SOCKET_MEMORY_ERROR.code);
 					return;
 				}
 				
@@ -3449,7 +3755,8 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					errorCallback("java.lang.Exception", "Error desconocido");
+					errorCode = ErrorCode.Request.SOCKET_UNKNOWN_ERROR.code;
+					errorCallback("java.lang.Exception", ErrorCode.Request.SOCKET_UNKNOWN_ERROR.message, errorCode);
 					return;
 				}
 				
@@ -3529,16 +3836,40 @@ var AutoScript = ( function ( window, undefined ) {
 				successCallback(signature, certificate);
 			}
 			
-			function errorServiceResponseFunction(exception, message){
+			function errorServiceResponseFunction(exception, message, errCode){
+				errorCode = errCode.code;
 				if (errorCallback) {
-					errorCallback(exception, message);
+					errorCallback(exception, message, errorCode);
 				}
 			}
 			
 			function successBatchResponseFunction (data) {
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					errorCode = ErrorCode.Functional.CANCELLED_OP.code;
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, errorCode);
+					return;
+				}
+				
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substr(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {
+					var errorType;
+					if (data.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					errorCallback(errorType, errorMessage, errorCode);
 					return;
 				}
 				
@@ -3550,7 +3881,8 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					errorCallback("java.lang.Exception", "Error desconocido");
+					errorCode = ErrorCode.Request.SOCKET_UNKNOWN_ERROR.code;
+					errorCallback("java.lang.Exception",ErrorCode.Request.SOCKET_UNKNOWN_ERROR.message, errorCode);
 					return;
 				}
 				
@@ -3711,6 +4043,22 @@ var AutoScript = ( function ( window, undefined ) {
 				return errorType;
 			}
 
+			/**
+			 * Recupera el codigo comleto del ultimo error capturado.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getErrorCode () {
+				return errorCode;
+			}
+			
+			/**
+			 * Recupera el numero del codigo del ultimo error capturado.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getErrorCodeNumber () {
+				return !!errorCode ? errorCode.substring(2) : null;
+			}
+
 			/* Metodos que publicamos del objeto AppAfirmaJSSocket */
 			return {
 				echo : echo,
@@ -3732,7 +4080,9 @@ var AutoScript = ( function ( window, undefined ) {
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType			
+				getErrorType : getErrorType,
+				getErrorCode : getErrorCode,
+				getErrorCodeNumber : getErrorCodeNumber	
 			}
 		});
 
@@ -3744,9 +4094,6 @@ var AutoScript = ( function ( window, undefined ) {
 
 			/* Longitud maxima que generalmente se permite a una URL. */
 			var MAX_LONG_GENERAL_URL = 2000;
-			
-			/** Version del protocolo utilizada. */
-			var PROTOCOL_VERSION = 3;
 			
 			/** Tiempo de espera entre intentos de obtener el resultado de la operacion. */
 			var WAITING_CYCLE_MILLIS = Platform.isAndroid() || Platform.isIOS() ? 4000 : 3000;
@@ -3772,6 +4119,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 			var errorMessage = '';
 			var errorType = '';
+			var errorCode = '';
 			var defaultKeyStore = null;
 			var retrieverServletAddress = null;
 			var storageServletAddress = null;
@@ -3830,11 +4178,11 @@ var AutoScript = ( function ( window, undefined ) {
 				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
 				if (isURLTooLong(url)) {
 					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
+						throwException("java.lang.IllegalArgumentException", ErrorCode.Request.STORAGE_URL_NOT_FOUND);
 						return;
 					}
 					else if (retrieverServletAddress == null || retrieverServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para la recuperacion de datos");
+						throwException("java.lang.IllegalArgumentException", ErrorCode.Request.RETRIEVE_URL_NOT_FOUND);
 						return;
 					}
 					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
@@ -3921,7 +4269,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
 				if (isURLTooLong(url)) {
 					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
+						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos", ErrorCode.Request.STORAGE_URL_NOT_FOUND);
 						return;
 					}
 
@@ -3993,7 +4341,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
 				if (isURLTooLong(url)) {
 					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
+						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos", ErrorCode.Request.STORAGE_URL_NOT_FOUND);
 						return;
 					}
 
@@ -4174,13 +4522,14 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Carga de fichero de datos. Se realiza mediante la invocacion de una app nativa. 
 			 */
 			function getFileNameContentBase64 (title, extensions, description, filePath, successCallback, errorCallback) {
-				var errorType = "java.lang.UnsupportedOperationException";
-				var errorMessage = "La operacion de carga de fichero no esta disponible por servidor intermedio";
+				errorType = "java.lang.UnsupportedOperationException";
+				errorMessage = ErrorCode.Functional.UPLOAD_FILE_SERVER.message;
+				errorCode = ErrorCode.Functional.UPLOAD_FILE_SERVER.code;
 				if (!errorCallback) {
-					throwException(errorType, errorMessage);
+					throwException(errorType, ErrorCode.Functional.UPLOAD_FILE_SERVER);
 				}
 				else {
-					errorCallback(errorType, errorMessage);
+					errorCallback(errorType, errorMessage, errorCode);
 				}
 			}
 
@@ -4188,13 +4537,14 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Carga de multiples ficheros de datos. Se realiza mediante la invocacion de una app nativa. 
 			 */
 			function getMultiFileNameContentBase64  (title, extensions, description, filePath, successCallback, errorCallback) {
-				var errorType = "java.lang.UnsupportedOperationException";
-				var errorMessage = "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio";
+				errorType = "java.lang.UnsupportedOperationException";
+				errorMessage = ErrorCode.Functional.UPLOAD_MULTIPLE_FILE_SERVER.message;
+				errorCode = ErrorCode.Functional.UPLOAD_MULTIPLE_FILE_SERVER.code;
 				if (!errorCallback) {
-					throwException(errorType, errorMessage);
+					throwException(errorType, errorMessage, ErrorCode.Functional.UPLOAD_MULTIPLE_FILE_SERVER);
 				}
 				else {
-					errorCallback(errorType, errorMessage);
+					errorCallback(errorType, errorMessage, errorCode);
 				}
 			}
 
@@ -4220,6 +4570,20 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 
 			/**
+			 * Recupera el codigo completo del ultimo error capturado.
+			 */
+			function getErrorCode () {
+				return errorCode;
+			}
+			
+			/**
+			 * Recupera el numero de codigo del ultimo error capturado.
+			 */
+			function getErrorCodeNumber () {
+				return !!errorCode ? errorCode.substring(2) : null;
+			}
+
+			/**
 			 * Establece las rutas de los servlets encargados de almacenar y recuperar las firmas de los dispositivos moviles.
 			 */
 			function setServlets (storageServlet,  retrieverServlet) {
@@ -4230,9 +4594,10 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Establece el error indicado como error interno y lanza una excepcion.
 			 */
-			function throwException (type, message) {
+			function throwException (type, errCode) {
 				errorType = type;
-				errorMessage = message;
+				errorMessage = errCode.message;
+				errorCode = errCode.code;
 				throw new Error();
 			}
 
@@ -4292,7 +4657,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Subimos los datos al servidor intermedio
 				var httpRequest = getHttpRequest();
 				if (!httpRequest) {
-					throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
+					throwException("java.lang.Exception", ErrorCode.Internal.BROWSER_CANT_PREPROCESS);
 				}
 				httpRequest.open("POST", storageServletAddress, true);
 				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -4304,7 +4669,8 @@ var AutoScript = ( function ( window, undefined ) {
 						 if (httpRequest.status == 200) {
 							url = buildUrlWithoutData(op, fileId, retrieverServletAddress, cipherKey);
 							if (isURLTooLong(url)) {
-								errorCallback("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.");
+								errorCode = ErrorCode.Request.TOO_LONG_URL.code;
+								errorCallback("java.lang.IllegalArgumentException",ErrorCode.Request.TOO_LONG_URL.message, errorCode);
 								return;
 							}
 							execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
@@ -4312,11 +4678,12 @@ var AutoScript = ( function ( window, undefined ) {
 					else {
 						errorOcurred = true;
 						console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
+						errorCode = ErrorCode.Request.UPLOADING_TO_APP.code;
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
 								 function() { sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) },
-								 function() { errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");});
+								 function() { errorCallback("java.lang.IOException", ErrorCode.Request.UPLOADING_TO_APP.message, errorCode);});
 						if (!enabled) {
-							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");
+							errorCallback("java.lang.IOException", ErrorCode.Request.UPLOADING_TO_APP.message, errorCode);
 						}
 					}
 					}
@@ -4325,7 +4692,8 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) {	
 						if (!errorOcurred) {
 							console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
-							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
+							errorCode = ErrorCode.ThirdParty.UPLOADING_TO_SERVER.code;
+							errorCallback("java.lang.IOException", ErrorCode.ThirdParty.UPLOADING_TO_SERVER.message, errorCode);
 						}
 					}
 				}
@@ -4346,7 +4714,8 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.send(requestData);
 				}
 				catch(e) {
-					errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto");	
+					errorCode = ErrorCode.Communication.CANT_CONNECT_SERVER.code;
+					errorCallback("java.lang.IOException", ErrorCode.Communication.CANT_CONNECT_SERVER.message, errorCode);	
 				}
 			}
 			
@@ -4481,14 +4850,28 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				// Si se obtiene otro mensaje de error, se deja de intentar y se ejecuta la funcion callback de error
 				if (html.substr(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {
-					errorMessage = html.substring(html.indexOf(":=") + 2);
+					var errorType;		
 					if (html.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
 						errorType = "es.gob.afirma.core.AOCancelledOperationException";
 					} else {
 						errorType = "java.lang.Exception";
 					}
+
+					var errorCodeAndMessage = html.substring(html.indexOf(":=") + 2);
+					// Se comprueba si la respuesta viene de modo codigo-mensaje o no
+					if(errorCodeAndMessage.indexOf(" - ") != -1) {
+						var splitCode = errorCodeAndMessage.substring(0, errorCodeAndMessage.indexOf(" - "));
+						if (splitCode.length == 8) {
+							errorCode = splitCode;
+							errorMessage = errorCodeAndMessage.substring(errorCodeAndMessage.indexOf(" - ") + 3);
+						} else {
+							errorMessage = errorCodeAndMessage;
+						}								
+					} else {
+						errorMessage = errorCodeAndMessage;
+					}
 					if (!!errorCallback) {
-						errorCallback(errorType, errorMessage);
+						errorCallback(errorType, errorMessage, errorCode);
 					}
 					return false;
 				}
@@ -4496,7 +4879,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Se ha cancelado la operacion
 				if (html == "CANCEL" || html == "CANCEL\r\n" || html == "CANCEL\n") {
 					if (!!errorCallback) {
-						errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+						errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, ErrorCode.Functional.CANCELLED_OP.code);
 					}
 					return false;
 				}
@@ -4648,7 +5031,7 @@ var AutoScript = ( function ( window, undefined ) {
 				return false;
 			}
 			
-			function errorResponseFunction (type, message, errorCallback) {
+			function errorResponseFunction (type, message, errorCallback, errCode) {
 				
 				// Cerramos el dialogo de espera al obtener el error
 				Dialog.disposeSupportDialog();
@@ -4657,8 +5040,9 @@ var AutoScript = ( function ( window, undefined ) {
 						type : "java.lang.Exception";
 				errorMessage = (message != null && message.length > 0) ?
 						message : "No se ha podido extablecer la comunicaci\u00F3n entre la aplicaci\u00F3n de firma y la p\u00E1gina web";
+				errorCode = errCode;
 				if (!!errorCallback) {
-					errorCallback(errorType, errorMessage);
+					errorCallback(errorType, errorMessage, errorCode);
 				}
 			}
 			
@@ -4743,7 +5127,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				var httpRequest = getHttpRequest();
 				if (!httpRequest) {
-					throwException("java.lang.Exception", "Su navegador no permite obtener el resultado de la operaci\u00F3n");
+					throwException("java.lang.Exception", ErrorCode.Internal.BROWSER_CANT_RECOVER_RESULT);
 				}
 
 				iterations = 0;
@@ -4755,9 +5139,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (wrongInstallation) {
 					var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																	function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
-																	function (){errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback);});
+																	function (){errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSERVER_INVOICE_APP.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP.code);});
 					if (!enabled) {
-						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback);
+						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSERVER_INVOICE_APP.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP.code);
 					}
 					return;
 				}
@@ -4767,25 +5151,22 @@ var AutoScript = ( function ( window, undefined ) {
 					if(!!afirmaConnected) {
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
 																		function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback)},
-																		function() {errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);});
+																		function() {errorResponseFunction("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);});
 						if (!enabled) {
-							errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);
+							errorResponseFunction("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);
 						}
 					} else {
 						var errorType;
-						var errorCallbackMsg;
 						if (!!isCompatibleProcedure) {
 							errorType = ERROR_CONNECTING_AFIRMA;
-							errorCallbackMsg = Dialog.buildErrorConnectingApplicationMsg();
 						} else {
 							errorType = ERROR_CONNECTING_SERVICE;
-							errorCallbackMsg = Dialog.buildCustomErrorServerMsg();
 						}
 						var enabled = Dialog.showErrorDialog(errorType,
 																	function (){execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
-																	function (){errorCallback("java.lang.IOException", errorCallbackMsg.replace(/<br>/g,""));});
+																	function (){errorCallback("java.lang.IOException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);});
 						if(!enabled) {
-							errorResponseFunction("java.util.concurrent.TimeoutException", errorCallbackMsg.replace(/<br>/g,""), errorCallback);
+							errorResponseFunction("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);
 						}
 					}
 					return;
@@ -4816,9 +5197,9 @@ var AutoScript = ( function ( window, undefined ) {
 						else {
 							var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
 																			function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback)},
-																			function() {errorResponseFunction("java.lang.IOException", currentLocale.error_connecting_server_recovering + "(Status: " + httpRequest.status + ")", errorCallback);});
+																			function() {errorResponseFunction("java.lang.IOException", ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.message + " (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code);});
 							if (!enabled) {
-								errorResponseFunction("java.lang.IOException", currentLocale.error_connecting_server_recovering + "(Status: " + httpRequest.status + ")", errorCallback);
+								errorResponseFunction("java.lang.IOException", ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.message + " (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code);
 							}
 						}
 					}
@@ -4833,7 +5214,7 @@ var AutoScript = ( function ( window, undefined ) {
 				catch(e) {
 					// Error en la llamada para al recuperacion del resultado. No lo encuentra o problema
 					// de tipo cross-domain
-					errorResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma", errorCallback);
+					errorResponseFunction("java.lang.IOException", ErrorCode.Communication.WEBSERVER_NETWORK_ERROR.message, errorCallback, ErrorCode.Communication.WEBSERVER_NETWORK_ERROR.code);
 					return;
 				}
 			}
@@ -4899,7 +5280,9 @@ var AutoScript = ( function ( window, undefined ) {
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType
+				getErrorType : getErrorType,
+				getErrorCode : getErrorCode,
+				getErrorCodeNumber : getErrorCodeNumber
 			}
 		});
 		
@@ -4973,6 +5356,8 @@ var AutoScript = ( function ( window, undefined ) {
 			/* Gestion de errores */
 			getErrorMessage : getErrorMessage,
 			getErrorType : getErrorType,
+			getErrorCode : getErrorCode,
+			getErrorCodeNumber : getErrorCodeNumber,
 
 			/* Utilidad JavaScript*/
 			getBase64FromText : getBase64FromText,

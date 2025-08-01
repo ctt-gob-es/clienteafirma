@@ -9,40 +9,42 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
+
 /** Error usado para indicar que es necesaria la comunicaci&oacute;n por
  * socket para realizar una operaci&oacute;n. */
-class SocketOperationException extends Exception {
+class SocketOperationException extends AOException {
 
 	/** Serial Id. */
 	private static final long serialVersionUID = -1031351741046263364L;
 
-	private String errorCode ;
-
-	SocketOperationException(final String code) {
-		super();
-		setErrorCode(code);
+	SocketOperationException(final ErrorCode errorCode) {
+		super(errorCode);
 	}
 
-	SocketOperationException(final String code, final Throwable cause) {
-		super(cause != null ? cause.getMessage(): null, cause);
-		setErrorCode(code);
+	SocketOperationException(final AOException cause) {
+		super(cause, cause.getErrorCode());
 	}
 
-	SocketOperationException(final String code, final String message, final Throwable cause) {
-		super(message != null ? message : cause != null ? cause.getMessage(): null, cause);
-		setErrorCode(code);
+	SocketOperationException(final String message, final AOException cause) {
+		super(message, cause, cause.getErrorCode());
 	}
 
-	public String getErrorCode() {
-		return this.errorCode;
+	SocketOperationException(final String message, final ErrorCode errorCode) {
+		super(message, errorCode);
 	}
 
-	public void setErrorCode(final String errorCode) {
-		this.errorCode = errorCode;
+	SocketOperationException(final Throwable cause, final ErrorCode errorCode) {
+		super(cause != null ? cause.getMessage() : null, cause, errorCode);
+	}
+
+	SocketOperationException(final String message, final Throwable cause, final ErrorCode errorCode) {
+		super(message, cause, errorCode);
 	}
 
 	@Override
 	public String getMessage() {
-		return super.getMessage() != null ? super.getMessage() : this.errorCode;
+		return super.getMessage() != null ? super.getMessage() : getErrorCode().getCode();
 	}
 }

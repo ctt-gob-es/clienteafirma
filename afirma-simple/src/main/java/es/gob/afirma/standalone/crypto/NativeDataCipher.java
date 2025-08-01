@@ -7,6 +7,7 @@ import java.security.InvalidKeyException;
 import java.util.Arrays;
 
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.plugins.DataCipher;
 import es.gob.afirma.standalone.plugins.EncryptingException;
 
@@ -28,7 +29,7 @@ public final class NativeDataCipher implements DataCipher {
 		try {
 			return cipherData(data, this.cipherKey);
 		} catch (final Exception e) {
-			throw new EncryptingException("Error durante el cifrado de los datos", e); //$NON-NLS-1$
+			throw new EncryptingException("Error durante el cifrado de los datos", e, SimpleErrorCode.Internal.ENCRYPTING_PARAMS_ERROR); //$NON-NLS-1$
 		}
 	}
 
@@ -37,7 +38,7 @@ public final class NativeDataCipher implements DataCipher {
 		try {
 			return decipherData(cipheredData, this.cipherKey);
 		} catch (final Exception e) {
-			throw new EncryptingException("Error durante el descifrado de los datos", e); //$NON-NLS-1$
+			throw new EncryptingException("Error durante el descifrado de los datos", e, SimpleErrorCode.Internal.DECRYPTING_PARAMS_ERROR); //$NON-NLS-1$
 		}
 	}
 

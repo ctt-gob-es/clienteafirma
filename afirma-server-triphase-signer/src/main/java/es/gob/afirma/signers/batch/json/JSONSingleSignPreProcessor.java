@@ -11,18 +11,21 @@ package es.gob.afirma.signers.batch.json;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
-import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.signers.batch.BatchServiceErrorCode;
 import es.gob.afirma.signers.batch.LegacyFunctions;
 import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
@@ -89,7 +92,7 @@ final class JSONSingleSignPreProcessor {
 		try {
 			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), docBytes, sSign.getSignFormat().name());
 		}
-		catch (final IncompatiblePolicyException e) {
+		catch (final SignaturePolicyIncompatibilityException e) {
 			LOGGER.log(
 					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica", e); //$NON-NLS-1$
 			extraParams = sSign.getExtraParams();
@@ -168,8 +171,10 @@ final class JSONSingleSignPreProcessor {
 		// que el PKCS#1 recibido se genero con el certificado de firma
 		try {
 			TriPhaseHelper.addVerificationCodes(td, certChain[0]);
+		} catch (final CertificateEncodingException e) {
+			throw new AOException("No se pudo decodificar el certificado de firma del lote", e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		} catch (final Exception e) {
-			throw new AOException("No se pudo agregar le codigo de verificacion de firmas", e); //$NON-NLS-1$
+			throw new AOException("No se pudo agregar le codigo de verificacion de firmas", e, BatchServiceErrorCode.Internal.INTERNAL_JSON_BATCH_ERROR); //$NON-NLS-1$
 		}
 
 		if (Boolean.parseBoolean(ConfigManager.isCacheEnabled())) {

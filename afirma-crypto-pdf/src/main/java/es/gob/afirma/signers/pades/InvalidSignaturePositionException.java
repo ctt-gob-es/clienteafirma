@@ -9,17 +9,24 @@
 
 package es.gob.afirma.signers.pades;
 
-/** Indica que la firma visible no se encuentra en el rango en ninguna de las p&aacute;ginas del documento a firmar
- * @author Jos&eacute; Montero Rivero */
-public final class InvalidSignaturePositionException extends IllegalArgumentException {
+import es.gob.afirma.core.AORuntimeException;
+import es.gob.afirma.signers.pades.common.PdfErrorCode;
+
+/**
+ * Indica que la firma visible no se encuentra en el rango en ninguna de las p&aacute;ginas del documento a firmar
+ * @author Jos&eacute; Montero Rivero
+ */
+public final class InvalidSignaturePositionException extends AORuntimeException {
 
 	private static final long serialVersionUID = -2415913095143368605L;
 
-	/** Crea la excepci&oacute;n indicando que la firma visible no se encuentra en el
+	/**
+	 * Crea la excepci&oacute;n indicando que la firma visible no se encuentra en el
 	 * rango en ninguna de las p&aacute;ginas del documento.
-	 * @param msg Mensaje de error. */
+	 * @param msg Mensaje de error.
+	 */
 	public InvalidSignaturePositionException(final String msg) {
-		super(msg);
+		super(msg, PdfErrorCode.Request.INVALID_SIGNATURE_POSITION);
 	}
 
 }

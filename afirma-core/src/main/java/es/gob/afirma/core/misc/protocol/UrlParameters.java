@@ -19,6 +19,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.DataDownloader;
 
@@ -71,7 +72,7 @@ public abstract class UrlParameters {
 
 	/** Versi&oacute;n m&iacute;nima de cliente requetida. */
 	protected static final String MINIMUM_CLIENT_VERSION_PARAM = "mcv"; //$NON-NLS-1$
-	
+
 	/** Nombre de aplicaci&oacute;n o dominio desde el que se realiza la llamada. */
 	protected static final String APP_NAME_PARAM = "appname"; //$NON-NLS-1$
 
@@ -250,7 +251,7 @@ public abstract class UrlParameters {
 		this.id = sessionId;
 	}
 
-	void setCommonParameters(final Map<String, String> params) throws ParameterException {
+	void setCommonParameters(final Map<String, String> params) throws ParameterException, ParameterLocalAccessRequestedException {
 
 		setDesKey(verifyCipherKey(params));
 
@@ -272,7 +273,8 @@ public abstract class UrlParameters {
 
 				if (!params.containsKey(RETRIEVE_SERVLET_PARAM)) {
 					throw new ParameterException(
-						"No se ha recibido la direccion del servlet para la recuperacion de los datos a firmar" //$NON-NLS-1$
+						"No se ha recibido la direccion del servlet para la recuperacion de los datos a firmar", //$NON-NLS-1$
+						ErrorCode.Request.RETRIEVE_URL_TO_SIGN_NOT_FOUND
 					);
 				}
 
@@ -283,14 +285,15 @@ public abstract class UrlParameters {
 						)
 					);
 				}
-				catch (final ParameterLocalAccessRequestedException e) {
+				catch (final LocalAccessRequestException e) {
 					throw new ParameterLocalAccessRequestedException(
-						"La URL del servicio de recuperacion de datos no puede ser local", e //$NON-NLS-1$
+						"La URL del servicio de recuperacion de datos no puede ser local", e, ErrorCode.Request.LOCAL_RETRIEVE_URL //$NON-NLS-1$
 					);
 				}
-				catch (final ParameterException e) {
+				catch (final IllegalArgumentException e) {
 					throw new ParameterException(
-						"Error al validar la URL del servlet de recuperacion: " + e, e //$NON-NLS-1$
+						"Error al validar la URL del servlet de recuperacion: " + e, e, //$NON-NLS-1$
+						ErrorCode.Request.INVALID_RETRIEVE_URL_TO_SIGN
 					);
 				}
 			}
@@ -299,7 +302,8 @@ public abstract class UrlParameters {
 			final String dataPrm = params.get(DATA_PARAM);
 			if (dataPrm.startsWith("file:/")) { //$NON-NLS-1$
 				throw new ParameterException(
-					"No se permite la lectura de ficheros locales: " + dataPrm //$NON-NLS-1$
+					"No se permite la lectura de ficheros locales: " + dataPrm, //$NON-NLS-1$
+					ErrorCode.Request.RETRIEVE_URL_TO_SIGN_CANT_BE_LOCAL
 				);
 			}
 			try {
@@ -314,7 +318,8 @@ public abstract class UrlParameters {
 			}
 			catch (final Exception e) {
 				throw new ParameterException(
-					"No se han podido obtener los datos: " + e, e //$NON-NLS-1$
+					"No se han podido obtener los datos: " + e, e, //$NON-NLS-1$
+					ErrorCode.Internal.LOADING_LOCAL_FILE_ERROR
 				);
 			}
 		}
@@ -339,16 +344,19 @@ public abstract class UrlParameters {
 
 		// Comprobamos que la clave de cifrado tenga la longitud correcta
 		if (key.length() != CIPHER_KEY_LENGTH) {
-			throw new ParameterException("La longitud de la clave de cifrado no es correcta"); //$NON-NLS-1$
+			throw new ParameterException("La longitud de la clave de cifrado no es correcta", ErrorCode.Request.UNSUPPORTED_CIPHER_KEY); //$NON-NLS-1$
 		}
 		return key.getBytes();
 	}
 
-	/** Valida una URL para asegurar que cumple con los requisitos m&iacute;nimos de seguridad.
+	/**
+	 * Valida una URL para asegurar que cumple con los requisitos m&iacute;nimos de seguridad.
 	 * @param url URL que se desea validar.
 	 * @return URL formada y validada.
-	 * @throws ParameterException Cuando ocurre alg&uacute;n problema al validar la URL. */
-	protected static URL validateURL(final String url) throws ParameterException {
+	 * @throws IllegalArgumentException Cuando ocurre alg&uacute;n problema al validar la URL.
+	 * @throws LocalAccessRequestException Cuando la URL usa los dominios localhost o 127.0.0.1.
+	 */
+	protected static URL validateURL(final String url) throws IllegalArgumentException, LocalAccessRequestException {
 
 		// Comprobamos que la URL sea valida
 		final URL servletUrl;
@@ -356,25 +364,25 @@ public abstract class UrlParameters {
 			servletUrl = new URL(URLDecoder.decode(url, DEFAULT_ENCODING));
 		}
 		catch (final Exception e) {
-			throw new ParameterException(
+			throw new IllegalArgumentException(
 				"La URL proporcionada para el servlet no es valida (" + url + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		// Comprobamos que el protocolo este soportado
 		if (!"http".equals(servletUrl.getProtocol()) && !"https".equals(servletUrl.getProtocol())) { //$NON-NLS-1$ //$NON-NLS-2$
-			throw new ParameterException(
+			throw new IllegalArgumentException(
 				"El protocolo de la URL proporcionada para el servlet no esta soportado: " + servletUrl.getProtocol() //$NON-NLS-1$
 			);
 		}
 		// Comprobamos que la URL sea una llamada al servlet y que no sea local
 		if ("localhost".equals(servletUrl.getHost()) || "127.0.0.1".equals(servletUrl.getHost())) { //$NON-NLS-1$ //$NON-NLS-2$
-			throw new ParameterLocalAccessRequestedException(
+			throw new LocalAccessRequestException(
 				"El host de la URL proporcionada para el Servlet es local" //$NON-NLS-1$
 			);
 		}
 		// El servlet no puede recibir parametros
 		if (servletUrl.toString().indexOf('?') != -1 || servletUrl.toString().indexOf('=') != -1) {
-			throw new ParameterException("Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
 		}
 		return servletUrl;
 	}
@@ -453,5 +461,13 @@ public abstract class UrlParameters {
 			cleanedpath = null;
 		}
 		return cleanedpath;
+	}
+
+	protected static class LocalAccessRequestException extends Exception {
+		private static final long serialVersionUID = -2823729189870521694L;
+
+		protected LocalAccessRequestException(final String msg) {
+			super(msg);
+		}
 	}
 }

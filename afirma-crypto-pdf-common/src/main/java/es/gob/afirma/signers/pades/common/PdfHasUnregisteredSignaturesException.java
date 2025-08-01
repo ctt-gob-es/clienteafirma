@@ -29,7 +29,7 @@ public final class PdfHasUnregisteredSignaturesException extends RuntimeConfigNe
 	 * @param msg Mensaje de error.
 	 */
 	public PdfHasUnregisteredSignaturesException(final String msg) {
-		super(msg, RequestType.CONFIRM, REQUESTOR_MSG_CODE, PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES);
+		super(msg, RequestType.CONFIRM, REQUESTOR_MSG_CODE, PdfExtraParams.ALLOW_COSIGNING_UNREGISTERED_SIGNATURES, PdfErrorCode.Internal.SIGNING_PDF_WITH_UNREGISTER_SIGNATURES);
 	}
 
 }

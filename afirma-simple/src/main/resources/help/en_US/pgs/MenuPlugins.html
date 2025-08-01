@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Plugin Management</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="sign, CAdES, XAdES, PAdES, OOXML, ODF, format">
+  <meta name="description" content="Plugin Management.">
+ </head>
+ <body> 
+  <h2>Plugin Management Panel</h2>
+  <p>Autofirma integrates a simple plug-in system that allows users to integrate plugins developed by themselves or by third parties into their signature processes. These plugins allow you to integrate a pre-process of the data before signing, a post-process after signing and different operations detached from the signing process but which can have as input the data charged by the user, the generated signature, the certificates used to sign or the certificates themselves contained in the signatures. These processes only act on the signature and bulk signature operations carried out through the Autofirma interface. They do not apply to the signatures requested from a web browser or via a command line.</p>
+  <p><b> NOTE: </b> Some functionalities previously integrated in Autofirma, such as <a href="Plugins.html"> calculating and checking hashes, </a> are now distributed in the form of plugins. To access these features from the Autofirma graphical interface, the context menu of the operating system or command line will need to install these <a href="Plugins.html"> plugins. </a></p>
+  <p>To manage the plugins installed in Autofirma, access the management panel via the &quot;Tools&quot; → &quot;Manage Plugins&quot; option in the application menu bar. From this panel you will be able to install, uninstall, configure and consult the information from the plugins.</p>
+  <p align="center"><img src="../gfx/menuplugins_mini.png" alt="Screen for plugin management"></p>
+  <h3>Options available in the panel:</h3>
+  <ul>
+   <li><b> Installed plugins: </b><p>This box shows a list of plugins currently installed in Autofirma. You can press the &quot;Add&quot; button at the bottom of the list to install a new plugin or the &quot;Remove&quot; button to uninstall the selected plugin from the list. Installing and uninstalling plugins has immediate effect. When selecting a plugin from the list, the information from it will be displayed in the &quot;Plugin Info&quot; panel.</p>
+   </li>
+   <li><b> Plugin Information </b><p>This panel displays the information from the selected plugin in the list &quot;Installed Plugins&quot;. This information has the version number of the plugin, the authors, the contact information and a description. Some of these data may be omitted if the plugin does not report them.</p>
+    <p>Optionally, if the plugin allows, a &quot;Set up&quot; button can appear at the bottom of the panel. This button opens the configuration dialog defined by the plugin itself. If a plugin does not support settings, this button will not appear.</li>
+  </ul>
+  <p>Plugins can define certain permissions and perform various tasks for installation and uninstallation. Some plugins may not work until the application is restarted.</p>
+ </body>
+</html>

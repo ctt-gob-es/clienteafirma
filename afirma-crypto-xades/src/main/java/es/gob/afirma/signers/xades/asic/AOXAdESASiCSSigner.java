@@ -20,7 +20,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
@@ -30,6 +30,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xades.XAdESConstants;
 import es.gob.afirma.signers.xades.XAdESExtraParams;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
 
 /** Manejador de firmas XML XAdES ASiC-S.
@@ -76,7 +77,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 			digestValue = hash(data, externalReferencesHashAlgorithm);
 		}
 		catch (final Exception e) {
-			throw new AOException("No se reconoce el algoritmo de huella digital", e); //$NON-NLS-1$
+			throw new AOException("No se reconoce el algoritmo de huella digital", e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI); //$NON-NLS-1$
 		}
 
 		final byte[] xadesSignature = new AOXAdESSigner().sign(
@@ -206,13 +207,13 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
+			throws AOInvalidSignatureFormatException, IOException {
 		return getSignersStructure(sign, null, asSimpleSignInfo);
 	}
 
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
+			throws AOInvalidSignatureFormatException, IOException {
 		return new AOXAdESSigner().getSignersStructure(
 			ASiCUtil.getASiCSXMLSignature(sign),
 			asSimpleSignInfo
@@ -251,7 +252,7 @@ public final class AOXAdESASiCSSigner implements AOSigner {
 	}
 
 	@Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+	public byte[] getData(final byte[] sign) throws AOInvalidSignatureFormatException, IOException, AOException {
 		return getData(sign, null);
 	}
 

@@ -33,6 +33,7 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.pades.PdfUtil;
+import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 
@@ -281,7 +282,7 @@ public final class TimestampsAnalyzer {
     				: false;
     		pdfReader = PdfUtil.getPdfReader(sign, params, headless);
     	}
-    	catch (final BadPasswordException e) {
+    	catch (final BadPdfPasswordException e) {
     		try {
     			pdfReader = new PdfReader(
 					sign,

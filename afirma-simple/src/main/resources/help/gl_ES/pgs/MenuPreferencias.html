@@ -1,0 +1,196 @@
+<html>
+ <head> 
+  <title>Menú preferencias</title> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+  <meta name="KEYWORDS" content="firmar, CAdES, XAdES, PAdES, OOXML, ODF, formato" /> 
+  <meta name="description" content="Menú preferencias." /> 
+ </head> 
+ <body> 
+  <h2>Menú Preferencias</h2> 
+  <p> Para configurar as firmas xeradas pola ferramenta, acceda ao menú de configuración a través da opción &quot;Ferramentas&quot; -&gt; &quot;Preferencias&quot; na barra de menús da aplicación. Desde este menú pode configurar o comportamento xeral da aplicación e as firmas xeradas para cada tipo de formato. </p> 
+  <p> Se pulsa no botón &quot;Cancelar&quot; desde calquera das pestanas do menú, pecharase leste ignorando calquera cambio realizado; se se pulsa o botón &quot;Aceptar&quot; pecharase o menú deixando configuradas as opcións definidas no menú e se se pulsa o botón &quot;Aplicar agora&quot;, aplicaranse os cambios realizados sen pechar o menú. </p> 
+  <h3>Menú &quot;Xeral&quot;</h3> 
+  <p align="center"> <img src="../gfx/menugeneral_mini.png" alt="Pantalla para la configuración del comportamniento general de la aplicación" /> </p> 
+  <ul> 
+   <li><b>Opcións xerais:</b> 
+    <ul> 
+     <li><b>Importar configuración xeral da aplicación:</b> Opción para importar un ficheiro da configuración proporcionado por un administrador.</li> 
+     <li><b>Restaurar configuración xeral da aplicación:</b> Opción para restaurar a configuración por defecto da aplicación.</li> 
+     <li><b>Non pedir confirmación ao pechar a aplicación:</b> Permite saír da aplicación sen confirmación do usuario.</li> 
+     <li><b>Buscar actualizacións ao comezo:</b> Permite configurar se se deben búscar se hai actualizacións dispoñibles ao iniciar a aplicacion.</li> 
+     <li><b>Habilitar JMulticard para o uso dos cartóns da FNMT e DNIe:</b> Só en Windows e Linux. Configura se debe utilizarse o controlador integrado en Autofirma para o uso dos cartóns de FNMT e DNIe. En caso de desactivarse, utilizaranse os controladores atopados no sistema. O uso desta función permite usar os cartóns compatibles cando o usuario non ten instalado o seu controlador ou existe algunha incompatibilidade con el. Esta función pode ocasionar que se solicite ao usuario múltiples veces a inserción do PIN do cartón en procesos de firma masiva. Esta configuración non terá efecto ata a próxima vez que se abra a aplicación.</li> 
+     <li><b>Funcionamento optimizado para VDI:</b> Só en Windows. Configura a comunicación por WebScokets co navegador de tal modo que se evitarán bloqueos cando se utilice Autofirma nunha contorna VDI. Con todo, esta configuración retarda a comunicación cando a cantidade de datos a transmitir é grande, polo que non se recomenda noutras contornas.</li> 
+    </ul> </li> 
+   <li><b>Opcións de firma:</b> 
+    <ul> 
+     <li><b>Algoritmo de firma:</b> Algoritmo de firma por defecto que utiliza a aplicación para xerar as firmas electrónicas.</li> 
+     <li><b>Formatos de firma:</b> Configura que formato de sinatura debe aplicarse cando se proporciona determinado tipo de documento. Ao pulsar o botón &quot;Configurar formatos&quot; móstrase un diálogo cos tipos de documento para os que se pode configurar un formato de firma específico: 
+      <ul> 
+       <li>Documentos PDF</li> 
+       <li>Documentos OOXML de Microsoft Office</li> 
+       <li>Facturas electrónicas</li> 
+       <li>Ficheiros XML xenéricos</li> 
+       <li>Ficheiros ODF de LibreOffice ou OpenOffice</li> 
+       <li>Resto de ficheiros</li> 
+      </ul> <p>Calquera destes tipos de ficheiro poden asinarse cos formatos CAdES e XAdES (acordes á configuración establecida nas pestanas correspondentes) e algúns deles poden ser asinados en formatos específicos.<br /> O tipo de documento &quot;Resto de ficheiros&quot; fai referencia a calquera documento que non estea en calquera das categorías anteriores. </p> <p><b><u>ADVERTENCIA:</u></b> Non se recomenda que se modifique que as facturas electrónicas asínense nun formato distinto ao de factura electrónica. </p> </li> 
+     <li><b>Solicitar confirmación para asinar:</b> Cando está habilitada esta opción solicítase confirmación ao usuario antes de asinar.</li> 
+     <li><b>Permitir agregar novas firmas a documentos con firmas non válidas:</b> Ao habilitar esta opción, Autofirma non impedirá agregar novas firmas (cofirma ou contrafirma) a documentos nos que se atope que xa hai firmas e estas non sexan válidas (estean corruptas ou con certificados caducados).</li> 
+     <li><b>Sobreescribir ficheiros no directorio de saída:</b> Opción para configurar se se desexa que, ao xerar a estrutura de directorios de firmas resultante dun proceso de firma masiva, e en caso de atopar un ficheiro co mesmo nome co que se vai a gardar unha firma, se sobreescriba o ficheiro preexistente polo novo ficheiro de firma ou se garde a firma utilizando un novo nome.</li> 
+    </ul> </li> 
+   <li><b>Configuración de rede:</b> 
+    <ul> 
+     <li><b>Aceptar só conexións con sitios seguros (Recomendado):</b> Se esta opción está activada comprobarase a confianza do certificado SSL dos sitios web aos que deba conectarse a aplicación. Se se traballa en sitios web cun certificado SSL non recoñecido, é probable que deba deshabilitar esta opción.</li> 
+    </ul> 
+    <ul> 
+     <li><b>Dominios seguros:</b> Opción para configurar unha lista de dominios que Autofirma tratará como seguros ao conectar a traves de SSL. Para saber máis, consulte a páxina <a href="VentanaListaBlancaDominios.html">Configuración de lista branca de dominios</a>.</li> 
+    </ul> 
+    <ul> 
+     <li><b>Configurar proxy:</b> Opción para configurar o proxy para todas as conexións de rede de Autofirma. Para saber máis, consulte a páxina <a href="VentanaConfigurarProxy.html">Configuración do proxy de rede</a>.</li> 
+    </ul> 
+    <ul> 
+     <li><b>Certificados de confianza:</b> Opción para configurar certificados de confianza en conexións de rede. Para saber máis, consulte a páxina <a href="VentanaCertificadosConfianza.html">Certificados de confianza</a>.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Firmas PAdES (PDF)&quot;</h3> 
+  <p align="center"> <img src="../gfx/menufirmaspades_mini.png" alt="Pantalla para la configuración de las firmas de documentos PDF" /> </p> 
+  <ul> 
+   <li><b>Configuración da política de firma:</b> Permite declarar a política de firma que se segue nas firmas PAdES. <p>Os valores accesibles a través do panel de configuración son:</p> 
+    <ul> 
+     <li>Ningunha política: As firmas de PDF xeradas non declararán política de firma.</li> 
+     <li>Política de sinatura da AGE 1.9: Declárase a política de sinatura da AGE v1.9.</li> 
+     <li>Política a medida: Permite configurar manualmente cada unha das propiedades da política.</li> 
+     <ul> 
+      <li>Identificador da política.</li> 
+      <li>Pegada dixital do identificador da política.</li> 
+      <li>Algoritmo de pegada dixital do identificador da política.</li> 
+      <li>Calificador da política</li> 
+     </ul> 
+    </ul> </li> 
+   <li><b>Opcións de firma:</b> Opcións xerais de firma PAdESFormato básico de firma. 
+    <ul> 
+     <li>Formato básico de firma: Permite configurar o formato básico das firmas PAdES: 
+      <ul> 
+       <li>PAdES Básico: É o formato de firma PAdES xerado por Adobe Acrobat e o utilizado por defecto por Autofirma.</li> 
+       <li>PAdES-BES: É o formato que máis se axusta ao estándar PAdES, pero Adobe Reader/Acrobat non valida correctamente as multisinaturas xeradas a partir del.</li> 
+      </ul> </li> 
+     <li>Realizar por defecto firmas visibles PDF: Ao habilitar esta opción e asinar un documento en formato PAdES, presentaráselle ao usuario unha xanela para a selección da área do PDF no que se agregará a firma visible. Consulte as apartado <a href="VentanaPdfVisible.html">Firmas visibles PDF</a> para maior detalle.</li> 
+     <li>Ofuscar identificadores de usuario dos certificados das firmas visibles: Ao habilitar esta opción, se ofuscarán os identificadores de usuario introducidido nos textos visibles PDF ao tomar os datos dun certificado. A ofuscación non se realizará cando o certificado de firma sexa un certificado de pseudónimo.</li> 
+     <li>Aplicar marca visible a documentos PDF: Ao habilitar esta opción e asinar un documento en formato PAdES, presentaráselle ao usuario unha xanela para a selección da área e páxinas do PDF nas que se agregará unha marca visible. Consulte as apartado <a href="VentanaPdfVisible.html">Marcas visibles PDF</a> para maior detalle.</li> 
+     <li>Xerar PDF certificado: Ao habilitar esta opción, permitirase ao usuario xerar un PDF certificado, co nivel de certificación que se elixa na listaxe situada a seguir.</li> 
+     <ul> 
+      <li>Sen certificar: Non se realiza firma certificada do documento, xerar asina PAdES.</li> 
+      <li>Certificada de autor: Non se admiten cambios.</li> 
+      <li>Certificada de autor para formularios: Só permítense accións de enchido de formularios, firma e adición de páxinas.</li> 
+      <li>Certificada común: Só permítense accións de comentarios, enchido de formularios, firma e adición de páxinas.</li> 
+     </ul> 
+    </ul> </li> 
+   <li><b>Metadatos das firmas PAdES:</b> 
+    <ul> 
+     <li>Razón pola que se asina o documento: Descrición breve do motivo da firma.</li> 
+     <li>Cidade na que se realiza a firma: Cidade na que se localiza o asinante no momento da firma.</li> 
+     <li>Contacto do asinante: Dirección de correo electrónico.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Firmas CAdES (binarias)&quot;</h3> 
+  <p align="center"> <img src="../gfx/menufirmascades_mini.png" alt="Pantalla para la configuración de las firmas de documentos binarios" /> </p> 
+  <ul> 
+   <li><b>Configuración da política de firma:</b> Permite declarar a política de firma que se segue nas firmas CAdES: <p>Os valores accesibles a través do panel de configuración son:</p> 
+    <ul> 
+     <li>Ningunha política: As firmas xeradas non declararán política de firma.</li> 
+     <li>Política de sinatura da AGE 1.9: Declárase a política de sinatura da AGE v1.9</li> 
+     <li>Política a medida: Permite configurar manualmente cada unha das propiedades da política.</li> 
+     <ul> 
+      <li>Identificador da política.</li> 
+      <li>Pegada dixital do identificador da política.</li> 
+      <li>Algoritmo de pegada dixital do identificador da política.</li> 
+      <li>Calificador da política</li> 
+     </ul> 
+    </ul> </li> 
+   <li><b>Opcións de firma:</b> 
+    <ul> 
+     <li>Incluír unha copia dos datos asinados na propia firma: Configura se a firma electrónica debe almacenar internamente os datos asinados.</li> 
+    </ul> </li> 
+   <li><b>Operación en multisinaturas:</b> Permite configurar a operación que deberá realizarse cando o ficheiro de entrada sexa unha firma CAdES. 
+    <ul> 
+     <li>Cofirma: Cofirma a sinatura de entrada.</li> 
+     <li>Contrafirma (unicamente dos nodos folla): Contrafirma os nodos folla da sinatura de entrada.</li> 
+     <li>Contrafirma (de toda a árbore): Contrafirma todos os nodos de sinatura da sinatura de entrada.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Firmas XAdES (XML)&quot;</h3> 
+  <p align="center"> <img src="../gfx/menufirmasxades_mini.png" alt="Pantalla para la configuración de las firmas de documentos XML" /> </p> 
+  <ul> 
+   <li><b>Configuración da política de firma:</b> Permite declarar a política de firma que se segue nas firmas XAdES: <p>Os valores accesibles a través do panel de configuración son:</p> 
+    <ul> 
+     <li>Ningunha política: As firmas de XML xeradas non declararán política de firma.</li> 
+     <li>Política de sinatura da AGE 1.9: Declárase a política de sinatura da AGE v1.9</li> 
+     <li>Política a medida: Permite configurar manualmente cada unha das propiedades da política.</li> 
+     <ul> 
+      <li>Identificador da política.</li> 
+      <li>Pegada dixital do identificador da política.</li> 
+      <li>Algoritmo de pegada dixital do identificador da política.</li> 
+      <li>Calificador da política</li> 
+     </ul> 
+    </ul> </li> 
+   <li><b>Opcións de firma:</b> 
+    <ul> 
+     <li><b>Formato das firmas:</b> 
+      <ul> 
+       <li>XAdES Enveloping: Configúrase o modo enveloping (a firma envolve aos datos asinados).</li> 
+       <li>XAdES Detached: Configúrase o modo detached (firma e datos nunha super-estrutura XML).</li> 
+       <li>XAdES Enveloped: Configúrase o modo enveloped (a firma insérese dentro dos datos XML).</li> 
+      </ul> </li> 
+    </ul> <p><b><u>ADVERTENCIA:</u></b> A política de sinatura da AGE, só permite a realización de firmas en formatos Enveloped e Internally Detached (aquí referida como Detached). Así pois, só se poderán configurar estes formatos de firma cando se declare a política de sinatura da AGE.</p> </li> 
+   <li><b>Metadatos das firmas XAdES:</b> 
+    <ul> 
+     <li>Cidade na que se realiza a firma: Cidade na que se localiza o asinante no momento da firma.</li> 
+     <li>Provincia na que se realiza a firma: Provincia na que se localiza o asinante no momento da firma.</li> 
+     <li>Código postal na que se realiza a firma: Código postal na que se localiza o asinante no momento da firma.</li> 
+     <li>País no que se realiza a firma: País a que se localiza o asinante no momento da firma.</li> 
+     <li>Cargo do asinante: Cargo de quen realiza a firma.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Factura Electrónica&quot;</h3> 
+  <p align="center"> <img src="../gfx/menufirmasfacturae_mini.png" alt="Pantalla para la configuración de las firmas de facturas electrónicas" /> </p> 
+  <ul> 
+   <li><b>Configuración da política de firma:</b> Permite declarar a versión da política de sinatura de Factura electrónica que debe utilizarse.</li> 
+   <li><b>Opcións de firma:</b> 
+    <ul> 
+     <li>Papel do asinante da factura electrónica: Permite configurar o rol que desempeña o asinante no ciclo de vida da factura.</li> 
+    </ul> </li> 
+   <li><b>Metadatos das facturas electrónicas:</b> 
+    <ul> 
+     <li>Cidade na que se realiza a firma: Cidade na que se localiza o asinante no momento da firma.</li> 
+     <li>Provincia na que se realiza a firma: Provincia na que se localiza o asinante no momento da firma.</li> 
+     <li>Código postal na que se realiza a firma: Código postal na que se localiza o asinante no momento da firma.</li> 
+     <li>País no que se realiza a firma: País a que se localiza o asinante no momento da firma.</li> 
+    </ul> </li> 
+  </ul> 
+  <h3>Menú &quot;Almacéns de claves&quot;</h3> 
+  <p align="center"> <img src="../gfx/menualmacenesclaves_mini.png" alt="Pantalla para la configuración de las firmas de facturas electrónicas" /> </p> 
+  <ul> 
+   <li><b>Almacén por defecto:</b> 
+    <ul> 
+     <li>Permite seleccionar o almacén de claves que se cargará por defecto na interface de escritorio.</li> 
+     <li><b>Ver contido:</b> Permite ver os certificados que contén o almacén seleccionado.</li> 
+     <li><b>Usar tamén nas chamadas de Autofirma desde o navegador:</b> Indica se se desexa que o almacén configurado sexa o que se cargue por defecto tamén cando se chame a Autofirma desde o navegador.</li> 
+    </ul> </li> 
+   <li><b>Filtros de certificados:</b> 
+    <ul> 
+     <li><b>Non mostrar a pantalla inicial de DNIe e traballar sempre co almacén por defecto:</b> Omite a pantalla inicial ao detectar un DNIe e utilizarase o almacén por defecto que estea configurado.</li> 
+     <li><b>Permitir o uso de certificados caducados:</b> Ao estar habilitada esta opción, os certificados caducados aparecerán no diálogo de selección de certificados de firma, o que permitirá asinar con eles.</li> 
+     <li><b>Usar só certificados específicos para firma nas firmas electrónicas (atributo de non repudio):</b> Se está marcada esta opción, só se mostrarán os certificados que declaren especificamente ser de firma.</li> 
+     <li><b>Usar exclusivamente certificados de pseudónimo cando están dispoñibles:</b> Restrinxe que unicamente se poidan usar certificados de pseudónimo cando estes estean dispoñibles.</li> 
+     <li><b>Omitir certificado de autenticación de DNIe:</b> Oculta o certificado de autenticación incluído nos almacéns de claves para DNIe.</li> 
+    </ul> </li> 
+   <li><b>Cartóns intelixentes:</b> 
+    <ul> 
+     <li>Permite dar de alta cartóns intelixentes a partir do seu controlador PKCS#11 para poder usalas directamente como un almacén de claves accesible desde o diálogo de seleccín de certificados. Os cartóns intelixentes agregadas aquí, poderanse configurar como almacéns por defecto no desplegable do primeiro apartado.</li> 
+     <li><b>Conectar:</b> Realiza unha proba de conexión co almacén de claves do cartón intelixente seleccionada.</li> 
+     <li><b>Agregar cartón:</b> Engade un novo cartón intelixente. Abrirase un diálogo onde introducir un nome para o cartón intelixente e a ruta onde se atopa o seu controlador PKCS#11.</li> 
+     <li><b>Modificar:</b> Permite modificar o nome e a ruta do controlador do cartón intelixente seleccionada.</li> 
+     <li><b>Eliminar:</b> Elimina o cartón intelixente seleccionada no desplegable.</li> 
+    </ul> </li> 
+  </ul>  
+ </body>
+</html>

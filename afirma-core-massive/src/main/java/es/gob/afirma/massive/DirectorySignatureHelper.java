@@ -243,10 +243,10 @@ public class DirectorySignatureHelper {
         final File id = new File(startDir != null && startDir.trim().length() > 0 ? startDir.trim() : "."); //$NON-NLS-1$
         this.inDir = id.getAbsolutePath();
         if (!id.exists() || !id.isDirectory()) {
-            throw new AOException("El directorio de entrada no existe"); //$NON-NLS-1$
+            throw new AOException("El directorio de entrada no existe", MassiveErrorCode.Functional.INDIR_NOT_FOUND); //$NON-NLS-1$
         }
         if (!id.canRead()) {
-            throw new AOException("No se tienen permisos de lectura para el directorio de entrada"); //$NON-NLS-1$
+            throw new AOException("No se tienen permisos de lectura para el directorio de entrada", MassiveErrorCode.Functional.ACCESS_TO_DIR_IS_NOT_ALLOWED); //$NON-NLS-1$
         }
         final List<String> filenames = new ArrayList<>();
         final List<File> files = new ArrayList<>();
@@ -505,7 +505,7 @@ public class DirectorySignatureHelper {
 				);
         	}
         	catch (final IOException e) {
-        		throw new AOException("El hash '" + hashes[i] + "' no es un Base64 valido", e);  //$NON-NLS-1$//$NON-NLS-2$
+        		throw new AOException("El hash '" + hashes[i] + "' no es un Base64 valido", e, MassiveErrorCode.Request.DECODING_HASH_ERROR);  //$NON-NLS-1$//$NON-NLS-2$
         	}
         }
 

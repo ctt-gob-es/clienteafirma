@@ -36,6 +36,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.CustomRuntimeConfigNeededException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.RuntimePasswordNeededException;
@@ -181,7 +182,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		return;
         	}
         	catch (final Exception e) {
-        		LOGGER.severe("Ocurrio un error al extraer la clave privada del certificiado seleccionado: " + e); //$NON-NLS-1$
+        		LOGGER.severe("Ocurrio un error al extraer la clave privada del certificado seleccionado: " + e); //$NON-NLS-1$
         		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.56"), e); //$NON-NLS-1$
         		return;
         	}
@@ -294,7 +295,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
             catch (final Exception e) {
             	LOGGER.severe("Error cargando el fichero a firmar: " + e); //$NON-NLS-1$
             	if (onlyOneFile) {
-            		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.123"), e); //$NON-NLS-1$
+            		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.123"), new AOException(ErrorCode.Internal.LOADING_LOCAL_FILE_ERROR)); //$NON-NLS-1$
             		return;
             	}
             	continue;
@@ -361,7 +362,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
 					this.selectedPke = getPrivateKeyEntry(filters, true);
 				}
 				catch (final Exception e2) {
-					LOGGER.log(Level.SEVERE, "Ocurrio un error al extraer la clave privada del certificiado seleccionado", e2); //$NON-NLS-1$
+					LOGGER.log(Level.SEVERE, "Ocurrio un error al extraer la clave privada del certificado seleccionado", e2); //$NON-NLS-1$
 					showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.56"), e); //$NON-NLS-1$
 					return;
 				}

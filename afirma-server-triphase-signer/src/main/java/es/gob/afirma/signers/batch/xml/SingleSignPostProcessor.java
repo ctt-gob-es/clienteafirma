@@ -19,10 +19,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
-import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.batch.LegacyFunctions;
@@ -85,7 +86,7 @@ final class SingleSignPostProcessor {
 		try {
 			extraParams = ExtraParamsProcessor.expandProperties(sSign.getExtraParams(), docBytes, sSign.getSignFormat().name());
 		}
-		catch (final IncompatiblePolicyException e) {
+		catch (final SignaturePolicyIncompatibilityException e) {
 			LOGGER.log(
 					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica", e); //$NON-NLS-1$
 			extraParams = sSign.getExtraParams();
@@ -120,7 +121,7 @@ final class SingleSignPostProcessor {
 			TriPhaseHelper.checkSignaturesIntegrity(td, docBytes, certChain[0], algorithm, needVerifyPkcs1);
 		}
 		catch (final Exception e) {
-			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e); //$NON-NLS-1$
+			throw new AOException("Error en la verificacion de los PKCS#1 de las firmas recibidas", e, ErrorCode.Internal.INVALID_PKCS1_VALUE); //$NON-NLS-1$
 		}
 
 		// Identificamos el algoritmo de firma apropiado la clave del certificado seleccionado

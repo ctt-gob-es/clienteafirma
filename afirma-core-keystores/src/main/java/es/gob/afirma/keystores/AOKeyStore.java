@@ -85,6 +85,15 @@ public enum AOKeyStore {
 		NullPasswordCallback.getInstance(),
 		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.5")) //$NON-NLS-1$
 	),
+    /** Mozilla / Firefox (NSS / PKCS#11, con m&oacute;dulos de seguridad
+     * internos y externos unificados) junto al almacen correspondiente al sistema operativo. */
+    MOZ_UNI_WITH_OS(
+		"Mozilla / Firefox (unificado) junto a almacen de SO", //$NON-NLS-1$
+		8,
+		"PKCS11", //$NON-NLS-1$
+		NullPasswordCallback.getInstance(),
+		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.5")) //$NON-NLS-1$
+	),
     /** Java Cryptography Extension KeyStore (JCEKS). */
     JCEKS(
 		"Java Cryptography Extension KeyStore (JCEKS)", //$NON-NLS-1$

@@ -76,7 +76,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
         }
 		else {
 			throw new AOKeyStoreManagerException(
-				"Tipo de almacen no soportado, este gestor es exclusivo CAPI: " + type.getName() //$NON-NLS-1$
+				"Tipo de almacen no soportado, este gestor es exclusivo CAPI: " + type.getName(), KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR //$NON-NLS-1$
 			);
 		}
 	}
@@ -223,7 +223,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 	        	throw e;
 			}
 	        catch (final Exception e) {
-	        	throw new AOKeyStoreManagerException("No se ha podido obtener el almacen Windows.MY: " + e, e); //$NON-NLS-1$
+	        	throw new AOKeyStoreManagerException("No se ha podido obtener el almacen Windows.MY: " + e, e, KeyStoreErrorCode.Internal.LOADING_WINDOWS_KEYSTORE_ERROR); //$NON-NLS-1$
 			}
 
 	        // Tratamos los alias repetidos, situacion problematica afectada por el bug

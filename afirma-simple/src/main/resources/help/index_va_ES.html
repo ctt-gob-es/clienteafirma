@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head> 
+  <title>Autofirma</title> 
+  <meta name="AppleTitle" content="Ayuda de Autofirma" /> 
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png" /> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+  <script>
+  
+      function getLanguageFolder() {
+        return "va_ES/";
+      }
+
+    function loadScreen(page) {
+        var folder = getLanguageFolder();
+        
+        var cleanedPageAddress = cleanAddress(page);
+        document.getElementById("dynamicContent").innerHTML = '<object type="text/html" data="' + folder + cleanedPageAddress + '" width="107%" style="align:right; min-height:100vh; margin: 0 auto;"></object>';
+	}
+    
+    function cleanAddress(page) {
+    	return page.replace('\\', '/').replace('..', '').replace(' ', '%20')
+    		.replace('?', '%3F').replace('&', '%26').replace('<', '%3C').replace('>', '%3E');
+	}
+  
+  
+  </script> 
+  <style>
+ 
+	body {
+		overflow-y: hidden;
+	}
+ 
+	.sidebar {
+		height: 100%;
+		min-height: 400px;
+		width: 20%; 
+		position: fixed; 
+		z-index: 1;
+		top: 0;
+		left: 0;
+		padding-top: 60px; 
+		overflow-y: scroll;
+	}
+	
+	.sidebar ul {
+		margin:0;
+		padding:0;
+	}
+	
+	.sidebar li {
+		border: 2px solid white; 
+		list-style: none;
+		padding: 7px;
+		margin: 10px;
+		background-color: #96181c; 
+		text-decoration: none; 
+		font-family: 'Helvetica', sans-serif; 
+		border-radius: 15px; 
+	}
+	
+	.sidebar a {
+		text-decoration: none;
+		color: white;
+	}
+	
+	.content {
+		margin-left: 20%;
+		width:75%;
+	}
+
+  
+  </style> 
+ </head> 
+ <body> 
+  <div id="sidebar" class="sidebar"> 
+   <ul> 
+    <li><a href="javascript:loadScreen(&quot;Autofirma.html&quot;);">Autofirma</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/PantallaEspera.html&quot;);">Esperant a la inserci&oacute; del DNIe...</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/PantallaFirma.html&quot;);">Signatura electr&ograve;nica de documents</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/PantallaDetalle.html&quot;);">Detall de les signatures una vegada completades</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/MenuPreferencias.html&quot;);">Menu de configuraci&oacute;</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/MenuRestauracion.html&quot;);">Panell de restauraci&oacute; de la instal·laci&oacute;</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/MenuPlugins.html&quot;);">Panell de gestion de plugins</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/Plugins.html&quot;);">Plugins</a></li> 
+	<li><a href='javascript:loadScreen("pgs/CambioIdioma.html");'>Canvi i importaci&oacute; d&apos;idioma</a></li>
+    <li><a href="javascript:loadScreen(&quot;pgs/VentanaConfigurarProxy.html&quot;);">Finestra de configuraci&oacute; de proxy</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/VentanaListaBlancaDominios.html&quot;);">Finestra de configuraci&oacute; de llista blanca de dominis</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/VentanaPdfVisible.html&quot;);">Finestra de configuraci&oacute; d&apos;elements visibles en PDF</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/LineaComandos.html&quot;);">&Uacute;s per l&iacute;nia de comandos</a></li> 
+    <li><a href="javascript:loadScreen(&quot;pgs/Licencia.html&quot;);">Llicència d&apos;&uacute;s i distribucion</a></li> 
+   </ul> 
+  </div> 
+  <div id="dynamicContent" class="content"> 
+  </div> 
+  <script>	
+	var urlToString = window.location.search;
+	var urlParams = new URLSearchParams(urlToString);
+	var redirectPage = urlParams.get('redirectPage');
+	loadScreen(redirectPage);
+
+  
+  </script>  
+ </body>
+</html>

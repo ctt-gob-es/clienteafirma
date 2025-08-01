@@ -50,7 +50,7 @@ final class AOKeyStoreManagerHelperCapiAddressBook {
                 p = (Provider) Class.forName("es.gob.afirma.keystores.capiaddressbook.MSCAPIAddressBook").getConstructor().newInstance(); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                throw new MissingLibraryException("No se ha podido instanciar el proveedor MSCAPIAddressBook", e); //$NON-NLS-1$
+                throw new MissingLibraryException("No se ha podido instanciar el proveedor MSCAPIAddressBook", e, KeyStoreErrorCode.ThirdParty.AFIRMA_MSCAPI_ADDRESBOOK_PROVIDER_NOT_FOUND); //$NON-NLS-1$
             }
             Security.addProvider(p);
         }
@@ -60,14 +60,14 @@ final class AOKeyStoreManagerHelperCapiAddressBook {
             ks = KeyStore.getInstance(ksType.getProviderName(), p);
         }
         catch (final Exception e) {
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen " + ksType.getProviderName() + ": " + e, e);  //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen " + ksType.getProviderName() + ": " + e, e, KeyStoreErrorCode.Internal.LOADING_PUBLIC_WINDOWS_KEYSTORE_ERROR);  //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         try {
             ks.load(null, null);
         }
         catch (final Exception e) {
-            throw new AOKeyStoreManagerException("No se ha podido abrir el almacen " + ksType.getProviderName() + ": " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOKeyStoreManagerException("No se ha podido abrir el almacen " + ksType.getProviderName() + ": " + e, e, KeyStoreErrorCode.Internal.LOADING_PUBLIC_WINDOWS_KEYSTORE_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return ks;

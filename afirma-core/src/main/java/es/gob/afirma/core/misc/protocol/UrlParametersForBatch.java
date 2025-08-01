@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.AOUtil;
 
 /** Par&aacute;metros para el proceso de lotes de firmas predefinidos en XML.
@@ -75,7 +76,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 	/** Indica si la peticion de firma por lotes es monof&aacute;sica o trif&aacute;sica */
 	private boolean localBatchProcess;
-	
+
 	/** Nombre de aplicaci&oacute;n o dominio desde que se realiza la llamada. */
 	private String appName;
 
@@ -181,7 +182,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 	void setBatchPostsignerUrl(final String url) {
 		this.batchPostSignerUrl = url;
 	}
-	
+
 	public String getAppName() {
 		return this.appName;
 	}
@@ -197,13 +198,13 @@ public final class UrlParametersForBatch extends UrlParameters {
 			// Comprobamos que el identificador de sesion de la firma no sea mayor de un cierto numero de caracteres
 			final String sessionId = params.containsKey(ID_PARAM) ? params.get(ID_PARAM) : params.get(FILE_ID_PARAM);
 			if (sessionId.length() > MAX_ID_LENGTH) {
-				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres.", ErrorCode.Request.INVALID_SESSION_ID_TO_SIGN_BATCH); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
 			for (final char c : sessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
 				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
-					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
+					throw new ParameterException("El identificador de la firma debe ser alfanumerico.", ErrorCode.Request.INVALID_SESSION_ID_TO_SIGN_BATCH); //$NON-NLS-1$
 				}
 			}
 
@@ -217,7 +218,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 		else {
 			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
 		}
-		
+
 		if (params.containsKey(APP_NAME_PARAM)) {
 			this.appName = params.get(APP_NAME_PARAM);
 		}
@@ -237,26 +238,42 @@ public final class UrlParametersForBatch extends UrlParameters {
 
 			if (!params.containsKey(PARAM_BATCH_POSTSIGNER)) {
 				throw new ParameterException(
-					"No se ha recibido la URL del postprocesador de lotes" //$NON-NLS-1$
+					"No se ha recibido la URL del postprocesador de lotes", ErrorCode.Request.POSTSIGN_BATCH_URL_NOT_FOUND //$NON-NLS-1$
 				);
 			}
 			if (!params.containsKey(PARAM_BATCH_PRESIGNER)) {
 				throw new ParameterException(
-					"No se ha recibido la URL del preprocesador de lotes" //$NON-NLS-1$
+					"No se ha recibido la URL del preprocesador de lotes", ErrorCode.Request.PRESIGN_BATCH_URL_NOT_FOUND //$NON-NLS-1$
 				);
 			}
 
-			setBatchPostsignerUrl(
-				validateURL(
-					params.get(PARAM_BATCH_POSTSIGNER)
-				).toString()
-			);
+			try {
+				setBatchPostsignerUrl(
+						validateURL(
+								params.get(PARAM_BATCH_POSTSIGNER)
+								).toString()
+						);
+			}
+			catch (final LocalAccessRequestException e) {
+				throw new ParameterLocalAccessRequestedException("La URL del servicio de postfirma de lote no puede ser local", e, ErrorCode.Request.LOCAL_POSTSIGN_BATCH_URL); //$NON-NLS-1$
+			}
+			catch (final IllegalArgumentException e) {
+				throw new ParameterException("Error al validar la URL de postfirma de lote: " + e, e, ErrorCode.Request.INVALID_POSTSIGN_BATCH_URL); //$NON-NLS-1$
+			}
 
-			setBatchPresignerUrl(
-				validateURL(
-					params.get(PARAM_BATCH_PRESIGNER)
-				).toString()
-			);
+			try {
+				setBatchPresignerUrl(
+						validateURL(
+								params.get(PARAM_BATCH_PRESIGNER)
+								).toString()
+						);
+			}
+			catch (final LocalAccessRequestException e) {
+				throw new ParameterLocalAccessRequestedException("La URL del servicio de prefirma de lote no puede ser local", e, ErrorCode.Request.LOCAL_PRESIGN_BATCH_URL); //$NON-NLS-1$
+			}
+			catch (final IllegalArgumentException e) {
+				throw new ParameterException("Error al validar la URL de prefirma de lote: " + e, e, ErrorCode.Request.INVALID_PRESIGN_BATCH_URL); //$NON-NLS-1$
+			}
 		}
 
 		// Validamos la URL del servlet de guardado en caso de ser necesaria
@@ -268,17 +285,17 @@ public final class UrlParametersForBatch extends UrlParameters {
 				try {
 					storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
 				}
-				catch (final ParameterLocalAccessRequestedException e) {
-					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e); //$NON-NLS-1$
+				catch (final LocalAccessRequestException e) {
+					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e, ErrorCode.Request.LOCAL_STORAGE_URL_TO_SIGN_BATCH); //$NON-NLS-1$
 				}
-				catch (final ParameterException e) {
-					throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e); //$NON-NLS-1$
+				catch (final IllegalArgumentException e) {
+					throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e, ErrorCode.Request.INVALID_STORAGE_URL_TO_SIGN_BATCH); //$NON-NLS-1$
 				}
 				setStorageServletUrl(storageServletUrl);
 			}
 			// Si no se encuentra a pesar de tener todos los parametros, falla la operacion
 			else if (params.containsKey(ID_PARAM)) {
-				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion"); //$NON-NLS-1$
+				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion", ErrorCode.Request.STORAGE_URL_TO_SIGN_BATCH_NOT_FOUND); //$NON-NLS-1$
 			}
 		}
 

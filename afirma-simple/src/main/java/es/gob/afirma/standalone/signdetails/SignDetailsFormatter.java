@@ -65,39 +65,39 @@ public class SignDetailsFormatter {
 		final List<SignDetails> signDetailsParent = analyzer.getAllSignDetails();
 		if (analyzer.getSignFormat() != null) {
 			signFormat = analyzer.getSignFormat();
-			result += "<p><b>Formato</b>: " + analyzer.getSignFormat() + "</p>";  //$NON-NLS-1$ //$NON-NLS-2$
+			result += "<p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.44") + "</b>: " + analyzer.getSignFormat() + "</p>";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		final String dataLocation = analyzer.getDataLocation();
 		if (dataLocation != null) {
-			result += "<p><b>Localizaci&oacute;n de los datos: </b>" + dataLocation + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+			result += "<p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.45") + ": </b>" + dataLocation + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		if (signDetailsParent.size() > 0 && signDetailsParent.get(0).getDataObjectFormats() != null && signDetailsParent.get(0).getDataObjectFormats().size() > 0) {
-			result += "<div><p><b>Informaci&oacute;n sobre datos firmados:</b></p>"; //$NON-NLS-1$
+			result += "<div><p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.46") + ":</b></p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			result += "<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
 			for (int i = 0 ; i < signDetailsParent.get(0).getDataObjectFormats().size() ; i++) {
 				if (signDetailsParent.get(0).getDataObjectFormats().get(i).getEncoding() != null && !signDetailsParent.get(0).getDataObjectFormats().get(i).getEncoding().isEmpty()) {
-					result += "<li>Encoding: " + signDetailsParent.get(0).getDataObjectFormats().get(i).getEncoding() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+					result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.68") + ": " + signDetailsParent.get(0).getDataObjectFormats().get(i).getEncoding() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				}
 				if (signDetailsParent.get(0).getDataObjectFormats().get(i).getDescription() != null && !signDetailsParent.get(0).getDataObjectFormats().get(i).getDescription().isEmpty()) {
-					result += "<li>Descripcion: " + signDetailsParent.get(0).getDataObjectFormats().get(i).getDescription() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+					result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.47") + ": " + signDetailsParent.get(0).getDataObjectFormats().get(i).getDescription() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				}
 				String type = signDetailsParent.get(0).getDataObjectFormats().get(i).getMimeType();
 				if (MIMETYPE_MAPPER.containsKey(type)) {
 					type = MIMETYPE_MAPPER.get(type);
 				}
-				result += "<li>Tipo de certificado: " + type + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+				result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.48") + ": " + type + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			result += "</ul></div>"; //$NON-NLS-1$
 		}
 		final AOTreeModel signersTree = analyzer.getSignersTree();
 		if (signersTree != null) {
-			result += "<div style=\"margin-bottom: 0;\"><p><b>&Aacute;rbol de firmantes:</b><ul style=\"margin-bottom: 0;\">";  //$NON-NLS-1$
+			result += "<div style=\"margin-bottom: 0;\"><p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.49") + ":</b><ul style=\"margin-bottom: 0;\">";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			result += parseSignersTree((AOTreeNode) signersTree.getRoot());
 			result += "</ul></p></div>"; //$NON-NLS-1$
 		}
 		signerIndex = new Integer(1);
 		final String generalValidationDesc = generalValidation.get(0).validityTypeToString();
-		result += "<p><b>Resultado de la validaci&oacute;n</b>: " + generalValidationDesc + "</p>";  //$NON-NLS-1$ //$NON-NLS-2$
+		result += "<p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.50") + "</b>: " + generalValidationDesc + "</p>";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		boolean isULAdded = false;
 
 		for (int k = 0 ; k < generalValidation.size(); k++) {
@@ -128,19 +128,19 @@ public class SignDetailsFormatter {
 							result += "<ul>"; //$NON-NLS-1$
 							isULAdded = true;
 						}
-						result += "<li>Firma " + (i+1) + ": " + signDetailsParent.get(i).getValidityResult().get(m) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.51") + " " + (i+1) + ": " + signDetailsParent.get(i).getValidityResult().get(m) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 
 			final CertificateDetails certDetails = signDetailsParent.get(i).getSigner();
 			if (certDetails != null) {
-				final String validation = (String) certDetails.getValidityResult().get("Validacion"); //$NON-NLS-1$
+				final String validation = (String) certDetails.getValidityResult().get(SimpleAfirmaMessages.getString("ValidationInfoDialog.68")); //$NON-NLS-1$
 				if (!SimpleAfirmaMessages.getString("ValidationInfoDialog.40").equals(validation)) { //$NON-NLS-1$
 					if (!isULAdded) {
 						result += "<ul>"; //$NON-NLS-1$
 						isULAdded = true;
 					}
-					result += "<li>Firma " + (i + 1) + ": " + validation + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.51") + " " + (i + 1) + ": " + validation + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				}
 			}
 		}
@@ -160,7 +160,7 @@ public class SignDetailsFormatter {
 		String result = ""; //$NON-NLS-1$
 		for (int i = 0; i < details.size() ; i++) {
 			final SignDetails detail = details.get(i);
-			result += "<h1>Firma " + (i+1);  //$NON-NLS-1$
+			result += "<h1>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.51") + " " + (i+1);  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (detail.getSigner() != null) {
 				final String certName = detail.getSigner().getName();
 				if (certName != null && !certName.isEmpty()) {
@@ -170,39 +170,39 @@ public class SignDetailsFormatter {
 			result += "</h1>"; //$NON-NLS-1$
 			result += "<div style=\"border:5px outset black;padding-left: 25px;padding-bottom: 10px;\">"; //$NON-NLS-1$
 			if (!FacturaESignAnalyzer.FACTURAE.equals(signFormat)) {
-				result += "<p><b>Perfil de firma</b>: " + detail.getSignProfile() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+				result += "<p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.52") + "</b>: " + detail.getSignProfile() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			if (PAdESSignAnalyzer.PADES.equals(signFormat)) {
 				if (detail.getCertificationLevel() > -1 && detail.getCertificationSign() == true) {
 					switch (detail.getCertificationLevel()) {
 					case 1:
-						result += "<p><b>PDF certificado</b>: " + SimpleAfirmaMessages.getString("ValidationInfoDialog.41") + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						result += "<p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.53") + "</b>: " + SimpleAfirmaMessages.getString("ValidationInfoDialog.41") + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 						break;
 					case 2:
-						result += "<p><b>PDF certificado</b>: " + SimpleAfirmaMessages.getString("ValidationInfoDialog.42") + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						result += "<p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.53") + "</b>: " + SimpleAfirmaMessages.getString("ValidationInfoDialog.42") + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 						break;
 					case 3:
-						result += "<p><b>PDF certificado</b>: " + SimpleAfirmaMessages.getString("ValidationInfoDialog.43") + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						result += "<p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.53") + "</b>: " + SimpleAfirmaMessages.getString("ValidationInfoDialog.43") + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 						break;
 					}
 				}
 			}
 			if (detail.getAlgorithm() != null && !detail.getAlgorithm().isEmpty()) {
-				result += "<p><b>Algoritmo de firma</b>: " + detail.getAlgorithm() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$
+				result += "<p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.54") + "</b>: " + detail.getAlgorithm() + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			if (detail.getSigningTime() != null) {
-				result += "<p><b>Fecha y hora de firma</b>: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(detail.getSigningTime()) + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				result += "<p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.55") + "</b>: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(detail.getSigningTime()) + "</p>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			}
 			if (detail.getValidityResult() != null
 				&& !detail.getValidityResult().get(0).getValidity().equals(SIGN_DETAIL_TYPE.OK)) {
-					result += "<div><br><b>Resultado de la validacion</b> :<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
+					result += "<div><br><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.50") + "</b> :<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					for(final SignValidity validity : detail.getValidityResult()) {
 						result += "<li>" + validity + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					result += "</ul></div>"; //$NON-NLS-1$
 			}
 			if (detail.getPolicy() != null) {
-				result += "<div><p><b>Pol&iacute;tica de firma: </b>" ; //$NON-NLS-1$
+				result += "<div><p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.56") + ": </b>" ; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 				if (AOFacturaESigner.POLICY_FACTURAE_30.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())
 					|| AOFacturaESigner.POLICY_FACTURAE_31.getPolicyIdentifier().equals(detail.getPolicy().getPolicy().getPolicyIdentifier())
@@ -216,30 +216,30 @@ public class SignDetailsFormatter {
 					result += "<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
 					final String name = detail.getPolicy().getName();
 					if (name != null && !name.isEmpty()) {
-						result += "<li>Descripci&oacute;n: " + name + "</li>"; //$NON-NLS-1$//$NON-NLS-2$
+						result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.47") + ": " + name + "</li>"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					}
 					final String polId = detail.getPolicy().getPolicy().getPolicyIdentifier();
 					if (polId != null && !polId.isEmpty()) {
-						result += "<li>Identificador: " + polId + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+						result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.57") + ": " + polId + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					}
 					final String polIdHash = detail.getPolicy().getPolicy().getPolicyIdentifierHash();
 					if (polIdHash != null && !polIdHash.isEmpty()) {
-						result += "<li>Hash: " + polIdHash + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+						result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.58") + ": " + polIdHash + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					}
 					final String polIdHashAlgo = detail.getPolicy().getPolicy().getPolicyIdentifierHashAlgorithm();
 					if (polIdHashAlgo != null && !polIdHashAlgo.isEmpty()) {
-						result += "<li>Algoritmo: " + polIdHashAlgo + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+						result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.59") + ": " + polIdHashAlgo + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					}
 					final String polQual = detail.getPolicy().getPolicy().getPolicyQualifier().toString();
 					if (polQual != null && !polQual.isEmpty()) {
-						result += "<li>Calificador: " + polQual + "</li>";//$NON-NLS-1$ //$NON-NLS-2$
+						result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.60") + ": " + polQual + "</li>";//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					}
 					result += "</ul></p>"; //$NON-NLS-1$
 				}
 				result += "</div>"; //$NON-NLS-1$
 			}
 			if (detail.getMetadata() != null && detail.getMetadata().size() > 0) {
-				result += "<div><p><b>Metadatos </b>:</p><ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$
+				result += "<div><p><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.61") + " </b>:</p><ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				String claimedRoles = ""; //$NON-NLS-1$
 				String metadata = ""; //$NON-NLS-1$
 				for(final Object key : detail.getMetadata().keySet()) {
@@ -285,7 +285,7 @@ public class SignDetailsFormatter {
 				}
 
 				if (!claimedRoles.isEmpty()) {
-					result += "<li>Roles: " + claimedRoles.substring(0, claimedRoles.length() - 1) + "</li>";  //$NON-NLS-1$//$NON-NLS-2$
+					result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.62") + ": " + claimedRoles.substring(0, claimedRoles.length() - 1) + "</li>";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				}
 				result += metadata;
 				result += "</ul></div>"; //$NON-NLS-1$
@@ -306,12 +306,12 @@ public class SignDetailsFormatter {
 	 * @return Cadena con los detalles de los certificados en HTML.
 	 */
 	private static String parseCertificatesToHTML(final CertificateDetails certDetail) {
-		String result = "<br><b>Certificado:</b><ul>"; //$NON-NLS-1$
-		result += "<li>Nombre: " + certDetail.getName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "<li>Emisor: " + certDetail.getIssuerName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "<li>Fecha de caducidad: " + certDetail.getExpirationDate() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$
+		String result = "<br><b>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.63") + ":</b><ul>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.64") + ": " + certDetail.getName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.65") + ": " + certDetail.getIssuerName() + "</li>" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.66") + ": " + certDetail.getExpirationDate() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		if (certDetail.getValidityResult() != null) {
-			result += "<li>Resultado de la validacion :<ul>"; //$NON-NLS-1$
+			result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.50") + " :<ul>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			for (final Object key : certDetail.getValidityResult().keySet()) {
 				result += "<li>" + key + ": " + certDetail.getValidityResult().getProperty((String) key) + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
@@ -330,7 +330,7 @@ public class SignDetailsFormatter {
 		String result = ""; //$NON-NLS-1$
 		for (int i = 0; i < AOTreeModel.getChildCount(signersNode); i++) {
 			final AOTreeNode node = (AOTreeNode) AOTreeModel.getChild(signersNode, i);
-			result += "<li>Firma " + signerIndex + ": " + node.toString() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			result += "<li>" + SimpleAfirmaMessages.getString("ValidationInfoDialog.51") + " " + signerIndex + ": " + node.toString() + "</li>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			signerIndex++;
 			if (node.getChildCount() > 0) {
 				result += "<ul style=\"margin-bottom: 0;\">"; //$NON-NLS-1$

@@ -46,8 +46,8 @@
 			document.getElementById('result').value = certificateB64;
 		}
 		
-		function showErrorCallback(errorType, errorMessage) {
-			showLog("Type: " + errorType + "\nMessage: " + errorMessage);
+		function showErrorCallback(errorType, errorMessage, errorCode) {
+			showLog("Type: " + errorType + "\nMessage: " + errorMessage + "\nCodigo: " + errorCode);
 		}
 
 		function doSign() {
@@ -262,7 +262,7 @@
 
 		}
 
-		function setStickySignature() {
+		function setStickySignatory() {
 
 			var isSticky = document.getElementById("sticky").checked;
 
@@ -295,6 +295,7 @@
 	<body>
 		<script>
 			//AutoScript.setMinimumClientVersion("1.8");
+			//AutoScript.setLocale("ca_ES");
 			AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
 					window.location.origin + "/afirma-signature-retriever/RetrieveService");
 			AutoScript.setForceWSMode(true);
@@ -339,6 +340,7 @@
 		 <option value="ODF">ODF</option>
 		 <option value="OOXML">OOXML</option>
 		 <option value="NONE">PKCS#1</option>
+		 <option value="NONEtri">PKCS#1tri</option>
 		 <option value="AUTO">AUTO</option>
 		 </select>
 		 <span>(El formato AUTO detecta el formato en las operaciones de multifirma)</span>
@@ -362,7 +364,7 @@
 		<textarea id="params" cols="50" rows="5" readonly></textarea>
 		<br>
 		<br>
-		<input id="sticky" type="checkbox" onchange="setStickySignature();">Sticky Signature
+		<input id="sticky" type="checkbox" onchange="setStickySignatory();">Cachear certificado
 		</div>
 		</fieldset>
 		<br/>

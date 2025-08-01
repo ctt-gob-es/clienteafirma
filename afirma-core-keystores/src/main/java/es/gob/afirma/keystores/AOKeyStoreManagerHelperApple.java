@@ -37,7 +37,7 @@ final class AOKeyStoreManagerHelperApple {
 		}
 		catch (final Exception e) {
 			throw new AOKeyStoreManagerException(
-				"No se ha podido obtener el almacen Apple.KeychainStore", e); //$NON-NLS-1$
+				"No se ha podido obtener el almacen Apple.KeychainStore", e, KeyStoreErrorCode.Internal.LOADING_APPLE_KEYSTORE_ERROR); //$NON-NLS-1$
 		}
 
 		try {
@@ -45,11 +45,11 @@ final class AOKeyStoreManagerHelperApple {
 		}
 		catch (final CertificateException e) {
 			throw new AOKeyStoreManagerException(
-				"No se han podido cargar los certificados del almacen Apple.KeychainStore", e); //$NON-NLS-1$
+				"No se han podido cargar los certificados del almacen Apple.KeychainStore", e, KeyStoreErrorCode.Internal.LOADING_APPLE_KEYSTORE_ERROR); //$NON-NLS-1$
 		}
 		catch (final NoSuchAlgorithmException e) {
 			throw new AOKeyStoreManagerException(
-				"No se ha podido verificar la integridad del almacen Apple.KeychainStore", e); //$NON-NLS-1$
+				"No se ha podido verificar la integridad del almacen Apple.KeychainStore", e, KeyStoreErrorCode.Internal.LOADING_APPLE_KEYSTORE_ERROR); //$NON-NLS-1$
 		}
 		return ks;
 	}

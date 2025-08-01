@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Command line use</title>
+  <meta name="AppleTitle" content="Ayuda de Autofirma">
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png">
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+ </head>
+ <body> 
+  <h2>Command line use</h2>
+  <p>Self-signing enables its use via command line, providing signature, batch signing, and hashes creation and verification capabilities.<p>The executable or script to use for the execution of Autofirma by command line varies depending on the system:<ul>
+    <li>Windows</li>
+	  <ul>
+	    <li>The installation process copies in the Autofirma directory the executable &quot;Autofirma CommandLine&quot; and, if possible, includes the directory in the <i> path. </i> Use this executable from command line to perform the various operations that are supported.</li>
+	  </ul>
+	<li>Linux</li>
+	  <ul>
+	    <li>The installation process generates in the directory &quot;/usr/bin&quot; the script &quot;Autofirma&quot;. Use this script to run the application by providing you directly with the parameters of the operation you want.</li>
+	  </ul>
+	<li>macOS</li>
+	  <ul>
+	    <li>For the use of the command-line application a script &quot;AutoCommandLine&quot; is created within the application in the application directory. You can run this script by accessing the internal &quot;Resources&quot; directory of the application (commonly, &quot;/Applications/Autofirma.app/Contents/MacOS&quot;). It is important that <b> the parameters that may contain spaces are passed in the command between simple quotation marks. </b></li>
+	  </ul>
+  </ul>
+  <p>For example, you can run Autofirma and list the different operations available through the command line with the &quot;-help&quot; command as follows:</p><span> In Windows: </span><ul><li><code> Autofirma CommandLine – help </code></li></ul><span> In Linux: </span><ul><li><code> /usr/bin/Autofirma – help </code></li></ul><span> On Mac: </span><ul><li><code> /Applications/Autofirma.app/Contents/MacOS/AutoCommandLine – help </code></li></ul>
+  <p>This would result in:</p>
+  <div style="background-color: black; color: white; width: 50%"><code><pre>
+Document signing tool.
+
+Syntax: Self-signing cmd [options...]
+
+Cmd commands:
+
+  sign (file signature)
+  cosign (file cosignature)
+  countersign (file counter)
+  listaliases (list available aliases in stock)
+  verify (opens a panel with validation information for a signature or certificate)
+  batchsign (signature/multi-signature lots of files)
+  createdigest (creation of digital fingerprints with graphical interface)
+  checkdigest (fingerprint check with graphical interface)
+
+Use &quot;Autofirma cmd -help&quot; to view the &quot;cmd&quot; command syntax
+    </pre></code></div>
+
+  <p>To list the configuration options of any of the operations, you can use the &quot;-help&quot; command over any of them. For example:</p>
+  <ul><li><code> Autofirma CommandLine sign –help </code></li></ul>
+
+  <p>This would result in:</p>
+  <div style="background-color: black; color: white; width: 50%"><code><pre>
+Syntax: Autofirma sign [options...]
+
+Options:
+  -gui (Perform the operation with graphical environment. Has priority over -certgui)
+  -certgui (Use a graphic dialogue to select the signing certificate)
+  -i inputfile (Input file path)
+  -o outputfile (Output file path)
+  -algorithm something (signature algorithm)
+  -format (Sets the signature format)
+         auto (Format selection based on input file)
+         cades (CAdES format)
+         pades (PAdES format)
+         xades (XAdES format)
+         invoice (electronic invoice signature)
+  -config extraParams (Flat text properties with operation configuration)
+  -store (Sets the store of keys. By default, the system)
+         auto (Store system keys)
+         windows (Store Windows Keys)
+         mac (Store macOS keys)
+         mozilla (Store Mozilla Firefox Keys)
+         dni (Electronic ID)
+         pkcs12:p12file (Store PKCS#12. &quot;p12file&quot; is the store route)
+         pkcs11:p11file (Store PKCS#11. &quot;p11file&quot; is the driver path)
+
+  -password password (Sets the store counter)
+  -alias (alias of signature certificate)
+  -filter (Filter to select the certificate of signature)
+  -xml (Format the answer as XML)
+    </pre></code></div>
+  
+  <p>The <code> config </code> configuration parameter allows you to be provided with a list of configuration properties concatenated by &quot;\n&quot;. Each of these properties will have the key format=value.</p>
+  <p>An example of a configuration parameter would be:</p>
+    <ul><li><code> -config &quot;format=XAdES Enveloping\nsignerEmbassyRoles=Director\nxadesNamespace=http://uri.etsi.org/01903/v1.4.1# </code></li></ul>
+  <p>Configuration options vary from one signature format to another. The following describe the configuration options for each signature format.</p>
+  
+  <h3>CAdES Signature Configuration Options</h3>
+  <p>The configuration properties supported by CAdES signatures are listed below. Some of these options may not have effect in cases of signature where they do not apply, as in the case of counter-affirmations.</p>  
+  <ul>
+  <li style="margin-top: 15pt"><code> mode: </code></li>
+  	<ul>
+  	<li><code> explicit: </code> The resulting signature shall not include the signed data. If the mode property is not <code> indicated, this behavior is </code> automatically configured.</li>
+  	<li><code> implicit: </code> The resulting signature shall not include the signed data. The resulting signature shall include internally a copy of the signed data. The use of this value could generate large signatures. In the co-signatures, this property will be ignored if the data were already contained in the original signature or if the data is not provided.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> contentTypeOid: </code></li>
+  <ul>
+  	<li>Identifier of the type of data signed.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> contentDescription: </code></li>
+  <ul>
+  	<li>Textual description of the type of data signed.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> includeMimeTypeAttribute: </code></li>
+  <ul>
+ 	<li><code> true: </code> Includes in the signature the attribute id-aa-ets-mimeType defined in CAdES v2.1.1 and above (valid in baseline signatures). The mimetype value will be taken from the <code> mimetype </code> property or, if not included, it will be extrapolated from the <code> contentTypeOid property. </code> If this is not possible, these values will also be obtained from one of the previous signatures (in the case of co-signatures). If this is not possible, the type of data analysis (which might not be correct or concrete) will be obtained. If the type cannot be obtained in any way, the mimetype application/octet stream shall be used.</li>
+ 	<li><code> false: </code> Does not include the id-aa-ets-mimeType attribute in the signature. Default value.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> mimeType: </code></li>
+  <ul>
+  	<li>MIME-Type of data to be signed. It is only included when the property is <code> indicated. </code></li>
+  </ul>
+  <li style="margin-top: 10pt"><code> policyIdentifier: </code></li>
+  <ul>
+  	<li>Signature policy identifier, required to generate CAdES-EPES signatures.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> policyIdentifierHash: </code></li>
+  <ul>
+  	<li>Base Chain 64 with the fingerprint of the signature policy. It is mandatory to indicate this paramount property if Identifier has also indicated, as it is also mandatory to give value to the <code> policyIdentifierHashAlgorithm property. </code></li>
+  </ul>	
+  <li style="margin-top: 10pt"><code> policyIdentifierHashAlgorithm: </code></li>
+  	<ul>
+  	<li><code> SHA1: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA1 algorithm.</li>
+  	<li><code> SHA-256: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-256 algorithm.</li>
+  	<li><code> SHA-384: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-384 algorithm.</li>
+  	<li><code> SHA-512: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-512 algorithm.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> policyQualifier: </code></li>
+  <ul>
+  	<li>URL accessible to the document (usually PDF) containing a textual description of the signature policy. This property is optional even if you want to generate CAdES-EPES signatures.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> includeOnlySignningCertificate: </code></li>
+  	<ul>
+  	<li><code> true: </code> Indicates that only the certificate of the signatory should be included in the signature.</li>
+  	<li><code> false: </code> Indicates that the entire certification chain of the signatory certificate should be included in the signature. Default value.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> policyQualifier: </code></li>
+  <ul>
+  	<li>URL accessible to the document (usually PDF) containing a textual description of the signature policy. This property is optional even if you want to generate CAdES-EPES signatures.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCity:</code></li>
+  <ul>
+  	<li>It adds to the firm a field with the city in which the signature is made. The encoding should be UTF-8.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionPostalCode: </code></li>
+  <ul>
+  	<li>Add to the firm a field with the postal code where the signature is made. The encoding should be UTF-8.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCountry: </code></li>
+  <ul>
+  	<li>Add to the firm a field with the country in which the signature is made. The encoding should be UTF-8.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signerClaimedRoles: </code></li>
+  <ul>
+  	<li>He adds fields to the firm with the charges attributed to the signatory. The charges must be separated with the character &quot;|&quot; (and this cannot be in the text itself of any charge).</li>
+  </ul>		
+  <li style="margin-top: 10pt"><code>commitmentTypeIndications: </code></li>
+  <ul>
+  	<li>Number of commitmentTypeIndications to be declared. These are the reasons for the signing. Specific values are specified with TypeIndicationnIdentifier and TypeIndicationnDescription, where ‘n’ goes from 0 to the value indicated on this property minus 1.</li>
+  </ul>
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li>
+  	<ul>
+  	<li><code> 1: </code> It states that the number n (counting from scratch) TypeIndications is &quot;Proof of Origin&quot;.</li>
+  	<li><code> 2: </code> It states that the number n (counting from scratch) TypeIndications is &quot;Reception Test&quot;.</li>
+  	<li><code> 3: </code> It states that the number n (counting from scratch) TypeIndications is &quot;Delivery Test&quot;.</li>
+  	<li><code> 4: </code> Sets that the number n (counting from scratch) is &quot;Shipping Test&quot;.</li>
+  	<li><code> 5: </code> It states that the number n (counting from scratch) TypeIndications is &quot;Approval Test&quot;.</li>
+  	<li><code> 6: </code> Establishes that the number n (counting from scratch) TypeIndications is &quot;Proof of Creation&quot;.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>CommitmentTypeQualifiers</code>:</li>
+  <ul>
+  	<li>List of textual indicators separated by &#39;|&#39; character that are provided as additional qualifiers of the CommitmentTypeIndication number n (optional attribute). They&#39;re usually OID. The items in the list cannot contain the &#39;|&#39; character (as it is used as a separator).</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li>
+  	<ul>
+  	<li><code> true: </code> The SigningCertificateV2 attribute shall be included in the signature.</li>
+  	<li><code> false </code> (or other value): The SigningCertificate attribute shall be included in the signature.</li>
+  	<li>Unspecified: The SigningCertificate will be included if the signature uses a signature algorithm SHA1 and SigningCertificateV2 for the other algorithms.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> allowSignLTSignature: </code></li>
+  	<ul>
+  	<li><code> true: </code> Longevo file signatures are allowed to be co-signed/countersigned, even though they will not be valid thereafter.</li>
+  	<li><code> false </code> (or other value): Co-signing/counter-signing of longevo file signatures is not permitted.</li>
+	</ul>
+  </ul>
+  
+  
+  
+  <h3>XAdES sign-up options</h3>
+  <p>The configuration properties supported by the XAdES signatures are listed below. Some of these options may not have effect in cases of signature where they do not apply, as in the case of counter-affirmations.</p>  
+  <ul>
+  <li style="margin-top: 10pt"><code>insertEnvelopedSignatureOnNodeByXPath: </code></li>
+  <ul>
+  	<li>Expression XPath (v1) indicating the node under which the signature node must be inserted in the case of a Enveloped signature. If the expression returns more than one node, only the first one is used. If the expression does not return nodes or is poorly constructed, an exception will be launched. This property only has effect on Enveloped signatures.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>useManifest: </code></li>
+  	<ul>
+  	<li><code> true: </code> Use a XMLDSig Manifest with signature references instead of signing these references directly. It is ignored in the co-signature operation. This allows checking the destination and fingerprints of the references to be optional.</li>
+  	<li><code> false: </code> Generate the signatures normally, without Manifest (default behavior).</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>uri<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>URI which refers to the data to be signed within a manifest signature. ‘n’ indicates the reference number of those who want to sign, starting with ‘1’.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>precalculatedHashAlgorithm: </code></li>
+  	<ul>
+  	<li><code> SHA1: </code> It indicates that the fingerprints of the data referenced in the manifest were calculated using the SHA1 algorithm.</li>
+  	<li><code> SHA-256: </code> It indicates that the fingerprints of the data referenced in the manifest were calculated using the SHA-256 algorithm.</li>
+  	<li><code> SHA-384: </code> It indicates that the fingerprints of the data referenced in the manifest were calculated using the algorithm SHA-284.</li>
+  	<li><code> SHA-512: </code> It indicates that the fingerprints of the data referenced in the manifest were calculated using the SHA-512 algorithm.</li>
+	</ul>
+<li style="margin-top: 10pt"><code>md<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>Base 64 with the fingerprint of the data associated with the reference ‘n’. The fingerprint algorithm shall be the one indicated in preembassyHashAlgorithm <code> </code></li>
+  </ul>
+
+  <li style="margin-top: 10pt"><code>mimetype<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>MIME-Type of data associated with the reference ‘n’ in a manifest signature. If this property is not indicated, the ‘application/octet stream’ type shall be used.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>contentTypeOid<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>OID or URN of the type of data signed for the reference number ‘n’ in a manifest signature. This property is complementary (non-exclusive) to the mimetypen property. <code> <i> <b> </b> </i> </code></li>
+  </ul>
+  <li style="margin-top: 10pt"><code>encoding<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>Coding of the data associated with the reference number ‘n’ in a manifest signature. Improper use of this property may lead to the generation of an invalid signature.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>addKeyInfoKeyValue: </code></li>
+  	<ul>
+  	<li><code> true: </code> Includes the KeyValue node within KeyInfo from XAdES (default behavior).</li>
+  	<li><code> false: </code> Does not include the KeyValue node within XAdES KeyInfo.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>addKeyInfoKeyName: </code></li>
+  	<ul>
+  	<li><code> true: </code> Includes the KeyName node within KeyInfo from XAdES.</li>
+  	<li><code> false: </code> Does not include the KeyName node within XAdES KeyInfo (default behavior).</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>avoidXpathExtraTransformsOnEnveloped: </code></li>
+  	<ul>
+  	<li><code> true: </code> Prevents the inclusion of the XPATH2 transformation that is normally added to enable co-signatures and removes all signatures from the document to leave only the content. WARNING: The co-signing of a document in which at least one of the signatures does not include the XPATH transformation will result in a signature document that will potentially be incorrectly validated by the signature validators. For this reason, the use of this property is only allowed in the signature operation (not in the co-signature operation).</li>
+  	<li><code> false: </code> Includes the XPATH2 transformation enables co-signatures by removing all signatures from the document to leave content alone (default behavior).</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> format: </code></li>
+  	<ul>
+  	<li><code> XAdES Enveloping: </code> Generates signatures in Enveloping format. This is the default format used when none is indicated.</li>
+  	<li><code> XAdES Enveloped: </code> Generates signatures in Enveloped format.</li>
+  	<li><code> XAdES Detached: </code> It generates signatures in Internally Detached format.</li>
+  	<li><code> XAdES Externally Detached:Generates </code> signatures in Externally Detached format.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>includeOnlySignningCertificate</code>:</li>
+  	<ul>
+  	<li><code> true: </code> Indicates that only the certificate of the signatory should be included in the signature.</li>
+  	<li><code> false: </code> Indicates that the entire certification chain of the signatory certificate should be included in the signature. Default value.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>policyIdentifier: </code></li>
+  <ul>
+  	<li>Signature policy identifier (typically a URL to the policy in actionable XML format), needed to generate XAdES-EPES signatures.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>policyIdentifierHash: </code></li>
+  <ul>
+  	<li>Base Chain 64 with the fingerprint of the signature policy. It is mandatory to indicate this property if it also indicated policyIdentifier, as it is also mandatory to give value to the property <code> PolicyIdentifierHashAlgorithm. </code></li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm: </code></li>
+  	<ul>
+  	<li><code> SHA1: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA1 algorithm.</li>
+  	<li><code> SHA-256: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-256 algorithm.</li>
+  	<li><code> SHA-384: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-384 algorithm.</li>
+  	<li><code> SHA-512: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-512 algorithm.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> policyQualifier: </code></li>
+  <ul>
+  	<li>URL accessible to the document (usually PDF) containing a textual description of the signature policy. This property is optional even if you want to generate XAdES-EPES signatures.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> policyDescription: </code></li>
+  <ul>
+  	<li>Textual description of the signature policy. If an XML is signed, the encoding of the used text should be aligned with the signed XML. This property is optional even if you want to generate XAdES-EPES signatures.</li>
+  </ul>		
+   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li>
+  <ul>
+  	<li>He adds fields to the firm with the charges attributed to the signatory. The charges must be separated with the character &quot;|&quot; (and this cannot be in the text itself of any charge). If an XML is signed, the encoding of the used text should be aligned with the signed XML.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li>
+  <ul>
+  	<li>It adds to the firm a field with the city in which the signature is made. If an XML is signed, the encoding of the used text should be aligned with the signed XML.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionProvince</code>:</li>
+  <ul>
+  	<li>It adds to the firm a field with the province in which the signature is made. If an XML is signed, the encoding of the used text should be aligned with the signed XML.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signatureProductionPostalCode</code>:</li>
+  <ul>
+  	<li>Add to the firm a field with the postal code in which the signature is made. If an XML is signed, the encoding of the used text should be aligned with the signed XML.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signatureProductionCountry</code>:</li>
+  <ul>
+  	<li>Add to the firm a field with the country in which the signature is made. If an XML is signed, the encoding of the used text should be aligned with the signed XML.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>referencesDigestMethod</code>:</li>
+  	<ul>
+  	<li>http://www.w3.org/2000/09/xmldsig#sha1: Use the SHA1 algorithm to calculate fingerprints of signed XML references.</li>
+  	<li>http://www.w3.org/2001/04/xmlenc#sha256: Use the SHA-256 algorithm to calculate fingerprints of signed XML references.</li>
+  	<li>http://www.w3.org/2001/04/xmlenc#sha512: Use the SHA-512 algorithm to calculate fingerprints of signed XML references. This is the default behavior.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> mimeType: </code></li>
+  <ul>
+  	<li>MIME-Type of data to be signed. If this property is not indicated, the system tries to self-detect the type, establishing the closest (which may not be the strictly correct).</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code> encoding: </code></li>
+  <ul>
+  	<li>URI with the encoding of the data to be signed (see the documentation of the XMLDSig Object element for more information). Improper use of this property may lead to the generation of an invalid signature. If data is provided to be previously coded in Base64 but is to be considered as its decoded form, this value should be set to http://www.w3.org/2000/09/xmldsig#base64 and the actual rate specified in the <code> mimeType property. </code> For example, to sign a PNG image by making the signature refer to its direct binary form, you can provide the image directly encoded in Base64 by indicating the encoding as http://www.w3.org/2000/09/xmldsig#base64 and the mimeType as image/png. The value must always be a URI.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>outputXmlEncoding</code>:</li>
+  <ul>
+  	<li>Output XML encoding. If this value is not indicated, an attempt is made to self-detect from the input XML (if the data to be signed is an XML).</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> contentTypeOid: </code></li>
+  <ul>
+  	<li>OID or URN type OID with the type identifier signed. This property is complementary (non-exclusive) to the <code> mimeType property. </code></li>
+  </ul>
+  <li style="margin-top: 10pt"><code>canonicalizationAlgorithm</code>:</li>
+  	<ul>
+  	<li>http://www.w3.org/TR/2001/REC-xml-c14n-20010315: The XML is signed with inclusive XML 1.0 canonized (default value).</li>
+  	<li>http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments: The XML is signed with inclusive XML 1.0 canonized with comments.</li>
+  	<li>http://www.w3.org/2001/10/xml-exc-c14n#: The XML is signed with exclusive XML 1.0 canonized.</li>
+  	<li>http://www.w3.org/2001/10/xml-exc-c14n#WithComments: The XML is signed with exclusive XML 1.0 canonized with comments.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>xadesNamespace: </code></li>
+  	<ul>
+  	<li>http://uri.etsi.org/01903/v1.3.2#: URL for defining the XAdES namespace corresponding to version 1.3.2 of XAdES. This is the default value.</li>
+  	<li>http://uri.etsi.org/01903/v1.4.1#: XAdES namespace definition URL corresponding to version 1.4.1 of XAdES. If this property is established you may also need to set the <code> signedPropertyTypeUrl </code> property to avoid inconsistencies in the XAdES version.</li>
+	</ul>
+ <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl: </code></li>
+  	<ul>
+  	<li>http://uri.etsi.org/01903#SignedProperties: Signed Properties URL of XAdES. This is the default value.</li>
+  	<li>http://uri.etsi.org/01903/1.3.2#SignedProperties: Signed Properties URL of XAdES v1.3.2.</li>
+  	<li>http://uri.etsi.org/01903/1.4.1#SignedProperties: Signed Properties URL of XAdES v1.4.1. If this property is established it may be necessary to also establish the property <code> xadesNamespace </code> to avoid inconsistencies in the version of XAdES.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>ignoreStyleSheets: </code></li>
+  	<ul>
+  	<li><code> true: </code> If you sign an XML with style sheets, ignore them by leaving them unsigned.</li>
+  	<li><code> false: </code> If an XML with style sheets is signed, also sign the style sheets (default value, see additional notes on signature style sheets).</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>avoidBase64Transforms: </code></li>
+  	<ul>
+  	<li><code> true: </code> It does not declare Base64 transformations even if necessary.</li>
+  	<li><code> false: </code> Declares Base64 transformations when the data to be signed in Base64 has been internally coded (default value).</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>headless: </code></li>
+  	<ul>
+  	<li><code> true: </code> Prevents further graphical dialogues to the user (e.g. for the deferencing of style sheets linked to relative routes).</li>
+  	<li><code> false: </code> Enables additional graphical dialogues to be displayed to the user.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>xmlTransforms: </code></li>
+  <ul>
+  	<li>Number of transformations to be applied to the signed content. The same number of xmlTransformnType parameters should then be indicated, replacing n with a consecutive ordinal, starting at 0 (see additional notes on indication of additional transformations).</li>
+  </ul>
+ <li style="margin-top: 10pt"><code>xmlTransformnType: </code></li>
+  	<ul>
+  	<li>http://www.w3.org/2000/09/xmldsig#base64: It indicates that the data provided to sign is already encoded in Base64 and this additional transformation must be declared so that they are decoded before signing them. This Base64 transformation is in addition to the transformation needed to pass the data through the customer&#39;s signature methods.</li>
+  	<li>http://www.w3.org/TR/1999/REC-xpath-19991116: The content must be processed through this XPATH transformation before it is signed. only applies when XML content is signed.</li>
+  	<li>http://www.w3.org/2002/06/xmldsig-filter2: The content must be processed through this XPATH2 transformation before it is signed. only applies when XML content is signed.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>xmlTransformnSubtype </code></li>
+  <ul>
+  	<li>Subtype of transformation n. The accepted values and their functionality depend on the value indicated in xmlTransformnType.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>xmlTransformnBody: </code></li>
+  <ul>
+  	<li>Body of transformation n. The accepted values and their functionalities depend on the values indicated in xmlTransformnType and xmlTransformnSubtype.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>nodeToSign: </code></li>
+  <ul>
+  	<li>Node identifier (established by the attribute &quot;Id&quot;) to be signed within an XML.</li>
+  </ul>	
+<li style="margin-top: 10pt"><code>commitmentTypeIndications: </code></li>
+  <ul>
+  	<li>Number of commitmentTypeIndications to be declared. These are the reasons for the signing. Specific values are specified with commitmentTypeIndicationnIdentifier and commitmentTypeIndicationnDescription, where ‘n’ goes from 0 to the minus 1 value indicated on this property.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li>
+  	<ul>
+  	<li><code> 1: </code> It states that the number <i> <b> n </b> </i> (counting from scratch) CommitmentTypeIndications is &quot;Proof of Origin&quot;.</li>
+  	<li><code> 2: </code> It states that the number <i> <b> n </b> </i> (counting from scratch) CommitmentTypeIndications is &quot;Reception Test&quot;.</li>
+  	<li><code> 3: </code> It states that the number <i> <b> n </b> </i> (counting from scratch) CommitmentTypeIndications is &quot;Delivery Test&quot;.</li>
+  	<li><code> 4: </code> Sets that the number <i> <b> n </b> </i> (counting from scratch) is &quot;Shipping Test&quot;.</li>
+  	<li><code> 5: </code> It states that the number <i> <b> n </b> </i> (counting from scratch) CommitmentTypeIndications is &quot;Approval Test&quot;.</li>
+  	<li><code> 6: </code> Establishes that the number <i> <b> n </b> </i> (counting from scratch) CommitmentTypeIndications is &quot;Proof of Creation&quot;.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Description</code>:</li>
+  <ul>
+  	<li>Sets the description of the StringTypeIndications number <i> <b> n. </b> </i> This attribute is optional.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>DocumentationReferences</code>:</li>
+  <ul>
+  	<li>List of URLs separated by &#39;|&#39; character that are provided as documentary references of the CommitmentTypeIndication number <i> <b> n </b> </i> (optional attribute). List URLs cannot contain &#39;|&#39; character (as this is used as a separator).</li>
+  </ul>
+  <li style="margin-top: 10pt">TypeDesignDesignDesignQualifiers: <code> <i> <b> </b> </i> </code></li>
+  <ul>
+  	<li>List of textual indicators separated by &#39;|&#39; character that are provided as additional qualifiers of the DiffTypeIndication number <i> <b> n </b> </i> (optional attribute). They&#39;re usually OID. The items in the list cannot contain the &#39;|&#39; character (as it is used as a separator).</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li>
+  	<ul>
+  	<li><code> true: </code> Longevo file signatures are allowed to be co-signed/countersigned, even though they will not be valid thereafter.</li>
+  	<li><code> false </code> (or other value): Co-signing/counter-signing of longevo file signatures is not permitted.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>avoidAGEPolicyIncompatibilities</code>:</li>
+  	<ul>
+  	<li><code> true: </code> The policy of signing the AGE shall be avoided when the result of the operation is to be incompatible with this policy.</li>
+  	<li><code> false </code> (or other value): Co-signing with AGE&#39;s signature policy is not allowed when the result will not be compatible with the policy.</li>
+	</ul>
+    <li style="margin-top: 10pt"><code>allowXadesEnvelopedWithoutXPath</code>:</li>
+  <ul>
+  	<li><code>true</code>: Allows the co-signature of a signature that does not contain an XPath transform and will therefore be invalidated. The XPath transformation will be included in the new co-signature.</li>
+  	<li><code>false</code>:	Co-signing of signatures that do not contain an XPath transform is not allowed.</li>
+  </ul>
+  </ul>
+
+
+  <h3>Electronic Invoice Signatures Setup Options</h3>
+  <p>The configuration properties supported by electronic invoice signatures (Invoice E) are listed below.</p>  
+  <ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li>
+  <ul>
+  	<li>It adds to the firm a field with the city in which the signature is made. If an XML is signed, the encoding of the used text should be aligned with the signed XML.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionProvince</code>:</li>
+  <ul>
+  	<li>It adds to the firm a field with the province in which the signature is made. If an XML is signed, the encoding of the used text should be aligned with the signed XML.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signatureProductionPostalCode</code>:</li>
+  <ul>
+  	<li>Add to the firm a field with the postal code in which the signature is made. If an XML is signed, the encoding of the used text should be aligned with the signed XML.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signatureProductionCountry</code>:</li>
+  <ul>
+  	<li>Add to the firm a field with the country in which the signature is made. If an XML is signed, the encoding of the used text should be aligned with the signed XML.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code xadesNamespace: </code></li>
+  <ul>
+  	<li>URL of the XAdES namespace definition (the use of this property may condition the XAdES version declaration). If this property is established you may also need to set the signedPropertyTypeUrl property to avoid inconsistencies in the XAdES version.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl</code>:</li>
+  <ul>
+  	<li>Signed Properties URL of XAdES. If this property is established it may be necessary to also establish the property <code> xadesNamespace </code> to avoid inconsistencies in the version of XAdES. If not set the default value is used: http://uri.etsi.org/01903#SignedProperties.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li>
+  	<ul>
+  	<li><code> issuer: </code> Declares that the signatory is the issuer of the invoice. This is the default value.</li>
+  	<li><code> receiver: </code> Declares that the signatory is the recipient of the invoice.</li>
+  	<li><code> third: </code> Declares that the signatory is a third party with regard to the invoice.</li>
+  	<li><code> supplier: </code> Declares that the signatory is the issuer of the invoice.</li>
+  	<li><code> customer: </code> Declares that the signatory is the recipient of the invoice.</li>
+  	<li><code> third party: </code> Declares that the signatory is a third party with regard to the invoice.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> policyIdentifier: </code></li>
+  <ul>
+  	<li>http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf: Signature policy identifier 3.1. This is the default value.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> policyIdentifierHash: </code></li>
+  <ul>
+  	<li><code> Ohixl6upD6av8N7pEvDABhEL6hM=: </code> Fingerprint to configure signature policy 3.1. This is the default value.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code> policyIdentifierHashAlgorithm: </code></li>
+  	<ul>
+  	<li><code> SHA1: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA1 algorithm.</li>
+  	<li><code> SHA-256: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-256 algorithm.</li>
+  	<li><code> SHA-384: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-384 algorithm.</li>
+  	<li><code> SHA-512: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-512 algorithm.</li>
+	</ul>
+  </ul>
+
+
+  <h3>PAdES sign-up options</h3>
+  <p>The configuration properties supported by PAdES signatures are listed below.</p>
+  <ul>  
+  <li style="margin-top: 10pt"><code>includeOnlySignningCertificate</code>:</li>
+  	<ul>
+  	<li><code> true: </code> Indicates that only the certificate of the signatory should be included in the signature.</li>
+  	<li><code> false: </code> Indicates that the entire certification chain of the signatory certificate should be included in the signature. Default value.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> alwaysCreateRevision: </code></li>
+  	<ul>
+  	<li><code> true: </code> You will always create a review when you sign. Requires the document to comply with PDF 1.7 specification (ISO 32000-1:2008)</li>
+  	<li><code> false: </code> It will not create revision at the first firm and yes at the following.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>signatureField</code>:</li>
+  <ul>
+  	<li>Name of the pre-existing signature field in which the signature is inserted.</li>
+  </ul>
+   <li style="margin-top: 10pt"><code>signaturePages</code>:</li>
+  <ul>
+  	<li>Indicates the pages on which the signature must appear visible.</li>
+  	<li>Supports the following values:</li>
+  	<ul>
+	  <li><code> all: </code> In order to indicate that the visible signature appears on all pages of the document, it must be given this value.</li>
+	  <li><code> append: </code> If the visible signature must appear on a new blank page added at the end of the document, it must be given this value.</li>
+	  <li>Page or page listing: This option allows you to select the page or page range where the visible signature will appear. If you want to indicate a page or several pages where the visible signature is displayed, you can indicate page by page with a comma separation (1,4.7: <code> </code> It is stamped on pages 1, 4 and 7 or indicating a range of pages through a script (1-8: <code> </code> It is printed on the pages from 1 to 8). As explained in the previous paragraph, it is permitted to indicate the pages with a negative value, where it will start from the end (1,-1: <code> </code> It will be printed on the first and last page).</li>
+  	</ul>
+  </ul>
+  <li style="margin-top: 10pt"><code>signaturePositionOnPageLowerLeftX</code>:</li>
+  <ul>
+  	<li>Whole number with horizontal coordinate from the lower left corner of the page to the lower left corner of the visible signature field.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signaturePositionOnPageLowerLeftY</code>:</li>
+  <ul>
+  	<li>Whole number with vertical coordinate from the lower left corner of the page to the lower left corner of the visible signature field.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signaturePositionOnPageUpperRightX</code>:</li>
+  <ul>
+  	<li>Whole number with horizontal coordinate from the lower left corner of the page to the upper right corner of the visible signature field.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signaturePositionOnPageUpperRightY</code>:</li>
+  <ul>
+  	<li>Whole number with vertical coordinate from the lower left corner of the page to the upper right corner of the visible signature field.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureRubricImage</code>:</li>
+  <ul>
+  	<li>Path of the file with the JPEG image of the image to be displayed in the visible signature PDF. Base 64 of the image can also be directly indicated.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> layer2Text: </code></li>
+  <ul>
+  	<li>Text to show in the visible signature field.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>layer2FontFamily: </code></li>
+  <ul>
+  	<li><code> 0: </code> The text of the visible signature will be displayed with Courier source. This is the default value.</li>
+  	<li><code> 1: </code> The text of the visible signature will be displayed with Helvetica source.</li>
+  	<li><code> 2: </code> The text of the visible signature will be displayed with Times Roman font.</li>
+  	<li><code> 3: </code> The text of the visible signature will be displayed with Symbol font.</li>
+  	<li><code> 4: </code> The text of the visible signature will be displayed with ZapfDingBats source.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>layer2FontSize: </code></li>
+  <ul>
+  	<li>Font size of visible signature text.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>layer2FontStyle: </code></li>
+  <ul>
+  	<li><code> 0: </code> Text of the visible signature without style. Default value.</li>
+  	<li><code> 1: </code> Text of the signature visible in bold.</li>
+  	<li><code> 2: </code> Text of the visible signature in italics.</li>
+  	<li><code> 4: </code> Text of the underlined visible signature.</li>
+  	<li><code> 8: </code> Text of the marked visible signature.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>layer2FontColor: </code></li>
+  <ul>
+  	<li><code> black: </code> Text of the visible signature without style. Default value.</li>
+  	<li><code> white: </code> The text of the visible signature shall be white.</li>
+  	<li><code> gray: </code> The text of the visible signature shall be grey.</li>
+  	<li><code> lightGray: </code> The text of the visible signature shall be light grey.</li>
+  	<li><code> darkgray: </code> The text of the visible signature shall be dark grey.</li>
+  	<li><code> network: </code> The text of the visible signature shall be red.</li>
+  	<li><code> pink: </code> The text of the visible signature shall be pink.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>obfuscateCertText</code>:</li>
+  <ul>
+  	<li><code> true: </code> User identifiers extracted from the CN or DN of the certificate and displayed in the visible signature PDF are offended. Data from pseudonym certificates are not offended. This is the default value.</li>
+  	<li><code> false: </code> The information on the certificates is not offended.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>obfuscationMask: </code></li>
+  <ul>
+  	<li>Criteria for the obfuscation of user identifiers in visible signatures PDF. You must show the following pattern:</li>
+		<ul><li><code> character; longitudinal digits; positions; displacement </code></li></ul>
+	<li>In this pattern:</li>
+	<ul>
+	  <li><code> caracter: </code> It&#39;s the character to use to offend characters.</li>
+	  <li><code> longitudinally digits: </code> Minimum number of digits a text string must have in order to be deemed to be offended.</li>
+	  <li><code> positions: </code> List of positions indicating which characters should be displayed. The listing is expressed with a <code> sequence of true/false </code> separated by commas (&#39;,&#39;), where <code> true </code> indicates that the character must be displayed and <code> false </code> than not.</li>
+	  <li><code> displacement: </code> Indicates whether the displacement of positions of the mask is allowed to show all the characters indicated (true) <code> or </code> whether it must be respected (false). <code> </code></li>
+	</ul>
+  </ul>
+  <li style="margin-top: 10pt"><code>visibleSignature</code>:</li>
+  <ul>
+  	<li><code> default: </code> Visible signature PDF will be made if the parameters have been provided with the area and the signature page. This is the default value.</li>
+  	<li><code> want: </code> The user must select the visible signature area. If you cancel the process:</li>
+	<ul>
+	  <li>If the petition also includes visible signature area parameters (position and page), these parameters will be used and the signing process will continue.</li>
+	  <li>If the petition does not include visible signing area parameters, the signing process will be terminated.</li>
+    </ul>
+	<li><code> optional: </code> The user will be able to choose whether or not to include the visible signature area. If you cancel the process:</li>
+	<ul>
+	  <li>If the petition also includes visible signature area parameters (position and page), these parameters will be used and the signing process will continue.</li>
+	  <li>If the request does not include visible signature area parameters, an unvisible signature shall be made.</li>
+    </ul>
+  </ul>
+  <li style="margin-top: 10pt"><code>visibleAppearance: </code></li>
+  <ul>
+  	<li><code> default: </code> The default aspect shall be applied for the visible signature PDF or, if the appearance parameters were provided, the configured aspect. This is the default value.</li>
+  	<li><code> custom: </code> The user can choose the appearance of the visible signature. If the process is cancelled, the default aspect will be used.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureRotation: </code></li>
+  <ul>
+  	<li><code> 0: </code> Do not rotate the text of the signature field. This is the default value.</li>
+  	<li><code> 90: </code> The text of the signature field rotates 90 degrees clockwise. Any signature image configuration will be ignored.</li>
+  	<li><code> 180: </code> It rotates 180 degrees clockwise the text of the signature field. Any signature image configuration will be ignored.</li>
+  	<li><code> 270: </code> It rotates 270 degrees clockwise the text of the signature field. Any signature image configuration will be ignored.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>includeQuestionMark: </code></li>
+  <ul>
+  	<li><code> true: </code> Allow the PDF reader to display together with the visible signature a mark indicating the result obtained by validating it. The appearance of this brand depends entirely on the PDF reader used and it is this that decides if it is shown. For example, the mark may not be displayed when a background image is defined in the signature.</li>
+  	<li><code> false: </code> It does not allow to show the mark with the result of the validation. This is the default value.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>image: </code></li>
+  <ul>
+  	<li>Path of the JPEG image file to be inserted in the document before signing it. Base 64 of the image can also be directly indicated. This property can only be used in the first signature of the document.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePage: </code></li>
+  <ul>
+  	<li>Page number of the PDF document in which the image is inserted.</li>
+  	<li><code> 0: </code> Embed on all pages</li>
+  	<li><code> -1: </code> Insert image on the last page.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePositionOnPageLowerLeftX: </code></li>
+  <ul>
+  	<li>Whole number with horizontal coordinate from the lower left corner of the page to the lower left corner of the image.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePositionOnPageLowerLeftY: </code></li>
+  <ul>
+  	<li>Whole number with the vertical coordinate from the lower left corner of the page to the lower left corner of the image.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePositionOnPageUpperRightX: </code></li>
+  <ul>
+  	<li>Whole number with horizontal coordinate from the lower left corner of the page to the upper right corner of the image.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePositionOnPageUpperRightY: </code></li>
+  <ul>
+  	<li>Whole number with the vertical coordinate from the lower left corner of the page to the upper right corner of the image.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>attach: </code></li>
+  <ul>
+  	<li>Path of the file with the content to be added as attachment to the PDF. Data base 64 can also be directly indicated. Requires to set attachFileName.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>attachFileName: </code></li>
+  <ul>
+  	<li>Name to be assigned to the attached file.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>attachDescription: </code></li>
+  <ul>
+  	<li>Description of the attached document.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>certificationLevel: </code></li>
+  <ul>
+  	<li><code> 0: </code> Signature uncertified. This would be an approval signature. It&#39;s the default value.</li>
+  	<li><code> 1: </code> Signature certified by the author. After this type of certified signature, no further changes to the document are allowed (no signatures can be added or forms filled).</li>
+  	<li><code> 2: </code> Certified signature of author for forms. After this type of certified signature, only the filling of the form fields is allowed (no signatures can be added).</li>
+  	<li><code> 3: </code> Common certified signature. After this type of certified signature, only the filling of the form fields and the creation of approval signatures are allowed.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> compressPdf: </code></li>
+  <ul>
+  	<li><code> true: </code> Press the signed PDF to make it smaller. It only applies if it is a PDF v4 or higher. This is the default value.</li>
+  	<li><code> false: </code> Never compress the signed PDF.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> pdfVersion: </code></li>
+  <ul>
+  	<li><code> -1: </code> It is stated that the signed version of the PDF is respected.</li>
+  	<li><code> 2: </code> The output PDF version is declared to be 1.2.</li>
+  	<li><code> 3: </code> It is stated that the output PDF version is 1.3.</li>
+  	<li><code> 4: </code> The output PDF version is 1.4.</li>
+  	<li><code> 5: </code> It is stated that the output PDF version is 1.5.</li>
+  	<li><code> 6: </code> It is stated that the output PDF version is 1.6.</li>
+  	<li><code> 7: </code> It is stated that the output PDF version is 1.7.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> signatureSubFilter: </code></li>
+  <ul>
+  	<li>Sub-filter declared. By default, basic signatures adbe.pkcs7.detached are used. You can use the &quot;ETSI.CAdES.detached&quot; string to create BES signatures.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> signReason: </code></li>
+  <ul>
+  	<li>That is why the signature is made.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li>
+  <ul>
+  	<li>City where the signature is made.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signerContact</code>:</li>
+  <ul>
+  	<li>Contact information of the signatory.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li>
+  <ul>
+  	<li>List of roles declared by the signatory (separated by &quot;|&quot;).</li>
+  </ul>  
+  <li style="margin-top: 10pt"><code> policyIdentifier: </code></li>
+  <ul>
+  	<li>Signature policy identifier (typically a URL to the policy in actionable XML format), needed to generate XAdES-EPES signatures.</li>
+  </ul>  
+  <li style="margin-top: 10pt"><code> policyIdentifierHash: </code></li>
+  <ul>
+  	<li>Base Text 64 with the fingerprint of the signature policy. It is mandatory to indicate this property if the value indicated in policyIdentifier is not universally accessible. If this property is valued, it is also mandatory to value <code> policyIdentifierHashAlgorithm property. </code></li>
+  </ul>
+  <li style="margin-top: 10pt"><code> policyIdentifierHashAlgorithm: </code></li>
+  	<ul>
+  	<li><code> SHA1: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA1 algorithm.</li>
+  	<li><code> SHA-256: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-256 algorithm.</li>
+  	<li><code> SHA-384: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-384 algorithm.</li>
+  	<li><code> SHA-512: </code> It indicates that the fingerprint indicated in <code> policyIdentifierHash </code> property was calculated using the SHA-512 algorithm.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code> policyQualifier: </code></li>
+  <ul>
+  	<li>URL to the document containing a textual description of the signature policy.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> ownerPassword: </code></li>
+  <ul>
+  	<li>PDF Opening Password. The signing of PDF documents encrypted with certificates or AES-256 algorithm is not supported.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> headless: </code></li>
+  <ul>
+  	<li><code> true: </code> Do not interrupt the signing process by requesting user interaction.</li>
+  	<li><code> false: </code> Displays user dialogues if you require your authorization or any additional data to sign. This is the default value.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowSigningCertifiedPdfs</code>:</li>
+  <ul>
+  	<li><code> true: </code> Allows the signing of certified PDF documents. The result could invalidate earlier signatures of the PDF.</li>
+  	<li><code> false: </code> It makes a mistake when signing certified PDF documents.</li>
+  	<li>Omitted: If it is found that the PDF entry document is certified, the user will be warned that the signature could invalidate earlier signatures and will be allowed to choose whether to sign or cancel the operation.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowSigningCertifiedPdfs</code>:</li>
+  <ul>
+  	<li><code> true: </code> Allows the signing of certified PDF documents. The result could invalidate earlier signatures of the PDF.</li>
+  	<li><code> false: </code> It makes a mistake when signing certified PDF documents.</li>
+  	<li>Omitted: If it is found that the PDF entry document is certified, the user will be warned that the signature could invalidate earlier signatures and will be allowed to choose whether to sign or cancel the operation.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowCosigningUnregisteredSignatures</code>:</li>
+  <ul>
+  	<li><code> true: </code> It allows you to sign PDF documents with previously unregistered signatures.</li>
+  	<li><code> false: </code> It does not allow you to sign PDF documents with previously unregistered signatures.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signingCertificateV2: </code></li>
+  <ul>
+  	<li><code> true: </code> You use the signingCertificateV2 attribute in the signatures.</li>
+  	<li><code> false: </code> You use the signingCertificateV2 attribute in the signatures.</li>
+  	<li>Omitted: The signingCertificateV1 in the sigbatures SHA1withRSA and signingCertificateV2 attribute is used in the rest.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signReservedSize</code>:</li>
+  <ul>
+  	<li>Maximum size in bytes of the signature to be added to the PDF. By default, 27000.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signingCertificateV2</code>:</li>
+  <ul>
+  	<li><code> true: </code> You use the signingCertificateV2 attribute in the signatures.</li>
+  	<li><code> false: </code> You use the signingCertificateV2 attribute in the signatures.</li>
+  	<li>Omitted: The signingCertificateV1 in the sigbatures SHA1withRSA and signingCertificateV2 attribute is used in the rest.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowShadowAttack: </code></li>
+  <ul>
+  	<li><code> true: </code> The PDF Shadow Attack will not be checked during the validation of the previous signatures.</li>
+  	<li><code> false: </code> The PDF Shadow Attack will be checked during the validation of the previous signatures and, if detected, the signature will be given by invalid.</li>
+  	<li>Omitted: The PDF Shadow Attack will be checked during the validation of the previous signatures and, if detected, the user will be consulted if the operation should be continued.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowModifiedForm: </code></li>
+  <ul>
+  	<li><code> true: </code> Changes to the document forms or PDF Shadow Attack will not be checked during validation of the previous signatures.</li>
+  	<li><code> false: </code> The verification of changes to the document forms will be carried out during the validation of the previous signatures and, if detected, the signature will be given by invalid.</li>
+  	<li>Omitted: Changes to the document forms will be checked during validation of the previous signatures and, if detected, the user will be consulted if the operation should be continued.</li>
+  </ul>
+  </ul>
+ </body>
+</html>

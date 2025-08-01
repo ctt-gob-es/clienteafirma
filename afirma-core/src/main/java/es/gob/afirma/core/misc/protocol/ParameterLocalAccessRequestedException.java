@@ -9,24 +9,34 @@
 
 package es.gob.afirma.core.misc.protocol;
 
-/** Error que indica que se ha solicitado en los par&aacute;metros un acceso local prohibido.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+import es.gob.afirma.core.ErrorCode;
+
+/**
+ * Error que indica que se ha solicitado en los par&aacute;metros un acceso local prohibido.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
 public final class ParameterLocalAccessRequestedException extends ParameterException {
 
 	private static final long serialVersionUID = -6979789543878872249L;
 
-	/** Crea una excepci&oacute;n que indica que se ha solicitado en los par&aacute;metros
-	 * un acceso local prohibido.
-	 * @param msg Mensaje de la excepci&oacute;n. */
-	public ParameterLocalAccessRequestedException(final String msg) {
-		super(msg);
-	}
-
-	/** Crea una excepci&oacute;n que indica que se ha solicitado en los par&aacute;metros
+	/**
+	 * Crea una excepci&oacute;n que indica que se ha solicitado en los par&aacute;metros
 	 * un acceso local prohibido.
 	 * @param msg Mensaje de la excepci&oacute;n.
-	 * @param cause Causa inicial de la excepci&oacute;n. */
-	public ParameterLocalAccessRequestedException(final String msg, final Throwable cause) {
-		super(msg, cause);
+	 * @param code C&oacute;dico que identifica el error.
+	 */
+	public ParameterLocalAccessRequestedException(final String msg, final ErrorCode code) {
+		super(msg, code);
+	}
+
+	/**
+	 * Crea una excepci&oacute;n que indica que se ha solicitado en los par&aacute;metros
+	 * un acceso local prohibido.
+	 * @param msg Mensaje de la excepci&oacute;n.
+	 * @param cause Causa inicial de la excepci&oacute;n.
+	 * @param code C&oacute;dico que identifica el error.
+	 */
+	public ParameterLocalAccessRequestedException(final String msg, final Throwable cause, final ErrorCode code) {
+		super(msg, cause, code);
 	}
 }

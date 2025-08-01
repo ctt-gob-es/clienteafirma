@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Ús per línia de comandos</title> 
+  <meta name="AppleTitle" content="Ayuda de Autofirma" /> 
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png" /> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+ </head> 
+ <body>
+ <h2>Ús per línia de comandos</h2> 
+  <p>Autofirma permet el seu ús a través de línia de comandos, proporcionant funcionalitats de signatura, signatura de lots i creació i verificació d&apos;hashes. </p> 
+  <p>L&apos;executable o script a utilitzar per a l&apos;execució d&apos;Autofirma per línia de comandos varia en funció del sistema: </p> 
+  <ul> 
+   <li>Windows</li> 
+   <ul> 
+    <li>El procés d&apos;instal·lació copia en el directori d&apos;Autofirma l&apos;executable &quot;AutofirmaCommandLine&quot;&quot; i, si li és possible, inclou el directori en el <i>path</i>. Utilitzi aquest executable des de línia de comandos per a realitzar les diferents operacions que se suporten.</li> 
+   </ul> 
+   <li>Linux</li> 
+   <ul> 
+    <li>El procés d&apos;instal·lació genera en el directori &quot;/usr/bin&quot; el script &quot;autofirma&quot;. Utilitzi aquest script per a executar l&apos;aplicació proporcionant-li directament els paràmetres de l&apos;operació que desitgi.</li> 
+   </ul> 
+   <li>macOS</li> 
+   <ul> 
+    <li>Per a l&apos;ús de l&apos;aplicació per línia de comandos es crea dins de l&apos;aplicació un script &quot;AutofirmaCommandLine&quot; en el directori de l&apos;aplicació. Es pot executar aquest script accedint al directori intern &quot;Resources&quot; de l&apos;aplicació (comunament, &quot;/Applications/Autofirma.app/Contents/MacOS&quot;). És important que <b>els paràmetres que puguin contenir espais es passin en el comando entre cometes simples</b>.</li> 
+   </ul> 
+  </ul> 
+  <p>Per exemple, es pot executar Autofirma i llistar les diferents operacions disponibles a través de la línia de comandos amb el comando &quot;-help&quot; de la següent manera:</p> 
+  <span>En Windows:</span> 
+  <ul> 
+   <li><code>AutofirmaCommandLine –help</code></li> 
+  </ul> 
+  <span>En Linux:</span> 
+  <ul> 
+   <li><code>/usr/bin/Autofirma –help</code></li> 
+  </ul> 
+  <span>En Mac:</span> 
+  <ul> 
+   <li><code>/Applications/Autofirma.app/Contents/MacOS/AutofirmaCommandLine –help</code></li> 
+  </ul> 
+  <p>Això donaria com a resultat:</p> 
+  <div style="background-color: black; color: white; width: 50%"> 
+   <code><pre>
+Eina de signatura de documents.
+
+Sintaxi: Autofirma cmd [options...]
+
+Comandos cmd:
+
+  sign           (signatura de fitxer)
+  cosign         (cosignatura de fitxer)
+  countersign    (contrasigna de fitxer)
+  listaliases    (llista els àlies disponibles en l&apos;almacen)
+  verify         (obre un panell amb la informacion de validacion d&apos;una signatura o certificat)
+  batchsign      (signatura/multisignatura de lots de fitxers)
+  createdigest   (creacion de petjada digitals amb interfície grafica)
+  checkdigest    (comprobacion de petjada digitals amb interfície grafica)
+
+Utilitzi &quot;Autofirma cmd -help&quot; per a veure la sintaxi del comando &quot;cmd&quot;
+    </pre></code> 
+  </div> 
+  <p>Per a llistar les opcions de configuració d&apos;alguna de les operacions, pot utilitzar el comando &quot;-help&quot; sobre qualsevol d&apos;elles. Per exemple:</p> 
+  <ul> 
+   <li><code>AutofirmaCommandLine sign –help</code></li> 
+  </ul> 
+  <p>Això donaria com a resultat:</p> 
+  <div style="background-color: black; color: white; width: 50%"> 
+   <code><pre>
+Sintaxi: Autofirma sign [opcions...]
+
+Opcions:
+  -gui                   (Realitza l&apos;operacion amb entorn grafico. Té prioritat sobre -certgui)
+  -certgui               (Usa un dialogo grafico per a la seleccion del certificat de signatura)
+  -i inputfile           (Ruta del fitxer d&apos;entrada)
+  -o outputfile          (Ruta del fitxer de sortida)
+  -algorithm alguna cosa        (Algorisme de signatura)
+  -format                (Estableix el format de signatura)
+         acte            (Seleccion de format sobre la base del fitxer d&apos;entrada)
+         cades           (Format CAdES)
+         pades           (Format PAdES)
+         xades           (Format XAdES)
+         facturae        (Signatura de factura electronica)
+  -config extraParams    (Properties en text pla amb la configuracion de l&apos;operacion)
+  -store                 (Estableix l&apos;almacen de claus. Per defecte, el del sistema)
+         acte            (Almacen de claus del sistema)
+         windows         (Almacen de claus de Windows)
+         mac             (Almacen de claus de macOS)
+         mozilla         (Almacen de claus de Mozilla Firefox)
+         dni             (DNI electronico)
+         pkcs12:p12file  (Almacen PKCS#12. &quot;p12file&quot; és la ruta de l&apos;almacen)
+         pkcs11:p11file  (Almacen PKCS#11. &quot;p11file&quot; és la ruta del controlador)
+
+  -password password     (Estableix la contrasena de l&apos;almacen)
+  -àlies àlies           (Alias del certificat de signatura)
+  -filter filter         (Filtre per a seleccionar el certificat de signatura)
+  -xml                   (Formata la resposta com XML)
+    </pre></code> 
+  </div> 
+  <p>El paràmetre de configuració <code>-config</code> permet que se li proporcioni un llistat de propietats de configuració concatenades per &quot;\n&quot;. Cadascuna d&apos;aquestes propietats tindrà el format clau=valor.</p> 
+  <p>Un exemple de paràmetre de configuració seria:</p> 
+  <ul> 
+   <li><code>-config &quot;format=XAdES Enveloping\nsignerClaimedRoles=Director\nxadesNamespace=http://uri.etsi.org/01903/v1.4.1#</code></li> 
+  </ul> 
+  <p>Les opcions de configuració varien d&apos;un format de signatura a un altre. A continuació de descriuen les opcions de configuració per a cada format de signatura.</p> 
+  <h3>Opcions de configuració de signatures CAdES</h3> 
+  <p>A continuació es llisten les propietats de configuració admeses per les signatures CAdES. Algunes d&apos;aquestes opcions poden no tenir efecte en casos de signatura en les quals no apliquin, com en el cas de les contrasignes.</p> 
+  <ul> 
+   <li style="margin-top: 15pt"><code>mode</code>:</li> 
+   <ul> 
+    <li><code>explicit</code>: La signatura resultant no inclourà les dades signades. Si no s&apos;indica el la propietat <code>mode</code> es configura automàticament aquest comportament.</li> 
+    <li><code>implicit</code>: La signatura resultant no inclourà les dades signades. La signatura resultant inclourà internament una còpia de les dades signades. L&apos;ús d&apos;aquest valor podria generar signatures de gran grandària. En les cosignatures, aquesta propietat s&apos;ignorarà si les dades ja estaven continguts en la signatura original o si no es proporcionen les dades.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>contentTypeOid</code>:</li> 
+   <ul> 
+    <li>Identificador del tipus de dada signada.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>contentDescription</code>:</li> 
+   <ul> 
+    <li>Descripció textual del tipus de dades signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>includeMimeTypeAttribute</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Inclou en la signatura l&apos;atribut aneu-aa-ets-mimeType definit en CAdES v2.1.1 i superiors (vàlid en signatures baseline). El valor de mimetype es prendrà de la propietat <code>mimetype</code> o, si no s&apos;incloc, s&apos;extrapolarà de la propietat <code>contentTypeOid</code>. Si tampoc fos possible, es tractaran d&apos;obtenir aquests valors d&apos;alguna de les signatures prèvies (en cas de cosignatures). Si tampoc fos possible, s&apos;obtindrà el tipus de l&apos;anàlisi de les dades (que podria no ser correcte o concret). En cas que no es pugui obtenir el tipus de cap manera, s&apos;usarà el mimetype application/octet-stream.</li> 
+    <li><code>false</code>: No inclou l&apos;atribut aneu-aa-ets-mimeType en la signatura. Valor per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>mimeType</code>:</li> 
+   <ul> 
+    <li>ACARONI-Type de les dades a signar. Només s&apos;inclou quan s&apos;indica la propietat <code>includeMimeTypeAttribute</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifier</code>:</li> 
+   <ul> 
+    <li>Identificador de la política de signatura, necessari per a generar signes CAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li> 
+   <ul> 
+    <li>Cadena Base 64 amb l&apos;empremta digital de la política de signatura. És obligatori indicar aquest paráesta propietat si de va indicar també policyIdentifier, igual que és obligatori també donar valor a l&apos;a la propietat <code>policyIdentifierHashAlgorithm</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>SHA1</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA1.</li> 
+    <li><code>SHA-256</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-256.</li> 
+    <li><code>SHA-384</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-384.</li> 
+    <li><code>SHA-512</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-512.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li> 
+   <ul> 
+    <li>URL accessible cap al document (normalment PDF) que conté una descripció textual de la política de signatura. Aquesta propietat és opcional fins i tot si es desitja generar signes CAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>includeOnlySignningCertificate</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Indica que ha d&apos;incloure&apos;s en la signatura únicament el certificat del signant.</li> 
+    <li><code>false</code>: Indica que ha d&apos;incloure&apos;s en la signatura tota la cadena de certificació del certificat signant. Valor per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li> 
+   <ul> 
+    <li>URL accessible cap al document (normalment PDF) que conté una descripció textual de la política de signatura. Aquesta propietat és opcional fins i tot si es desitja generar signes CAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb la ciutat en la qual es realitza la signatura. La codificació ha de ser UTF-8.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionPostalCode</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb el codi postal on es realitza la signatura. La codificació ha de ser UTF-8.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCountry</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb el país en la qual es realitza la signatura. La codificació ha de ser UTF-8.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura camps amb els càrrecs atribuïts al signant. Han de separar-se els càrrecs amb el caràcter &quot;|&quot; (i aquest no pot estar en el propi text de cap càrrec).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndications</code>:</li> 
+   <ul> 
+    <li>Número de CommitmentTypeIndications que es declararan. Aquests són els motius que es declaren per a la signatura. Els valors concrets s&apos;especifiquen amb commitmentTypeIndicationnIdentifier i commitmentTypeIndicationnDescription, on ‘n’ va des de 0 fins al valor indicat en aquesta propietat menys 1.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li> 
+   <ul> 
+    <li><code>1</code>: Estableix que el CommitmentTypeIndications número n (comptant des de zero) és &quot;Prova d&apos;origen&quot;.</li> 
+    <li><code>2</code>: Estableix que el CommitmentTypeIndications número n (comptant des de zero) és &quot;Prova de recepció&quot;.</li> 
+    <li><code>3</code>: Estableix que el CommitmentTypeIndications número n (comptant des de zero) és &quot;Prova de lliurament&quot;.</li> 
+    <li><code>4</code>: Estableix que el CommitmentTypeIndications número n (comptant des de zero) és &quot;Prova d&apos;enviament&quot;.</li> 
+    <li><code>5</code>: Estableix que el CommitmentTypeIndications número n (comptant des de zero) és &quot;Prova d&apos;aprovació&quot;.</li> 
+    <li><code>6</code>: Estableix que el CommitmentTypeIndications número n (comptant des de zero) és &quot;Prova de creació&quot;.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>CommitmentTypeQualifiers</code>:</li> 
+   <ul> 
+    <li>Llista d&apos;indicadors textuals separats pel caràcter &apos;|&apos; que s&apos;aporten com a qualificadors addicionals del CommitmentTypeIndication número n (atribut opcional). Normalment són OID. Els elements de la llista no poden contenir el caràcter &apos;|&apos; (ja que aquest s&apos;usa com a separador).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li> 
+   <ul> 
+    <li><code>true</code>: S&apos;inclourà l&apos;atribut SigningCertificateV2 en la signatura.</li> 
+    <li><code>false</code> (O un altre valor): S&apos;inclourà l&apos;atribut SigningCertificate en la signatura.</li> 
+    <li>Sense especificar: S&apos;inclourà SigningCertificate si la signatura utilitza un algorisme de signatura SHA1 i SigningCertificateV2 per a la resta d&apos;algorismes.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Es permet la cosignatura/contrasigna de signatures d&apos;arxiu longeu, a pesar que aquestes no seran vàlides posteriorment. </li> 
+    <li><code>false</code> (O un altre valor): No es permet la cosignatura/contrasigna de signatures d&apos;arxiu longeu.</li> 
+   </ul> 
+  </ul> 
+  <h3>Opcions de configuració de signatures XAdES</h3> 
+  <p>A continuació es llisten les propietats de configuració admeses per les signatures XAdES. Algunes d&apos;aquestes opcions poden no tenir efecte en casos de signatura en les quals no apliquin, com en el cas de les contrasignes.</p> 
+  <ul> 
+   <li style="margin-top: 10pt"><code>insertEnvelopedSignatureOnNodeByXPath</code>:</li> 
+   <ul> 
+    <li>Expressió XPath (v1) que indica el node sota el qual ha d&apos;inserir-se el node de signatura en el cas d&apos;una signatura Enveloped. Si l&apos;expressió retorna més d&apos;un node, s&apos;usa només el primer. Si l&apos;expressió no retorna nodes o està mal construïda es llançarà una excepció. Aquesta propietat només té efecte en signatures Enveloped.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>useManifest</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Usa un Manifest de XMLDSig amb les referències de signatura en comptes de signar directament aquestes referències. S&apos;ignora en l&apos;operació de cosignatura. Això permet que sigui opcional la comprovació de la destinació i empremtes digitals de les referències.</li> 
+    <li><code>false</code>: Genera les signatures normalment, sense Manifest (comportament per defecte).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>uri<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>URI que referencia a les dades que es desitgen signatura dins d&apos;una signatura manifest. ‘n’ indica el número de referència d&apos;entre les que es volen signar, començant en ‘1’.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>precalculatedHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>SHA1</code>: Indica que les empremtes digitals de les dades referenciades en el manifest es van calcular mitjançant l&apos;algorisme SHA1.</li> 
+    <li><code>SHA-256</code>: Indica que les empremtes digitals de les dades referenciades en el manifest es van calcular mitjançant l&apos;algorisme SHA-256.</li> 
+    <li><code>SHA-384</code>: Indica que les empremtes digitals de les dades referenciades en el manifest es van calcular mitjançant l&apos;algorisme SHA-284.</li> 
+    <li><code>SHA-512</code>: Indica que les empremtes digitals de les dades referenciades en el manifest es van calcular mitjançant l&apos;algorisme SHA-512.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>md<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>Base 64 amb l&apos;empremta digital de les dades associades a la referència ‘n’. L&apos;algorisme de petjada serà l&apos;indicat en <code>precalculatedHashAlgorithm</code></li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>mimetype<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>ACARONI-Type de les dades associades a la referència ‘n’ en una signatura manifest. Si no s&apos;indica aquesta propietat, s&apos;utilitzarà el tipus ‘application/octet-stream’.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>contentTypeOid<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>OID o URN del tipus de dada signada per a la referència número ‘n’ en una signatura manifest. Aquesta propietat és complementària (que no excloent) a la propietat <code>mimetype<i><b>n</b></i></code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>encoding<i><b>n</b></i></code>:</li> 
+   <ul> 
+    <li>Codificació de les dades associades a la referència número ‘n’ en una signatura manifest. Un ús incorrecte d&apos;aquesta propietat pot provocar la generació d&apos;una signatura invàlida.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>addKeyInfoKeyValue</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Inclou el node KeyValue dins de KeyInfo de XAdES (comportament per defecte).</li> 
+    <li><code>false</code>: No inclou el node KeyValue dins de KeyInfo de XAdES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>addKeyInfoKeyName</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Inclou el node KeyName dins de KeyInfo de XAdES.</li> 
+    <li><code>false</code>: No inclou el node KeyName dins de KeyInfo de XAdES (comportament per defecte).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>avoidXpathExtraTransformsOnEnveloped</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Evita la inclusió de la transformació XPATH2 que normalment s&apos;afegeix per a possibilitar les cosignatures i que elimina totes les signatures del document per a deixar únicament el contingut. ADVERTIMENT: La cosignatura d&apos;un document en el qual almenys una de les signatures no inclou la transformació XPATH, donarà lloc a un document de signatura que potencialment serà validat incorrectament pels validadors de signatura. Per aquest motiu, només es permet l&apos;ús d&apos;aquesta propietat en l&apos;operació de signatura (no en la de cosignatura).</li> 
+    <li><code>false</code>: Inclou la transformació XPATH2 possibilita les cosignatures eliminant totes les signatures del document per a deixar únicament el contingut (comportament per defecte).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>format</code>:</li> 
+   <ul> 
+    <li><code>XAdES Enveloping</code>: Genera signatures en format Enveloping. Aquest és el format que s&apos;utilitza per defecte quan no s&apos;indica cap.</li> 
+    <li><code>XAdES Enveloped</code>: Genera signatures en format Enveloped.</li> 
+    <li><code>XAdES Detached</code>: Genera signatures en format Internally Detached.</li> 
+    <li><code>XAdES Externally Detached</code>:Genera signatures en format Externally Detached.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>includeOnlySignningCertificate</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Indica que ha d&apos;incloure&apos;s en la signatura únicament el certificat del signant.</li> 
+    <li><code>false</code>: Indica que ha d&apos;incloure&apos;s en la signatura tota la cadena de certificació del certificat signant. Valor per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifier</code>:</li> 
+   <ul> 
+    <li>Identificador de la política de signatura (normalment una URL cap a la política en format XML procesable), necessari per a generar signes XAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li> 
+   <ul> 
+    <li>Cadena Base 64 amb l&apos;empremta digital de la política de signatura. És obligatori indicar aquesta propietat si de va indicar també policyIdentifier, igual que és obligatori també donar valor a la propietat <code>policyIdentifierHashAlgorithm</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>SHA1</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA1.</li> 
+    <li><code>SHA-256</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-256.</li> 
+    <li><code>SHA-384</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-384.</li> 
+    <li><code>SHA-512</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-512.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li> 
+   <ul> 
+    <li>URL accessible cap al document (normalment PDF) que conté una descripció textual de la política de signatura. Aquesta propietat és opcional fins i tot si es desitja generar signes XAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyDescription</code>:</li> 
+   <ul> 
+    <li>Descripció textual de la política de signatura. En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat. Aquesta propietat és opcional fins i tot si es desitja generar signes XAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura camps amb els càrrecs atribuïts al signant. Han de separar-se els càrrecs amb el caràcter &quot;|&quot; (i aquest no pot estar en el propi text de cap càrrec). En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb la ciutat en la qual es realitza la signatura. En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionProvince</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb la província en la qual es realitza la signatura. En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionPostalCode</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb el codi postal en el qual es realitza la signatura. En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCountry</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb el país en el qual es realitza la signatura. En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>referencesDigestMethod</code>:</li> 
+   <ul> 
+    <li><code>http://www.w3.org/2000/09/xmldsig#sha1</code>: Usa l&apos;algorisme SHA1 per al càlcul de les empremtes digitals de les referències XML signades.</li> 
+    <li><code>http://www.w3.org/2001/04/xmlenc#sha256</code>: Usa l&apos;algorisme SHA-256 per al càlcul de les empremtes digitals de les referències XML signades.</li> 
+    <li><code>http://www.w3.org/2001/04/xmlenc#sha512</code>: Usa l&apos;algorisme SHA-512 per al càlcul de les empremtes digitals de les referències XML signades. Aquest és el comportament per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>mimeType</code>:</li> 
+   <ul> 
+    <li>ACARONI-Type de les dades a signar. Si no s&apos;indica aquesta propietat el sistema intenta acte-detectar el tipus, establint el més aproximat (que pot no ser l&apos;estrictament correcte).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>encoding</code>:</li> 
+   <ul> 
+    <li>URI amb la codificació de les dades a signar (veure la documentació de l&apos;element Object de XMLDSig per a més informació). Un ús incorrecte d&apos;aquesta propietat pot provocar la generació d&apos;una signatura invàlida. Si es proporcionen dades a signar prèviament codificats en Base64 però es desitja siguin considerats com la seva forma descodificada, ha d&apos;establir-se aquest valor a http://www.w3.org/2000/09/xmldsig#base64 i especificar-se el tipus real en la propietat <code>mimeType</code>. Per exemple, per a signar una imatge PNG fent que la signatura es refereixi a la seva forma binària directa, pot proporcionar-se la imatge directament codificada en Base64 indicant l&apos;encoding com http://www.w3.org/2000/09/xmldsig#base64 i el mimeType com image/png. El valor ha de ser sempre una URI.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>outputXmlEncoding</code>:</li> 
+   <ul> 
+    <li>Codificació del XML de sortida. Si no s&apos;indica aquest valor s&apos;intenta acte-detectar a partir del XML d&apos;entrada (si les dades a signar són un XML).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>contentTypeOid</code>:</li> 
+   <ul> 
+    <li>OID o URN de tipus OID amb l&apos;identificador del tipus de dada signada. Aquesta propietat és complementària (que no excloent) a la propietat <code>mimeType</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>canonicalizationAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>http://www.w3.org/tr/2001/rec-xml-c14n-20010315</code>: Se signa el XML amb canonitzat XML 1.0 inclusiu (valor per defecte). </li> 
+    <li><code>http://www.w3.org/tr/2001/rec-xml-c14n-20010315#WithComments</code>: Se signa el XML amb canonitzat XML 1.0 inclusiu amb comentaris.</li> 
+    <li><code>http://www.w3.org/2001/10/xml-exc-c14n#</code>: Se signa el XML amb canonitzat XML 1.0 exclusiu.</li> 
+    <li><code>http://www.w3.org/2001/10/xml-exc-c14n#WithComments</code>: Se signa el XML amb canonitzat XML 1.0 exclusiu amb comentaris.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xadesNamespace</code>:</li> 
+   <ul> 
+    <li><code>http://uri.etsi.org/01903/v1.3.2#</code>: URL de definició de l&apos;espai de noms de XAdES corresponent a la versió 1.3.2 de XAdES. Aquest és el valor per defecte.</li> 
+    <li><code>http://uri.etsi.org/01903/v1.4.1#</code>: URL de definició de l&apos;espai de noms de XAdES corresponent a la versió 1.4.1 de XAdES. Si s&apos;estableix aquesta propietat és possible que es necessiti establir també la propietat <code>signedPropertiesTypeUrl</code> per a evitar incoherències en la versió de XAdES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl</code>:</li> 
+   <ul> 
+    <li><code>http://uri.etsi.org/01903#SignedProperties</code>: URL de definició del tipus de les propietats signades (Signed Properties) de XAdES. Aquest és el valor per defecte.</li> 
+    <li><code>http://uri.etsi.org/01903/1.3.2#SignedProperties</code>: URL de definició del tipus de les propietats signades (Signed Properties) de XAdES v1.3.2.</li> 
+    <li><code>http://uri.etsi.org/01903/1.4.1#SignedProperties</code>: URL de definició del tipus de les propietats signades (Signed Properties) de XAdES v1.4.1. Si s&apos;estableix aquesta propietat és possible que es necessiti establir també la propietat <code>xadesNamespace</code> per a evitar incoherències en la versió de XAdES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>ignoreStyleSheets</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Si se signa un XML amb fulles d&apos;estil, ignora aquestes deixant-les sense signar.</li> 
+    <li><code>false</code>: Si se signa un XML amb fulles d&apos;estil, signatura també les fulles d&apos;estil (valor per defecte, consultar notes addicionals sobre signatura de fulles d&apos;estil).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>avoidBase64Transforms</code>:</li> 
+   <ul> 
+    <li><code>true</code>: No declara transformacions Base64 fins i tot si són necessàries.</li> 
+    <li><code>false</code>: Declara les transformacions Base64 quan s&apos;han codificat internament les dades a signar en Base64 (valor per defecte).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>headless</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Evita que es mostrin diàlegs gràfics addicionals a l&apos;usuari (com per exemple, per a la dereferenciación de fulles d&apos;estil enllaçades amb rutes relatives).</li> 
+    <li><code>false</code>: Permet que es mostrin diàlegs gràfics addicionals a l&apos;usuari.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xmlTransforms</code>:</li> 
+   <ul> 
+    <li>Nombre de transformacions a aplicar al contingut signat. Ha d&apos;indicar-se posteriorment igual nombre de paràmetres xmlTransformnType, substituint n per un ordinal consecutiu, començant en 0 (veure notes addicionals sobre indicació de transformacions addicionals).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xmlTransformnType</code>:</li> 
+   <ul> 
+    <li><code>http://www.w3.org/2000/09/xmldsig#base64</code>: Indica que les dades que es proporcionen per a signar ja estan codificats en Base64 i s&apos;ha de declarar aquesta transformació addicional perquè es decodifiquen abans de signar-los. Aquesta transformació Base64 és addicional a la transformació necessària per a passar les dades a través dels mètodes de signatura del client.</li> 
+    <li><code>http://www.w3.org/tr/1999/rec-xpath-19991116</code>: El contingut s&apos;ha de processar mitjançant aquesta transformació XPATH abans de ser signat. únicament és aplicable quan se signa contingut XML.</li> 
+    <li><code>http://www.w3.org/2002/06/xmldsig-filter2</code>: El contingut s&apos;ha de processar mitjançant aquesta transformació XPATH2 abans de ser signat. únicament és aplicable quan se signa contingut XML.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xmlTransformnSubtype</code>:</li> 
+   <ul> 
+    <li>Subtipus de la transformació n. Els valors acceptats i les seves funcionalitats depenen del valor indicat en xmlTransformnType.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xmlTransformnBody</code>:</li> 
+   <ul> 
+    <li>Cos de la transformació n. Els valors acceptats i les seves funcionalitats depenen del valors indicats en xmlTransformnType i en xmlTransformnSubtype.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>nodeToSign</code>:</li> 
+   <ul> 
+    <li>Identificador del node (establert mitjançant l&apos;atribut &quot;Aneu&quot;) que es desitja signar dins d&apos;un XML.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndications</code>:</li> 
+   <ul> 
+    <li>Número de CommitmentTypeIndications que es declararan. Aquests són els motius que es declaren per a la signatura. Els valors concrets s&apos;especifiquen amb commitmentTypeIndicationnIdentifier i commitmentTypeIndicationnDescription, on ‘n’ va des de 0 fins al valor menys 1 indicat en aquesta propietat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li> 
+   <ul> 
+    <li><code>1</code>: Estableix que el CommitmentTypeIndications número <i><b>n</b></i> (comptant des de zero) és &quot;Prova d&apos;origen&quot;.</li> 
+    <li><code>2</code>: Estableix que el CommitmentTypeIndications número <i><b>n</b></i> (comptant des de zero) és &quot;Prova de recepció&quot;.</li> 
+    <li><code>3</code>: Estableix que el CommitmentTypeIndications número <i><b>n</b></i> (comptant des de zero) és &quot;Prova de lliurament&quot;.</li> 
+    <li><code>4</code>: Estableix que el CommitmentTypeIndications número <i><b>n</b></i> (comptant des de zero) és &quot;Prova d&apos;enviament&quot;.</li> 
+    <li><code>5</code>: Estableix que el CommitmentTypeIndications número <i><b>n</b></i> (comptant des de zero) és &quot;Prova d&apos;aprovació&quot;.</li> 
+    <li><code>6</code>: Estableix que el CommitmentTypeIndications número <i><b>n</b></i> (comptant des de zero) és &quot;Prova de creació&quot;.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Description</code>:</li> 
+   <ul> 
+    <li>Estableix la descripció del CommitmentTypeIndications número <i><b>n</b></i>. Aquest atribut és opcional.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>DocumentationReferences</code>:</li> 
+   <ul> 
+    <li>Llista d&apos;URL separades pel caràcter &apos;|&apos; que s&apos;aporten com a referències documentals del CommitmentTypeIndication número <i><b>n</b></i> (atribut opcional). Les URL de la llista no poden contenir el caràcter &apos;|&apos; (ja que aquest s&apos;usa com a separador).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>CommitmentTypeQualifiers</code>:</li> 
+   <ul> 
+    <li>Llista d&apos;indicadors textuals separats pel caràcter &apos;|&apos; que s&apos;aporten com a qualificadors addicionals del CommitmentTypeIndication número <i><b>n</b></i> (atribut opcional). Normalment són OID. Els elements de la llista no poden contenir el caràcter &apos;|&apos; (ja que aquest s&apos;usa com a separador).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Es permet la cosignatura/contrasigna de signatures d&apos;arxiu longeu, a pesar que aquestes no seran vàlides posteriorment. </li> 
+    <li><code>false</code> (O un altre valor): No es permet la cosignatura/contrasigna de signatures d&apos;arxiu longeu.</li> 
+   </ul>  
+  <li style="margin-top: 10pt"><code>avoidAGEPolicyIncompatibilities</code>:</li> 
+  <ul> 
+   <li><code>true</code>: S&apos;evitarà declarar la política de signatura de l&apos;AGE quan el resultat de l&apos;operació vagi a ser incompatible amb aquesta política.</li> 
+   <li><code>false</code> (O un altre valor): No es permet la cosignatura amb la políítica de signatura de l&apos;AGE quan el resultat no serà compatible amb la política.</li> 
+  </ul> 
+  <li style="margin-top: 10pt"><code>allowXadesEnvelopedWithoutXPath</code>:</li>
+  <ul>
+  	<li><code>true</code>: Permet la cosignatura d'una signatura que no conté una transformació XPath i que per tant quedarà invalidada. En la nova cosignatura sí que s'inclourà la transformació XPath.</li>
+  	<li><code>false</code>:	No es permet la cosignatura de signatures que no continguin una transformació XPath.</li>
+  </ul>
+  </ul>
+  
+  <h3>Opcions de configuració de signatures de Factura Electrònica</h3> 
+  <p>A continuació es llisten les propietats de configuració admeses per les signatures de factura electrònica (FacturaE).</p> 
+  <ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb la ciutat en la qual es realitza la signatura. En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionProvince</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb la província en la qual es realitza la signatura. En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionPostalCode</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb el codi postal en el qual es realitza la signatura. En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCountry</code>:</li> 
+   <ul> 
+    <li>Agrega a la signatura un camp amb el país en el qual es realitza la signatura. En el cas que se signi un XML, la codificació del text usat ha d&apos;adequar-se al XML signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>xadesNamespace</code>:</li> 
+   <ul> 
+    <li>URL de definició de l&apos;espai de noms de XAdES (l&apos;ús d&apos;aquesta propietat pot condicionar la declaració de versió de XAdES). Si s&apos;estableix aquesta propietat és possible que es necessiti establir també la propietat signedPropertiesTypeUrl per a evitar incoherències en la versió de XAdES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl</code>:</li> 
+   <ul> 
+    <li>URL de definició del tipus de les propietats signades (Signed Properties) de XAdES. Si s&apos;estableix aquesta propietat és possible que es necessiti establir també la propietat <code>xadesNamespace</code> per a evitar incoherències en la versió de XAdES. Si no s&apos;estableix s&apos;usa el valor per defecte: http://uri.etsi.org/01903#SignedProperties.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li> 
+   <ul> 
+    <li><code>emissor</code>: Declara que el signant és l&apos;emissor de la factura. Aquest és el valor per defecte.</li> 
+    <li><code>receptor</code>: Declara que el signant és el receptor de la factura.</li> 
+    <li><code>tercer</code>: Declara que el signant és un tercer respecte a la factura.</li> 
+    <li><code>supplier</code>: Declara que el signant és l&apos;emissor de la factura.</li> 
+    <li><code>customer</code>: Declara que el signant és el receptor de la factura.</li> 
+    <li><code>third party</code>: Declara que el signant és un tercer respecte a la factura.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifier</code>:</li> 
+   <ul> 
+    <li><code>http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf</code>: Identificador de la política de signatura 3.1. Aquest és el valor per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li> 
+   <ul> 
+    <li><code>Ohixl6upD6av8N7pEvDABhEL6hM=</code>: Empremta digital per a configurar la política de signatura 3.1. Aquest és el valor per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>SHA1</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA1.</li> 
+    <li><code>SHA-256</code>: Indica que l&apos;empremta digital indicada en la propietat <code> policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-256.</li> 
+    <li><code>SHA-384</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-384.</li> 
+    <li><code>SHA-512</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-512.</li> 
+   </ul> 
+  </ul> 
+  <h3>Opcions de configuració de signatures PAdES</h3> 
+  <p>A continuació es llisten les propietats de configuració admeses per les signatures PAdES.</p> 
+  <ul> 
+   <li style="margin-top: 10pt"><code>includeOnlySignningCertificate</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Indica que ha d&apos;incloure&apos;s en la signatura únicament el certificat del signant.</li> 
+    <li><code>false</code>: Indica que ha d&apos;incloure&apos;s en la signatura tota la cadena de certificació del certificat signant. Valor per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>alwaysCreateRevision</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Sempre crearà una revisió en signar. Requereix que el document compleixi l&apos;especificació PDF 1.7 (ISO 32000-1:2008)</li> 
+    <li><code>false</code>: No crearà revisió en la primera signatura i sí en les següents.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureField</code>:</li> 
+   <ul> 
+    <li>Nom del camp de signatura preexistent en el qual inserir la signatura.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePages</code>:</li> 
+   <ul> 
+    <li>Indica les pàgines en les quals ha d&apos;aparèixer visible la signatura.</li> 
+    <li>Admet els següents valors:</li> 
+    <ul> 
+     <li><code>all</code>: Per a indicar que la signatura visible aparegui en totes les pàgines del document, se li haurà de donar aquest valor. </li> 
+     <li><code>append</code>: Si la signatura visible ha d&apos;aparèixer en una nova pàgina en blanc afegida al final del document, se li haurà de donar aquest valor.</li> 
+     <li>Pàgina o llistat de pàgines: En aquesta opció es permet seleccionar la pàgina o rang de pàgines on apareixerà la signatura visible. Si es desitja indicar una pàgina o diverses pàgines on estampar la signatura visible, és possible indicant pàgina a pàgina amb una separació de comes (<code>1,4,7</code>: S&apos;estampa en les pàgines 1, 4 i 7) o indicant un rang de pàgines a través d&apos;un guió (<code>1-8</code>: S&apos;estampa en les pàgines des de la 1 fins a la 8). Tal com s&apos;explica en el paràgraf anterior, es permet indicar les pàgines amb un valor negatiu, on es començarà des del final (<code>1,-1</code>: S&apos;estamparà en la primera i última pàgina).</li> 
+    </ul> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePositionOnPageLowerLeftX</code>:</li> 
+   <ul> 
+    <li>Nombre enter amb la coordenada horitzontal des de la cantonada inferior esquerra de la pàgina a la cantonada inferior esquerra del camp de signatura visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePositionOnPageLowerLeftY</code>:</li> 
+   <ul> 
+    <li>Nombre enter amb la coordenada vertical des de la cantonada inferior esquerra de la pàgina a la cantonada inferior esquerra del camp de signatura visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePositionOnPageUpperRightX</code>:</li> 
+   <ul> 
+    <li>Nombre enter amb la coordenada horitzontal des de la cantonada inferior esquerra de la pàgina a la cantonada superior dreta del camp de signatura visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signaturePositionOnPageUpperRightY</code>:</li> 
+   <ul> 
+    <li>Nombre enter amb la coordenada vertical des de la cantonada inferior esquerra de la pàgina a la cantonada superior dreta del camp de signatura visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureRubricImage</code>:</li> 
+   <ul> 
+    <li>Ruta del fitxer amb la imatge JPEG de la imatge a mostrar aplicar en la signatura visible PDF. També pot indicar-se directament el Base 64 de la imatge.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2Text</code>:</li> 
+   <ul> 
+    <li>Text que mostrar en el camp de signatura visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2FontFamily</code>:</li> 
+   <ul> 
+    <li><code>0</code>: El text de la signatura visible es mostrarà amb font Courier. Aquest és el valor per defecte.</li> 
+    <li><code>1</code>: El text de la signatura visible es mostrarà amb font Helvètica.</li> 
+    <li><code>2</code>: El text de la signatura visible es mostrarà amb font Times Roman.</li> 
+    <li><code>3</code>: El text de la signatura visible es mostrarà amb font Symbol.</li> 
+    <li><code>4</code>: El text de la signatura visible es mostrarà amb font ZapfDingBats.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2FontSize</code>:</li> 
+   <ul> 
+    <li>Grandària de font del text de la signatura visible.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2FontStyle</code>:</li> 
+   <ul> 
+    <li><code>0</code>: Text de la signatura visible sense estil. Valor per defecte.</li> 
+    <li><code>1</code>: Text de la signatura visible en negreta.</li> 
+    <li><code>2</code>: Text de la signatura visible en cursiva.</li> 
+    <li><code>4</code>: Text de la signatura visible subratllat.</li> 
+    <li><code>8</code>: Text de la signatura visible ratllat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>layer2FontColor</code>:</li> 
+   <ul> 
+    <li><code>black</code>: Text de la signatura visible sense estil. Valor per defecte.</li> 
+    <li><code>white</code>: El text de la signatura visible serà de color blanc.</li> 
+    <li><code>gray</code>: El text de la signatura visible serà de color gris.</li> 
+    <li><code>lightGray</code>: El text de la signatura visible serà de color gris clar.</li> 
+    <li><code>darkGray</code>: El text de la signatura visible serà de color gris fosc.</li> 
+    <li><code>xarxa</code>: El text de la signatura visible serà de color vermell.</li> 
+    <li><code>pink</code>: El text de la signatura visible serà de color rosa.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>obfuscateCertText</code>:</li> 
+   <ul> 
+    <li><code>true</code>: S&apos;ofusquen els identificadors d&apos;usuari extrets del CN o DN del certificat i mostrats en la signatura visible PDF. No s&apos;ofusquen les dades dels certificats de pseudònim. Aquest és el valor per defecte.</li> 
+    <li><code>false</code>: No s&apos;ofusca la informació dels certificats.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>obfuscationMask</code>:</li> 
+   <ul> 
+    <li>Criteris d&apos;ofuscació dels identificadors d&apos;usuari en les signatures visibles PDF. Ha de mostrar el següent patró:</li> 
+    <ul> 
+     <li><code>caràcter;longitudDigitos;posicions;desplaçament</code></li> 
+    </ul> 
+    <li>En aquest patró:</li> 
+    <ul> 
+     <li><code>caràcter</code>: És el caràcter que usar per a ofuscar caràcters.</li> 
+     <li><code>longitudDigitos</code>: Nombre mínim de dígits que ha de tenir una cadena de text perquè es consideri que ha d&apos;ofuscar-se.</li> 
+     <li><code>posicions</code>: Llistat de posicions que indica quins caràcters han de mostrar-se. El llistat s&apos;expressa amb una successió de <code>true/false</code> separats per comes (&apos;,&apos;), on <code>true</code> indica que el caràcter ha de mostrar-se i <code>false</code> que no.</li> 
+     <li><code>desplaçament</code>: Indica si s&apos;admet el desplaçament de posicions de la màscara per a mostrar tots els caràcters indicats (<code>true</code>) o si aquesta ha de respectar-se (<code>false</code>).</li> 
+    </ul> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>visibleSignature</code>:</li> 
+   <ul> 
+    <li><code>default</code>: Es realitzarà signatura visible PDF si s&apos;han proporcionat els paràmetres amb l&apos;àrea i la pàgina de signatura. Aquest és el valor per defecte.</li> 
+    <li><code>want</code>: L&apos;usuari ha de seleccionar l&apos;àrea de signatura visible. En cas de cancel·lar el procés:</li> 
+    <ul> 
+     <li>Si la petició també inclou els paràmetres d&apos;àrea de signatura visible (posició i pàgina), s&apos;usaran aquests paràmetres i es continuarà amb el procés de signatura.</li> 
+     <li>Si la petició no inclou els paràmetres d&apos;àrea de signatura visible, es cancel·larà el procés de signatura.</li> 
+    </ul> 
+    <li><code>optional</code>: L&apos;usuari podrà triar si desitja incloure o no l&apos;àrea de signatura visible. En cas de cancel·lar el procés:</li> 
+    <ul> 
+     <li>Si la petició també inclou els paràmetres d&apos;àrea de signatura visible (posició i pàgina), s&apos;usaran aquests paràmetres i es continuarà amb el procés de signatura.</li> 
+     <li>Si la petició no inclou els paràmetres d&apos;àrea de signatura visible, es realitzarà una signatura no visible.</li> 
+    </ul> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>visibleAppearance</code>:</li> 
+   <ul> 
+    <li><code>default</code>: S&apos;aplicarà l&apos;aspecte per defecte per a la signatura visible PDF o, si es van proporcionar els paràmetres d&apos;aspecte, l&apos;aspecte configurat. Aquest és el valor per defecte.</li> 
+    <li><code>custom</code>: L&apos;usuari pot triar l&apos;aspecte de la signatura visible. En cas de cancel·lar el procés, s&apos;usarà l&apos;aspecte per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureRotation</code>:</li> 
+   <ul> 
+    <li><code>0</code>: No trencada el text del camp de signatura. Aquest és el valor per defecte.</li> 
+    <li><code>90</code>: Rota 90 graus en sentit horari el text del camp de signatura. S&apos;ignorarà qualsevol configuració d&apos;imatge de signatura.</li> 
+    <li><code>180</code>: Rota 180 graus en sentit horari el text del camp de signatura. S&apos;ignorarà qualsevol configuració d&apos;imatge de signatura.</li> 
+    <li><code>270</code>: Rota 270 graus en sentit horari el text del camp de signatura. S&apos;ignorarà qualsevol configuració d&apos;imatge de signatura.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>includeQuestionMark</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permetre&apos;s al lector de PDF mostrar al costat de la signatura visible una marca que índique el resultat obtingut en validar-la. L&apos;aparença d&apos;aquesta marca depèn completament del lector de PDF utilitzat i és aquest el que decideix si es mostra. Per exemple, la marca podria no mostrar-se quan es definís una imatge de fons en la signatura.</li> 
+    <li><code>false</code>: No permet mostrar la marca amb el resultat de la validació. Aquest és el valor per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>image</code>:</li> 
+   <ul> 
+    <li>Ruta del fitxer d&apos;imatge JPEG que inserir en el document abans de signar-lo. També pot indicar-se directament el Base 64 de la imatge. Aquesta propietat només es pot utilitzar en la primera signatura del document.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePage</code>:</li> 
+   <ul> 
+    <li>Número de la pàgina del document PDF en la qual inserir la imatge.</li> 
+    <li><code>0</code>: Inserir en totes les pàgines</li> 
+    <li><code>-1</code>: Inserir imatge en l&apos;última pàgina.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePositionOnPageLowerLeftX</code>:</li> 
+   <ul> 
+    <li>Nombre enter amb la coordenada horitzontal des de la cantonada inferior esquerra de la pàgina a la cantonada inferior esquerra de la imatge.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePositionOnPageLowerLeftY</code>:</li> 
+   <ul> 
+    <li>Nombre enter amb la coordenada vertical des de la cantonada inferior esquerra de la pàgina a la cantonada inferior esquerra de la imatge.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePositionOnPageUpperRightX</code>:</li> 
+   <ul> 
+    <li>Nombre enter amb la coordenada horitzontal des de la cantonada inferior esquerra de la pàgina a la cantonada superior dreta de la imatge.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>imagePositionOnPageUpperRightY</code>:</li> 
+   <ul> 
+    <li>Nombre enter amb la coordenada vertical des de la cantonada inferior esquerra de la pàgina a la cantonada superior dreta de la imatge.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>attach</code>:</li> 
+   <ul> 
+    <li>Ruta del fitxer amb el contingut a afegir com a adjunt al PDF. També pot indicar-se directament el Base 64 de les dades. Requereix establir attachFileName.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>attachFileName</code>:</li> 
+   <ul> 
+    <li>Nom del qual assignar al fitxer adjunt.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>attachDescription</code>:</li> 
+   <ul> 
+    <li>Descripció del document adjunt.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>certificationLevel</code>:</li> 
+   <ul> 
+    <li><code>0</code>: Signatura sense certificar. Aquesta seria una signatura d&apos;aprovació. És el valor per defecte.</li> 
+    <li><code>1</code>: Signatura certificada d&apos;autor. Després d&apos;aquesta mena de signatura certificada, no es permet cap canvi posterior en el document (no es poden agregar signatures, ni emplenar formularis).</li> 
+    <li><code>2</code>: Signatura certificada d&apos;autor per a formularis. Després d&apos;aquesta mena de signatura certificada, només es permet el farciment dels camps de formulari (no es poden agregar signatures).</li> 
+    <li><code>3</code>: Signatura certificada comuna. Després d&apos;aquesta mena de signatura certificada, només es permet el farciment dels camps de formulari i la creació de signatures d&apos;aprovació.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>compressPdf</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Comprimeix el PDF signat perquè ocupi menys grandària. Només s&apos;aplica si es tracta d&apos;un PDF v4 o superior. Aquest és el valor per defecte.</li> 
+    <li><code>false</code>: Mai es comprimeix el PDF signat.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>pdfVersion</code>:</li> 
+   <ul> 
+    <li><code>-1</code>: Es declara que es respecti la versió del PDF que se signi.</li> 
+    <li><code>2</code>: Es declara que la versió del PDF de sortida és 1.2.</li> 
+    <li><code>3</code>: Es declara que la versió del PDF de sortida és 1.3.</li> 
+    <li><code>4</code>: Es declara que la versió del PDF de sortida és 1.4.</li> 
+    <li><code>5</code>: Es declara que la versió del PDF de sortida és 1.5.</li> 
+    <li><code>6</code>: Es declara que la versió del PDF de sortida és 1.6.</li> 
+    <li><code>7</code>: Es declara que la versió del PDF de sortida és 1.7.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureSubFilter</code>:</li> 
+   <ul> 
+    <li>Subfiltro declarat. Per defecte s&apos;utilitza el de les signatures bàsiques (adbe.pkcs7.detached). Pot usar-se la cadena &quot;ETSI.CAdES.detached&quot; per a crear signes BES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signReason</code>:</li> 
+   <ul> 
+    <li>Raó per la qual es realitza la signatura.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signatureProductionCity</code>:</li> 
+   <ul> 
+    <li>Ciutat en la qual es realitza la signatura.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerContact</code>:</li> 
+   <ul> 
+    <li>Informació de contacte del signant.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signerClaimedRoles</code>:</li> 
+   <ul> 
+    <li>Llistat de rols declarats pel signant (separats per &quot;|&quot;).</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifier</code>:</li> 
+   <ul> 
+    <li>Identificador de la política de signatura (normalment una URL cap a la política en format XML procesable), necessari per a generar signes XAdES-EPES.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHash</code>:</li> 
+   <ul> 
+    <li>Text Base 64 amb l&apos;empremta digital de la política de signatura. És obligatori indicar aquesta propietat si el valor indicat en policyIdentifier no és universalment accessible. Si es dóna valor a aquesta propietat és obligatori també donar valor a la propietat <code>policyIdentifierHashAlgorithm</code>.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm</code>:</li> 
+   <ul> 
+    <li><code>SHA1</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA1.</li> 
+    <li><code>SHA-256</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-256.</li> 
+    <li><code>SHA-384</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-384.</li> 
+    <li><code>SHA-512</code>: Indica que l&apos;empremta digital indicada en la propietat <code>policyIdentifierHash</code> es va calcular mitjançant l&apos;algorisme SHA-512.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>policyQualifier</code>:</li> 
+   <ul> 
+    <li>URL cap al document que conté una descripció textual de la política de signatura.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>ownerPassword</code>:</li> 
+   <ul> 
+    <li>Contrasenya d&apos;obertura del PDF. No se suporta la signatura de documents PDF xifrats amb certificats o algorisme AES-256.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>headless</code>:</li> 
+   <ul> 
+    <li><code>true</code>: No interromp el procés de signatura sol·licitant interacció de l&apos;usuari.</li> 
+    <li><code>false</code>: Mostra diàlegs a l&apos;usuari si requereix de la seva autorització o alguna dada addicional per a signar. Aquest és el valor per defecte.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowSigningCertifiedPdfs</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permet la signatura de documents PDF certificats. El resultat podria invalidar signatures anteriors del PDF.</li> 
+    <li><code>false</code>: Produeix un error en signar documents PDF certificats.</li> 
+    <li>S&apos;omet: En cas de detectar que el document PDF d&apos;entrada està certificat, s&apos;advertirà a l&apos;usuari que la signatura podria invalidar signatures anteriors i se li permetrà triar si signar o cancel·lar l&apos;operació.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowSigningCertifiedPdfs</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permet la signatura de documents PDF certificats. El resultat podria invalidar signatures anteriors del PDF.</li> 
+    <li><code>false</code>: Produeix un error en signar documents PDF certificats.</li> 
+    <li>S&apos;omet: En cas de detectar que el document PDF d&apos;entrada està certificat, s&apos;advertirà a l&apos;usuari que la signatura podria invalidar signatures anteriors i se li permetrà triar si signar o cancel·lar l&apos;operació.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowCosigningUnregisteredSignatures</code>:</li> 
+   <ul> 
+    <li><code>true</code>: Permet signar documents PDF amb signatures prèvies no registrades.</li> 
+    <li><code>false</code>: No permet signar documents PDF amb signatures prèvies no registrades.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signingCertificateV2</code>:</li> 
+   <ul> 
+    <li><code>true</code>: S&apos;utilitza l&apos;atribut signingCertificateV2 en les signatures.</li> 
+    <li><code>false</code>: S&apos;utilitza l&apos;atribut signingCertificateV1 en les signatures.</li> 
+    <li>S&apos;omet: S&apos;utilitza l&apos;atribut signingCertificateV1 en les signatures SHA1withRSA i signingCertificateV2 en la resta.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signReservedSize</code>:</li> 
+   <ul> 
+    <li>Grandària màxima en bytes de la signatura que s&apos;incorporarà al PDF. Per defecte, 27000.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>signingCertificateV2</code>:</li> 
+   <ul> 
+    <li><code>true</code>: S&apos;utilitza l&apos;atribut signingCertificateV2 en les signatures.</li> 
+    <li><code>false</code>: S&apos;utilitza l&apos;atribut signingCertificateV1 en les signatures.</li> 
+    <li>S&apos;omet: S&apos;utilitza l&apos;atribut signingCertificateV1 en les signatures SHA1withRSA i signingCertificateV2 en la resta.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowShadowAttack</code>:</li> 
+   <ul> 
+    <li><code>true</code>: No es realitzarà la comprovació de PDF Shadow Attack durant la validació de les signatures prèvies.</li> 
+    <li><code>false</code>: Es realitzarà la comprovació de PDF Shadow Attack durant la validació de les signatures prèvies i, en cas de detectar-se, es donarà la signatura per invàlida.</li> 
+    <li>S&apos;omet: Es realitzarà la comprovació de PDF Shadow Attack durant la validació de les signatures prèvies i, en cas de detectar-se, es consultarà a l&apos;usuari si s&apos;ha de continuar amb l&apos;operació.</li> 
+   </ul> 
+   <li style="margin-top: 10pt"><code>allowModifiedForm</code>:</li> 
+   <ul> 
+    <li><code>true</code>: No es realitzarà la comprovació de canvis en els formularis del document ni PDF Shadow Attack durant la validació de les signatures prèvies.</li> 
+    <li><code>false</code>: Es realitzarà la comprovació de canvis en els formularis del document durant la validació de les signatures prèvies i, en cas de detectar-se, es donarà la signatura per invàlida.</li> 
+    <li>S&apos;omet: Es realitzarà la comprovació de canvis en els formularis del document durant la validació de les signatures prèvies i, en cas de detectar-se, es consultarà a l&apos;usuari si s&apos;ha de continuar amb l&apos;operació.</li> 
+   </ul> 
+  </ul>  
+ </body>
+</html>

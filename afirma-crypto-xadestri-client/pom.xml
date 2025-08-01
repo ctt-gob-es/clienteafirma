@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.9</version>
+		<version>1.10-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -24,6 +24,11 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-core-xml</artifactId>
+			<version>${clienteafirma.version}</version>
 		</dependency>
 	</dependencies>
 </project>

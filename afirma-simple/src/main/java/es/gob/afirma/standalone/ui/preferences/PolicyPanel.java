@@ -460,8 +460,23 @@ final class PolicyPanel extends JPanel implements ItemListener {
 		return (PolicyItem) this.policiesCombo.getSelectedItem();
 	}
 
-	JTextField getIdentifierField() {
+	public JTextField getIdentifierField() {
 		return this.identifierField;
 	}
 
+	public JTextField getHashField() {
+		return this.hashField;
+	}
+	
+	public JComboBox<String> getHashAlgorithmField() {
+		return this.hashAlgorithmField;
+	}
+	
+	public JTextField getQualifierField() {
+		return this.qualifierField;
+	}
+	
+	public boolean isNoPolicySelected() {
+		return this.policiesCombo.getSelectedIndex() <= getNoPolicyIndex();
+	}
 }

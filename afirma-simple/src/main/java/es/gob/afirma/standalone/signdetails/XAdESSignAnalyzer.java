@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
@@ -80,15 +80,15 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
             signInfo = SignAnalyzer.getSignInfo(data);
 
             this.signersTree = signInfo.getSignsTree();
-    		this.signDetailsList = new ArrayList<SignDetails>();
-    		this.certDetailsList = new ArrayList<CertificateDetails>();
+    		this.signDetailsList = new ArrayList<>();
+    		this.certDetailsList = new ArrayList<>();
     		this.signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(data));
     		this.dataLocation = obtainDataLocation();
     		final NodeList signaturesList = this.signDocument.getElementsByTagNameNS(XMLConstants.DSIGNNS, XMLConstants.TAG_SIGNATURE);
     		createSignDetails(signaturesList);
     	}
     	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 	}
 
@@ -115,9 +115,9 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 	/**
 	 * Construye los detalles de la firma.
 	 * @param signaturesList Lista con datos de firmas.
-	 * @throws AOInvalidFormatException Error formateando los datos.
+	 * @throws AOInvalidSignatureFormatException Error formateando los datos.
 	 */
-	private void createSignDetails(final NodeList signaturesList) throws AOInvalidFormatException {
+	private void createSignDetails(final NodeList signaturesList) throws AOInvalidSignatureFormatException {
     	try {
     		for (int i = 0 ; i < signaturesList.getLength() ; i++) {
     			final Element signature = (Element) signaturesList.item(i);
@@ -136,7 +136,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
     		}
     	}
     	catch (final Exception e) {
-    		throw new AOInvalidFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
+    		throw new AOInvalidSignatureFormatException("No se ha podido cargar el documento XML de firmas", e); //$NON-NLS-1$
     	}
 	}
 
@@ -145,9 +145,9 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 	 * @param signElement Elemento XML con datos de la firma.
 	 * @param signProfile Perfil de la firma.
 	 * @return Detalles de la firma.
-	 * @throws AOInvalidFormatException Error formateando datos.
+	 * @throws AOInvalidSignatureFormatException Error formateando datos.
 	 */
-	private static SignDetails buildSignDetails(final Element signElement, final String signProfile) throws AOInvalidFormatException {
+	private static SignDetails buildSignDetails(final Element signElement, final String signProfile) throws AOInvalidSignatureFormatException {
 		final SignDetails xadesSignDetails = new SignDetails();
 
 		xadesSignDetails.setSignProfile(signProfile);
@@ -159,7 +159,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 			}
 			xadesSignDetails.setAlgorithm(algorithm);
 		} else {
-			throw new AOInvalidFormatException("El elemento SignatureMethod no existe"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("El elemento SignatureMethod no existe"); //$NON-NLS-1$
 		}
 
 		// FIRMANTE
@@ -183,7 +183,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 			}
 
 			if (!existingNamespace) {
-				throw new AOInvalidFormatException(
+				throw new AOInvalidSignatureFormatException(
 						"Una de las firmas encontradas en el documento contiene una version inexistente de XAdES"); //$NON-NLS-1$
 			}
 
@@ -197,7 +197,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 			if (signedDataObjectPropertiesList.getLength() > 0) {
 				final NodeList dataObjectFormatList = ((Element) signedDataObjectPropertiesList.item(0))
 						.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_DATA_OBJECT_FORMAT);
-				final List<DataObjectFormat> dataObjectFormats = new ArrayList<DataObjectFormat>();
+				final List<DataObjectFormat> dataObjectFormats = new ArrayList<>();
 				for (int m = 0; m < dataObjectFormatList.getLength(); m++) {
 					final DataObjectFormat dof = new DataObjectFormat();
 					final Element dataObjectFormaElmt = (Element) dataObjectFormatList.item(m);
@@ -266,7 +266,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 			// METADATOS
 			final NodeList signatureProductionPlaceList = qualifyingProps.getElementsByTagNameNS(namespaceUri,
 					XAdESConstants.TAG_SIGNATURE_PRODUCTION_PLACE);
-			Map<String, String> metadata = new HashMap<String, String>();
+			Map<String, String> metadata = new HashMap<>();
 			if (signatureProductionPlaceList.getLength() > 0) {
 				metadata = getProductionPlaceMetadata(signatureProductionPlaceList, namespaceUri);
 			} else {
@@ -327,7 +327,7 @@ public class XAdESSignAnalyzer implements SignAnalyzer {
 	 * @return Mapa con datos de la localizaci&oacute;n.
 	 */
     private static Map<String, String> getProductionPlaceMetadata(final NodeList signatureProductionPlaceList, final String namespaceUri) {
-    	final Map<String, String> metadata = new HashMap<String, String>();
+    	final Map<String, String> metadata = new HashMap<>();
 		final Element signProdPlaceNode = (Element) signatureProductionPlaceList.item(0);
 		final NodeList streetAddressNode = signProdPlaceNode
 				.getElementsByTagNameNS(namespaceUri, XAdESConstants.TAG_STREET_ADDRESS);
