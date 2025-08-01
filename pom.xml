@@ -52,7 +52,7 @@
 	<properties>
 		<clienteafirma.version>1.10-SNAPSHOT</clienteafirma.version>
 		<triphase.service.version>2.8.1</triphase.service.version>
-		<jmulticard.version>2.0</jmulticard.version>
+		<jmulticard.version>2.1-SNAPSHOT</jmulticard.version>
 		<afirma.lib.itext.version>1.6</afirma.lib.itext.version>
 		<spongycastle.version>1.58.0.0</spongycastle.version>
 		<afirma.legible.version>1_8_0</afirma.legible.version>
