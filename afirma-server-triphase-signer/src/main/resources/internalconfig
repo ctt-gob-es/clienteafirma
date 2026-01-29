@@ -1,0 +1,8 @@
+# Nombre de la variable de entorno en la que buscar el directorio del fichero de configuracion
+config.dir.varname=clienteafirma.config.path
+
+# Nombre del fichero de propiedades que se buscara en el directorio de configuracion
+config.filename=tps_config.properties
+
+# Nombre usado para la impresion de los logs de la Java Logging API
+logger.name=es.gob.afirma

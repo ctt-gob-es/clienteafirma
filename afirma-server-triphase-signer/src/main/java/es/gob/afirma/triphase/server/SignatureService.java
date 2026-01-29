@@ -63,12 +63,12 @@ public final class SignatureService extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private static DocumentManager docManager;
 	private static DocumentCacheManager docCacheManager;
 
-	private static final String URL_DEFAULT_CHARSET = "utf-8"; //$NON-NLS-1$
+	private static final String URL_DEFAULT_CHARSET = StandardCharsets.UTF_8.displayName();
 
 	private static final String PARAM_NAME_OPERATION = "op"; //$NON-NLS-1$
 

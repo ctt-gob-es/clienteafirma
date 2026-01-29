@@ -38,7 +38,7 @@ import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 
 final class JSONSingleSignPostProcessor {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	/** Propiedad dedicada a almacenar el identificador del archivo a escribir o leer de cach&eacute;. */
 	private static final String TRIPHASE_PROP_CACHE_ID = "CACHE_ID"; //$NON-NLS-1$

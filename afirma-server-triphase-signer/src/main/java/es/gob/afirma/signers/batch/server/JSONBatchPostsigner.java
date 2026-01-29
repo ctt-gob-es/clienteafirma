@@ -38,7 +38,7 @@ public final class JSONBatchPostsigner extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private static final String BATCH_JSON_PARAM = "json"; //$NON-NLS-1$
 	private static final String BATCH_CRT_PARAM = "certs"; //$NON-NLS-1$

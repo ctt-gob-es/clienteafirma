@@ -59,7 +59,7 @@ public abstract class JSONSignBatch {
 
 	private static final String EXTRAPARAM_HEADLESS = "headless"; //$NON-NLS-1$
 
-	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	protected static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	/** Lista de firmas a procesar. */
 	protected final List<JSONSingleSign> signs;

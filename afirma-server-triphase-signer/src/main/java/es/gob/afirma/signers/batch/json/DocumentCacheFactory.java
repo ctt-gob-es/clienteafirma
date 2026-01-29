@@ -14,7 +14,7 @@ import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
  */
 public class DocumentCacheFactory {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private static Constructor<DocumentCacheManager> constructor = null;
 	private static boolean needConfig = false;

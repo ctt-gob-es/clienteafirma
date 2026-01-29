@@ -31,11 +31,12 @@ import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStoreFactory;
 import es.gob.afirma.signers.batch.TriPhaseHelper;
+import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.signer.processors.TriPhasePreProcessor;
 
 final class SingleSignPostProcessor {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private SingleSignPostProcessor() {
 		// No instanciable

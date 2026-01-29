@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.SignatureService;
 
 /**
@@ -22,7 +23,7 @@ import es.gob.afirma.triphase.server.SignatureService;
  */
 public class BatchConfigManager {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private static final String CONFIG_FILE = "signbatch_config.properties"; //$NON-NLS-1$
 

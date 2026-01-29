@@ -27,6 +27,7 @@ import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.xml.SingleSign;
+import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 
@@ -40,7 +41,7 @@ public final class JSONSingleSign extends SingleSign {
 	private static final String JSON_ELEMENT_SUBOPERATION = "suboperation"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_EXTRAPARAMS = "extraparams"; //$NON-NLS-1$
 
-	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private DocumentManager documentManager;
 

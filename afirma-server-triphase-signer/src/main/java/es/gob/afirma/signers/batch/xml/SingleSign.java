@@ -32,6 +32,7 @@ import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
 import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 /** Firma electr&oacute;nica &uacute;nica dentro de un lote.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -53,7 +54,7 @@ public class SingleSign {
 	private static final String HTTPS_SCHEME = "https://"; //$NON-NLS-1$
 	private static final String FTP_SCHEME = "ftp://"; //$NON-NLS-1$
 
-	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	protected Properties extraParams;
 

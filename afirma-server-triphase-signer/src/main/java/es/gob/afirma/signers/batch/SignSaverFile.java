@@ -18,6 +18,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.signers.batch.xml.SingleSign;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 /** Guarda firmas envi&aacute;ndolas a un servicio HTTP POST.
  * <b>Esta clase es &uacute;nicamente un ejemplo de implementaci&oacute;n del interfaz <code>SignSaver</code>
@@ -33,7 +34,7 @@ public final class SignSaverFile implements SignSaver {
 	 * qu&eacute; ficheros pueden sobrescribirse. */
 	private static final boolean DISABLED = false;
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private String filename;
 

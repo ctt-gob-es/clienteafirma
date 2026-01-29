@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 /**
  * Implementaci&oacute;n de cache&eacute; en disco.
@@ -34,7 +35,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	private static final long DEFAULT_EXP_TIME = 60000;
 	private static final int DEFAULT_MAX_USE_TO_CLEAN = 100;
 
-	final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	final static Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private static int uses = 0;
 
