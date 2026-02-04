@@ -55,40 +55,6 @@ public final class PreferencesPlistHandler {
 	 */
 	private static final String PREF_CERT_HASH_ALGORITHM = "SHA-256"; //$NON-NLS-1$
 
-//	/**
-//	 * Importa las preferencias de la aplicaci&oacute;n desde un fichero PList descargado desde una URL.
-//	 * @param url URL para la descarga del fichero de importaci&oacute;n con las preferencias de la aplicaci&oacute;n.
-//	 * @param unprotected
-//	 *        {@code true} Si las preferencias no est&aacute;n protegidas,
-//	 *        {@code false} en caso contrario
-//	 * @throws IOException Si hay problemas con la descarga del fichero de preferencias.
-//	 * @throws InvalidPreferencesFileException Si las preferencias no son v&aacute;lidas por cualquier motivo.
-//	 * @throws AOInvalidFormatException Si no se puede obtener informac&oacute;n sobre la firma de las preferencias.
-//	 */
-//	public static void importPreferencesFromUrl(final String url, final boolean unprotected) throws IOException, InvalidPreferencesFileException, AOInvalidFormatException {
-//		if (url == null){
-//			throw new IllegalStateException("La URL de descarga del fichero de configuracion no puede ser nula"); //$NON-NLS-1$
-//		}
-//		final byte[] configData = DataDownloader.downloadData(url);
-//		try {
-//			XAdESValidator.validate(configData, true);
-//		}
-//		catch (final Exception e) {
-//			throw new InvalidPreferencesFileException(
-//					"La firma del fichero de preferencias no es valida" //$NON-NLS-1$
-//					);
-//		}
-////		final AOTreeModel tm = new AOXAdESSigner().getSignersStructure(configData, true);
-////		final AOSimpleSignInfo ssi = (AOSimpleSignInfo) ((AOTreeNode)AOTreeModel.getChild(tm.getRoot(), 0)).getUserObject();
-////		final X509Certificate signerCert = ssi.getCerts()[0];
-////		if (!Base64.encode(signerCert.getPublicKey().getEncoded()).equals(PREFERENCES_SIGNATURE_PUK_BASE64)) {
-////			throw new InvalidPreferencesFileException(
-////					"La firmante del fichero de preferencias no esta autorizado" //$NON-NLS-1$
-////					);
-////		}
-//		importUserPreferencesFromXml(new String(configData), unprotected);
-//	}
-
 	/**
 	 * Importa las preferencias de la aplicaci&oacute;n desde un fichero PList.
 	 * @param configFile Fichero de importaci&oacute;n con las preferencias de la aplicaci&oacute;n.
@@ -126,7 +92,7 @@ public final class PreferencesPlistHandler {
 
 	/**
 	 * Importa las preferencias de la aplicaci&oacute;n desde un fichero PList.
-	 * @param configFile Fichero de importaci&oacute;n con las preferencias de la aplicaci&oacute;n.
+	 * @param config Documento de importaci&oacute;n con las preferencias de la aplicaci&oacute;n.
 	 * @param parent Componente padre para la modalidad.
 	 * @param unprotected
 	 *        {@code true} Si las preferencias no est&aacute;n protegidas,

@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-client</artifactId>
-	<version>1.10-SNAPSHOT</version>
+	<version>1.10</version>
 	<packaging>pom</packaging>
 	
 	<name>afirma-client</name>
@@ -14,7 +14,7 @@
 	
 	<developers>
 		<developer>
-			<name>Secretaría General de Administración Digital</name>
+			<name>Agencia Estatal de Administración Digital</name>
 			<email>soporte.afirma@correo.gob.es</email>
 			<organization>Gobierno de España</organization>
 			<organizationUrl>https://administracionelectronica.gob.es</organizationUrl>
@@ -37,30 +37,27 @@
 		<developerConnection>scm:git:ssh://github.com/ctt-gob-es/clienteafirma.git</developerConnection>
 		<url>https://github.com/ctt-gob-es/clienteafirma</url>
 	</scm>
-	
-	<distributionManagement>
-	  <snapshotRepository>
-		<id>ossrh</id>
-		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-	  </snapshotRepository>
-	  <repository>
-		<id>ossrh</id>
-		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-	  </repository>
-	</distributionManagement>
-	
-	<properties>
-		<clienteafirma.version>1.10-SNAPSHOT</clienteafirma.version>
-		<triphase.service.version>2.8.1</triphase.service.version>
-		<jmulticard.version>2.1-SNAPSHOT</jmulticard.version>
-		<afirma.lib.itext.version>1.7-SNAPSHOT</afirma.lib.itext.version>
-		<afirma.lib.others.version>0.0.9</afirma.lib.others.version>
-		<spongycastle.version>1.58.0.0</spongycastle.version>
-		<afirma.legible.version>1_10_0</afirma.legible.version>
-		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 
+	<properties>
+		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
+		<clienteafirma.version>1.10</clienteafirma.version>
+		<afirma.legible.version>1_10_0</afirma.legible.version>
+		<triphase.service.version>2.8.1</triphase.service.version>
+		<jmulticard.version>2.1</jmulticard.version>
 		
+		<afirma.lib.itext.version>1.7</afirma.lib.itext.version>
+		<afirma.lib.others.version>0.0.10</afirma.lib.others.version>
+		<spongycastle.version>1.58.0.0</spongycastle.version>
+		
+		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+		<central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
+
+		<!-- test-dependencies -->		
 		<junit.version>4.13.2</junit.version>
 	</properties>
 
@@ -154,7 +151,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.10.1</version>
+					<version>${maven-compiler-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -484,7 +481,6 @@
 				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Aplicaciones -->
-				<module>afirma-ui-miniapplet</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
 				
@@ -499,7 +495,7 @@
 					<plugin>
 					  <groupId>org.apache.maven.plugins</groupId>
 					  <artifactId>maven-source-plugin</artifactId>
-					  <version>2.2.1</version>
+					  <version>${maven-source-plugin.version}</version>
 					  <executions>
 						<execution>
 						  <id>attach-sources</id>
@@ -512,7 +508,7 @@
 					<plugin>
 					  <groupId>org.apache.maven.plugins</groupId>
 					  <artifactId>maven-javadoc-plugin</artifactId>
-					  <version>2.9.1</version>
+					  <version>${maven-javadoc-plugin.version}</version>
 					  <executions>
 						<execution>
 						  <id>attach-javadocs</id>
@@ -540,7 +536,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-release-plugin</artifactId>
-						<version>2.5.3</version>
+						<version>${maven-release-plugin.version}</version>
 						<configuration>
 							<tagNameFormat>${project.name}_@{project.version}</tagNameFormat>
 						</configuration>
@@ -549,7 +545,7 @@
 					<plugin>
 					  <groupId>org.apache.maven.plugins</groupId>
 					  <artifactId>maven-gpg-plugin</artifactId>
-					  <version>3.1.0</version>
+					  <version>${maven-gpg-plugin.version}</version>
 					  <executions>
 						<execution>
 						  <id>sign-artifacts</id>
@@ -560,6 +556,17 @@
 						</execution>
 					  </executions>
 					</plugin>
+
+					<plugin>
+					  <groupId>org.sonatype.central</groupId>
+					  <artifactId>central-publishing-maven-plugin</artifactId>
+					  <version>${central-publishing-maven-plugin.version}</version>
+					  <extensions>true</extensions>
+					  <configuration>
+						<publishingServerId>central</publishingServerId>
+					  </configuration>
+					</plugin>
+					
 				</plugins>
 			</build>
 		</profile>

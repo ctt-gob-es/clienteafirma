@@ -64,8 +64,9 @@ public class XAdESValidator {
 	 * Valida una firma XML y, opcionalmente, la vigencia de sus certificados. En caso de encontrar
 	 * m&aacute;s de una firma, se comprobar&aacute; que todas son v&aacute;lidas, pero s&oacute;lo
 	 * se recuperar&aacute; la informaci&oacute;n de la primera firma.
-     * @param sign Firma a validar.
+     * @param sigDoc Firma XAdES a validar.
      * @param checkCertificates Indica si debe validarse la vigencia de los certificados.
+     * @return Informaci&oacute;n de la firma.
      * @throws CertificateException Cuando se valide la vigencia del certificado no lo est&eacute;.
 	 * @throws InvalidSignatureException Cuando la firma no sea v&aacute;lida.
 	 * @throws AOInvalidSignatureFormatException Cuando el documento no est&aacute; firmado.
@@ -188,10 +189,7 @@ public class XAdESValidator {
                     }
                     return new SimpleKeySelectorResult(publicKey);
                 }
-
-                // Si no hay KeyValue intentamos sacar la clave publica del primer Certificado
-                // que encontramos en X509Data
-                else if (xmlStructure instanceof X509Data) {
+				if (xmlStructure instanceof X509Data) {
                 	final List<?> x509DataObjects = ((X509Data)xmlStructure).getContent();
                 	for (final Object o : x509DataObjects) {
                 		if (o instanceof Certificate) {
