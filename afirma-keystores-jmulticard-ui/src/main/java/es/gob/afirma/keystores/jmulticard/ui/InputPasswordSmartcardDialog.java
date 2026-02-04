@@ -39,6 +39,8 @@
  */
 package es.gob.afirma.keystores.jmulticard.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -46,11 +48,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -62,6 +69,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 import es.gob.jmulticard.CancelledOperationException;
 
@@ -99,15 +108,24 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
     /** Panel principal. */
     private transient JPanel mainPanel = null;
+    
+    /** Panel de contrase&ntilde;a. */
+    private transient JPanel passwordPanel = null;
 
     /** Campo de texto o campo de contrase&ntilde;a. */
-    private transient JSecurePasswordLabel component = null;
+    private transient JSecurePasswordLabel securePasswordLabel = null;
+    
+    /** Panel para el bot&oacute;n de cacheo */
+    private transient JPanel useCacheCheckBoxPanel = null;
 
     /** Indica si se muestra o no la casilla de "No volver a preguntar" (<i>cacheo</i> del PIN). */
     private transient JCheckBox useCacheCheckBox = null;
 
     /** Etiqueta que contiene el icono de la alerta. */
     private transient final IconLabel iconLabel = new IconLabel();
+    
+    /** Boton para mostrar u ocultar contrase&ntilde;a */
+    private transient PasswordEyeButton eyeButton = null;
 
     /** Respuesta al mensaje */
     private transient int answer;
@@ -210,7 +228,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 		}
 
         setTitle(title);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); 
 
         this.answer = JOptionPane.NO_OPTION;
         // Contenedor del dialogo
@@ -245,24 +263,63 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
         // Se anade la etiqueta al panel de informacion general
         this.mainPanel.add(this.infoLabel, c);
+        
+        // Campo de password del dialogo
+        this.passwordPanel = new JPanel(new BorderLayout());
+     
+        this.securePasswordLabel = new JSecurePasswordLabel(20, this.passwordPanel);
+        
+        this.passwordPanel.setBorder(this.securePasswordLabel.getBorder());
+        this.passwordPanel.setBackground(getParent().getBackground());
+        this.passwordPanel.setOpaque(true);
+        
+        this.eyeButton =
+        	new PasswordEyeButton(
+        			this.securePasswordLabel,
+        			this.securePasswordLabel.eyeIcon,
+        			this.securePasswordLabel.eyeOffIcon
+        );
+        
+        // Asignamos al boton el atajo CTRL+P
+        KeyStroke ctrlP = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
 
+        this.eyeButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(ctrlP, "ctrlPAction"); //$NON-NLS-1$
 
-        // campo de password del dialogo
-        this.component = new JSecurePasswordLabel(16);
+        this.eyeButton.getActionMap()
+                .put("ctrlPAction", new AbstractAction() { //$NON-NLS-1$
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        InputPasswordSmartcardDialog.this.eyeButton.doClick();
+                    }
+                });
 
+        this.securePasswordLabel.setBorder(null);
+
+        this.passwordPanel.add(this.securePasswordLabel, BorderLayout.CENTER);
+        this.passwordPanel.add(this.eyeButton, BorderLayout.EAST);
+
+        // Restricciones para GridBagLayout
         c.gridy++;
-        c.insets = new Insets(2, 5, 2, 10); // right padding
+        c.insets = new Insets(2, 5, 2, 10);
+        c.fill = GridBagConstraints.HORIZONTAL;
 
-        // Se anade el campo de texto al panel de informacion general
-        this.mainPanel.add(this.component, c);
+        // Se agrega el panel completo al mainPanel
+        this.mainPanel.add(this.passwordPanel, c);
 
         // Si corresponde, se agrega la casilla de verificacion para el uso de la cache
         if (allowUseCache) {
+        	
         	this.useCacheCheckBox = new JCheckBox(Messages.getString("InputPasswordSmartcardDialog.useCache")); //$NON-NLS-1$
         	this.useCacheCheckBox.setSelected(defaultUseCache);
+        	
+        	this.useCacheCheckBoxPanel = new JPanel(new BorderLayout());
+        	this.useCacheCheckBoxPanel.setBorder(new LineBorder(new Color(0,0,0,0), 1));
+        	this.useCacheCheckBoxPanel.setOpaque(false);
+        	this.useCacheCheckBoxPanel.add(this.useCacheCheckBox, BorderLayout.CENTER);
 
         	c.gridy++;
-        	this.mainPanel.add(this.useCacheCheckBox, c);
+        	this.mainPanel.add(this.useCacheCheckBoxPanel, c);
         }
 
         // Panel de botones
@@ -411,7 +468,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
         inputPasswordDialog.getRootPane().setDefaultButton(null);
 
         // Configuramos el componente de insercion de contrasenas
-        inputPasswordDialog.component.addKeyListener(
+        inputPasswordDialog.securePasswordLabel.addKeyListener(
     		new KeyListener() {
 
 	            @Override
@@ -419,7 +476,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
 	            @Override
 	            public void keyReleased(final KeyEvent ke) {
-	            	final int length = inputPasswordDialog.getComponent().getPasswordLength();
+	            	final int length = inputPasswordDialog.getSecurePasswordLabel().getPasswordLength();
 	                //Control de los botones aceptar/cancelar
 	                if (length >= PIN_MIN_LENGTH && length <= PIN_MAX_LENGTH) {
 	                    getOkButton().setEnabled(true);
@@ -440,19 +497,17 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 	            }
 	        }
 		);
-        inputPasswordDialog.component.addAncestorListener(new RequestFocusListener());
-        AccesibilityUtils.remarcar(inputPasswordDialog.component);
-        AccesibilityUtils.setContrastColor(inputPasswordDialog.component);
-        AccesibilityUtils.setFontBold(inputPasswordDialog.component);
-        inputPasswordDialog.component.getAccessibleContext().setAccessibleName(
+        inputPasswordDialog.securePasswordLabel.addAncestorListener(new RequestFocusListener());
+        AccesibilityUtils.remarcar(inputPasswordDialog.securePasswordLabel);
+     	AccesibilityUtils.setContrastColor(inputPasswordDialog.securePasswordLabel); 
+        AccesibilityUtils.setFontBold(inputPasswordDialog.securePasswordLabel);
+        inputPasswordDialog.securePasswordLabel.getAccessibleContext().setAccessibleName(
     		message.replace(AccesiblityConstants.HTML_SALTO_LINEA, "") + "  ALT + " + mnemonic + ". " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		);
 
         // Etiqueta principal
         // Se relaciona la etiqueta con el componente
-        inputPasswordDialog.infoLabel.setLabelFor(inputPasswordDialog.component);
-        // Se asigna un atajo
-        inputPasswordDialog.infoLabel.setDisplayedMnemonic(mnemonic);
+        inputPasswordDialog.infoLabel.setLabelFor(inputPasswordDialog.securePasswordLabel);
         // Se muestra el atajo
         final String text = AccesibilityUtils.remarkMnemonic(inputPasswordDialog.infoLabel.getText(), mnemonic);
         inputPasswordDialog.infoLabel.setText(text);
@@ -476,11 +531,9 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 	    			}
 	    		}
 			);
-
-        	AccesibilityUtils.remarcar(inputPasswordDialog.useCacheCheckBox);
-        	AccesibilityUtils.setContrastColor(inputPasswordDialog.useCacheCheckBox);
-        	AccesibilityUtils.setFontBold(inputPasswordDialog.useCacheCheckBox);
-
+        	
+        	addAccesibleCheckboxFocusListener(inputPasswordDialog.useCacheCheckBox, inputPasswordDialog.useCacheCheckBoxPanel);
+        	
             // Se muestra el atajo
         	inputPasswordDialog.useCacheCheckBox.setMnemonic('e');
             AccesibilityUtils.remarkMnemonic(inputPasswordDialog.useCacheCheckBox, 'e');
@@ -512,7 +565,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 		);
 
         inputPasswordDialog.infoLabel.setHorizontalAlignment(SwingConstants.LEFT); // Se centra el texto
-        inputPasswordDialog.component.setVisible(true); // Se hace visible el campo de texto
+        inputPasswordDialog.securePasswordLabel.setVisible(true); // Se hace visible el campo de texto
 
         cancelButton.addActionListener(inputPasswordDialog);
 
@@ -522,13 +575,13 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
         // Control para saber si se ha pulsado el boton cancelar
         if (inputPasswordDialog.getAnswer() == JOptionPane.YES_OPTION) {
-        	final char[] finalPin = inputPasswordDialog.component.getPassword();
+        	final char[] finalPin = inputPasswordDialog.securePasswordLabel.getPassword();
 
         	// Por precaucion borramos el PIN y dejamos sus componentes relacionados
         	// listos para ser descartados
-        	inputPasswordDialog.component.setText(""); //$NON-NLS-1$
-        	inputPasswordDialog.component.setText(null);
-        	inputPasswordDialog.component = null;
+        	inputPasswordDialog.securePasswordLabel.setText(""); //$NON-NLS-1$
+        	inputPasswordDialog.securePasswordLabel.setText(null);
+        	inputPasswordDialog.securePasswordLabel = null;
         	inputPasswordDialog.dispose();
         	System.gc();
 
@@ -581,8 +634,8 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
         return this.answer;
     }
 
-    JSecurePasswordLabel getComponent() {
-        return this.component;
+    JSecurePasswordLabel getSecurePasswordLabel() {
+        return this.securePasswordLabel;
     }
 
     /** Devuelve una instancia de <code>CustomDialog</code>.
@@ -626,4 +679,46 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
         }
         setVisible(false);
     }
-}
+    
+    /**
+     * Da un foco accesible al elemento checkbox.
+     * @param checkBox Elemento al cual dar accesibilidad.
+     * @param panel Panel que lo contiene.
+     */
+    private static void addAccesibleCheckboxFocusListener(JCheckBox checkBox, JPanel panel) {
+
+        final boolean[] focusByKeyboard = {false};
+        
+        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+            .addKeyEventDispatcher(e -> {
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    focusByKeyboard[0] = true;
+                }
+                return false;
+            });
+
+        checkBox.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (focusByKeyboard[0]) {
+                    Border b;
+                    if (AccesibilityUtils.isHighContrast()) {
+                        b = new LineBorder(AccesibilityUtils.getAccessibleColor(panel), 1);
+                    } else {
+                        b = new LineBorder(Color.BLACK, 1);
+                    }
+                    panel.setBorder(b);
+                    panel.repaint();
+                }
+                focusByKeyboard[0] = false;
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                panel.setBorder(new LineBorder(new Color(0,0,0,0), 1));
+                panel.repaint();
+            }
+        });
+    }
+
+ }

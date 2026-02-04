@@ -49,6 +49,7 @@
 package es.gob.afirma.keystores.jmulticard.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.IllegalComponentStateException;
 import java.awt.Point;
@@ -206,7 +207,7 @@ final class AccesibilityUtils {
 	                    @Override
 	                    public void focusGained(final FocusEvent e) {
 	                        if (GeneralConfig.isHighContrast() || isHighContrast()) {
-	                            ((JPanel) checkBox.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+	                            ((JPanel) checkBox.getParent()).setBorder(BorderFactory.createLineBorder(getAccessibleColor(checkBox), 2));
 	                        }
 	                        else {
 	                            ((JPanel) checkBox.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
@@ -216,7 +217,7 @@ final class AccesibilityUtils {
         		);
             }
         }
-    }
+    				}
 
     /** Configura el comportamiento de ciertos componentes en Alto Contraste
      * @param component Componente al que aplicar el alto contraste */
@@ -332,4 +333,33 @@ final class AccesibilityUtils {
         tip.pack();
         tip.setVisible(show);
     }
+    
+   /**
+    * Devuelve el color accesible para el componente indicado.
+    * @param c Componente a analizar.
+    * @return Color accesible a usar.
+    */
+    public static Color getAccessibleColor(Component c) {
+
+        Color bg = c.getBackground();
+        if (bg == null) {
+            bg = UIManager.getColor("TextField.background"); //$NON-NLS-1$
+        }
+
+        if (bg == null) {
+            return Color.BLACK;
+        }
+
+        double luminance =
+            (0.2126 * bg.getRed() +
+             0.7152 * bg.getGreen() +
+             0.0722 * bg.getBlue()) / 255;
+
+        if (luminance > 0.6) {
+            return Color.BLACK;
+        }
+
+        return Color.WHITE;
+    }
+
 }
