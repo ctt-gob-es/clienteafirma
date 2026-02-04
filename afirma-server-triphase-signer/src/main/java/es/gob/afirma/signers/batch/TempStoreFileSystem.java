@@ -37,7 +37,7 @@ final class TempStoreFileSystem implements TempStore {
 
 	private static File tempDir;
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 	private static final MessageDigest MD;
 	static {
 		try {

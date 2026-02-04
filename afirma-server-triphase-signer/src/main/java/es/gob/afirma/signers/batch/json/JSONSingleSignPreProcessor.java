@@ -39,7 +39,7 @@ final class JSONSingleSignPreProcessor {
 
 	private static final String EXTRA_PARAM_CHECK_SIGNATURES = "checkSignatures"; //$NON-NLS-1$
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	/** Propiedad dedicada a almacenar el identificador del archivo a escribir o leer de cach&eacute;. */
 	private static final String TRIPHASE_PROP_CACHE_ID = "CACHE_ID"; //$NON-NLS-1$

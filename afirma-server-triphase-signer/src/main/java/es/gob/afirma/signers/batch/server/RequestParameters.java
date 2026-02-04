@@ -10,6 +10,7 @@ package es.gob.afirma.signers.batch.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -84,7 +85,7 @@ public class RequestParameters extends HashMap<String, String> {
 		final StringBuilder buffer = new StringBuilder(1048576);
 
 		int n = 0;
-		request.setCharacterEncoding("utf-8"); //$NON-NLS-1$
+		request.setCharacterEncoding(StandardCharsets.UTF_8.name());
 		try (final BufferedReader reader = request.getReader(); ) {
 			while ((n = reader.read(block, 0, block.length)) > 0) {
 				int startParams = 0;

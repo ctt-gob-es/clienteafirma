@@ -38,7 +38,7 @@ public final class BatchPostsigner extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private static final String BATCH_XML_PARAM = "xml"; //$NON-NLS-1$
 	private static final String BATCH_CRT_PARAM = "certs"; //$NON-NLS-1$
@@ -64,6 +64,12 @@ public final class BatchPostsigner extends HttpServlet {
 	protected void service(final HttpServletRequest request,
 			               final HttpServletResponse response) throws ServletException,
 			                                                          IOException {
+
+		if (!ConfigManager.isLegacyBatchXmlEnabled()) {
+			LOGGER.info("Se ha llamado al servicio de postfirma de lote XML, pero esta desactivado y se ignora la peticion"); //$NON-NLS-1$
+			response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "El servicio esta desactivado"); //$NON-NLS-1$
+			return;
+		}
 
 		// Si no se ha podido cargar el fichero de configuracion de la firma de lotes XML, se considera que
 		// el servicio no esta inicializado

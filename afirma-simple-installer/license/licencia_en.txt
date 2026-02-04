@@ -1,6 +1,6 @@
 
  Autofirma 1.10
- Copyright 2011, 2025 Government of Spain
+ Copyright 2011, 2026 Government of Spain
 
  Autofirma is Free Software; you can redistribute it and/or modify it
  under the terms of at least one of these two licences;

@@ -3,6 +3,8 @@ package es.gob.afirma.triphase.server;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -11,12 +13,25 @@ import java.util.logging.Logger;
  */
 public class ConfigManager {
 
-	private static final String CONFIG_FILE = "tps_config.properties"; //$NON-NLS-1$
+	private static final String INTERNAL_CONFIG_FILENAME = "internalconfig"; //$NON-NLS-1$
 
-	private static final String OLD_CONFIG_FILE = "config.properties"; //$NON-NLS-1$
+	/**
+	 * Propiedad del fichero de configuraci&ocute;n interno que establece el nombre de la variable
+	 * de entorno en la que se establece el directorio de b&uacute;squeda del fichero de configuraci&oacute;n.
+	 */
+	private static final String INTERNAL_PARAM_ENVIRONMENT_VAR_CONFIG_DIR = "config.dir.varname"; //$NON-NLS-1$
 
-	/** Variable de entorno que determina el directorio en el que buscar el fichero de configuraci&oacute;n. */
-	private static final String ENVIRONMENT_VAR_CONFIG_DIR = "clienteafirma.config.path"; //$NON-NLS-1$
+	/**
+	 * Propiedad del fichero de configuraci&ocute;n interno que establece el nombre del fichero
+	 * de configuraci&oacute;n externo del servicio.
+	 */
+	private static final String INTERNAL_PARAM_CONFIG_FILENAME = "config.filename"; //$NON-NLS-1$
+
+	/**
+	 * Propiedad del fichero de configuraci&ocute;n interno que establece el nombre usado para la impresi&oacute;n
+	 * de trazas de log.
+	 */
+	private static final String INTERNAL_PARAM_LOGGER_NAME = "logger.name"; //$NON-NLS-1$
 
 	private static final String CONFIG_PARAM_DOCUMENT_MANAGER_CLASS = "document.manager"; //$NON-NLS-1$
 	private static final String CONFIG_PARAM_DOCUMENT_CACHE_MANAGER_CLASS = "document.cache.manager"; //$NON-NLS-1$
@@ -52,6 +67,11 @@ public class ConfigManager {
 	 */
 	private static final String CONFIG_PARAM_BATCH_MAX_REFERENCE_SIZE = "batch.maxReferenceSize"; //$NON-NLS-1$
 
+	/**
+	 * Propiedad que indica si se debe activar el antiguo servicio de firma de lotes XML.
+	 */
+	private static final String CONFIG_PARAM_LEGACY_BATCH_XML_ENABLED = "legacy.xmlBatchEnabled"; //$NON-NLS-1$
+
 	private static final long DEFAULT_CONCURRENT_TIMEOUT = 30;
 
 	private static final int DEFAULT_CONCURRENT_MAXSIGNS = 10;
@@ -70,11 +90,42 @@ public class ConfigManager {
 
 	private static final String SYS_PROP_SUFIX = "}"; //$NON-NLS-1$
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER;
 
 	private static final Properties config;
 
+	private static final String ENVIRONMENT_VAR_CONFIG_DIR;
+
+	public static final String LOGGER_NAME;
+
+
 	static {
+
+		final Properties internalconfig = loadInternalConfigFile(INTERNAL_CONFIG_FILENAME);
+		if (internalconfig == null) {
+			throw new IllegalStateException("No se ha podido encontrar el fichero " //$NON-NLS-1$
+					+ INTERNAL_CONFIG_FILENAME + " con la configuracion interna del servicio"); //$NON-NLS-1$
+		}
+
+		final String configFilename = internalconfig.getProperty(INTERNAL_PARAM_CONFIG_FILENAME);
+		if (configFilename == null) {
+			throw new IllegalStateException("El fichero de configuracion interno no asigno un valor a la propiedad " //$NON-NLS-1$
+					+ INTERNAL_PARAM_CONFIG_FILENAME);
+		}
+
+		ENVIRONMENT_VAR_CONFIG_DIR = internalconfig.getProperty(INTERNAL_PARAM_ENVIRONMENT_VAR_CONFIG_DIR);
+		if (ENVIRONMENT_VAR_CONFIG_DIR == null) {
+			throw new IllegalStateException("El fichero de configuracion interno no asigno un valor a la propiedad " //$NON-NLS-1$
+					+ INTERNAL_PARAM_ENVIRONMENT_VAR_CONFIG_DIR);
+		}
+
+		LOGGER_NAME = internalconfig.getProperty(INTERNAL_PARAM_LOGGER_NAME);
+		if (LOGGER_NAME == null) {
+			throw new IllegalStateException("El fichero de configuracion interno no asigno un valor a la propiedad " //$NON-NLS-1$
+					+ INTERNAL_PARAM_LOGGER_NAME);
+		}
+
+		LOGGER = Logger.getLogger(LOGGER_NAME);
 
 		String configDir;
 		try {
@@ -92,11 +143,7 @@ public class ConfigManager {
 		}
 
 		// Cargamos la configuracion del servicio
-		Properties configProperties = loadConfigFile(configDir, CONFIG_FILE);
-		if (configProperties == null) {
-			configProperties = loadConfigFile(configDir, OLD_CONFIG_FILE);
-		}
-
+		final Properties configProperties = loadConfigFile(configDir, configFilename);
 		if (configProperties == null) {
 			throw new RuntimeException("No se ha encontrado el fichero de configuracion del servicio"); //$NON-NLS-1$
 		}
@@ -147,20 +194,28 @@ public class ConfigManager {
 				"Se cargara el fichero de configuracion " + configFilename + " desde el CLASSPATH" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 
-			try (final InputStream configIs = SignatureService.class.getClassLoader().getResourceAsStream(configFilename);) {
-				configProperties = new Properties();
-				configProperties.load(configIs);
-				LOGGER.info("Se cargo el fichero de configuracion interno " + configFilename); //$NON-NLS-1$
-			}
-			catch (final Exception e) {
-				LOGGER.warning(
-					"No se pudo cargar el fichero de configuracion " + configFilename + " desde el CLASSPATH: " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-				configProperties = null;
-			}
+			configProperties = loadInternalConfigFile(configFilename);
 		}
 
 		return configProperties;
+	}
+
+	public static Properties loadInternalConfigFile(final String configFilename) {
+
+		Properties loadedConfig;
+		try (final InputStream configIs = ConfigManager.class.getClassLoader().getResourceAsStream(configFilename);
+				InputStreamReader reader = new InputStreamReader(configIs, StandardCharsets.UTF_8);) {
+			loadedConfig = new Properties();
+			loadedConfig.load(reader);
+		}
+		catch (final Exception e) {
+			LOGGER.warning(
+				"Error al cargar el fichero de configuracion interno " + configFilename + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+			loadedConfig = null;
+		}
+
+		return loadedConfig;
 	}
 
 	public static String getDocManagerClassName() {
@@ -201,6 +256,15 @@ public class ConfigManager {
 		} catch (final Exception e) {
 			return 0;
 		}
+	}
+
+	/**
+	 * Indica si se deben habilitar los antiguos servicios de firma de lotes XML.
+	 * @return {@code true} si los servicios deben estar habilitados, {@code false}
+	 * en caso contrario.
+	 */
+	public static boolean isLegacyBatchXmlEnabled() {
+		return Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_LEGACY_BATCH_XML_ENABLED));
 	}
 
 	public static String getHMacKey() {

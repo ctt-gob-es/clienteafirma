@@ -32,6 +32,7 @@ import es.gob.afirma.signers.batch.ProcessResult;
 import es.gob.afirma.signers.batch.SingleSignConstants;
 import es.gob.afirma.signers.batch.TempStore;
 import es.gob.afirma.signers.batch.TempStoreFactory;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 /** Lote de firmas electr&oacute;nicas.
  * Un ejemplo de representaci&oacute;n XML de un lote podr&iacute;a ser:
@@ -65,7 +66,7 @@ public abstract class SignBatch {
 
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
-	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	protected static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	/** Lista de firmas a procesar. */
 	protected final List<SingleSign> signs;

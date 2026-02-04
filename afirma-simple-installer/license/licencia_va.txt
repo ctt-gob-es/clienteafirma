@@ -1,6 +1,6 @@
  
  Autofirma 1.10
- Copyright 2011, 2025 Govern d'Espanya
+ Copyright 2011, 2026 Govern d'Espanya
  
  Autofirma és Programari Lliure; pots redistribuir-ho i/o modificar-ho
  sota els termes d'almenys una d'estes dues llicències;

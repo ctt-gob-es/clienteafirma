@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.triphase.server.ConfigManager;
 
 /** Implementaci&oacute;n de acceso a gestor documental usando simplemente el sistema de ficheros.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -41,7 +42,7 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 
 	private static final String PROPERTY_FORMAT = "format"; //$NON-NLS-1$
 
-	private final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private final static Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	String inDir;
 	String outDir;
