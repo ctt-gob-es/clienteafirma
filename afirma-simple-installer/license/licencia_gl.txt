@@ -1,6 +1,6 @@
  
  Autofirma 1.10
- Copyright 2011, 2025 Goberno de España
+ Copyright 2011, 2026 Goberno de España
  
  Autofirma é Software Libre; podes redistribuír e/ou modificar
  baixo os termos de polo menos unha destas dúas licenzas;
