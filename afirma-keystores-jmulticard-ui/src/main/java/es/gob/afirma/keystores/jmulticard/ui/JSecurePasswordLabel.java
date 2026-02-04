@@ -144,12 +144,6 @@ final class JSecurePasswordLabel extends JLabel {
 
             @Override
             public void keyPressed(final KeyEvent e) {
-            	
-                if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    togglePasswordVisibility();
-                    e.consume();
-                    return;
-                }
 
                 // Pegar desde portapapeles
                 if (((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0 && e.getKeyCode() == KeyEvent.VK_V)
@@ -232,16 +226,9 @@ final class JSecurePasswordLabel extends JLabel {
                 BorderFactory.createEmptyBorder(0, 5, 0, 5)));
         setOpaque(true);
         setShowCursor(false);
-        
-        String imgEyePath;
-        String imgEyeOffPath;
-        if (!AccesibilityUtils.isHighContrast()) {
-        	imgEyePath = "/images/eye.png"; //$NON-NLS-1$
-        	imgEyeOffPath = "/images/eye-off.png"; //$NON-NLS-1$
-        } else {
-        	imgEyePath = "/images/eye-white.png"; //$NON-NLS-1$
-        	imgEyeOffPath = "/images/eye-off-white.png"; //$NON-NLS-1$
-        }
+ 
+        String imgEyePath = "/images/eye.png"; //$NON-NLS-1$
+        String imgEyeOffPath = "/images/eye-off.png"; //$NON-NLS-1$
 
         // Iconos de mostrar/ocultar password
         this.eyeIcon = new ImageIcon(new ImageIcon(getClass().getResource(imgEyePath))

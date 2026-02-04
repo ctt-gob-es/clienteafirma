@@ -40,6 +40,7 @@
 package es.gob.afirma.keystores.jmulticard.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -47,11 +48,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -63,6 +69,8 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 import es.gob.jmulticard.CancelledOperationException;
 
@@ -106,6 +114,9 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
     /** Campo de texto o campo de contrase&ntilde;a. */
     private transient JSecurePasswordLabel securePasswordLabel = null;
+    
+    /** Panel para el bot&oacute;n de cacheo */
+    private transient JPanel useCacheCheckBoxPanel = null;
 
     /** Indica si se muestra o no la casilla de "No volver a preguntar" (<i>cacheo</i> del PIN). */
     private transient JCheckBox useCacheCheckBox = null;
@@ -269,7 +280,19 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
         			this.securePasswordLabel.eyeOffIcon
         );
         
-        this.eyeButton.setMnemonic(KeyEvent.VK_P);
+        // Asignamos al boton el atajo CTRL+P
+        KeyStroke ctrlP = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
+
+        this.eyeButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(ctrlP, "ctrlPAction"); //$NON-NLS-1$
+
+        this.eyeButton.getActionMap()
+                .put("ctrlPAction", new AbstractAction() { //$NON-NLS-1$
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        InputPasswordSmartcardDialog.this.eyeButton.doClick();
+                    }
+                });
 
         this.securePasswordLabel.setBorder(null);
 
@@ -286,11 +309,17 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
         // Si corresponde, se agrega la casilla de verificacion para el uso de la cache
         if (allowUseCache) {
+        	
         	this.useCacheCheckBox = new JCheckBox(Messages.getString("InputPasswordSmartcardDialog.useCache")); //$NON-NLS-1$
         	this.useCacheCheckBox.setSelected(defaultUseCache);
+        	
+        	this.useCacheCheckBoxPanel = new JPanel(new BorderLayout());
+        	this.useCacheCheckBoxPanel.setBorder(new LineBorder(new Color(0,0,0,0), 1));
+        	this.useCacheCheckBoxPanel.setOpaque(false);
+        	this.useCacheCheckBoxPanel.add(this.useCacheCheckBox, BorderLayout.CENTER);
 
         	c.gridy++;
-        	this.mainPanel.add(this.useCacheCheckBox, c);
+        	this.mainPanel.add(this.useCacheCheckBoxPanel, c);
         }
 
         // Panel de botones
@@ -470,7 +499,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 		);
         inputPasswordDialog.securePasswordLabel.addAncestorListener(new RequestFocusListener());
         AccesibilityUtils.remarcar(inputPasswordDialog.securePasswordLabel);
-     	AccesibilityUtils.setContrastColor(inputPasswordDialog.securePasswordLabel); // NO aplicar al label
+     	AccesibilityUtils.setContrastColor(inputPasswordDialog.securePasswordLabel); 
         AccesibilityUtils.setFontBold(inputPasswordDialog.securePasswordLabel);
         inputPasswordDialog.securePasswordLabel.getAccessibleContext().setAccessibleName(
     		message.replace(AccesiblityConstants.HTML_SALTO_LINEA, "") + "  ALT + " + mnemonic + ". " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -502,11 +531,9 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 	    			}
 	    		}
 			);
-
-        	AccesibilityUtils.remarcar(inputPasswordDialog.useCacheCheckBox);
-        	AccesibilityUtils.setContrastColor(inputPasswordDialog.useCacheCheckBox);
-        	AccesibilityUtils.setFontBold(inputPasswordDialog.useCacheCheckBox);
-
+        	
+        	addAccesibleCheckboxFocusListener(inputPasswordDialog.useCacheCheckBox, inputPasswordDialog.useCacheCheckBoxPanel);
+        	
             // Se muestra el atajo
         	inputPasswordDialog.useCacheCheckBox.setMnemonic('e');
             AccesibilityUtils.remarkMnemonic(inputPasswordDialog.useCacheCheckBox, 'e');
@@ -651,6 +678,47 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
             this.answer = JOptionPane.CANCEL_OPTION;
         }
         setVisible(false);
+    }
+    
+    /**
+     * Da un foco accesible al elemento checkbox.
+     * @param checkBox Elemento al cual dar accesibilidad.
+     * @param panel Panel que lo contiene.
+     */
+    private static void addAccesibleCheckboxFocusListener(JCheckBox checkBox, JPanel panel) {
+
+        final boolean[] focusByKeyboard = {false};
+        
+        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+            .addKeyEventDispatcher(e -> {
+                if (e.getID() == KeyEvent.KEY_PRESSED) {
+                    focusByKeyboard[0] = true;
+                }
+                return false;
+            });
+
+        checkBox.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (focusByKeyboard[0]) {
+                    Border b;
+                    if (AccesibilityUtils.isHighContrast()) {
+                        b = new LineBorder(AccesibilityUtils.getAccessibleColor(panel), 1);
+                    } else {
+                        b = new LineBorder(Color.BLACK, 1);
+                    }
+                    panel.setBorder(b);
+                    panel.repaint();
+                }
+                focusByKeyboard[0] = false;
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                panel.setBorder(new LineBorder(new Color(0,0,0,0), 1));
+                panel.repaint();
+            }
+        });
     }
 
  }

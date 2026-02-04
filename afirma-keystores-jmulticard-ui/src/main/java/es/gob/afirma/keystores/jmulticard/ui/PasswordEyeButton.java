@@ -1,13 +1,16 @@
 package es.gob.afirma.keystores.jmulticard.ui;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,8 +29,7 @@ final class PasswordEyeButton extends JButton {
     private final Image eyeImage;
     private final Image eyeOffImage;
 
-    private static final Border FOCUS_BORDER = new LineBorder(Color.BLACK, 1);
-    private static final Border NO_BORDER = null;
+    private static final Insets FOCUS_MARGIN = new Insets(3, 3, 3, 3);
 
     PasswordEyeButton(final JSecurePasswordLabel label,
                       final ImageIcon eyeIcon,
@@ -38,22 +40,27 @@ final class PasswordEyeButton extends JButton {
         this.eyeOffImage = eyeOffIcon.getImage();
 
         setFocusable(true);
-        setBorder(NO_BORDER);
         setContentAreaFilled(false);
         setOpaque(false);
+        setMargin(FOCUS_MARGIN);
+        setBorderPainted(false);
 
-        setPreferredSize(new Dimension(eyeIcon.getIconWidth(), eyeIcon.getIconHeight()));
+        setPreferredSize(new Dimension(
+                eyeIcon.getIconWidth() + FOCUS_MARGIN.left + FOCUS_MARGIN.right,
+                eyeIcon.getIconHeight() + FOCUS_MARGIN.top + FOCUS_MARGIN.bottom
+            ));
 
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                setBorder(FOCUS_BORDER);
+                setBorder(createFocusBorder());
+                setBorderPainted(true);
                 repaint();
             }
 
             @Override
             public void focusLost(FocusEvent e) {
-                setBorder(NO_BORDER);
+                setBorderPainted(false);
                 repaint();
             }
         });
@@ -68,31 +75,77 @@ final class PasswordEyeButton extends JButton {
         this.passwordLabel.togglePasswordVisibility();
         repaint(); 
     }
-
+    
+    private Border createFocusBorder() {
+        return new LineBorder(AccesibilityUtils.getAccessibleColor(this.passwordLabel), 1);
+    }
+   
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g.create();
 
-        Image img;
+        Image baseImg;
         if (this.passwordLabel.isShowPassword()) {
-        	img = this.eyeOffImage;
-        	setToolTipText(Messages.getString("InputPasswordSmartcardDialog.hidePassword")); //$NON-NLS-1$
-        } else {
-        	img = this.eyeImage;
-        	setToolTipText(Messages.getString("InputPasswordSmartcardDialog.showPassword")); //$NON-NLS-1$
+            baseImg = this.eyeOffImage;
+            setToolTipText(Messages.getString(
+                "InputPasswordSmartcardDialog.hidePassword" //$NON-NLS-1$
+            ));
         }
+        else {
+            baseImg = this.eyeImage;
+            setToolTipText(Messages.getString(
+                "InputPasswordSmartcardDialog.showPassword" //$NON-NLS-1$
+            ));
+        }
+
+        Color iconColor;
+        if (AccesibilityUtils.isHighContrast()) {
+            iconColor = AccesibilityUtils.getAccessibleColor(this.passwordLabel);
+        }
+        else {
+            iconColor = Color.BLACK;
+        }
+
+        Image img = colorize(baseImg, iconColor);
 
         int x = (getWidth() - img.getWidth(null)) / 2;
         int y = (getHeight() - img.getHeight(null)) / 2;
+        
         g2.drawImage(img, x, y, null);
 
         if (hasFocus() && AccesibilityUtils.isHighContrast()) {
-            g2.setColor(Color.YELLOW);
+            g2.setColor(iconColor);
             g2.setStroke(new BasicStroke(1));
             g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
         }
 
         g2.dispose();
+    }
+    
+    /**
+     * Metodo que da color al icono.
+     * @param src Ruta de imagen.
+     * @param color Color a aplicar.
+     * @return Icono coloreado.
+     */
+    private Image colorize(Image src, Color color) {
+    	
+        BufferedImage image = new BufferedImage(
+            src.getWidth(null),
+            src.getHeight(null),
+            BufferedImage.TYPE_INT_ARGB
+        );
+
+        Graphics2D g = image.createGraphics();
+
+        g.drawImage(src, 0, 0, null);
+
+        g.setComposite(AlphaComposite.SrcAtop);
+        g.setColor(color);
+        g.fillRect(0, 0, image.getWidth(), image.getHeight());
+
+        g.dispose();
+        return image;
     }
 }
