@@ -597,6 +597,7 @@ public final class PreferencesManager {
 	private static final String SYSTEM_PREFERENCE_CONFIG_FILE_SHA256 = "configFileSHA256"; //$NON-NLS-1$
 	private static final String SYSTEM_PREFERENCE_ALLOW_UPDATE_CONFIG = "allowUpdateConfig"; //$NON-NLS-1$
 	private static final String SYSTEM_PREFERENCE_CONFIGURATION_DATE = "configDate"; //$NON-NLS-1$
+	public static final String  SYSTEM_PREFERENCE_ALLOW_IMPORT_NOT_SECURE_CERTS = "allowImportNotSecureCerts"; //$NON-NLS-1$
 
 	private static final String[] SYSTEM_EXCLUSIVE_PREFERENCES = new String[] {
 			SYSTEM_PREFERENCE_CONFIG_FILE_URL,
@@ -612,7 +613,7 @@ public final class PreferencesManager {
 	/** Indica si se permite la importaci&oacute;n de ficheros de preferencias sin firmar. */
 	public static final String ADMIN_PREFERENCE_REQUIRE_SIGNED_PREFERENCES = "requireSignedPrerefences"; //$NON-NLS-1$
 
-	/** Indica si hash en base 64 del certificado de firma de los fichers de preferencias. */
+	/** Indica si hash en base 64 del certificado de firma de los ficheros de preferencias. */
 	public static final String ADMIN_PREFERENCE_CERT_HASH_TO_SIGNED_PREFERENCES = "certHashToSignedPrerefences"; //$NON-NLS-1$
 
 

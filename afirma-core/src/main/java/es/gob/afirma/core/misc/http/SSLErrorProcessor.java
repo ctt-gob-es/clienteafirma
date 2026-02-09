@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
@@ -33,6 +34,12 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	private static final String PROPERTY_HEADLESS = "headless"; //$NON-NLS-1$
 
 	private static final String PROPERTY_SSL_HEADLESS = "sslOmitImportationDialog"; //$NON-NLS-1$
+	
+	private static final String PREFERENCE_NODE = "/es/gob/afirma/standalone/ui/preferences"; //$NON-NLS-1$
+	
+	private static final String PREFERENCE_ALLOW_IMPORT_NOT_SECURE_CERTS = "allowImportNotSecureCerts"; //$NON-NLS-1$
+	
+	private static final String PREFERENCE_ALLOW_AUTO_IMPORT_NOT_SECURE_CERTS = "allowAutoImportNotSecureCerts"; //$NON-NLS-1$
 
 	private static boolean showingConfirmDialog = false;
 
@@ -138,7 +145,6 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 		// Nos aseguramos de que solo se muestre el dialogo de confirmacion
 		// si no se esta mostrando ya
-
 		if (showingConfirmDialog) {
 			LOGGER.info("Ya se esta mostrando un dialogo de consulta para la importacion del certificado de confianza. Se omitira este."); //$NON-NLS-1$
 			throw cause;
@@ -160,6 +166,12 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		catch (Exception e) {
 			LOGGER.severe("Error al descargar certificados SSL del servidor: " + e); //$NON-NLS-1$
 			throw new IOException(e);
+		}
+		
+		// Comprobamos en las preferencias del sistema que se permite la importacion de certificados desde sitios no seguros
+		if(!checkAllowImportNotSecureCerts()) {
+			LOGGER.severe("La importacion de certificados desde sitio no seguros no esta permitida."); //$NON-NLS-1$
+			throw cause;
 		}
 		
 		// Descargamos los certificados SSL del servidor
@@ -249,6 +261,12 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		return urlManager.readUrl(url, timeout, method, requestProperties);
 	}
 
+	/**
+	 * Transforma los certificados obtenidos y selecciona los certificados para importar.
+	 * @param trustedServerCerts Certificados sin transformasr.
+	 * @return Certificados ya transformados como X509Certificate.
+	 * @throws Exception Error durante la transformaci&oacute;n.
+	 */
 	private static X509Certificate[] getCertsToImport(Certificate[] trustedServerCerts) throws Exception {
 
 		X509Certificate[] certsToImport;
@@ -267,6 +285,14 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		return certsToImport;
 	}
 	
+	/**
+	 * Comprueba que el emisor de los certificados es correcto.
+	 * @param urlStr URL donde e encuentran los certificados.
+	 * @param serverCert Certificado a comprobar
+	 * @return true en caso de que sea correcto, false en caso contrario.
+	 * @throws MalformedURLException Error en la estructura de la URL.
+	 * @throws CertificateParsingException Error transformando certificado.
+	 */
 	private boolean checkCorrectIssuer(String urlStr, X509Certificate serverCert)
 	        throws MalformedURLException, CertificateParsingException {
 
@@ -299,6 +325,12 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	    return false;
 	}
 	
+	/**
+	 * Comprueba que el dominio para el que esta expedido el certificado obtenido es correcto.
+	 * @param host Dominio del certificado del servidor.
+	 * @param san Dominio del certificao obtenido.
+	 * @return true si es correcto, false en caso contrario.
+	 */
 	private boolean matchesHost(String host, String san) {
 
 	    if (san.equals(host)) {
@@ -319,6 +351,12 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	    return false;
 	}
 	
+	/**
+	 * Descarga los certificados del servidor.
+	 * @param domainName Direcci&oacute;n del servidor.
+	 * @return Certificados descargados.
+	 * @throws Exception Error durante la desarga.
+	 */
 	private static Certificate[] downloadFromRemoteServer(final String domainName) throws Exception {
 
 		final URL url = new URL(domainName);
@@ -330,8 +368,28 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 		return trustedServerCerts;
 	}
-
+	
+	/**
+	 * Comprueba si el di&aacute;logo para importar certificados se ha cancelado.
+	 * @return true si el certificado se ha cancelado, false en caso contrario.
+	 */
 	public boolean isCancelled() {
 		return this.cancelled;
 	}
+	
+	/**
+	 * Comprueba en las preferencias del sistema si se permite la importaci&oacute;n 
+	 * de certificados desde sitio que no son seguros.
+	 * @return true en caso de que se permita, false en caso contrario.
+	 */
+	private boolean checkAllowImportNotSecureCerts() {
+		boolean allowImport;
+		Preferences systemPreferences = Preferences.systemRoot().node(PREFERENCE_NODE);
+		allowImport = systemPreferences.getBoolean(PREFERENCE_ALLOW_IMPORT_NOT_SECURE_CERTS, true);
+		if (allowImport) {
+			allowImport = allowImport && systemPreferences.getBoolean(PREFERENCE_ALLOW_AUTO_IMPORT_NOT_SECURE_CERTS, true);
+		}
+		return allowImport;
+	}
+	
 }
