@@ -150,7 +150,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 		Version maxVersion = null;
 		final File directoryLib = new File(startDir);
-		if (directoryLib.isDirectory()) {
+		if (directoryLib.isDirectory() && directoryLib.canRead() && directoryLib.canExecute()) {
 
 			// Tomamos lo numeros de version de firefox identificados
 			final List<String> firefoxVersions = new ArrayList<>();
