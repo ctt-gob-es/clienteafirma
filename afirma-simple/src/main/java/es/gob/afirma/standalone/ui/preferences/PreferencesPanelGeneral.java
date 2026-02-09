@@ -774,7 +774,15 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		this.secureConnections.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS));
 		
-		this.trustedCertificatesButton.setEnabled(PreferencesManager.getBoolean(PreferencesManager.SYSTEM_PREFERENCE_ALLOW_IMPORT_NOT_SECURE_CERTS));
+		boolean allowImportNotSecureCerts = PreferencesManager.getBoolean(PreferencesManager.SYSTEM_PREFERENCE_ALLOW_IMPORT_NOT_SECURE_CERTS);
+		this.trustedCertificatesButton.setEnabled(allowImportNotSecureCerts);
+		
+		if (!allowImportNotSecureCerts) {
+			this.trustedCertificatesButton.getAccessibleContext().setAccessibleDescription(
+					SimpleAfirmaMessages.getString("PreferencesPanel.212") //$NON-NLS-1$
+				);
+			this.trustedCertificatesButton.setToolTipText(SimpleAfirmaMessages.getString("PreferencesPanel.212")); //$NON-NLS-1$
+		}
 	}
 
 	/** Carga las opciones de configuraci&oacute;n por defecto del panel general
