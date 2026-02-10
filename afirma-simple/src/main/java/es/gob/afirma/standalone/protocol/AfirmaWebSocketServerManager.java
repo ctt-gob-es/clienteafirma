@@ -35,7 +35,7 @@ public class AfirmaWebSocketServerManager {
 	private static final int CURRENT_PROTOCOL_VERSION = PROTOCOL_VERSION_4;
 
 	/** Listado de versiones de protocolo soportadas. */
-	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { PROTOCOL_VERSION_3, PROTOCOL_VERSION_4 };
+	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = { PROTOCOL_VERSION_3, PROTOCOL_VERSION_4 };
 
     /** Propiedad del sistema para configurar la optimizacion de WebSockets para VDI. */
 	private static final String SYSTEM_PROPERTY_OPTIMIZED_FOR_VDI = "websockets.optimizedForVdi"; //$NON-NLS-1$
@@ -74,6 +74,7 @@ public class AfirmaWebSocketServerManager {
 			try {
 				switch (requestedProtocolVersion.getMajorVersion()) {
 				case PROTOCOL_VERSION_4:
+					LOGGER.info("Se procesada la peticion de forma " + (asynchronous ? "asincrona" : "sincrona")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					instance = new AfirmaWebSocketServerV4Sup(port, channelInfo.getIdSession(), requestedProtocolVersion);
 					((AfirmaWebSocketServerV4Sup) instance).setAsyncOperation(asynchronous);
 					break;
@@ -87,6 +88,10 @@ public class AfirmaWebSocketServerManager {
 				instance.setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sc));
 				instance.setBindingErrorListener(new BindingErrorListener(channelInfo, requestedProtocolVersion, asynchronous));
 				instance.start();
+
+				// Iniciamos un temporizador para cerrar el socket si no se recibe una
+				// primera peticion dentro de un tiempo determinado
+				instance.initInactivityCountdown();
 			}
 			catch (final Exception e) {
 				LOGGER.log(Level.WARNING, "No se ha podido abrir un socket en el puerto: " + port, e); //$NON-NLS-1$

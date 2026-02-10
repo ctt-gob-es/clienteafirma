@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.java_websocket.WebSocket;
+import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
@@ -43,9 +44,19 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 
 	private static final ProtocolVersion MIN_PROTOCOL_VERSION = ProtocolVersion.getInstance(ProtocolVersion.VERSION_0);
 
-	protected String sessionId;
+	/**
+	 * M&aacute;ximo n&uacute;mero de milisegundos que puede estar el websocket abierto
+	 * antes de recibir la primera petici&oacute;n.
+	 */
+	private static final long INITIAL_INACTIVITY_TIMEOUT = 30000;
 
 	private AfirmaWebSocketBindingErrorListener bindingErrorListener = null;
+
+	private Thread innactivityWatcher = null;
+
+	private WebSocket wsClient = null;
+
+	protected String sessionId;
 
 	/**
 	 * Genera un servidor websocket que atiende las peticiones de Autofirma.
@@ -72,14 +83,37 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 		});
 	}
 
-	private WebSocket wsClient = null;
-
 	@Override
 	public void onOpen(final WebSocket ws, final ClientHandshake handshake) {
 		LOGGER.info("Apertura del socket del puerto " + getAddress().getPort()); //$NON-NLS-1$
 
 		if (this.wsClient == null) {
 			this.wsClient = ws;
+		}
+	}
+
+	/**
+	 * Inicia la cuenta atr&aacute;s de inactividad, para que se cierre el socket
+	 * (y la aplicaci&oacute;n) si no se recibe ninguna petici&oacute;n en un
+	 * determinado tiempo.
+	 */
+	public void initInactivityCountdown() {
+		this.innactivityWatcher = new InnactivityWatcherThread(this.wsClient, INITIAL_INACTIVITY_TIMEOUT);
+		this.innactivityWatcher.start();
+	}
+
+	/**
+	 * Se&ntilde;ala que el websocket est&aacute; operativo y recibiendo peticiones.
+	 * Si no se llama a este m&eacute;todo despues de haber iniciado el websocket,
+	 * se cerrara el websocket pasado un cierto tiempo. Se hace asi para evitar que
+	 * la aplicaci&oacute;Mn se quede abierta indefinidamente sin recibir jam&aacute;s
+	 * una petici&oacute;n desde el navegador.
+	 */
+	protected void markAsWorking() {
+
+		if (this.innactivityWatcher != null) {
+			this.innactivityWatcher.interrupt();
+			this.innactivityWatcher = null;
 		}
 	}
 
@@ -104,6 +138,10 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 	public void onMessage(final WebSocket ws, final String message) {
 		LOGGER.info("Recibimos una peticion en el socket del puerto: " + getAddress().getPort()); //$NON-NLS-1$
 
+		// Indicamos que el socket esta operativo y recibiendo peticiones
+		// para evitar el cierre de seguridad
+		markAsWorking();
+
 		// Si recibimos en el socket un eco, lo respondemos con un OK
 		if (message.startsWith(ECHO_REQUEST_PREFIX)) {
 			broadcast(ECHO_OK_RESPONSE, Collections.singletonList(ws));
@@ -125,11 +163,59 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 		if (ex instanceof java.net.BindException && this.bindingErrorListener != null) {
 			LOGGER.severe("Se identifica como un error en la apertura del puerto " + getAddress().getPort() //$NON-NLS-1$
 					+ ". Se reintenta con el siguiente puerto disponible"); //$NON-NLS-1$
+
+			if (this.innactivityWatcher != null && this.innactivityWatcher.isAlive()) {
+				this.innactivityWatcher.interrupt();
+			}
 			this.bindingErrorListener.onErrorBinding();
 		}
 	}
 
 	public void setBindingErrorListener(final BindingErrorListener bindingErrorListener) {
 		this.bindingErrorListener = bindingErrorListener;
+	}
+
+
+	/**
+	 * Hilo para el cierre del websocket pasado un cierto tiempo.
+	 */
+	private class InnactivityWatcherThread extends Thread {
+
+		private final WebSocket websocket;
+		private final long timeoutMilis;
+
+		/**
+		 * Inicia el hilo que cerrar&aacute; el websocket.
+		 * @param websocket Websocket que debe cerrarse.
+		 * @param timeoutMilis N&uacute;nero de milisegundos que se debe esperar antes del cierre.
+		 */
+		public InnactivityWatcherThread(final WebSocket websocket, final long timeoutMilis) {
+			this.websocket = websocket;
+			this.timeoutMilis = timeoutMilis;
+		}
+
+		@Override
+		public void run() {
+			// Esperamos la cantidad de milisegundos indicada
+			try {
+				Thread.sleep(this.timeoutMilis);
+				//wait(this.timeoutMilis);
+			} catch (final InterruptedException e) {
+				// Si se interrumpe el hilo, se termina la ejecucion
+				// sin llegar a cerrar el socket
+				return;
+			}
+
+			// Si no se ha interrumpido este hilo es porque no se ha recibido ninguna
+			// peticion en el socket, asi que se cerrara el Websocket para que se cierre
+			// a su vez la aplicacion y no se quede en segundo plano indefinidamente
+			if (!isInterrupted()) {
+				onClose(
+						this.websocket,
+						CloseFrame.NEVER_CONNECTED,
+						"Se ha cumplido el tiempo maximo sin recibir la primera peticion en el socket", //$NON-NLS-1$
+						false);
+			}
+		}
 	}
 }

@@ -82,25 +82,24 @@ public final class AfirmaWebSocketServerV4Sup extends AfirmaWebSocketServer {
 			return;
 		}
 
+		// Indicamos que el socket esta operativo y recibiendo peticiones
+		// para evitar el cierre de seguridad
+		markAsWorking();
+
 		// Si recibimos en el socket un eco, lo respondemos con un OK
 		if (message.startsWith(ECHO_REQUEST_PREFIX)) {
 			broadcast(ECHO_OK_RESPONSE, Collections.singletonList(ws));
-		}
-		// Si recibimos cualquier cosa distinta de un eco, consideraremos que es una peticion de
-		// operacion y la procesaremos como tal
-		else {
-			// Ejecutamos la peticion y devolvemos el resultado
-			if (this.isAsyncOperation) {
-				// Se va a procesar la operacion de forma asincrona, asi que no habra riesgo de
-				// timeout en el websocket porque no quedara bloqueado. Se devolvera un mensaje
-				// de espera y se haran consultas recurrentes hasta obtener el resultado
-				WebSocketServerOperationHandler.handleOperation(this.protocol, message, this.sessionId, this, ws);
-			} else {
-				// Si se trata de una operacion de firma de lote, incrementamos el tiempo de timeout
-				final boolean batchOperation = message.startsWith(HEADER_BATCH_1) || message.startsWith(HEADER_BATCH_2);
-				setConnectionLostTimeout(batchOperation ? 240 : 60);
-				broadcast(ProtocolInvocationLauncher.launch(message, this.protocol, true), Collections.singletonList(ws));
-			}
+		} else // Ejecutamos la peticion y devolvemos el resultado
+		if (this.isAsyncOperation) {
+			// Se va a procesar la operacion de forma asincrona, asi que no habra riesgo de
+			// timeout en el websocket porque no quedara bloqueado. Se devolvera un mensaje
+			// de espera y se haran consultas recurrentes hasta obtener el resultado
+			WebSocketServerOperationHandler.handleOperation(this.protocol, message, this.sessionId, this, ws);
+		} else {
+			// Si se trata de una operacion de firma de lote, incrementamos el tiempo de timeout
+			final boolean batchOperation = message.startsWith(HEADER_BATCH_1) || message.startsWith(HEADER_BATCH_2);
+			setConnectionLostTimeout(batchOperation ? 240 : 60);
+			broadcast(ProtocolInvocationLauncher.launch(message, this.protocol, true), Collections.singletonList(ws));
 		}
 	}
 
