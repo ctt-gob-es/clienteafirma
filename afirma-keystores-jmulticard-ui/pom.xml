@@ -15,7 +15,6 @@
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard</artifactId>
-			<version>${jmulticard.version}</version>
 		</dependency>
 	</dependencies>
 </project>

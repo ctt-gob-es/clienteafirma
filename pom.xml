@@ -43,7 +43,7 @@
 		<jdk.version>1.8</jdk.version>
 		<clienteafirma.version>1.10</clienteafirma.version>
 		<afirma.legible.version>1_10_0</afirma.legible.version>
-		<triphase.service.version>2.8.1</triphase.service.version>
+		<triphase.service.version>2.9</triphase.service.version>
 		<jmulticard.version>2.1</jmulticard.version>
 		
 		<afirma.lib.itext.version>1.7</afirma.lib.itext.version>
@@ -180,7 +180,6 @@
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
 				<module>afirma-crypto-cipher2</module>
-				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-core-pkcs7-tsp</module>
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
@@ -205,8 +204,6 @@
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
-				<module>afirma-simple-plugin-hash</module>
-				<module>afirma-simple-plugin-validatecerts</module>
 			</modules>
 			
       		<build>
@@ -246,6 +243,10 @@
 				<!-- Aplicaciones -->
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
+				
+				<!-- Plugins -->
+				<module>afirma-simple-plugin-hash</module>
+				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Servicios -->
 				<module>afirma-server-triphase-signer</module>
@@ -287,7 +288,7 @@
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
 				<module>afirma-crypto-cipher2</module>
-				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-core-pkcs7-tsp</module>
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
 				<module>afirma-crypto-padestri-client</module>
@@ -311,12 +312,14 @@
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
-				<module>afirma-simple-plugin-hash</module>
-				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Aplicaciones -->
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
+				
+				<!-- Plugins -->
+				<module>afirma-simple-plugin-hash</module>
+				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Servicios -->
 				<module>afirma-server-triphase-signer</module>
@@ -357,12 +360,10 @@
 				<module>afirma-core-prefs</module>
 				<module>afirma-crypto-batch-client</module>
 				<module>afirma-crypto-cadestri-client</module>
-				<module>afirma-crypto-cipher</module>
 				<module>afirma-crypto-core-pkcs7</module>
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
 				<module>afirma-crypto-cipher2</module>
-				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-core-pkcs7-tsp</module>
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
@@ -374,7 +375,6 @@
 				<module>afirma-crypto-xadestri-client</module>
 				<module>afirma-crypto-xmlsignature</module>
 				<module>afirma-crypto-ooxml</module>
-				<module>afirma-crypto-jarverifier</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
 				<module>afirma-keystores-jmulticard-ui</module>
@@ -388,13 +388,7 @@
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
-				<module>afirma-simple-plugin-hash</module>
-				<module>afirma-simple-plugin-validatecerts</module>
 				
-				<!-- Servicios -->
-				<module>afirma-server-triphase-signer</module>
-				<module>afirma-signature-retriever</module>
-				<module>afirma-signature-storage</module>
 			</modules>
 			
 			<distributionManagement>
@@ -452,7 +446,6 @@
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
 				<module>afirma-crypto-cipher2</module>
-				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-core-pkcs7-tsp</module>
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
@@ -477,12 +470,14 @@
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
-				<module>afirma-simple-plugin-hash</module>
-				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Aplicaciones -->
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
+				
+				<!-- Plugins -->
+				<module>afirma-simple-plugin-hash</module>
+				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Servicios -->
 				<module>afirma-server-triphase-signer</module>
