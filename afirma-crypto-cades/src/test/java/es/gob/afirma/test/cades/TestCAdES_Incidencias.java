@@ -27,7 +27,7 @@ public final class TestCAdES_Incidencias {
 
 	/** Prueba de an&aacute;lisis de las firmas del Gobierno Canario. Originalmente, ocurr&iacute;a un error
 	 * de tipo:
-	 * <code>java.lang.ClassCastException: org.spongycastle.asn1.ASN1GeneralizedTime cannot be cast to org.spongycastle.asn1.ASN1UTCTime</code>
+	 * <code>java.lang.ClassCastException: org.bouncycastle.asn1.ASN1GeneralizedTime cannot be cast to org.bouncycastle.asn1.ASN1UTCTime</code>
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test

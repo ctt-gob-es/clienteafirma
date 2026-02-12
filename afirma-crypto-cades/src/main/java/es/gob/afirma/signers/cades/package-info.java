@@ -41,7 +41,7 @@
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo PKCS#7 (<i>afirma-crypto-core-pkcs7</i>) del Cliente.</li>
- *   <li>Dependencia con SpongyCastle 1.54 o superior (Proveedor + TSP + <i>Mail</i>).</li>
+ *   <li>Dependencia con BouncyCastle 1.71 o superior (Proveedor + TSP + <i>Mail</i>).</li>
  *  </ul>
  *  <p>Adicionalmente, se presentan las siguientes dependencias din&aacute;micas de primer nivel:</p>
  *  <ul>

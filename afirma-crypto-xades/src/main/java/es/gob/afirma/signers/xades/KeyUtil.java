@@ -9,7 +9,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.logging.Logger;
 
-import org.spongycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 
 /** Utilidades de claves criptogr&aacute;ficas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */

@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.cms.AttributeTable;
-import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
-import org.spongycastle.asn1.esf.ESFAttributes;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.cert.X509CRLHolder;
-import org.spongycastle.cms.CMSSignedData;
-import org.spongycastle.cms.SignerInformation;
-import org.spongycastle.cms.SignerInformationStore;
-import org.spongycastle.util.CollectionStore;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.esf.ESFAttributes;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.cert.X509CRLHolder;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.util.CollectionStore;
 
 import com.aowagie.text.pdf.AcroFields;
 import com.aowagie.text.pdf.PdfDictionary;
@@ -434,26 +434,19 @@ public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetect
 
 			if (isPAdESBLevel(signatureDictionary)) {
 				format = FORMAT_PADES_B_LEVEL;
-				if (isPAdESLTALevel(signatureDictionary, reader)) {
-					format = FORMAT_PADES_LTA_LEVEL;
-				} else if (isPAdESLTLevel(signatureDictionary, reader)) {
-					format = FORMAT_PADES_LT_LEVEL;
-				} else if (isPAdESTLevel(signatureDictionary, reader)) {
-					format = FORMAT_PADES_T_LEVEL;
-				}
 			}
 			else if (isPAdESBBLevel(signatureDictionary)) {
 				format = FORMAT_PADES_B_B_LEVEL;
-				if (isPAdESLTALevel(signatureDictionary, reader)) {
-					format = FORMAT_PADES_LTA_LEVEL;
-				} else if (isPAdESLTLevel(signatureDictionary, reader)) {
-					format = FORMAT_PADES_LT_LEVEL;
-				} else if (isPAdESTLevel(signatureDictionary, reader)) {
-					format = FORMAT_PADES_T_LEVEL;
-				}
 			}
 			else{
 				return getFormatOfPAdESSignature(signatureDictionary, reader);
+			}
+			if (isPAdESLTALevel(signatureDictionary, reader)) {
+				format = FORMAT_PADES_LTA_LEVEL;
+			} else if (isPAdESLTLevel(signatureDictionary, reader)) {
+				format = FORMAT_PADES_LT_LEVEL;
+			} else if (isPAdESTLevel(signatureDictionary, reader)) {
+				format = FORMAT_PADES_T_LEVEL;
 			}
 		} catch (final Exception e) {
 			format = FORMAT_UNRECOGNIZED;
@@ -1179,22 +1172,14 @@ public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetect
 	private static boolean checkUnsignedAttributesForCAdESLTLevel(final AttributeTable unsignedAttrs) {
 		if (unsignedAttrs != null) {
 			// complete-certificate-references
-			if (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certificateRefs) != null) {
-				return false;
-			}
+			
 
 			// complete-revocation-references
-			if (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_revocationRefs) != null) {
-				return false;
-			}
+			
 
 			// attribute-certificate-references
-			if (unsignedAttrs.get(ID_ATTRIBUTE_CERTIFICATE_REFERENCES) != null) {
-				return false;
-			}
-
 			// attribute-revocation-references
-			if (unsignedAttrs.get(ID_ATTRIBUTE_REVOCATION_REFERENCES) != null) {
+			if ((unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certificateRefs) != null) || (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_revocationRefs) != null) || (unsignedAttrs.get(ID_ATTRIBUTE_CERTIFICATE_REFERENCES) != null) || (unsignedAttrs.get(ID_ATTRIBUTE_REVOCATION_REFERENCES) != null)) {
 				return false;
 			}
 
@@ -1235,22 +1220,14 @@ public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetect
 	 */
 	private static boolean checkUnsignedAttributesForCAdESLTLevelAux(final AttributeTable unsignedAttrs) {
 		// revocation-values
-		if (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_revocationValues) != null) {
-			return false;
-		}
+		
 
 		// archive-time-stamp
-		if (unsignedAttrs.get(ESFAttributes.archiveTimestamp) != null) {
-			return false;
-		}
+		
 
 		// archive-time-stamp-v2
-		if (unsignedAttrs.get(ESFAttributes.archiveTimestampV2) != null) {
-			return false;
-		}
-
 		// long-term-validation
-		if (unsignedAttrs.get(ID_LONG_TERM_VALIDATION) != null) {
+		if ((unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_revocationValues) != null) || (unsignedAttrs.get(ESFAttributes.archiveTimestamp) != null) || (unsignedAttrs.get(ESFAttributes.archiveTimestampV2) != null) || (unsignedAttrs.get(ID_LONG_TERM_VALIDATION) != null)) {
 			return false;
 		}
 		return true;

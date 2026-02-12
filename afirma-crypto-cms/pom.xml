@@ -27,20 +27,15 @@
 			<artifactId>afirma-crypto-core-pkcs7</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>core</artifactId>
-		</dependency>
 
 		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>prov</artifactId>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
 		</dependency>
-		
+			
 		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk18on</artifactId>
 		</dependency>
 		
 	</dependencies>

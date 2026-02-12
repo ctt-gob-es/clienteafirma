@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Primitive;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.x509.qualified.QCStatement;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.x509.qualified.QCStatement;
 
 import es.gob.afirma.keystores.CertificateFilter;
 

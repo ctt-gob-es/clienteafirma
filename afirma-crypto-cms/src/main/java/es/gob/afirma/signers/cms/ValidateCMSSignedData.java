@@ -13,15 +13,15 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.cms.SignerInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.signers.pkcs7.SCChecker;
 
@@ -38,7 +38,7 @@ final class ValidateCMSSignedData {
      * @return si es de este tipo.
      * @throws IOException Si ocurren errores durante la lectura de los datos */
     public static boolean isCMSSignedData(final byte[] data) throws IOException {
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
         boolean isValid = true;
         try (
     		final ASN1InputStream is = new ASN1InputStream(data);
@@ -53,7 +53,7 @@ final class ValidateCMSSignedData {
             else {
                 // Contenido de SignedData
                 final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+                final ASN1Sequence datos = (ASN1Sequence) doj.getExplicitBaseObject();
                 final SignedData sd = SignedData.getInstance(datos);
                 final ASN1Set signerInfosSd = sd.getSignerInfos();
 

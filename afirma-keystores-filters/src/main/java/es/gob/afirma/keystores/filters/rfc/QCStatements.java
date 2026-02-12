@@ -35,12 +35,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.spongycastle.asn1.ASN1EncodableVector;
-import org.spongycastle.asn1.ASN1Object;
-import org.spongycastle.asn1.ASN1Primitive;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.DERSequence;
-import org.spongycastle.asn1.x509.qualified.QCStatement;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x509.qualified.QCStatement;
 
 /** Extensi&oacute;n <code>QCStatements</code> de un certificado X.509 (RFC 3039).
    <p>Esta extensi&oacute;n puede ser tanto cr&iacute;tica como no cr&iacute;tica.</p>

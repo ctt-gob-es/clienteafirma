@@ -14,10 +14,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.spongycastle.asn1.ASN1Encodable;
-import org.spongycastle.asn1.DERSequence;
-import org.spongycastle.asn1.DERUTF8String;
-import org.spongycastle.asn1.esf.SignerLocation;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.esf.SignerLocation;
 
 /** Clase de utilidad para el manejo de las estructuras CAdES <i>id-aa-ets-signerLocation</i> y
  * <i>id-aa-ets-signerAttr</i>.
@@ -61,10 +61,7 @@ public final class CAdESSignerMetadataHelper {
 	 * @param csl Metadatos de situaci&oacute;n del firmante en el momento de la firma.
 	 * @return Estructura ASN.1 <i>SignerLocation</i> */
 	public static SignerLocation getSignerLocation(final CAdESSignerMetadata.CAdESSignerLocation csl) {
-		if (csl == null) {
-			return null;
-		}
-		if (csl.getCountryName() == null && csl.getLocalityName() == null && csl.getPostalAddress() == null) {
+		if ((csl == null) || (csl.getCountryName() == null && csl.getLocalityName() == null && csl.getPostalAddress() == null)) {
 			return null;
 		}
 		final List<String> postalAddress = csl.getPostalAddress();

@@ -97,7 +97,7 @@ public final class AOCAdESSigner implements AOSigner {
 
     	checkAlgorithm(algorithm, extraParams);
 
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
 
     	noticeIncompatibleConfig(algorithm, extraParams);
 
@@ -172,7 +172,7 @@ public final class AOCAdESSigner implements AOSigner {
 
     	checkAlgorithm(algorithm, extraParams);
 
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
 
         try {
 			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").getConstructor().newInstance()).cosign( //$NON-NLS-1$
@@ -251,7 +251,7 @@ public final class AOCAdESSigner implements AOSigner {
 
     	checkAlgorithm(algorithm, extraParams);
 
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
 
         try {
 			return ((AOCoSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").getConstructor().newInstance()).cosign( //$NON-NLS-1$
@@ -321,7 +321,7 @@ public final class AOCAdESSigner implements AOSigner {
 
     	checkAlgorithm(algorithm, extraParams);
 
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
 
         try {
 			return ((AOCounterSigner)Class.forName("es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner").getConstructor().newInstance()).countersign( //$NON-NLS-1$
@@ -361,7 +361,7 @@ public final class AOCAdESSigner implements AOSigner {
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
 			throws AOInvalidSignatureFormatException, IOException {
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
     	if (!CAdESValidator.isCAdESValid(sign, false)) {
     		throw new AOInvalidSignatureFormatException("Los datos introducidos no se corresponden con un objeto de firma CAdES"); //$NON-NLS-1$
     	}
@@ -408,7 +408,7 @@ public final class AOCAdESSigner implements AOSigner {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
-        new SCChecker().checkSpongyCastle();
+        new SCChecker().checkBouncyCastle();
 		return CAdESValidator.isCAdESSignedData(data, true);
     }
 
@@ -453,7 +453,7 @@ public final class AOCAdESSigner implements AOSigner {
         if (sign == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
-        new SCChecker().checkSpongyCastle();
+        new SCChecker().checkBouncyCastle();
         if (!CAdESValidator.isCAdESValid(sign, false)) {
             throw new AOInvalidSignatureFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }

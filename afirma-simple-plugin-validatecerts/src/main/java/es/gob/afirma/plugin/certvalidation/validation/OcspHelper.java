@@ -30,32 +30,32 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.DERIA5String;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.x500.X500Name;
-import org.spongycastle.asn1.x509.AccessDescription;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
-import org.spongycastle.asn1.x509.AuthorityInformationAccess;
-import org.spongycastle.asn1.x509.Extension;
-import org.spongycastle.asn1.x509.GeneralName;
-import org.spongycastle.cert.X509CertificateHolder;
-import org.spongycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.spongycastle.cert.ocsp.BasicOCSPResp;
-import org.spongycastle.cert.ocsp.CertificateID;
-import org.spongycastle.cert.ocsp.CertificateStatus;
-import org.spongycastle.cert.ocsp.OCSPException;
-import org.spongycastle.cert.ocsp.OCSPReqBuilder;
-import org.spongycastle.cert.ocsp.OCSPResp;
-import org.spongycastle.cert.ocsp.RespID;
-import org.spongycastle.cert.ocsp.RevokedStatus;
-import org.spongycastle.cert.ocsp.SingleResp;
-import org.spongycastle.cert.ocsp.UnknownStatus;
-import org.spongycastle.jce.provider.BouncyCastleProvider;
-import org.spongycastle.operator.DigestCalculator;
-import org.spongycastle.operator.OperatorCreationException;
-import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.asn1.ASN1IA5String;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.CertificateID;
+import org.bouncycastle.cert.ocsp.CertificateStatus;
+import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
+import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.bouncycastle.cert.ocsp.RespID;
+import org.bouncycastle.cert.ocsp.RevokedStatus;
+import org.bouncycastle.cert.ocsp.SingleResp;
+import org.bouncycastle.cert.ocsp.UnknownStatus;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.DigestCalculator;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import es.gob.afirma.core.misc.AOUtil;
 
@@ -314,7 +314,7 @@ final class OcspHelper {
                 for (final AccessDescription accessDescription : accessDescriptions) {
                     final GeneralName gn = accessDescription.getAccessLocation();
                     if (gn.getTagNo() == GeneralName.uniformResourceIdentifier) {
-                        final DERIA5String str = DERIA5String.getInstance(gn.getName());
+                        final ASN1IA5String str = ASN1IA5String.getInstance(gn.getName());
                         final String accessLocation = str.getString();
                         ocspUrlList.add(accessLocation);
                     }

@@ -13,19 +13,19 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1Integer;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.EncryptedContentInfo;
-import org.spongycastle.asn1.cms.EnvelopedData;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.EncryptedContentInfo;
+import org.bouncycastle.asn1.cms.EnvelopedData;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.cms.SignerInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.DigestedData;
@@ -75,7 +75,7 @@ public final class CAdESValidator {
             /* Los valores de retorno no se usan, solo es para verificar que la
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
              * de la excepcion. */
-            new DEROctetString(doj.getObject());
+            new DEROctetString(doj.getExplicitBaseObject());
 
         }
         catch (final Exception ex) {
@@ -109,7 +109,7 @@ public final class CAdESValidator {
 
             // Contenido de SignedData
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-            final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+            final ASN1Sequence datos = (ASN1Sequence) doj.getExplicitBaseObject();
             final SignedData sd = SignedData.getInstance(datos);
 
             final ASN1Set signerInfosSd = sd.getSignerInfos();
@@ -184,7 +184,7 @@ public final class CAdESValidator {
             /* Los resultados no se usan, solo es para verificar que la
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
              * de la excepcion. */
-            new DigestedData((ASN1Sequence) doj.getObject());
+            new DigestedData((ASN1Sequence) doj.getExplicitBaseObject());
 
         }
         catch (final Exception ex) {
@@ -214,7 +214,7 @@ public final class CAdESValidator {
         // Contenido de Data
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-        final ASN1Sequence asq = (ASN1Sequence) doj.getObject();
+        final ASN1Sequence asq = (ASN1Sequence) doj.getExplicitBaseObject();
 
         try {
 
@@ -261,7 +261,7 @@ public final class CAdESValidator {
             /* los retornos no se usan, solo es para verificar que la conversion
              * ha sido correcta. De no ser asi, se pasaria al manejo de la
              * excepcion. */
-            EnvelopedData.getInstance(doj.getObject());
+            EnvelopedData.getInstance(doj.getExplicitBaseObject());
         }
         catch (final Exception ex) {
         	LOGGER.fine("Los datos proporcionados no son de tipo EnvelopedData: " + ex); //$NON-NLS-1$
@@ -289,7 +289,7 @@ public final class CAdESValidator {
         }
         // Contenido de SignedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+        final ASN1Sequence datos = (ASN1Sequence) doj.getExplicitBaseObject();
 
         final SignedAndEnvelopedData sd;
         try {

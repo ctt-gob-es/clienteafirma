@@ -9,23 +9,23 @@
 
 package es.gob.afirma.signers.pkcs7;
 
-/** Comprobador de la versi&oacute;n de SpongyCastle del sistema.
+/** Comprobador de la versi&oacute;n de BouncyCastle del sistema.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class SCChecker {
 
-    /** Versi&oacute;n de SpongyCastle necesaria para el uso de esta clase (1.47 o superior). */
+    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase (1.47 o superior). */
     private static final String SC_VERSION = "1.47"; //$NON-NLS-1$
 
-	/** Comprueba que la versi&oacute;n de SpongyCastle existente sea v1.47 o superior.
-	 * @throws InvalidSpongyCastleException Cuando no se puede detectar la versi&oacute;n de
-	 * SpongyCastle disponible o no es compatible con afirma. */
+	/** Comprueba que la versi&oacute;n de BouncyCastle existente sea v1.71 o superior.
+	 * @throws InvalidBouncyCastleException Cuando no se puede detectar la versi&oacute;n de
+	 * BouncyCastle disponible o no es compatible con afirma. */
 	@SuppressWarnings("static-method")
-	public void checkSpongyCastle() {
+	public void checkBouncyCastle() {
 		try {
-			Class.forName("org.spongycastle.asn1.ASN1Primitive"); //$NON-NLS-1$
+			Class.forName("org.bouncycastle.asn1.ASN1Primitive"); //$NON-NLS-1$
 		}
 		catch(final ClassNotFoundException e) {
-			throw new InvalidSpongyCastleException(SC_VERSION, "1.46 o anterior", e); //$NON-NLS-1$
+			throw new InvalidBouncyCastleException(SC_VERSION, "1.71 o anterior", e); //$NON-NLS-1$
 		}
 	}
 

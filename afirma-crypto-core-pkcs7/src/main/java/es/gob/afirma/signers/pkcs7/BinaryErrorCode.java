@@ -12,7 +12,7 @@ public class BinaryErrorCode {
 	}
 
 	public static class ThirdParty {
-		public static final ErrorCode BOUNCYCASTLE_VERSION_NOT_SUPPORTED		= new ErrorCode("300001", "Se ha encontrado una version de Spongycastle no soportada"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode BOUNCYCASTLE_VERSION_NOT_SUPPORTED		= new ErrorCode("300001", "Se ha encontrado una version de BouncyCastle no soportada"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 

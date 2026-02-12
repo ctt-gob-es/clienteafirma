@@ -21,21 +21,21 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.ASN1Encodable;
-import org.spongycastle.asn1.ASN1GeneralizedTime;
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1Integer;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.ASN1UTCTime;
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.CMSAttributes;
-import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.ASN1UTCTime;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.pkcs.IssuerAndSerialNumber;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.SignedData;
+import org.bouncycastle.asn1.pkcs.SignerInfo;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
@@ -97,7 +97,7 @@ public final class ReadNodesTree {
 
         // Contenido de SignedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) contentsData.nextElement();
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();
+        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getExplicitBaseObject();
 
         // Raiz de la secuencia de SignerInfo
         // Obtenemos los signerInfos del SignedData
@@ -121,7 +121,7 @@ public final class ReadNodesTree {
             for (int i = 0; i < signerInfosSd.size(); i++) {
                 final ASN1Sequence atribute = (ASN1Sequence) signerInfosSd.getObjectAt(i);
                 final IssuerAndSerialNumber issuerSerial = IssuerAndSerialNumber.getInstance(atribute.getObjectAt(1));
-                final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
+                final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getCertificateSerialNumber());
                 final SignerInfo si = SignerInfo.getInstance(atribute);
                 final Date signingTime = getSigningTime(si);
                 final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
@@ -137,7 +137,7 @@ public final class ReadNodesTree {
             for (int i = 0; i < signerInfosSd.size(); i++) {
                 final ASN1Sequence atribute = (ASN1Sequence) signerInfosSd.getObjectAt(i);
                 final IssuerAndSerialNumber issuerSerial = IssuerAndSerialNumber.getInstance(atribute.getObjectAt(1));
-                final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
+                final String nameSigner = searchName(certificates, issuerSerial.getCertificateSerialNumber());
                 final SignerInfo si = SignerInfo.getInstance(atribute);
                 this.rama = new AOTreeNode(nameSigner);
                 this.lista.add(nameSigner);
@@ -209,7 +209,7 @@ public final class ReadNodesTree {
                             final IssuerAndSerialNumber issuerSerial = IssuerAndSerialNumber.getInstance(atrib.getObjectAt(1));
                             final SignerInfo si = SignerInfo.getInstance(atrib);
                             if (withCertificates) {
-                                final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
+                                final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getCertificateSerialNumber());
                                 final Date signingTime = getSigningTime(si);
                                 final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
                                 aossi.setPkcs1(si.getEncryptedDigest().getOctets());
@@ -220,7 +220,7 @@ public final class ReadNodesTree {
                                 getUnsignedAtributes(true, si.getUnauthenticatedAttributes(), this.rama2, certificates);
                             }
                             else {
-                                final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
+                                final String nameSigner = searchName(certificates, issuerSerial.getCertificateSerialNumber());
                                 this.rama2 = new AOTreeNode(nameSigner);
                                 this.lista.add(nameSigner);
                                 ramahija.add(this.rama2);

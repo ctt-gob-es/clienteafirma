@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
@@ -62,7 +62,7 @@ public final class AOCMSSigner implements AOSigner {
 			           final java.security.cert.Certificate[] certChain,
 			           final Properties xParams) throws AOException, IOException {
 
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -114,7 +114,7 @@ public final class AOCMSSigner implements AOSigner {
 			             final java.security.cert.Certificate[] certChain,
 			             final Properties xParams) throws AOException, IOException {
 
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -159,7 +159,7 @@ public final class AOCMSSigner implements AOSigner {
 			             final java.security.cert.Certificate[] certChain,
 			             final Properties extraParams) throws AOException, IOException {
 
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
@@ -203,7 +203,7 @@ public final class AOCMSSigner implements AOSigner {
                               final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException, IOException {
 
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm);
 
@@ -310,7 +310,7 @@ public final class AOCMSSigner implements AOSigner {
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
 			throws AOInvalidSignatureFormatException, IOException {
-    	new SCChecker().checkSpongyCastle();
+    	new SCChecker().checkBouncyCastle();
         final ReadNodesTree rn = new ReadNodesTree();
         try {
             return rn.readNodesTree(sign, asSimpleSignInfo);

@@ -48,7 +48,7 @@
 		
 		<afirma.lib.itext.version>1.7</afirma.lib.itext.version>
 		<afirma.lib.others.version>0.0.10</afirma.lib.others.version>
-		<spongycastle.version>1.58.0.0</spongycastle.version>
+		<bouncycastle.version>1.83</bouncycastle.version>
 		
 		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
 		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
@@ -106,21 +106,15 @@
 			</dependency>
 
 			<dependency>
-				<groupId>com.madgag.spongycastle</groupId>
-				<artifactId>core</artifactId>
-				<version>${spongycastle.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.madgag.spongycastle</groupId>
-				<artifactId>prov</artifactId>
-				<version>${spongycastle.version}</version>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			
 			<dependency>
-				<groupId>com.madgag.spongycastle</groupId>
-				<artifactId>bcpkix-jdk15on</artifactId>
-				<version>${spongycastle.version}</version>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcpkix-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			
 			<dependency>
