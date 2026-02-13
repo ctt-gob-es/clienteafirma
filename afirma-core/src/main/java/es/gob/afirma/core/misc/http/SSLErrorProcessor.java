@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
@@ -35,13 +34,11 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 	private static final String PROPERTY_SSL_HEADLESS = "sslOmitImportationDialog"; //$NON-NLS-1$
 	
-	private static final String PREFERENCE_NODE = "/es/gob/afirma/standalone/ui/preferences"; //$NON-NLS-1$
-	
-	private static final String PREFERENCE_ALLOW_IMPORT_NOT_SECURE_CERTS = "allowImportNotSecureCerts"; //$NON-NLS-1$
-	
-	private static final String PREFERENCE_ALLOW_AUTO_IMPORT_NOT_SECURE_CERTS = "allowAutoImportNotSecureCerts"; //$NON-NLS-1$
+	public static  final String SYSTEM_PREFERENCE_BLOCK_AUTO_IMPORT_TRUSTED_CERTS = "blockAutoImportTrustedCerts"; //$NON-NLS-1$
 
 	private static boolean showingConfirmDialog = false;
+	
+	private boolean blockAutoImportTrustedCerts = false;
 
 	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
 
@@ -60,24 +57,13 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 				&& (Boolean.parseBoolean(params.getProperty(PROPERTY_HEADLESS)) ||
 						Boolean.parseBoolean(params.getProperty(PROPERTY_SSL_HEADLESS)));
 
-		// Si podemos usar entornos grafico por lo indicado en la operacion,
-		// comprobamos ahora si realmente lo tenemos disponible para poder usarlo
-		if (!this.headless) {
-			boolean headlessEnviroment = false;
-			try {
-				headlessEnviroment = !hasGraphicsEnvironment();
-			}
-			catch (final Throwable e) {
-				headlessEnviroment = true;
-			}
-			this.headless = headlessEnviroment;
-		}
+		initialize();
 	}
 
 	/**
 	 * Inicializa el objeto.
 	 */
-	private void initilize() {
+	private void initialize() {
 
 		// Si no esta inicializado ya, lo hacemos
 		if (!this.initialized) {
@@ -93,6 +79,11 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 				}
 				this.headless = headlessEnviroment;
 			}
+			
+			// Comprobamos si se permite o no la importacion automatica de certificados no seguros
+			String blockAutoImportTrustedCertsProp = System.getProperty(SYSTEM_PREFERENCE_BLOCK_AUTO_IMPORT_TRUSTED_CERTS, "false"); //$NON-NLS-1$
+			this.blockAutoImportTrustedCerts = Boolean.valueOf(blockAutoImportTrustedCertsProp);
+			
 			this.initialized = true;
 		}
 	}
@@ -135,7 +126,13 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		}
 
 		// Inicializamos el objeto
-		initilize();
+		initialize();
+		
+		// Comprobamos en las preferencias del sistema que se permite la importacion de certificados desde sitios no seguros
+		if(this.blockAutoImportTrustedCerts) {
+			LOGGER.severe("La importacion de certificados desde sitio no seguros no esta permitida."); //$NON-NLS-1$
+			throw cause;
+		}
 
 		// Si se nos ha pedido no mostrar dialogos, relanzamos la excepcion
 		if (this.headless) {
@@ -166,12 +163,6 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		catch (Exception e) {
 			LOGGER.severe("Error al descargar certificados SSL del servidor: " + e); //$NON-NLS-1$
 			throw new IOException(e);
-		}
-		
-		// Comprobamos en las preferencias del sistema que se permite la importacion de certificados desde sitios no seguros
-		if(!checkAllowImportNotSecureCerts()) {
-			LOGGER.severe("La importacion de certificados desde sitio no seguros no esta permitida."); //$NON-NLS-1$
-			throw cause;
 		}
 		
 		// Descargamos los certificados SSL del servidor
@@ -375,21 +366,6 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	 */
 	public boolean isCancelled() {
 		return this.cancelled;
-	}
-	
-	/**
-	 * Comprueba en las preferencias del sistema si se permite la importaci&oacute;n 
-	 * de certificados desde sitio que no son seguros.
-	 * @return true en caso de que se permita, false en caso contrario.
-	 */
-	private boolean checkAllowImportNotSecureCerts() {
-		boolean allowImport;
-		Preferences systemPreferences = Preferences.systemRoot().node(PREFERENCE_NODE);
-		allowImport = systemPreferences.getBoolean(PREFERENCE_ALLOW_IMPORT_NOT_SECURE_CERTS, true);
-		if (allowImport) {
-			allowImport = allowImport && systemPreferences.getBoolean(PREFERENCE_ALLOW_AUTO_IMPORT_NOT_SECURE_CERTS, true);
-		}
-		return allowImport;
 	}
 	
 }

@@ -34,6 +34,15 @@ public class SSLContextConfigurationTask extends Thread{
     	LOGGER.info("Configuramos el listado de dominios seguros"); //$NON-NLS-1$
     	HttpManager.setSecureDomains(
     			PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST));
+    	
+    	// Configuramos las propiedades del sistema necesarias para que SSLErrorProcesor las trate correctamente
+    	boolean allowPersonalTruststore = PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE);
+    	boolean allowAutoImportTrustedCerts = PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_AUTO_IMPORT_TRUSTED_CERTS);
+
+		boolean allowAutoImport = allowPersonalTruststore && allowAutoImportTrustedCerts;
+		if (!allowAutoImport) {
+			System.setProperty(PreferencesManager.SYSTEM_PREFERENCE_BLOCK_AUTO_IMPORT_TRUSTED_CERTS, "true"); //$NON-NLS-1$
+		}    	
 
     	// Establecemos los almacenes de claves de Java y de Autofirma como de confianza para las
     	// conexiones remotas
@@ -43,7 +52,14 @@ public class SSLContextConfigurationTask extends Thread{
     		
     		try {
     			LOGGER.info("Configuramos el almacen de confianza de la aplicacion"); //$NON-NLS-1$
-    			truststoreConfigured = SslSecurityManager.configureAfirmaTrustManagers();
+    			
+    			if (allowPersonalTruststore) {
+    				truststoreConfigured = SslSecurityManager.configureAfirmaTrustManagers();
+    			} else {
+    				LOGGER.info("El almacen de confianza no se cargara debido a la configuracion de Autofirma"); //$NON-NLS-1$
+    				truststoreConfigured = false;
+    			}
+    			
     		} catch (IOException | GeneralSecurityException e) {
     			LOGGER.warning("Error al configurar almacenes de confianza: " + e); //$NON-NLS-1$
     			truststoreConfigured = false;

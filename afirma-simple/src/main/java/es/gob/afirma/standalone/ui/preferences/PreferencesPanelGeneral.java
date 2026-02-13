@@ -774,10 +774,11 @@ final class PreferencesPanelGeneral extends JScrollPane {
 
 		this.secureConnections.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS));
 		
-		boolean allowImportNotSecureCerts = PreferencesManager.getBoolean(PreferencesManager.SYSTEM_PREFERENCE_ALLOW_IMPORT_NOT_SECURE_CERTS);
-		this.trustedCertificatesButton.setEnabled(allowImportNotSecureCerts);
+		boolean allowPersonalTruststore = PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE);
 		
-		if (!allowImportNotSecureCerts) {
+		this.trustedCertificatesButton.setEnabled(allowPersonalTruststore);
+		
+		if (!allowPersonalTruststore) {
 			this.trustedCertificatesButton.getAccessibleContext().setAccessibleDescription(
 					SimpleAfirmaMessages.getString("PreferencesPanel.212") //$NON-NLS-1$
 				);
