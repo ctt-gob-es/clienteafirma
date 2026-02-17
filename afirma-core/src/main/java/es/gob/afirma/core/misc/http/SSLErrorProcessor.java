@@ -33,11 +33,11 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	private static final String PROPERTY_HEADLESS = "headless"; //$NON-NLS-1$
 
 	private static final String PROPERTY_SSL_HEADLESS = "sslOmitImportationDialog"; //$NON-NLS-1$
-	
+
 	public static  final String SYSTEM_PREFERENCE_BLOCK_AUTO_IMPORT_TRUSTED_CERTS = "blockAutoImportTrustedCerts"; //$NON-NLS-1$
 
 	private static boolean showingConfirmDialog = false;
-	
+
 	private boolean blockAutoImportTrustedCerts = false;
 
 	static final String TRUSTED_KS_PWD = "changeit"; //$NON-NLS-1$
@@ -51,67 +51,16 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		this.headless = false;
 	}
 
+	public SSLErrorProcessor(final boolean headless) {
+		this.headless = headless;
+	}
+
 	public SSLErrorProcessor(final Properties params) {
 		// Comprobamos si directamente nos indican que no se use entorno grafico
 		this.headless = params != null
 				&& (Boolean.parseBoolean(params.getProperty(PROPERTY_HEADLESS)) ||
 						Boolean.parseBoolean(params.getProperty(PROPERTY_SSL_HEADLESS)));
-
-		initialize();
 	}
-
-	/**
-	 * Inicializa el objeto.
-	 */
-	private void initialize() {
-
-		// Si no esta inicializado ya, lo hacemos
-		if (!this.initialized) {
-			// Si podemos usar entornos grafico por lo indicado en la operacion,
-			// comprobamos ahora si realmente lo tenemos disponible para poder usarlo
-			if (!this.headless) {
-				boolean headlessEnviroment = false;
-				try {
-					headlessEnviroment = !hasGraphicsEnvironment();
-				}
-				catch (final Throwable e) {
-					headlessEnviroment = true;
-				}
-				this.headless = headlessEnviroment;
-			}
-			
-			// Comprobamos si se permite o no la importacion automatica de certificados no seguros
-			String blockAutoImportTrustedCertsProp = System.getProperty(SYSTEM_PREFERENCE_BLOCK_AUTO_IMPORT_TRUSTED_CERTS, "false"); //$NON-NLS-1$
-			this.blockAutoImportTrustedCerts = Boolean.valueOf(blockAutoImportTrustedCertsProp);
-			
-			this.initialized = true;
-		}
-	}
-
-	/**
-	 * Comprueba si hay un entorno gr&aacute;fico disponible.
-	 * @return {@code true} si hay entorno gr&aacute;fico, {@code false} si no.
-	 */
-	private static boolean hasGraphicsEnvironment() {
-		boolean headless;
-		try {
-			final Class<?> graphicsEnvironmentClass = Class.forName("java.awt.GraphicsEnvironment"); //$NON-NLS-1$
-			final Method isHeadlessMethod = graphicsEnvironmentClass.getMethod("isHeadless"); //$NON-NLS-1$
-			final Object headlessBoolean = isHeadlessMethod.invoke(null);
-			headless = headlessBoolean instanceof Boolean ? ((Boolean) headlessBoolean).booleanValue() : true;
-		}
-		catch (final Throwable e) {
-			LOGGER.warning("No se pudo comprobar si hay entorno gr&aacute;fico: " + e); //$NON-NLS-1$
-			headless = true;
-		}
-		return !headless;
-	}
-
-	public SSLErrorProcessor(final boolean headless) {
-		this.headless = headless;
-	}
-
-
 
 	@Override
 	public byte[] processHttpError(final IOException cause, final UrlHttpManager urlManager,
@@ -127,7 +76,7 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 		// Inicializamos el objeto
 		initialize();
-		
+
 		// Comprobamos en las preferencias del sistema que se permite la importacion de certificados desde sitios no seguros
 		if(this.blockAutoImportTrustedCerts) {
 			LOGGER.severe("La importacion de certificados desde sitio no seguros no esta permitida."); //$NON-NLS-1$
@@ -146,25 +95,25 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 			LOGGER.info("Ya se esta mostrando un dialogo de consulta para la importacion del certificado de confianza. Se omitira este."); //$NON-NLS-1$
 			throw cause;
 		}
-		
+
 		//Comprobamos que el certificado este expedido realmente para el dominio correcto
 		final Certificate[] trustedServerCerts;
 		try {
 			trustedServerCerts = downloadFromRemoteServer(url);
-			boolean correctIssuer = checkCorrectIssuer(url, (X509Certificate) trustedServerCerts[0]);
+			final boolean correctIssuer = checkCorrectIssuer(url, (X509Certificate) trustedServerCerts[0]);
 			if (!correctIssuer) {
 				throw new InvalidDomainSSLCertificateException(cause, url);
 			}
-		} 
-		catch (InvalidDomainSSLCertificateException e) {
+		}
+		catch (final InvalidDomainSSLCertificateException e) {
 			LOGGER.severe("Se ha interrumpido la operacion al detectar una conexion con un entorno no seguro: " + e); //$NON-NLS-1$
 			throw e;
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			LOGGER.severe("Error al descargar certificados SSL del servidor: " + e); //$NON-NLS-1$
 			throw new IOException(e);
 		}
-		
+
 		// Descargamos los certificados SSL del servidor
 		X509Certificate[] serverCerts;
 		try {
@@ -172,22 +121,22 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		} catch (final Exception e) {
 			LOGGER.severe("Error al descargar certificados SSL del servidor: " + e); //$NON-NLS-1$
 			throw new IOException(e);
-		}	
-		
+		}
+
 		boolean allCertsAlreadyTrusted = true;
 
-		for (X509Certificate cert : serverCerts) {
+		for (final X509Certificate cert : serverCerts) {
 		    try {
 				if (!TrustStoreManager.getInstance().containsCert(cert)) {
 				    allCertsAlreadyTrusted = false;
 				    break;
 				}
-			} catch (KeyStoreException e) {
+			} catch (final KeyStoreException e) {
 				LOGGER.severe("Error al comprobar certificados SSL del servidor: " + e); //$NON-NLS-1$
 				throw new IOException(e);
 			}
 		}
-		
+
 		if (!allCertsAlreadyTrusted) {
 
 			int userResponse;
@@ -253,12 +202,59 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	}
 
 	/**
+	 * Inicializa el objeto.
+	 */
+	private void initialize() {
+
+		// Si no esta inicializado ya, lo hacemos
+		if (!this.initialized) {
+			// Si podemos usar entornos grafico por lo indicado en la operacion,
+			// comprobamos ahora si realmente lo tenemos disponible para poder usarlo
+			if (!this.headless) {
+				boolean headlessEnviroment = false;
+				try {
+					headlessEnviroment = !hasGraphicsEnvironment();
+				}
+				catch (final Throwable e) {
+					headlessEnviroment = true;
+				}
+				this.headless = headlessEnviroment;
+			}
+
+			// Comprobamos si se permite o no la importacion automatica de certificados no seguros
+			final String blockAutoImportTrustedCertsProp = System.getProperty(SYSTEM_PREFERENCE_BLOCK_AUTO_IMPORT_TRUSTED_CERTS, "false"); //$NON-NLS-1$
+			this.blockAutoImportTrustedCerts = Boolean.parseBoolean(blockAutoImportTrustedCertsProp);
+
+			this.initialized = true;
+		}
+	}
+
+	/**
+	 * Comprueba si hay un entorno gr&aacute;fico disponible.
+	 * @return {@code true} si hay entorno gr&aacute;fico, {@code false} si no.
+	 */
+	private static boolean hasGraphicsEnvironment() {
+		boolean headless;
+		try {
+			final Class<?> graphicsEnvironmentClass = Class.forName("java.awt.GraphicsEnvironment"); //$NON-NLS-1$
+			final Method isHeadlessMethod = graphicsEnvironmentClass.getMethod("isHeadless"); //$NON-NLS-1$
+			final Object headlessBoolean = isHeadlessMethod.invoke(null);
+			headless = headlessBoolean instanceof Boolean ? ((Boolean) headlessBoolean).booleanValue() : true;
+		}
+		catch (final Throwable e) {
+			LOGGER.warning("No se pudo comprobar si hay entorno gr&aacute;fico: " + e); //$NON-NLS-1$
+			headless = true;
+		}
+		return !headless;
+	}
+
+	/**
 	 * Transforma los certificados obtenidos y selecciona los certificados para importar.
 	 * @param trustedServerCerts Certificados sin transformasr.
 	 * @return Certificados ya transformados como X509Certificate.
 	 * @throws Exception Error durante la transformaci&oacute;n.
 	 */
-	private static X509Certificate[] getCertsToImport(Certificate[] trustedServerCerts) throws Exception {
+	private static X509Certificate[] getCertsToImport(final Certificate[] trustedServerCerts) throws Exception {
 
 		X509Certificate[] certsToImport;
 		if (trustedServerCerts.length > 1) {
@@ -275,73 +271,107 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 		return certsToImport;
 	}
-	
+
 	/**
-	 * Comprueba que el emisor de los certificados es correcto.
+	 * Comprueba que el certificado se ha emitido para este dominio.
 	 * @param urlStr URL donde e encuentran los certificados.
 	 * @param serverCert Certificado a comprobar
 	 * @return true en caso de que sea correcto, false en caso contrario.
 	 * @throws MalformedURLException Error en la estructura de la URL.
 	 * @throws CertificateParsingException Error transformando certificado.
 	 */
-	private boolean checkCorrectIssuer(String urlStr, X509Certificate serverCert)
+	private static boolean checkCorrectIssuer(final String urlStr, final X509Certificate serverCert)
 	        throws MalformedURLException, CertificateParsingException {
 
 	    final URL url = new URL(urlStr);
-	    String host = url.getHost().toLowerCase();
-	    
-	    String subjectName = serverCert.getSubjectX500Principal().getName();
-	    
-	    if (matchesHost(host, subjectName)) {
-	    	return true;
+	    final String host = url.getHost().toLowerCase();
+
+	    // Comprobamos el nombre de dominio contra los alternative names del certificado
+	    final Collection<List<?>> alternativeNamesList = serverCert.getSubjectAlternativeNames();
+	    if (alternativeNamesList != null && !alternativeNamesList.isEmpty()) {
+	    	for (final List<?> name : alternativeNamesList) {
+	    		final int type = ((Integer) name.get(0)).intValue();
+
+	    		// Si es de tipo nombre de dominio (tipo 2) o ip (tipo 7) los comparamos,
+	    		// pero en el caso de IP no admitimos wildcards
+	    		if (type == 2 || type == 7) {
+	    			final String dnsName = ((String) name.get(1)).toLowerCase();
+	    			if (matchesHost(host, dnsName, type == 7)) {
+	    				return true;
+	    			}
+	    		}
+	    	}
 	    }
-
-	    Collection<List<?>> certList = serverCert.getSubjectAlternativeNames();
-	    if (certList == null) {
-	        return false;
-	    }
-
-	    for (List<?> san : certList) {
-	        Integer type = (Integer) san.get(0);
-
-	        if (type == 2) {
-	            String sanName = ((String) san.get(1)).toLowerCase();
-
-	            if (matchesHost(host, sanName)) {
-	                return true;
-	            }
-	        }
+	    // Comprobamos contra el common name si y solo si no habia alternative names
+	    else {
+	    	final String commonName = AOUtil.getRDNvalueFromLdapName("cn", serverCert.getSubjectX500Principal().toString()); //$NON-NLS-1$
+	    	if (commonName != null && matchesHost(host, commonName.toLowerCase(), isIP(host))) {
+				return true;
+			}
 	    }
 
 	    return false;
 	}
-	
+
 	/**
 	 * Comprueba que el dominio para el que esta expedido el certificado obtenido es correcto.
-	 * @param host Dominio del certificado del servidor.
-	 * @param san Dominio del certificao obtenido.
-	 * @return true si es correcto, false en caso contrario.
+	 * @param host Host de la URL.
+	 * @param name Dominio/ip del certificado.
+	 * @return {@code true} si es correcto, {@code false} en caso contrario.
 	 */
-	private boolean matchesHost(String host, String san) {
+	private static boolean matchesHost(final String host, final String name, final boolean hostIsIp) {
 
-	    if (san.equals(host)) {
+		// Si el nombre de host es el del certificado, es valido
+	    if (name.equals(host)) {
 	        return true;
 	    }
 
-	    if (san.startsWith("*.")) { //$NON-NLS-1$
-	        String sanDomain = san.substring(2);
-
-	        if (!host.endsWith("." + sanDomain)) { //$NON-NLS-1$
-	            return false;
-	        }
-
-	        String hostPrefix = host.substring(0, host.length() - sanDomain.length() - 1);
-	        return !hostPrefix.contains("."); //$NON-NLS-1$
+	    // Si era una IP o el nombre no tenia wildcard o no era un nombre valido, no admitimos mas opciones
+	    if (hostIsIp || !name.startsWith("*.") || name.endsWith(".")) { //$NON-NLS-1$ //$NON-NLS-2$
+	    	return false;
 	    }
 
-	    return false;
+	    // Si el nombre de host no termina igual que el nombre del certificado,
+	    // no es valido
+	    final String sanDomain = name.substring(1);
+	    if (!host.endsWith(sanDomain)) {
+	    	return false;
+	    }
+
+	    // Comprobamos que el wildcard cubra un nivel de dominio del host y solo uno
+	    final String hostPrefix = host.substring(0, host.length() - sanDomain.length());
+	    return !hostPrefix.isEmpty() && !hostPrefix.contains("."); //$NON-NLS-1$
 	}
-	
+
+	private static boolean isIP(final String hostname) {
+		return isIPv4Literal(hostname) || isIPv6Literal(hostname);
+	}
+
+    private static boolean isIPv4Literal(final String s) {
+        final String[] parts = s.split("\\."); //$NON-NLS-1$
+        if (parts.length != 4) {
+			return false;
+		}
+        try {
+        	for (final String p : parts) {
+        		final int v = Integer.parseInt(p);
+        		 // Comprobamos que sea un numero valido
+        		if (v < 0 || v > 255 || p.length() > 1 && p.startsWith("0")) { //$NON-NLS-1$
+        			return false;
+        		}
+        	}
+        }
+        catch (final Exception e) {
+        	// Habia algun elemento que no era un numero
+        	return false;
+        }
+        return true;
+    }
+
+    private static boolean isIPv6Literal(final String s) {
+        return s.contains(":"); //$NON-NLS-1$
+    }
+
 	/**
 	 * Descarga los certificados del servidor.
 	 * @param domainName Direcci&oacute;n del servidor.
@@ -359,7 +389,7 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 		return trustedServerCerts;
 	}
-	
+
 	/**
 	 * Comprueba si el di&aacute;logo para importar certificados se ha cancelado.
 	 * @return true si el certificado se ha cancelado, false en caso contrario.
@@ -367,5 +397,5 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	public boolean isCancelled() {
 		return this.cancelled;
 	}
-	
+
 }

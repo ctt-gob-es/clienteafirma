@@ -34,7 +34,7 @@ import es.gob.afirma.standalone.plugins.manager.PluginsManager;
  * certificado de firma y lo instala en los almacenes pertinentes. */
 public class AutofirmaConfigurator implements ConsoleListener {
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final File TMP = new File("/var/tmp"); //$NON-NLS-1$
 	private static final File TEMP = new File("/var/temp"); //$NON-NLS-1$
@@ -457,10 +457,8 @@ public class AutofirmaConfigurator implements ConsoleListener {
 						if (i < args.length - 1) {
 							this.languagePath = args[++i];
 						}
-					} else if (DEFAULT_LANGUAGE.equalsIgnoreCase(arg)) {
-						if (i < args.length - 1) {
-							this.defaultLanguage = args[++i];
-						}
+					} else if (DEFAULT_LANGUAGE.equalsIgnoreCase(arg) && (i < args.length - 1)) {
+						this.defaultLanguage = args[++i];
 					}
 				}
 			}
