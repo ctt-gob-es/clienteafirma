@@ -237,7 +237,7 @@ public final class CreateHashFileDialog extends JDialog implements KeyListener {
 				)
 		);
 		this.copyToClipBoardCheckBox.setSelected(
-			Boolean.parseBoolean(this.config.getProperty(HashPreferences.PREFERENCE_CREATE_HASH_CLIPBOARD))
+			Boolean.parseBoolean(this.config.getProperty(HashPreferences.PREFERENCE_CREATE_HASH_CLIPBOARD, "true")) //$NON-NLS-1$
 		);
 		this.copyToClipBoardCheckBox.addKeyListener(this);
 

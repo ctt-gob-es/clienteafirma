@@ -81,6 +81,8 @@ final class PreferencesPanelGeneral extends JScrollPane {
 	private final JCheckBox massiveOverwrite = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
 
 	private final JCheckBox secureConnections = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.173")); //$NON-NLS-1$
+	
+	private final JButton trustedCertificatesButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.194")); //$NON-NLS-1$
 
 	private final DisposableInterface disposableInterface;
 	DisposableInterface getDisposableInterface() {
@@ -528,15 +530,11 @@ final class PreferencesPanelGeneral extends JScrollPane {
 				"</html>"); //$NON-NLS-1$
 		proxyLabel.setLabelFor(proxyConfigButton);
 
-		final JButton trustedCertificatesButton = new JButton(
-				SimpleAfirmaMessages.getString("PreferencesPanel.194") //$NON-NLS-1$
-			);
-
-		trustedCertificatesButton.setMnemonic('t');
-		trustedCertificatesButton.addActionListener(
+		this.trustedCertificatesButton.setMnemonic('t');
+		this.trustedCertificatesButton.addActionListener(
 			ae -> trustedCertificatesDlg(this)
 		);
-		trustedCertificatesButton.getAccessibleContext().setAccessibleDescription(
+		this.trustedCertificatesButton.getAccessibleContext().setAccessibleDescription(
 			SimpleAfirmaMessages.getString("PreferencesPanel.195") //$NON-NLS-1$
 		);
 
@@ -559,7 +557,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		netConstraints.insets = new Insets(0, 0, 0, 0);
 		netConstraints.gridy++;
 		netConstraints.gridx = 0;
-		netConfigInnerPanel.add(trustedCertificatesButton, netConstraints);
+		netConfigInnerPanel.add(this.trustedCertificatesButton, netConstraints);
 
 		gbc.gridy++;
 		mainPanel.add(signGeneralPanel, gbc);
@@ -775,6 +773,17 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.massiveOverwrite.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE));
 
 		this.secureConnections.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS));
+		
+		boolean allowPersonalTruststore = PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE);
+		
+		this.trustedCertificatesButton.setEnabled(allowPersonalTruststore);
+		
+		if (!allowPersonalTruststore) {
+			this.trustedCertificatesButton.getAccessibleContext().setAccessibleDescription(
+					SimpleAfirmaMessages.getString("PreferencesPanel.212") //$NON-NLS-1$
+				);
+			this.trustedCertificatesButton.setToolTipText(SimpleAfirmaMessages.getString("PreferencesPanel.212")); //$NON-NLS-1$
+		}
 	}
 
 	/** Carga las opciones de configuraci&oacute;n por defecto del panel general
