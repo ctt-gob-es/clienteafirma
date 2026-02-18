@@ -177,6 +177,7 @@
 				<module>afirma-crypto-batch-client</module>
 				<module>afirma-crypto-cadestri-client</module>
 				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
 				<module>afirma-crypto-cipher2</module>
@@ -285,6 +286,7 @@
 				<module>afirma-crypto-batch-client</module>
 				<module>afirma-crypto-cadestri-client</module>
 				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
 				<module>afirma-crypto-cipher2</module>
@@ -361,6 +363,7 @@
 				<module>afirma-crypto-batch-client</module>
 				<module>afirma-crypto-cadestri-client</module>
 				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
 				<module>afirma-crypto-cipher2</module>
@@ -443,6 +446,7 @@
 				<module>afirma-crypto-batch-client</module>
 				<module>afirma-crypto-cadestri-client</module>
 				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
 				<module>afirma-crypto-cipher2</module>
