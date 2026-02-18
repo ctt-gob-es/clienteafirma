@@ -56,8 +56,9 @@ public class AfirmaWebSocketServerManager {
 		checkSupportProtocol(requestedProtocolVersion);
 
     	// Si al intentar obtener el contexto SSL, se recibe alguna excepcion, se mostrar el error
+		 SSLContext sc;
     	try {
-    		SecureSocketUtils.getSecureSSLContext();
+    		sc = SecureSocketUtils.getSecureSSLContext();
     	} catch (final Exception e) {
 			throw new SllKeyStoreException("No se ha podido cargar el certificado SSL para la securizacion del WebSocket", e); //$NON-NLS-1$
     	}
@@ -84,7 +85,7 @@ public class AfirmaWebSocketServerManager {
 					break;
 				}
 
-				final SSLContext sc = SecureSocketUtils.getSecureSSLContext();
+				sc = SecureSocketUtils.getSecureSSLContext();
 				instance.setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sc));
 				instance.setBindingErrorListener(new BindingErrorListener(channelInfo, requestedProtocolVersion, asynchronous));
 				instance.start();
@@ -132,10 +133,12 @@ public class AfirmaWebSocketServerManager {
 		}
 	}
 
-	/** Comprueba si una versi&oacute;n de protocolo est&aacute; soportado por la implementaci&oacute;n actual.
+	/**
+	 * Comprueba si una versi&oacute;n de protocolo est&aacute; soportado por la implementaci&oacute;n actual.
 	 * @param version Identificador de la versi&oacute;n del protocolo.
 	 * @throws UnsupportedProtocolException Cuando la versi&oacute;n de protocolo utilizada no se encuentra
-	 *                                      entre las soportadas. */
+	 *                                      entre las soportadas.
+	 */
 	private static void checkSupportProtocol(final ProtocolVersion requestversion) throws UnsupportedProtocolException {
 		for (final int supportedVersion : SUPPORTED_PROTOCOL_VERSIONS) {
 			if (supportedVersion == requestversion.getMajorVersion()) {

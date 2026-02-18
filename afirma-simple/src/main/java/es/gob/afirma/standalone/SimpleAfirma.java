@@ -833,9 +833,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * realizar&aacute; acorde a la siguiente secuencia:<br>
      * <ol>
      *   <li>Si no se pasan par&aacute;metros se iniciar&aacute; normalmente.</li>
-	 * <li>Si se pasan par&aacute;metros, se iniciar&aacute; el modo de
+	 *   <li>Si se pasan par&aacute;metros, se iniciar&aacute; el modo de
 	 * invocaci&oacute;n por protocolo</li>
-	 * <li>Si falla la invocaci&oacute;n por protocolo debido a que no se cuenta con
+	 *   <li>Si falla la invocaci&oacute;n por protocolo debido a que no se cuenta con
 	 * entorno gr&aacute;fico, se iniciar&aacute; el modo consola.</li>
      * </ol>
 	 *
@@ -877,15 +877,19 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		}
 		}
 
+		// Configuramos el contexto SSL para las conexiones remotas
 		sslContextConfigurationTask = new SSLContextConfigurationTask();
         new Thread(sslContextConfigurationTask).start();
 
-		LOGGER.info("Identificamos si es una llamada por linea de comandos"); //$NON-NLS-1$
-    	// Uso en modo linea de comandos
+		// Uso en modo linea de comandos
     	if (isUsingCommandLine(args) || isHeadlessMode()) {
+    		LOGGER.info("Se procesa la peticion en modo linea de comandos"); //$NON-NLS-1$
     		CommandLineLauncher.main(args);
     		return;
     	}
+
+    	// Imprimimos informacion del sistemas
+		printSystemInfo();
 
        	// Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -916,7 +920,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		}
         }
 
-
        	// Comprobamos si es necesario buscar actualizaciones
         LOGGER.info("Comprobamos si es necesario buscar actualizaciones"); //$NON-NLS-1$
        	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera
@@ -930,7 +933,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	// Comprobamos actualizaciones si estan habilitadas
         if (updatesEnabled && PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK)) {
-
         	LOGGER.info("Buscamos actualizaciones"); //$NON-NLS-1$
 			Updater.checkForUpdates(null, sslContextConfigurationTask);
 		} else {
@@ -945,9 +947,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     			LOGGER.info("Identificamos que es una invocacion por protocolo"); //$NON-NLS-1$
 
-    			printSystemInfo();
+    			LOGGER.info("Iniciamos la carga del almacen de claves por defecto en segundo plano"); //$NON-NLS-1$
+    			ProtocolInvocationLauncher.initLoadKeyStoreTask();
 
-    			LOGGER.info("Invocacion por protocolo con URL:\n" + args[0]); //$NON-NLS-1$
+    			LOGGER.info("URL de invocacion:\n" + args[0]); //$NON-NLS-1$
     			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.3")); //$NON-NLS-1$
     			ProtocolInvocationLauncher.launch(args[0]);
     			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.3")); //$NON-NLS-1$
@@ -976,8 +979,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     			LOGGER.info("Apertura como herramienta de escritorio"); //$NON-NLS-1$
     			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.6")); //$NON-NLS-1$
-
-				printSystemInfo();
 
 				// Comprobamos si hay que actualizar las preferencias del sistema o no.
 				LOGGER.info("Comprobamos si hay que actualizar la configuracion del sistema"); //$NON-NLS-1$

@@ -23,7 +23,8 @@ public class LoadKeystoreTask extends Thread{
 	private Exception exception;
 
 	/**
-	 * Construye la tarea seleccionando ya cual ser&aacute; el almac&eacute;n por defecto.
+	 * Construye la tarea seleccionando ya cu&aacute;l es el almac&eacute;n por defecto que
+	 * se cargar&aacute;.
 	 */
 	public LoadKeystoreTask() {
 
@@ -55,7 +56,7 @@ public class LoadKeystoreTask extends Thread{
     @Override
     public void run() {
 
-    	LOGGER.info("Iniciando hilo para la carga de almacen: "); //$NON-NLS-1$
+    	LOGGER.info("Iniciando hilo para la carga de almacen: " + this.keystore.getName()); //$NON-NLS-1$
 
     	try {
     		final PasswordCallback pwc = this.keystore.getStorePasswordCallback(null);
@@ -67,20 +68,35 @@ public class LoadKeystoreTask extends Thread{
 					null // Parent
 					);
     	} catch (final Exception e) {
-    		LOGGER.severe("Error al cargar almacen de claves :" + e); //$NON-NLS-1$
+    		LOGGER.severe("Error al cargar almacen de claves en segundo plano: " + e); //$NON-NLS-1$
     		this.exception = e;
     	}
 
     }
 
+    /**
+     * Devuelve el gestor de almac&eacute;n configurado una vez se ha cargado. Este m&eacute;todo
+     * devolver&aacute; {@code null} si el hilo no se ha ejecutado o no ha terminado.
+     * @return Gestor de almac&eacute;n o {@code null} si no se ha cargado a&uacute;n.
+     */
 	public AOKeyStoreManager getKeyStoreManager() {
 		return this.keyStoreManager;
 	}
 
+	/**
+     * Devuelve el tipo de almac&eacute;n configurado.
+     * @return Tipo de almac&eacute;n.
+     */
 	public AOKeyStore getAOKeyStore() {
 		return this.keystore;
 	}
 
+	/**
+	 * Devuelve la excepci&oacute;n producida al cargarse el gestor de almac&eacute;n de claves
+	 * en caso de producirse.
+	 * @return Excepci&oacute;n producida durante la carga del almac&eacute;n o {@code null} si
+	 * a&uacute;n no ha terminado la cargar del almac&eacute;n o si se produjo alguna al cargarse.
+	 */
 	public Exception getException() {
 		return this.exception;
 	}

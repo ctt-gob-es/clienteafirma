@@ -22,7 +22,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -38,7 +37,7 @@ public final class SslSecurityManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
+	static final TrustManager[] DUMMY_TRUST_MANAGER = {
 		new X509TrustManager() {
 			@Override
 			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -52,12 +51,7 @@ public final class SslSecurityManager {
 		}
 	};
 
-		static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
-		@Override
-		public boolean verify(final String hostname, final SSLSession session) {
-			return true;
-		}
-	};
+		static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = (hostname, session) -> true;
 
 	private static final String KEYSTORE = "javax.net.ssl.keyStore"; //$NON-NLS-1$
 	private static final String KEYSTORE_PASS = "javax.net.ssl.keyStorePassword"; //$NON-NLS-1$
@@ -234,6 +228,7 @@ public final class SslSecurityManager {
 		// Si no encontramos el almacen de confianza del Cliente @firma, no modificamos
 		// la configuracion SSL
 		if (!trustStoreFile.isFile()) {
+			LOGGER.info("No se ha encontrado un almacen de confianza SSL de la aplicacion"); //$NON-NLS-1$
 			return false;
 		}
 
@@ -253,6 +248,7 @@ public final class SslSecurityManager {
 
 		// Agregamos los trustmanagers del Cliente @firma
 		if (trustStore.aliases() == null || !trustStore.aliases().hasMoreElements()) {
+			LOGGER.info("No se han encontrado certificados en el almacen de confianza SSL de la aplicacion"); //$NON-NLS-1$
 			return false;
 		}
 

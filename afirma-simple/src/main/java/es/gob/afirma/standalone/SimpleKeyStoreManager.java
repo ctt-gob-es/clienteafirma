@@ -337,8 +337,11 @@ public final class SimpleKeyStoreManager {
     	return ks != null ? ks : AOKeyStore.getDefaultKeyStoreTypeByOs(Platform.getOS());
     }
 
-    /** Obtiene el almac&eacute;n de claves por defecto de la aplicaci&oacute;n.
-     * @return Almac&eacute;n de claves por defecto de la aplicaci&oacute;n. */
+    /**
+     * Obtiene el almac&eacute;n de claves v&aacute;lido para el sistema, que puede ser el
+     * almac&eacute;n o, si este no era v&aacute;lido, el por defecto del sistema.
+     * @return Almac&eacute;n de claves v&aacute;lido para el sistema actual.
+     */
     private static AOKeyStore getValidKeyStoreType(final String keyStoreName) {
     	AOKeyStore ks = null;
     	if (keyStoreName != null && !keyStoreName.isEmpty()) {

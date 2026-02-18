@@ -64,7 +64,7 @@ public final class ProtocolInvocationLauncher {
 
     private static final String OK_RESPONSE = "OK"; //$NON-NLS-1$
 
-    private static final ProtocolVersion[] SUPPORTED_PROTOCOLS = new ProtocolVersion[] {
+    private static final ProtocolVersion[] SUPPORTED_PROTOCOLS = {
     		ProtocolVersion.getInstance(ProtocolVersion.VERSION_4_1),
     		ProtocolVersion.getInstance(ProtocolVersion.VERSION_3),
     		ProtocolVersion.getInstance(ProtocolVersion.VERSION_2),
@@ -261,16 +261,10 @@ public final class ProtocolInvocationLauncher {
 
         // Se invoca la aplicacion para iniciar la comunicacion por socket
         if (urlString.startsWith("afirma://websocket?") || urlString.startsWith("afirma://websocket/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-        	LOGGER.info("Se inicia el modo de comunicacion por websockets: " + urlString); //$NON-NLS-1$
+        	LOGGER.info("Se inicia el modo de comunicacion por websockets"); //$NON-NLS-1$
 
         	requestedProtocolVersion = getVersion(urlParams);
         	reviewProtocolVersion(requestedProtocolVersion, jvc);
-
-        	// Iniciamos en segundo plano la tarea para cargar del almacen de claves por defecto si no se habia hecho antes
-            if (loadKeyStoreTask == null) {
-            	loadKeyStoreTask = new LoadKeystoreTask();
-            	loadKeyStoreTask.start();
-            }
 
         	final ChannelInfo channelInfo = getChannelInfo(urlParams);
 
@@ -304,18 +298,11 @@ public final class ProtocolInvocationLauncher {
 
         	return OK_RESPONSE;
         }
-        // Se invoca la aplicacion para iniciar la comunicacion por socket
-        else if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
-        	LOGGER.info("Se inicia el modo de comunicacion por sockets: " + urlString); //$NON-NLS-1$
+		if (urlString.startsWith("afirma://service?") || urlString.startsWith("afirma://service/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+        	LOGGER.info("Se inicia el modo de comunicacion por sockets"); //$NON-NLS-1$
 
         	requestedProtocolVersion = getVersion(urlParams);
         	reviewProtocolVersion(requestedProtocolVersion, jvc);
-
-        	// Iniciamos en segundo plano la tarea para cargar del almacen de claves por defecto si no se habia hecho antes
-            if (loadKeyStoreTask == null) {
-            	loadKeyStoreTask = new LoadKeystoreTask();
-            	loadKeyStoreTask.start();
-            }
 
         	final ChannelInfo channelInfo = getChannelInfo(urlParams);
 
@@ -346,19 +333,12 @@ public final class ProtocolInvocationLauncher {
 
         	return OK_RESPONSE;
         }
-        // Se solicita una operacion de firma batch
-        else if (urlString.startsWith("afirma://batch?") || urlString.startsWith("afirma://batch/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (urlString.startsWith("afirma://batch?") || urlString.startsWith("afirma://batch/?")) { //$NON-NLS-1$ //$NON-NLS-2$
         	LOGGER.info("Se invoca a la aplicacion para el procesado de un lote de firma"); //$NON-NLS-1$
 
         	try {
                 UrlParametersForBatch params =
                 		ProtocolInvocationUriParserUtil.getParametersToBatch(urlParams, !bySocket);
-
-                // Iniciamos la tarea para cargar del almacen de claves por defecto si no se habia hecho antes
-                if (loadKeyStoreTask == null) {
-                	loadKeyStoreTask = new LoadKeystoreTask();
-                	loadKeyStoreTask.start();
-                }
 
 				// Si se indica un identificador de fichero, es que el JSON o XML de definicion de lote
 				// se tiene que
@@ -444,19 +424,12 @@ public final class ProtocolInvocationLauncher {
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
             }
         }
-        // Se solicita una operacion de seleccion de certificado
-        else if (urlString.startsWith("afirma://selectcert?") || urlString.startsWith("afirma://selectcert/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (urlString.startsWith("afirma://selectcert?") || urlString.startsWith("afirma://selectcert/?")) { //$NON-NLS-1$ //$NON-NLS-2$
         	LOGGER.info("Se invoca a la aplicacion para la seleccion de un certificado"); //$NON-NLS-1$
 
         	try {
         		UrlParametersToSelectCert params =
         				ProtocolInvocationUriParserUtil.getParametersToSelectCert(urlParams, !bySocket);
-
-        		// Iniciamos la tarea para cargar del almacen de claves por defecto si no se habia hecho antes
-                if (loadKeyStoreTask == null) {
-                	loadKeyStoreTask = new LoadKeystoreTask();
-                	loadKeyStoreTask.start();
-                }
 
         		// Si se indica un identificador de fichero, es que la configuracion de la
         		// operacion
@@ -525,7 +498,7 @@ public final class ProtocolInvocationLauncher {
         			msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
         		}
 
-        		// Si no es por sockets, y si no hay errores de conexion con el servidor, 
+        		// Si no es por sockets, y si no hay errores de conexion con el servidor,
         		// se devuelve el resultado al servidor y detenemos la
         		// espera activa si se encontraba vigente
         		if (!bySocket && !errorConnectingServer) {
@@ -545,8 +518,7 @@ public final class ProtocolInvocationLauncher {
         		return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
         	}
         }
-        // Se solicita una operacion de guardado
-        else if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (urlString.startsWith("afirma://save?") || urlString.startsWith("afirma://save/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             LOGGER.info("Se invoca a la aplicacion para el guardado de datos"); //$NON-NLS-1$
 
             try {
@@ -641,21 +613,12 @@ public final class ProtocolInvocationLauncher {
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
             }
         }
-
-		// Se solicita una operacion de firma/multifirma seguida del guardado del
-		// resultado
-        else if (urlString.startsWith("afirma://signandsave?") || urlString.startsWith("afirma://signandsave/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (urlString.startsWith("afirma://signandsave?") || urlString.startsWith("afirma://signandsave/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             LOGGER.info("Se invoca a la aplicacion para la firma/multifirma y el guardado del resultado"); //$NON-NLS-1$
 
             try {
                 UrlParametersToSignAndSave params =
                 		ProtocolInvocationUriParserUtil.getParametersToSignAndSave(urlParams, !bySocket);
-
-             // Iniciamos la tarea para cargar del almacen de claves por defecto si no se habia hecho antes
-                if (loadKeyStoreTask == null) {
-                	loadKeyStoreTask = new LoadKeystoreTask();
-                	loadKeyStoreTask.start();
-                }
 
 				LOGGER.info("Cantidad de datos a firmar y guardar: " //$NON-NLS-1$
 						+ (params.getData() == null ? 0 : params.getData().length));
@@ -747,9 +710,7 @@ public final class ProtocolInvocationLauncher {
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
             }
         }
-
-        // Se solicita una operacion de firma/cofirma/contrafirma
-        else if (urlString.startsWith("afirma://sign?")        || urlString.startsWith("afirma://sign/?") || //$NON-NLS-1$ //$NON-NLS-2$
+		if (urlString.startsWith("afirma://sign?")        || urlString.startsWith("afirma://sign/?") || //$NON-NLS-1$ //$NON-NLS-2$
                  urlString.startsWith("afirma://cosign?")      || urlString.startsWith("afirma://cosign/?") || //$NON-NLS-1$ //$NON-NLS-2$
                  urlString.startsWith("afirma://countersign?") || urlString.startsWith("afirma://countersign/?") //$NON-NLS-1$ //$NON-NLS-2$
         ) {
@@ -758,12 +719,6 @@ public final class ProtocolInvocationLauncher {
             try {
                 UrlParametersToSign params =
                 		ProtocolInvocationUriParserUtil.getParametersToSign(urlParams, !bySocket);
-
-             // Iniciamos la tarea para cargar del almacen de claves por defecto si no se habia hecho antes
-                if (loadKeyStoreTask == null) {
-                	loadKeyStoreTask = new LoadKeystoreTask();
-                	loadKeyStoreTask.start();
-                }
 
 				// Si se indica un identificador de fichero, es que la configuracion de la
 				// operacion
@@ -855,9 +810,7 @@ public final class ProtocolInvocationLauncher {
 				return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, errorCode);
             }
         }
-
-        // Se solicita una operacion de carga de ficheros
-        else if (urlString.startsWith("afirma://load?") || urlString.startsWith("afirma://load/?")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (urlString.startsWith("afirma://load?") || urlString.startsWith("afirma://load/?")) { //$NON-NLS-1$ //$NON-NLS-2$
             LOGGER.info("Se invoca a la aplicacion para realizar una operacion de carga de uno o varios ficheros"); //$NON-NLS-1$
 
             try {
@@ -1016,7 +969,7 @@ public final class ProtocolInvocationLauncher {
 			} catch (final SocketTimeoutException e) {
 				LOGGER.log(Level.SEVERE, "Se excedio el tiempo de espera maximo en la llamada al servicio de guardado del servidor intermedio", e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, SimpleErrorCode.Communication.SENDING_RESULT_TIMEOUT);
-			} 
+			}
 			catch (final InvalidDomainSSLCertificateException e) {
 				LOGGER.log(Level.SEVERE, "El certificado SSL no esta expedido para el dominio al que pertenece el servidor: " + e, e); //$NON-NLS-1$
 				ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, ErrorCode.Communication.INVALID_DOMAIN_SSL_CERTIFICATE_ERROR, e.getHost());
@@ -1191,9 +1144,25 @@ public final class ProtocolInvocationLauncher {
 		return false;
 	}
 
+
+	/**
+	 * Inicia en segundo plano la tarea para cargar del almac&eacute;n de claves por defecto
+	 * si no se hab&iacute;a hecho antes. El almac&eacute;n cargado puede ser el del sistema
+	 * o el configurado en Autofirma para la invocaci&oacute;n por protocolo, siempre que
+	 * no sea un almac&eacute;n en fichero o tarjeta.
+	 */
+	public static void initLoadKeyStoreTask() {
+		if (loadKeyStoreTask == null) {
+			loadKeyStoreTask = new LoadKeystoreTask();
+			loadKeyStoreTask.start();
+		}
+	}
+
+	/**
+	 * Devuelve la tarea de carga del almac&eacute;n de claves en segundo plano.
+	 * @return Tarea de carga del almac&eacute;n o {@code null} si no se defini&oacute;.
+	 */
 	public static LoadKeystoreTask getLoadKeyStoreTask() {
 		return loadKeyStoreTask;
 	}
-
-
 }

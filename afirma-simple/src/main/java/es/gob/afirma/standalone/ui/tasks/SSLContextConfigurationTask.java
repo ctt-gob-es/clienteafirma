@@ -26,7 +26,7 @@ public class SSLContextConfigurationTask extends Thread {
     @Override
     public void run() {
 
-    	LOGGER.info("Iniciando hilo para la configuracion del contexto SSL: "); //$NON-NLS-1$
+    	LOGGER.info("Iniciando hilo para la configuracion del contexto SSL"); //$NON-NLS-1$
 
     	// Establecemos si deben respetarse las comprobaciones de seguridad de las
     	// conexiones de red
@@ -60,7 +60,6 @@ public class SSLContextConfigurationTask extends Thread {
     			if (allowPersonalTruststore) {
     				LOGGER.info("Configuramos el almacen de confianza de la aplicacion"); //$NON-NLS-1$
     				truststoreConfigured = SslSecurityManager.configureAfirmaTrustManagers();
-    	    		LOGGER.info("El almacen de confianza de la aplicacion existe y se ha configurado: " + truststoreConfigured); //$NON-NLS-1$
     			} else {
     				LOGGER.info("El almacen de confianza no se cargara debido a la configuracion de Autofirma"); //$NON-NLS-1$
     				truststoreConfigured = false;
