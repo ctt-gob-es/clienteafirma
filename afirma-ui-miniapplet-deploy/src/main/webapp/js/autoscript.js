@@ -23,7 +23,7 @@ var SupportDialog;
 
 var AutoScript = ( function ( window, undefined ) {
 
-		var VERSION = "1.10.0";
+		var VERSION = "1.10.1";
 		var VERSION_CODE = 4;
 
 		/* ========== DEPRECADO: No se utiliza, pero se mantiene por compatibilidad con los despliegues del MiniApplet. */
@@ -4864,6 +4864,7 @@ var AutoScript = ( function ( window, undefined ) {
 								errorCallback("java.lang.IllegalArgumentException",ErrorCode.Request.TOO_LONG_URL.message, errorCode);
 								return;
 							}
+							console.log("URL: " + url);
 							execAppIntent(url, idSession, cipherConfig, successCallback, errorCallback);
 						}
 						else {
