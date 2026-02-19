@@ -18,10 +18,10 @@ import java.security.cert.Certificate;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfSignatureAppearance;
-import com.aowagie.text.pdf.PdfString;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfSignatureAppearance;
+import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ErrorCode;

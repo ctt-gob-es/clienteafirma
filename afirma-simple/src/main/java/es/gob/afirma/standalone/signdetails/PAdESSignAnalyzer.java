@@ -16,15 +16,15 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 
-import com.aowagie.text.exceptions.BadPasswordException;
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PdfArray;
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfObject;
-import com.aowagie.text.pdf.PdfPKCS7;
-import com.aowagie.text.pdf.PdfReader;
-import com.aowagie.text.pdf.PdfString;
+import com.lowagie.text.exceptions.BadPasswordException;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfArray;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfObject;
+import com.lowagie.text.pdf.PdfPKCS7;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -178,7 +178,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		// Comprobamos si la firma es la que certifica el documento
 		if (signPdfDictionary.get(PdfName.REFERENCE) != null) {
 			final PdfArray reference = (PdfArray) signPdfDictionary.get(PdfName.REFERENCE);
-			final ArrayList<PdfObject> p = reference.getArrayList();
+			final List<PdfObject> p = reference.getElements();
 			final PdfDictionary dictionaryReference = (PdfDictionary) p.get(0);
 			padesSignDetails.setCertificationSign(dictionaryReference.get(PdfName.TRANSFORMMETHOD) != null);
 		}

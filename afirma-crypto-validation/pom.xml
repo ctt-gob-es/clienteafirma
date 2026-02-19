@@ -77,7 +77,8 @@
 		
 		<dependency>
 			<groupId>es.gob.afirma.lib</groupId>
-			<artifactId>afirma-lib-itext</artifactId>
+			<artifactId>openpdf</artifactId>
+			<version>${afirma.openpdf}</version>
 		</dependency>
 		
 		<dependency>

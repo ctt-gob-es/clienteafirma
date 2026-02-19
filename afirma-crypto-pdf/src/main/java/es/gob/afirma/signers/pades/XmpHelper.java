@@ -17,7 +17,6 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -40,10 +39,10 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.aowagie.text.DocumentException;
-import com.aowagie.text.pdf.PdfDate;
-import com.aowagie.text.pdf.PdfReader;
-import com.aowagie.text.pdf.PdfStamper;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.PdfDate;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
@@ -72,7 +71,7 @@ final class XmpHelper {
 			"</rdf:li>"; //$NON-NLS-1$
 
 	private static String getOriginalCreationDateAsW3C(final PdfReader pdfReader) {
-		final HashMap<String, String> info = pdfReader.getInfo();
+		final Map<String, String> info = pdfReader.getInfo();
 		final String pdfDate = info.get("CreationDate"); //$NON-NLS-1$
 		return pdfDate != null ? PdfDate.getW3CDate(pdfDate) : null;
 	}

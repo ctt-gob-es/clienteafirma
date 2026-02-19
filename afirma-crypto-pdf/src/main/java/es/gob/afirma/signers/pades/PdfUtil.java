@@ -25,19 +25,19 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.aowagie.text.Rectangle;
-import com.aowagie.text.exceptions.BadPasswordException;
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PdfArray;
-import com.aowagie.text.pdf.PdfDeveloperExtension;
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfObject;
-import com.aowagie.text.pdf.PdfReader;
-import com.aowagie.text.pdf.PdfSignatureAppearance;
-import com.aowagie.text.pdf.PdfStamper;
-import com.aowagie.text.pdf.PdfString;
-import com.aowagie.text.pdf.PdfWriter;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.exceptions.BadPasswordException;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfArray;
+import com.lowagie.text.pdf.PdfDeveloperExtension;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfObject;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfSignatureAppearance;
+import com.lowagie.text.pdf.PdfStamper;
+import com.lowagie.text.pdf.PdfString;
+import com.lowagie.text.pdf.PdfWriter;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
@@ -459,7 +459,7 @@ public final class PdfUtil {
      * @param extraParams Definici&oacute;n de las coordenadas como conjunto de propiedades
      * @param prefix Prefijo de las propiedades de coordenada en el conjunto
      * @return Rect&aacute;ngulo que define una posici&oacute;n de un elemento en una p&aacute;gina del PDF */
-    public static com.aowagie.text.Rectangle getPositionOnPage(final Properties extraParams, final String prefix) {
+    public static com.lowagie.text.Rectangle getPositionOnPage(final Properties extraParams, final String prefix) {
 	    	if (extraParams == null || prefix == null) {
 	    		LOGGER.severe("Se ha pedido una posicion para un elemento grafico nulo"); //$NON-NLS-1$
 	    		return null;
@@ -469,7 +469,7 @@ public final class PdfUtil {
 	    			&& extraParams.getProperty(prefix + "PositionOnPageUpperRightX") != null //$NON-NLS-1$
 	    			&& extraParams.getProperty(prefix + "PositionOnPageUpperRightY") != null) { //$NON-NLS-1$
 	    		try {
-	    			return new com.aowagie.text.Rectangle(
+	    			return new com.lowagie.text.Rectangle(
 	    					Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftX").trim()), //$NON-NLS-1$
 	    					Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageLowerLeftY").trim()), //$NON-NLS-1$
 	    					Integer.parseInt(extraParams.getProperty(prefix + "PositionOnPageUpperRightX").trim()), //$NON-NLS-1$

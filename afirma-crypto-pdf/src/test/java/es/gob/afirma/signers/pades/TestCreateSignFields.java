@@ -16,13 +16,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.aowagie.text.DocumentException;
-import com.aowagie.text.Rectangle;
-import com.aowagie.text.pdf.PdfAnnotation;
-import com.aowagie.text.pdf.PdfFormField;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfReader;
-import com.aowagie.text.pdf.PdfStamper;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfAnnotation;
+import com.lowagie.text.pdf.PdfFormField;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;

@@ -20,16 +20,16 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.aowagie.text.DocumentException;
-import com.aowagie.text.exceptions.BadPasswordException;
-import com.aowagie.text.pdf.PdfDate;
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfReader;
-import com.aowagie.text.pdf.PdfSignature;
-import com.aowagie.text.pdf.PdfSignatureAppearance;
-import com.aowagie.text.pdf.PdfStamper;
-import com.aowagie.text.pdf.PdfString;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.exceptions.BadPasswordException;
+import com.lowagie.text.pdf.PdfDate;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfSignature;
+import com.lowagie.text.pdf.PdfSignatureAppearance;
+import com.lowagie.text.pdf.PdfStamper;
+import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.InvalidLibraryException;

@@ -17,7 +17,7 @@ import javax.swing.JFrame;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.aowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.ui.pdf.PdfLoader.PdfLoaderListener;
@@ -122,7 +122,7 @@ public final class Pdf2ImagesConverterTests {
 		final int numberOfPages = reader.getNumberOfPages();
 		final List<Dimension> pageSizes = new ArrayList<>(numberOfPages);
 		for(int i=1;i<=numberOfPages;i++) {
-			final com.aowagie.text.Rectangle rect = reader.getPageSize(i);
+			final com.lowagie.text.Rectangle rect = reader.getPageSize(i);
 			pageSizes.add(
 				new Dimension(
 					Math.round(rect.getWidth()),

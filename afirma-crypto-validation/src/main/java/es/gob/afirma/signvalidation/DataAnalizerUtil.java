@@ -32,15 +32,15 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationWidget;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PRAcroForm;
-import com.aowagie.text.pdf.PRAcroForm.FieldInformation;
-import com.aowagie.text.pdf.PRIndirectReference;
-import com.aowagie.text.pdf.PdfArray;
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfObject;
-import com.aowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PRAcroForm;
+import com.lowagie.text.pdf.PRAcroForm.FieldInformation;
+import com.lowagie.text.pdf.PRIndirectReference;
+import com.lowagie.text.pdf.PdfArray;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfObject;
+import com.lowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.Base64;
@@ -401,10 +401,7 @@ public final class DataAnalizerUtil {
 		// Se comprueba a partir de la siguiente posicion para no comprobarse a si mismo
 		for (int i = index; i < signAnnotations.size() ; i++) {
 			final Rectangle2D rect2 = toJavaRectangle(signAnnotations.get(i).getRectangle());
-			if (rect1.getMinX() > rect2.getMaxX() || rect2.getMinX() > rect1.getMaxX()) {
-				return false;
-			}
-			if (rect1.getMinY() > rect2.getMaxY() || rect2.getMinY() > rect1.getMaxY()) {
+			if (rect1.getMinX() > rect2.getMaxX() || rect2.getMinX() > rect1.getMaxX() || rect1.getMinY() > rect2.getMaxY() || rect2.getMinY() > rect1.getMaxY()) {
 				return false;
 			}
 		}

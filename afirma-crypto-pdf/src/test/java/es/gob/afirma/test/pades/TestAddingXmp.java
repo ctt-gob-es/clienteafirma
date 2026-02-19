@@ -10,8 +10,8 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
-import com.aowagie.text.pdf.PdfReader;
-import com.aowagie.text.pdf.PdfStamper;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfStamper;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;

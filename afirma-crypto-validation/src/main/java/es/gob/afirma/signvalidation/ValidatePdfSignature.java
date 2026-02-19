@@ -20,13 +20,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PdfArray;
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfObject;
-import com.aowagie.text.pdf.PdfPKCS7;
-import com.aowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfArray;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfObject;
+import com.lowagie.text.pdf.PdfPKCS7;
+import com.lowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.signers.pades.PdfUtil;
@@ -212,7 +212,7 @@ public final class ValidatePdfSignature extends SignValider {
 				// Comprobamos si la firma es la que certifica el documento
 				if (pdfDictionary.get(PdfName.REFERENCE) != null) {
 					final PdfArray reference = (PdfArray) pdfDictionary.get(PdfName.REFERENCE);
-					final ArrayList<PdfObject> p = reference.getArrayList();
+					final List<PdfObject> p = reference.getElements();
 					final PdfDictionary dictionaryReference = (PdfDictionary) p.get(0);
 					if (dictionaryReference.get(PdfName.TRANSFORMMETHOD) != null) {
 						certRevision = af.getRevision(nameS);

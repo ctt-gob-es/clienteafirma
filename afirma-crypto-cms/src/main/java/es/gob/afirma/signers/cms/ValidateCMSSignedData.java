@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
-import es.gob.afirma.signers.pkcs7.SCChecker;
+import es.gob.afirma.signers.pkcs7.BCChecker;
 
 /** Clase que permite verificar si unos datos se corresponden con una firma CMS. */
 final class ValidateCMSSignedData {
@@ -38,7 +38,7 @@ final class ValidateCMSSignedData {
      * @return si es de este tipo.
      * @throws IOException Si ocurren errores durante la lectura de los datos */
     public static boolean isCMSSignedData(final byte[] data) throws IOException {
-    	new SCChecker().checkBouncyCastle();
+    	new BCChecker().checkBouncyCastle();
         boolean isValid = true;
         try (
     		final ASN1InputStream is = new ASN1InputStream(data);

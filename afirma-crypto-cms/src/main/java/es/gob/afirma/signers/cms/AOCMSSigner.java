@@ -33,7 +33,7 @@ import es.gob.afirma.signers.pkcs7.BinaryErrorCode;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
-import es.gob.afirma.signers.pkcs7.SCChecker;
+import es.gob.afirma.signers.pkcs7.BCChecker;
 
 /** Manejador de firmas binarias CMS. Par&aacute;metros adicionales aceptados
  * para las operaciones de firma:<br>
@@ -62,7 +62,7 @@ public final class AOCMSSigner implements AOSigner {
 			           final java.security.cert.Certificate[] certChain,
 			           final Properties xParams) throws AOException, IOException {
 
-    	new SCChecker().checkBouncyCastle();
+    	new BCChecker().checkBouncyCastle();
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -114,7 +114,7 @@ public final class AOCMSSigner implements AOSigner {
 			             final java.security.cert.Certificate[] certChain,
 			             final Properties xParams) throws AOException, IOException {
 
-    	new SCChecker().checkBouncyCastle();
+    	new BCChecker().checkBouncyCastle();
 
         final Properties extraParams = xParams != null ? xParams : new Properties();
 
@@ -159,7 +159,7 @@ public final class AOCMSSigner implements AOSigner {
 			             final java.security.cert.Certificate[] certChain,
 			             final Properties extraParams) throws AOException, IOException {
 
-    	new SCChecker().checkBouncyCastle();
+    	new BCChecker().checkBouncyCastle();
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
@@ -203,7 +203,7 @@ public final class AOCMSSigner implements AOSigner {
                               final java.security.cert.Certificate[] certChain,
                               final Properties extraParams) throws AOException, IOException {
 
-    	new SCChecker().checkBouncyCastle();
+    	new BCChecker().checkBouncyCastle();
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm);
 
@@ -310,7 +310,7 @@ public final class AOCMSSigner implements AOSigner {
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
 			throws AOInvalidSignatureFormatException, IOException {
-    	new SCChecker().checkBouncyCastle();
+    	new BCChecker().checkBouncyCastle();
         final ReadNodesTree rn = new ReadNodesTree();
         try {
             return rn.readNodesTree(sign, asSimpleSignInfo);

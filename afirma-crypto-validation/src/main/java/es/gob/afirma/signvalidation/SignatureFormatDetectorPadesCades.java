@@ -15,10 +15,10 @@ import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.util.CollectionStore;
 
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfReader;
 
 public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetector {
 
@@ -1184,17 +1184,11 @@ public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetect
 			}
 
 			// CAdES-C-time-stamp
-			if (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_escTimeStamp) != null) {
-				return false;
-			}
+			
 
 			// time-stamped-certs-crls-references
-			if (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certCRLTimestamp) != null) {
-				return false;
-			}
-
 			// certificate-values
-			if (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certValues) != null) {
+			if ((unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_escTimeStamp) != null) || (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certCRLTimestamp) != null) || (unsignedAttrs.get(PKCSObjectIdentifiers.id_aa_ets_certValues) != null)) {
 				return false;
 			}
 

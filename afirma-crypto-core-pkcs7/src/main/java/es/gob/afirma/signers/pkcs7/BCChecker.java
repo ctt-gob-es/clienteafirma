@@ -11,10 +11,10 @@ package es.gob.afirma.signers.pkcs7;
 
 /** Comprobador de la versi&oacute;n de BouncyCastle del sistema.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class SCChecker {
+public final class BCChecker {
 
-    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase (1.47 o superior). */
-    private static final String SC_VERSION = "1.47"; //$NON-NLS-1$
+    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase (1.71 o superior). */
+    private static final String SC_VERSION = "1.71"; //$NON-NLS-1$
 
 	/** Comprueba que la versi&oacute;n de BouncyCastle existente sea v1.71 o superior.
 	 * @throws InvalidBouncyCastleException Cuando no se puede detectar la versi&oacute;n de
