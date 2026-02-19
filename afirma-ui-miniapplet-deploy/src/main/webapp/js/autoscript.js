@@ -4781,7 +4781,7 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			/** Completa la configuracion basica de la operacion y la inicia. */
-			function initProcess(opId, cipherConfig, params, successCallback, errorCallback) {
+			function initProcess (opId, cipherConfig, params, successCallback, errorCallback) {
 				
 				var idSession = AfirmaUtils.generateNewIdSession();
 				var desKey = !!cipherConfig ? cipherConfig.legDes : generateDESCipherKey();
@@ -4800,6 +4800,12 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
 
 				var url = buildUrl(opId, params);
+
+				// Si no hay configuracion de cifrado avanzada, componemos el objeto con la configuracion DES para
+				// despues poder procesar el resultado
+				if (!cipherConfig) {
+					cipherConfig = { legDes : desKey };
+				}
 
 				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
 				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
@@ -4823,7 +4829,7 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param successCallback Funcion callback que debe ejecutarse en caso de exito.
 			 * @param errorCallback Funcion callback que debe ejecutarse en caso de error.
 			 */
-			function sendDataAndExecAppIntent(idSession, cipherConfig, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) {
+			function sendDataAndExecAppIntent (idSession, cipherConfig, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) {
 
 				// Mostramos el dialogo de carga
 				Dialog.showLoadingDialog();
@@ -4893,47 +4899,50 @@ var AutoScript = ( function ( window, undefined ) {
 	
 				var dataB64 = buildXML(op, params);
 				
-				// Si sabemos que se puede usar el cifrado avanzado, lo usamos. Si no, usamos el antiguo
-				if (newCiphersSupported) {
-					dataB64 = cipherAndSendData(dataB64, cipherConfig, fileId, httpRequest, errorCallback);
-					
-				} else {
-					dataB64 = cipherDES(dataB64, cipherConfig.legDes);
-					sendData(dataB64, fileId, httpRequest, errorCallback);
-				}
+				// Ciframos y enviamos los datos
+				cipherAndSendData(dataB64, cipherConfig, fileId, httpRequest, errorCallback);
 			}
 			
 			function cipherAndSendData(dataB64, cipherConfig, fileId, httpRequest, errorCallback) {
 				
 				var cipherConfigJson = cipherConfig;
-				var rawKey = base64ToBytes(cipherConfigJson.key);
-							
-			    window.crypto.subtle.importKey(
-			        "raw",                // formato de la clave
-			        rawKey,               // bytes de la clave
-			        { name: "AES-CBC" },  // algoritmo
-			        false,                // no exportable
-			        ["encrypt"]           // usos permitidos
-			    ).then(function (cryptoKey) {
-					var iv = base64ToBytes(cipherConfigJson.iv);
-				    var encoded = base64ToBytes(dataB64);
-				
-				    return window.crypto.subtle.encrypt(
-				        {
-				            name: "AES-CBC",
-				            iv: iv
-				        },
-				        cryptoKey,
-				        encoded
-				    );
-				}).then(function (ciphered) {
-					let cipheredDataB64 = arrayBufferToBase64(ciphered);
+
+				// Si se soporta el cifrado avanzado, se utiliza				
+				if (newCiphersSupported) {
+					var rawKey = base64ToBytes(cipherConfigJson.key);
+								
+				    window.crypto.subtle.importKey(
+				        "raw",                // formato de la clave
+				        rawKey,               // bytes de la clave
+				        { name: "AES-CBC" },  // algoritmo
+				        false,                // no exportable
+				        ["encrypt"]           // usos permitidos
+				    ).then(function (cryptoKey) {
+						var iv = base64ToBytes(cipherConfigJson.iv);
+					    var encoded = base64ToBytes(dataB64);
+					
+					    return window.crypto.subtle.encrypt(
+					        {
+					            name: "AES-CBC",
+					            iv: iv
+					        },
+					        cryptoKey,
+					        encoded
+					    );
+					}).then(function (ciphered) {
+						let cipheredDataB64 = arrayBufferToBase64(ciphered);
+						sendData(cipheredDataB64, fileId, httpRequest, errorCallback);
+					}).catch(function(error) {
+						console.log("Error al hacer el cifrado avanzado de los datos para la subida al servidor: " + error);
+						errorCode = ErrorCode.Internal.CIPHERING_ERROR.code;
+						errorCallback("java.lang.Exception", ErrorCode.Internal.CIPHERING_ERROR.message, errorCode);
+					});
+				}
+				// Si no se soporta el cifrado avanzado, usamos el comun
+				else {
+					let cipheredDataB64 = cipherDES(dataB64, cipherConfig.legDes);
 					sendData(cipheredDataB64, fileId, httpRequest, errorCallback);
-				}).catch(function(error) {
-					console.log("Error al hacer el cifrado avanzado de los datos para la subida al servidor: " + error);
-					errorCode = ErrorCode.Internal.CIPHERING_ERROR.code;
-					errorCallback("java.lang.Exception", ErrorCode.Internal.CIPHERING_ERROR.message, errorCode);
-				});
+				}
 			}
 			
 			function sendData(dataB64, fileId, httpRequest, errorCallback) {
@@ -5055,7 +5064,9 @@ var AutoScript = ( function ( window, undefined ) {
 					if (!!cipherConfig.legDes) {
 						newParams[j++] = {key:"key", value:cipherConfig.legDes};
 					}
-					newParams[j++] = {key:"cipher", value:encodeCipherConfig(cipherConfig)};
+					if (!!cipherConfig.algo && cipherConfig.algo != "DES") {
+						newParams[j++] = {key:"cipher", value:encodeCipherConfig(cipherConfig)};
+					}
 				}
 				return buildUrl(op, newParams);
 			};
