@@ -80,9 +80,9 @@ public class TestPadesBaseline {
 		this.commitmentTypeIndicationsParams = new Properties();
 		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS, "2"); //$NON-NLS-1$
 		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER, "1"); //$NON-NLS-1$ //$NON-NLS-2$
-		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "1.2.3.4|1.56.23.1"); //$NON-NLS-1$ //$NON-NLS-2$
+		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "1.2.3.4|0.4.0.1862.1.6"); //$NON-NLS-1$ //$NON-NLS-2$
 		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "1" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER, "6"); //$NON-NLS-1$ //$NON-NLS-2$
-		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "1" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "1.56.23.2"); //$NON-NLS-1$ //$NON-NLS-2$
+		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "1" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "0.4.0.1862.1.6"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Tipos erroneos que no deberian declararse
 		this.contentHintParams = new Properties();

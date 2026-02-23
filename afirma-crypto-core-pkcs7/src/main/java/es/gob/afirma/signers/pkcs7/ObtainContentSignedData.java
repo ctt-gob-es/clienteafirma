@@ -13,13 +13,14 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.pkcs.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -135,9 +136,14 @@ public final class ObtainContentSignedData {
 					final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
 					final ASN1ObjectIdentifier oids = (ASN1ObjectIdentifier) elemento.getObjectAt(0);
 					if (CMSAttributes.messageDigest.getId().equals(oids.toString())) {
-						final DERSet derSetHash = (DERSet) elemento.getObjectAt(1);
-						final DEROctetString derHash = (DEROctetString) derSetHash.getObjectAt(0);
-						messageDigest = derHash.getOctets();
+						final ASN1Set attrValues = (ASN1Set) elemento.getObjectAt(1);
+						if (attrValues.size() > 0) {
+						    final ASN1Encodable value = attrValues.getObjectAt(0);
+						    if (value instanceof ASN1OctetString) {
+						        final ASN1OctetString hash = (ASN1OctetString) value;
+						        messageDigest = hash.getOctets();
+						    }
+						}
 						break;
 					}
 				}

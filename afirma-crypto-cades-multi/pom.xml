@@ -39,5 +39,9 @@
 			<artifactId>bcprov-jdk18on</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
 	</dependencies>
 </project>

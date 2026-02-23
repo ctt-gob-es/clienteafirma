@@ -61,7 +61,7 @@ final class CertUtil {
 
 	private static final int KEY_SIZE = 2048;
 
-	private static final String PROVIDER = "SC"; //$NON-NLS-1$
+	private static final String PROVIDER = "BC"; //$NON-NLS-1$
 
 	private static final String DEFAULT_LOCALHOST_IP = "127.0.0.1"; //$NON-NLS-1$
 

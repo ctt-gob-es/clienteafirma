@@ -370,9 +370,14 @@ final class CoSigner {
                     final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
                     final ASN1ObjectIdentifier oids = (ASN1ObjectIdentifier) elemento.getObjectAt(0);
                     if (CMSAttributes.messageDigest.getId().toString().equals(oids.toString())) {
-                        final DERSet derSetHash = (DERSet) elemento.getObjectAt(1);
-                        final DEROctetString derHash = (DEROctetString) derSetHash.getObjectAt(0);
-                        messageDigest = derHash.getOctets();
+                    	final ASN1Set attrValues = (ASN1Set) elemento.getObjectAt(1);
+						if (attrValues.size() > 0) {
+						    final ASN1Encodable value = attrValues.getObjectAt(0);
+						    if (value instanceof ASN1OctetString) {
+						        final ASN1OctetString hash = (ASN1OctetString) value;
+						        messageDigest = hash.getOctets();
+						    }
+						}
                     }
                 }
             }
