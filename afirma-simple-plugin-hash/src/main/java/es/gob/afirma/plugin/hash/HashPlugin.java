@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -122,8 +123,8 @@ public class HashPlugin extends AfirmaPlugin {
 	 * @throws IOException Cuando ocurre un error al eliminar el elemento.
 	 */
 	private static void deleteFile(final File file) throws IOException {
-		if (file.isDirectory()) {
-			for (final File subFile : file.listFiles()) {
+		if (file.isDirectory() && file.canRead()) {
+			for (final File subFile : Objects.requireNonNull(file.listFiles())) {
 				deleteFile(subFile);
 			}
 		}

@@ -17,6 +17,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.LoggerUtil;
@@ -150,11 +151,11 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 		Version maxVersion = null;
 		final File directoryLib = new File(startDir);
-		if (directoryLib.isDirectory()) {
+		if (directoryLib.isDirectory() && directoryLib.canRead()) {
 
 			// Tomamos lo numeros de version de firefox identificados
 			final List<String> firefoxVersions = new ArrayList<>();
-			for (final String filename : directoryLib.list()) {
+			for (final String filename : Objects.requireNonNull(directoryLib.list())) {
 				if (filename.startsWith("firefox-")) { //$NON-NLS-1$
 					firefoxVersions.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
 				}
