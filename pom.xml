@@ -83,7 +83,7 @@
 			
 			<dependency>
 			    <groupId>es.gob.afirma.lib</groupId>
-			    <artifactId>openpdf-afirma</artifactId>
+			    <artifactId>openpdf</artifactId>
 			    <version>${afirma.openpdf}</version>
 			</dependency>
 
