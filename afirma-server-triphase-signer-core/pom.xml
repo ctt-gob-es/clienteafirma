@@ -53,4 +53,14 @@
 
 	</dependencies>
 
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.basedir}</directory>
+				<includes>
+					<include>__no_resources__</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 </project>
