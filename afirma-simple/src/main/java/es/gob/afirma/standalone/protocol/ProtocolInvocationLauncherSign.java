@@ -197,6 +197,10 @@ final class ProtocolInvocationLauncherSign {
 					throw e;
 				}
 			}
+			catch (final RuntimeException e) {
+				ProgressInfoDialogManager.hideProgressDialog();
+				throw e;
+			}
 		}
 
 		StringBuilder dataToSend;
@@ -412,8 +416,9 @@ final class ProtocolInvocationLauncherSign {
 			final SignValider validator = SignValiderFactory.getSignValider(signer);
 			SignValidity validity = null;
 			if (validator != null) {
-				// Establecemos una validacion relajada para que nos informen cuando la firma presenta
-				// problemas que requiririan la intervencion del usuario para operar con ella
+				// Establecemos una validacion relajada para que, en caso de encontrar problemas con las
+				// firmas previas, no falle este proceso de firma, sino que se nos informen si se pudiese
+				// continuar mediante la intervencion del usuario
 				validator.setRelaxed(true);
 				if (signer instanceof AOPDFSigner || signer instanceof AOPDFTriPhaseSigner) {
 					configurePdfSignature(extraParams);
