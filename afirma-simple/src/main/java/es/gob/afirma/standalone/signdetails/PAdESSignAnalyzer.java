@@ -193,26 +193,31 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 			LOGGER.log(Level.SEVERE, "El PDF contiene una firma corrupta o con un formato desconocido (" + //$NON-NLS-1$
 					signName + ")", //$NON-NLS-1$
 					e);
-			throw e;
 		}
 
-		// Signing time
-		if (pkcs7.getSignDate() != null) {
-			padesSignDetails.setSigningTime(pkcs7.getSignDate().getTime());
+		if (pkcs7 != null) {
+			
+			// Signing time
+			if (pkcs7.getSignDate() != null) {
+				padesSignDetails.setSigningTime(pkcs7.getSignDate().getTime());
+			}
+
+			// Obtenemos el algoritmo de firma
+			final String digestAlgorithm = pkcs7.getDigestAlgorithm();
+			if (digestAlgorithm != null) {
+				padesSignDetails.setAlgorithm(digestAlgorithm);
+			}
+
+			// Obtenemos el firmante y lo agregamos al arbol
+			this.signersTree.add(new AOTreeNode(AOUtil.getCN(pkcs7.getSigningCertificate()) + " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(pkcs7.getSignDate().getTime()) + ")")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			// Detalles del certificado
+			final CertificateDetails certDetails = new CertificateDetails(pkcs7.getSigningCertificate());
+			padesSignDetails.setSigner(certDetails);
+			
+		} else {			
+			this.signersTree.add(new AOTreeNode(SimpleAfirmaMessages.getString("ValidationInfoDialog.69"))); //$NON-NLS-1$
 		}
-
-		// Obtenemos el algoritmo de firma
-		final String digestAlgorithm = pkcs7.getDigestAlgorithm();
-		if (digestAlgorithm != null) {
-			padesSignDetails.setAlgorithm(digestAlgorithm);
-		}
-
-		// Obtenemos el firmante y lo agregamos al arbol
-		this.signersTree.add(new AOTreeNode(AOUtil.getCN(pkcs7.getSigningCertificate()) + " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(pkcs7.getSignDate().getTime()) + ")")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// Detalles del certificado
-		final CertificateDetails certDetails = new CertificateDetails(pkcs7.getSigningCertificate());
-		padesSignDetails.setSigner(certDetails);
 
 		// Metadatos
 		final Map<String, String> metadataMap = new HashMap<>();

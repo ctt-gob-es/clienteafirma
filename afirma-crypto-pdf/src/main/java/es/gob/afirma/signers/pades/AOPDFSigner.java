@@ -469,6 +469,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 							"), se continua con las siguientes si las hubiese: " + e, //$NON-NLS-1$
 					e
 				);
+    			root.add(new AOTreeNode(CryptoPdfMessages.getString("SignersStructure.0"))); //$NON-NLS-1$
     			continue;
     		}
 
