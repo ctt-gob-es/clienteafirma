@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -157,7 +156,9 @@ public final class CMSTimestamper {
         	}
         }
         this.tsqGenerator.setCertReq(requireCert);
-        this.tsqGenerator.setReqPolicy(new ASN1ObjectIdentifier(policy));
+        if (policy != null) {
+        	this.tsqGenerator.setReqPolicy(new ASN1ObjectIdentifier(policy));
+		}
         this.tsaURL = tsa;
         this.tsaPassword = tsaPwd;
         this.tsaUsername = tsaUsr;
@@ -392,12 +393,7 @@ public final class CMSTimestamper {
 
 	    	if (conn instanceof javax.net.ssl.HttpsURLConnection) {
 	    		((javax.net.ssl.HttpsURLConnection)conn).setHostnameVerifier(
-					new javax.net.ssl.HostnameVerifier() {
-		    			@Override
-		    			public boolean verify(final String hostname, final SSLSession session) {
-		    				return true;
-		    			}
-		    		}
+					(hostname, session) -> true
 				);
 	    	}
 	    	else {
