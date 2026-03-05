@@ -11,17 +11,14 @@ package es.gob.afirma.signers.pades;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.lowagie.text.Annotation;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
-import com.lowagie.text.Jpeg;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfReader;
@@ -113,38 +110,8 @@ public final class PdfPreProcessor {
 
 	}
 
-	/** Sobreimpone una imagen JPEG en un documento PDF.
-	 * @param jpegImage Imagen JPEG
-	 * @param width Ancho de la imagen
-	 * @param height Alto de la imagen
-	 * @param left Distancia de la imagen al borde izquiero de la p&aacute;gina del PDF
-	 * @param bottom Distancia de la imagen al borde inferior de la p&aacute;gina del PDF
-	 * @param pageNum N&uacute;mero de p&aacute;gina del PDF donde insertar la imagen
-	 *                (la numeraci&oacute;n comienza en 1)
-	 * @param url URL a la que enlazar&aacute; la imagen si queremos que esta sea un hiperv&iacute;nculo
-	 *            (puede ser <code>null</code>)
-	 * @param stp Estampador PDF de iText
-	 * @throws IOException En caso de errores de entrada / salida */
-	public static void addImage(final byte[] jpegImage,
-			                     final int width,
-			                     final int height,
-			                     final int left,
-			                     final int bottom,
-			                     final int pageNum,
-			                     final String url,
-			                     final PdfStamper stp) throws IOException {
-		Image image;
-		try {
-			image = new Jpeg(jpegImage);
-		}
-		catch (final DocumentException e) {
-			throw new IOException("Error durante la carga de la imagen JPG", e); //$NON-NLS-1$
-		}
-		addImage(image, width, height, left, bottom, pageNum, url, stp);
-	}
-
-	/** Sobreimpone una imagen JPEG en un documento PDF.
-	 * @param image Imagen JPEG
+	/** Sobreimpone una imagen en un documento PDF.
+	 * @param image Imagen
 	 * @param width Ancho de la imagen
 	 * @param height Alto de la imagen
 	 * @param left Distancia de la imagen al borde izquiero de la p&aacute;gina del PDF
@@ -261,63 +228,56 @@ public final class PdfPreProcessor {
 		LOGGER.info("Anadida imagen al PDF antes de la firma"); //$NON-NLS-1$
 	}
 
-    static com.lowagie.text.Image getImage(final String imageReference, final boolean secureMode)
-    		throws IOException {
-    	if (imageReference == null || imageReference.isEmpty()) {
-    		return null;
-    	}
+	static com.lowagie.text.Image getImage(final String imageReference, final boolean secureMode)
+	        throws IOException {
+		
+		com.lowagie.text.Image imageResult = null;
 
-    	byte[] image = null;
+	    if (imageReference == null || imageReference.isEmpty()) {
+	        return null;
+	    }
 
-    	// Si no tenemos habilitado el modo seguro, permitiriamos que la imagen se cargue desde una
-    	// ruta externa
-    	if (!secureMode) {
-    		// Permitimos un tamano maximo de ruta para no interpretar como ruta
-    		// un base 64 grande
-    		if (imageReference.length() < MAX_PATH_SIZE) {
-    			try {
-    				final URI uri = AOUtil.createURI(imageReference);
-    				try (InputStream is = AOUtil.loadFile(uri)) {
-    					image = AOUtil.getDataFromInputStream(is);
-    				}
-    			} catch (final Exception e) {
-    				throw new IOException("El parametro de imagen no contiene una ruta valida a un recurso", e); //$NON-NLS-1$
-    			}
-    		}
-    	}
+	    byte[] image = null;
 
-    	// Si estaba configurado el modo seguro o el parametro de imagen no era una ruta,
-    	// interpretamos que es un Base 64 con la propia imagen
-    	if (image == null) {
+	    // Si no tenemos habilitado el modo seguro, permitimos cargar desde ruta externa
+	    if (!secureMode) {
+	        if (imageReference.length() < MAX_PATH_SIZE) {
+	            try {
+	                final URI uri = AOUtil.createURI(imageReference);
+	                try (InputStream is = AOUtil.loadFile(uri)) {
+	                    image = AOUtil.getDataFromInputStream(is);
+	                }
+	            }
+	            catch (final Exception e) {
+	                throw new IOException(
+	                    "El parametro de imagen no contiene una ruta valida a un recurso", e //$NON-NLS-1$
+	                );
+	            }
+	        }
+	    }
 
-    		try {
-    			image = Base64.decode(imageReference);
-    		}
-    		catch (final Exception e) {
-    			throw new IOException("Se ha proporcionado una imagen de rubrica que no esta codificada en Base64", e); //$NON-NLS-1$
-    		}
-    	}
+	    // Si estaba configurado el modo seguro o no era ruta, interpretamos Base64
+	    if (image == null) {
+	        try {
+	            image = Base64.decode(imageReference);
+	        }
+	        catch (final Exception e) {
+	            throw new IOException(
+	                "Se ha proporcionado una imagen de rubrica que no esta codificada en Base64", e //$NON-NLS-1$
+	            );
+	        }
+	    }
 
-    	// Si es posible en este entorno la imagen para hacerla asegurar su compatibilidad con PDF
-    	byte[] normalizedImage;
-    	try {
-    		final Class<?> ImageUtilsClass = Class.forName("es.gob.afirma.ui.utils.ImageUtils"); //$NON-NLS-1$
-    		final Method normalizeImageToPdfMethod = ImageUtilsClass.getMethod("normalizeImageToPdf", byte[].class); //$NON-NLS-1$
-    		final Object normalizedImageObject = normalizeImageToPdfMethod.invoke(null, image);
-    		normalizedImage = (byte[]) normalizedImageObject;
-    	}
-    	catch (final Throwable e) {
-    		LOGGER.log(Level.WARNING, "No se pudo normalizar la imagen de rubrica. Se agregara tal cual: " + e); //$NON-NLS-1$
-    		normalizedImage = image;
-    	}
+	    try {
+	    	imageResult = com.lowagie.text.Image.getInstance(image);
+	    }
+	    catch (final Exception e) {
+	        throw new IOException(
+	            "La imagen de rubrica no es un formato soportado (PNG, JPG, GIF)", e //$NON-NLS-1$
+	        );
+	    }
+	    
+	    return imageResult;
+	}
 
-    	final Image jpgImage;
-    	try {
-			jpgImage = new Jpeg(normalizedImage);
-		}
-    	catch (final Exception e) {
-    		throw new IOException("Se ha proporcionado una imagen de rubrica que no esta codificada en JPEG", e); //$NON-NLS-1$
-		}
-    	return jpgImage;
-    }
 }

@@ -108,7 +108,7 @@ public final class PdfExtraParams {
 
 	/**
 	 * Imagen que se desea insertar en el PDF antes de que este sea firmado. La
-	 * imagen debe proporcionarse en formato JPEG codificado en Base64. Si el
+	 * imagen debe proporcionarse codificada en Base64. Si el
 	 * documento ya contiene firmas es posible que se invaliden, por lo que conviene
 	 * usarlo &uacute;nicamente en documentos sin firmas previas.
 	 */
@@ -382,7 +382,7 @@ public final class PdfExtraParams {
 	public static final String SIGNATURE_POSITION_ON_PAGE_UPPER_RIGHTY = "signaturePositionOnPageUpperRightY";//$NON-NLS-1$
 
 	/**
-	 * Imagen JPEG codificada en Base64 de la r&uacute;brica de la firma manuscrita
+	 * Imagen codificada en Base64 de la r&uacute;brica de la firma manuscrita
 	 * que se desea aparezca como firma visible en el PDF.
 	 */
 	public static final String SIGNATURE_RUBRIC_IMAGE = "signatureRubricImage";//$NON-NLS-1$

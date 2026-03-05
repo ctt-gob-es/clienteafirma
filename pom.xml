@@ -189,7 +189,6 @@
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
 				<module>afirma-keystores-jmulticard-ui</module>
-				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>
@@ -295,7 +294,6 @@
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
 				<module>afirma-keystores-jmulticard-ui</module>
-				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>
@@ -372,7 +370,6 @@
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
 				<module>afirma-keystores-jmulticard-ui</module>
-				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>
@@ -461,7 +458,6 @@
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
 				<module>afirma-keystores-jmulticard-ui</module>
-				<module>afirma-ui-utils</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>

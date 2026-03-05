@@ -53,13 +53,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>es.gob.afirma</groupId>
-			<artifactId>afirma-ui-utils</artifactId>
-			<version>${clienteafirma.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
