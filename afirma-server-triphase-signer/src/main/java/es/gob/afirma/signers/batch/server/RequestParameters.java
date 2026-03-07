@@ -26,7 +26,6 @@ public class RequestParameters extends HashMap<String, String> {
 	private static final long serialVersionUID = 6942017463741129394L;
 
 	private RequestParameters() {
-		super();
 	}
 
 	/**
@@ -77,6 +76,9 @@ public class RequestParameters extends HashMap<String, String> {
 		while (names.hasMoreElements()) {
 			final String name = (String) names.nextElement();
 			params.put(name, request.getParameter(name));
+
+
+			System.out.println(" - Param " + name + ": " + params.get(name));
 		}
 	}
 
@@ -114,7 +116,12 @@ public class RequestParameters extends HashMap<String, String> {
 		if (sep == -1) {
 			throw new IllegalArgumentException("La peticion no esta bien formada"); //$NON-NLS-1$
 		}
-		params.put(param.substring(0, sep), param.substring(sep + 1));
+		final String key = param.substring(0, sep);
+		final String value = param.substring(sep + 1);
+
+		System.out.println(" - Param " + key + ": " + value);
+
+		params.put(key, value);
 		param.setLength(0);
 	}
 

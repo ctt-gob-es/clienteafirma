@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.ProcessResult;
@@ -61,12 +62,12 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				if (this.stopOnError) {
 					ignoreRemaining = true;
 					LOGGER.log(Level.WARNING,
-							"Error en una de las firmas del lote (" + ss.getId() + "), se ignoraran el resto de elementos", e); //$NON-NLS-1$ //$NON-NLS-2$
+							"Error en una de las firmas del lote (" + LoggerUtil.getTrimStr(ss.getId()) + "), se ignoraran el resto de elementos", e); //$NON-NLS-1$ //$NON-NLS-2$
 
 				}
 				else {
 					LOGGER.log(Level.WARNING,
-							"Error en una de las firmas del lote (" + ss.getId() + "), se continua con el siguiente elemento", e); //$NON-NLS-1$ //$NON-NLS-2$
+							"Error en una de las firmas del lote (" + LoggerUtil.getTrimStr(ss.getId()) + "), se continua con el siguiente elemento", e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				continue;
 			}
@@ -120,12 +121,12 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				resultado = ProcessResult.PROCESS_RESULT_DONE_SAVED;
 			}
 			catch (final SaveDataException e) {
-				LOGGER.log(Level.SEVERE, "Error de guardado en una de las firmas del lote (" + ss.getId() + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.log(Level.SEVERE, "Error de guardado en una de las firmas del lote (" + LoggerUtil.getTrimStr(ss.getId()) + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
 				resultado = new ProcessResult(ProcessResult.Result.DONE_BUT_ERROR_SAVING, e.getMessage());
 				error = true;
 			}
 			catch (final Exception e) {
-				LOGGER.log(Level.SEVERE, "Error en una de las firmas del lote (" + ss.getId() + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.log(Level.SEVERE, "Error en una de las firmas del lote (" + LoggerUtil.getTrimStr(ss.getId()) + "): " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
 				resultado = new ProcessResult(ProcessResult.Result.ERROR_POST, e.getMessage());
 				error = true;
 			}
@@ -155,7 +156,7 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 							((BatchDocumentManager) this.documentManager).rollback(ss.getDataRef(), certChain, singleSignProps);
 						} catch (final IOException e) {
 							LOGGER.severe(
-									"No se pudo deshacer el guardado de una firma (" + ss.getId() + ") despues de la cancelacion del lote: " + e //$NON-NLS-1$ //$NON-NLS-2$
+									"No se pudo deshacer el guardado de una firma (" + LoggerUtil.getTrimStr(ss.getId()) + ") despues de la cancelacion del lote: " + e //$NON-NLS-1$ //$NON-NLS-2$
 								);
 						}
 					}

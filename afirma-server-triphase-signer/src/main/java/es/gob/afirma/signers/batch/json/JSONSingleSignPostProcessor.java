@@ -140,11 +140,11 @@ final class JSONSingleSignPostProcessor {
 		}
 		catch (final SignaturePolicyIncompatibilityException e) {
 			LOGGER.log(
-					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica: " + e, e); //$NON-NLS-1$
+					Level.WARNING, "No se ha podido expandir la politica de firma. Se realizara una firma basica", e); //$NON-NLS-1$
 			extraParams = sSign.getExtraParams();
 		}
 
-		//TODO: Deshacer cuando se permita la generacion de firmas baseline
+		//TODO: Deshacer cuando se permita la generacion de firmas B-B-Level
 		extraParams.remove("profile"); //$NON-NLS-1$
 
 		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se

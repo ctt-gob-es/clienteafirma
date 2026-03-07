@@ -15,6 +15,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -44,6 +46,8 @@ public final class RetrieveService extends HttpServlet {
 	private static final String OPERATION_RETRIEVE = "get"; //$NON-NLS-1$
 	private static final String OPERATION_CHECK = "check"; //$NON-NLS-1$
 	private static final String SUCCESS = "OK"; //$NON-NLS-1$
+
+	private static Boolean allowExtendedLogs = null;
 
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
@@ -108,29 +112,51 @@ public final class RetrieveService extends HttpServlet {
 			return;
 		}
 
-		LOGGER.info("Se solicita el fichero con el identificador: " + id); //$NON-NLS-1$
+		if (id.indexOf('.') > -1 || id.indexOf('/') > -1 || id.indexOf('\\') > -1) {
+			LOGGER.log(Level.WARNING, "Se han encontrado caracteres no validos en el identificador de datos"); //$NON-NLS-1$
+			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID));
+			return;
+		}
 
-		final File inFile = new File(RetrieveConfig.getTempDir(), id);
+		LOGGER.info("Se solicita el fichero con el identificador: " + getTrim(id)); //$NON-NLS-1$
 
-		// No hacemos distincion si el archivo no existe, no es un fichero, no puede leerse o ha caducado
+		File inFile;
+		try {
+			inFile = composeTargetFile(RetrieveConfig.getTempDir(), id);
+		}
+		catch (final SecurityException e) {
+			LOGGER.log(Level.WARNING, "Se ha intentado acceder a un fichero fuera del path configurado", e); //$NON-NLS-1$
+			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID));
+			return;
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se ha podido componer la ruta del fichero solicitado"); //$NON-NLS-1$
+			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID));
+			return;
+		}
+
+		// No hacemos distincion si el archivo no existe, no es un fichero, es un enlace, no puede leerse o ha caducado
 		// para evitar que un atacante conozca su situacion. Lo borramos despues de usarlo
-		if (!inFile.isFile() || !inFile.canRead() || isExpired(inFile, RetrieveConfig.getExpirationTime())) {
+		if (!inFile.isFile() || Files.isSymbolicLink(inFile.toPath()) || !inFile.canRead() || isExpired(inFile, RetrieveConfig.getExpirationTime())) {
 
 			if (!inFile.exists()) {
-				LOGGER.warning("El fichero con el identificador '" + id + "' no existe: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El fichero con el identificador '" + getTrim(id) + "' no existe: " + getTrim(inFile.getAbsolutePath())); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if (!inFile.isFile()) {
-				LOGGER.warning("El archivo con el identificador '" + id + "' no es un fichero: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El archivo con el identificador '" + getTrim(id) + "' no es un fichero: " + getTrim(inFile.getAbsolutePath())); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else if (Files.isSymbolicLink(inFile.toPath())) {
+				LOGGER.warning("El fichero con el identificador '" + getTrim(id) + "' es un enlace simbolico"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if (!inFile.canRead()) {
-				LOGGER.warning("El fichero con el identificador '" + id + "' no tiene permisos de lectura: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El fichero con el identificador '" + getTrim(id) + "' no tiene permisos de lectura: " + getTrim(inFile.getAbsolutePath())); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else {
-				LOGGER.warning("El fichero con el identificador '" + id + "' esta caducado: " + inFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.warning("El fichero con el identificador '" + getTrim(id) + "' esta caducado: " + getTrim(inFile.getAbsolutePath())); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			out.println(
-				ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID)  + " ('" + id + "')" //$NON-NLS-1$ //$NON-NLS-2$
+				ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID)
 			);
 			// Que el fichero sea de tipo fichero, implica que existe
 			if (inFile.isFile() && !RetrieveConfig.DEBUG) {
@@ -138,14 +164,12 @@ public final class RetrieveService extends HttpServlet {
 			}
 		}
 		else {
-			try {
-				final InputStream fis = new FileInputStream(inFile);
+			try (final InputStream fis = new FileInputStream(inFile)) {
 				out.println(new String(getDataFromInputStream(fis)));
-				fis.close();
-				LOGGER.info("Se recupera el fichero: " + inFile.getName()); //$NON-NLS-1$
+				LOGGER.info("Se recupera el fichero: " + getTrim(inFile.getName())); //$NON-NLS-1$
 			}
 			catch (final IOException e) {
-				LOGGER.severe("Error recuperando el fichero " + inFile.getAbsolutePath() + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.log(Level.SEVERE, "Error recuperando el fichero " + getTrim(inFile.getAbsolutePath()), e); //$NON-NLS-1$
 				out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA));
 				return;
 			}
@@ -154,6 +178,27 @@ public final class RetrieveService extends HttpServlet {
 			}
 		}
 	}
+
+	/**
+	 * Compone el fichero de destino que se debe recuperar.
+	 * @param baseDir Directorio base del fichero.
+	 * @param filename Nombre del fichero.
+	 * @return Fichero de destino.
+	 * @throws IOException Cuando no se pueda componer la ruta del fichero.
+	 * @throws SecurityException Cuando se trate de cargar un fichero fuera
+	 * del directorio base.
+	 */
+	private static File composeTargetFile(final File baseDir, final String filename)
+			throws IOException, SecurityException {
+
+		final File targetFile = new File(baseDir, filename).getCanonicalFile();
+		if (!baseDir.equals(targetFile.getParentFile())) {
+			throw new SecurityException("El fichero solicitado no esta en el raiz del directorio"); //$NON-NLS-1$
+		}
+
+		return targetFile;
+	}
+
 
 	/**
 	 * Elimina del directorio temporal todos los ficheros que hayan sobrepasado el tiempo m&aacute;ximo
@@ -208,5 +253,28 @@ public final class RetrieveService extends HttpServlet {
             baos.write(buffer, 0, nBytes);
         }
         return baos.toByteArray();
+    }
+
+    /**
+     * Limita la cadena a 200 caracteres. En caso de que la propiedad {@code "allow.extended.logs"}
+     * est&eacute; activa, se omite el recortarla.
+     * @param text Cadena de texto que limitar.
+     * @return Cadena tratada.
+     */
+    public static String getTrim(final String text) {
+
+    	if (text == null) {
+    		return null;
+    	}
+
+    	if (allowExtendedLogs == null) {
+    		allowExtendedLogs = Boolean.valueOf(Boolean.getBoolean("allow.extended.logs")); //$NON-NLS-1$
+    	}
+
+    	if (!allowExtendedLogs.booleanValue() && text.length() >= 200) {
+			return text.substring(0, 200) + "..."; //$NON-NLS-1$
+		}
+
+    	return text;
     }
 }

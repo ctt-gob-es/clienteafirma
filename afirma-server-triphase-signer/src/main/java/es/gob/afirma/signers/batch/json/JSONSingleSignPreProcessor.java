@@ -99,7 +99,9 @@ final class JSONSingleSignPreProcessor {
 		}
 
 		// Eliminamos configuraciones que no deseemos que se utilicen externamente
-		extraParams.remove("profile"); //TODO: Deshacer cuando se permita la generacion de firmas baseline //$NON-NLS-1$
+
+		//TODO: Deshacer cuando se permita la generacion de firmas  B-B-Level
+		extraParams.remove("profile");
 
 		// XXX: Codigo de soporte de firmas XAdES explicitas (Eliminar cuando se
 		// abandone el soporte de XAdES explicitas)

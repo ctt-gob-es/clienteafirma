@@ -128,7 +128,6 @@ public abstract class JSONSignBatch {
 		try {
 			jsonObject = new JSONObject(new JSONTokener(new ByteArrayInputStream(json)));
 		} catch (final JSONException e){
-			LOGGER.severe("Error al parsear JSON: " + e); //$NON-NLS-1$
 			throw new JSONException(
 					"El JSON de definicion de lote de firmas no esta formado correctamente", e //$NON-NLS-1$
 				);
@@ -183,7 +182,7 @@ public abstract class JSONSignBatch {
 				this.documentManager = (DocumentManager) constructor.newInstance(ConfigManager.getConfig());
 
 				} catch (final Exception e) {
-					LOGGER.severe("El DocumentManager utilizado no dispone de un constructor con Properties, "+ //$NON-NLS-1$
+					LOGGER.severe("El DocumentManager utilizado no dispone de un constructor con Properties, " + //$NON-NLS-1$
 									"se utilizara un constructor vacio para instanciarlo"); //$NON-NLS-1$
 					this.documentManager = (DocumentManager) docManagerClass.newInstance();
 				}

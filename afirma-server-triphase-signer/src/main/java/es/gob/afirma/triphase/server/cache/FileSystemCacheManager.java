@@ -15,12 +15,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.triphase.server.ConfigManager;
+import es.gob.afirma.triphase.server.FileSystemUtils;
 
 /**
  * Implementaci&oacute;n de cache&eacute; en disco.
@@ -31,15 +37,20 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	private static final String PROP_EXP_TIME = "cache.expTime"; //$NON-NLS-1$
 	private static final String PROP_MAX_USE_TO_CLEANING = "cache.maxUseToCleaning"; //$NON-NLS-1$
 
-	private static final File DEFAULT_TMP_DIR = new File(System.getProperty("java.io.tmpdir"), "triphaseSignTemp");  //$NON-NLS-1$ //$NON-NLS-2$
 	private static final long DEFAULT_EXP_TIME = 60000;
 	private static final int DEFAULT_MAX_USE_TO_CLEAN = 100;
+
+	private static final int ID_MAX_SIZE = 60;
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final Encoder BASE64_ENCODER = Base64.getEncoder().withoutPadding();
+
 
 	final static Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private static int uses = 0;
 
-	private File tmpDir;
+	private File cacheDir;
 	private long expTime;
 	private int maxUseToCleaning;
 
@@ -50,14 +61,24 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 		// Establecemos el directorio configurado o el por defecto si no existe
 		final String tmpDirProp = config.getProperty(PROP_TMP_DIR, ""); //$NON-NLS-1$
 		if (!tmpDirProp.isEmpty() && new File(tmpDirProp).isDirectory()) {
-			this.tmpDir = new File(tmpDirProp);
+			this.cacheDir = new File(tmpDirProp);
 		}
 		else {
-			this.tmpDir = DEFAULT_TMP_DIR;
-			if (!this.tmpDir.exists()) {
-				this.tmpDir.mkdirs();
+			this.cacheDir = new File(System.getProperty("java.io.tmpdir"), "triphaseSignTemp"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (!this.cacheDir.exists()) {
+				this.cacheDir.mkdirs();
 			}
 		}
+
+		try {
+			this.cacheDir = this.cacheDir.getCanonicalFile();
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se pudo canonicalizar la ruta del directorio de cache"); //$NON-NLS-1$
+		}
+
+		LOGGER.info("Los ficheros cacheados se almacenaran en: " //$NON-NLS-1$
+				+ LoggerUtil.getTrimStr(this.cacheDir.getAbsolutePath()));
 
 		// Establecemos el tiempo de caducidad
 		try {
@@ -83,7 +104,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 
 	@Override
 	public void cleanCache() {
-		new ExpiredDocumentsCleanerThread(this.expTime, this.tmpDir).start();
+		new ExpiredDocumentsCleanerThread(this.expTime, this.cacheDir).start();
 	}
 
 	/**
@@ -99,31 +120,51 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	@Override
 	public byte[] getDocumentFromCache(final String idCacheFile) throws IOException {
 
+		// Excluimos recuperar los datos si el ID es anormalmente grande
+		if (idCacheFile.length() > ID_MAX_SIZE) {
+			LOGGER.log(Level.WARNING, "Se proporciono un ID de cache demasiado grande y se ignorara"); //$NON-NLS-1$
+			return null;
+		}
+
+
 		LOGGER.fine("Recuperamos de la cache el documento con identificador: " + idCacheFile); //$NON-NLS-1$
 
 		byte[] data = null;
 
-		final File inFile = new File(this.tmpDir, idCacheFile);
+		File inFile;
+		try {
+			inFile = FileSystemUtils.composeTargetFile(this.cacheDir, idCacheFile);
+		}
+		catch (final SecurityException e) {
+			LOGGER.log(Level.WARNING, "Se intento leer un fichero de fuera de la cache", e); //$NON-NLS-1$
+			return null;
 
-		//Recuperamos el archivo del directorio de cache
-		if (!inFile.isFile() || !inFile.canRead() || isExpired(inFile, this.expTime)) {
+		}
+		catch (final Exception e) {
+			throw new IOException("No se pudo componente la ruta del fichero", e); //$NON-NLS-1$
+		}
+
+		// Comprobaciones de seguridad
+		if (!inFile.isFile() || !inFile.canRead() || isExpired(inFile, this.expTime) || Files.isSymbolicLink(inFile.toPath())) {
 			return null;
 		}
 
+		// Recuperamos el archivo del directorio de cache
 		try (final InputStream fis = new FileInputStream(inFile)) {
 			data = AOUtil.getDataFromInputStream(fis);
 		}
 		catch (final IOException e) {
-			throw new IOException("Error al leer de cache el fichero: " + inFile.getAbsolutePath(), e); //$NON-NLS-1$
+			throw new IOException("Error al leer de cache el fichero: " + LoggerUtil.getTrimStr(inFile.getName()), e); //$NON-NLS-1$
 		}
 
+		// El fichero se elimina de cache tras su uso
 		try {
 			if (!inFile.delete()) {
-				LOGGER.warning(String.format("El fichero %1s no se elimino la de cache", idCacheFile)); //$NON-NLS-1$
+				LOGGER.warning(String.format("El fichero %1s no se elimino la de cache", LoggerUtil.getTrimStr(inFile.getName()))); //$NON-NLS-1$
 			}
 		}
 		catch (final Exception e) {
-			LOGGER.warning(String.format("El fichero %1s no se pudido eliminar la de cache: %2s", idCacheFile, e)); //$NON-NLS-1$
+			LOGGER.warning(String.format("El fichero %1s no se pudido eliminar la de cache: %2s", LoggerUtil.getTrimStr(inFile.getName()), e)); //$NON-NLS-1$
 		}
 
 		return data;
@@ -136,8 +177,8 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 		String newId;
 		File file;
 		do {
-			newId = generateNewId() + ".tmp"; //$NON-NLS-1$
-			file = new File(this.tmpDir, newId);
+			newId = generateNewId();
+			file = new File(this.cacheDir, newId);
 		} while (file.exists());
 
 		// Guardamos el archivo en el directorio indicado en el archivo de configuracion
@@ -163,14 +204,9 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	 * @return Nombre aleatorio para el archivo a guardar
 	 */
 	private static String generateNewId() {
-		char c;
-		final SecureRandom rnd = new SecureRandom();
-		String newId = ""; //$NON-NLS-1$
-		for (int i=0; i < 10 ; i++) {
-			c = (char)(rnd.nextDouble() * 26.0 + 65.0 );
-			newId += c;
-		}
-		return newId;
+		final byte[] data = new byte[24];
+		SECURE_RANDOM.nextBytes(data);
+		return BASE64_ENCODER.encodeToString(data);
 	}
 
 

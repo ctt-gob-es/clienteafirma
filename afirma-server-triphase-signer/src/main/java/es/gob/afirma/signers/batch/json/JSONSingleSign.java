@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.ProcessResult;
 import es.gob.afirma.signers.batch.ProcessResult.Result;
@@ -122,7 +123,7 @@ public final class JSONSingleSign extends SingleSign {
 		}
 		catch (final IOException e) {
 			LOGGER.severe(
-				"Error convirtiendo los parametros adicionales de la firma '" + getId() + "' a Base64: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"Error convirtiendo los parametros adicionales de la firma '" + LoggerUtil.getTrimStr(getId()) + "' a Base64: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		sb.append("\",\n"); //$NON-NLS-1$
@@ -318,7 +319,7 @@ public final class JSONSingleSign extends SingleSign {
 				result = new PreprocessResult(presignature);
 			}
 			catch (final Exception e) {
-				LOGGER.log(Level.WARNING, "Error en la pretfirma del documento: " + this.ss.getId(), e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "Error en la pretfirma del documento: " + LoggerUtil.getTrimStr(this.ss.getId()), e); //$NON-NLS-1$
 				final ProcessResult errorResult = new ProcessResult(Result.ERROR_PRE, e.getMessage());
 				errorResult.setId(this.ss.getId());
 				final ResultSingleSign singleResult = new ResultSingleSign(this.ss.getId(), false, errorResult);
@@ -363,7 +364,7 @@ public final class JSONSingleSign extends SingleSign {
 														this.docCacheManager);
 			}
 			catch(final Exception e) {
-				LOGGER.log(Level.WARNING, "Error en la postfirma del documento: " + this.ss.getId(), e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "Error en la postfirma del documento: " + LoggerUtil.getTrimStr(this.ss.getId()), e); //$NON-NLS-1$
 				final ProcessResult result = new ProcessResult(Result.ERROR_POST, e.getMessage());
 				return new ResultSingleSign(this.ss.getId(), false, result);
 			}
@@ -396,7 +397,7 @@ public final class JSONSingleSign extends SingleSign {
 				this.documentManager.storeDocument(this.ss.getDataRef(), this.certChain, dataToSave, singleSignProps);
 			}
 			catch(final Exception e) {
-				LOGGER.log(Level.WARNING, "No se puede almacenar la firma del documento: " + this.ss.getId(), e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "No se puede almacenar la firma del documento: " + LoggerUtil.getTrimStr(this.ss.getId()), e); //$NON-NLS-1$
 				final ProcessResult result = new ProcessResult(Result.DONE_BUT_ERROR_SAVING, "Error al almacenar la firma del documento"); //$NON-NLS-1$
 				return new ResultSingleSign(this.ss.getId(), false, result);
 			}

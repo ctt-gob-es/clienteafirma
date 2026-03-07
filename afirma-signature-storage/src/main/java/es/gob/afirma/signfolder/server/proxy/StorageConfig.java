@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Configuraci&oacute;n para la gesti&oacute;n del almacenamiento temporal de ficheros en servidor. */
@@ -52,7 +53,7 @@ final class StorageConfig {
 	private static final int DEFAULT_MAX_SIZE = 0; // Ilimitado
 
 	/** Directorio temporal a usar. */
-	private static final File TMP_DIR;
+	private static File TMP_DIR;
 
 	/** Modo de depuraci&oacute;n activo o no, en el que no se borran los ficheros en servidor ni se dan por caducados. */
 	static final boolean DEBUG;
@@ -68,7 +69,7 @@ final class StorageConfig {
 		try {
 			final String configDir = System.getProperty(ENVIRONMENT_VAR_CONFIG_DIR);
 			if (configDir != null) {
-				final File configFile = new File(configDir, CONFIG_FILE).getCanonicalFile();
+				final File configFile = new File(configDir, CONFIG_FILE);
 				if (!configFile.isFile() || !configFile.canRead()) {
 					LOGGER.warning(
 						"No se encontro o no se pudo leer el fichero " + CONFIG_FILE + //$NON-NLS-1$
@@ -109,12 +110,12 @@ final class StorageConfig {
 			tmpDir = new File(tmpDirName);
 			if (!tmpDir.isDirectory()) {
 				throw new IllegalStateException(
-					"El directorio temporal indicado en el fichero de propiedades no existe: " + config.getProperty(TMP_DIR_KEY) //$NON-NLS-1$
+					"El directorio temporal indicado en el fichero de propiedades no existe: " + tmpDirName //$NON-NLS-1$
 				);
 			}
 			if (!tmpDir.canRead() || !tmpDir.canWrite()) {
 				throw new IllegalStateException(
-					"No se tienen permisos sobre el directorio temporal: " + config.getProperty(TMP_DIR_KEY) //$NON-NLS-1$
+					"No se tienen permisos sobre el directorio temporal: " + tmpDirName //$NON-NLS-1$
 				);
 			}
 		}
@@ -139,7 +140,12 @@ final class StorageConfig {
 				}
 			}
 		}
-		TMP_DIR = tmpDir;
+		try {
+			TMP_DIR = tmpDir.getCanonicalFile();
+		} catch (final IOException e) {
+			LOGGER.log(Level.WARNING, "Error en la composicion del directorio de guardado", e); //$NON-NLS-1$
+			TMP_DIR = tmpDir;
+		}
 
 		long expTime;
 		final String expTimeValue = getProperty(config, EXPIRATION_TIME_KEY, null);

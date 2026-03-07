@@ -172,9 +172,7 @@ public final class SignatureService extends HttpServlet {
 		if (cacheEnabled) {
 
 			final Class<?> docCacheManagerClass;
-			String docCacheManagerClassName;
-			docCacheManagerClassName = ConfigManager.getDocCacheManagerClassName();
-
+			final String docCacheManagerClassName = ConfigManager.getDocCacheManagerClassName();
 			try {
 				docCacheManagerClass = Class.forName(docCacheManagerClassName);
 			}
@@ -230,7 +228,9 @@ public final class SignatureService extends HttpServlet {
 		for (final String param : params) {
 			if (param.indexOf('=') != -1) {
 				try {
-					parameters.put(param.substring(0, param.indexOf('=')), URLDecoder.decode(param.substring(param.indexOf('=') + 1), URL_DEFAULT_CHARSET));
+					final String key = param.substring(0, param.indexOf('='));
+					final String value = URLDecoder.decode(param.substring(param.indexOf('=') + 1), URL_DEFAULT_CHARSET);
+					parameters.put(key, value);
 				}
 				catch (final Exception e) {
 					LOGGER.warning("Error al decodificar un parametro de la peticion: " + e); //$NON-NLS-1$
@@ -252,7 +252,7 @@ public final class SignatureService extends HttpServlet {
 			final String operation = parameters.get(PARAM_NAME_OPERATION);
 			if (operation == null) {
 				LOGGER.severe("No se ha indicado la operacion trifasica a realizar"); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(1));
+				out.print(ErrorManager.getErrorMessage(ErrorManager.OPERATION_ARGUMENT_NOT_FOUND));
 				out.flush();
 				return;
 			}
@@ -273,7 +273,7 @@ public final class SignatureService extends HttpServlet {
 			LOGGER.info("Formato de firma seleccionado: " + format); //$NON-NLS-1$
 			if (format == null) {
 				LOGGER.warning("No se ha indicado formato de firma"); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(4));
+				out.print(ErrorManager.getErrorMessage(ErrorManager.FORMAT_ARGUMENT_NOT_FOUND));
 				out.flush();
 				return;
 			}
@@ -287,7 +287,7 @@ public final class SignatureService extends HttpServlet {
 			}
 			catch (final Exception e) {
 				LOGGER.severe("El formato de los parametros adicionales suministrado es erroneo: " +  e); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(6) + ": " + e); //$NON-NLS-1$);
+				out.print(ErrorManager.getErrorMessage(ErrorManager.INVALID_EXTRAPARAMS_FORMAT) + ": " + e); //$NON-NLS-1$);
 				out.flush();
 				return;
 			}
@@ -320,7 +320,7 @@ public final class SignatureService extends HttpServlet {
 			}
 			catch (final Exception e) {
 				LOGGER.severe("El formato de los datos de sesion suministrados es erroneo: "  + e); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(6) + ": " + e); //$NON-NLS-1$
+				out.print(ErrorManager.getErrorMessage(ErrorManager.INVALID_EXTRAPARAMS_FORMAT) + ": " + e); //$NON-NLS-1$
 				out.flush();
 				return;
 			}
@@ -332,7 +332,7 @@ public final class SignatureService extends HttpServlet {
 			final String cert = parameters.get(PARAM_NAME_CERT);
 			if (cert == null) {
 				LOGGER.warning("No se ha indicado certificado de firma"); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(5));
+				out.print(ErrorManager.getErrorMessage(ErrorManager.CERTIFICATE_ARGUMENT_NOT_FOUND));
 				out.flush();
 				return;
 			}
@@ -352,7 +352,7 @@ public final class SignatureService extends HttpServlet {
 				catch(final Exception e) {
 
 					LOGGER.log(Level.SEVERE, "Error al decodificar el certificado: " + receivedCerts[i], e);  //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(7));
+					out.print(ErrorManager.getErrorMessage(ErrorManager.INVALID_CERTIFICATE_FORMAT));
 					out.flush();
 					return;
 				}
@@ -383,8 +383,9 @@ public final class SignatureService extends HttpServlet {
 							"Recuperado documento de " + docBytes.length + " octetos"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				catch (final Throwable e) {
-					LOGGER.log(Level.WARNING, "Error al recuperar el documento", e); //$NON-NLS-1$
-					out.print(AOTriphaseException.parsePresignException(ErrorManager.RECOVERING_DOCUMENT_ERROR, e.getMessage(), e).toString());
+					final String errorMessage = "Error al recuperar el documento"; //$NON-NLS-1$
+					LOGGER.log(Level.WARNING, errorMessage, e);
+					out.print(AOTriphaseException.parsePresignException(ErrorManager.RECOVERING_DOCUMENT_ERROR, errorMessage, e).toString());
 					out.flush();
 					return;
 				}
@@ -414,7 +415,7 @@ public final class SignatureService extends HttpServlet {
 				algorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
 			} else if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
 				LOGGER.severe("Las firmas electronicas no permiten huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
-				out.print(ErrorManager.getErrorMessage(20));
+				out.print(ErrorManager.getErrorMessage(ErrorManager.UNSUPPORTED_ALGORITHM));
 				out.flush();
 				return;
 	    	}
@@ -430,7 +431,7 @@ public final class SignatureService extends HttpServlet {
 				}
 				catch (final IllegalArgumentException e) {
 					LOGGER.severe("Formato de firma no soportado: " + format); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(8));
+					out.print(ErrorManager.getErrorMessage(ErrorManager.UNSUPPORTED_FORMAT));
 					out.flush();
 					return;
 				}
@@ -664,7 +665,7 @@ public final class SignatureService extends HttpServlet {
 				}
 				catch(final Throwable e) {
 					LOGGER.severe("Error al almacenar el documento: " + e); //$NON-NLS-1$
-					out.print(ErrorManager.getErrorMessage(10) + ": " + e); //$NON-NLS-1$
+					out.print(ErrorManager.getErrorMessage(ErrorManager.SAVING_DOCUMENT_ERROR) + ": " + e); //$NON-NLS-1$
 					out.flush();
 					return;
 				}
@@ -676,7 +677,7 @@ public final class SignatureService extends HttpServlet {
 				LOGGER.info("== FIN POSTFIRMA"); //$NON-NLS-1$
 			}
 			else {
-				out.println(ErrorManager.getErrorMessage(11));
+				out.println(ErrorManager.getErrorMessage(ErrorManager.UNSUPPORTED_OPERATION));
 			}
 		}
         catch (final Exception e) {
@@ -802,7 +803,6 @@ public final class SignatureService extends HttpServlet {
 			if (verificationHMac == null) {
 				throw new InvalidVerificationCodeException("Alguna de las firmas no contenida el codigo de verificacion"); //$NON-NLS-1$
 			}
-
 
 			final String preSign = triSign.getProperty(TRIPHASE_PROP_PRESIGN);
 

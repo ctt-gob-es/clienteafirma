@@ -26,7 +26,7 @@ final class ErrorManager {
 	static final String ERROR_MISSING_SYNTAX_VERSION	 = "ERR-20"; //$NON-NLS-1$
 
 
-	private static final AbstractMap<String, String> ERRORS = new HashMap<String, String>();
+	private static final AbstractMap<String, String> ERRORS = new HashMap<>();
 	static {
 		ERRORS.put(ERROR_MISSING_OPERATION_NAME,     "No se ha indicado c\u00F3digo de operaci\u00F3n");                          //$NON-NLS-1$
 		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "C\u00F3digo de operaci\u00F3n no soportado");                               //$NON-NLS-1$
