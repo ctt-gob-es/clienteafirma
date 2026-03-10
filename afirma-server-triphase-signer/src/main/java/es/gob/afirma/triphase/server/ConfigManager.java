@@ -67,11 +67,6 @@ public class ConfigManager {
 	 */
 	private static final String CONFIG_PARAM_BATCH_MAX_REFERENCE_SIZE = "batch.maxReferenceSize"; //$NON-NLS-1$
 
-	/**
-	 * Propiedad que indica si se debe activar el antiguo servicio de firma de lotes XML.
-	 */
-	private static final String CONFIG_PARAM_LEGACY_BATCH_XML_ENABLED = "legacy.xmlBatchEnabled"; //$NON-NLS-1$
-
 	private static final long DEFAULT_CONCURRENT_TIMEOUT = 30;
 
 	private static final int DEFAULT_CONCURRENT_MAXSIGNS = 10;
@@ -256,15 +251,6 @@ public class ConfigManager {
 		} catch (final Exception e) {
 			return 0;
 		}
-	}
-
-	/**
-	 * Indica si se deben habilitar los antiguos servicios de firma de lotes XML.
-	 * @return {@code true} si los servicios deben estar habilitados, {@code false}
-	 * en caso contrario.
-	 */
-	public static boolean isLegacyBatchXmlEnabled() {
-		return Boolean.parseBoolean(config.getProperty(CONFIG_PARAM_LEGACY_BATCH_XML_ENABLED));
 	}
 
 	public static String getHMacKey() {

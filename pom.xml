@@ -40,7 +40,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-		<jdk.version>1.8</jdk.version>
+		<jdk.version>1.7</jdk.version>
 		<clienteafirma.version>1.10</clienteafirma.version>
 		<afirma.legible.version>1_10_0</afirma.legible.version>
 		<triphase.service.version>2.9</triphase.service.version>
@@ -194,12 +194,8 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
-				<module>afirma-keystores-jmulticard-ui</module>
 				<module>afirma-ui-utils</module>
-				<module>afirma-ui-core-jse</module>
-				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>
-				<module>afirma-ui-simple-configurator-common</module>
 				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
@@ -230,6 +226,40 @@
 			</build>
 	    </profile>
 
+		<!-- ===== Construccion para la generacion de aplicaciones finales y servicios ===== -->
+		<profile>
+			<id>autofirma</id>
+			<modules>
+				<!-- Modulos core -->
+				<module>afirma-keystores-jmulticard-ui</module>
+				<module>afirma-ui-simple-configurator-common</module>
+				<module>afirma-ui-core-jse</module>
+				<module>afirma-ui-core-jse-keystores</module>
+				<!-- Aplicaciones -->
+				<module>afirma-simple</module>
+				<module>afirma-ui-simple-configurator</module>
+				
+			</modules>
+			
+			<!-- Las instrucciones de construccion particulares estan dentro de cada modulo.
+			     Aqui se agregan unas genericas por si fuese necesario -->
+			<build>
+       			<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+							<fork>true</fork>
+							<debug>false</debug>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+			
+		</profile>
+		
 		<!-- ===== Construccion para la generacion de aplicaciones finales y servicios ===== -->
 		<profile>
 			<id>env-install</id>

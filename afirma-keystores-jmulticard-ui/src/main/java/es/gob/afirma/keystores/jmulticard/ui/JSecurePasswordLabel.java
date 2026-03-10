@@ -70,7 +70,7 @@ import javax.swing.UIManager;
 /**
  * Componente basado en <code>JLabel</code> para capturar contrase&ntilde;as usando
  * &uacute;nicamente arrays de <code>char</code> y restringiendo los caracteres aceptados.
- * 
+ *
  * @author Jose Luis Escanciano
  */
 final class JSecurePasswordLabel extends JLabel {
@@ -115,7 +115,7 @@ final class JSecurePasswordLabel extends JLabel {
 
     /**
      * Constructor.
-     * 
+     *
      * @param maxLength     Longitud m&aacute;xima de la contrase&ntilde;a
      * @param passwordPanel Panel padre que contiene los elementos de la contrase&ntilde;a
      */
@@ -146,9 +146,9 @@ final class JSecurePasswordLabel extends JLabel {
             public void keyPressed(final KeyEvent e) {
 
                 // Pegar desde portapapeles
-                if (((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0 && e.getKeyCode() == KeyEvent.VK_V)
-                        || ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0
-                                && e.getKeyCode() == KeyEvent.VK_INSERT)) {
+                if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0 && e.getKeyCode() == KeyEvent.VK_V
+                        || (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0
+                                && e.getKeyCode() == KeyEvent.VK_INSERT) {
                     pasteFromClipboard();
                     e.consume();
                     return;
@@ -190,7 +190,7 @@ final class JSecurePasswordLabel extends JLabel {
                 } else {
                 	setBackground(Color.LIGHT_GRAY);
                     JSecurePasswordLabel.this.parentPanel.setBackground(Color.LIGHT_GRAY);
-                }                
+                }
             }
         });
 
@@ -226,7 +226,7 @@ final class JSecurePasswordLabel extends JLabel {
                 BorderFactory.createEmptyBorder(0, 5, 0, 5)));
         setOpaque(true);
         setShowCursor(false);
- 
+
         String imgEyePath = "/images/eye.png"; //$NON-NLS-1$
         String imgEyeOffPath = "/images/eye-off.png"; //$NON-NLS-1$
 
@@ -334,7 +334,7 @@ final class JSecurePasswordLabel extends JLabel {
     void togglePasswordVisibility() {
         setShowPassword(!isShowPassword());
     }
-    
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -349,5 +349,5 @@ final class JSecurePasswordLabel extends JLabel {
             this.repaint();
         }
     }
-   
+
 }

@@ -23,7 +23,7 @@ public class FileSystemUtils {
 			throws IOException, SecurityException {
 
 		final File targetFile = new File(baseDir, filename).getCanonicalFile();
-		if (!baseDir.equals(targetFile.getParentFile())) {
+		if (!baseDir.getAbsolutePath().equals(targetFile.getParentFile().getAbsolutePath())) {
 			throw new SecurityException("El fichero solicitado no esta en el raiz del directorio: " + LoggerUtil.getTrimStr(filename)); //$NON-NLS-1$
 		}
 

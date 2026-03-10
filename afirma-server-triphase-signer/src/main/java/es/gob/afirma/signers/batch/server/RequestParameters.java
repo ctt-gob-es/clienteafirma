@@ -76,9 +76,6 @@ public class RequestParameters extends HashMap<String, String> {
 		while (names.hasMoreElements()) {
 			final String name = (String) names.nextElement();
 			params.put(name, request.getParameter(name));
-
-
-			System.out.println(" - Param " + name + ": " + params.get(name));
 		}
 	}
 
@@ -118,9 +115,6 @@ public class RequestParameters extends HashMap<String, String> {
 		}
 		final String key = param.substring(0, sep);
 		final String value = param.substring(sep + 1);
-
-		System.out.println(" - Param " + key + ": " + value);
-
 		params.put(key, value);
 		param.setLength(0);
 	}

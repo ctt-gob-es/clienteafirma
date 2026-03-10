@@ -31,9 +31,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -392,9 +394,11 @@ public final class CMSTimestamper {
     		// Podrian encontrarse varios tipos de conexion HTTPS
 
 	    	if (conn instanceof javax.net.ssl.HttpsURLConnection) {
-	    		((javax.net.ssl.HttpsURLConnection)conn).setHostnameVerifier(
-					(hostname, session) -> true
-				);
+	    		((javax.net.ssl.HttpsURLConnection)conn).setHostnameVerifier(new HostnameVerifier() {
+	    			public boolean verify(final String hostname, final SSLSession session) {
+	    				return true;
+	    			}
+	    		});
 	    	}
 	    	else {
 	    		LOGGER.warning(

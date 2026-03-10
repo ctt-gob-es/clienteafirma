@@ -72,6 +72,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
+import es.gob.afirma.keystores.jmulticard.ui.AbstractJAccessibilityCustomDialog.ButtonAbstractAction;
 import es.gob.jmulticard.CancelledOperationException;
 
 /** Componente di&aacute;logo que solicita una contrase&ntilde;a al usuario. */
@@ -108,13 +109,13 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
     /** Panel principal. */
     private transient JPanel mainPanel = null;
-    
+
     /** Panel de contrase&ntilde;a. */
     private transient JPanel passwordPanel = null;
 
     /** Campo de texto o campo de contrase&ntilde;a. */
     private transient JSecurePasswordLabel securePasswordLabel = null;
-    
+
     /** Panel para el bot&oacute;n de cacheo */
     private transient JPanel useCacheCheckBoxPanel = null;
 
@@ -123,7 +124,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
     /** Etiqueta que contiene el icono de la alerta. */
     private transient final IconLabel iconLabel = new IconLabel();
-    
+
     /** Boton para mostrar u ocultar contrase&ntilde;a */
     private transient PasswordEyeButton eyeButton = null;
 
@@ -228,7 +229,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 		}
 
         setTitle(title);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); 
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         this.answer = JOptionPane.NO_OPTION;
         // Contenedor del dialogo
@@ -263,23 +264,23 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
         // Se anade la etiqueta al panel de informacion general
         this.mainPanel.add(this.infoLabel, c);
-        
+
         // Campo de password del dialogo
         this.passwordPanel = new JPanel(new BorderLayout());
-     
+
         this.securePasswordLabel = new JSecurePasswordLabel(20, this.passwordPanel);
-        
+
         this.passwordPanel.setBorder(this.securePasswordLabel.getBorder());
         this.passwordPanel.setBackground(getParent().getBackground());
         this.passwordPanel.setOpaque(true);
-        
+
         this.eyeButton =
         	new PasswordEyeButton(
         			this.securePasswordLabel,
         			this.securePasswordLabel.eyeIcon,
         			this.securePasswordLabel.eyeOffIcon
         );
-        
+
         // Asignamos al boton el atajo CTRL+P
         KeyStroke ctrlP = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
 
@@ -309,10 +310,10 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 
         // Si corresponde, se agrega la casilla de verificacion para el uso de la cache
         if (allowUseCache) {
-        	
+
         	this.useCacheCheckBox = new JCheckBox(Messages.getString("InputPasswordSmartcardDialog.useCache")); //$NON-NLS-1$
         	this.useCacheCheckBox.setSelected(defaultUseCache);
-        	
+
         	this.useCacheCheckBoxPanel = new JPanel(new BorderLayout());
         	this.useCacheCheckBoxPanel.setBorder(new LineBorder(new Color(0,0,0,0), 1));
         	this.useCacheCheckBoxPanel.setOpaque(false);
@@ -499,7 +500,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 		);
         inputPasswordDialog.securePasswordLabel.addAncestorListener(new RequestFocusListener());
         AccesibilityUtils.remarcar(inputPasswordDialog.securePasswordLabel);
-     	AccesibilityUtils.setContrastColor(inputPasswordDialog.securePasswordLabel); 
+     	AccesibilityUtils.setContrastColor(inputPasswordDialog.securePasswordLabel);
         AccesibilityUtils.setFontBold(inputPasswordDialog.securePasswordLabel);
         inputPasswordDialog.securePasswordLabel.getAccessibleContext().setAccessibleName(
     		message.replace(AccesiblityConstants.HTML_SALTO_LINEA, "") + "  ALT + " + mnemonic + ". " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -531,9 +532,9 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
 	    			}
 	    		}
 			);
-        	
+
         	addAccesibleCheckboxFocusListener(inputPasswordDialog.useCacheCheckBox, inputPasswordDialog.useCacheCheckBoxPanel);
-        	
+
             // Se muestra el atajo
         	inputPasswordDialog.useCacheCheckBox.setMnemonic('e');
             AccesibilityUtils.remarkMnemonic(inputPasswordDialog.useCacheCheckBox, 'e');
@@ -679,7 +680,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
         }
         setVisible(false);
     }
-    
+
     /**
      * Da un foco accesible al elemento checkbox.
      * @param checkBox Elemento al cual dar accesibilidad.
@@ -688,7 +689,7 @@ public final class InputPasswordSmartcardDialog extends AbstractJAccessibilityCu
     private static void addAccesibleCheckboxFocusListener(JCheckBox checkBox, JPanel panel) {
 
         final boolean[] focusByKeyboard = {false};
-        
+
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
             .addKeyEventDispatcher(e -> {
                 if (e.getID() == KeyEvent.KEY_PRESSED) {

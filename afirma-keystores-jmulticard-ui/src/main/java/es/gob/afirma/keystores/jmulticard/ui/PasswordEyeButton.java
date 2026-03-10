@@ -73,13 +73,13 @@ final class PasswordEyeButton extends JButton {
      */
     private void togglePasswordVisibility() {
         this.passwordLabel.togglePasswordVisibility();
-        repaint(); 
+        repaint();
     }
-    
+
     private Border createFocusBorder() {
         return new LineBorder(AccesibilityUtils.getAccessibleColor(this.passwordLabel), 1);
     }
-   
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -111,7 +111,7 @@ final class PasswordEyeButton extends JButton {
 
         int x = (getWidth() - img.getWidth(null)) / 2;
         int y = (getHeight() - img.getHeight(null)) / 2;
-        
+
         g2.drawImage(img, x, y, null);
 
         if (hasFocus() && AccesibilityUtils.isHighContrast()) {
@@ -122,7 +122,7 @@ final class PasswordEyeButton extends JButton {
 
         g2.dispose();
     }
-    
+
     /**
      * Metodo que da color al icono.
      * @param src Ruta de imagen.
@@ -130,7 +130,7 @@ final class PasswordEyeButton extends JButton {
      * @return Icono coloreado.
      */
     private Image colorize(Image src, Color color) {
-    	
+
         BufferedImage image = new BufferedImage(
             src.getWidth(null),
             src.getHeight(null),

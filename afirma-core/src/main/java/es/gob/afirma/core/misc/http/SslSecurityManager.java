@@ -22,6 +22,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -37,21 +38,26 @@ public final class SslSecurityManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	static final TrustManager[] DUMMY_TRUST_MANAGER = {
-		new X509TrustManager() {
-			@Override
-			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-				return null;
-			}
-			@Override
-			public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
-			@Override
-			public void checkServerTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */  }
+	static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
+			new X509TrustManager() {
+				@Override
+				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+					return null;
+				}
+				@Override
+				public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+				@Override
+				public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
 
+			}
+		};
+
+	static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
+
+		public boolean verify(final String hostname, final SSLSession session) {
+			return true;
 		}
 	};
-
-		static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = (hostname, session) -> true;
 
 	private static final String KEYSTORE = "javax.net.ssl.keyStore"; //$NON-NLS-1$
 	private static final String KEYSTORE_PASS = "javax.net.ssl.keyStorePassword"; //$NON-NLS-1$

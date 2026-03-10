@@ -22,12 +22,10 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.ProcessResult;
+import es.gob.afirma.signers.batch.SingleSign;
 import es.gob.afirma.signers.batch.ProcessResult.Result;
 import es.gob.afirma.signers.batch.SingleSignConstants;
-import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
-import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStore;
-import es.gob.afirma.signers.batch.xml.SingleSign;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
@@ -50,47 +48,6 @@ public final class JSONSingleSign extends SingleSign {
 	 * @param id Identificador de la firma. */
 	JSONSingleSign(final String id) {
 		this.id = id;
-	}
-
-	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
-	 * @param id Identificador de la firma.
-	 * @param dataSrc Datos a firmar.
-	 * @param fmt Formato de firma.
-	 * @param subOp Tipo de firma a realizar.
-	 * @param xParams Opciones adicionales de la firma.
-	 * @param ss Objeto para guardar la firma una vez completada. */
-	public JSONSingleSign(final String id,
-			          final String dataSrc,
-			          final SignFormat fmt,
-			          final SignSubOperation subOp,
-			          final Properties xParams,
-			          final DocumentManager ss) {
-
-		if (dataSrc == null) {
-			throw new IllegalArgumentException(
-				"El origen de los datos a firmar no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-
-		if (fmt == null) {
-			throw new IllegalArgumentException(
-				"El formato de firma no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-
-		if (ss == null) {
-			throw new IllegalArgumentException(
-				"El objeto de guardado de firma no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-
-		this.dataRef = dataSrc;
-		this.format = fmt;
-
-		this.id = id;
-
-		this.subOperation = subOp;
-		this.documentManager = ss;
 	}
 
 	@Override

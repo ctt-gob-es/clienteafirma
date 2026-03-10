@@ -15,6 +15,10 @@
 		<version>1.10</version>
 	</parent>
 	
+	<properties>
+		<java.version>1.7</java.version>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
@@ -94,6 +98,17 @@
 			      </configuration>
 			    </execution>
 			  </executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<fork>true</fork>
+					<compilerArgument>-XDignore.symbol.file</compilerArgument>
+				</configuration>
 			</plugin>
 
 			<plugin>

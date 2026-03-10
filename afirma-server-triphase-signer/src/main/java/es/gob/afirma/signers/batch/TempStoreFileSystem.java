@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.LoggerUtil;
-import es.gob.afirma.signers.batch.xml.SingleSign;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.FileSystemUtils;
 
@@ -55,7 +54,8 @@ final class TempStoreFileSystem implements TempStore {
 			tempDir = ConfigManager.getTempDir();
 		}
 		else {
-			tempDir = BatchConfigManager.getTempDir();
+			final String defaultDir = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
+			tempDir = new File(defaultDir);
 		}
 	}
 

@@ -43,7 +43,7 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 	private static final int ID_MAX_SIZE = 60;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private static final Encoder BASE64_ENCODER = Base64.getEncoder().withoutPadding();
+    private static final Encoder BASE64_ENCODER = Base64.getUrlEncoder().withoutPadding();
 
 
 	final static Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
@@ -125,7 +125,6 @@ public final class FileSystemCacheManager implements DocumentCacheManager {
 			LOGGER.log(Level.WARNING, "Se proporciono un ID de cache demasiado grande y se ignorara"); //$NON-NLS-1$
 			return null;
 		}
-
 
 		LOGGER.fine("Recuperamos de la cache el documento con identificador: " + idCacheFile); //$NON-NLS-1$
 
