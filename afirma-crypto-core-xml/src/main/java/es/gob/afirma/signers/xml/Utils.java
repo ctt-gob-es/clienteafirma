@@ -573,7 +573,7 @@ public final class Utils {
         	final Element signingTimeElement = (Element) signature.getElementsByTagNameNS(namespace, "SigningTime").item(0); //$NON-NLS-1$
         	if (signingTimeElement != null) {
         		try {
-        			signingTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse( //$NON-NLS-1$
+        			signingTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX").parse( //$NON-NLS-1$
         					signingTimeElement.getTextContent()
         					);
         		}
