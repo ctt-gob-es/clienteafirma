@@ -20,8 +20,9 @@
 	<script type="text/javascript" src="js/autoscript.js"></script>
 	<script type="text/javascript" defer="defer">
 		
-		var servletsBase = window.location.href.indexOf("/firmaMovil/") > 0
-				? window.location.href.substring(0, window.location.href.indexOf("/firmaMovil/") + "/firmaMovil/".length - 1)
+		var basePos = window.location.href.toLowerCase().indexOf("/firmamovil/");
+		var servletsBase = basePos > 0
+				? window.location.href.substring(0, basePos + "/firmamovil/".length - 1)
 				: window.location.origin;
 		
 		function firmar() {

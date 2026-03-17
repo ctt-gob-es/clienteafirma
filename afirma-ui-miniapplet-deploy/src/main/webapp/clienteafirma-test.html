@@ -276,10 +276,18 @@
 			dataField.value = null;
 		}
 
-		function addExtraParam(extraParam) {
-			var paramsList = document.getElementById("params");
+		function addExtraParam() {
+			var extraParam = document.getElementById('newParam').value;
+			var paramsList = document.getElementById('params');
 			paramsList.value = paramsList.value + "\n" + extraParam;
 			document.getElementById('newParam').value = "";
+		}
+		
+		function onKeyDownExtraParam(event) {
+		    if (event.key === 'Enter') {
+			    event.preventDefault();
+			    addExtraParam();
+		    }
 		}
 
 		function cleanExtraParams() {
@@ -290,6 +298,7 @@
 		function showLog(newLog) {
 			document.getElementById('console').value += "\n" + newLog;
 		}
+
 	</script>
   </head>
 	<body>
@@ -361,7 +370,7 @@
 
 		<div>
 		 <label for="newParam">ExtraParams</label>
-		 <input id="newParam" type="text"><input type="button" value="Agregar" onclick="addExtraParam(document.getElementById('newParam').value);">&nbsp;
+		 <input id="newParam" type="text"><input id="addParam" type="button" value="Agregar">&nbsp;
 		 <input type="button" value="Limpiar" onclick="cleanExtraParams();">&nbsp;
 		 <span>(Insertar las propiedades de una en una)</span>
 		 <br>
@@ -402,8 +411,27 @@
 		<input type="button" value="Guardar" onclick="saveSignature();">
 		
 		<script>
-			var paramsElement = document.getElementById("params");
-			paramsElement.innerHTML = "serverUrl=" + window.location.origin + "/afirma-server-triphase-signer/SignatureService\n";
+			const paramsInput = document.getElementById("params");
+			paramsInput.innerHTML = "serverUrl=" + window.location.origin + "/afirma-server-triphase-signer/SignatureService\n";
+			
+
+			const newParamInput = document.getElementById('newParam');
+			const addExtraParamBtn = document.getElementById('addParam');
+
+			newParamInput.addEventListener('keydown', (event) => {
+			    if (event.key === 'Enter') {
+			        event.preventDefault();
+			        // Realiza la misma operacion que haber pulsado el boton de agregar extraParam
+			        addExtraParamBtn.click();
+			    }
+			  });
+
+			addExtraParamBtn.addEventListener('click', () => {
+		        var extraParam = newParamInput.value;
+		        paramsInput.value = paramsInput.value + "\n" + extraParam;
+		        newParamInput.value = "";
+			});
+			
 		</script>
 	</body>
 </html>	
