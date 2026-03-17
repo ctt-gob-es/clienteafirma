@@ -43,7 +43,7 @@
 		<jdk.version>1.7</jdk.version>
 		<clienteafirma.version>1.10</clienteafirma.version>
 		<afirma.legible.version>1_10_0</afirma.legible.version>
-		<triphase.service.version>2.9</triphase.service.version>
+		<triphase.service.version>2.9.1</triphase.service.version>
 		<jmulticard.version>2.1</jmulticard.version>
 		
 		<afirma.lib.itext.version>1.7</afirma.lib.itext.version>

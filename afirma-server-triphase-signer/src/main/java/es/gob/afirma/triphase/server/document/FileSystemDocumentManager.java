@@ -42,7 +42,7 @@ public class FileSystemDocumentManager implements BatchDocumentManager {
 	/** Tama&ntilde;o m&aacute;ximo de documento permitido. Cero (0) indica sin l&iacute;mite. */
 	private static final long DEFAULT_MAXDOCSIZE = 0;
 
-	private static final int MAX_REF_LENGTH = 64;
+	private static final int MAX_REF_LENGTH = 150;
 
 	private static final String PROPERTY_FORMAT = "format"; //$NON-NLS-1$
 
