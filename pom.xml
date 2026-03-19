@@ -228,40 +228,6 @@
 
 		<!-- ===== Construccion para la generacion de aplicaciones finales y servicios ===== -->
 		<profile>
-			<id>autofirma</id>
-			<modules>
-				<!-- Modulos core -->
-				<module>afirma-keystores-jmulticard-ui</module>
-				<module>afirma-ui-simple-configurator-common</module>
-				<module>afirma-ui-core-jse</module>
-				<module>afirma-ui-core-jse-keystores</module>
-				<!-- Aplicaciones -->
-				<module>afirma-simple</module>
-				<module>afirma-ui-simple-configurator</module>
-				
-			</modules>
-			
-			<!-- Las instrucciones de construccion particulares estan dentro de cada modulo.
-			     Aqui se agregan unas genericas por si fuese necesario -->
-			<build>
-       			<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<configuration>
-							<source>1.8</source>
-							<target>1.8</target>
-							<fork>true</fork>
-							<debug>false</debug>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-			
-		</profile>
-		
-		<!-- ===== Construccion para la generacion de aplicaciones finales y servicios ===== -->
-		<profile>
 			<id>env-install</id>
 			<activation>
 				<property>
@@ -271,6 +237,12 @@
 			</activation>
 			
 			<modules>
+				<!-- Modulos core -->
+				<module>afirma-keystores-jmulticard-ui</module>
+				<module>afirma-ui-simple-configurator-common</module>
+				<module>afirma-ui-core-jse</module>
+				<module>afirma-ui-core-jse-keystores</module>
+				
 				<!-- Aplicaciones -->
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
@@ -294,8 +266,8 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
-							<source>${jdk.version}</source>
-							<target>${jdk.version}</target>
+							<source>1.8</source>
+							<target>1.8</target>
 							<fork>true</fork>
 							<debug>false</debug>
 						</configuration>
