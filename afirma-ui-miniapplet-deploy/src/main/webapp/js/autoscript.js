@@ -3337,7 +3337,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				data.appname = generateDataKeyValue ("appname", !appName ? appName : DOMAIN_NAME);
 				if (serviceTimeout != null && serviceTimeout >= 0) {
-					data.servicetimeout = createKeyValuePair ("servicetimeout", serviceTimeout, true);
+					data.servicetimeout = generateDataKeyValue ("servicetimeout", serviceTimeout, true);
 				}
 
 				return data;
@@ -3364,7 +3364,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				data.appname = generateDataKeyValue ("appname", !appName ? appName : DOMAIN_NAME);
 				if (serviceTimeout != null && serviceTimeout >= 0) {
-					data.servicetimeout = createKeyValuePair ("servicetimeout", serviceTimeout, true);
+					data.servicetimeout = generateDataKeyValue ("servicetimeout", serviceTimeout, true);
 				}
 
 				return data;
@@ -4796,7 +4796,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!!desKey) {					params[params.length] = {key:"key", value:desKey}; }
 				if (!!cipherConfigEncoded) {	params[params.length] = {key:"cipher", value:cipherConfigEncoded}; }
 				if (!!storageServletAddress) {	params[params.length] = {key:"stservlet", value:storageServletAddress}; }
-				if (!showDialog) {				params[params.length] = {key:"dlgload", showDialog}; }	// Si no debemos mostrar el dialogo de carga, lo indicamos
+				if (!showDialog) {				params[params.length] = {key:"dlgload", value:showDialog}; }	// Si no debemos mostrar el dialogo de carga, lo indicamos
 				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
 
 				var url = buildUrl(opId, params);
