@@ -303,21 +303,9 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 					this.activePanel = new SignPdfUiPanelPreview(this, p, im);
 					((SignPdfUiPanelPreview) this.activePanel).setDialogParent(this);
 
-					// Comprobamos la imagen precargada, en caso de que exista, para avisar si
-					// contiene transparencias
-					if (((SignPdfUiPanelPreview) this.activePanel).checkRubricTransparency()) {
-			        	AOUIFactory.showMessageDialog(
-			        			this,
-								SignPdfUiMessages.getString("SignPdfDialog.9"),  //$NON-NLS-1$
-								SignPdfUiMessages.getString("SignPdfDialog.8"),  //$NON-NLS-1$
-			                    JOptionPane.WARNING_MESSAGE,
-			                    null
-			                );
-					}
-
 					this.scrollPanel.setViewportView(this.activePanel);
 					pack();
-					((SignPdfUiPanelPreview) this.activePanel).requestFocusInWindow();
+					this.activePanel.requestFocusInWindow();
 				}
 				else {
 					positionSelected(p);
@@ -333,7 +321,7 @@ public final class SignPdfDialog extends JDialog implements PdfLoaderListener, S
 			((SignPdfUiPanelStamp) this.activePanel).setDialogParent(this);
 			this.scrollPanel.setViewportView(this.activePanel);
 			pack();
-			((SignPdfUiPanelStamp) this.activePanel).requestFocusInWindow();
+			this.activePanel.requestFocusInWindow();
 		}
 		// En cualquier otro caso, damos por terminada la configuracion.
 		else {

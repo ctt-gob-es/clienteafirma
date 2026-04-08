@@ -28,6 +28,8 @@ public final class TestTrailing {
 	@SuppressWarnings("static-method")
 	@Test
 	public void testRevisionOnTrailedPdf() throws Exception {
+		
+		final String EOF_INDICATOR = "%%EOF"; //$NON-NLS-1$
 
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 		final AOPDFSigner signer = new AOPDFSigner();
@@ -41,28 +43,57 @@ public final class TestTrailing {
 
         Exception raised = null;
         try {
-	        signer.sign(
+	        byte [] dataByteArray = signer.sign(
 	    		testPdf,
 	    		DEFAULT_SIGNATURE_ALGORITHM,
 	    		pke.getPrivateKey(),
 	    		pke.getCertificateChain(),
 	    		extraParams
 			);
+	        
+	        String result = new String(dataByteArray);
+	        int count = 0;
+	        int idx = 0;
+
+	        while ((idx = result.indexOf(EOF_INDICATOR, idx)) != -1) {
+	            count++;
+	            idx += EOF_INDICATOR.length();
+	        }
+
+	        Assert.assertEquals(2, count);
         }
         catch(final Exception e) {
         	raised = e;
         }
-        Assert.assertNotNull(raised);
+        Assert.assertNull(raised);
 
         extraParams.put("alwaysCreateRevision", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        signer.sign(
-    		testPdf,
-    		DEFAULT_SIGNATURE_ALGORITHM,
-    		pke.getPrivateKey(),
-    		pke.getCertificateChain(),
-    		extraParams
-		);
+        try {
+        	byte [] dataByteArray = signer.sign(
+            		testPdf,
+            		DEFAULT_SIGNATURE_ALGORITHM,
+            		pke.getPrivateKey(),
+            		pke.getCertificateChain(),
+            		extraParams
+        		);
+        	
+	        String result = new String(dataByteArray);
+	        int count = 0;
+	        int idx = 0;
+
+	        while ((idx = result.indexOf(EOF_INDICATOR, idx)) != -1) {
+	            count++;
+	            idx += EOF_INDICATOR.length();
+	        }
+
+	        Assert.assertEquals(1, count);
+        } catch(final Exception e) {
+        	raised = e;
+        }
+        
+        Assert.assertNull(raised);
+        
 	}
 
 }

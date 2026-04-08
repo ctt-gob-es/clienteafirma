@@ -80,33 +80,33 @@
   <p>
   Este interfaz permite configurar las siguientes propiedades para la firma visible:
   </p>
-	<ul>
+  <ul>
 	<li><b>Vista previa</b>. Puede configurarse el fichero de imagen pulsando sobre
 	la previsualizaci&oacute;n de la firma. No se permiten im&aacute;genes con transparencias.</li>
 	<li><b>Configuraci&oacute;n de firma:</b></li>
 	<ul>
 	  <li><b>Imagen de firma:</b> Ruta de la imagen con la r&uacute;brica de firma. Puede seleccionarse
-	  mediante el bot&oacute;n <b>Examinar</b> y eliminarse mediante el bot&oacute;n <b>Limpiar</b>. No
-	  se admiten transparencias en la imagen y se omitir&aacute;n en caso de encontrarse.</li>
-	  <li><b>Texto de firma: </b> Texto a mostrar en la firma del PDF.   Para la configuraci&oacute;n del
+	  mediante el bot&oacute;n <b>Examinar</b> y eliminarse mediante el bot&oacute;n <b>Limpiar</b>. Se
+	  admiten los formatos de imagen JPEG, PNG y GIF. Se admiten im&aacute;genes con transparencias.</li>
+	  <li><b>Texto de firma: </b> Texto a mostrar en la firma del PDF. Para la configuraci&oacute;n del
 	  texto que se desea mostrar en la firma es posible utilizar una serie de palabras clave que ser&aacute;n
 	  sustituidas por los textos apropiados del titular o emisor del certificado de firma en el momento de
 	  firmar. Estas son:</li>
 	  <ul>
-	  	<p><li><b>$$SUBJECTCN$$</b><ul><li>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del titular del certificado de firma.</li></ul></li></p>
-	  	<p><li><b>$$ISSUERCN$$</b><ul><li>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del emisor del certificado de firma.</li></ul></li></p>
-	  	<p><li><b>$$CERTSERIAL$$</b><ul><li>N&uacute;mero de serie del certificado de firma.</li></ul></li></p>
-	  	<p><li><b>$$SIGNDATE=PATR&Oacute;N$$</b><ul><li>Fecha de la firma, donde PATR&Oacute;N debe indicar el formato en el que debe mostrarse la fecha, siguiendo el esquema definido por Oracle para la clase SimpleDateFormat.</li></ul></li></p>
-	  	<p><li><b>$$GIVENNAME$$</b><ul><li>Nombre del titular (G, Given Name) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-		<p><li><b>$$SURNAME$$</b><ul><li>Apellidos del titular (SN, Surname) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-		<p><li><b>$$ORGANIZATION$$</b><ul><li>Organizaci&oacute;n (O, Organization) del titular declarada en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-		<p><li><b>$$PSEUDONYM$$</b><ul><li>Seud&oacute;nimo del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-	 	<p><li><b>$$OU$$</b><ul><li>Unidad Organizativa (OU, Organization Unit) del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-	 	<p><li><b>$$OUS$$</b><ul><li>Listado de Unidades Organizativas del certificado. En caso de que hubiese m&aacute;s de una, se presentar&iacute;an todas separadas por ", ". El certificado podr&iacute;a no tener definidas Unidades Organizativas, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-	 	<p><li><b>$$TITLE$$</b><ul><li>Informaci&oacute;n sobre el puesto o rol del titular del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li></p>
-	 	<p><li><b>$$REASON$$</b><ul><li>Raz&oacute;n por la que se firma el PDF, configurada la operaci&oacute;n de firma mediante la propiedad "signatureReason". El patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a si no se hubiese establecido este valor.</li></ul></li></p>
-		<p><li><b>$$LOCATION$$</b><ul><li>Ciudad en la que se firma el PDF, configurada la operaci&oacute;n de firma mediante la propiedad "signatureProductionCity". El patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a si no se hubiese establecido este valor.</li></ul></li></p>
-		<p><li><b>$$CONTACT$$</b><ul><li>Informaci&oacute;n de contacto del firmante del PDF, configurada la operaci&oacute;n de firma mediante la propiedad "signatureContact". El patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a si no se hubiese establecido este valor.</li></ul></li></p>
+	  	<li><b>$$SUBJECTCN$$</b><ul><li>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del titular del certificado de firma.</li></ul></li>
+	  	<li><b>$$ISSUERCN$$</b><ul><li>Nombre com&uacute;n (CN, Common Name) dentro del X.500 Principal del emisor del certificado de firma.</li></ul></li>
+	  	<li><b>$$CERTSERIAL$$</b><ul><li>N&uacute;mero de serie del certificado de firma.</li></ul></li>
+	  	<li><b>$$SIGNDATE=PATR&Oacute;N$$</b><ul><li>Fecha de la firma, donde PATR&Oacute;N debe indicar el formato en el que debe mostrarse la fecha, siguiendo el esquema definido por Oracle para la clase SimpleDateFormat.</li></ul></li>
+	  	<li><b>$$GIVENNAME$$</b><ul><li>Nombre del titular (G, Given Name) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li>
+		<li><b>$$SURNAME$$</b><ul><li>Apellidos del titular (SN, Surname) declarado en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li>
+		<li><b>$$ORGANIZATION$$</b><ul><li>Organizaci&oacute;n (O, Organization) del titular declarada en el certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li>
+		<li><b>$$PSEUDONYM$$</b><ul><li>Seud&oacute;nimo del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li>
+	 	<li><b>$$OU$$</b><ul><li>Unidad Organizativa (OU, Organization Unit) del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li>
+	 	<li><b>$$OUS$$</b><ul><li>Listado de Unidades Organizativas del certificado. En caso de que hubiese m&aacute;s de una, se presentar&iacute;an todas separadas por ", ". El certificado podr&iacute;a no tener definidas Unidades Organizativas, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li>
+	 	<li><b>$$TITLE$$</b><ul><li>Informaci&oacute;n sobre el puesto o rol del titular del certificado. Este valor podr&iacute;a no aparecer en el certificado, en cuyo caso, el patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a.</li></ul></li>
+	 	<li><b>$$REASON$$</b><ul><li>Raz&oacute;n por la que se firma el PDF, configurada la operaci&oacute;n de firma mediante la propiedad "signatureReason". El patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a si no se hubiese establecido este valor.</li></ul></li>
+		<li><b>$$LOCATION$$</b><ul><li>Ciudad en la que se firma el PDF, configurada la operaci&oacute;n de firma mediante la propiedad "signatureProductionCity". El patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a si no se hubiese establecido este valor.</li></ul></li>
+		<li><b>$$CONTACT$$</b><ul><li>Informaci&oacute;n de contacto del firmante del PDF, configurada la operaci&oacute;n de firma mediante la propiedad "signatureContact". El patr&oacute;n se sustituir&aacute; por cadena vac&iacute;a si no se hubiese establecido este valor.</li></ul></li>
 	  </ul>
 	  <li>Al texto se le pueden aplicar las siguientes opciones de formato:</li>
 	  <ul>
@@ -116,8 +116,10 @@
 		<li>Estilo de fuente (Negrita, Cursiva, Subrayado o Tachado).</li>
 		<li>Color del texto.</li>
 	  </ul>
-	  <p>La casilla "Recordar configuraci&oacute;n" permite guardar la configuraci&oacute;n establecida (texto, imagen y estilos) para utilizarla en las siguientes firmas. El bot&oacute;n "Restaurar configuraci&oacute;n por defecto" devolver&aacute; la configuraci&oacute;n del panel a los valores por defecto.</p>
 	</ul>
+	<li><b>Recordar configuraci&oacute;n:</b> Esta casilla permite guardar la configuraci&oacute;n establecida (texto, imagen y estilos) para utilizarla en las siguientes firmas.</li>
+	<li><b>Restaurar configuraci&oacute;n por defecto:</b> Devuelve la configuraci&oacute;n del panel a los valores por defecto.</li>
+  </ul>
   <p>
   Si no se desea agregar una firma visible al PDF, antes de pulsar el bot&oacute;n firmar en la pantalla de firma, aseg&uacute;rese
   de que no se encuentra seleccionada la casilla &quot;Hacer la firma visible dentro del PDF&quot;.
@@ -135,7 +137,7 @@
   </p>
   <ul>
   	<li><b>Seleccionar imagen:</b> Al pulsar este bot&oacute;n se abrir&aacute; una ventana en la que podr&aacute; seleccionar 
-  	la imagen de marca. No se admiten transparencias en la imagen y se omitir&aacute;n en caso de encontrarse</li>
+  	la imagen de marca. Se admiten los formatos de imagen JPEG, PNG y GIF. Se admiten im&aacute;genes con transparencias.</li>
   	<li><b>X</b>: N&uacute;mero de p&iacute;xeles en el eje X en el que situar la marca.</li>
   	<li><b>Y</b>: N&uacute;mero de p&iacute;xeles en el eje Y en el que situar la marca.</li>
   	<li><b>Anchura</b>: N&uacute;mero de p&iacute;xeles que se debe extender en horizontal la marca.</li>

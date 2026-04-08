@@ -2,7 +2,7 @@ package es.gob.afirma.signvalidation;
 
 import java.io.Serializable;
 
-import com.aowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfDictionary;
 
 /**
  * <p>Class that contains information related to a signature dictionary of a PDF document.</p>

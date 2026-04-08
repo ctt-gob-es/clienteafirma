@@ -18,28 +18,28 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.ASN1Encodable;
-import org.spongycastle.asn1.ASN1EncodableVector;
-import org.spongycastle.asn1.ASN1Encoding;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1OctetString;
-import org.spongycastle.asn1.ASN1Primitive;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.BEROctetString;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.DERSet;
-import org.spongycastle.asn1.cms.AttributeTable;
-import org.spongycastle.asn1.cms.ContentInfo;
-import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerIdentifier;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.asn1.x500.X500Name;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
-import org.spongycastle.asn1.x509.TBSCertificate;
-import org.spongycastle.cms.CMSProcessable;
-import org.spongycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.BEROctetString;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.cms.SignerIdentifier;
+import org.bouncycastle.asn1.cms.SignerInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.TBSCertificate;
+import org.bouncycastle.cms.CMSProcessable;
+import org.bouncycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOUnsupportedSignAlgorithmException;
@@ -308,7 +308,7 @@ public final class CAdESTriPhaseSigner {
         for (final Certificate cert : signerCertificateChain) {
             try {
                 ce.add(
-            		org.spongycastle.asn1.x509.Certificate.getInstance(
+            		org.bouncycastle.asn1.x509.Certificate.getInstance(
         				ASN1Primitive.fromByteArray(
     						cert.getEncoded()
 						)

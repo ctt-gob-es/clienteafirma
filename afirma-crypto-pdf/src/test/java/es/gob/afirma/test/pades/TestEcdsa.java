@@ -11,9 +11,9 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PdfPKCS7;
-import com.aowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfPKCS7;
+import com.lowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSigner;

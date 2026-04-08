@@ -24,12 +24,12 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.aowagie.text.exceptions.BadPasswordException;
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfPKCS7;
-import com.aowagie.text.pdf.PdfReader;
+import com.lowagie.text.exceptions.BadPasswordException;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfPKCS7;
+import com.lowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -469,6 +469,7 @@ public final class AOPDFSigner implements AOSigner, AOConfigurableContext {
 							"), se continua con las siguientes si las hubiese: " + e, //$NON-NLS-1$
 					e
 				);
+    			root.add(new AOTreeNode(CryptoPdfMessages.getString("SignersStructure.0"))); //$NON-NLS-1$
     			continue;
     		}
 

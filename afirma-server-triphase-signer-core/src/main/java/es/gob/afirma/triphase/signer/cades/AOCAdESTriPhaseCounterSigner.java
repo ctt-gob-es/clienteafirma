@@ -25,30 +25,30 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.spongycastle.asn1.ASN1Encodable;
-import org.spongycastle.asn1.ASN1EncodableVector;
-import org.spongycastle.asn1.ASN1Encoding;
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1OctetString;
-import org.spongycastle.asn1.ASN1Primitive;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.DERSet;
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.AttributeTable;
-import org.spongycastle.asn1.cms.CMSAttributes;
-import org.spongycastle.asn1.cms.ContentInfo;
-import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerIdentifier;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.asn1.x500.X500Name;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
-import org.spongycastle.asn1.x509.TBSCertificate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.cms.SignerIdentifier;
+import org.bouncycastle.asn1.cms.SignerInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
@@ -273,7 +273,7 @@ public final class AOCAdESTriPhaseCounterSigner {
         final ASN1TaggedObject pkcs7RootContextSpecificZero = (ASN1TaggedObject) pkcs7RootSequenceElements.nextElement();
 
         // Sacamos la secuencia de dentro Context-Specific, que es ya el SignedData ASN.1
-        return SignedData.getInstance(pkcs7RootContextSpecificZero.getObject());
+        return SignedData.getInstance(pkcs7RootContextSpecificZero.getExplicitBaseObject());
 	}
 
 	private static byte[] generateSignedAttributes(final SignerInfo si, final String algorithm,
@@ -435,7 +435,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 		}
 		// SignedData
 		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-		return SignedData.getInstance(doj.getObject());
+		return SignedData.getInstance(doj.getExplicitBaseObject());
 	}
 
 	/**

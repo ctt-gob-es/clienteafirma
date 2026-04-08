@@ -35,13 +35,13 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>core</artifactId>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>prov</artifactId>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 		
 	</dependencies>

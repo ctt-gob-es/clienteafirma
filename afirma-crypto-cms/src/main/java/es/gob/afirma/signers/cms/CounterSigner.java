@@ -23,35 +23,35 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.spongycastle.asn1.ASN1Encodable;
-import org.spongycastle.asn1.ASN1EncodableVector;
-import org.spongycastle.asn1.ASN1Encoding;
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1OctetString;
-import org.spongycastle.asn1.ASN1Primitive;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.ASN1UTCTime;
-import org.spongycastle.asn1.BERSet;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.DERPrintableString;
-import org.spongycastle.asn1.DERSet;
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.AttributeTable;
-import org.spongycastle.asn1.cms.CMSAttributes;
-import org.spongycastle.asn1.cms.ContentInfo;
-import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerIdentifier;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.asn1.x500.X500Name;
-import org.spongycastle.asn1.x500.style.RFC4519Style;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
-import org.spongycastle.asn1.x509.Certificate;
-import org.spongycastle.asn1.x509.TBSCertificate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.ASN1UTCTime;
+import org.bouncycastle.asn1.BERSet;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.cms.SignerIdentifier;
+import org.bouncycastle.asn1.cms.SignerInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.RFC4519Style;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -63,7 +63,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
 /**
  * Contrafirma digital PKCS#7/CMS SignedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
- * crear un mensaje SignedData de SpongyCastle pero con la
+ * crear un mensaje SignedData de bouncycastle pero con la
  * peculiaridad de que es una Contrafirma.
  */
 final class CounterSigner {
@@ -122,7 +122,7 @@ final class CounterSigner {
         e.nextElement();
         // Contenido de SignedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();
+        final ASN1Sequence contentSignedData = ASN1Sequence.getInstance(doj, true);
 
         final SignedData sd = SignedData.getInstance(contentSignedData);
 
@@ -325,7 +325,7 @@ final class CounterSigner {
                 counterSigner = getCounterNodeUnsignedAtributes(si, parameters, key, certChain);
             }
             else {
-                if (this.actualIndex != nodo) {
+                {
                     counterSigner = getCounterNodeUnsignedAtributes(si, parameters, key, certChain, nodo);
                 }
             }

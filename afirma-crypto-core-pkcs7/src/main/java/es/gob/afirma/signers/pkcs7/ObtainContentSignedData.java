@@ -13,19 +13,20 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.DERSet;
-import org.spongycastle.asn1.cms.CMSAttributes;
-import org.spongycastle.asn1.cms.ContentInfo;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.pkcs.ContentInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.SignedData;
+import org.bouncycastle.asn1.pkcs.SignerInfo;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 
@@ -72,8 +73,8 @@ public final class ObtainContentSignedData {
 		// buscamos si es signedData
 		if (doi.equals(PKCSObjectIdentifiers.signedData)) {
 			// obtenemos el signed Data
-			final SignedData sd = SignedData.getInstance(doj.getObject());
-			final ContentInfo ci = sd.getEncapContentInfo();
+			final SignedData sd = SignedData.getInstance(doj.getExplicitBaseObject());
+			final ContentInfo ci = sd.getContentInfo();
 			// obtenemos el contenido si lo tiene.
 			if (ci.getContent() != null) {
 				contenido = ((DEROctetString) ci.getContent()).getOctets();
@@ -121,7 +122,7 @@ public final class ObtainContentSignedData {
 
 		// Contenido a obtener informacion
 		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-		final SignedData sd = SignedData.getInstance(doj.getObject());
+		final SignedData sd = SignedData.getInstance(doj.getExplicitBaseObject());
 		final ASN1Set signerInfosSd = sd.getSignerInfos();
 
 		byte[] messageDigest = null;
@@ -135,9 +136,14 @@ public final class ObtainContentSignedData {
 					final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
 					final ASN1ObjectIdentifier oids = (ASN1ObjectIdentifier) elemento.getObjectAt(0);
 					if (CMSAttributes.messageDigest.getId().equals(oids.toString())) {
-						final DERSet derSetHash = (DERSet) elemento.getObjectAt(1);
-						final DEROctetString derHash = (DEROctetString) derSetHash.getObjectAt(0);
-						messageDigest = derHash.getOctets();
+						final ASN1Set attrValues = (ASN1Set) elemento.getObjectAt(1);
+						if (attrValues.size() > 0) {
+						    final ASN1Encodable value = attrValues.getObjectAt(0);
+						    if (value instanceof ASN1OctetString) {
+						        final ASN1OctetString hash = (ASN1OctetString) value;
+						        messageDigest = hash.getOctets();
+						    }
+						}
 						break;
 					}
 				}

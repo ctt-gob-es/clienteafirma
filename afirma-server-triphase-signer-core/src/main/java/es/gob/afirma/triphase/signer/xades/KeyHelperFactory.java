@@ -23,7 +23,7 @@ final class KeyHelperFactory {
 		// La implementacion con curva eliptica para firma XAdES fallara en los entornos afectados
 		// por el error de Java '8182580':
 		// https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8182580
-		if (key instanceof ECPublicKey || key instanceof org.spongycastle.jce.interfaces.ECPublicKey) {
+		if (key instanceof ECPublicKey || key instanceof org.bouncycastle.jce.interfaces.ECPublicKey) {
 			 return new KeyHelperEcdsa();
 		}
 		throw new InvalidKeyException(

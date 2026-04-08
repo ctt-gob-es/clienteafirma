@@ -14,10 +14,10 @@ import java.util.logging.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PRAcroForm;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PRAcroForm;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;

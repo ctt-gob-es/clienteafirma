@@ -71,18 +71,14 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>prov</artifactId>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
 		</dependency>
 		
 		<dependency>
 			<groupId>es.gob.afirma.lib</groupId>
-			<artifactId>afirma-lib-itext</artifactId>
+			<artifactId>openpdf</artifactId>
+			<version>${afirma.openpdf}</version>
 		</dependency>
 		
 		<dependency>

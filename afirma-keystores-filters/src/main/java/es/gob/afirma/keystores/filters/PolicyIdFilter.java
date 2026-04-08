@@ -15,10 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.ASN1OctetString;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.x509.CertificatePolicies;
-import org.spongycastle.asn1.x509.PolicyInformation;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.x509.CertificatePolicies;
+import org.bouncycastle.asn1.x509.PolicyInformation;
 
 import es.gob.afirma.keystores.CertificateFilter;
 

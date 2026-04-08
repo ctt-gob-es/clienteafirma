@@ -20,13 +20,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PdfArray;
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfObject;
-import com.aowagie.text.pdf.PdfPKCS7;
-import com.aowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfArray;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfObject;
+import com.lowagie.text.pdf.PdfPKCS7;
+import com.lowagie.text.pdf.PdfReader;
 
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.signers.pades.PdfUtil;
@@ -212,7 +212,7 @@ public final class ValidatePdfSignature extends SignValider {
 				// Comprobamos si la firma es la que certifica el documento
 				if (pdfDictionary.get(PdfName.REFERENCE) != null) {
 					final PdfArray reference = (PdfArray) pdfDictionary.get(PdfName.REFERENCE);
-					final ArrayList<PdfObject> p = reference.getArrayList();
+					final List<PdfObject> p = reference.getElements();
 					final PdfDictionary dictionaryReference = (PdfDictionary) p.get(0);
 					if (dictionaryReference.get(PdfName.TRANSFORMMETHOD) != null) {
 						certRevision = af.getRevision(nameS);
@@ -267,42 +267,51 @@ public final class ValidatePdfSignature extends SignValider {
 		final List<SignValidity> validityList = new ArrayList<>();
 
 		// Valimamos la firma
-		final PdfPKCS7 pk = signAcrofields.verifySignature(signName);
-
-		// Comprobamos que el algoritmo de hash este bien declarado, supliendo asi la
-		// flexibilidad de iText que permite
-		// cargar firmas que usan algoritmos de firma como algoritmos de hash
-		if (pk.getStrictHashAlgorithm() == null) {
-			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED));
+		PdfPKCS7 pk = null;
+		try {
+			pk = signAcrofields.verifySignature(signName);
+		} catch (Exception e) {
+			validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e));
 		}
+		
+		if (pk != null) {
+			
+			// Comprobamos que el algoritmo de hash este bien declarado, supliendo asi la
+			// flexibilidad de iText que permite
+			// cargar firmas que usan algoritmos de firma como algoritmos de hash
+			if (pk.getStrictHashAlgorithm() == null) {
+				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED));
+			}
 
-		// Comprobamos si es una firma o un sello
-		final PdfDictionary pdfDictionary = signAcrofields.getSignatureDictionary(signName);
+			// Comprobamos si es una firma o un sello
+			final PdfDictionary pdfDictionary = signAcrofields.getSignatureDictionary(signName);
 
-		// Si no es un sello, comprobamos el PKCS#1
-		if (!PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER))
-				&& !PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
-			try {
-				if (!pk.verify()) {
-					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+			// Si no es un sello, comprobamos el PKCS#1
+			if (!PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER))
+					&& !PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
+				try {
+					if (!pk.verify()) {
+						validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA));
+					}
+				} catch (final Exception e) {
+					LOGGER.warning("Error validando una de las firmas del PDF: " + e); //$NON-NLS-1$
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e));
 				}
-			} catch (final Exception e) {
-				LOGGER.warning("Error validando una de las firmas del PDF: " + e); //$NON-NLS-1$
-				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN, e));
 			}
-		}
 
-		if (checkCert) {
-			final X509Certificate signCert = pk.getSigningCertificate();
-			try {
-				signCert.checkValidity();
-			} catch (final CertificateExpiredException e) {
-				// Certificado caducado
-				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e));
-			} catch (final CertificateNotYetValidException e) {
-				// Certificado aun no valido
-				validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e));
+			if (checkCert) {
+				final X509Certificate signCert = pk.getSigningCertificate();
+				try {
+					signCert.checkValidity();
+				} catch (final CertificateExpiredException e) {
+					// Certificado caducado
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED, e));
+				} catch (final CertificateNotYetValidException e) {
+					// Certificado aun no valido
+					validityList.add(new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET, e));
+				}
 			}
+			
 		}
 
 		if (!ISignatureFormatDetector.FORMAT_PADES_BASIC.equals(signProfile)

@@ -15,7 +15,7 @@ import java.security.cert.CertificateException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.spongycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedData;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;

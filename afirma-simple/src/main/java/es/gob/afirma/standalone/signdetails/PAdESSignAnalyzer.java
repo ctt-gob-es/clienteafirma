@@ -8,23 +8,23 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.AttributeTable;
-import org.spongycastle.asn1.esf.SignaturePolicyId;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.cms.CMSSignedData;
-import org.spongycastle.cms.SignerInformation;
-import org.spongycastle.cms.SignerInformationStore;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.esf.SignaturePolicyId;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 
-import com.aowagie.text.exceptions.BadPasswordException;
-import com.aowagie.text.pdf.AcroFields;
-import com.aowagie.text.pdf.PdfArray;
-import com.aowagie.text.pdf.PdfDictionary;
-import com.aowagie.text.pdf.PdfName;
-import com.aowagie.text.pdf.PdfObject;
-import com.aowagie.text.pdf.PdfPKCS7;
-import com.aowagie.text.pdf.PdfReader;
-import com.aowagie.text.pdf.PdfString;
+import com.lowagie.text.exceptions.BadPasswordException;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfArray;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfObject;
+import com.lowagie.text.pdf.PdfPKCS7;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -178,7 +178,7 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 		// Comprobamos si la firma es la que certifica el documento
 		if (signPdfDictionary.get(PdfName.REFERENCE) != null) {
 			final PdfArray reference = (PdfArray) signPdfDictionary.get(PdfName.REFERENCE);
-			final ArrayList<PdfObject> p = reference.getArrayList();
+			final List<PdfObject> p = reference.getElements();
 			final PdfDictionary dictionaryReference = (PdfDictionary) p.get(0);
 			padesSignDetails.setCertificationSign(dictionaryReference.get(PdfName.TRANSFORMMETHOD) != null);
 		}
@@ -193,26 +193,31 @@ public class PAdESSignAnalyzer implements SignAnalyzer {
 			LOGGER.log(Level.SEVERE, "El PDF contiene una firma corrupta o con un formato desconocido (" + //$NON-NLS-1$
 					signName + ")", //$NON-NLS-1$
 					e);
-			throw e;
 		}
 
-		// Signing time
-		if (pkcs7.getSignDate() != null) {
-			padesSignDetails.setSigningTime(pkcs7.getSignDate().getTime());
+		if (pkcs7 != null) {
+			
+			// Signing time
+			if (pkcs7.getSignDate() != null) {
+				padesSignDetails.setSigningTime(pkcs7.getSignDate().getTime());
+			}
+
+			// Obtenemos el algoritmo de firma
+			final String digestAlgorithm = pkcs7.getDigestAlgorithm();
+			if (digestAlgorithm != null) {
+				padesSignDetails.setAlgorithm(digestAlgorithm);
+			}
+
+			// Obtenemos el firmante y lo agregamos al arbol
+			this.signersTree.add(new AOTreeNode(AOUtil.getCN(pkcs7.getSigningCertificate()) + " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(pkcs7.getSignDate().getTime()) + ")")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			// Detalles del certificado
+			final CertificateDetails certDetails = new CertificateDetails(pkcs7.getSigningCertificate());
+			padesSignDetails.setSigner(certDetails);
+			
+		} else {			
+			this.signersTree.add(new AOTreeNode(SimpleAfirmaMessages.getString("ValidationInfoDialog.69"))); //$NON-NLS-1$
 		}
-
-		// Obtenemos el algoritmo de firma
-		final String digestAlgorithm = pkcs7.getDigestAlgorithm();
-		if (digestAlgorithm != null) {
-			padesSignDetails.setAlgorithm(digestAlgorithm);
-		}
-
-		// Obtenemos el firmante y lo agregamos al arbol
-		this.signersTree.add(new AOTreeNode(AOUtil.getCN(pkcs7.getSigningCertificate()) + " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(pkcs7.getSignDate().getTime()) + ")")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// Detalles del certificado
-		final CertificateDetails certDetails = new CertificateDetails(pkcs7.getSigningCertificate());
-		padesSignDetails.setSigner(certDetails);
 
 		// Metadatos
 		final Map<String, String> metadataMap = new HashMap<>();

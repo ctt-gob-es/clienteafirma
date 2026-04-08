@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.aowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfReader;
 
 final class SignPdfUiUtil {
 
@@ -68,7 +68,7 @@ final class SignPdfUiUtil {
 		final int numberOfPages = reader.getNumberOfPages();
 		final List<Dimension> pageSizes = new ArrayList<>(numberOfPages);
 		for(int i=1;i<=numberOfPages;i++) {
-			final com.aowagie.text.Rectangle rect = reader.getPageSizeWithRotation(i);
+			final com.lowagie.text.Rectangle rect = reader.getPageSizeWithRotation(i);
 			pageSizes.add(
 				new Dimension(
 					Math.round(rect.getWidth()),

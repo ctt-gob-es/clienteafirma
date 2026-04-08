@@ -15,7 +15,7 @@
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
  *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
- *   <li>Dependencia con SpongyCastle 1.54 o superior (Proveedor + <i>Mail</i>).</li>
+ *   <li>Dependencia con BouncyCastle 1.71 o superior (Proveedor + <i>Mail</i>).</li>
  *  </ul>
  *  <p>
  *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6 o superior y con Android 4 o superior.<br>

@@ -487,14 +487,12 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 						getStrikethroughButton().doClick();
 					}
 					addStyle(Font.BOLD);
-					setViewFont(getViewFont().deriveFont(getStyle()));
-					showPreview();
 				}
 				else {
 					deleteStyle(Font.BOLD);
-					setViewFont(getViewFont().deriveFont(getStyle()));
-					showPreview();
 				}
+				setViewFont(getViewFont().deriveFont(getStyle()));
+				showPreview();
 			}
 		);
 		this.boldButton.addKeyListener(this);
@@ -513,14 +511,12 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 						getStrikethroughButton().doClick();
 					}
 					addStyle(Font.ITALIC);
-					setViewFont(getViewFont().deriveFont(getStyle()));
-					showPreview();
 				}
 				else {
 					deleteStyle(Font.ITALIC);
-					setViewFont(getViewFont().deriveFont(getStyle()));
-					showPreview();
 				}
+				setViewFont(getViewFont().deriveFont(getStyle()));
+				showPreview();
 			}
 		);
 		this.italicButton.addKeyListener(this);
@@ -544,12 +540,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 					final Map<TextAttribute, Integer> atr = new HashMap<>();
 					atr.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 					setViewFont(getViewFont().deriveFont(atr));
-					showPreview();
 				}
 				else {
 					setViewFont(new Font(getViewFont().getFontName(), getStyle(), getSelectedSize()));
-					showPreview();
 				}
+				showPreview();
 			}
 		);
 		this.underlineButton.addKeyListener(this);
@@ -573,12 +568,11 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 					final Map<TextAttribute, Boolean> atr = new HashMap<>();
 					atr.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
 					setViewFont(getViewFont().deriveFont(atr));
-					showPreview();
 				}
 				else {
 					setViewFont(new Font(getViewFont().getFontName(), getStyle(), getSelectedSize()));
-					showPreview();
 				}
+				showPreview();
 			}
 		);
 		this.strikethroughButton.addKeyListener(this);
@@ -1087,15 +1081,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
         showPreview();
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
-		if (checkRubricTransparency()) {
-        	AOUIFactory.showMessageDialog(
-        			this,
-					SignPdfUiMessages.getString("SignPdfDialog.9"),  //$NON-NLS-1$
-					SignPdfUiMessages.getString("SignPdfDialog.8"),  //$NON-NLS-1$
-                    JOptionPane.WARNING_MESSAGE,
-                    null
-                );
-		}
     }
 
 	private static boolean isValidImage(final String file) {
@@ -1451,61 +1436,6 @@ final class SignPdfUiPanelPreview extends JPanel implements KeyListener {
 //
 //		return dimg;
 //	}
-
-	/**
-	 * Comprueba si la imag&eacute;n tiene alg&uacute;n canal alfa o alg&eacute;n
-	 * p&iacute; transparente
-	 * @return devuelve true en caso de que detecte transparencias
-	 */
-	public boolean checkRubricTransparency() {
-
-		boolean hasTransparency = false;
-
-		if (this.rubricImage != null) {
-			if (containsAlphaChannel(this.rubricImage) || containsTransparency(this.rubricImage)) {
-				hasTransparency = true;
-			}
-		}
-
-		return hasTransparency;
-	}
-
-	/**
-	 * M&eacute;todo que comprueba si la imagen tiene alg&uacute;n canal alfa
-	 * @param image imagen a comprobar
-	 * @return devuelve true en caso de que disponga de un canal alfa
-	 */
-    private static boolean containsAlphaChannel(final BufferedImage image){
-        return image.getColorModel().hasAlpha();
-    }
-
-    /**
-     * Comprueba pixel a pixel de la imagen si alguno es transparente
-     * @param image imagen a comprobar
-     * @return devuelve true si detecta alg&uacute;n p&iacute;xel transparente
-     */
-    private static boolean containsTransparency(final BufferedImage image){
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                if (isTransparent(image, j, i)){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Comprueba la transparencia de un p&iacute;xel concreto
-     * @param image imagen a comprobar
-     * @param x posici&oacute;n x
-     * @param y posici&oacute;n y
-     * @return devuelve true si el p&iacute;xel es transparente
-     */
-    public static boolean isTransparent(final BufferedImage image, final int x, final int y ) {
-        final int pixel = image.getRGB(x,y);
-        return pixel>>24 == 0x00;
-    }
 
 	int getStyleIndex() {
 		if (getStrikethroughButton().isSelected()) {
