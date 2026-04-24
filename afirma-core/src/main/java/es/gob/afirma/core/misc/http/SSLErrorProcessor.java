@@ -125,9 +125,10 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 		boolean allCertsAlreadyTrusted = true;
 
+		final TrustStoreManager trustStoreManager = TrustStoreManager.getInstance();
 		for (final X509Certificate cert : serverCerts) {
 		    try {
-				if (!TrustStoreManager.getInstance().containsCert(cert)) {
+				if (!trustStoreManager.containsCert(cert)) {
 				    allCertsAlreadyTrusted = false;
 				    break;
 				}
@@ -181,7 +182,7 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 
 			// Configuramos los certificados SSL en el almacen de confianza
 			try {
-				TrustStoreManager.getInstance().importCerts(serverCerts);
+				trustStoreManager.importCerts(serverCerts);
 			} catch (final Exception e) {
 				LOGGER.severe("Error al importar los certificados SSL en el almacen de confianza: " + e); //$NON-NLS-1$
 				throw new IOException(e);

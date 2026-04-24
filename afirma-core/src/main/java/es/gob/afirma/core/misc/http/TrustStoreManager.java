@@ -68,7 +68,7 @@ public class TrustStoreManager {
 		this.tsPath = getJKSFile();
 
 		// Si el fichero existe, lo cargamos
-		if (this.tsPath.isFile()) {
+		if (this.tsPath.isFile() && this.tsPath.length() > 0) {
 			try {
 				this.ks = loadTrustedKeyStore();
 			}
@@ -275,7 +275,7 @@ public class TrustStoreManager {
 	public static File getJKSFile() {
 		return new File(Platform.getUserHome(), ".afirma" + File.separator + "TrustedCertsKeystore.jks"); //$NON-NLS-1$ //$NON-NLS-2$;
 	}
-	
+
 	/**
 	 * Comprueba si el certificado pasado por parametro existe ya en el almacen.
 	 * @param cert Certificado a comprobar.
