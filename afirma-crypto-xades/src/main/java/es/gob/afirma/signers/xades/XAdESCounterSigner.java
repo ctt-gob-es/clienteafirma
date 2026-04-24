@@ -642,6 +642,7 @@ public final class XAdESCounterSigner {
 			throw new AOMalformedSignatureException("No se han encontrado los atributos firmados de la firma original"); //$NON-NLS-1$
 		}
 
+		final String xmldSignPrefix = signature.getPrefix();
 		String xadesPrefix = signedPropertiesElement.getPrefix();
 		final String xadesNamespace = signedPropertiesElement.getNamespaceURI();
 		final String signedPropertiesTypeUrl = signedPropertiesReference.getAttribute("Type"); //$NON-NLS-1$
@@ -757,7 +758,7 @@ public final class XAdESCounterSigner {
                 profile,
 				xadesNamespace,
 				xadesPrefix,
-				XAdESConstants.DEFAULT_XML_SIGNATURE_PREFIX,
+				xmldSignPrefix,
 				digestMethodAlgorithm,
 				counterSignature.getOwnerDocument(),
 				counterSignature,
@@ -767,7 +768,7 @@ public final class XAdESCounterSigner {
 		// Metadatos de firma
 		XAdESCommonMetadataUtil.addCommonMetadata(xades, extraParams);
 
-		// Agregamos el DataObjectFormats, salvo en firma baseline, en las que no
+		// Agregamos el DataObjectFormat, salvo en firma baseline, en las que no
 		// se debe agregar a las contrafirmas: ETSI EN 319 132-1 V1.1.1 (2016-04)
 		// Apartado 6.3, aclaracion k)
 		if (!profile.equalsIgnoreCase(AOSignConstants.SIGN_PROFILE_BASELINE)) {
