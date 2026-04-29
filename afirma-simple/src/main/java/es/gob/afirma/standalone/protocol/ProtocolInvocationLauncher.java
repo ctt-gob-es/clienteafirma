@@ -234,7 +234,7 @@ public final class ProtocolInvocationLauncher {
         int jvc = DEFAULT_JAVASCRIPT_VERSION_CODE;
         if (urlParams.containsKey(JAVASCRIPT_VERSION_CODE_PARAM)) {
         	try {
-        	jvc = Integer.parseInt(urlParams.get(JAVASCRIPT_VERSION_CODE_PARAM));
+        		jvc = Integer.parseInt(urlParams.get(JAVASCRIPT_VERSION_CODE_PARAM));
         	}
         	catch (final Exception e) {
         		jvc = DEFAULT_JAVASCRIPT_VERSION_CODE;
@@ -290,7 +290,7 @@ public final class ProtocolInvocationLauncher {
         		LOGGER.log(Level.SEVERE, "No se pudo abrir ninguno de los puertos proporcionados. Se cerrara la aplicacion", e); //$NON-NLS-1$
         		ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, SimpleErrorCode.Internal.SOCKET_INITIALIZING_ERROR);
         		forceCloseApplication(0);
-        	} catch (final SllKeyStoreException e) {
+        	} catch (final SslKeyStoreException e) {
         		LOGGER.log(Level.SEVERE, "No se ha encontrado o no ha podido cargarse el almacen del certificado SSL. Se cerrara la aplicacion", e); //$NON-NLS-1$
         		ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, SimpleErrorCode.Internal.LOADING_SSL_KEYSTORE_ERROR);
         		forceCloseApplication(0);
@@ -321,7 +321,7 @@ public final class ProtocolInvocationLauncher {
         		LOGGER.severe("La version del protocolo no esta soportada (" + e.getVersion() + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$
         		ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, e);
         		return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
-        	} catch (final SllKeyStoreException e) {
+        	} catch (final SslKeyStoreException e) {
         		LOGGER.log(Level.SEVERE, "No se ha encontrado o no ha podido cargarse el almacen del certificado SSL. Se cerrara la aplicacion", e); //$NON-NLS-1$
         		ProtocolInvocationLauncherErrorManager.showError(requestedProtocolVersion, SimpleErrorCode.Internal.LOADING_SSL_KEYSTORE_ERROR);
         		return ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
@@ -1018,7 +1018,7 @@ public final class ProtocolInvocationLauncher {
 
 	/**
 	 * Obtiene el valor asignado al par&aacute;metro de versi&oacute;n de una URL.
-	 * @param params Par&acute;metros declarados en una URL.
+	 * @param params Par&aacute;metros declarados en una URL.
 	 * @return Valor del par&aacute;metro de versi&oacute;n ('v') o el valor '1' si no est&aacute; definido.
 	 */
 	private static ProtocolVersion getVersion(final Map<String, String> params) {

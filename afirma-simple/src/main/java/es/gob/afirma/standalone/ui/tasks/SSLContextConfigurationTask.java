@@ -11,6 +11,7 @@ import javax.net.ssl.HttpsURLConnection;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.standalone.HttpManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
 
 /**
  * Hilo para la configuraci&oacute;n del contexto SSL para las conexiones remotas.
@@ -41,8 +42,18 @@ public class SSLContextConfigurationTask extends Thread {
     			PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST));
 
     	// Configuramos las propiedades del sistema necesarias para que SSLErrorProcesor las trate correctamente
-    	final boolean allowPersonalTruststore = PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE);
-    	final boolean allowAutoImportTrustedCerts = PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_AUTO_IMPORT_TRUSTED_CERTS);
+
+    	// Cargamos de las preferencias del sistema y, si no se encuentran, las preferencias por defecto
+    	// Si no se encontro un valor definido, se utilizara el valor por defecto
+    	final String allowPersonalTruststoreString = PreferencesManager.get(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE, PreferencesSource.SYSTEM);
+    	final boolean allowPersonalTruststore = allowPersonalTruststoreString == null
+    			? PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE, PreferencesSource.DEFAULT)
+    					: Boolean.parseBoolean(allowPersonalTruststoreString);
+
+    	final String allowAutoImportTrustedCertsString = PreferencesManager.get(PreferencesManager.ADMIN_PREFERENCE_ALLOW_AUTO_IMPORT_TRUSTED_CERTS, PreferencesSource.SYSTEM);
+    	final boolean allowAutoImportTrustedCerts = allowPersonalTruststoreString == null
+    			? PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_AUTO_IMPORT_TRUSTED_CERTS, PreferencesSource.DEFAULT)
+    					: Boolean.parseBoolean(allowAutoImportTrustedCertsString);
 
 		final boolean allowAutoImport = allowPersonalTruststore && allowAutoImportTrustedCerts;
 		if (!allowAutoImport) {

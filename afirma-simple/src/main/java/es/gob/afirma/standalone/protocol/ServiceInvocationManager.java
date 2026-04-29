@@ -95,11 +95,11 @@ public final class ServiceInvocationManager {
 	 * @param channelInfo Informaci&oacute;n para el establecimiento del canal Par&aacute;metros de la URL de llamada (debe indicarse el puerto).
 	 * @param protocolVersion Versi&oacute;n declarada del protocolo.
 	 * @throws UnsupportedProtocolException Si no se soporta el protocolo o la versi&oacute;n de este.
-	 * @throws SllKeyStoreException Cuando no se encuentre o no se pueda cargar el almac&eacute;n SSL para la securizaci&oacute;n del socket.
+	 * @throws SslKeyStoreException Cuando no se encuentre o no se pueda cargar el almac&eacute;n SSL para la securizaci&oacute;n del socket.
 	 * @throws IOException Cuando no se puede abrir el socket o se cierra durante la operaci&oacute;n.
 	 */
 	static void startService(final ChannelInfo channelInfo, final ProtocolVersion protocolVersion) throws UnsupportedProtocolException,
-		SllKeyStoreException, IOException {
+		SslKeyStoreException, IOException {
 
 		checkSupportProtocol(protocolVersion);
 
@@ -109,7 +109,7 @@ public final class ServiceInvocationManager {
     	try {
     		sc = SecureSocketUtils.getSecureSSLContext();
     	} catch (final Exception e) {
-			throw new SllKeyStoreException("No se ha podido cargar el certificado SSL para la securizacion del WebSocket", e); //$NON-NLS-1$
+			throw new SslKeyStoreException("No se ha podido cargar el certificado SSL para la securizacion del WebSocket", e); //$NON-NLS-1$
     	}
 
 		final SSLServerSocketFactory ssocketFactory = sc.getServerSocketFactory();

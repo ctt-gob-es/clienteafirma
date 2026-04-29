@@ -94,8 +94,8 @@ import es.gob.afirma.standalone.ui.SignOperationConfig;
 import es.gob.afirma.standalone.ui.SignPanel;
 import es.gob.afirma.standalone.ui.SignResultListPanel;
 import es.gob.afirma.standalone.ui.SignatureResultViewer;
-import es.gob.afirma.standalone.ui.tasks.CheckTrustKeyStoreTask;
 import es.gob.afirma.standalone.ui.tasks.SSLContextConfigurationTask;
+import es.gob.afirma.standalone.ui.tasks.SslSocketKeyStoreChecker;
 import es.gob.afirma.standalone.updater.Updater;
 
 /**
@@ -1056,8 +1056,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				LOGGER.info("Comprobando si es una version de Java compatible"); //$NON-NLS-1$
 				checkJavaVersion(saf.getMainFrame());
 
-				// Comprobamos si el almacen de confianza con el certificado SSL esta instalado correctamente
-    			final CheckTrustKeyStoreTask checkTrustStoreTask = new CheckTrustKeyStoreTask(saf.getMainFrame());
+				// Comprobamos si el almacen para la conexion segura por sockets con el navegador esta instalado correctamente
+    			final SslSocketKeyStoreChecker checkTrustStoreTask = new SslSocketKeyStoreChecker(saf.getMainFrame());
     			checkTrustStoreTask.execute();
 
 			} else {

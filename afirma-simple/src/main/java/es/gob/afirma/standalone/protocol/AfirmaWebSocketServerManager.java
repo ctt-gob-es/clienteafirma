@@ -49,9 +49,9 @@ public class AfirmaWebSocketServerManager {
 	 * @param asynchronous Si viene con valor <code>true</code> tratar&aacute; las operaciones de forma as&iacute;ncrona si viene a false las tratara como s&iacute;ncronas<code>false</code>.
 	 * @throws UnsupportedProtocolException Cuando se ha solicitado el uso de una versi&oacute;n de protocolo no soportada.
 	 * @throws SocketOperationException Cuando no se pueda abrir el websocket.
-	 * @throws SllKeyStoreException Cuando no se encuentre o no se pueda cargar el almac&eacute;n SSL para la securizaci&oacute;n del websocket.
+	 * @throws SslKeyStoreException Cuando no se encuentre o no se pueda cargar el almac&eacute;n SSL para la securizaci&oacute;n del websocket.
 	 */
-	public static void startService(final ChannelInfo channelInfo, final ProtocolVersion requestedProtocolVersion, final boolean asynchronous) throws UnsupportedProtocolException, SocketOperationException, SllKeyStoreException {
+	public static void startService(final ChannelInfo channelInfo, final ProtocolVersion requestedProtocolVersion, final boolean asynchronous) throws UnsupportedProtocolException, SocketOperationException, SslKeyStoreException {
 
 		checkSupportProtocol(requestedProtocolVersion);
 
@@ -60,7 +60,7 @@ public class AfirmaWebSocketServerManager {
     	try {
     		sc = SecureSocketUtils.getSecureSSLContext();
     	} catch (final Exception e) {
-			throw new SllKeyStoreException("No se ha podido cargar el certificado SSL para la securizacion del WebSocket", e); //$NON-NLS-1$
+			throw new SslKeyStoreException("No se ha podido cargar el certificado SSL para la securizacion del WebSocket", e); //$NON-NLS-1$
     	}
 
  		// Configuramos la optimizacion para VDI segun lo establecido en el dialogo de preferencias
@@ -85,7 +85,6 @@ public class AfirmaWebSocketServerManager {
 					break;
 				}
 
-				sc = SecureSocketUtils.getSecureSSLContext();
 				instance.setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sc));
 				instance.setBindingErrorListener(new BindingErrorListener(channelInfo, requestedProtocolVersion, asynchronous));
 				instance.start();
