@@ -79,10 +79,10 @@ public final class DNIeWaitPanel extends JPanel implements KeyListener {
 		);
         dniButton.setMnemonic('C');
         dniButton.getAccessibleContext().setAccessibleDescription(
-    		SimpleAfirmaMessages.getString(SimpleAfirmaMessages.getString("DNIeWaitPanel.5")) //$NON-NLS-1$
+    		SimpleAfirmaMessages.getString("DNIeWaitPanel.5") //$NON-NLS-1$
 		);
         dniButton.getAccessibleContext().setAccessibleName(
-    		SimpleAfirmaMessages.getString(SimpleAfirmaMessages.getString("DNIeWaitPanel.6")) //$NON-NLS-1$
+    		SimpleAfirmaMessages.getString("DNIeWaitPanel.6") //$NON-NLS-1$
 		);
         dniButton.requestFocus();
         dniButton.addKeyListener(this);
