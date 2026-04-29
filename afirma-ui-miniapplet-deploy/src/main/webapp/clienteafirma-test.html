@@ -25,6 +25,8 @@
 		}
 		
 		function showSignResultCallback(signatureB64, certificateB64, extraData) {
+			console.log("Firma OK")
+			
 			showLog("Firma OK");
 			if (extraData) {
 				var extras = JSON.parse(extraData);

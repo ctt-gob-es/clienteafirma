@@ -2532,7 +2532,7 @@ var AutoScript = ( function ( window, undefined ) {
 					// Indicamos que la conexion esta activa y que el WebSocket activo es el actual 
 					connected = true;
 					ws = this;
-					console.log("Se abre el socket");
+					console.log("Se abre el socket en el puerto " + port);
 				};
 				
 				webSocket.onclose = function(e) {
@@ -2630,6 +2630,8 @@ var AutoScript = ( function ( window, undefined ) {
 					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP);
 					return;
 				}
+				
+console.log(" === Respuesta del socket: " + (data.length > 20 ? data.substring(0, 20) : data));
 				
 				// Se recibe un mensaje de espera, la operacion solicitada no ha terminado aun
 				if (data == "#wait") {
@@ -2872,7 +2874,10 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Procesa la respuesta de una operacion de firma.
 			 */
 			function processSignResponse(data) {
+
 				
+console.log(" === La procesamos como respuesta de firma");
+								
 				// Si no se proporciona funcion de exito, no se procesa la respuesta
 				if (!successCallback) {
 					console.log("No se ha proporcionado funcion callback para procesar el resultado de la firma");
@@ -2903,6 +2908,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!!successCallback) {
 					var responseSuccessCallback = successCallback;
 					setCallbacks(null, null);
+					
+console.log(" === Llamamos al metodo callback de respuesta: " + responseSuccessCallback);
+					
 					responseSuccessCallback(signature, certificate, extraInfo);
 				}
 				else {
@@ -2986,7 +2994,7 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		var AppAfirmaJSSocket = ( function (clientAddress, window, undefined) {
 
-			var PROTOCOL_VERSION = 4;
+			var PROTOCOL_VERSION = 3;
 			
 			/**
 			 *  Atributos para la configuracion del objeto sustituto del applet Java de firma
@@ -3265,7 +3273,7 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 			
 			execAppIntent = function (url) {
-				
+
 				// Primera ejecucion, no hay puerto definido
 				if (port == "") {
 					// Calculamos los puertos
@@ -3314,7 +3322,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!showDialog) {
 					url += "&dlgload=" + showDialog;
 				}
-					
+
 				openUrl(url);
 			}
 
