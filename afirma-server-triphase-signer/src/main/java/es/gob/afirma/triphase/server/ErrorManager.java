@@ -69,7 +69,7 @@ final class ErrorManager {
 		return getErrorPrefix(errNo) + ":" + code + ": " + errorMessages.get(Integer.valueOf(errNo)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	static String getErrorPrefix(final int errNo) {
+	public static String getErrorPrefix(final int errNo) {
 		return "ERR-" + Integer.toString(errNo); //$NON-NLS-1$
 	}
 

@@ -10,23 +10,26 @@
 package es.gob.afirma.keystores;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 
-/** Excepci&oacute;n para notificar que no se han encontrado certificados de
- * usuario en un almac&eacute;n de certificados. */
+/**
+ * Excepci&oacute;n para notificar que no se han encontrado certificados de
+ * usuario en un almac&eacute;n de certificados.
+ */
 public final class AOCertificatesNotFoundException extends AOException {
 
     private static final long serialVersionUID = -6996346324337434742L;
 
     /** Crea la excepci&oacute;n con el mensaje por defecto. */
     public AOCertificatesNotFoundException() {
-        super("No hay certificados en el almacen"); //$NON-NLS-1$
+        super("No hay certificados en el almacen", ErrorCode.Functional.CERTIFICATE_NEEDED); //$NON-NLS-1$
     }
 
     /** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n. */
     public AOCertificatesNotFoundException(final String msg) {
-        super(msg);
+        super(msg, ErrorCode.Functional.CERTIFICATE_NEEDED);
     }
 
     /** Crea la excepci&oacute;n con un mensaje determinado.
@@ -35,6 +38,6 @@ public final class AOCertificatesNotFoundException extends AOException {
      * @param cause
      * 		  Motivo que origin&oacute; el error. */
     public AOCertificatesNotFoundException(final String msg, final Throwable cause) {
-        super(msg, cause);
+        super(msg, cause, ErrorCode.Functional.CERTIFICATE_NEEDED);
     }
 }

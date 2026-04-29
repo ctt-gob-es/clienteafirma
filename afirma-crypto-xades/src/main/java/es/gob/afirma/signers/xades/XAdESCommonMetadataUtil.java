@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignaturePolicyIdentifier;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignatureProductionPlace;
@@ -47,15 +48,7 @@ final class XAdESCommonMetadataUtil {
 
 		// SignaturePolicyIdentifier
 		if (xades instanceof XadesWithExplicitPolicy) {
-			final SignaturePolicyIdentifier spi;
-			try {
-				spi = getPolicy(extraParams);
-			}
-			catch (final NoSuchAlgorithmException e1) {
-				throw new AOException(
-						"El algoritmo indicado para la politica (" + extraParams.getProperty(XAdESExtraParams.POLICY_IDENTIFIER_HASH_ALGORITHM) + ") no esta soportado: " + e1, e1 //$NON-NLS-1$ //$NON-NLS-2$
-						);
-			}
+			final SignaturePolicyIdentifier spi = getPolicy(extraParams);
 			if (spi != null) {
 				((XadesWithExplicitPolicy) xades).setSignaturePolicyIdentifier(spi);
 			}
@@ -185,7 +178,7 @@ final class XAdESCommonMetadataUtil {
     	return new SignatureProductionPlaceV2Impl(city, streetAddress, province, postalCode, country);
     }
 
-	private static SignaturePolicyIdentifier getPolicy(final Properties extraParams) throws NoSuchAlgorithmException {
+	private static SignaturePolicyIdentifier getPolicy(final Properties extraParams) throws AOException {
 		if (extraParams == null) {
 			return null;
 		}
@@ -202,7 +195,7 @@ final class XAdESCommonMetadataUtil {
 			                                           final String identifierHash,
 			                                           final String identifierHashAlgorithm,
 			                                           final String description,
-			                                           final String qualifier) throws NoSuchAlgorithmException {
+			                                           final String qualifier) throws AOException {
 		if (id == null) {
 			return null;
 		}
@@ -224,7 +217,16 @@ final class XAdESCommonMetadataUtil {
 			identifier = id;
 		}
 
-		final String hashAlgo = identifierHashAlgorithm != null ? XAdESUtil.getDigestMethodByCommonName(identifierHashAlgorithm) : null;
+		String hashAlgo;
+		try {
+			hashAlgo = identifierHashAlgorithm != null ? XAdESUtil.getDigestMethodByCommonName(identifierHashAlgorithm) : null;
+		}
+		catch (final NoSuchAlgorithmException e1) {
+			throw new AOException(
+					"El algoritmo indicado para la politica no esta soportado: " + identifierHashAlgorithm, //$NON-NLS-1$
+					e1, ErrorCode.Request.UNSUPPORTED_POLICY_HASH_ALGORITHM);
+
+		}
 
 		final SignaturePolicyIdentifier spi = new SignaturePolicyIdentifierImpl(false);
 		try {

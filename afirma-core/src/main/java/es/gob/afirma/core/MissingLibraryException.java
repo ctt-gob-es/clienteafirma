@@ -9,18 +9,24 @@
 
 package es.gob.afirma.core;
 
-/** Indica que el JRE carece de una biblioteca necesaria para la ejecuci&oacute;n de Afirma.
+/**
+ * Indica que el JRE carece de una biblioteca necesaria para la ejecuci&oacute;n de Afirma.
  * A menudo es debido a las diferencias entre los JRE de 32 y 64 bits o entre los JRE de
  * Oracle y de IBM.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class MissingLibraryException extends RuntimeException {
-
-	/** Crea una nueva instancia de la excepci&oacute;n.
-	 * @param desc Descripci&oacute;n de la excepci&oacute;n
-	 * @param e Excepci&oacute;n previa en la cadena */
-	public MissingLibraryException(final String desc, final Exception e) {
-		super(desc, e);
-	}
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
+public class MissingLibraryException extends AORuntimeException {
 
 	private static final long serialVersionUID = -2323154676951325543L;
+
+	/**
+	 * Crea una nueva instancia de la excepci&oacute;n.
+	 * @param desc Descripci&oacute;n de la excepci&oacute;n
+	 * @param e Excepci&oacute;n previa en la cadena
+	 * @param errorCode C&oacute;digo que identifica concretamente al error.
+	 */
+	public MissingLibraryException(final String desc, final Exception e, final ErrorCode errorCode) {
+		super(desc, e, errorCode);
+	}
+
 }

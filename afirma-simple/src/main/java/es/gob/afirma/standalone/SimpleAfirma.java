@@ -46,8 +46,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.smartcardio.CardTerminal;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -57,20 +55,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.LogManager;
 import es.gob.afirma.core.LogManager.App;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
-import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.LanguageManager;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.KeystoreAlternativeException;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
@@ -89,11 +88,14 @@ import es.gob.afirma.standalone.ui.ClosePanel;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
 import es.gob.afirma.standalone.ui.MainMenu;
 import es.gob.afirma.standalone.ui.MainScreen;
+import es.gob.afirma.standalone.ui.ProgressInfoDialogManager;
 import es.gob.afirma.standalone.ui.SignDetailPanel;
 import es.gob.afirma.standalone.ui.SignOperationConfig;
 import es.gob.afirma.standalone.ui.SignPanel;
 import es.gob.afirma.standalone.ui.SignResultListPanel;
 import es.gob.afirma.standalone.ui.SignatureResultViewer;
+import es.gob.afirma.standalone.ui.tasks.CheckTrustKeyStoreTask;
+import es.gob.afirma.standalone.ui.tasks.SSLContextConfigurationTask;
 import es.gob.afirma.standalone.updater.Updater;
 
 /**
@@ -128,24 +130,19 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 	private static final String SYSTEM_PROPERTY_DEBUG_LEVEL = "afirma_debug_level"; //$NON-NLS-1$
 
-
-    /**
-     * Propiedad del sistema con la que configurar que se ignoren los lectores de
-     * tarjeta que se reconozcan como lectores virtuales.
-     */
-    private static final String SYSTEM_PROPERTY_IGNORE_VIRTUAL_READERS = "ignoreVirtualReaders"; //$NON-NLS-1$
-
 	/** Directorio de datos de la aplicaci&oacute;n. */
 	public static final String APPLICATION_HOME = Platform.getUserHome() + File.separator + ".afirma" + File.separator //$NON-NLS-1$
 			+ "Autofirma"; //$NON-NLS-1$
 
 	private static final String PLUGINS_DIRNAME = "plugins"; //$NON-NLS-1$
 
+	private static final String LANGUAGES_DIRNAME = "languages"; //$NON-NLS-1$
+
 	/**
 	 * Inicio (en min&uacute;sculas) de una ruta que invoca a la aplicaci&oacute;n
 	 * por protocolo.
 	 */
-    private static final String PROTOCOL_URL_START_LOWER_CASE = "afirma://"; //$NON-NLS-1$
+    public static final String PROTOCOL_URL_START_LOWER_CASE = "afirma://"; //$NON-NLS-1$
 
 	/**
 	 * Esquema y host de las URL de petici&oacute;n para la comunicaci&oacute;n por
@@ -178,11 +175,10 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     /** Versiones de Java soportadas. */
 	private static final String[] SUPPORTED_JAVA_VERSIONS = {
 			"1.8", // Version LTS //$NON-NLS-1$
-			"9.0", //$NON-NLS-1$
-			"10.0", //$NON-NLS-1$
 			"11.0", // Version LTS //$NON-NLS-1$
 			"17.0", // Version LTS //$NON-NLS-1$
-			"21" // Version LTS //$NON-NLS-1$
+			"21", // Version LTS //$NON-NLS-1$
+			"25" // Version LTS //$NON-NLS-1$
 	};
 
     /** Modo de depuraci&oacute;n para toda la aplicaci&oacute;n. */
@@ -209,6 +205,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     private static final PluginsManager pluginsManager = new PluginsManager(getPluginsDir());
 
+    private static SSLContextConfigurationTask sslContextConfigurationTask = null;
+
 	/**
 	 * Construye la aplicaci&oacute;n principal y establece el <i>Look&amp;Feel</i>.
 	 */
@@ -217,9 +215,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
 		// Indicamos si se debe instalar el proveedor de firma XML de Apache
        XmlDSigProviderHelper.configureXmlDSigProvider();
-
-       // Indicamos que no queremos cargar los lectores de tarjeta virtuales
-       System.setProperty(SYSTEM_PROPERTY_IGNORE_VIRTUAL_READERS, Boolean.TRUE.toString());
     }
 
 	/**
@@ -256,12 +251,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
      * la configurada por defecto en la interfaz para el tipo de fichero seleccionado.
      */
 	void initGUI(final File preSelectedFile, final SignOperationConfig signConfig) {
-        // Cargamos las preferencias establecidas
-		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
-		if (defaultLocale == null || defaultLocale.isEmpty()) {
-			defaultLocale = Locale.getDefault().toString();
-		}
-        setDefaultLocale(buildLocale(defaultLocale));
 
         // Una excepcion en un constructor no siempre deriva en un objeto nulo,
         // por eso usamos un booleano para ver si fallo, en vez de una comprobacion
@@ -270,13 +259,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				&& !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN);
         if (showDNIeScreen) {
 	        try {
-	        	// Si no hay lectores de tarjetas o el unico es el de Windows Hello,
-	        	// ignoraremos el mostrar la pantalla inicial para el uso del DNIe
-	        	final List<CardTerminal> terminals = javax.smartcardio.TerminalFactory.getDefault().terminals().list();
-	        	if (terminals.isEmpty()) {
-	        		showDNIeScreen = false;
-	        	}
-	        	else if (Platform.getOS() == Platform.OS.WINDOWS && terminals.size() == 1 && terminals.get(0).getName().startsWith("Windows Hello")) {
+	        	if (javax.smartcardio.TerminalFactory.getDefault().terminals().list().isEmpty()) {
 	        		showDNIeScreen = false;
 	        	}
 			} catch (final Exception e) {
@@ -342,6 +325,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	LOGGER.info("Cargaremos el almacen de claves por defecto"); //$NON-NLS-1$
         this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         try {
+
             new SimpleKeyStoreManagerWorker(this, null, false, false).execute();
 		} catch (final Exception e) {
 			LOGGER.severe("No se pudo abrir el almacen por defecto del entorno operativo: " + e); //$NON-NLS-1$
@@ -476,7 +460,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						this // Parent
 				);
 
-			} catch (final AOKeystoreAlternativeException e) {
+			} catch (final KeystoreAlternativeException e) {
 	 			LOGGER.log(Level.SEVERE, "Error al seleccionar el tipo de almacen", e); //$NON-NLS-1$
 	 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.54"), //$NON-NLS-1$
 						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
@@ -555,7 +539,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     						this // Parent
     				);
 
-    			} catch (final AOKeystoreAlternativeException e) {
+    			} catch (final KeystoreAlternativeException e) {
     	 			LOGGER.log(Level.SEVERE, "Error al seleccionar el tipo de almacen", e); //$NON-NLS-1$
     	 			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.54"), //$NON-NLS-1$
     						SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, e); //$NON-NLS-1$
@@ -632,7 +616,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     @Override
     public void showResultsInfo(final byte[] signature, final SignOperationConfig signConfig,
     		final X509Certificate signingCert) {
-    	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
     	List<SignValidity> validityList = new ArrayList<>();
@@ -704,7 +687,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     @Override
     public void showResultsInfo(final List<SignOperationConfig> signConfig, final File outDir,
     		final X509Certificate signingCert) {
-    	this.mainMenu.setEnabledSignCommand(false);
     	this.mainMenu.setEnabledOpenCommand(false);
 
 		final JPanel newPanel = new SignResultListPanel(this, signConfig, outDir, signingCert);
@@ -764,20 +746,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         if (l != null) {
             Locale.setDefault(l);
             PreferencesManager.put(PreferencesManager.PREFERENCES_LOCALE, l.toString());
+            LanguageManager.init(getLanguagesDir());
             SimpleAfirmaMessages.changeLocale();
-        }
-    }
-
-	/**
-	 * Habilita o desabilita el men&uacute; <i>Archivo</i> de la barra de
-     * men&uacute;.
-	 *
-	 * @param e <code>true</code> para habilitar el men&uacute; <i>Archivo</i>,
-	 *          <code>false</code> para deshabilitarlo
-	 */
-    public void setSignMenuCommandEnabled(final boolean e) {
-        if (this.mainMenu != null) {
-            this.mainMenu.setEnabledSignCommand(e);
         }
     }
 
@@ -809,14 +779,33 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 			}
 		}
 
+		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
+		if (defaultLocale == null || defaultLocale.isEmpty()) {
+			defaultLocale = "es_ES"; //$NON-NLS-1$
+		}
+
 		// Cargamos el fichero
-		final String indexHelpFile = helpDir + File.separator + "index.html"; //$NON-NLS-1$
+		final String indexHelpFile = helpDir + File.separator + "index_" + defaultLocale + ".html"; //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Comprobamos si existe una version importada de la ayuda del idioma
+		final File helpInstallIndexFile = new File(DesktopUtil.getApplicationDirectory() + File.separator + "help"+ File.separator + "index_" + defaultLocale + ".html"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (helpInstallIndexFile.exists()) {
+			try {
+				HelpResourceManager.extractImportedResources(helpDir);
+			} catch (final IOException e) {
+				LOGGER.log(Level.WARNING, "No se ha podido importar el archivo de ayuda correctamente", e); //$NON-NLS-1$
+			}
+		}
 
 		try (final InputStream is = new FileInputStream(indexHelpFile)) {
 			Desktop.getDesktop().browse(new URI(HelpResourceManager.createHelpFileLauncher(indexHelpFile + "?redirectPage=" + redirectPage))); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se ha podido leer el archivo de ayuda correctamente", e); //$NON-NLS-1$
+			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.58"), //$NON-NLS-1$
+                    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    					JOptionPane.ERROR_MESSAGE,
+                    					new AOException(SimpleErrorCode.Internal.CANT_LOAD_HELP));
 		}
 	}
 
@@ -844,9 +833,9 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * realizar&aacute; acorde a la siguiente secuencia:<br>
      * <ol>
      *   <li>Si no se pasan par&aacute;metros se iniciar&aacute; normalmente.</li>
-	 * <li>Si se pasan par&aacute;metros, se iniciar&aacute; el modo de
+	 *   <li>Si se pasan par&aacute;metros, se iniciar&aacute; el modo de
 	 * invocaci&oacute;n por protocolo</li>
-	 * <li>Si falla la invocaci&oacute;n por protocolo debido a que no se cuenta con
+	 *   <li>Si falla la invocaci&oacute;n por protocolo debido a que no se cuenta con
 	 * entorno gr&aacute;fico, se iniciar&aacute; el modo consola.</li>
      * </ol>
 	 *
@@ -857,11 +846,27 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	// Configuramos el log de la aplicacion
     	configureLog();
 
+    	ProgressInfoDialogManager.init(args);
+    	ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.5")); //$NON-NLS-1$
+
+    	LOGGER.info("Arranque de la aplicacion"); //$NON-NLS-1$
+
+        // Cargamos las preferencias establecidas
+    	LOGGER.info("Establecemos el idioma por defecto"); //$NON-NLS-1$
+		String defaultLocale = PreferencesManager.get(PreferencesManager.PREFERENCES_LOCALE);
+		if (defaultLocale == null || defaultLocale.isEmpty()) {
+			defaultLocale = "es_ES"; //$NON-NLS-1$
+		}
+		setDefaultLocale(buildLocale(defaultLocale));
+
     	// Se define el look and feel
+        LOGGER.info("Definimos el lookAndFeel grafico"); //$NON-NLS-1$
     	LookAndFeelManager.applyLookAndFeel();
 
     	// Se establece la configuracion del proxy
-    	try {
+    	LOGGER.info("Configuramos el proxy de la aplicacion"); //$NON-NLS-1$
+    	ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.4")); //$NON-NLS-1$
+		try {
     		ProxyUtil.setProxySettings();
     	}
     	catch (final Throwable e) {
@@ -872,42 +877,23 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		}
 		}
 
-		// Establecemos si deben respetarse las comprobaciones de seguridad de las
-		// conexiones de red
-    	final boolean secureConnections = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS);
+		// Configuramos el contexto SSL para las conexiones remotas
+		sslContextConfigurationTask = new SSLContextConfigurationTask();
+        new Thread(sslContextConfigurationTask).start();
 
-    	HttpManager.setSecureConnections(secureConnections);
-
-		// Establecemos el listado de dominios seguros
-		HttpManager.setSecureDomains(
-				PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST));
-
-		// Establecemos los almacenes de claves de Java y de Autofirma como de confianza para las
-		// conexiones remotas
-		if (secureConnections) {
-			try {
-				SslSecurityManager.configureAfirmaTrustManagers();
-				// Se realiza una primera conexion que fallara para aplicar los cambios en el contexto SSL
-				try {
-					final URL url = new URL("https://www.google.es/"); //$NON-NLS-1$
-					final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-					conn.connect();
-					conn.disconnect();
-				}
-				catch (final Exception e) { /* La primera vez falla para aplicar cambios en trust managers*/ }
-			} catch (final Exception e) {
-				LOGGER.warning("Error al configurar almacenes de confianza: " + e); //$NON-NLS-1$
-			}
-		}
-
-    	// Uso en modo linea de comandos
-    	if (isUsingCommnadLine(args) || isHeadlessMode()) {
+		// Uso en modo linea de comandos
+    	if (isUsingCommandLine(args) || isHeadlessMode()) {
+    		LOGGER.info("Se procesa la peticion en modo linea de comandos"); //$NON-NLS-1$
     		CommandLineLauncher.main(args);
     		return;
     	}
 
+    	// Imprimimos informacion del sistemas
+		printSystemInfo();
+
        	// Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+        	LOGGER.info("Establecemos la conexion especifica para macOS"); //$NON-NLS-1$
 			final Image icon = Toolkit.getDefaultToolkit()
 					.getImage(SimpleAfirma.class.getResource("/resources/logo_cliente_256.png")); //$NON-NLS-1$
         	try {
@@ -934,8 +920,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		}
         }
 
-
        	// Comprobamos si es necesario buscar actualizaciones
+        LOGGER.info("Comprobamos si es necesario buscar actualizaciones"); //$NON-NLS-1$
        	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera
 			updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK)
 					&& !Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
@@ -947,19 +933,27 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
     	// Comprobamos actualizaciones si estan habilitadas
         if (updatesEnabled && PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK)) {
-			Updater.checkForUpdates(null);
+        	LOGGER.info("Buscamos actualizaciones"); //$NON-NLS-1$
+			Updater.checkForUpdates(null, sslContextConfigurationTask);
 		} else {
 			LOGGER.info("No se buscaran nuevas versiones de la aplicacion"); //$NON-NLS-1$
 		}
 
     	try {
+
     		// Invocacion por protocolo
-    		if (args != null && args.length > 0 && args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE)) {
+    		if (args != null && args.length > 0
+    		 && args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE)) {
 
-    			printSystemInfo();
+    			LOGGER.info("Identificamos que es una invocacion por protocolo"); //$NON-NLS-1$
 
-    			LOGGER.info("Invocacion por protocolo con URL:\n" + args[0]); //$NON-NLS-1$
+    			LOGGER.info("Iniciamos la carga del almacen de claves por defecto en segundo plano"); //$NON-NLS-1$
+    			ProtocolInvocationLauncher.initLoadKeyStoreTask();
+
+    			LOGGER.info("URL de invocacion:\n" + args[0]); //$NON-NLS-1$
+    			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.3")); //$NON-NLS-1$
     			ProtocolInvocationLauncher.launch(args[0]);
+    			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.3")); //$NON-NLS-1$
 
     			// Segun sea el modo de comunicacion:
 				// - Servidor intermedio: Se llegara a este punto al completar una peticion de
@@ -983,11 +977,11 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     		// Lo primero es comprobar que no se encuentre ya abierta.
     		else if (!isSimpleAfirmaAlreadyRunning()) {
 
-				printSystemInfo();
-
-				LOGGER.info("Apertura como herramienta de escritorio"); //$NON-NLS-1$
+    			LOGGER.info("Apertura como herramienta de escritorio"); //$NON-NLS-1$
+    			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.6")); //$NON-NLS-1$
 
 				// Comprobamos si hay que actualizar las preferencias del sistema o no.
+				LOGGER.info("Comprobamos si hay que actualizar la configuracion del sistema"); //$NON-NLS-1$
 				if (ConfigUpdaterManager.needCheckConfigUpdates()) {
 					new Thread(() -> {
 						LOGGER.info("Comprobamos si existe nueva configuracion remota"); //$NON-NLS-1$
@@ -995,6 +989,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 					}).start();
 				}
 
+				LOGGER.info("Comprobamos si hay que actualizar la configuracion del sistema"); //$NON-NLS-1$
 				final SimpleAfirma saf = new SimpleAfirma();
 
 				final OS os = Platform.getOS();
@@ -1058,7 +1053,13 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				LOGGER.info("Iniciando entorno grafico"); //$NON-NLS-1$
 				saf.initGUI(null, null);
 
+				LOGGER.info("Comprobando si es una version de Java compatible"); //$NON-NLS-1$
 				checkJavaVersion(saf.getMainFrame());
+
+				// Comprobamos si el almacen de confianza con el certificado SSL esta instalado correctamente
+    			final CheckTrustKeyStoreTask checkTrustStoreTask = new CheckTrustKeyStoreTask(saf.getMainFrame());
+    			checkTrustStoreTask.execute();
+
 			} else {
 				LOGGER.log(Level.WARNING, "La aplicacion ya se encuentra activa en otra ventana. Se cerrara esta instancia"); //$NON-NLS-1$
 	    		AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("SimpleAfirma.3"), //$NON-NLS-1$
@@ -1175,6 +1176,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		} catch (final Exception e) {
     		LOGGER.warning("No se ha podido verificar si se deseaba modificar el nivel de log: " + e); //$NON-NLS-1$
     	}
+
 	}
 
 	/**
@@ -1273,7 +1275,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 * @return {@code true} si se considera que la aplicaci&oacute;n se ejecuta
 	 * 		en l&iacute;nea de comandos.
 	 */
-	private static boolean isUsingCommnadLine(final String[] args) {
+	private static boolean isUsingCommandLine(final String[] args) {
 		return args != null && args.length > 0 && !args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE);
 	}
 
@@ -1395,5 +1397,23 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 		}
 		return new File(appDir, PLUGINS_DIRNAME);
 	}
+
+    /**
+     * Obtiene el directorio en el que se encuentran guardados o se deben
+     * guardar los idiomas.
+     * @return Directorio de idiomas.
+     */
+    private static File getLanguagesDir() {
+		File appDir = DesktopUtil.getAlternativeDirectory();
+		if (appDir == null) {
+			appDir = DesktopUtil.getApplicationDirectory();
+		}
+		return new File(appDir, LANGUAGES_DIRNAME);
+	}
+
+	public static SSLContextConfigurationTask getSSLContextConfigurationTask() {
+		return sslContextConfigurationTask;
+	}
+
 
 }

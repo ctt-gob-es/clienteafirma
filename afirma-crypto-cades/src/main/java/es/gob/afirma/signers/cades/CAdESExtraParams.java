@@ -118,7 +118,7 @@ public final class CAdESExtraParams {
      *  Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro policyIdentifierHash.
      *  Es obligatorio indicarlo cuando se proporciona una huella digital distinta de 0.
      */
-    public static final String POLICY_IDENTIFIER_HASH_ALGORITHM = "poliyIdentifierHashAlgorithm";//$NON-NLS-1$
+    public static final String POLICY_IDENTIFIER_HASH_ALGORITHM = "policyIdentifierHashAlgorithm";//$NON-NLS-1$
 
     /**
      *  URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).

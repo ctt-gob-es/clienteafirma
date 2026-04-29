@@ -13,8 +13,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.protocol.ParameterException;
+import es.gob.afirma.signers.batch.client.BatchErrorCode;
 import es.gob.afirma.standalone.protocol.LocalBatchSigner.LocalSingleBatchResult;
 import es.gob.afirma.standalone.protocol.SingleSignOperation.Operation;
 
@@ -60,7 +62,7 @@ public class JSONBatchManager {
 			config = JSONBatchManager.parseBatchConfig(jsonObject);
 		}
 		catch (final Exception e) {
-			throw new ParameterException("La declaracion del lote suministrada no es correcta", e); //$NON-NLS-1$
+			throw new ParameterException("La declaracion del lote suministrada no es correcta", BatchErrorCode.Request.MALFORMED_JSON_BATCH); //$NON-NLS-1$
 		}
 
 		return config;
@@ -87,14 +89,14 @@ public class JSONBatchManager {
 		// Identificamos el formato de firma general del lote
 		String format;
 		if (!json.has(ELEM_FORMAT)) {
-			throw new ParameterException("El lote no declaraba el formato de firma"); //$NON-NLS-1$
+			throw new ParameterException("El lote no declaraba el formato de firma", ErrorCode.Request.SIGNATURE_FORMAT_NOT_FOUND); //$NON-NLS-1$
 		}
 		format = json.getString(ELEM_FORMAT);
 
 		// Identificamos el algorimo de firma general del lote
 		String algorithm;
 		if (!json.has(ELEM_ALGORITHM)) {
-			throw new ParameterException("El lote no declaraba el algoritmo de firma"); //$NON-NLS-1$
+			throw new ParameterException("El lote no declaraba el algoritmo de firma", ErrorCode.Request.SIGNATURE_ALGORITHM_NOT_FOUND); //$NON-NLS-1$
 		}
 		algorithm = json.getString(ELEM_ALGORITHM);
 
@@ -116,12 +118,12 @@ public class JSONBatchManager {
 				final SingleSignOperation singleOperation = new SingleSignOperation();
 
 				if (!jsonSinleSign.has(ELEM_ID)) {
-					throw new ParameterException("No se ha incluido el identificador de un documento del lote"); //$NON-NLS-1$
+					throw new ParameterException("No se ha incluido el identificador de un documento del lote", ErrorCode.Request.DATA_NOT_FOUND); //$NON-NLS-1$
 				}
 				singleOperation.setDocId(jsonSinleSign.getString(ELEM_ID));
 
 				if (!jsonSinleSign.has(ELEM_DATAREFERENCE)) {
-					throw new ParameterException("No se ha incluido la referencia de un documento del lote"); //$NON-NLS-1$
+					throw new ParameterException("No se ha incluido la referencia de un documento del lote", ErrorCode.Request.DATA_NOT_FOUND); //$NON-NLS-1$
 				}
 				singleOperation.setData(Base64.decode(jsonSinleSign.getString(ELEM_DATAREFERENCE)));
 

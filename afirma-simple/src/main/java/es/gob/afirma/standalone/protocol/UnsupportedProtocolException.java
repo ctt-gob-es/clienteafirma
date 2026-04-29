@@ -9,29 +9,26 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.protocol.ProtocolVersion;
+import es.gob.afirma.standalone.SimpleErrorCode;
+
 /**
  * Excepci&oacute;n con la que se indica si una versi&oacute;n de protocolo de comunicaci&oacute;n
  * no esta soportado y si es necesario actualizar la aplicaci&oacute;n para soportarlo (protocolo
  * m&aacute;s avanzada que el soportado por la aplicaci&oacute;n) o si se trata de un protocolo
  * obsoleto.
  */
-public class UnsupportedProtocolException extends Exception {
+public class UnsupportedProtocolException extends AOException {
 
 	/** Serial Id. */
 	private static final long serialVersionUID = -7429271911165454430L;
 
-	/** Versi&oacute;n por defecto cuando no se establece ninguna. */
-	private static final int DEFAULT_VERSION = 1;
-
 	private final boolean newVersionNeeded;
-	private final int version;
+	private final ProtocolVersion version;
 
-	UnsupportedProtocolException() {
-		this(DEFAULT_VERSION, true);
-	}
-
-	UnsupportedProtocolException(final int version, final boolean newVersionNeeded) {
-		super("Version del protocolo no soportada"); //$NON-NLS-1$
+	UnsupportedProtocolException(final ProtocolVersion version, final boolean newVersionNeeded) {
+		super("Version del protocolo no soportada", SimpleErrorCode.Request.UNSUPPORTED_PROTOCOL_VERSION); //$NON-NLS-1$
 		this.version = version;
 		this.newVersionNeeded = newVersionNeeded;
 	}
@@ -50,7 +47,7 @@ public class UnsupportedProtocolException extends Exception {
 	 * Recupera la versi&oacute;n de protocolo necesaria.
 	 * @return Versi&oacute;n del protocolo solicitada.
 	 */
-	public int getVersion() {
+	public ProtocolVersion getVersion() {
 		return this.version;
 	}
 }

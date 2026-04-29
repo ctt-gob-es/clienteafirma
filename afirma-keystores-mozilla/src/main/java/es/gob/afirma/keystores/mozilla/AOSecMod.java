@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.KeyStoreUtilities;
 
 /** Clase para la obtenci&oacute;n de los m&oacute;dulos PKCS#11 instalados en la
@@ -140,7 +141,7 @@ public final class AOSecMod {
             }
             final File secmod = new File(profileDir, "secmod.db"); //$NON-NLS-1$
             if (!secmod.exists()) {
-                throw new AOException("El directorio del perfil de Mozilla proporcionado no contiene una base de datos de modulos (secmod.db)"); //$NON-NLS-1$
+                throw new AOException("El directorio del perfil de Mozilla proporcionado no contiene una base de datos de modulos (secmod.db)", KeyStoreErrorCode.Internal.LOADING_MOZILLA_KEYSTORE_ERROR); //$NON-NLS-1$
             }
             final byte[] secMod;
             try (
@@ -149,7 +150,7 @@ public final class AOSecMod {
                 secMod = AOUtil.getDataFromInputStream(is);
             }
             catch (final Exception e) {
-                throw new AOException("Error leyendo la base de datos de modulos (secmod.db)", e); //$NON-NLS-1$
+                throw new AOException("Error leyendo la base de datos de modulos (secmod.db)", e, KeyStoreErrorCode.Internal.LOADING_MOZILLA_KEYSTORE_ERROR); //$NON-NLS-1$
             }
 
             // Obtenemos los modulos PKCS#11 asegurandonos de que no aparecen

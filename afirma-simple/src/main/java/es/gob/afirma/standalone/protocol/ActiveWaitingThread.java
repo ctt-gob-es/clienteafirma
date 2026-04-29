@@ -3,6 +3,8 @@ package es.gob.afirma.standalone.protocol;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import es.gob.afirma.standalone.SimpleAfirma;
+
 /**
  * Hilo para la solicitud continua de espera a trav&eacute;s del servidor
  * intermedio. Una vez en ejecuci&oacute;n, enviar&aacute; cada cierto
@@ -34,12 +36,18 @@ public class ActiveWaitingThread extends Thread {
 
 	@Override
 	public void run() {
+		
+		try {
+			SimpleAfirma.getSSLContextConfigurationTask().join();
+		} catch (InterruptedException e) {
+			LOGGER.warning("No se ha podido configurar correctamente el contexto SSL: " + e); //$NON-NLS-1$
+		}
 
 		while (!this.cancelled) {
 
 			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
 				if (!this.cancelled) {
-					try {
+					try {					
 						IntermediateServerUtil.sendData(WAIT_CONSTANT, this.storageServiceUrl, this.transactionId);
 					} catch (final IOException e) {
 						LOGGER.warning("No se ha podido enviar la peticion de espera: " + e); //$NON-NLS-1$

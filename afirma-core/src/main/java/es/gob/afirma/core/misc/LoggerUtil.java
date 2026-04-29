@@ -32,7 +32,7 @@ public final class LoggerUtil {
     /**
      * Limita la cadena a 200 caracteres. En caso de que la propiedad "allow.extended.logs"
      * est&eacute; activa, se omite el recortarla.
-     * @param str Cadena a recortar.
+     * @param str Cadena que recortar.
      * @return Cadena tratada.
      */
     public static String getTrimStr(final String str) {
@@ -41,10 +41,35 @@ public final class LoggerUtil {
     	}
 
     	if (!allowExtendedLogs.booleanValue() && str != null && str.length() >= 200) {
-    		return str.substring(0, 200) + "..."; //$NON-NLS-1$
+   			return str.substring(0, 200) + "..."; //$NON-NLS-1$
     	}
 
     	return str;
+    }
+
+    /**
+     * Limita la cadena a 200 caracteres. En caso de que la propiedad "allow.extended.logs"
+     * est&eacute; activa, se omite el recortarla.
+     * @param obj Objeto del que obtener la representaci&oacute;n.
+     * @return Cadena tratada.
+     */
+    public static String getTrimObject(final Object obj) {
+
+    	if (obj == null) {
+    		return null;
+    	}
+
+    	if (allowExtendedLogs == null) {
+    		allowExtendedLogs = Boolean.valueOf(Boolean.getBoolean("allow.extended.logs")); //$NON-NLS-1$
+    	}
+    	final String completStr = obj.toString();
+    	if (!allowExtendedLogs.booleanValue()) {
+    		if (completStr.length() >= 200) {
+    			return completStr.substring(0, 200) + "..."; //$NON-NLS-1$
+    		}
+    	}
+
+    	return completStr;
     }
 
     /**

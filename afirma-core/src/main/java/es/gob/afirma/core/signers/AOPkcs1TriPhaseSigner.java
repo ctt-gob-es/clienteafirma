@@ -10,6 +10,7 @@
 package es.gob.afirma.core.signers;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -19,9 +20,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.misc.http.HttpError;
 import es.gob.afirma.core.misc.http.SSLErrorProcessor;
 import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
@@ -33,7 +35,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
  * Las firmas PKCS#1 se realizan por completo en cliente, no tiene prefirma ni postfirma. Este
  * manejador permite emular la gestion de firmas trif&aacute;de PKCS#1 lo que nos permite que los
  * datos a firmar se obtengan desde el servidor trifasico en lugar del cliente. */
-public class AOPkcs1TriPhaseSigner implements AOSigner {
+public class AOPkcs1TriPhaseSigner extends AOTriphaseSigner {
 
 	/** <i>Logger</i> para la clase y sus derivadas. */
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -116,10 +118,10 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 	public final byte[] getData(final byte[] sign) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException {
+	public byte[] getData(final byte[] sign, final Properties params) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
 
@@ -160,13 +162,13 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 			                                     final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
 	public boolean isSign(final byte[] signData, final Properties params) {
@@ -200,7 +202,7 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 	public AOSignInfo getSignInfo(final byte[] sign) {
 		throw new UnsupportedOperationException("No se soporta en firma trifasica"); //$NON-NLS-1$
 	}
-	
+
 	/** {@inheritDoc} */
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException {
@@ -220,7 +222,7 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 	 * S&oacute;lo se utiliza el {@code serverUrl}.
 	 * @return Resultado de la operaci&oacute;n de firma.
 	 * @throws AOException Cuando se produce un error durante la operaci&oacute;n. */
-	protected static byte[] triPhaseOperation(final String format,
+	protected byte[] triPhaseOperation(final String format,
 			                                final String cryptoOperation,
 			                                final byte[] data,
 			                                final String algorithm,
@@ -254,7 +256,14 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 		// Decodificamos el identificador del documento
 		final String documentId = Base64.encode(data, true);
 
-		final UrlHttpManager urlManager = UrlHttpManagerFactory.getInstalledManager();
+		// Creamos el objeto de conexion
+		final UrlHttpManager urlManager;
+		if (this.httpConnection != null) {
+			urlManager = this.httpConnection;
+		}
+		else {
+			urlManager = UrlHttpManagerFactory.getInstalledManager();
+		}
 
 		// Preparamos el parametro de cadena de certificados
 		final String cerChainParamContent;
@@ -262,7 +271,7 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 			cerChainParamContent = Base64.encode(certChain[0].getEncoded(), true);
 		}
 		catch (final CertificateEncodingException e) {
-			throw new AOException("Error decodificando la cadena de certificados: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error decodificando la cadena de certificados: " + e, e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		}
 
 		final SSLErrorProcessor errorProcessor = new SSLErrorProcessor(extraParams);
@@ -302,12 +311,18 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 
 			urlBuffer.setLength(0);
 		}
+		catch (final HttpError e) {
+			throw new AOException("El servicio de prefirma devolvio un error: " + e, e, ErrorCode.ThirdParty.PRESIGN_HTTP_ERROR); //$NON-NLS-1$
+		}
+		catch (final SocketTimeoutException e) {
+			throw new AOException("La prefirma en servidor ha excedido el tiempo de espera", e, ErrorCode.Communication.PRESIGN_SERVICE_TIMEOUT); //$NON-NLS-1$
+		}
 		catch (final IOException e) {
 			if (errorProcessor.isCancelled()) {
 				LOGGER.info("El usuario no permite la importacion del certificado SSL de confianza del servicio de firma trifasica: " //$NON-NLS-1$
 						+ LoggerUtil.getTrimStr(signServerUrl.toString()));
 			}
-			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la llamada de prefirma al servidor: " + e, e, ErrorCode.Communication.PRESIGN_SERVICE_CONNECTION_ERROR); //$NON-NLS-1$
 		}
 
 		// ----------
@@ -323,25 +338,32 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
-			throw new AOException("Error al analizar la prefirma enviada por el servidor: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error al analizar la prefirma enviada por el servidor: " + e, e, ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE); //$NON-NLS-1$
+		}
+
+		if (triphaseData.getSignsCount() <= 0) {
+			throw new AOException("No se han obtenido prefirmas del servicio de prefirma", ErrorCode.ThirdParty.PRESIGNS_NOT_FOUND); //$NON-NLS-1$
 		}
 
 		final TriSign tri = triphaseData.getSign(0);
 
-		byte[] pkcs1;
+		byte[] presignature;
 		try {
-			pkcs1 = new AOPkcs1Signer().sign(
-				Base64.decode(tri.getProperty(PROPERTY_NAME_PRESIGN)),
+			presignature = Base64.decode(tri.getProperty(PROPERTY_NAME_PRESIGN));
+		}
+		catch (final IOException e) {
+			LOGGER.severe("Error al decodificar la prefirma de los datos: " + e); //$NON-NLS-1$
+			throw new AOException("Error al decodificar la prefirma de los datos", e, ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE); //$NON-NLS-1$
+		}
+
+		final byte[] pkcs1 = new AOPkcs1Signer().sign(
+				presignature,
 				algorithm,
 				key,
 				certChain,
 				extraParams
 			);
-		}
-		catch (final IOException e) {
-			LOGGER.severe("Error al decodificar la prefirma de los datos: " + e); //$NON-NLS-1$
-			throw new AOException("Error al decodificar la prefirma de los datos", e); //$NON-NLS-1$
-		}
+
 		tri.addProperty(PROPERTY_NAME_PKCS1_SIGN, Base64.encode(pkcs1));
 
 		final String preResultAsBase64 = Base64.encode(
@@ -367,14 +389,20 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 
 			triSignFinalResult = urlManager.readUrl(urlBuffer.toString(), UrlHttpMethod.POST);
 		}
+		catch (final HttpError e) {
+			throw new AOException("El servicio de postfirma devolvio un error: " + e, e, ErrorCode.ThirdParty.POSTSIGN_HTTP_ERROR); //$NON-NLS-1$
+		}
+		catch (final SocketTimeoutException e) {
+			throw new AOException("La postfirma en servidor ha excedido el tiempo de espera", e, ErrorCode.Communication.POSTSIGN_SERVICE_TIMEOUT); //$NON-NLS-1$
+		}
 		catch (final IOException e) {
-			throw new AOException("Error en la llamada de postfirma al servidor: " + e, e); //$NON-NLS-1$
+			throw new AOException("Error en la llamada de postfirma al servidor: " + e, e, ErrorCode.Communication.POSTSIGN_SERVICE_CONNECTION_ERROR); //$NON-NLS-1$
 		}
 
 		// Analizamos la respuesta del servidor
 		final String stringTrimmedResult = new String(triSignFinalResult).trim();
 		if (!stringTrimmedResult.startsWith(SUCCESS)) {
-			throw new AOException("La firma trifasica no ha finalizado correctamente: " + stringTrimmedResult); //$NON-NLS-1$
+			throw new AOException("La firma trifasica no ha finalizado correctamente: " + stringTrimmedResult, ErrorCode.ThirdParty.POSTSIGN_ERROR); //$NON-NLS-1$
 		}
 
 		// Los datos no se devuelven, se quedan en el servidor
@@ -383,8 +411,7 @@ public class AOPkcs1TriPhaseSigner implements AOSigner {
 		}
 		catch (final IOException e) {
 			LOGGER.warning("El resultado de NEWID del servidor no estaba en Base64: " + e); //$NON-NLS-1$
-			throw new AOException("El resultado devuelto por el servidor no es correcto: " + e, e); //$NON-NLS-1$
+			throw new AOException("El resultado devuelto por el servidor no es correcto: " + e, e, ErrorCode.ThirdParty.MALFORMED_POSTSIGN_RESPONSE); //$NON-NLS-1$
 		}
 	}
-
 }

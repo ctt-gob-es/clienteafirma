@@ -115,7 +115,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
                 			"Ha fallado el segundo intento de inicializacion del PKCS#11 para la la biblioteca " + p11lib, e //$NON-NLS-1$
             			);
                     throw new AOKeyStoreManagerException(
-                		"No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca '" + p11lib + "': " + ex, ex  //$NON-NLS-1$//$NON-NLS-2$
+                		"No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca '" + p11lib + "': " + ex, ex, KeyStoreErrorCode.Internal.LOADING_PKCS11_KEYSTORE_ERROR  //$NON-NLS-1$//$NON-NLS-2$
             		);
                 }
             }
@@ -149,7 +149,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
         	// En caso de no poder instanciar la tarjeta en cuestion, se retira el proveedor
         	Security.removeProvider("SunPKCS11-" + p11ProviderName); //$NON-NLS-1$
 			throw new AOKeyStoreManagerException(
-				"Error construyendo el KeyStore PKCS#11 para la biblioteca '" + p11lib + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+				"Error construyendo el KeyStore PKCS#11 para la biblioteca '" + p11lib + "': " + e, e, KeyStoreErrorCode.Internal.LOADING_PKCS11_KEYSTORE_ERROR //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
     }
@@ -161,7 +161,7 @@ final class AOKeyStoreManagerHelperPkcs11 {
         }
         catch (final Exception e) {
             Security.removeProvider(p11Provider.getName());
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11: " + e, e); //$NON-NLS-1$
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11: " + e, e, KeyStoreErrorCode.Internal.LOADING_PKCS11_KEYSTORE_ERROR); //$NON-NLS-1$
         }
 
         try {
@@ -169,19 +169,19 @@ final class AOKeyStoreManagerHelperPkcs11 {
         }
         catch (final IOException e) {
             throw new AOKeyStoreManagerException(
-        		"No se ha podido obtener el almacen PKCS#11 solicitado: " + e, e //$NON-NLS-1$
+        		"No se ha podido obtener el almacen PKCS#11 solicitado: " + e, e, KeyStoreErrorCode.Internal.LOADING_PKCS11_KEYSTORE_ERROR //$NON-NLS-1$
     		);
         }
         catch (final CertificateException e) {
             Security.removeProvider(p11Provider.getName());
             throw new AOKeyStoreManagerException(
-        		"No se han podido cargar los certificados del almacen PKCS#11 solicitado: " + e, e //$NON-NLS-1$
+        		"No se han podido cargar los certificados del almacen PKCS#11 solicitado: " + e, e, KeyStoreErrorCode.Internal.LOADING_PKCS11_KEYSTORE_ERROR //$NON-NLS-1$
     		);
         }
         catch (final NoSuchAlgorithmException e) {
             Security.removeProvider(p11Provider.getName());
             throw new AOKeyStoreManagerException(
-        		"No se ha podido verificar la integridad del almacen PKCS#11 solicitado: " + e, e //$NON-NLS-1$
+        		"No se ha podido verificar la integridad del almacen PKCS#11 solicitado: " + e, e, KeyStoreErrorCode.Internal.LOADING_PKCS11_KEYSTORE_ERROR //$NON-NLS-1$
     		);
 		}
         return ks;

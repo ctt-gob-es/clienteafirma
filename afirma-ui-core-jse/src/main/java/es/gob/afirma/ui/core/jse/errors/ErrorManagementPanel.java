@@ -9,24 +9,17 @@
 
 package es.gob.afirma.ui.core.jse.errors;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.Window;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 
 import es.gob.afirma.ui.core.jse.JSEUIMessages;
 
@@ -39,25 +32,14 @@ public final class ErrorManagementPanel extends JPanel {
 	/** Serial Id. */
 	private static final long serialVersionUID = 8384222173067817402L;
 
-	private static final int DETAILS_PREFERRED_WIDTH = 700;
-
-	private static final int DETAILS_PREFERRED_HEIGHT = 200;
-
 	private final Window window;
 
 	private JPanel errorInfoPanel;
 	private JPanel buttonsPanel;
 
 	private JButton closeButton;
-	private JButton detailsButton;
-	private JButton copyErrorButton;
-
-	private JScrollPane scrollPane;
-	private JTextArea errorTextArea;
 
 	final ErrorManagementHandler eventsHandler;
-
-	private boolean expandedDetails;
 
 	/**
 	 * Constructor con la ventana padre.
@@ -66,9 +48,9 @@ public final class ErrorManagementPanel extends JPanel {
 	 * @param message Mensaje sobre el error.
 	 * @param messageType Tipo de mensaje (precauci&oacute;n o error).
 	 */
-	ErrorManagementPanel(final ErrorManagementDialog w, final Throwable t, final Object message, final int messageType) {
+	ErrorManagementPanel(final Window w, final Throwable t, final Object message, final int messageType) {
 		this.window = w;
-		this.eventsHandler = new ErrorManagementHandler(this, w);
+		this.eventsHandler = new ErrorManagementHandler(this);
 		createUI(t, message, messageType);
 		this.eventsHandler.registerComponents();
 	}
@@ -85,40 +67,8 @@ public final class ErrorManagementPanel extends JPanel {
 
 		this.errorInfoPanel = createInfoTextPanel(t, message, messageType);
 
-		this.errorTextArea = new JTextArea();
-		this.errorTextArea.setEditable(false);
-
-		boolean withTrace = false;
-
-		if (t != null && t.getStackTrace().length != 0) {
-			final StringWriter errors = new StringWriter();
-			t.printStackTrace(new PrintWriter(errors));
-			this.errorTextArea.append(errors.toString().replaceAll("\t", "      "));  //$NON-NLS-1$//$NON-NLS-2$
-			withTrace = true;
-		}
-
-		this.scrollPane = new JScrollPane(this.errorTextArea);
-		this.scrollPane.getVerticalScrollBar().setValue(this.scrollPane.getVerticalScrollBar().getMinimum());
-		final double screenHeight = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-		final Dimension preferedFrameSize = new Dimension(
-				DETAILS_PREFERRED_WIDTH,
-				(int) Math.min(DETAILS_PREFERRED_HEIGHT, screenHeight * 0.7));
-		this.scrollPane.setPreferredSize(preferedFrameSize);
-
-		//Las barras de scroll se dejan al principio despues de escribir
-		SwingUtilities.invokeLater(new Runnable() {
-            @Override
-			public void run() {
-        		getScrollPane().getVerticalScrollBar().setValue(getScrollPane().getVerticalScrollBar().getMinimum());
-        		getScrollPane().getHorizontalScrollBar().setValue(getScrollPane().getHorizontalScrollBar().getMinimum());
-            }
-        });
-
-		//Por defecto no se mostraran los detalles
-		this.scrollPane.setVisible(false);
-
         // Creamos un panel para los botones de detalles y cerrar
-        this.buttonsPanel = createButtonsPanel(withTrace);
+        this.buttonsPanel = createButtonsPanel();
 
         // Anadimos cada elemento al panel
         final GridBagConstraints c = new GridBagConstraints();
@@ -129,11 +79,6 @@ public final class ErrorManagementPanel extends JPanel {
 		c.gridy = 0;
 		c.insets = new Insets(15, 5, 11, 15);
 		add(this.errorInfoPanel, c);
-
-		c.gridy++;
-		c.ipady = 140;
-		c.insets = new Insets(0, 15,  11,  15);
-		add(this.scrollPane, c);
 
         c.gridy++;
 		c.ipady = 0;
@@ -159,11 +104,10 @@ public final class ErrorManagementPanel extends JPanel {
 			icon =  new ImageIcon(ErrorManagementPanel.class.getResource("warning_icon.png")); //$NON-NLS-1$
 			errorIconLabel.setIcon(icon);
 		}
-
+		
 		final String newMessage = "<html>" + message.toString().replace("\n", "<br>") + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		final JLabel errorInfoLabel = new JLabel();
 		errorInfoLabel.setText(newMessage);
-
 
 		final JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEADING, 11, 0));
 		panel.add(errorIconLabel);
@@ -174,28 +118,11 @@ public final class ErrorManagementPanel extends JPanel {
 
 	/** Construye el objeto gr&aacute;fico que representa el panel
 	 * donde se ubican los botones de detalles y cerrar
-	 * @param withTrace indica si viene con informaci&oacute;n sobre el error
 	 * @return Panel donde se ubican los botones de detalles y cerrar*/
-	private JPanel createButtonsPanel(final boolean withTrace) {
+	private JPanel createButtonsPanel() {
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
-
-		if(withTrace) {
-
-			this.copyErrorButton = new JButton(JSEUIMessages.getString("JSEUIManager.92")); //$NON-NLS-1$
-			this.copyErrorButton.getAccessibleContext().setAccessibleDescription(
-				JSEUIMessages.getString("JSEUIManager.92")  //$NON-NLS-1$
-			);
-			this.copyErrorButton.setVisible(false);
-			panel.add(this.copyErrorButton);
-
-			this.detailsButton = new JButton(JSEUIMessages.getString("JSEUIManager.90")); //$NON-NLS-1$
-			this.detailsButton.getAccessibleContext().setAccessibleDescription(
-				JSEUIMessages.getString("JSEUIManager.90")  //$NON-NLS-1$
-			);
-			panel.add(this.detailsButton);
-		}
 
 		this.closeButton = new JButton(JSEUIMessages.getString("JSEUIManager.1")); //$NON-NLS-1$
 		this.closeButton.getAccessibleContext().setAccessibleDescription(
@@ -222,14 +149,6 @@ public final class ErrorManagementPanel extends JPanel {
 	}
 
 	/**
-	 * Devuelve el componente del panel de scroll
-	 * @return Panel de scroll.
-	 */
-	public JScrollPane getScrollPane() {
-		return this.scrollPane;
-	}
-
-	/**
 	 * Devuelve el bot&oacute;n de cierre del di&aacute;logo.
 	 * @return Bot&oacute;n de cierre.
 	 */
@@ -237,43 +156,4 @@ public final class ErrorManagementPanel extends JPanel {
 		return this.closeButton;
 	}
 
-	/**
-	 * Devuelve el bot&oacute;n de abrir o cerrar de los detalles.
-	 * @return Bot&oacute;n de abrir o cerrar los detalles.
-	 */
-	public JButton getDetailsButton() {
-		return this.detailsButton;
-	}
-
-	/**
-	 * Variable que indica si los detalles est&aacute;n expandidos
-	 * @return Devuelve true si los detalles est&oacute;n expandidos
-	 */
-	public boolean isExpandedDetails() {
-		return this.expandedDetails;
-	}
-
-	/**
-	 * Da valor a la variable que indica si los detalles est&aacute;n expandidos
-	 * @param expandedDetails Valor para indicar si los detalles est&aacute;n expandidos
-	 */
-	public void setExpandedDetails(final boolean expandedDetails) {
-		this.expandedDetails = expandedDetails;
-	}
-
-	/**
-	 * Devuelve el bot&oacute; de copiar el error del textarea
-	 * @return Bot&oacute; de copiar el error del textarea
-	 */
-	public JButton getCopyErrorButton() {
-		return this.copyErrorButton;
-	}
-
-	/**
-	 * Devuelve el textarea con la informaci&oacute; sobre el error
-	 * @return Textarea con la informaci&oacute; sobre el error
-	 */
-	public JTextArea getErrorTextArea() {
-		return this.errorTextArea;
-	}
 }

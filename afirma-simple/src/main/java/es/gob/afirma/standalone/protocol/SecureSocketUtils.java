@@ -14,7 +14,7 @@ import javax.net.ssl.SSLContext;
 
 import es.gob.afirma.standalone.DesktopUtil;
 
-class SecureSocketUtils {
+public class SecureSocketUtils {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -25,13 +25,33 @@ class SecureSocketUtils {
 	private static final String PKCS12 = "PKCS12"; //$NON-NLS-1$
 	private static final String SSLCONTEXT = "TLSv1"; //$NON-NLS-1$
 
+	private static KeyManagerFactory kmf = null;
+
 	/**
 	 * Obtiene un contexto SSL para la apertura de un socket/websocket seguro.
 	 * @return Contexto SSL.
 	 * @throws GeneralSecurityException Cuando no se ha podido cargar el almac&eacute;n de claves SSL.
 	 * @throws IOException Cuando no se ha encontrado el almacen de claves SSL o este no es v&aacute;lido.
 	 */
-	static SSLContext getSecureSSLContext() throws GeneralSecurityException, IOException {
+	public static SSLContext getSecureSSLContext() throws GeneralSecurityException, IOException {
+
+		if (kmf == null) {
+			kmf = initialize();
+		}
+
+		final SSLContext sc = SSLContext.getInstance(SSLCONTEXT);
+		sc.init(kmf.getKeyManagers(), null, null);
+
+		return sc;
+	}
+
+	/**
+	 * Inicializa el almacen con la clave para el cifrado SSL del socket.
+	 * @return Factor&iacute;a con el almac&eacute;n de claves.
+	 * @throws GeneralSecurityException Cuando falla la carga del almac&eacute;n.
+	 * @throws IOException Cuando no se encuentra o no se puede cargar el fichero de almac&eacute;n.
+	 */
+	private static KeyManagerFactory initialize() throws GeneralSecurityException, IOException {
 
 		// Ruta del almacen para el cifrado SSL
 		final File sslKeyStoreFile = getKeyStoreFile();
@@ -50,18 +70,17 @@ class SecureSocketUtils {
 			ks.load(is, ksPass);
 		}
 		// key manager factory por defecto (de tipo SunX509 en OpenJDK, o de tipo ibmX509 en IBM JVM)
-		final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		kmf.init(ks, ctPass);
 
-		final SSLContext sc = SSLContext.getInstance(SSLCONTEXT);
-		sc.init(kmf.getKeyManagers(), null, null);
-
-		return sc;
+		return kmf;
 	}
 
-	/** Obtiene el fichero del almac&eacute;n con la clave SSL de alguno de los directorios
+	/**
+	 * Obtiene el fichero del almac&eacute;n con la clave SSL de alguno de los directorios
 	 * del sistema en los que puede estar.
-	 * @return Almac&eacute;n de claves o {@code null} si no se encontr&oacute;. */
+	 * @return Almac&eacute;n de claves o {@code null} si no se encontr&oacute;.
+	 */
 	private static File getKeyStoreFile() {
 
 		File appDir = DesktopUtil.getApplicationDirectory();

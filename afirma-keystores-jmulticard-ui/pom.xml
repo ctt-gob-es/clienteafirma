@@ -8,14 +8,13 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.9</version>
+		<version>1.9.1</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>es.gob.afirma.jmulticard</groupId>
 			<artifactId>jmulticard</artifactId>
-			<version>${jmulticard.version}</version>
 		</dependency>
 	</dependencies>
 </project>

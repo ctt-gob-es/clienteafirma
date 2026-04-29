@@ -23,7 +23,7 @@ public class SmartCardLockedException extends SmartCardException {
 	 * @param msg Mensaje que describe el error que origin&oacute; la excepci&oacute;n.
 	 */
 	public SmartCardLockedException(final String msg) {
-		super(msg);
+		super(msg, KeyStoreErrorCode.Hardware.SMARTCARD_LOCKED);
 	}
 
 	/**
@@ -33,6 +33,6 @@ public class SmartCardLockedException extends SmartCardException {
 	 * @param t Error que origin&oacute; la excepci&oacute;n.
 	 */
 	public SmartCardLockedException(final String msg, final Throwable t) {
-		super(msg, t);
+		super(msg, t, KeyStoreErrorCode.Hardware.SMARTCARD_LOCKED);
 	}
 }

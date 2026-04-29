@@ -35,6 +35,7 @@ import es.gob.afirma.signvalidation.InvalidSignatureException;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.ValidatePdfSignature;
+import es.gob.afirma.triphase.signer.TriphaseErrorCode;
 
 /** Procesador de firmas trif&aacute;sicas PAdES.
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
@@ -164,7 +165,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		// Cargamos la configuracion de la operacion
 		if (triphaseData.getSignsCount() < 1) {
 			LOGGER.severe("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
-			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
+			throw new AOException("No se ha encontrado la informacion de firma en la peticion", TriphaseErrorCode.Request.MALFORMED_PRESIGN); //$NON-NLS-1$
 		}
 
 		final TriSign signConfig = triphaseData.getSign(0);
@@ -223,7 +224,7 @@ public final class PAdESTriPhasePreProcessor implements TriPhasePreProcessor {
 		for (final String param : params) {
 			if (sessionConfig.getProperty(param) == null) {
 				throw new AOException(
-					"No se ha proporcionado un parametro obligatorio para la postfirma PAdES: " + param //$NON-NLS-1$
+					"No se ha proporcionado un parametro obligatorio para la postfirma PAdES: " + param, TriphaseErrorCode.Request.MALFORMED_PRESIGN //$NON-NLS-1$
 				);
 			}
 		}

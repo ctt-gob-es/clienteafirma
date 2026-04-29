@@ -54,18 +54,22 @@ final class XAdESTriPhaseSignerUtil {
 
 	private static final String ID_STR = "Id=\""; //$NON-NLS-1$
 
-	/** Inserta en la estructura base XML las partes comunes de la firma XML generada
+	/**
+	 * Inserta en la estructura base XML las partes comunes de la firma XML generada
 	 * para los mismos datos y certificados.
 	 * @param xmlBase Estructura base XML de la firma.
 	 * @param xmlSource Firma XML con las partes comunes que hay que insertar en la estructura base.
 	 * @param extraParams Par&aacute;metros de configuraci&oacute;n de la firma.
 	 * @return Firma XML completa.
 	 * @throws SAXException Cuando se detecta un error de forma al parsear los XML.
+	 * @throws UnsupportedEncodingException Cuando alguno de los juegos de caracteres no est&aacute; soportado.
 	 * @throws IOException Cuando ocurre un error en la lectura de los XML.
-	 * @throws ParserConfigurationException Cuando no se puede construir los XML. */
+	 * @throws ParserConfigurationException Cuando no se puede construir los XML.
+	 */
 	static byte[] insertCommonParts(final byte[] xmlBase,
 			                        final byte[] xmlSource,
 			                        final Properties extraParams) throws SAXException,
+    																	 UnsupportedEncodingException,
 	                                                                     IOException,
 	                                                                     ParserConfigurationException {
 

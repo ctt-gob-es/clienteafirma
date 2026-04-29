@@ -23,8 +23,8 @@ var SupportDialog;
 
 var AutoScript = ( function ( window, undefined ) {
 
-		var VERSION = "1.9.0";
-		var VERSION_CODE = 3;
+		var VERSION = "1.10.1";
+		var VERSION_CODE = 4;
 
 		/* ========== DEPRECADO: No se utiliza, pero se mantiene por compatibilidad con los despliegues del MiniApplet. */
 		var JAVA_ARGUMENTS = null;
@@ -45,6 +45,10 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		var appName = null;
 		
+		var serviceTimeout = null;
+		
+		var showDialog = true;
+				
 		var DOMAIN_NAME;
 		try {
 			DOMAIN_NAME = window.location.hostname; 
@@ -71,12 +75,14 @@ var AutoScript = ( function ( window, undefined ) {
 		    install_client: "<br>Si lo tiene instalado o lo acaba de instalar, pulse el bot&oacute;n para reintentar la operaci&oacute;n.",
 		    ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga en la App Store'></a>",
 		    loading: "Cargando",
-		    no_compatible_procedure: "Esta aplicaci&oacute;n no permite firmar desde el navegador en dispositivos m&oacute;viles. ",
-		    pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Firma Electr&oacute;nica</a>",
+		    no_compatible_procedure: "Esta aplicaci&oacute;n no permite firmar desde el navegador en dispositivos m&oacute;viles.",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/ciudadanos/descargas'>Portal de Firma Electr&oacute;nica</a>",
 		    procedure_from_url: "Puede realizar el tr&aacute;mite desde la siguiente aplicaci&oacute;n:",
 		    restore_installation: "Si lo tiene instalado, puede restaurar la instalaci&oacute;n desde Autofirma en Herramientas -> Restaurar instalaci&oacute;n",
 		    retry_operation: "Reintentar operaci\u00F3n",
 		    timeout_receiving_sign: "No se ha podido conectar con el cliente de firma. Si no lo tiene instalado, puede descargarlo desde:",
+			unsecure_context: "El contexto de ejecuci&oacute;n no es seguro y no se usar&aacute;n las funciones de cifrado avanzadas.",
+			ok: "Aceptar",
 		    warning: "Advertencia:"
 	  	};
 	  	LOCALIZED_STRINGS["gl_ES"] = {
@@ -97,13 +103,123 @@ var AutoScript = ( function ( window, undefined ) {
 		    ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga na App Store'></a>",
 		    loading: "Cargando",
 		    no_compatible_procedure: "Esta aplicaci&oacute;n non permite asinar desde o navegador en dispositivos m&oacute;biles.",
-		    pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/Home/Descargas.html'>Portal de Sinatura Electr&oacute;nica</a>",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/gl/ciudadanos/descargas'>Portal de Sinatura Electr&oacute;nica</a>",
 		    procedure_from_url: "Podes realizar o tr&aacute;mite dende a seguinte aplicaci&oacute;n:",
 		    restore_installation: "Se o tes instalado, podes restaurar a instalaci&oacute;n desde Autofirma en Ferramentas -> Restaurar instalaci&oacute;n.",
 		    retry_operation: "Reintento a operaci\u00F3n",
 		    timeout_receiving_sign: "Non se puido conectar co cliente que asina. Se non o tes instalado, podes descargalo desde:",
-		    warning: "Aviso:"
+			unsecure_context: "O contexto de execución non é seguro e non se usarán as funcións de cifrado avanzadas.",
+		    ok: "Aceptar",
+			warning: "Aviso:"
 	  	};
+		LOCALIZED_STRINGS["va_ES"] = {
+				access_from_pc: "Accedisca des d'un PC per a realitzar el tr&agrave;mit.",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descarrega-ho de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				checktime_warn: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Es recomana que es corregisca abans de polsar Acceptar per a continuar.",
+				checktime_err: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Ha de corregir l'hora del seu sistema i recarregar esta p&agrave;gina abans de continuar.",
+				checktime_local_time: "Hora del seu sistema",
+				checktime_server_time: "Hora del servidor",
+				close: "Tancar",
+				contact_admin: "Per favor, informe de l'error si el problema persisteix: ",
+				error_connecting_autofirma: "No &eacute;s possible connectar amb Autofirma a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tindre-ho instal·lat, pot descarregar-se des del següent enllaç:",
+				error_connecting_client: "No &eacute;s possible connectar amb el client de signatura a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tindre-ho instal·lat, pot descarregar-se des del següent enllaç:",
+				error_connecting_service: "No s'ha pogut connectar amb el servei de l'aplicaci&oacute; de signatura. &eacute;s probable que no puga completar signatures electr&ograve;niques des d'esta p&agrave;gina.",
+				error_connecting_server_recovering: "No es va poder connectar amb el servei de l'aplicaci&oacute; per a recuperar el resultat de l'operaci&oacute;.",
+				firefox_reinstall_message: "Instal·lar o restaurar Autofirma requerir&agrave; tancar el navegador i reiniciar el tr&agrave;mit.",
+				install_client: "<br>Si el t&eacute; instal·lat o l'acaba d'instal·lar, polse el bot&oacute; per a reintentar l'operaci&oacute;.",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Desc&agrave;rrega en l'App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				loading: "Carregant",
+				no_compatible_procedure: "Esta aplicaci&oacute; no permet signar des del navegador en dispositius m&ograve;bils. ",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/va/ciudadanos/descargas'>Portal de Signatura Electr&ograve;nica</a>",
+				procedure_from_url: "Pot realitzar el tr&agrave;mit des de la següent aplicaci&oacute;:",
+				restore_installation: "Si el t&eacute; instal·lat, pot restaurar la instal·laci&oacute; des d'Autofirma en Eines -> Restaurar instal·laci&oacute;",
+				retry_operation: "Reintentar operaci\u00F3",
+				timeout_receiving_sign: "No s'ha pogut connectar amb el client de signatura. Si no el t&eacute; instal·lat, pot descarregar-ho des de:",
+				unsecure_context: "El context d'execució no és segur i no s'usaran les funcions de xifrat avançades.",
+				ok: "Acceptar",
+				warning: "Advertiment:"
+		};
+		LOCALIZED_STRINGS["ca_ES"] = {
+				access_from_pc: "Accedeixi des d'un PC per a realitzar el tr&agrave;mit.",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descarrega-ho de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				checktime_warn: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Es recomana que es corregeixi abans de pr&eacute;mer Acceptar per a continuar.",
+				checktime_err: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Ha de corregir l'hora del seu sistema i recarregar aquesta p&agrave;gina abans de continuar.",
+				checktime_local_time: "Hora del seu sistema",
+				checktime_server_time: "Hora del servidor",
+				close: "Tancar",
+				contact_admin: "Si us plau, informe de l'error si el problema persisteix: ",
+				error_connecting_autofirma: "No &eacute;s possible connectar amb Autofirma a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tenir-ho instal·lat, pot descarregar-se des del següent enllaç:",
+				error_connecting_client: "No &eacute;s possible connectar amb el client de signatura a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tenir-ho instal·lat, pot descarregar-se des del següent enllaç:",
+				error_connecting_service: "No s'ha pogut connectar amb el servei de l'aplicaci&oacute; de signatura. &eacute;s probable que no pugui completar signatures electr&ograve;niques des d'aquesta p&agrave;gina.",
+				error_connecting_server_recovering: "No es va poder connectar amb el servei de l'aplicaci&oacute; per a recuperar el resultat de l'operaci&oacute;.",
+				firefox_reinstall_message: "Instal·lar o restaurar Autofirma requerir&agrave; tancar el navegador i reiniciar el tr&agrave;mit.",
+				install_client: "<br>Si el t&eacute; instal·lat o l'acaba d'instal·lar, premi el bot&oacute; per a reintentar l'operaci&oacute;.",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Desc&agrave;rrega en l'App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				loading: "Carregant",
+				no_compatible_procedure: "Aquesta aplicaci&oacute; no permet signar des del navegador en dispositius m&ograve;bils. ",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/ca/ciudadanos/descargas'>Portal de Signatura Electr&ograve;nica</a>",
+				procedure_from_url: "Pot realitzar el tr&agrave;mit des de la següent aplicaci&oacute;:",
+				restore_installation: "Si el t&eacute; instal·lat, pot restaurar la instal·laci&oacute; des d'Autofirma en Eines -> Restaurar instal·laci&oacute;",
+				retry_operation: "Reintentar operaci\u00F3",
+				timeout_receiving_sign: "No s'ha pogut connectar amb el client de signatura. Si no el t&eacute; instal·lat, pot descarregar-ho des de:",
+				unsecure_context: "El context d'execució no és segur i no s'usaran les funcions de xifrat avançades.",
+				ok: "Acceptar",
+				warning: "Advertiment:"
+		};
+		LOCALIZED_STRINGS["eu_ES"] = {
+				access_from_pc: "Sartu PC batetik tramitea egiteko. ",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Deskargatu Google Playtik' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				checktime_warn: "Zure sistemaren eta zerbitzariaren arteko ordu-desfasea detektatu da. Jarraitzeko, Ados sakatu aurretik zuzentzea gomendatzen da. ",
+				checktime_err: "Zure sistemaren eta zerbitzariaren artean ordu-desfase bat detektatu da. Zure sistemaren ordua zuzendu behar duzu, eta orri hau kargatu jarraitu aurretik. ",
+				checktime_local_time: "Zure sistemaren ordua",
+				checktime_server_time: "Zerbitzariaren ordua",
+				close: "Itxi",
+				contact_admin: "Mesedez, eman akatsaren berri, arazoak bere horretan jarraitzen badu: ",
+				error_connecting_autofirma: "Ezin da Autofirma-rekin konektatu, bezeroaren komunikazio- edo instalazio-arazo bat dela eta. Instalatuta ez baduzu, esteka honetatik deskarga dezakezu:",
+				error_connecting_client: "Ezin da bezeroarekin konektatu, komunikazio- edo instalazio-arazo bat dela eta. Instalatuta ez baduzu, esteka honetatik deskarga dezakezu:",
+				error_connecting_service: "Ezin izan da sinadura-aplikazioaren zerbitzuarekin konektatu. Litekeena da orrialde honetatik sinadura elektronikorik ezin osatzea. ",
+				error_connecting_server_recovering: "Ezin izan da aplikazioaren zerbitzuarekin konektatu eragiketaren emaitza berreskuratzeko. ",
+				firefox_reinstall_message: "Autofirma instalatu edo berrezartzeko, nabigatzailea itxi eta izapidea berrabiarazi behar da. ",
+				install_client: "<br>Instalatuta baduzu edo instalatu berri baduzu, sakatu botoia eragiketa berriro saiatzeko. ",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Deskargatu App Store-n' style='border-radius: 13px'; height: 140px></40px>",
+				loading: "Kargatzen",
+				no_compatible_procedure: "Aplikazio honek ez du uzten nabigatzailetik gailu mugikorretan sinatzen. ",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/eu/ciudadanos/descargas'>Sinadura elektronikoaren ataria</a>",
+				procedure_from_url: "Tramitea aplikazio honetatik egin dezakezu:",
+				restore_installation: "Instalatuta baduzu, instalazioa Autofirma-tik berrezar dezakezu Tresnak aukeran -> Instalazioa leheneratu",
+				retry_operation: "Saiatu berriro",
+				timeout_receiving_sign: "Ezin izan da konektatu sinadura-bezeroarekin. Instalatuta ez baduzu, hemendik deskarga dezakezu:",
+				unsecure_context: "Exekuzio-testuingurua ez da segurua eta ez dira enkriptatze-funtzio aurreratuak erabiliko.",
+				ok: "Onartu",
+				warning: "Oharra:"
+		};
+		LOCALIZED_STRINGS["en_US"] = {
+				access_from_pc: "Access from a PC to perform the procedure. ",
+				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Download Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+				checktime_warn: "A time lag between your system and the server has been detected. It is recommended that it be corrected before pressing OK to continue. ",
+				checktime_err: "A time lag between your system and the server has been detected. You must correct the time of your system and recharge this page before continuing. ",
+				checktime_local_time: "Time of your system",
+				checktime_server_time: "Server time",
+				close: "Close",
+				contact_admin: "Please report the error if the problem persists:",
+				error_connecting_autofirma: "It is not possible to connect with Autofirma due to a communication or installation problem of the client. If you do not have it installed, you can download it from the following link:",
+				error_connecting_client: "It is not possible to connect with the signature client due to a communication or installation problem of the client. If you do not have it installed, you can download it from the following link:",
+				error_connecting_service: "It has not been possible to connect with the service of the signature application. You may not be able to complete electronic signatures from this page. ",
+				error_connecting_server_recovering: "It was not possible to connect with the application service to recover the result of the operation. ",
+				firefox_reinstall_message: "Installing or restoring Autofirma will require closing the browser and restarting the process. ",
+				install_client: "<br>If you have it installed or just installed, press the button to retry the operation. ",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Download from App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				loading: "Loading",
+				no_compatible_procedure: "This application does not allow you to sign from your browser on mobile devices. ",
+				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/en/ciudadanos/descargas'>Electronic Signature Portal</a>",
+				procedure_from_url: "You can complete the procedure from the following application:",
+				restore_installation: "If you have it installed, you can restore the installation from Autofirma on Tools -> Restore Installation",
+				retry_operation: "Retry operation",
+				timeout_receiving_sign: "It was not possible to connect with the signature client. If you don't have it installed, you can download it from:",
+				unsecure_context: "The execution context is not secure and advanced encryption functions will not be used.",
+				ok: "Ok",
+				warning: "Warning:"
+		};
 
 		var DEFAULT_LOCALE = LOCALIZED_STRINGS["es_ES"];
 
@@ -201,18 +317,121 @@ var AutoScript = ( function ( window, undefined ) {
 		/** Comprueba si una cadena de texto es una URL (http/https). La alternativa implicaria ser un Base64. */ 
 		function isValidUrl(data) { 
 			return data != null && data.length > "https://".length &&
-				("http:" == data.substr(0, 5) || "https:" == data.substr(0, 6));
+				("http:" == data.substring(0, 5) || "https:" == data.substring(0, 6));
 		}
 
 		var downloadSuccessFunction = null;
 		var downloadErrorFunction = null;
 		var downloadTypeData = null;
 		
+		/* Tipos de dialogos de advertencia */
+		var WARNING_INSECURE_CONTEXT = 1;
+		
 		/* Tipos de errores para mostrar en los dialogos */
 		var ERROR_CONNECTING_AFIRMA = 1;
 		var ERROR_NO_COMPATIBLE_PROCEDURE = 2;
 		var ERROR_CONNECTING_SERVICE = 3;
 		var ERROR_CHECKING_SERVICE = 4;
+		
+		/* Codigos de error */
+		var ErrorCode = {
+		  Internal: {
+			CIPHERING_ERROR: {
+			  code: "AS200007", message: "Error al cifrar los datos para el envio al cliente de firma"
+			},
+			DECIPHERING_ERROR: {
+			  code: "AS200008", message: "Error al descifrar los datos recibidos del cliente de firma"
+			},
+			BROWSER_CANT_PREPROCESS: {
+		      code: "AS220005", message: "Su navegador no permite preprocesar los datos que desea tratar"
+		    },
+		    WEBSOCKET_INVALID_RESP: {
+		      code: "AS220006", message: "Respuesta no valida"
+		    },
+		    BROWSER_CANT_RECOVER_RESULT: {
+		      code: "AS220007", message: "Su navegador no permite obtener el resultado de la operacion"
+    		}
+		  },
+		  ThirdParty: {
+		    UPLOADING_TO_SERVER: {
+		      code: "AS300302", message: "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa"
+		    }
+		  },
+		  Communication: {
+		    CANT_CONNECT_SERVER: {
+		      code: "AS400003",
+		      message: "No se pudo conectar con el servidor remoto"
+		    },
+		    WEBSOCKET_CLOSE: {
+		      code: "AS420002", message: "Autofirma se ha cerrado o ha cerrado el websocket de comunicacion"
+		    },
+		    SOCKET_CONNECTING_APP: {
+		      code: "AS420503", message: "Se ha perdido la conexion con la aplicacion Autofirma"
+		    },
+		    SOCKET_NETWORK_ERROR: {
+		      code: "AS420504", message: "Ocurrio un error de red en la llamada al servicio de firma"
+		    },
+		    WEBSERVER_NETWORK_ERROR: {
+		      code: "AS420505", message: "Ocurrio un error de red en la llamada al servicio de firma"
+		    }
+		  },
+		  Functional: {
+		    CANCELLED_OP: {
+		      code: "AS500001", message: "Operacion cancelada por el usuario"
+		    },
+		    UPLOAD_FILE_SERVER: {
+		      code: "AS500008", message: "La operacion de carga de fichero no esta disponible por servidor intermedio"
+		    },
+		    UPLOAD_MULTIPLE_FILE_SERVER : {
+		      code: "AS500009", message: "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio"
+		    },
+		    NON_OPERATIVE_JS_METHOD : {
+		      code: "AS500010", message: "El metodo JavaScript no se encuentra operativo"
+		    }
+		  },
+		  Request: {
+		    RETRIEVE_URL_NOT_FOUND: {
+		      code: "AS600101", message: "No se ha indicado la direccion del servlet para la recuperacion de datos"
+		    },
+		    STORAGE_URL_NOT_FOUND: {
+		      code: "AS600102", message: "No se ha indicado la direccion del servlet para el guardado de datos"
+		    },
+		    TOO_LONG_URL : {
+		      code: "AS620014", message: "La URL de invocacion al servicio de firma es demasiado larga"
+		    },
+		    UPLOADING_TO_APP : {
+		      code: "AS620015", message: "Ocurrio un error al enviar los datos a la aplicacion nativa"
+		    },
+		    WEBSOCKET_INVOICE_APP : {
+		      code: "AS620017", message: "Ha ocurrido un error al intentar invocar a la aplicacion nativa mediante websocket"
+		    },
+		    WEBSOCKET_MEMORY_ERROR : {
+		      code: "AS620018", message: "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion"
+		    },
+		    WEBSOCKET_UNKNOWN_ERROR : {
+		      code: "AS620019", message: "Error desconocido"
+		    },
+		    SOCKET_INVOICE_APP : {
+		      code: "AS620020", message: "Ha ocurrido un error al intentar invocar a la aplicacion nativa mediante socket"
+		    },
+		    SOCKET_MEMORY_ERROR : {
+		      code: "AS620021", message: "Problema de memoria en servidor"
+		    },
+		    SOCKET_UNKNOWN_ERROR : {
+		      code: "AS620022", message: "Error desconocido"
+		    },
+		    WEBSERVER_INVOICE_APP : {
+		      code: "AS620023", message: "Ha ocurrido un error al intentar invocar a la aplicacion nativa mediante servidor intermedio"
+		    },
+		    WEBSERVER_INVOICE_APP_TIMEOUT : {
+		      code: "AS620024", message: "El tiempo para la recepcion de la firma por la pagina web ha expirado"
+		    },
+		    WEBSERVER_ERROR_CONNECTING_SERVICE : {
+		      code: "AS620025", message: "Error al conectar con el servicio de la aplicacion para recuperar el resultado de la operacion"
+		    }
+		  }
+		};
+		
 		
 		/**
 		 * Realiza la descarga de datos de una URL y, una vez termina, llama al metodo
@@ -454,14 +673,24 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		/** Establece el nombre de aplicacion o dominio desde el que se realiza la llamada. */
 		var setAppName = function (name) {
-			appName = name;
+			appName = encodeURIComponent(name);
+		}
+		
+		/** Establece el tiempo de espera en milisegundos para la lectura de llamadas a servicios. */
+		var setServiceTimeout = function (timeoutMs) {
+			serviceTimeout = timeoutMs;
+		}
+		
+		/** Indica si Autofirma debe de mostrar su dialogo de carga o no. */
+		var enableProgressDialog = function (showDlg) {
+			showDialog = showDlg;
 		}
 		
 		var selectCertificate = function (params, successCallback, errorCallback) {
 			clienteFirma.selectCertificate(params, successCallback, errorCallback);
 			resetStickySignatory = false;
 		}
-			
+
 		var sign = function (dataB64, algorithm, format, params, successCallback, errorCallback) {
 			clienteFirma.sign(dataB64, algorithm, format, params, successCallback, errorCallback);
 			resetStickySignatory = false;
@@ -577,7 +806,7 @@ var AutoScript = ( function ( window, undefined ) {
 		
 		var getCurrentLog = function (successCallback, errorCallback) {
 			if (!!errorCallback) {
-				errorCallback("java.lang.NoSuchMethodException", "El metodo getCurrentLog no se encuentra operativo");
+				errorCallback("java.lang.UnsupportedOperationException", ErrorCode.Functional.NON_OPERATIVE_JS_METHOD.message, ErrorCode.Functional.NON_OPERATIVE_JS_METHOD.code);
 				return;
 			}
 		}
@@ -606,7 +835,11 @@ var AutoScript = ( function ( window, undefined ) {
 		}
 
 		var setLocale = function (locale) {
-			currentLocale = (locale == null || LOCALIZED_STRINGS[locale] == null ? DEFAULT_LOCALE : LOCALIZED_STRINGS[locale]); 
+			currentLocale = (!locale || !LOCALIZED_STRINGS[locale]) ? DEFAULT_LOCALE : LOCALIZED_STRINGS[locale]; 
+		}
+
+		var setLocaleMessages = function (localeMessages) {
+			currentLocale = !localeMessages ? DEFAULT_LOCALE : localeMessages; 
 		}
 
 		var getErrorMessage = function () {
@@ -615,6 +848,14 @@ var AutoScript = ( function ( window, undefined ) {
 
 		var getErrorType = function () {
 			return clienteFirma.getErrorType();
+		}
+		
+		var getErrorCode = function () {
+			return clienteFirma.getErrorCode();
+		}
+		
+		var getErrorCodeNumber = function () {
+			return clienteFirma.getErrorCodeNumber();
 		}
 		
 		var setServlets = function(storageServlet, retrieverServlet) {
@@ -829,11 +1070,11 @@ var AutoScript = ( function ( window, undefined ) {
 		 * con internet Explorer 10 y anteriores que trataran la comunicacion por sockets).
 		 */
 		function cargarAppAfirma(clientAddress, keystore) {
-			
+									
 			if (!!Dialog.isEnabled()) {
 				loadSupportDialogStyles();
 			}			
-					
+								
 			// Comprobamos que no haya un desfase horario declarado como grave y
 			// abortamos la carga en ese caso
 			if (severeTimeDelay) {
@@ -843,7 +1084,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				return;
 			}
-
+			
 			// Si se fuerza el uso de servidor intermedio o estamos en un dispositivo movil,
 			// usamos servidor intermedio
 			if (forceWSMode || Platform.isIOS() || Platform.isAndroid()) {
@@ -891,143 +1132,143 @@ var AutoScript = ( function ( window, undefined ) {
 			clienteFirma.setKeyStore(keystore);
 		}
 		
-		/** Carga los estilos por defecto del diálogo de soporte de manera responsiva */
+		/** Carga los estilos por defecto del dialogo de soporte de manera responsiva */
 	  	function loadSupportDialogStyles() {
-		    var styles = `
-		        /* Backdrop que siempre ocupa todo el viewport y centra el modal */
-		        .afirma-modal-backdrop {
-		            position: fixed;
-		            top: 0;
-		            left: 0;
-		            width: 100vw;
-		            height: 100vh;
-		            background: rgba(0, 0, 0, 0.6);
-		            z-index: 9990;
-		            display: flex;
-		            align-items: center;
-		            justify-content: center;
-		            box-sizing: border-box;
-		        }
-		        /* Contenedor principal del diálogo */
-		        .afirma-modal-container {
-		            background-color: #ffffff;
-		            border-radius: 8px;
-		            padding: 20px;
-		            box-shadow: 0 0px 15px 2px rgb(0 0 0 / 50%);
-		            width: 90%;
-		            max-width: 500px;
-		            max-height: 90vh;
-		            overflow-y: auto;
-		            box-sizing: border-box;
-		            display: flex;
-		            flex-direction: column;
-		            align-items: center;
-		            text-align: center;
-		        }
-		        /* Ajuste para pantallas más grandes */
-		        @media (min-width: 600px) {
-		            .afirma-modal-container {
-		                width: 500px;
-		            }
-		            /* En pantallas grandes, botones en columna */
-		            .afirma-modal-button-container {
-		              display: flex;
-		              flex-direction: row !important;
-		              justify-content: flex-end;
-		            }
-		
-		            .afirma-modal-button-container button {
-		              margin: 0 0.5rem 0 0;
-		          }
-		        }
-		        /* Panel de contenido: logo + texto */
-		        .afirma-modal-message-panel {
-		            display: flex;
-		            flex-direction: column;
-		            align-items: center;
-		        }
-		        /* Logo (reutiliza la clase existente) */
-		        .afirma-modal-logo {
-		            width: 15%;
-		            min-width: 64px;
-		            height: 64px;
-		            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABg2lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpaJVBzuIOGSoTnZRkY6likWwUNoKrTqYXPoFTRqSFBdHwbXg4Mdi1cHFWVcHV0EQ/ABxF5wUXaTE/yWFFjEeHPfj3b3H3TtAaFaZavbEAFWzjHQiLubyq2LgFQL8GMAQohIz9WRmMQvP8XUPH1/vIjzL+9yfY1ApmAzwicQxphsW8Qbx3Kalc94nDrGypBCfE08ZdEHiR67LLr9xLjks8MyQkU3PE4eIxVIXy13MyoZKPEscVlSN8oWcywrnLc5qtc7a9+QvDBa0lQzXaY4jgSUkkYIIGXVUUIWFCK0aKSbStB/38I85/hS5ZHJVwMixgBpUSI4f/A9+d2sWZ6bdpGAc6H2x7Y8JILALtBq2/X1s260TwP8MXGkdf60JRD9Jb3S08BEwvA1cXHc0eQ+43AFGn3TJkBzJT1MoFoH3M/qmPDByC/Svub2193H6AGSpq+Ub4OAQmCxR9rrHu/u6e/v3TLu/H5arcrVRvvChAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH6QIDCxUWWt6gwAAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAR1SURBVHja7ZtNiFtVFMd/5+XVacGCHyuno9jaDwcZpZOXmY5m4hTGliKIFoqKFnQhKgjWRS0IikhFcCVYETeKDCjYhQpSEXRC5sXUkgxdVAXRWnShCxdarRTG5B0Xk5E2ZJLcmzd3XjLeZfJezrm/e8+5/3PeC6zxIavtQCHNiCc8dJlTA7yc/ZK/XNj3VxtAymNYlSOXfqYXKQKfuLDvJXIXCtOujK86gEibAtizZgBI8zw0XMxwS18CKIyxuRgwUxhnG4Bo80Qcwf19CUCURxUe9qpcU/egKQCJeKDvACiI6OKRp4LWV1qWiY1tcxnu7CsAxQx7gS0NO0Ja7Jan+isElKcNxdi9hQzX9wWAUpqbgb2NK99qBwB+SnmmLwDUPJ6/dLX/ywFeazmu8GRpgk09DSAcYzva/FiT9vXI+lqVZ3t7B0S8AqSWWWLpIHc8vqQbeg5AMc1uYL+hEmwcA16NN3oOQH4KX4XXjGuB5uOucIz7egrAur85DNzaxgMxCKVjp8a4ticAFAN2qPKCZTG03BhcUN5MPID8FL7C28D6DmoDs66UciAMOJhoAP4FjgK3t7omVdcBqFVb7q1wlHQiAcyluRs43FYY1Sce2fUlN+BxPI58ECuAQsBOEd43+V3xrBuzmxcijp/YykAiAOR3caO32MjcaBjT3XSmd2+8ivc+OLCMyHIFID/OkF/lc2Cw03uWcoB035rff9053lHLuXQNoLiTQb/KLHCTlUrWWJ5NHAzT7HMOID/OkKaYRex1usT0cMbzGHYKoJBmxK9RAnZ0mYZX9emUFYAwYDolhNB9t0biCQE0qusKU81iae+EwjqSNdRlCKRi81rjOYmWOkyuAERd+ltFuVh3/CzwSwyx3BsAVHhXlRvuqPA1QK7Cx5MVNqkwjfJ9v++AF3NlHsnN82vjF7kyX7DAuMAZS4+cAjA3JoTZCi+1umTyDL8jPGgDWJMeAl7EUenAyWyZb4CC8e8nPARq5893PimFT5O+A0yN6b4fWOjYKTV/P0jVLi/ZARBqpoLr5ARXG3h1ZaKlMGq+3apV7jFYzT0WE0l2EpSIQ/mp9tI7DJgCi5eknCZBsYg34bbUBV7XFuVvaZStwAwWJbJbIWSZcASeKAbMzqUZvWziE2yYy/BY1eMrYMgyKzutBrupBaZEmA8DfgR+AgZq/zAipr3EmJSgb7kD4qjit9DwukxXfQVxewxGJG30WDm8Et0QdwBE7YytqKBxWQ1qAkPA6TGoCQwBnIYAa3wHJDEJeiS9I7TSI0q2EqwpPCfCHx3RjUiJcMxkgWxDwLfNAYbWZnMVXjW5IQw4BGxPpA4w7b6oUrGgbHSP056gqe72PAsAEfNGlytVlzpADSdjDEA9MwDgEIBhEvwtO8/Ppgau8DhtYsdtNWjgmMJJGwO7TvEn8K1BfeJwBxjQFqXUxeleMrBTcweg81NARfioixr/w46FhmcHwE4HKDO6+IZIO3FydrLMd7bzz5b5LAw4ItT/Ytfap3P8P8zHv6ZaYpBH636jAAAAAElFTkSuQmCC);
-		            background-repeat: no-repeat;
-		            background-position: center;
-		            background-size: contain;
-		            margin-bottom: 1rem;
-		        }
-		        .afirma-modal-close-button {
-		          background-color: #878787;
-		          color: #fff;
-		          flex: 1;
-		          margin-top: 0.4rem;
-		          padding: 0.5rem 1rem;
-		          border: none;
-		          border-radius: 4px;
-		          font-family: Helvetica, Arial, sans-serif;
-		          font-size: 16px;
-		          cursor: pointer;
-		          box-sizing: border-box;
-		        }
-		        .afirma-modal-action-button {
-		          background-color: #c33400;
-		          color: #fff;
-		          flex: 1;
-		          margin-top: 0.4rem;
-		          padding: 0.5rem 1rem;
-		          border: none;
-		          border-radius: 4px;
-		          font-family: Helvetica, Arial, sans-serif;
-		          font-size: 16px;
-		          cursor: pointer;
-		          box-sizing: border-box;
-		        }
-		        /* Texto del mensaje */
-		        .afirma-modal-loading-message, .afirma-modal-error-message {
-		          margin-top: 10px;
-		          font-family: Helvetica, Arial, sans-serif;
-		          font-size: 16px;
-		          color: #333;
-		        }
-		
-		        .afirma-modal-loading-message a, .afirma-modal-error-message a {
-		          color: #c33400;
-		          line-height: 1.5rem;
-		        }
-		
-		        .afirma-modal-loading-message a img, .afirma-modal-error-message a img {
-		            margin-top: 1rem;
-		            width: 140px;
-		            max-width: 140px;
-		        }
-		        /* Panel de botones: por defecto en fila (pantallas pequeñas) */
-		        .afirma-modal-button-container {
-		            display: flex;
-		            flex-direction: column;
-		            justify-content: flex-end;
-		            width: 100%;
-		            margin-top: 20px;
-		            box-sizing: border-box;
-		        }
-		        /* Elimina margen derecho del último botón */
-		        .afirma-modal-button-container button:last-child {
-		            margin-right: 0;
-		        }
-		        /* Spinner para indicar carga */
-		        .afirma-modal-spinner {
-		            border: 4px solid rgba(0, 0, 0, 0.1);
-		            border-top-color: #c33400;
-		            width: 24px;
-		            height: 24px;
-		            border-radius: 50%;
-		            animation: spin 1s linear infinite;
-		            margin-top: 10px;
-		        }
-		        @keyframes spin {
-		            to { transform: rotate(360deg); }
-		        }
-		    `;
+		    var styles = "\
+		        /* Backdrop que siempre ocupa todo el viewport y centra el modal */\
+		        .afirma-modal-backdrop {\
+		            position: fixed;\
+		            top: 0;\
+		            left: 0;\
+		            width: 100vw;\
+		            height: 100vh;\
+		            background: rgba(0, 0, 0, 0.6);\
+		            z-index: 9990;\
+		            display: flex;\
+		            align-items: center;\
+		            justify-content: center;\
+		            box-sizing: border-box;\
+		        }\
+		        /* Contenedor principal del dialogo */\
+		        .afirma-modal-container {\
+		            background-color: #ffffff;\
+		            border-radius: 8px;\
+		            padding: 20px;\
+		            box-shadow: 0 0px 15px 2px rgb(0 0 0 / 50%);\
+		            width: 90%;\
+		            max-width: 500px;\
+		            max-height: 90vh;\
+		            overflow-y: auto;\
+		            box-sizing: border-box;\
+		            display: flex;\
+		            flex-direction: column;\
+		            align-items: center;\
+		            text-align: center;\
+		        }\
+		        /* Ajuste para pantallas mas grandes */\
+		        @media (min-width: 600px) {\
+		            .afirma-modal-container {\
+		                width: 500px;\
+		            }\
+		            /* En pantallas grandes, botones en columna */\
+		            .afirma-modal-button-container {\
+		              display: flex;\
+		              flex-direction: row !important;\
+		              justify-content: flex-end;\
+		            }\
+					\
+		            .afirma-modal-button-container button {\
+		              margin: 0 0.5rem 0 0;\
+		          }\
+		        }\
+		        /* Panel de contenido: logo + texto */\
+		        .afirma-modal-message-panel {\
+		            display: flex;\
+		            flex-direction: column;\
+		            align-items: center;\
+		        }\
+		        /* Logo (reutiliza la clase existente) */\
+		        .afirma-modal-logo {\
+		            width: 15%;\
+		            min-width: 64px;\
+		            height: 64px;\
+		            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABg2lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpaJVBzuIOGSoTnZRkY6likWwUNoKrTqYXPoFTRqSFBdHwbXg4Mdi1cHFWVcHV0EQ/ABxF5wUXaTE/yWFFjEeHPfj3b3H3TtAaFaZavbEAFWzjHQiLubyq2LgFQL8GMAQohIz9WRmMQvP8XUPH1/vIjzL+9yfY1ApmAzwicQxphsW8Qbx3Kalc94nDrGypBCfE08ZdEHiR67LLr9xLjks8MyQkU3PE4eIxVIXy13MyoZKPEscVlSN8oWcywrnLc5qtc7a9+QvDBa0lQzXaY4jgSUkkYIIGXVUUIWFCK0aKSbStB/38I85/hS5ZHJVwMixgBpUSI4f/A9+d2sWZ6bdpGAc6H2x7Y8JILALtBq2/X1s260TwP8MXGkdf60JRD9Jb3S08BEwvA1cXHc0eQ+43AFGn3TJkBzJT1MoFoH3M/qmPDByC/Svub2193H6AGSpq+Ub4OAQmCxR9rrHu/u6e/v3TLu/H5arcrVRvvChAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH6QIDCxUWWt6gwAAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAR1SURBVHja7ZtNiFtVFMd/5+XVacGCHyuno9jaDwcZpZOXmY5m4hTGliKIFoqKFnQhKgjWRS0IikhFcCVYETeKDCjYhQpSEXRC5sXUkgxdVAXRWnShCxdarRTG5B0Xk5E2ZJLcmzd3XjLeZfJezrm/e8+5/3PeC6zxIavtQCHNiCc8dJlTA7yc/ZK/XNj3VxtAymNYlSOXfqYXKQKfuLDvJXIXCtOujK86gEibAtizZgBI8zw0XMxwS18CKIyxuRgwUxhnG4Bo80Qcwf19CUCURxUe9qpcU/egKQCJeKDvACiI6OKRp4LWV1qWiY1tcxnu7CsAxQx7gS0NO0Ja7Jan+isElKcNxdi9hQzX9wWAUpqbgb2NK99qBwB+SnmmLwDUPJ6/dLX/ywFeazmu8GRpgk09DSAcYzva/FiT9vXI+lqVZ3t7B0S8AqSWWWLpIHc8vqQbeg5AMc1uYL+hEmwcA16NN3oOQH4KX4XXjGuB5uOucIz7egrAur85DNzaxgMxCKVjp8a4ticAFAN2qPKCZTG03BhcUN5MPID8FL7C28D6DmoDs66UciAMOJhoAP4FjgK3t7omVdcBqFVb7q1wlHQiAcyluRs43FYY1Sce2fUlN+BxPI58ECuAQsBOEd43+V3xrBuzmxcijp/YykAiAOR3caO32MjcaBjT3XSmd2+8ivc+OLCMyHIFID/OkF/lc2Cw03uWcoB035rff9053lHLuXQNoLiTQb/KLHCTlUrWWJ5NHAzT7HMOID/OkKaYRex1usT0cMbzGHYKoJBmxK9RAnZ0mYZX9emUFYAwYDolhNB9t0biCQE0qusKU81iae+EwjqSNdRlCKRi81rjOYmWOkyuAERd+ltFuVh3/CzwSwyx3BsAVHhXlRvuqPA1QK7Cx5MVNqkwjfJ9v++AF3NlHsnN82vjF7kyX7DAuMAZS4+cAjA3JoTZCi+1umTyDL8jPGgDWJMeAl7EUenAyWyZb4CC8e8nPARq5893PimFT5O+A0yN6b4fWOjYKTV/P0jVLi/ZARBqpoLr5ARXG3h1ZaKlMGq+3apV7jFYzT0WE0l2EpSIQ/mp9tI7DJgCi5eknCZBsYg34bbUBV7XFuVvaZStwAwWJbJbIWSZcASeKAbMzqUZvWziE2yYy/BY1eMrYMgyKzutBrupBaZEmA8DfgR+AgZq/zAipr3EmJSgb7kD4qjit9DwukxXfQVxewxGJG30WDm8Et0QdwBE7YytqKBxWQ1qAkPA6TGoCQwBnIYAa3wHJDEJeiS9I7TSI0q2EqwpPCfCHx3RjUiJcMxkgWxDwLfNAYbWZnMVXjW5IQw4BGxPpA4w7b6oUrGgbHSP056gqe72PAsAEfNGlytVlzpADSdjDEA9MwDgEIBhEvwtO8/Ppgau8DhtYsdtNWjgmMJJGwO7TvEn8K1BfeJwBxjQFqXUxeleMrBTcweg81NARfioixr/w46FhmcHwE4HKDO6+IZIO3FydrLMd7bzz5b5LAw4ItT/Ytfap3P8P8zHv6ZaYpBH636jAAAAAElFTkSuQmCC);\
+		            background-repeat: no-repeat;\
+		            background-position: center;\
+		            background-size: contain;\
+		            margin-bottom: 1rem;\
+		        }\
+		        .afirma-modal-close-button {\
+		          background-color: #878787;\
+		          color: #fff;\
+		          flex: 1;\
+		          margin-top: 0.4rem;\
+		          padding: 0.5rem 1rem;\
+		          border: none;\
+		          border-radius: 4px;\
+		          font-family: Helvetica, Arial, sans-serif;\
+		          font-size: 16px;\
+		          cursor: pointer;\
+		          box-sizing: border-box;\
+		        }\
+		        .afirma-modal-action-button {\
+		          background-color: #c33400;\
+		          color: #fff;\
+		          flex: 1;\
+		          margin-top: 0.4rem;\
+		          padding: 0.5rem 1rem;\
+		          border: none;\
+		          border-radius: 4px;\
+		          font-family: Helvetica, Arial, sans-serif;\
+		          font-size: 16px;\
+		          cursor: pointer;\
+		          box-sizing: border-box;\
+		        }\
+		        /* Texto del mensaje */\
+		        .afirma-modal-loading-message, .afirma-modal-error-message {\
+		          margin-top: 10px;\
+		          font-family: Helvetica, Arial, sans-serif;\
+		          font-size: 16px;\
+		          color: #333;\
+		        }\
+				\
+		        .afirma-modal-loading-message a, .afirma-modal-error-message a {\
+		          color: #c33400;\
+		          line-height: 1.5rem;\
+		        }\
+				\
+		        .afirma-modal-loading-message a img, .afirma-modal-error-message a img {\
+		            margin-top: 1rem;\
+		            width: 140px;\
+		            max-width: 140px;\
+		        }\
+		        /* Panel de botones: por defecto en fila (pantallas pequenas) */\
+		        .afirma-modal-button-container {\
+		            display: flex;\
+		            flex-direction: column;\
+		            justify-content: flex-end;\
+		            width: 100%;\
+		            margin-top: 20px;\
+		            box-sizing: border-box;\
+		        }\
+		        /* Elimina margen derecho del ultimo boton */\
+		        .afirma-modal-button-container button:last-child {\
+		            margin-right: 0;\
+		        }\
+		        /* Spinner para indicar carga */\
+		        .afirma-modal-spinner {\
+		            border: 4px solid rgba(0, 0, 0, 0.1);\
+		            border-top-color: #c33400;\
+		            width: 24px;\
+		            height: 24px;\
+		            border-radius: 50%;\
+		            animation: spin 1s linear infinite;\
+		            margin-top: 10px;\
+		        }\
+		        @keyframes spin {\
+		            to { transform: rotate(360deg); }\
+		        }\
+		    ";
 		    var styleSheet = document.createElement("style");
 		    styleSheet.innerText = styles;
 		    document.head.appendChild(styleSheet);
@@ -1202,7 +1443,7 @@ var AutoScript = ( function ( window, undefined ) {
 	      "'>" +
 	      currentLocale.warning +
 	      "</span> ";
-	
+
 	    //Setters
 	    function enableSupportDialog(isEnabled) {
 	      enabled = isEnabled;
@@ -1275,7 +1516,7 @@ var AutoScript = ( function ( window, undefined ) {
 	    }
 	
 	    function isEnabled() {
-	      return enabled;
+	      return enabled && !Platform.isInternetExplorer();
 	    }
 	
 	    function showLoadingDialog() {
@@ -1323,6 +1564,28 @@ var AutoScript = ( function ( window, undefined ) {
 	      return enabled;
 	    }
 	
+		function showWarningDialog(
+	      warningType,
+	      closeButtonCallback
+	    ) {
+	      var messageWarning;
+	      var closeButtonText;
+	      switch (warningType) {
+	        case WARNING_INSECURE_CONTEXT:
+	          messageWarning = buildUnsecureContextWarningMsg();
+	          closeButtonText = currentLocale.ok;
+	          break;
+	      }
+	      var enabled = showSupportDialog(
+	        messageWarning,
+			null,
+			null,
+	        closeButtonText,
+	        closeButtonCallback
+	      );
+	      return enabled;
+	    }
+		
 	    /**
 	     * Muestra un diálogo de soporte responsivo.
 	     * Siempre se utiliza un div con backdrop que bloquea todo el scroll (body y html).
@@ -1400,7 +1663,7 @@ var AutoScript = ( function ( window, undefined ) {
 	        actionButton.textContent = actionButtonText;
 	        actionButton.addEventListener("click", function () {
 	          disposeSupportDialog();
-	          if (actionButtonCallback) actionButtonCallback();
+			  if (actionButtonCallback) actionButtonCallback();
 	        });
 	        buttonsPanel.appendChild(actionButton);
 	        isLoadingDialog = false;
@@ -1562,6 +1825,10 @@ var AutoScript = ( function ( window, undefined ) {
 	      return errorMsg;
 	    }
 	
+		function buildUnsecureContextWarningMsg() {
+			return warningText + currentLocale.unsecure_context;
+		}
+		
 	    return {
 	      buildErrorConnectingApplicationMsg: buildErrorConnectingApplicationMsg,
 	      buildCustomUrl: buildCustomUrl,
@@ -1590,6 +1857,7 @@ var AutoScript = ( function ( window, undefined ) {
 	      setAdminContactInfo: setAdminContactInfo,
 	      showLoadingDialog: showLoadingDialog,
 	      showErrorDialog: showErrorDialog,
+		  showWarningDialog: showWarningDialog,
 	      disposeSupportDialog: disposeSupportDialog,
 	    };
 	  })();
@@ -1795,10 +2063,14 @@ var AutoScript = ( function ( window, undefined ) {
 			var OPERATION_SELECT_CERTIFICATE = "certificate";
 
 			var OPERATION_SIGN = "sign";
+			
+			// Tiempo de espera entre los intentos de conexion para obtener el resultado de la operacion por websocket
+			var AUTOFIRMA_GETRESULT_TIME = 2000;
 
 			/** Informacion de error. */
 			var errorMessage = '';
 			var errorType = '';
+			var errorCode = '';
 		
 			
 			/** WebSocket para la comunicacion con la aplicacion. Antes de crearlo
@@ -2001,6 +2273,9 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				data.appname = createKeyValuePair ("appname", !appName ? appName : DOMAIN_NAME);
 				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64, true);
+				if (serviceTimeout != null && serviceTimeout >= 0) {
+					data.servicetimeout = createKeyValuePair ("servicetimeout", serviceTimeout, true);
+				}
 				
 				return data;
 			}
@@ -2031,6 +2306,9 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				data.appname = createKeyValuePair ("appname", !appName ? appName : DOMAIN_NAME);
 				data.dat = createKeyValuePair ("dat", dataB64 == "" ? null : dataB64, true);
+				if (serviceTimeout != null && serviceTimeout >= 0) {
+					data.servicetimeout = createKeyValuePair ("servicetimeout", serviceTimeout, true);
+				}
 				
 				return data;
 			}
@@ -2058,6 +2336,9 @@ var AutoScript = ( function ( window, undefined ) {
 					if (localBatchProcess) {
 						data.localBatchProcess = createKeyValuePair ("localBatchProcess", true);
 					}
+				}
+				if (serviceTimeout != null && serviceTimeout >= 0) {
+					data.servicetimeout = createKeyValuePair ("servicetimeout", serviceTimeout, true);
 				}
 				
 				return data;
@@ -2148,11 +2429,12 @@ var AutoScript = ( function ( window, undefined ) {
 						console.log("Tratamos de conectar con el cliente a traves de WebSockets en los puertos " + ports);
 						setTimeout(waitAppAndProcessRequest, 3000, ports, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, url, successCB, errorCB);
 					} catch (e) {
+						errorCode = ErrorCode.Request.WEBSOCKET_INVOICE_APP.code;
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA, 
 																		function (){execAppIntent(url, successCB, errorCB)} , 
-																		function (){errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," ")); });
+																		function (){errorCB("java.lang.IOException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode); });
 						if(!enabled) {
-							errorCB("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+							errorCB("java.lang.IOException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);
 						}
 					}
 				}
@@ -2188,6 +2470,10 @@ var AutoScript = ( function ( window, undefined ) {
 					+ "&v=" + PROTOCOL_VERSION
 					+ "&jvc=" + VERSION_CODE
 					+ "&idsession=" + idSession;
+				if (!showDialog) {
+					url += "&dlgload=" + showDialog;
+				}
+
 				openUrl(url);
 			}
 
@@ -2210,11 +2496,13 @@ var AutoScript = ( function ( window, undefined ) {
 	
 						ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
 						
+						errorCode = ErrorCode.Request.WEBSOCKET_INVOICE_APP.code;
+						
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 															function (){execAppIntent(url, successCB, errorCB)}, 
-															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+															function (){errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);});
 						if (!enabled) {
-							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);
 						}
 					}			
 				}
@@ -2252,7 +2540,7 @@ var AutoScript = ( function ( window, undefined ) {
 						connected = false;
 						ws = null;
 						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
-						processErrorResponse("java.lang.InterruptedException", "Autofirma se ha cerrado o ha cerrado el websocket de comunicacion");
+						processErrorResponse("java.lang.InterruptedException", ErrorCode.Communication.WEBSOCKET_CLOSE);
 					}
 				};
 
@@ -2260,9 +2548,9 @@ var AutoScript = ( function ( window, undefined ) {
 					console.log("Procesado por defecto del mensaje");
 				}
 				
-				webSocket.onerror = function() {
+				webSocket.onerror = function(e) {
 					console.log("Procesado por defecto del error");
-				}
+				};
 				
 				return webSocket;
 			}
@@ -2308,9 +2596,9 @@ var AutoScript = ( function ( window, undefined ) {
 				if (retries <= 0) {
 					var enabled =  Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																function (){sendEcho(ws, idSession, 1)}, 
-																function (){processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+																function (){processErrorResponse("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSOCKET_INVOICE_APP);});
 					if (!enabled) {
-						processErrorResponse("java.util.concurrent.TimeoutException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+						processErrorResponse("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSOCKET_INVOICE_APP);
 					}
 					return;
 				}
@@ -2336,27 +2624,58 @@ var AutoScript = ( function ( window, undefined ) {
 			 * el tipo de operacion que la envie.
 			 */
 			function processResponse (data) {
+						
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					processErrorResponse("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP);
+					return;
+				}
+				
+				// Se recibe un mensaje de espera, la operacion solicitada no ha terminado aun
+				if (data == "#wait") {
+					setTimeout(function() {
+				        ws.send("getresult?idsession=" + idSession);
+				    }, AUTOFIRMA_GETRESULT_TIME);
+					return;
+				}
+				
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substring(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {
+					var errorType;		
+					if (data.substring(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					processErrorResponse(errorType, errorCode, errorMessage);
 					return;
 				}
 				
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
-					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
+					processErrorResponse("es.gob.afirma.core.OutOfMemoryError", ErrorCode.Request.WEBSOCKET_MEMORY_ERROR);
 					return;
 				}
 				
 				// Se ha producido un error
-				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
+				if (data.length > 4 && data.substring(0, 4) == "SAF_") {
 					processErrorResponse("java.lang.Exception", data);
 					return;
 				}
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					processErrorResponse("java.lang.Exception", "Error desconocido");
+					processErrorResponse("java.lang.Exception", ErrorCode.Request.WEBSOCKET_UNKNOWN_ERROR);
 					return;
 				}
 
@@ -2395,13 +2714,22 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Procesa la respuesta cuando se detecta un error.
 			 */
-			function processErrorResponse(exception, message) {
+			function processErrorResponse(exception, errCode, errMessage) {
 				errorType = exception;
-				errorMessage = message;
+				if (!!errMessage) {
+					errorMessage = errMessage;
+				} else {
+					errorMessage = errCode.message;
+				}
+				if (!!errCode.code) {
+					errorCode = errCode.code;
+				} else {
+					errorCode = errCode;
+				}		
 				if (!!errorCallback) {
 					var responseErrorCallback = errorCallback;
 					setCallbacks(null, null);
-					responseErrorCallback(exception, message);
+					responseErrorCallback(exception, errorMessage, errorCode);
 				}
 			}
 			
@@ -2417,7 +2745,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// pudiendo obtener cada dato del par teniendo en cuenta el
 				// separador ":"
 				if (data.indexOf(":") <= 0) {
-					processErrorResponse("java.lang.Exception", "Respuesta no valida");
+					processErrorResponse("java.lang.Exception", ErrorCode.Internal.WEBSOCKET_INVALID_RESP);
 					return;
 				}
 
@@ -2485,7 +2813,7 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				// Termina mal
 				else {
-					processErrorResponse("java.lang.Exception", "Error desconocido al procesar los datos");
+					processErrorResponse("java.lang.Exception", ErrorCode.Request.WEBSOCKET_UNKNOWN_ERROR);
 				}
 			}
 
@@ -2613,6 +2941,20 @@ var AutoScript = ( function ( window, undefined ) {
 				return errorType;
 			}
 
+			/**
+			 * Recupera el codigo completo del ultimo error capturado.
+			 */
+			function getErrorCode () {
+				return errorCode;
+			}
+			
+			/**
+			 * Recupera el numero de codigo del ultimo error capturado.
+			 */
+			function getErrorCodeNumber () {
+				return !!errorCode ? errorCode.substring(2) : null;
+			}
+
 			/* Metodos que publicamos del objeto AppAfirmaWebSocketClient */
 			return {
 				echo : echo,
@@ -2630,8 +2972,11 @@ var AutoScript = ( function ( window, undefined ) {
 				getMultiFileNameContentBase64 : getMultiFileNameContentBase64,
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
+				setLocaleMessages : setLocaleMessages,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType	
+				getErrorType : getErrorType,
+				getErrorType : getErrorCode,
+				getErrorCodeNumber : getErrorCodeNumber
 			}
 		});
 
@@ -2641,18 +2986,19 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		var AppAfirmaJSSocket = ( function (clientAddress, window, undefined) {
 
+			var PROTOCOL_VERSION = 4;
+			
 			/**
 			 *  Atributos para la configuracion del objeto sustituto del applet Java de firma
 			 */
 			var errorMessage = '';
 			var errorType = '';
+			var errorCode = '';
 
 			/** Puerto a traves del que se ha conectado con la aplicacion nativa. */
 			var port = "";
 			
 			var idSession;
-			
-			var PROTOCOL_VERSION = 1;
 			
 			/* Tiempo de retardo para peticiones */
 			var WAITING_TIME = 500;
@@ -2932,9 +3278,9 @@ var AutoScript = ( function ( window, undefined ) {
 					} catch (e){
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																	function (){execAppIntent(url);}, 
-																	function (){errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+																	function (){errorServiceResponseFunction("java.lang.IOException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);});
 						if (!enabled) {
-							errorServiceResponseFunction("java.lang.IOException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+							errorServiceResponseFunction("java.lang.IOException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);
 						}
 					}
 				}
@@ -2965,7 +3311,10 @@ var AutoScript = ( function ( window, undefined ) {
 					+ "&v=" + PROTOCOL_VERSION
 					+ "&jvc=" + VERSION_CODE
 					+ "&idsession=" + idSession;
-				
+				if (!showDialog) {
+					url += "&dlgload=" + showDialog;
+				}
+					
 				openUrl(url);
 			}
 
@@ -2987,6 +3336,9 @@ var AutoScript = ( function ( window, undefined ) {
 					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
 				}
 				data.appname = generateDataKeyValue ("appname", !appName ? appName : DOMAIN_NAME);
+				if (serviceTimeout != null && serviceTimeout >= 0) {
+					data.servicetimeout = createKeyValuePair ("servicetimeout", serviceTimeout, true);
+				}
 
 				return data;
 			}
@@ -3011,6 +3363,9 @@ var AutoScript = ( function ( window, undefined ) {
 					data.resetSticky = generateDataKeyValue ("resetsticky", resetStickySignatory);
 				}
 				data.appname = generateDataKeyValue ("appname", !appName ? appName : DOMAIN_NAME);
+				if (serviceTimeout != null && serviceTimeout >= 0) {
+					data.servicetimeout = createKeyValuePair ("servicetimeout", serviceTimeout, true);
+				}
 
 				return data;
 			}
@@ -3094,9 +3449,9 @@ var AutoScript = ( function ( window, undefined ) {
 								}
 								var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
 																			function (){execAppIntent(url)},
-																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));});
+																			function (){errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);});
 								if (!enabled) {
-									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "));
+									errorServiceResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.SOCKET_INVOICE_APP.message, ErrorCode.Request.SOCKET_INVOICE_APP);
 								}
 							}
 							return;
@@ -3150,7 +3505,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// El envio no se fragmenta
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText);
+						errorServiceResponseFunction("java.lang.IOException", httpRequest.responseText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 					}
 					// Las operaciones que no requieren respuesta, llaman directamente a la funcion de exito 
 					if (isSaveOperation) {
@@ -3163,7 +3518,7 @@ var AutoScript = ( function ( window, undefined ) {
 					else {
 						if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
 							if (Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
-								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+								errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor", ErrorCode.Request.SOCKET_MEMORY_ERROR);
 								return;
 							}
 							// Juntamos los fragmentos
@@ -3180,11 +3535,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) {
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0) {
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						}
 						// error desconocido 
 						else {
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ErrorCode.Communication.SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3207,7 +3562,7 @@ var AutoScript = ( function ( window, undefined ) {
 				var urlToSend = url.substring(((i-1) * URL_MAX_SIZE), Math.min(URL_MAX_SIZE * i, url.length));
 				httpRequest.onreadystatechange = function () {
 					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						return;
 					}
 					// Respuesta afirmativa, hay que mandar mas fragmentos
@@ -3242,11 +3597,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) { 
 						// Status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0){
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						}
 						// Error desconocido 
 						else{
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ErrorCode.Communication.SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3269,7 +3624,7 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 
 					if (httpRequest.status == 404) {
-						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText);
+						errorServiceResponseFunction("java.lang.Exception", httpRequest.responseText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 					}
 
 					// Se ha realizado la operacion save, no controlamos reintentos ni el exito de la peticion
@@ -3300,11 +3655,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) { 
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0){
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						}
 						// error desconocido 
 						else{
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ErrorCode.Communication.SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3324,7 +3679,7 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.readyState == 4 && httpRequest.status == 200 && httpRequest.responseText != "") {
 						if(Base64.decode(httpRequest.responseText) == "MEMORY_ERROR"){
-							errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor");
+							errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor", ErrorCode.Request.SOCKET_MEMORY_ERROR);
 							return;
 						}
 						//console.log("recibida la parte " + part);
@@ -3365,11 +3720,11 @@ var AutoScript = ( function ( window, undefined ) {
 					httpRequest.onerror = function(e) { 
 						// status error 0 es que no se ha podido comunicar con la aplicacion
 						if (e.target.status == 0){
-							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion @firma " + e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Se ha perdido la conexion con la aplicacion Autofirma " + e.target.statusText, ErrorCode.Communication.SOCKET_CONNECTING_APP);
 						}
 						// error desconocido 
 						else{
-							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText);
+							errorServiceResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma "+e.target.statusText, ErrorCode.Communication.SOCKET_NETWORK_ERROR);
 						}
 					}
 				}
@@ -3392,19 +3747,42 @@ var AutoScript = ( function ( window, undefined ) {
 			function successSelectCertServiceResponseFunction (data) {
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					errorCode = ErrorCode.Functional.CANCELLED_OP.code;
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, errorCode);
 					return;
 				}
 
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substring(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {		
+					if (data.substring(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					errorCallback(errorType, errorMessage, errorCode);
+					return;
+				}
+				
 				// Se ha producido un error
-				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
+				if (data.length > 4 && data.substring(0, 4) == "SAF_") {
 					errorCallback("java.lang.Exception", data);
 					return;
 				}
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					errorCallback("java.lang.Exception", "Error desconocido");
+					errorCode = ErrorCode.Request.SOCKET_UNKNOWN_ERROR.code;
+					errorCallback("java.lang.Exception", ErrorCode.Request.SOCKET_UNKNOWN_ERROR.message, errorCode);
 					return;
 				}
 
@@ -3418,9 +3796,33 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param data Resultado obtenido.
 			 */
 			function successServiceResponseFunction (data) {
+				
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					errorCode = ErrorCode.Functional.CANCELLED_OP.code;
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, errorCode);
+					return;
+				}
+				
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substring(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {		
+					var errorType;
+					if (data.substring(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					errorCallback(errorType, errorMessage, errorCode);
 					return;
 				}
 				
@@ -3437,19 +3839,20 @@ var AutoScript = ( function ( window, undefined ) {
 
 				// Error de memoria
 				if (data == "MEMORY_ERROR") {
-					errorCallback("es.gob.afirma.core.OutOfMemoryError", "El fichero que se pretende firmar o guardar excede de la memoria disponible para aplicacion");
+					errorCallback("es.gob.afirma.core.OutOfMemoryError", ErrorCode.Request.SOCKET_MEMORY_ERROR.message, ErrorCode.Request.SOCKET_MEMORY_ERROR.code);
 					return;
 				}
 				
 				// Se ha producido un error
-				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
+				if (data.length > 4 && data.substring(0, 4) == "SAF_") {
 					errorCallback("java.lang.Exception", data);
 					return;
 				}
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					errorCallback("java.lang.Exception", "Error desconocido");
+					errorCode = ErrorCode.Request.SOCKET_UNKNOWN_ERROR.code;
+					errorCallback("java.lang.Exception", ErrorCode.Request.SOCKET_UNKNOWN_ERROR.message, errorCode);
 					return;
 				}
 				
@@ -3529,28 +3932,53 @@ var AutoScript = ( function ( window, undefined ) {
 				successCallback(signature, certificate);
 			}
 			
-			function errorServiceResponseFunction(exception, message){
+			function errorServiceResponseFunction(exception, message, errCode){
+				errorCode = errCode.code;
 				if (errorCallback) {
-					errorCallback(exception, message);
+					errorCallback(exception, message, errorCode);
 				}
 			}
 			
 			function successBatchResponseFunction (data) {
 				// No se ha obtenido respuesta o se notifica la cancelacion
 				if (data == undefined || data == null || data == "CANCEL") {
-					errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+					errorCode = ErrorCode.Functional.CANCELLED_OP.code;
+					errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, errorCode);
+					return;
+				}
+				
+				// Si se obtiene otro mensaje de error, se ejecuta la funcion callback de error
+				if (data.length > 7 && data.substring(0, 4).toLowerCase() == "err-" && data.indexOf(":=") != -1) {
+					var errorType;
+					if (data.substring(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+						errorType = "es.gob.afirma.core.AOCancelledOperationException";
+					} else {
+						errorType = "java.lang.Exception";
+					}
+
+					// Se espera el formato "err-XX:= CODIGO - MENSAJE", donde CODIGO tiene exactamente 8 caracteres
+					var errorCodeAndMessage = data.substring(data.indexOf(":=") + 2);
+					if (errorCodeAndMessage.indexOf(" - ") != 8) {
+						errorMessage = errorCodeAndMessage;
+					}
+					else {
+						errorCode = errorCodeAndMessage.substring(0, 8)
+						errorMessage = errorCodeAndMessage.substring(11);
+					}
+					errorCallback(errorType, errorMessage, errorCode);
 					return;
 				}
 				
 				// Se ha producido un error
-				if (data.length > 4 && data.substr(0, 4) == "SAF_") {
+				if (data.length > 4 && data.substring(0, 4) == "SAF_") {
 					errorCallback("java.lang.Exception", data);
 					return;
 				}
 
 				// Se ha producido un error y no se ha identificado el tipo
 				if (data == "NULL") {
-					errorCallback("java.lang.Exception", "Error desconocido");
+					errorCode = ErrorCode.Request.SOCKET_UNKNOWN_ERROR.code;
+					errorCallback("java.lang.Exception",ErrorCode.Request.SOCKET_UNKNOWN_ERROR.message, errorCode);
 					return;
 				}
 				
@@ -3711,6 +4139,22 @@ var AutoScript = ( function ( window, undefined ) {
 				return errorType;
 			}
 
+			/**
+			 * Recupera el codigo comleto del ultimo error capturado.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getErrorCode () {
+				return errorCode;
+			}
+			
+			/**
+			 * Recupera el numero del codigo del ultimo error capturado.
+			 * Implementada en el applet Java de firma.
+			 */
+			function getErrorCodeNumber () {
+				return !!errorCode ? errorCode.substring(2) : null;
+			}
+
 			/* Metodos que publicamos del objeto AppAfirmaJSSocket */
 			return {
 				echo : echo,
@@ -3732,7 +4176,9 @@ var AutoScript = ( function ( window, undefined ) {
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType			
+				getErrorType : getErrorType,
+				getErrorCode : getErrorCode,
+				getErrorCodeNumber : getErrorCodeNumber	
 			}
 		});
 
@@ -3742,11 +4188,10 @@ var AutoScript = ( function ( window, undefined ) {
 		 */
 		var AppAfirmaJSWebService = ( function (clientAddress, window, undefined) {
 
+			var PROTOCOL_VERSION = 4;
+			
 			/* Longitud maxima que generalmente se permite a una URL. */
 			var MAX_LONG_GENERAL_URL = 2000;
-			
-			/** Version del protocolo utilizada. */
-			var PROTOCOL_VERSION = 3;
 			
 			/** Tiempo de espera entre intentos de obtener el resultado de la operacion. */
 			var WAITING_CYCLE_MILLIS = Platform.isAndroid() || Platform.isIOS() ? 4000 : 3000;
@@ -3766,12 +4211,16 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			var currentOperation = OPERATION_SIGN;
 			
+			var innerOperationFunction;
+			var innerOperationParams;
+			
 			/** Certificado en base 64 que se deve usar por defecto cuando la opcion stickySignatory
 			 * este activada. */
 			var stickyCertificate;
 
 			var errorMessage = '';
 			var errorType = '';
+			var errorCode = '';
 			var defaultKeyStore = null;
 			var retrieverServletAddress = null;
 			var storageServletAddress = null;
@@ -3789,6 +4238,14 @@ var AutoScript = ( function ( window, undefined ) {
 				retrieverServletAddress = window.location.origin + "/afirma-signature-retriever/RetrieveService";
 				storageServletAddress = window.location.origin + "/afirma-signature-storage/StorageService";
 			}
+
+			/** Indica si se tiene constancia de que el cliente de firma soporta los nuevos mecanismos de cifrado */
+			var newCiphersSupported = false;
+
+			/** Indica si el navegador soporta los nuevos mecanismos de cifrado avanzado. */
+			function isSecureEnvironment() {
+				return window.crypto && window.crypto.subtle && window.crypto.subtle.generateKey; 
+			}
 			
 			/**
 			 * Establece el almacen de certificados de que se debe utilizar por defecto.
@@ -3801,47 +4258,31 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Inicia el proceso de seleccion de certificado.
 			 */
 			function selectCertificate (extraParams, successCallback, errorCallback) {
-			
-				currentOperation = OPERATION_SELECT_CERTIFICATE;
+
+				var parameters = {
+					extraParams : extraParams
+				};
 				
-				var idSession = AfirmaUtils.generateNewIdSession();
-				var cipherKey = generateCipherKey();
+				// Ejecutamos la operacion de seleccion de certificado
+				processInnerOperation(innerSelectCertificate, parameters, successCallback, errorCallback);
+			}
+			
+			function innerSelectCertificate(cipherConfig, parameters, successCallback, errorCallback) {
+							
+				// Registramos los datos de la operacion actual para gestionar la respuesta y
+				// los reintentos
+				currentOperation = OPERATION_SELECT_CERTIFICATE;
+				innerOperationFunction = innerSelectCertificate;
+				innerOperationParams = parameters;
 
 				var opId = "selectcert";
 				
 				var params = new Array();
-				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
-				params[params.length] = {key:"op", value:opId};
+				if (!!defaultKeyStore) {		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
 				
-				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
-				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
-																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
-				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
+				configureExtraParams(params, parameters.extraParams);
 
-				configureExtraParams(params, extraParams);
-				
-				var url = buildUrl(opId, params);
-
-				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
-				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
-				if (isURLTooLong(url)) {
-					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
-						return;
-					}
-					else if (retrieverServletAddress == null || retrieverServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para la recuperacion de datos");
-						return;
-					}
-					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
-				}
-				else {
-					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
-				}
+				initProcess(opId, cipherConfig, params, successCallback, errorCallback);
 			}
 			
 			/**
@@ -3876,62 +4317,56 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param errorCallback M&eacute;todo a ejecutar en caso de error.
 			 */
 			function signOperation (signId, dataB64, algorithm, format, extraParams, successCallback, errorCallback) {
+			
+				var parameters = {
+					signId : signId,
+					dataB64 : dataB64,
+					algorithm : algorithm,
+					format : format,
+					extraParams : extraParams
+				};
 
+				// Ejecutamos la operacion de firma/multifirma
+				processInnerOperation(innerSignOperation, parameters, successCallback, errorCallback);
+			}
+			
+			function innerSignOperation(cipherConfig, parameters, successCallback, errorCallback) {
+			
+				// Registramos los datos de la operacion actual para gestionar la respuesta y
+				// los reintentos
 				currentOperation = OPERATION_SIGN;
+				innerOperationFunction = innerSignOperation;
+				innerOperationParams = parameters;
 				
-				if (dataB64 == undefined || dataB64 == "") {
-					dataB64 = null;
-				}
+				var dataB64 = parameters.dataB64;
+				var algorithm = parameters.algorithm;
+				var format = parameters.format;
+				var extraParams = parameters.extraParams;
 
-				if (dataB64 != null && !isValidUrl(dataB64)) {
-					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
-					dataB64 = dataB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en Autofirma
+				if (!!dataB64 && !isValidUrl(dataB64)) {
+					// Pasamos a URL SAFE y eliminamos saltos de carro para que no generen espacios codificados como 0x20
+					// al codificarlos como XML si se tienen que enviar al servidor intermedio
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_").replace(/\n/g, "").replace(/\r/g, "");
 				}
 				
-				var idSession = AfirmaUtils.generateNewIdSession();
-				var cipherKey = generateCipherKey();
-
-				if (!appName) {
-					appName = DOMAIN_NAME;
-				}
-												
+				var opId = parameters.signId;
+				
 				var params = new Array();
-				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
-				if (signId != null && signId != undefined) {			params[params.length] = {key:"op", value:signId}; }
-				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
-				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
-																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
-				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
-				if (format != null && format != undefined) {			params[params.length] = {key:"format", value:format}; }
-				if (algorithm != null && algorithm != undefined) {		params[params.length] = {key:"algorithm", value:algorithm}; }
-				if (extraParams != null && extraParams != undefined) { 	params[params.length] = {key:"properties", value:Base64.encode(extraParams)}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
-				if (appName != null && appName != undefined) {			params[params.length] = {key:"appname", value:appName}; }
+				if (!!defaultKeyStore) {				params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+				if (!!format) {							params[params.length] = {key:"format", value:format}; }
+				if (!!algorithm) {						params[params.length] = {key:"algorithm", value:algorithm}; }
+				
+				if (!!serviceTimeout != null 
+					&& serviceTimeout != undefined
+					&& serviceTimeout >= 0) {			params[params.length] = {key:"servicetimeout", value:serviceTimeout}; }
 
 				configureExtraParams(params, extraParams);
 
-				if (dataB64 != null) {									params[params.length] = {key:"dat", value:dataB64}; }
+				if (!!dataB64) {						params[params.length] = {key:"dat", value:dataB64}; }
 			
-				var url = buildUrl(signId, params);
-
-				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
-				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
-				if (isURLTooLong(url)) {
-					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
-						return;
-					}
-
-					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, signId, params, successCallback, errorCallback)
-				}
-				else {
-					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
-				}
+				initProcess(opId, cipherConfig, params, successCallback, errorCallback);
 			}
-
+			
 			/**
 			 * Realiza una operacion de firma/multifirma y permite guardar el fichero a disco.
 			 * @param signId Identificador de la operacion a realizar (sign, cosign y countersign).
@@ -3944,257 +4379,233 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param errorCallback M&eacute;todo a ejecutar en caso de error.
 			 */
 			function signAndSaveToFile (signId, dataB64, algorithm, format, extraParams, outputFileName, successCallback, errorCallback) {
+				
+				var parameters = {
+					signId : signId,
+					dataB64 : dataB64,
+					algorithm : algorithm,
+					format : format,
+					extraParams : extraParams,
+					outputFileName : outputFileName
+				};
 
+				// Ejecutamos la operacion de firma/multifirma y guardado
+				processInnerOperation(innerSignAndSaveFile, parameters, successCallback, errorCallback);
+			}
+			
+			function innerSignAndSaveFile(cipherConfig, parameters, successCallback, errorCallback) {
+
+				// Registramos los datos de la operacion actual para gestionar la respuesta y
+				// los reintentos
 				currentOperation = OPERATION_SIGN;
+				innerOperationFunction = innerSignAndSaveFile;
+				innerOperationParams = parameters;
 				
-				if (dataB64 == undefined || dataB64 == "") {
-					dataB64 = null;
-				}
-
-				if (dataB64 != null && !isValidUrl(dataB64)) {
-					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
-					dataB64 = dataB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en Autofirma
+				var signId = parameters.signId;
+				var dataB64 = parameters.dataB64;
+				var algorithm = parameters.algorithm;
+				var format = parameters.format;
+				var extraParams = parameters.extraParams;
+				var outputFileName = parameters.outputFileName;
+				
+				if (!!dataB64 && !isValidUrl(dataB64)) {
+					// Pasamos a URL SAFE y eliminamos saltos de carro para que no generen espacios codificados como 0x20
+					// al codificarlos como XML si se tienen que enviar al servidor intermedio
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_").replace(/\n/g, "").replace(/\r/g, "");
 				}
 				
-				var idSession = AfirmaUtils.generateNewIdSession();
-				var cipherKey = generateCipherKey();
-
-				if (!appName) {
-					appName = DOMAIN_NAME;
-				}
-
 				var opId = "signandsave";
-				var params = new Array();
 				
-				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
-				params[params.length] = {key:"op", value:opId};
-				if (signId != null && signId != undefined) {			params[params.length] = {key:"cop", value:signId}; }
-				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
-				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
-																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
-				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
-				if (format != null && format != undefined) {			params[params.length] = {key:"format", value:format}; }
-				if (algorithm != null && algorithm != undefined) {		params[params.length] = {key:"algorithm", value:algorithm}; }
-				if (outputFileName != null &&
-						outputFileName != undefined) {					params[params.length] = {key:"filename", value:outputFileName}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
-				if (appName != null && appName != undefined) {			params[params.length] = {key:"appname", value:appName}; }
-
+				var params = new Array();
+				if (!!signId) {						params[params.length] = {key:"cop", value:signId}; }
+				if (!!defaultKeyStore) {			params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+				if (!!format) {						params[params.length] = {key:"format", value:format}; }
+				if (!!algorithm) {					params[params.length] = {key:"algorithm", value:algorithm}; }
+				if (!!outputFileName) {				params[params.length] = {key:"filename", value:outputFileName}; }
+				
+				if (serviceTimeout != null 
+					&& serviceTimeout != undefined
+					&& serviceTimeout >= 0) {		params[params.length] = {key:"servicetimeout", value:serviceTimeout}; }
+				
 				configureExtraParams(params, extraParams);
 				
-				if (dataB64 != null) {									params[params.length] = {key:"dat", value:dataB64}; }
+				if (!!dataB64) {					params[params.length] = {key:"dat", value:dataB64}; }
 			
-				var url = buildUrl(opId, params);
-
-				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
-				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
-				if (isURLTooLong(url)) {
-					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
-						return;
-					}
-
-					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
-				}
-				else {
-					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
-				}
+				initProcess(opId, cipherConfig, params, successCallback, errorCallback);
 			}
 			
 			/**
 			 * Ejecuta una operacion de firma de lote con XML.
 			 */
 			function signBatchXML (batchB64, batchPreSignerUrl, batchPostSignerUrl, extraParams, successCallback, errorCallback) {
-				
+				var parameters = {
+					batchB64 : batchB64,
+					batchPreSignerUrl : batchPreSignerUrl,
+					batchPostSignerUrl : batchPostSignerUrl,
+					extraParams : extraParams
+				};
+
+				// Ejecutamos la operacion de firma de lote XML
+				processInnerOperation(innerSignBatchXML, parameters, successCallback, errorCallback);
+			}
+
+			function innerSignBatchXML(cipherConfig, parameters, successCallback, errorCallback) {
+
+				// Registramos los datos de la operacion actual para gestionar la respuesta y
+				// los reintentos
 				currentOperation = OPERATION_BATCH;
+				innerOperationFunction = innerSignBatchXML;
+				innerOperationParams = parameters;
+
+				var batchB64 = parameters.batchB64;
+				var batchPreSignerUrl = parameters.batchPreSignerUrl;
+				var batchPostSignerUrl = parameters.batchPostSignerUrl;
+				var extraParams = parameters.extraParams;
 				
-				if (batchB64 == undefined || batchB64 == "") {
-					batchB64 = null;
-				}
-
-				if (batchB64 != null && !isValidUrl(batchB64)) {
-					batchB64 = batchB64.replace(/\+/g, "-").replace(/\//g, "_");
-					batchB64 = batchB64.replace(/\n/g, "").replace(/\r/g, ""); //eliminamos saltos de carro para que no generen espacios 0x20 al parsear los atributos del XML enviado/recibido (storageServletAddress y retrieverServletAddress) que impiden la firma en Autofirma
-				}
-
-				var idSession = AfirmaUtils.generateNewIdSession();
-				var cipherKey = generateCipherKey();
-
-				if (!appName) {
-					appName = DOMAIN_NAME;
+				if (!!dataB64 && !isValidUrl(dataB64)) {
+					// Pasamos a URL SAFE y eliminamos saltos de carro para que no generen espacios codificados como 0x20
+					// al codificarlos como XML si se tienen que enviar al servidor intermedio
+					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_").replace(/\n/g, "").replace(/\r/g, "");
 				}
 
 				var opId = "batch";
-				
+
 				var params = new Array();
-				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
-				params[params.length] = {key:"op", value:opId};
-				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
-				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
-																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
-				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
-				if (batchPreSignerUrl != null &&
-						batchPreSignerUrl != undefined) {				params[params.length] = {key:"batchpresignerurl", value:batchPreSignerUrl}; }				
-				if (batchPostSignerUrl != null &&
-						batchPostSignerUrl != undefined) {				params[params.length] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
-				if (appName != null && appName != undefined) {			params[params.length] = {key:"appname", value:appName}; }
-				params[params.length] = {key:"needcert", value:"true"}; 
+				if (!!defaultKeyStore) {				params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+				if (!!batchPreSignerUrl) {				params[params.length] = {key:"batchpresignerurl", value:batchPreSignerUrl}; }				
+				if (!!batchPostSignerUrl) {				params[params.length] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
+				
+				if (serviceTimeout != null 
+					&& serviceTimeout != undefined
+					&& serviceTimeout >= 0) {			params[params.length] = {key:"servicetimeout", value:serviceTimeout}; }
 
 				configureExtraParams(params, extraParams);
+					
+				params[params.length] = {key:"needcert", value:"true"}; 
 				
-				if (batchB64 != null) {									params[params.length] = {key:"dat", value:batchB64}; }
+				if (!!batchB64) {						params[params.length] = {key:"dat", value:batchB64}; }
 
-				var url = buildUrl(opId, params);
-
-				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
-				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
-				if (isURLTooLong(url)) {
-					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
-						return;
-					}
-
-					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
-				}
-				else {
-					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
-				}
+				initProcess(opId, cipherConfig, params, successCallback, errorCallback);
 			}
 			
 			/**
 			 * Ejecuta una operacion de firma de lote JSON.
 			 */
 			function signBatchJSON (jsonRequestB64, batchPreSignerUrl, batchPostSignerUrl, certFilters, successCallback, errorCallback) {
-				
-				currentOperation = OPERATION_BATCH;
-				
-				var idSession = AfirmaUtils.generateNewIdSession();
-				var cipherKey = generateCipherKey();
+				var parameters = {
+					jsonRequestB64 : jsonRequestB64,
+					batchPreSignerUrl : batchPreSignerUrl,
+					batchPostSignerUrl : batchPostSignerUrl,
+					certFilters : certFilters
+				};
 
-				if (!appName) {
-					appName = DOMAIN_NAME;
-				}
+				// Ejecutamos la operacion de firma de lote JSON
+				processInnerOperation(innerSignBatchJSON, parameters, successCallback, errorCallback);
+			}
+
+			function innerSignBatchJSON(cipherConfig, parameters, successCallback, errorCallback) {
+
+				// Registramos los datos de la operacion actual para gestionar la respuesta y
+				// los reintentos
+				currentOperation = OPERATION_BATCH;
+				innerOperationFunction = innerSignBatchJSON;
+				innerOperationParams = parameters;
+
+				var jsonRequestB64 = parameters.jsonRequestB64;
+				var batchPreSignerUrl = parameters.batchPreSignerUrl;
+				var batchPostSignerUrl = parameters.batchPostSignerUrl;
+				var certFilters = parameters.certFilters;
 
 				var opId = "batch";
-				
+
 				var params = new Array();
-				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
-				params[params.length] = {key:"op", value:opId};
-				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
-				if (defaultKeyStore != null &&
-						defaultKeyStore != undefined) {					params[params.length] = {key:"keystore", value:defaultKeyStore};
-																		params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
-				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
-				if (batchPreSignerUrl != null &&
-						batchPreSignerUrl != undefined) {				params[params.length] = {key:"batchpresignerurl", value:batchPreSignerUrl}; }				
-				if (batchPostSignerUrl != null &&
-						batchPostSignerUrl != undefined) {				params[params.length] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:true}; } // Espera activa
-				if (appName != null && appName != undefined) {			params[params.length] = {key:"appname", value:appName}; }
-				if (localBatchProcess) {								params[params.length] = {key:"localBatchProcess", value:true}; }
-
+				if (!!defaultKeyStore) {					params[params.length] = {key:"ksb64", value:Base64.encode(defaultKeyStore)}; }
+				if (!!batchPreSignerUrl) {					params[params.length] = {key:"batchpresignerurl", value:batchPreSignerUrl}; }				
+				if (!!batchPostSignerUrl) {					params[params.length] = {key:"batchpostsignerurl", value:batchPostSignerUrl}; }
+				if (!!localBatchProcess) {					params[params.length] = {key:"localBatchProcess", value:true}; }
+				
+				if (serviceTimeout != null 
+					&& serviceTimeout != undefined
+					&& serviceTimeout >= 0) {				params[params.length] = {key:"servicetimeout", value:serviceTimeout}; }
+				
 				configureExtraParams(params, certFilters);
-								
+
 				params[params.length] = {key:"needcert", value:true};
-				params[params.length] = {key:"jsonbatch", value:true}; 
-				params[params.length] = {key:"dat", value:jsonRequestB64}; 
-				 
-				var url = buildUrl(opId, params);
+				params[params.length] = {key:"jsonbatch", value:true};
+				
+				if (!!jsonRequestB64) {						params[params.length] = {key:"dat", value:jsonRequestB64}; }
 
-				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
-				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
-				if (isURLTooLong(url)) {
-					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
-						return;
-					}
-
-					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
-				}
-				else {
-					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
-				}
+				initProcess(opId, cipherConfig, params, successCallback, errorCallback);
 			}
 			
 			/**
 			 * Guardado de datos en disco. Se realiza mediante la invocacion de una app nativa. 
 			 */
 			function saveDataToFile (dataB64, title, filename, extension, description, successCallback, errorCallback) {
+				var parameters = {
+					dataB64 : dataB64,
+					title : title,
+					filename : filename,
+					extension : extension,
+					description : description
+				};
 
-				if (dataB64 != undefined && dataB64 != null && dataB64 != "") {
-					dataB64 = dataB64.replace(/\+/g, "-").replace(/\//g, "_");
-				}
+				// Ejecutamos la operacion de guardado
+				processInnerOperation(innerSaveDataToFile, parameters, successCallback, errorCallback);
+			}
 
-				var idSession = AfirmaUtils.generateNewIdSession();
-				var cipherKey = generateCipherKey();
+			function innerSaveDataToFile(cipherConfig, parameters, successCallback, errorCallback) {
 
+				// Registramos los datos de la operacion actual para gestionar la respuesta y
+				// los reintentos
+				innerOperationFunction = innerSaveDataToFile;
+				innerOperationParams = parameters;
+				
+				var dataB64 = parameters.dataB64;
+				var title = parameters.title;
+				var filename = parameters.filename;
+				var extension = parameters.extension;
+				var description = parameters.description;
+				
 				var opId = "save";
+				
 				var params = new Array();
-				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
-				params[params.length] = {key:"op", value:opId};
-				if (idSession != null && idSession != undefined) {		params[params.length] = {key:"id", value:idSession}; }
-				if (cipherKey != null && cipherKey != undefined) {		params[params.length] = {key:"key", value:cipherKey}; }
-				if (storageServletAddress != null &&
-						storageServletAddress != undefined) {			params[params.length] = {key:"stservlet", value:storageServletAddress}; }
-				if (title != null && title != undefined) {				params[params.length] = {key:"title", value:title}; }
-				if (filename != null && filename != undefined) {		params[params.length] = {key:"filename", value:filename}; }
-				if (extension != null && extension != undefined) {		params[params.length] = {key:"extension", value:extension}; }
-				if (description != null && description != undefined) {	params[params.length] = {key:"description", value:description}; }
-				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
-				if (dataB64 != null && dataB64 != undefined && dataB64 != "") {			params[params.length] = {key:"dat", value:dataB64}; }
-				
-				
-				var url = buildUrl(opId, params);
+				if (!!title) {				params[params.length] = {key:"title", value:title}; }
+				if (!!filename) {			params[params.length] = {key:"filename", value:filename}; }
+				if (!!extension) {			params[params.length] = {key:"extension", value:extension}; }
+				if (!!description) {		params[params.length] = {key:"description", value:description}; }
+				if (!!dataB64) {			params[params.length] = {key:"dat", value:dataB64.replace(/\+/g, "-").replace(/\//g, "_")}; }
 
-				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
-				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
-				if (isURLTooLong(url)) {
-					if (storageServletAddress == null || storageServletAddress == undefined) {
-						throwException("java.lang.IllegalArgumentException", "No se ha indicado la direccion del servlet para el guardado de datos");
-						return;
-					}
-
-					sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
-				}
-				else {
-					execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
-				}
+				initProcess(opId, cipherConfig, params, successCallback, errorCallback);
 			}
 
 			/**
-			 * Carga de fichero de datos. Se realiza mediante la invocacion de una app nativa. 
+			 * Carga de fichero de datos. No se encuentra implementada en este modo de comunicacion. 
 			 */
 			function getFileNameContentBase64 (title, extensions, description, filePath, successCallback, errorCallback) {
-				var errorType = "java.lang.UnsupportedOperationException";
-				var errorMessage = "La operacion de carga de fichero no esta disponible por servidor intermedio";
+				errorType = "java.lang.UnsupportedOperationException";
+				errorMessage = ErrorCode.Functional.UPLOAD_FILE_SERVER.message;
+				errorCode = ErrorCode.Functional.UPLOAD_FILE_SERVER.code;
 				if (!errorCallback) {
-					throwException(errorType, errorMessage);
+					throwException(errorType, ErrorCode.Functional.UPLOAD_FILE_SERVER);
 				}
 				else {
-					errorCallback(errorType, errorMessage);
+					errorCallback(errorType, errorMessage, errorCode);
 				}
 			}
 
 			/**
-			 * Carga de multiples ficheros de datos. Se realiza mediante la invocacion de una app nativa. 
+			 * Carga de multiples ficheros de datos. No se encuentra implementada en este modo de comunicacion.
 			 */
 			function getMultiFileNameContentBase64  (title, extensions, description, filePath, successCallback, errorCallback) {
-				var errorType = "java.lang.UnsupportedOperationException";
-				var errorMessage = "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio";
+				errorType = "java.lang.UnsupportedOperationException";
+				errorMessage = ErrorCode.Functional.UPLOAD_MULTIPLE_FILE_SERVER.message;
+				errorCode = ErrorCode.Functional.UPLOAD_MULTIPLE_FILE_SERVER.code;
 				if (!errorCallback) {
-					throwException(errorType, errorMessage);
+					throwException(errorType, ErrorCode.Functional.UPLOAD_MULTIPLE_FILE_SERVER);
 				}
 				else {
-					errorCallback(errorType, errorMessage);
+					errorCallback(errorType, errorMessage, errorCode);
 				}
 			}
 
@@ -4220,6 +4631,20 @@ var AutoScript = ( function ( window, undefined ) {
 			}
 
 			/**
+			 * Recupera el codigo completo del ultimo error capturado.
+			 */
+			function getErrorCode () {
+				return errorCode;
+			}
+			
+			/**
+			 * Recupera el numero de codigo del ultimo error capturado.
+			 */
+			function getErrorCodeNumber () {
+				return !!errorCode ? errorCode.substring(2) : null;
+			}
+
+			/**
 			 * Establece las rutas de los servlets encargados de almacenar y recuperar las firmas de los dispositivos moviles.
 			 */
 			function setServlets (storageServlet,  retrieverServlet) {
@@ -4230,9 +4655,10 @@ var AutoScript = ( function ( window, undefined ) {
 			/**
 			 * Establece el error indicado como error interno y lanza una excepcion.
 			 */
-			function throwException (type, message) {
+			function throwException (type, errCode) {
 				errorType = type;
-				errorMessage = message;
+				errorMessage = errCode.message;
+				errorCode = errCode.code;
 				throw new Error();
 			}
 
@@ -4244,8 +4670,12 @@ var AutoScript = ( function ( window, undefined ) {
 				return url.length > MAX_LONG_GENERAL_URL;
 			}
 			
+			function isHttpsAddress() {
+				return window.location.protocol == "https:";
+			}
+			
 			/* Genera un numero aleatorio para utilizar como clave de cifrado. */
-			function generateCipherKey() {
+			function generateDESCipherKey() {
 				var random;
 				if (typeof window.crypto != "undefined" && typeof window.crypto.getRandomValues != "undefined") {
 					var randomInts = new Uint32Array(1);
@@ -4258,7 +4688,7 @@ var AutoScript = ( function ( window, undefined ) {
 
 				return random;
 			}
-
+			
 			/* Completa un numero con ceros a la izquierda. */
 			function zeroFill(number, width) {
 				width -= number.toString().length;
@@ -4268,12 +4698,130 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				return number + "";
 			}
+			
 
+			/**
+			 * Ejecuta una de las operaciones del cliente a traves de servidor intermedio.
+			 */
+			function processInnerOperation(innerOperation, parameters, successCallback, errorCallback) {
+				
+				// Si no tenemos la URL de guardado o recuperacion, abortamos la operacion
+				if (storageServletAddress == null || storageServletAddress == undefined) {
+					throwException("java.lang.IllegalArgumentException", ErrorCode.Request.STORAGE_URL_NOT_FOUND);
+					return;
+				}
+				if (retrieverServletAddress == null || retrieverServletAddress == undefined) {
+					throwException("java.lang.IllegalArgumentException", ErrorCode.Request.RETRIEVE_URL_NOT_FOUND);
+					return;
+				}
+				
+				// Comprobamos si estamos en un entorno seguro desde el que podamos usar el cifrado avanzado
+				if (isSecureEnvironment()) {
+					executeWithAdvancedCipher(innerOperation, parameters, successCallback, errorCallback);
+				}
+				// Si la direccion no es HTTPS, sera eso por lo que no se tiene acceso a la CryptoAPI
+				// y, antes de ejecutar la operacion, deberemos avisarlo para que los integradores lo
+				// tengan en cuenta
+				else if (!isHttpsAddress()) {
+					// Si el dialogo estaba desactivado ejecutamos directamente
+					if (!Dialog.showWarningDialog(WARNING_INSECURE_CONTEXT,
+							function() { innerOperation(null, parameters, successCallback, errorCallback) })) {
+						innerOperation(null, parameters, successCallback, errorCallback)
+					}
+				}
+				// Si no se tiene acceso a la CryptoAPI por otro motivo, simplemente se usa el mecanismo antiguo
+				else {
+					innerOperation(null, parameters, successCallback, errorCallback);
+				}
+			}
+
+			/**
+			 * Ejecuta un metodo de operacion enviando los datos por servidor intermedio
+			 * @param operationMethod Metodo de la operacion que debe ejecutar.
+			 * @param operationParameters Parametro con toda la informacion para la ejecucion del metodo
+			 */
+			function executeWithAdvancedCipher(operationMethod, operationParameters, successCallback, errorCallback) {
+
+				var c = window.crypto.subtle;
+
+				c.generateKey(
+					{
+						name: "AES-CBC",
+						length: 256
+					},
+					true,
+					["encrypt", "decrypt"]
+				)
+				.then(function(cipherKey) {
+					return c.exportKey("raw", cipherKey)
+				})
+				.then(function(exportedKey) {
+					
+					var keyB64 = bytesToBase64(new Uint8Array(exportedKey));
+					var iv = window.crypto.getRandomValues(new Uint8Array(16));
+					var ivGenerated = new Uint8Array(iv.length);
+					ivGenerated.set(iv, 0);
+					var ivB64 = bytesToBase64(ivGenerated);
+					
+					var cipherJSON = {
+					  algo: "AES",
+					  key: 	keyB64,
+					  iv: 	ivB64,
+					  legDes:	generateDESCipherKey()
+					};
+
+					operationMethod(cipherJSON, operationParameters, successCallback, errorCallback);
+				});
+			}
+
+			/** Codifica la configuracion de cifrado para el envio. */
+			function encodeCipherConfig(config) {
+				var plainConfig = JSON.stringify(config);				
+				return Base64.encode(plainConfig);
+			}
+			
+			/** Completa la configuracion basica de la operacion y la inicia. */
+			function initProcess (opId, cipherConfig, params, successCallback, errorCallback) {
+				
+				var idSession = AfirmaUtils.generateNewIdSession();
+				var desKey = !!cipherConfig ? cipherConfig.legDes : generateDESCipherKey();
+				var cipherConfigEncoded = !!cipherConfig ? encodeCipherConfig(cipherConfig) : null;
+				var sourceName = !!appName ? appName : DOMAIN_NAME;
+								
+				params[params.length] = {key:"ver", value:PROTOCOL_VERSION};
+				params[params.length] = {key:"op", value:opId};
+				params[params.length] = {key:"id", value:idSession};
+				params[params.length] = {key:"appname", value:sourceName};
+				
+				if (!!desKey) {					params[params.length] = {key:"key", value:desKey}; }
+				if (!!cipherConfigEncoded) {	params[params.length] = {key:"cipher", value:cipherConfigEncoded}; }
+				if (!!storageServletAddress) {	params[params.length] = {key:"stservlet", value:storageServletAddress}; }
+				if (!showDialog) {				params[params.length] = {key:"dlgload", showDialog}; }	// Si no debemos mostrar el dialogo de carga, lo indicamos
+				if (!Platform.isAndroid() && !Platform.isIOS()) {		params[params.length] = {key:"aw", value:"true"}; } // Espera activa
+
+				var url = buildUrl(opId, params);
+
+				// Si no hay configuracion de cifrado avanzada, componemos el objeto con la configuracion DES para
+				// despues poder procesar el resultado
+				if (!cipherConfig) {
+					cipherConfig = { legDes : desKey };
+				}
+
+				// Si la URL es muy larga, realizamos un preproceso para que los datos se suban al
+				// servidor y la aplicacion nativa los descargue, en lugar de pasarlos directamente 
+				if (isURLTooLong(url)) {
+					sendDataAndExecAppIntent(idSession, cipherConfig, storageServletAddress, retrieverServletAddress, opId, params, successCallback, errorCallback)
+				}
+				else {
+					execAppIntent(url, idSession, cipherConfig, successCallback, errorCallback);
+				}
+			}
+			
 			/**
 			 * Envia los datos al servidor intermedio y luego invoca a la
 			 * aplicacion nativa para que los descargue y opere con ellos.
 			 * @param idSession Identificador de la operacion con el que se espera recuperar el resultado.
-			 * @param cipherKey Clave de cifrado. Si no se indica, no se cifra.
+			 * @param cipherConfig Configuracion para el cifrado y descifrado de los datos que se transmitan via servidor intermedio. Si no se indica, no se cifra/descifra.
 			 * @param storageServletAddress URL del servlet que almacena.
 			 * @param retrieverServletAddress URL del servlet que recupera.
 			 * @param op Identificador del tipo de operacion (firma, cofirma, guardado,...).
@@ -4281,7 +4829,7 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param successCallback Funcion callback que debe ejecutarse en caso de exito.
 			 * @param errorCallback Funcion callback que debe ejecutarse en caso de error.
 			 */
-			function sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) {
+			function sendDataAndExecAppIntent (idSession, cipherConfig, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) {
 
 				// Mostramos el dialogo de carga
 				Dialog.showLoadingDialog();
@@ -4292,40 +4840,52 @@ var AutoScript = ( function ( window, undefined ) {
 				// Subimos los datos al servidor intermedio
 				var httpRequest = getHttpRequest();
 				if (!httpRequest) {
-					throwException("java.lang.Exception", "Su navegador no permite preprocesar los datos que desea tratar");
+					throwException("java.lang.Exception", ErrorCode.Internal.BROWSER_CANT_PREPROCESS);
 				}
 				httpRequest.open("POST", storageServletAddress, true);
 				httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
 				var errorOcurred = false;
 
+				// Sacamos de los parametros el ID necesario para la respuesta				
+				var responseId = "";
+				for (var i = 0; i < params.length && !responseId; i++) {
+					if (params[i].key == "id") {
+						responseId = params[i].value;
+					}
+				}
+				
 				httpRequest.onreadystatechange = function () {
 					if (httpRequest.readyState == 4) {
 						 if (httpRequest.status == 200) {
-							url = buildUrlWithoutData(op, fileId, retrieverServletAddress, cipherKey);
+							url = buildUrlWithoutData(op, fileId, responseId, retrieverServletAddress, storageServletAddress, cipherConfig);
 							if (isURLTooLong(url)) {
-								errorCallback("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.");
+								errorCode = ErrorCode.Request.TOO_LONG_URL.code;
+								errorCallback("java.lang.IllegalArgumentException",ErrorCode.Request.TOO_LONG_URL.message, errorCode);
 								return;
 							}
-							execAppIntent(url, idSession, cipherKey, successCallback, errorCallback);
+							console.log("URL: " + url);
+							execAppIntent(url, idSession, cipherConfig, successCallback, errorCallback);
 						}
-					else {
-						errorOcurred = true;
-						console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
-						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
-								 function() { sendDataAndExecAppIntent(idSession, cipherKey, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) },
-								 function() { errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");});
-						if (!enabled) {
-							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos a la aplicacion nativa");
+						else {
+							errorOcurred = true;
+							console.log("Error al enviar los datos al servidor intermedio. HTTP Status: " + httpRequest.status);
+							errorCode = ErrorCode.Request.UPLOADING_TO_APP.code;
+							var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
+									 function() { sendDataAndExecAppIntent(idSession, cipherConfig, storageServletAddress, retrieverServletAddress, op, params, successCallback, errorCallback) },
+									 function() { errorCallback("java.lang.IOException", ErrorCode.Request.UPLOADING_TO_APP.message, errorCode);});
+							if (!enabled) {
+								errorCallback("java.lang.IOException", ErrorCode.Request.UPLOADING_TO_APP.message, errorCode);
+							}
 						}
-					}
 					}
 				}
 				try {
 					httpRequest.onerror = function(e) {	
 						if (!errorOcurred) {
 							console.log("Error al enviar los datos al servidor intermedio (HTTP Status: " + httpRequest.status + "): " + e.message);
-							errorCallback("java.lang.IOException", "Ocurrio un error al enviar los datos al servicio intermedio para la comunicacion con la aplicacion nativa");
+							errorCode = ErrorCode.ThirdParty.UPLOADING_TO_SERVER.code;
+							errorCallback("java.lang.IOException", ErrorCode.ThirdParty.UPLOADING_TO_SERVER.message, errorCode);
 						}
 					}
 				}
@@ -4337,16 +4897,67 @@ var AutoScript = ( function ( window, undefined ) {
 				if (minimumClientVersion) {
 					params[params.length] = { key:"mcv", value:minimumClientVersion};
 				}
+	
+				var dataB64 = buildXML(op, params);
+				
+				// Ciframos y enviamos los datos
+				cipherAndSendData(dataB64, cipherConfig, fileId, httpRequest, errorCallback);
+			}
+			
+			function cipherAndSendData(dataB64, cipherConfig, fileId, httpRequest, errorCallback) {
+				
+				var cipherConfigJson = cipherConfig;
+
+				// Si se soporta el cifrado avanzado, se utiliza				
+				if (newCiphersSupported) {
+					var rawKey = base64ToBytes(cipherConfigJson.key);
+								
+				    window.crypto.subtle.importKey(
+				        "raw",                // formato de la clave
+				        rawKey,               // bytes de la clave
+				        { name: "AES-CBC" },  // algoritmo
+				        false,                // no exportable
+				        ["encrypt"]           // usos permitidos
+				    ).then(function (cryptoKey) {
+						var iv = base64ToBytes(cipherConfigJson.iv);
+					    var encoded = base64ToBytes(dataB64);
+					
+					    return window.crypto.subtle.encrypt(
+					        {
+					            name: "AES-CBC",
+					            iv: iv
+					        },
+					        cryptoKey,
+					        encoded
+					    );
+					}).then(function (ciphered) {
+						let cipheredDataB64 = arrayBufferToBase64(ciphered);
+						sendData(cipheredDataB64, fileId, httpRequest, errorCallback);
+					}).catch(function(error) {
+						console.log("Error al hacer el cifrado avanzado de los datos para la subida al servidor: " + error);
+						errorCode = ErrorCode.Internal.CIPHERING_ERROR.code;
+						errorCallback("java.lang.Exception", ErrorCode.Internal.CIPHERING_ERROR.message, errorCode);
+					});
+				}
+				// Si no se soporta el cifrado avanzado, usamos el comun
+				else {
+					let cipheredDataB64 = cipherDES(dataB64, cipherConfig.legDes);
+					sendData(cipheredDataB64, fileId, httpRequest, errorCallback);
+				}
+			}
+			
+			function sendData(dataB64, fileId, httpRequest, errorCallback) {
 				
 				var requestData =
-					"op=put&v=1_0&id=" + fileId + "&dat=" + 
-					cipher(buildXML(op, params), cipherKey);
+					"op=put&v=1_0&id=" + fileId + "&dat="				
+					+ dataB64.replace(/\+/g, "-").replace(/\//g, "_");;				
 
 				try {
 					httpRequest.send(requestData);
 				}
 				catch(e) {
-					errorCallback("java.lang.IOException", "No se pudo conectar con el servidor remoto");	
+					errorCode = ErrorCode.Communication.CANT_CONNECT_SERVER.code;
+					errorCallback("java.lang.IOException", ErrorCode.Communication.CANT_CONNECT_SERVER.message, errorCode);	
 				}
 			}
 			
@@ -4358,11 +4969,11 @@ var AutoScript = ( function ( window, undefined ) {
 			 *
 			 * @param intentURL URL para la invocacion del Cliente JavaScript
 			 * @param idSession Identificador de la sesi\u00F3n para la recuperaci\u00F3n del resultado.
-			 * @param cipherKey Clave de cifrado para la respuesta del servidor.
+			 * @param decipherConfig Configuracion para el descifrado.
 			 * @param successCallback Actuaci\u00F3n a realizar cuando se recupera el resultado de la operaci&oacute;n.
 			 * @param errorCallback Actuaci\u00F3n a realizar cuando ocurre un error al recuperar el resultado.
 			 */
-			execAppIntent = function (intentURL, idSession, cipherKey, successCallback, errorCallback) {
+			execAppIntent = function (intentURL, idSession, decipherConfig, successCallback, errorCallback) {
 
 				// Mostramos el dialogo de carga
 				Dialog.showLoadingDialog();
@@ -4373,8 +4984,8 @@ var AutoScript = ( function ( window, undefined ) {
 				openUrl(intentURL);
 
 				// Preguntamos repetidamente por el resultado
-				if (!!idSession) {							
-					getStoredFileFromServlet(idSession, retrieverServletAddress, cipherKey, intentURL, successCallback, errorCallback);
+				if (!!idSession) {
+					getStoredFileFromServlet(idSession, retrieverServletAddress, decipherConfig, innerOperationFunction, innerOperationParams, successCallback, errorCallback);
 				}
 			}
 
@@ -4430,21 +5041,33 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Crea una URL a partir de los parametros introducidos para la invocaci&oacute;n de
 			 * una app nativa para que descargue la configuracion de la operaci&oacute;n a realizar.
 			 * @param op Codigo de la operacion a la que tiene que invocar la URL.
-			 * @param id Identificador para la descarga.
+			 * @param fileId Identificador para la descarga.
+			 * @param responseId Identificador de la respuesta.
 			 * @param rtServlet Servlet para la descarga de la configuraci&oacute;n.
-			 * @param cipherKey Clave para el descifrado.
+			 * @param stServlet Servlet para la subida de la configuraci&oacute;n.
+			 * @param cipherConfig Configuracion para el descifrado. Si no se indica, no se descifra.
 			 * @returns URL para la llamada a la app con los datos necesarios para que descargue
 			 * la configuraci&oacute;n de la operaci&oacute;n a realizar.
 			 */
-			function buildUrlWithoutData (op, id, rtServlet, cipherKey) {
+			function buildUrlWithoutData (op, fileId, responseId, rtServlet, stServlet, cipherConfig) {
 				var j = 0;
 				var newParams = new Array();
-				newParams[j++] = {key:"fileid", value:id};
+				newParams[j++] = {key:"fileid", value:fileId};
+				newParams[j++] = {key:"rid", value:responseId};
 				if (rtServlet != null || rtServlet != undefined) {
 					newParams[j++] = {key:"rtservlet", value:rtServlet};
 				}
-				if (cipherKey != null || cipherKey != undefined) {
-					newParams[j++] = {key:"key", value:cipherKey};
+				if (stServlet != null || stServlet != undefined) {
+					newParams[j++] = {key:"stservlet", value:stServlet};
+				}
+				
+				if (!!cipherConfig) {
+					if (!!cipherConfig.legDes) {
+						newParams[j++] = {key:"key", value:cipherConfig.legDes};
+					}
+					if (!!cipherConfig.algo && cipherConfig.algo != "DES") {
+						newParams[j++] = {key:"cipher", value:encodeCipherConfig(cipherConfig)};
+					}
 				}
 				return buildUrl(op, newParams);
 			};
@@ -4456,16 +5079,16 @@ var AutoScript = ( function ( window, undefined ) {
 			 * de indicar false, no se esperara mas; en caso de true, se seguira con la espera; y si se
 			 * de vuelve "reset" se debera reiniciar la espera.
 			 * @param html Resultado obtenido.
-			 * @param cipherKey Clave para el descifrado del resultado si no es un error.
+			 * @param cipherConfig Configuracion para el descifrado del resultado si no es un error.
 			 * @param successCallback Metodo a ejecutar en caso de exito.
 			 * @param errorCallback Metodo a ejecutar en caso de error.
 			 * @returns Devuelve true si se ha fallado pero se puede volver a reintentar, false en caso de
 			 * error determinante o exito.
 			 */
-			function successResponseFunction (html, cipherKey, successCallback, errorCallback) {
+			function successResponseFunction (html, cipherConfig, successCallback, errorCallback) {
 				
 				// Si se obtiene el mensaje de  error de que el identificador no existe, seguimos intentandolo
-				if (html.substr(0, 6).toLowerCase() == "err-06") {
+				if (html.substring(0, 6).toLowerCase() == "err-06") {
 					return true;
 				}
 
@@ -4475,20 +5098,34 @@ var AutoScript = ( function ( window, undefined ) {
 				// Si se obtiene el mensaje de espera, es que el cliente se ha levantado y ha iniciado el proceso.
 				// Siempre que obtengamos este resultado, deberemos reiniciar el tiempo de espera, ya que la aplicacion
 				// sigue activa y nos pide mas tiempo
-				if (html.substr(0, 5).toLowerCase() == "#wait") {
+				if (html.substring(0, 5).toLowerCase() == "#wait") {
 					return "reset";
 				}
 				
 				// Si se obtiene otro mensaje de error, se deja de intentar y se ejecuta la funcion callback de error
-				if (html.substr(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {
-					errorMessage = html.substring(html.indexOf(":=") + 2);
-					if (html.substr(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
+				if (html.substring(0, 4).toLowerCase() == "err-" && html.indexOf(":=") != -1) {
+					var errorType;		
+					if (html.substring(0, 7).toLowerCase() == "err-11:") { // Tipo de error asociado a la cancelacion de la operacion
 						errorType = "es.gob.afirma.core.AOCancelledOperationException";
 					} else {
 						errorType = "java.lang.Exception";
 					}
+
+					var errorCodeAndMessage = html.substring(html.indexOf(":=") + 2);
+					// Se comprueba si la respuesta viene de modo codigo-mensaje o no
+					if(errorCodeAndMessage.indexOf(" - ") != -1) {
+						var splitCode = errorCodeAndMessage.substring(0, errorCodeAndMessage.indexOf(" - "));
+						if (splitCode.length == 8) {
+							errorCode = splitCode;
+							errorMessage = errorCodeAndMessage.substring(errorCodeAndMessage.indexOf(" - ") + 3);
+						} else {
+							errorMessage = errorCodeAndMessage;
+						}								
+					} else {
+						errorMessage = errorCodeAndMessage;
+					}
 					if (!!errorCallback) {
-						errorCallback(errorType, errorMessage);
+						errorCallback(errorType, errorMessage, errorCode);
 					}
 					return false;
 				}
@@ -4496,7 +5133,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Se ha cancelado la operacion
 				if (html == "CANCEL" || html == "CANCEL\r\n" || html == "CANCEL\n") {
 					if (!!errorCallback) {
-						errorCallback("es.gob.afirma.core.AOCancelledOperationException", "Operacion cancelada por el usuario");
+						errorCallback("es.gob.afirma.core.AOCancelledOperationException", ErrorCode.Functional.CANCELLED_OP.message, ErrorCode.Functional.CANCELLED_OP.code);
 					}
 					return false;
 				}
@@ -4510,63 +5147,88 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				// Se ha producido un error
-				if (html.length > 4 && html.substr(0, 4) == "SAF_") {
+				if (html.length > 4 && html.substring(0, 4) == "SAF_") {
 					if (!!errorCallback) {
 						errorCallback("java.lang.Exception", html);
 					}
 					return false;
 				}
 				
+
+				// Llegados a este punto sabemos que hemos obtenido un resultado correcto que hay
+				// que procesar. Los distintos valores del resultado se separan con una tuberia
+				// ('|'). Si se definio una clave de cifrado, consideramos que cada uno de los
+				// datos se han cifrado de forma independiente
+				
+				var datas = new Array();
+				var sepPos1 = 0;
+				var sepPos2 = html.indexOf('|');
+				if (sepPos2 == -1) {
+					datas.push(html);
+				} else {
+					do {
+						datas.push(html.substring(sepPos1, sepPos2));
+						sepPos1 = sepPos2 + 1;
+						sepPos2 = html.indexOf('|', sepPos1);
+					} while (sepPos2 != -1);
+					datas.push(html.substring(sepPos1));
+				}
+				
+				// Si tenemos disponible los mecanismos de los entornos seguros, usamos el descifrado avanzado
+				// de forma asincrona y finalizamos
+				if (isSecureEnvironment() && !!cipherConfig) {
+					try {
+						advDecipherDatasAndProcessResultAsync(datas, cipherConfig, successCallback, errorCallback);
+						return;					
+					} catch (e) {
+						console.log("El cliente de firma no uso el cifrado avanzado, se usara el corriente");
+					}
+				}
+				
+				// Si el cifrado avanzado no estaba disponible o fallo, usamos el descifrado corriente
+				if (!!cipherConfig) {
+				 	datas = decipherDES(datas, cipherConfig.legDes);
+				}
+				processSuccessResult(datas, successCallback);
+			}
+			
+			function processSuccessResult (datas, successCallback) {
+				
 				// Si no se obtuvo un error ni hemos recibido ninguno de los resultados anteriores,
 				// procesamos el resultado segun el tipo de operacion:
 				//  - Si es una firma; se recibira la firma, el certificado + la firma, o el certificado + firma + datos extra.
 				//  - Si es una seleccion de certificado; solo se recibira el certificado.
-				//  - Si es una firma de lote; se recibira el resultado del lote, o el resultado del lote + certificado. 
-				// Los distintos valores del resultado se separan con una tuberia ('|'). Si se
-				// definio una clave de cifrado, consideramos que cada uno de los datos se han
-				// cifrado de forma independiente
+				//  - Si es una firma de lote; se recibira el resultado del lote, o el resultado del lote + certificado.
 				
 				// Procesamos el resultado de la firma de lote
 				if (currentOperation == OPERATION_BATCH) {
 					var result;
 					var certificate = null;
-					var sepPos = html.indexOf('|');
-
+					
 					// En caso de recibir un unico parametro, este sera la firma en el caso de las operaciones de firma y el
 					// certificado cuando se pidio seleccionar uno 
-					if (sepPos == -1) {
-						if (cipherKey != undefined && cipherKey != null) {
-							result = decipher(html, cipherKey);
-						}
-						else {
-							result = fromBase64UrlSaveToBase64(html);
+					result = fromBase64UrlSaveToBase64(datas[0]);
+					if (datas.length > 1) {
+						certificate = fromBase64UrlSaveToBase64(datas[1]);
+					}
+												
+					// Guardamos el certificado si corresponde
+					if (!!stickySignatory) {
+						if (!!certificate) {
+							stickyCertificate = certificate;
 						}
 					}
 					else {
-						if (cipherKey != undefined && cipherKey != null) {
-							result = decipher(html.substring(0, sepPos), cipherKey, true);
-							certificate = decipher(html.substring(sepPos + 1), cipherKey);
-						}
-						else {
-							result = fromBase64UrlSaveToBase64(html.substring(0, sepPos));
-							certificate = fromBase64UrlSaveToBase64(html.substring(sepPos + 1));
-						}
-						// Guardamos el certificado si corresponde
-						if (!!stickySignatory) {
-							if (!!certificate) {
-								stickyCertificate = certificate;
-							}
-						}
-						else {
-							stickyCertificate = null;
-						}
+						stickyCertificate = null;
 					}
 					
+					// Si era una operacion de firma de lote JSON, compone el resultado,
+					// si era un lote XML, fallara y devolvera el mismo valor
 					try {
 						result = AfirmaUtils.parseJSONData(result);
 					}
 					catch (e) {}
-
+					
 					if (!!successCallback) {
 						successCallback(result, certificate);
 					}
@@ -4574,15 +5236,9 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				// Procesamos el resultado de la seleccion de certificado
 				else if (currentOperation == OPERATION_SELECT_CERTIFICATE) {
-					var certificate;
-					if (cipherKey != undefined && cipherKey != null) {
-						certificate = decipher(html, cipherKey);
-					}
-					else {
-						certificate = fromBase64UrlSaveToBase64(html);
-					}
+					var certificate = fromBase64UrlSaveToBase64(datas[0]);
 
-					// Guardamos el certificado
+					// Guardamos el certificado si corresponde
 					stickyCertificate = !!stickySignatory ? certificate : null;
  					
 					if (!!successCallback) {
@@ -4595,42 +5251,20 @@ var AutoScript = ( function ( window, undefined ) {
 				var signature;
 				var certificate = null;
 				var extraInfo = null;
-				var sepPos = html.indexOf('|');
 
 				// En caso de recibir un unico parametro, este sera la firma en el caso de las operaciones de firma y el
 				// certificado cuando se pidio seleccionar uno 
-				if (sepPos == -1) {
-					if (cipherKey != undefined && cipherKey != null) {
-						signature = decipher(html, cipherKey);
-					}
-					else {
-						signature = fromBase64UrlSaveToBase64(html);
-					}
+				if (datas.length == 1) {
+					signature = fromBase64UrlSaveToBase64(datas[0]);
+				}
+				else if (datas.length == 2) {
+					certificate = fromBase64UrlSaveToBase64(datas[0]);
+					signature = fromBase64UrlSaveToBase64(datas[1]);
 				}
 				else {
-					var sepPos2 = html.indexOf('|', sepPos + 1);
-					if (sepPos2 == -1) {
-						if (cipherKey != undefined && cipherKey != null) {
-							certificate = decipher(html.substring(0, sepPos), cipherKey, true);
-							signature = decipher(html.substring(sepPos + 1), cipherKey);
-						}
-						else {
-							certificate = fromBase64UrlSaveToBase64(html.substring(0, sepPos));
-							signature = fromBase64UrlSaveToBase64(html.substring(sepPos + 1));
-						}
-					}
-					else {
-						if (cipherKey != undefined && cipherKey != null) {
-							certificate = decipher(html.substring(0, sepPos), cipherKey, true);
-							signature = decipher(html.substring(sepPos + 1, sepPos2), cipherKey, true);
-							extraInfo = Base64.decode(decipher(html.substring(sepPos2 + 1), cipherKey));
-						}
-						else {
-							certificate = fromBase64UrlSaveToBase64(html.substring(0, sepPos));
-							signature = fromBase64UrlSaveToBase64(html.substring(sepPos + 1));
-							extraInfo = Base64.decode(fromBase64UrlSaveToBase64(html.substring(sepPos2 + 1)));
-						}
-					}
+					certificate = fromBase64UrlSaveToBase64(datas[0]);
+					signature = fromBase64UrlSaveToBase64(datas[1]);
+					extraInfo = Base64.decode(fromBase64UrlSaveToBase64(datas[2]));
 				}
 
 				if (!!stickySignatory) {
@@ -4645,10 +5279,65 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!!successCallback) {
 					successCallback(signature, certificate, extraInfo);
 				}
-				return false;
 			}
 			
-			function errorResponseFunction (type, message, errorCallback) {
+			function advDecipherDatasAndProcessResultAsync(cipheredDatas, decipherConfig, successCallback, errorCallback) {
+
+				var config = decipherConfig;
+				
+				var key = base64ToBytes(config.key);
+				var iv = base64ToBytes(config.iv);
+				
+				var decipheredDatas = new Array();
+				
+				decipherDataAndProcessResult(cipheredDatas, decipheredDatas, key, iv, successCallback, errorCallback);
+			}
+			
+			function decipherDataAndProcessResult(cipheredDatas, decipheredDatas, key, iv, successCallback, errorCallback) {
+	
+				// Procesamos el siguiente dato sin descifrar
+				var cipheredDataB64 = cipheredDatas[decipheredDatas.length];
+				
+				var ciphered = base64ToBytes(fromBase64UrlSaveToBase64(cipheredDataB64));
+				var c = window.crypto.subtle;
+
+				c.importKey(
+					"raw",
+					key,
+					{
+						name: "AES-CBC",
+						length: 256
+					},
+					false,
+					["encrypt", "decrypt"]
+				).then(function(cryptoKey) {
+					return c.decrypt(
+						{
+							name: "AES-CBC",
+							iv: iv
+						},
+						cryptoKey,
+						ciphered
+					);
+				}).then(function(deciphered) {
+					decipheredDatas.push(arrayBufferToBase64(deciphered));
+					// Indicamos que el cliente de firma soporta el cifrado avanzado
+					newCiphersSupported = true;
+					// Si hemos descifrado ya todos los datos, procesamos la respuesta; si no, seguimos decifrando
+					if (cipheredDatas.length == decipheredDatas.length) {
+						processSuccessResult(decipheredDatas, successCallback);
+					}
+					else {
+						decipherDataAndProcessResult(cipheredDatas, decipheredDatas, key, iv, successCallback, errorCallback);
+					}
+				}).catch(function(error) {
+					console.log("Error en el descifrado de la respuesta: " + error);
+					errorCode = ErrorCode.Internal.DECIPHERING_ERROR.code;
+					errorCallback("java.lang.Exception", ErrorCode.Internal.DECIPHERING_ERROR.message, errorCode);
+				 });
+			}
+			
+			function errorResponseFunction (type, message, errorCallback, errCode) {
 				
 				// Cerramos el dialogo de espera al obtener el error
 				Dialog.disposeSupportDialog();
@@ -4657,8 +5346,9 @@ var AutoScript = ( function ( window, undefined ) {
 						type : "java.lang.Exception";
 				errorMessage = (message != null && message.length > 0) ?
 						message : "No se ha podido extablecer la comunicaci\u00F3n entre la aplicaci\u00F3n de firma y la p\u00E1gina web";
+				errorCode = errCode;
 				if (!!errorCallback) {
-					errorCallback(errorType, errorMessage);
+					errorCallback(errorType, errorMessage, errorCode);
 				}
 			}
 			
@@ -4739,53 +5429,50 @@ var AutoScript = ( function ( window, undefined ) {
 			
 			var iterations = 0;
 
-			function getStoredFileFromServlet (idDocument, servletAddress, cipherKey, intentURL, successCallback, errorCallback) {
+			function getStoredFileFromServlet (idDocument, servletAddress, decipherConfig, operationFunction, operationParams, successCallback, errorCallback) {
 
 				var httpRequest = getHttpRequest();
 				if (!httpRequest) {
-					throwException("java.lang.Exception", "Su navegador no permite obtener el resultado de la operaci\u00F3n");
+					throwException("java.lang.Exception", ErrorCode.Internal.BROWSER_CANT_RECOVER_RESULT);
 				}
 
 				iterations = 0;
-				setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, servletAddress, "op=get&v=1_0&id=" + idDocument + "&it=0", cipherKey, intentURL, idDocument, false, successCallback, errorCallback);
+				setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, servletAddress, "op=get&v=1_0&id=" + idDocument + "&it=0", decipherConfig, operationFunction, operationParams, false, successCallback, errorCallback);
 			}
 
-			function retrieveRequest(httpRequest, url, params, cipherKey, intentURL, idDocument, afirmaConnected, successCallback, errorCallback) {
+			function retrieveRequest(httpRequest, url, params, cipherConfig, operationFunction, operationParams, afirmaConnected, successCallback, errorCallback) {
 
 				if (wrongInstallation) {
 					var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
-																	function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
-																	function (){errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback);});
+																	function() {operationFunction(cipherConfig, operationParams, successCallback, errorCallback) },
+																	function (){errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSERVER_INVOICE_APP.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP.code);});
 					if (!enabled) {
-						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", Dialog.buildErrorConnectingApplicationMsg().replace(/<br>/g," "), errorCallback);
+						errorResponseFunction("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSERVER_INVOICE_APP.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP.code);
 					}
 					return;
 				}
-			
+							
 				// Contamos la nueva llamada al servidor
 				if (iterations > NUM_MAX_ITERATIONS) {
 					if(!!afirmaConnected) {
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
-																		function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback)},
-																		function() {errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);});
+																		function() {operationFunction(cipherConfig, operationParams, successCallback, errorCallback)},
+																		function() {errorResponseFunction("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);});
 						if (!enabled) {
-							errorResponseFunction("java.util.concurrent.TimeoutException", "El tiempo para la recepcion de la firma por la pagina web ha expirado.", errorCallback);
+							errorResponseFunction("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);
 						}
 					} else {
 						var errorType;
-						var errorCallbackMsg;
 						if (!!isCompatibleProcedure) {
 							errorType = ERROR_CONNECTING_AFIRMA;
-							errorCallbackMsg = Dialog.buildErrorConnectingApplicationMsg();
 						} else {
 							errorType = ERROR_CONNECTING_SERVICE;
-							errorCallbackMsg = Dialog.buildCustomErrorServerMsg();
 						}
 						var enabled = Dialog.showErrorDialog(errorType,
-																	function (){execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback) },
-																	function (){errorCallback("java.lang.IOException", errorCallbackMsg.replace(/<br>/g,""));});
+																	function() {operationFunction(cipherConfig, operationParams, successCallback, errorCallback)},
+																	function (){errorCallback("java.lang.IOException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);});
 						if(!enabled) {
-							errorResponseFunction("java.util.concurrent.TimeoutException", errorCallbackMsg.replace(/<br>/g,""), errorCallback);
+							errorResponseFunction("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.message, errorCallback, ErrorCode.Request.WEBSERVER_INVOICE_APP_TIMEOUT.code);
 						}
 					}
 					return;
@@ -4795,7 +5482,7 @@ var AutoScript = ( function ( window, undefined ) {
 				httpRequest.onreadystatechange = function() {
 					if (httpRequest.readyState == 4) {
 						if (httpRequest.status == 200) {
-							var needContinue = successResponseFunction(httpRequest.responseText, cipherKey, successCallback, errorCallback);
+							var needContinue = successResponseFunction(httpRequest.responseText, cipherConfig, successCallback, errorCallback);
 							if (needContinue) {
 								// En caso de que la respuesta sea "reset", se reinicia la espera
 								var oldIterations = iterations-1;
@@ -4803,7 +5490,7 @@ var AutoScript = ( function ( window, undefined ) {
 									iterations = 0;
 									afirmaConnected = true;
 								}
-								setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + oldIterations, "&it=" + iterations), cipherKey, intentURL, idDocument, afirmaConnected, successCallback, errorCallback);
+								setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + oldIterations, "&it=" + iterations), cipherConfig, operationFunction, operationParams, afirmaConnected, successCallback, errorCallback);
 							}
 						}
 						// En iOS, a veces, despues de abrirse Autofirma, la primera llamada al metodo de recuperacion
@@ -4811,14 +5498,14 @@ var AutoScript = ( function ( window, undefined ) {
 						// proseguimos intentandolo hasta obtener un respuesta correcta o agotar los intentos 
 						else if (httpRequest.status == 0) {
 							var oldIterations = iterations-1;
-							setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + oldIterations, "&it=" + iterations), cipherKey, intentURL, idDocument, successCallback, errorCallback);
+							setTimeout(retrieveRequest, WAITING_CYCLE_MILLIS, httpRequest, url, params.replace("&it=" + oldIterations, "&it=" + iterations), cipherConfig, operationFunction, operationParams, afirmaConnected, successCallback, errorCallback);
 						}
 						else {
 							var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_SERVICE,
-																			function() {execAppIntent(intentURL, idDocument, cipherKey, successCallback, errorCallback)},
-																			function() {errorResponseFunction("java.lang.IOException", currentLocale.error_connecting_server_recovering + "(Status: " + httpRequest.status + ")", errorCallback);});
+																			function() {operationFunction(cipherConfig, operationParams, successCallback, errorCallback)},
+																			function() {errorResponseFunction("java.lang.IOException", ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.message + " (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code);});
 							if (!enabled) {
-								errorResponseFunction("java.lang.IOException", currentLocale.error_connecting_server_recovering + "(Status: " + httpRequest.status + ")", errorCallback);
+								errorResponseFunction("java.lang.IOException", ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.message + " (Status: " + httpRequest.status + ")", errorCallback, ErrorCode.Request.WEBSERVER_ERROR_CONNECTING_SERVICE.code);
 							}
 						}
 					}
@@ -4833,11 +5520,11 @@ var AutoScript = ( function ( window, undefined ) {
 				catch(e) {
 					// Error en la llamada para al recuperacion del resultado. No lo encuentra o problema
 					// de tipo cross-domain
-					errorResponseFunction("java.lang.IOException", "Ocurrio un error de red en la llamada al servicio de firma", errorCallback);
+					errorResponseFunction("java.lang.IOException", ErrorCode.Communication.WEBSERVER_NETWORK_ERROR.message, errorCallback, ErrorCode.Communication.WEBSERVER_NETWORK_ERROR.code);
 					return;
 				}
 			}
-
+							
 			/**
 			 * Realiza un descifrado DES compatible con Java (Algoritmo DES, modo CBC, sin Padding).
 			 * Recibe en base 64 la cadena de texto cifrado antecedido por el padding anadido manualmente
@@ -4846,13 +5533,22 @@ var AutoScript = ( function ( window, undefined ) {
 			 * devuelto por la aplicacion, lo que permite reajustar el padding.
 			 * Como resultado devuelve la cadena de texto descifrada en base 64.
 			 */
-			function decipher(cipheredData, key, intermediate) {
-								
-				var dotPos = cipheredData.indexOf('.');
-				var padding = cipheredData.substr(0, dotPos);
+			function decipherDES(cipheredDatas, key) {
 				
-				var deciphered = Cipher.des(key, Cipher.base64ToString(fromBase64UrlSaveToBase64(cipheredData.substr(dotPos + 1))), 0, 0, null);
-				return Cipher.stringToBase64(deciphered.substr(0, deciphered.length - parseInt(padding) - (intermediate ? 0 : 8)));
+				var datas = new Array();
+				do {
+					var cipheredData = cipheredDatas[datas.length];
+					var dotPos = cipheredData.indexOf('.');
+					var padding = cipheredData.substring(0, dotPos);
+					
+					var intermediate = datas.length < cipheredDatas.length - 1
+					
+					var deciphered = Cipher.des(key, Cipher.base64ToString(fromBase64UrlSaveToBase64(cipheredData.substring(dotPos + 1))), 0, 0, null);
+					var decipheredB64 = Cipher.stringToBase64(deciphered.substring(0, deciphered.length - parseInt(padding) - (intermediate ? 0 : 8)));
+					datas.push(decipheredB64);
+				} while (datas.length < cipheredDatas.length);
+
+				return datas;	
 			}
 			
 			/**
@@ -4861,7 +5557,7 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param key Clave de cifrado.
 			 * @return Base 64 cifrado.
 			 */
-			function cipher(dataB64, key) {
+			function cipherDES(dataB64, key) {
 
 				var data = Cipher.base64ToString(fromBase64UrlSaveToBase64(dataB64));
 				var padding = (8 - (data.length % 8)) % 8;
@@ -4870,7 +5566,29 @@ var AutoScript = ( function ( window, undefined ) {
 				// le habra agregado el metodo de cifrado separados por un punto ('.').
 				return padding  + "." + Cipher.stringToBase64(Cipher.des(key, data, 1, 0, null)).replace(/\+/g, "-").replace(/\//g, "_");
 			}
-
+						
+			function bytesToBase64(bytes) {
+			  var binString = Array.from(bytes, function (byte) {
+				return String.fromCodePoint(byte);
+			  }).join("");
+			  return btoa(binString);
+			}
+			
+			function base64ToBytes(base64) {
+			  var binString = atob(base64);
+			  return Uint8Array.from(binString, function (m) { return m.codePointAt(0)});
+			}
+			
+			function arrayBufferToBase64(buffer) {
+			    let binary = '';
+			    let bytes = new Uint8Array(buffer);
+			    let len = bytes.byteLength;
+			    for (let i = 0; i < len; i++) {
+			        binary += String.fromCharCode(bytes[i]);
+			    }
+			    return btoa(binary);
+			}
+			
 			/**
 			 * Convierte de Base64 URL Save a Base64 normal.
 			 */
@@ -4878,7 +5596,7 @@ var AutoScript = ( function ( window, undefined ) {
 				if (!base64UrlSave) {
 					return base64UrlSave;
 				}
-				return base64UrlSave.replace(/\-/g, "+").replace(/\_/g, "/")
+				return base64UrlSave.replace(/\-/g, "+").replace(/\_/g, "/");
 			}
 			
 			/* Metodos que publicamos del objeto AppAfirmaJSWebService */
@@ -4899,7 +5617,9 @@ var AutoScript = ( function ( window, undefined ) {
 				setStickySignatory : setStickySignatory,
 				setLocale : setLocale,
 				getErrorMessage : getErrorMessage,
-				getErrorType : getErrorType
+				getErrorType : getErrorType,
+				getErrorCode : getErrorCode,
+				getErrorCodeNumber : getErrorCodeNumber
 			}
 		});
 		
@@ -4969,10 +5689,14 @@ var AutoScript = ( function ( window, undefined ) {
 			setLocale : setLocale,
 			setMinimumClientVersion : setMinimumClientVersion,
 			setAppName : setAppName,
+			setServiceTimeout : setServiceTimeout,
+			enableProgressDialog : enableProgressDialog,
 
 			/* Gestion de errores */
 			getErrorMessage : getErrorMessage,
 			getErrorType : getErrorType,
+			getErrorCode : getErrorCode,
+			getErrorCodeNumber : getErrorCodeNumber,
 
 			/* Utilidad JavaScript*/
 			getBase64FromText : getBase64FromText,

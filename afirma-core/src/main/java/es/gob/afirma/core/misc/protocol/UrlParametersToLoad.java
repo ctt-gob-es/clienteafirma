@@ -157,7 +157,7 @@ public final class UrlParametersToLoad extends UrlParameters {
 			setMinimumProtocolVersion(params.get(VER_PARAM));
 		}
 		else {
-			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
+			setMinimumProtocolVersion(ProtocolVersion.VERSION_0);
 		}
 
 		// Parametro que indica si se debe utilizar el dialogo de seleccion

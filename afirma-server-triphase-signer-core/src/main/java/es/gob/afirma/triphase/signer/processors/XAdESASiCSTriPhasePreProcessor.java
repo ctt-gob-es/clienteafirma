@@ -15,6 +15,7 @@ import java.security.cert.X509Certificate;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
@@ -57,7 +58,7 @@ public final class XAdESASiCSTriPhasePreProcessor extends XAdESTriPhasePreProces
 			digestValue = AOXAdESASiCSSigner.hash(data, externalReferencesHashAlgorithm);
 		}
 		catch (final Exception e) {
-			throw new AOException("No se reconoce el algoritmo de huella digital", e); //$NON-NLS-1$
+			throw new AOException("No se reconoce el algoritmo de huella digital", e, ErrorCode.Internal.UNSUPPORTED_HASH_ALGORITHM); //$NON-NLS-1$
 		}
 
 		return super.preProcessPreSign(

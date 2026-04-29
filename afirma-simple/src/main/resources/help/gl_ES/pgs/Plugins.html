@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Plugins</title> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+  <meta name="KEYWORDS" content="plugin, hash" /> 
+  <meta name="description" content="Plugins." /> 
+ </head> 
+ <body> 
+  <h2>Plugins</h2> 
+  <p> Xunto a Autofirma distribúense unha serie de plugins que permiten agregar á aplicación funcións adicionais. </p> 
+  <h3>Cálculo e comprobación de pegadas dixitais</h3> 
+  <p> Este plugin agrega a Autofirma opcións para calcular a pegada dixital (hash) dun ficheiro ou de todos os ficheiros dun directorio e comprobar esas mesmas pegadas que se xeraron. </p> 
+  <p> Unha vez instálase o plugin, aparecerá na barra de menús de Autofirma a opción &quot;Pegadas dixitais&quot; coas distintas operacións que se poden realizar. </p> 
+  <ul> 
+   <li><b>Calcular pegada dixital:</b> Permite calcular o hash dun ficheiro e gardalo a disco. O formato e a extensión do ficheiro de hash variará segundo o formato seleccionado.</li> 
+   <p align="center"> <img src="../gfx/pluginhash_calculo_fichero_mini.png" alt="Pantalla de cálculo de ficheros" /> </p> 
+   <ul> 
+    <li><b>Ficheiro sobre o que calcular a pegada dixital:</b> Ficheiro do que desexamos calcular o hash.</li> 
+    <li><b>Algoritmo de pegada dixital:</b> Algoritmo de hash.</li> 
+    <li><b>Formato da pegada dixital:</b> Codificación empregada para gardar o hash: 
+     <ul> 
+      <li>Hexadecimal en ASCII (Base16): A pegada almacenarase como cadea hexadecimal termiada en &apos;h&apos;.</li> 
+      <li>Base64: A pegada almacenarase en Base 64.</li> 
+      <li>Binario: A pegada almacenarase sen codificar.</li> 
+     </ul> </li> 
+    <li><b>Copiar pegada dixital ao portapapeles:</b> Ao activar esta opción, ademais de gardar o hash en ficheiro, copiarase ao portapapeles. O hash copiarase coa codificación do formato seleccionado ou, se se seleccionou o formato binario, en hexadecimal.</li> 
+   </ul> 
+   <br /> 
+   <li><b>Comprobar pegada dixital:</b> Permite comprobar o hash dun ficheiro.</li> 
+   <p align="center"> <img src="../gfx/pluginhash_comprobacion_fichero_mini.png" alt="Pantalla de comprobación de ficheros" /> </p> 
+   <ul> 
+    <li><b>Ficheiro de datos:</b> Ficheiro ao que corresponde a pegada dixital que se desexa comprobar.</li> 
+    <li><b>Ficheiro que contén a pegada dixital:</b> Ficheiro coa pegada dixital.</li> 
+   </ul> 
+   <br /> 
+   <li><b>Calcular pegada dixital en directorio:</b> Permite calcular o hash dos ficheiros dun directorio.</li> 
+   <p align="center"> <img src="../gfx/pluginhash_calculo_directorio_mini.png" alt="Pantalla de cálculo de hash de directorio" /> </p> 
+   <ul> 
+    <li><b>Directorio sobre o que calcular as pegadas dixitais:</b> Directorio cos ficheiros dos que queremos calcular a pegada dixital.</li> 
+    <li><b>Algoritmo de pegada dixital:</b> Algoritmo de hash.</li> 
+    <li><b>Recursivo:</b> Ao activala calcularase tamén o hash dos ficheiros localizados nos subdirectorios do directorio seleccionado.</li> 
+   </ul> 
+   <br /> 
+   <li><b>Comprobar pegada dixital en directorio:</b> Permite comprobar o hash dos ficheiros dun directorio.</li> 
+   <p align="center"> <img src="../gfx/pluginhash_comprobacion_directorio_mini.png" alt="Pantalla de comprobación de hash de directorio" /> </p> 
+   <ul> 
+    <li><b>Directorio:</b> Directorio cos ficheiros aos que corresponden as pegadas dixitais que se desexan comprobar.</li> 
+    <li><b>Ficheiro de pegadas dixitais:</b> Ficheiro coas pegadas dixitais que se van a comprobar.</li> 
+   </ul> 
+  </ul> 
+  <p> Ao instalar o plugin de pegadas dixitais en sistemas Windows, tamén se agregan as opcións de xerar e comprobar pegadas dixitais no menú contextual de ficheiros e directorios do sistema. </p> 
+  <p>As opcións que aparecen son:</p> 
+  <ul> 
+   <li><b>Xerar pegada dixital:</b> Esta opción aparece no menú contextual de todos os ficheiros e directorios e permite xerar o hash do ficheiro ou dos ficheiros do directorio.</li> 
+   <li><b>Comprobar pegada dixital:</b> Esta opción aparece no menú contextual dos ficheiros de hashes (.hash, .hashb64, .hashfiles e .hexhash) e permite seleccionar o ficheiro ou directorio do que se desexa comprobar o hash.</li> 
+  </ul>  
+ </body>
+</html>

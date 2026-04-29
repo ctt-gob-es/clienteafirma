@@ -16,20 +16,10 @@ public abstract class RuntimePasswordNeededException extends RuntimeConfigNeeded
 	 * @param msg Mensaje descriptivo del problema.
 	 * @param requestorText Identificador de la cadena de texto que debe
 	 * usarse para pedir los datos al usuario.
+	 * @param errorCode C&oacute;digo de error.
 	 */
-	public RuntimePasswordNeededException(final String msg, final String requestorText) {
-		super(msg, RequestType.PASSWORD, requestorText, null);
-	}
-
-	/**
-	 * Crea la excepci&oacute;n.
-	 * @param msg Mensaje descriptivo del problema.
-	 * @param requestorText Identificador de la cadena de texto que debe
-	 * usarse para pedir los datos al usuario.
-	 * @param cause Causa del error.
-	 */
-	public RuntimePasswordNeededException(final String msg, final String requestorText, final Throwable cause) {
-		super(msg, RequestType.PASSWORD, requestorText, null, cause);
+	protected RuntimePasswordNeededException(final String msg, final String requestorText, final ErrorCode errorCode) {
+		super(msg, RequestType.PASSWORD, requestorText, null, errorCode);
 	}
 
 	/**
@@ -39,10 +29,36 @@ public abstract class RuntimePasswordNeededException extends RuntimeConfigNeeded
 	 * usarse para pedir los datos al usuario.
 	 * @param param Nombre del par&aacute;metro que deber&iacute;a establecerse en la configuraci&oacute;n
 	 * con la contrase&ntilde;a que se solicite.
+	 * @param errorCode C&oacute;digo de error.
+	 */
+	protected RuntimePasswordNeededException(final String msg, final String requestorText, final String param, final ErrorCode errorCode) {
+		super(msg, RequestType.PASSWORD, requestorText, param, errorCode);
+	}
+
+	/**
+	 * Crea la excepci&oacute;n.
+	 * @param msg Mensaje descriptivo del problema.
+	 * @param requestorText Identificador de la cadena de texto que debe
+	 * usarse para pedir los datos al usuario.
+	 * @param errorCode C&oacute;digo de error.
 	 * @param cause Causa del error.
 	 */
-	public RuntimePasswordNeededException(final String msg, final String requestorText, final String param, final Throwable cause) {
-		super(msg, RequestType.PASSWORD, requestorText, param, cause);
+	protected RuntimePasswordNeededException(final String msg, final String requestorText, final ErrorCode errorCode, final Throwable cause) {
+		super(msg, RequestType.PASSWORD, requestorText, null, errorCode, cause);
+	}
+
+	/**
+	 * Crea la excepci&oacute;n.
+	 * @param msg Mensaje descriptivo del problema.
+	 * @param requestorText Identificador de la cadena de texto que debe
+	 * usarse para pedir los datos al usuario.
+	 * @param param Nombre del par&aacute;metro que deber&iacute;a establecerse en la configuraci&oacute;n
+	 * con la contrase&ntilde;a que se solicite.
+	 * @param errorCode C&oacute;digo de error.
+	 * @param cause Causa del error.
+	 */
+	protected RuntimePasswordNeededException(final String msg, final String requestorText, final String param, final ErrorCode errorCode, final Throwable cause) {
+		super(msg, RequestType.PASSWORD, requestorText, param, errorCode, cause);
 	}
 
 	/**

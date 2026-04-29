@@ -37,6 +37,9 @@ import es.gob.afirma.core.signers.TriphaseUtil;
 
 final class PreSigner {
 
+	/** Timeout de espera para descartar la lectura de petici&oacute;n. */
+	private static final String SERVICE_TIMEOUT_PARAM = "servicetimeout"; //$NON-NLS-1$
+
 	private PreSigner() {
 		// No instanciable
 	}

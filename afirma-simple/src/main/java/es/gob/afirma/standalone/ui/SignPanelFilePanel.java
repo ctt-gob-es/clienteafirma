@@ -30,9 +30,11 @@ import javax.swing.JPanel;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.VisorFirma;
 
 final class SignPanelFilePanel extends JPanel implements Scrollable {
@@ -96,6 +98,17 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         								SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
         								JOptionPane.ERROR_MESSAGE,
         								null
+        								);
+        						return;
+        					} catch (IllegalArgumentException e) {
+        						Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+        								"Error abriendo el fichero: " + e //$NON-NLS-1$
+        								);
+        						AOUIFactory.showErrorMessage(
+        								SimpleAfirmaMessages.getString("SignPanel.53"), //$NON-NLS-1$
+        								SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+        								AOUIFactory.ERROR_MESSAGE,
+        								new AOException(SimpleErrorCode.Internal.CANT_LOAD_FILE)
         								);
         						return;
         					}

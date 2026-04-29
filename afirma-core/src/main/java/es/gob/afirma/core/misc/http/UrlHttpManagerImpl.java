@@ -47,15 +47,12 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	/** Lista de dominios seguros para conexiones HTTPS. */
 	public static final String JAVA_PARAM_SECURE_DOMAINS_LIST = "secureDomainsList"; //$NON-NLS-1$
 
-	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
-	public static final int DEFAULT_TIMEOUT = -1;
-
-
-
 	private static final String URN_SEPARATOR = ":"; //$NON-NLS-1$
 	private static final String PROT_SEPARATOR = URN_SEPARATOR + "//"; //$NON-NLS-1$
 
 	private static final String ACCEPT = "Accept"; //$NON-NLS-1$
+
+	private int readTimeout = DEFAULT_TIMEOUT;
 
 	static {
 		final CookieManager cookieManager = new CookieManager();
@@ -144,7 +141,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 
 	@Override
 	public byte[] readUrl(final String urlToRead,
-	                      final int timeout,
+	                      final int connectionTimeout,
 		                  final UrlHttpMethod method,
 		                  final Properties requestProperties,
 		                  final HttpErrorProcessor httpProcessor,
@@ -207,8 +204,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				conn = (HttpURLConnection) uri.openConnection();
 			}
 
-			final boolean needDisableSslChecks = sslConfig == null && Boolean.parseBoolean(
-					System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, "false")); //$NON-NLS-1$
+			final String defaultSslCheck = System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, Boolean.FALSE.toString());
+			final boolean needDisableSslChecks = sslConfig == null && Boolean.parseBoolean(defaultSslCheck);
 			final boolean isSecureDomain = checkIsSecureDomain(uri);
 
 			// Si se trata de una conexion SSL:
@@ -259,6 +256,11 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				conn.addRequestProperty("Origin", uri.getProtocol() +  "://" + uri.getHost()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
+			// Si en las propiedades se agrego un timeout, lo indicamos en la conexion
+			if (this.readTimeout != DEFAULT_TIMEOUT) {
+				conn.setReadTimeout(this.readTimeout);
+			}
+
 			// Ponemos el resto de las cabeceras
 			for (final Map.Entry<?, ?> entry : headers.entrySet()) {
 				conn.addRequestProperty((String) entry.getKey(), (String) entry.getValue());
@@ -277,8 +279,8 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 			}
 
 			// Si se ha establecido un tiempo de timeout, se configura como tiempo maximo hasta la conexion
-			if (timeout != DEFAULT_TIMEOUT) {
-				conn.setConnectTimeout(timeout);
+			if (connectionTimeout != DEFAULT_TIMEOUT) {
+				conn.setConnectTimeout(connectionTimeout);
 			}
 
 			conn.connect();
@@ -302,7 +304,7 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		catch (final IOException e) {
 			if (httpProcessor != null) {
 				LOGGER.log(Level.WARNING, "Fallo la conexion pero intentamos recuperarla: " + e); //$NON-NLS-1$
-				return httpProcessor.processHttpError(e, this, url, timeout, method, requestProperties);
+				return httpProcessor.processHttpError(e, this, url, connectionTimeout, method, requestProperties);
 			}
 
 			throw e;
@@ -372,4 +374,13 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 		return false;
 	}
 
+	@Override
+	public void setReadTimeout(final int readTimeout) {
+		this.readTimeout = readTimeout;
+	}
+
+	@Override
+	public int getReadTimeout() {
+		return this.readTimeout;
+	}
 }

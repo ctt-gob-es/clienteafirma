@@ -11,32 +11,40 @@ package es.gob.afirma.signers.xml;
 
 import es.gob.afirma.core.AOFormatFileException;
 
-/** Excepci&oacute;n para notificar que se ha encontrado un objeto que no es un XML v&aacute;lido.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+/**
+ * Excepci&oacute;n para notificar que se ha encontrado un objeto que no es un XML v&aacute;lido.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
 public final class InvalidXMLException extends AOFormatFileException {
 
 	private static final long serialVersionUID = -8682543966969351726L;
 
-	/** Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
+	/**
+	 * Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
 	 * que no es un XML apto para ser firmado con los par&aacute;metros indicados.
-	 * @param e Causa de la excepci&oacute;n */
+	 * @param e Causa de la excepci&oacute;n
+	 */
 	public InvalidXMLException(final Throwable e) {
-		super("Los datos proporcionados no son un XML apto para su firma con los parametros indicados: " + e, e); //$NON-NLS-1$
+		super("Los datos proporcionados no son un XML apto para su firma con los parametros indicados: " + e, e, XMLErrorCode.Functional.XML_DOCUMENT_NEEDED); //$NON-NLS-1$
 	}
 
-	/** Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
+	/**
+	 * Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
 	 * que no es un XML apto para ser firmado con los par&aacute;metros indicados.
-	 * @param msg Mensaje de la excepci&oacute;n */
+	 * @param msg Mensaje de la excepci&oacute;n
+	 */
 	public InvalidXMLException(final String msg) {
-		super(msg);
+		super(msg, XMLErrorCode.Functional.XML_DOCUMENT_NEEDED);
 	}
 
-	/** Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
+	/**
+	 * Construye una excepci&oacute;n para notificar que se ha encontrado un objeto
 	 * que no es un XML apto para ser firmado con los par&aacute;metros indicados.
 	 * @param msg Mensaje de la excepci&oacute;n.
-	 * @param e Causa de la excepci&oacute;n. */
+	 * @param e Causa de la excepci&oacute;n.
+	 */
 	public InvalidXMLException(final String msg, final Throwable e) {
-		super(msg, e);
+		super(msg, e, XMLErrorCode.Functional.XML_DOCUMENT_NEEDED);
 	}
 
 }

@@ -11,6 +11,8 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import es.gob.jmulticard.callback.CardWithRetriesPasswordCallback;
+
 
 /** <code>CallbackHandler</code> que gestiona los <code>Callbacks</code> de petici&oacute;n de
  * informaci&oacute;n al usuario cuando utiliza un DNIe. Esta clase <i>cachea</i> las respuestas
@@ -80,9 +82,21 @@ public final class DnieCacheCallbackHandler implements CallbackHandler, CacheEle
 								// Comprobamos si anteriormente se activo la opcion de usar cache para
 								// poner este valor por defecto
 								final boolean useCacheDefaultValue = loadUseCachePreference();
+								
+								int retries = -1;
+								if (cb instanceof CardWithRetriesPasswordCallback) {
+									retries = ((CardWithRetriesPasswordCallback) cb).getRetriesLeft();
+								}
+								
+								String message;
+								if (retries != -1) {
+									message = Messages.getString("CommonPasswordCallback.3", String.valueOf(retries)); //$NON-NLS-1$
+								} else {
+									message = Messages.getString("CommonPasswordCallback.4"); //$NON-NLS-1$
+								}
 
 								final CommonPasswordCallback uip = new CommonPasswordCallback(
-									((PasswordCallback)cb).getPrompt(),
+									message,
 									Messages.getString("CommonPasswordCallback.1"), //$NON-NLS-1$
 									true,
 									true,

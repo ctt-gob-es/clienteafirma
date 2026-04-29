@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.w3c.dom.Document;
+
 /** Plist xml handling (serialization and deserialization).
  * The xml plist dtd can be found at <a href="http://www.apple.com/DTDs/PropertyList-1.0.dtd">http://www.apple.com/DTDs/PropertyList-1.0.dtd</a>.
  * @author Christoffer Lerno. */
@@ -64,13 +66,13 @@ public final class Plist
 	}
 
 	/**
-	 * Create a nested {@code map<String, Object>} from a plist xml string using the default mapping.
+	 * Create a nested {@code map<String, Object>} from a plist xml using the default mapping.
 	 *
-	 * @param xml the plist xml data as a string.
+	 * @param xml the plist xml data as a binary array.
 	 * @return the resulting map as read from the plist data.
 	 * @throws XmlParseException if the plist could not be properly parsed.
 	 */
-	public static Map<String, Object> fromXml(final String xml) throws XmlParseException
+	public static Map<String, Object> fromXml(final byte[] xml) throws XmlParseException
 	{
 		return PLIST.parse(Xmlwise.createXml(xml));
 	}
@@ -82,7 +84,7 @@ public final class Plist
 	 * @return the resulting map as read from the plist data.
 	 * @throws XmlParseException if the plist could not be properly parsed.
 	 */
-	public static Map<String, Object> fromXml(final byte[] xml) throws XmlParseException
+	public static Map<String, Object> fromXml(final Document xml) throws XmlParseException
 	{
 		return PLIST.parse(Xmlwise.createXml(xml));
 	}

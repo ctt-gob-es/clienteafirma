@@ -61,7 +61,6 @@ public final class AOCAdESTriPhaseCoSigner {
 
 	/** Realiza una pre-cofirma CAdES.
 	 * @param content Contenido a cofirmar
-	 * @param signatureAlgorithm Algoritmo de firma
 	 * @param signerCertificateChain Cadena de certificados del firmante
 	 * @param config Configuraci&oacute;n con el detalle de firma.
 	 * @return Pre-cofirma CAdES (SignedAttributes de CAdES)
@@ -69,7 +68,6 @@ public final class AOCAdESTriPhaseCoSigner {
 	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario
 	 * @throws IOException Cuando ocurren problemas de entrada / salida */
 	public static byte[] preCoSign(final byte[] content,
-			                       final String signatureAlgorithm,
 			                       final X509Certificate[] signerCertificateChain,
 			                       final CAdESParameters config
                                    ) throws CertificateEncodingException,

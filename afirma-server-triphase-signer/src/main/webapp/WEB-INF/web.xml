@@ -16,17 +16,6 @@
 		<servlet-name>SignatureService</servlet-name>
 		<url-pattern>/SignatureService</url-pattern>
 	</servlet-mapping>
-
-	<servlet>
-		<description>Realiza la primera fase de un proceso de firma por lote</description>
-		<servlet-name>BatchPresigner</servlet-name>
-		<servlet-class>es.gob.afirma.signers.batch.server.BatchPresigner</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>BatchPresigner</servlet-name>
-		<url-pattern>/BatchPresigner</url-pattern>
-	</servlet-mapping>
 	
 	<servlet>
 		<description>Realiza la primera fase de un proceso de firma por lote con JSON</description>
@@ -37,17 +26,6 @@
 	<servlet-mapping>
 		<servlet-name>JSONBatchPresigner</servlet-name>
 		<url-pattern>/presign</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote</description>
-		<servlet-name>BatchPostsigner</servlet-name>
-		<servlet-class>es.gob.afirma.signers.batch.server.BatchPostsigner</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>BatchPostsigner</servlet-name>
-		<url-pattern>/BatchPostsigner</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>

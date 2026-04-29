@@ -12,35 +12,27 @@ package es.gob.afirma.signers.padestri.client;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.http.UrlHttpManager;
+import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
-import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.signers.AOTriphaseException;
+import es.gob.afirma.core.signers.AOTriphaseSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
-import es.gob.afirma.signers.pades.common.PdfExtraParams;
-import es.gob.afirma.signers.pades.common.PdfFormModifiedException;
-import es.gob.afirma.signers.pades.common.PdfHasUnregisteredSignaturesException;
-import es.gob.afirma.signers.pades.common.PdfIsCertifiedException;
-import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
-import es.gob.afirma.signers.pades.common.SuspectedPSAException;
 
 /** Firmador PAdES en tres fases.
  * Las firmas que genera no se etiquetan como ETSI, sino como "Adobe PKCS#7 Detached".
  * @author Tom&acute;s Garc&iacute;a-Mer&aacute;s */
-public final class AOPDFTriPhaseSigner implements AOSigner {
+public final class AOPDFTriPhaseSigner extends AOTriphaseSigner {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -49,11 +41,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 
 	private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
 	private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
-
-	/** Prefijo del mensaje de error del servicio de prefirma. */
-	private static final String ERROR_PREFIX = "ERR-"; //$NON-NLS-1$
-	/** Prefijo del mensaje de error cuando para completar la operaci&oacute;n se requiere intervenci&oacute;n del usuario. */
-	private static final String CONFIG_NEEDED_ERROR_PREFIX = ERROR_PREFIX + "21:"; //$NON-NLS-1$
 
 	/** Tama&ntilde;o m&iacute;nimo de un PDF.
 	 * <a href="https://stackoverflow.com/questions/17279712/what-is-the-smallest-possible-valid-pdf">
@@ -91,6 +78,15 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		catch (final Exception e) {
 			throw new IllegalArgumentException("No se ha proporcionado una URL valida para el servidor de firma: " + extraParams.getProperty(PROPERTY_NAME_SIGN_SERVER_URL), e); //$NON-NLS-1$
 		}
+		
+		// Creamos el objeto de conexion
+		final UrlHttpManager urlManager;
+		if (this.httpConnection != null) {
+			urlManager = this.httpConnection;
+		}
+		else {
+			urlManager = UrlHttpManagerFactory.getInstalledManager();
+		}
 
 		// Decodificamos el identificador del documento
 		final String documentId = Base64.encode(data, true);
@@ -99,17 +95,13 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// PREFIRMA
 		// ---------
 
-		final byte[] preSignResult = PDFTriPhaseSignerUtil.doPresign(signServerUrl, algorithm, certChain, documentId, extraParams);
-
-		// Comprobamos que no se trate de un error
-		if (preSignResult.length > 8) {
-			final String headMsg = new String(Arrays.copyOf(preSignResult, 8), StandardCharsets.UTF_8);
-			if (headMsg.startsWith(ERROR_PREFIX)) {
-				final String msg = new String(preSignResult, StandardCharsets.UTF_8);
-				LOGGER.warning("Error durante la prefirma: " + msg); //$NON-NLS-1$
-				throw buildInternalException(msg, extraParams);
-			}
-		}
+		final byte[] preSignResult = PDFTriPhaseSignerUtil.doPresign(
+				urlManager,
+				signServerUrl,
+				algorithm,
+				certChain,
+				documentId,
+				extraParams);
 
 		// ----------
 		// FIRMA
@@ -131,6 +123,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		// ---------
 
 		final byte[] postSignResult = PDFTriPhaseSignerUtil.doPostSign(
+			urlManager,
 			preResultAsBase64,
 			signServerUrl,
 			algorithm,
@@ -138,15 +131,6 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			documentId,
 			extraParams
 		);
-
-		if (postSignResult.length > 8) {
-			final String headMsg = new String(Arrays.copyOf(postSignResult, 8), StandardCharsets.UTF_8);
-			if (headMsg.startsWith(CONFIG_NEEDED_ERROR_PREFIX)) {
-				final String msg = new String(postSignResult, StandardCharsets.UTF_8);
-				LOGGER.warning("Error durante la postfirma: " + msg); //$NON-NLS-1$
-				throw buildInternalException(msg, extraParams);
-			}
-		}
 
 		return postSignResult;
 	}
@@ -180,10 +164,10 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			final Properties extraParams) throws AOException {
 		throw new UnsupportedOperationException("No se soportan contrafirmas en PAdES"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public AOTreeModel getSignersStructure(final byte[] sign, final Properties params, final boolean asSimpleSignInfo)
-			throws AOInvalidFormatException, IOException {
+			throws AOInvalidSignatureFormatException, IOException {
 		throw new UnsupportedOperationException("No soportado para firmas trifasicas"); //$NON-NLS-1$
 	}
 
@@ -192,7 +176,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 			final boolean asSimpleSignInfo) {
 		throw new UnsupportedOperationException("No soportado para firmas trifasicas"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public boolean isSign(final byte[] sign, final Properties params){
 		return false;
@@ -223,21 +207,21 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		}
 		return originalName + inTextInt + PDF_FILE_SUFFIX;
 	}
-	
+
 	@Override
-	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidFormatException, IOException, AOException {
+	public byte[] getData(final byte[] sign, final Properties params) throws AOInvalidSignatureFormatException, IOException, AOException {
 		// Si no es una firma PDF valida, lanzamos una excepcion
 		if (!isSign(sign)) {
-			throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
 		}
 		return sign;
 	}
 
 	@Override
-	public byte[] getData(final byte[] sign) throws AOInvalidFormatException, IOException, AOException {
+	public byte[] getData(final byte[] sign) throws AOInvalidSignatureFormatException, IOException, AOException {
 		return getData(sign, null);
 	}
-	
+
 	@Override
 	public AOSignInfo getSignInfo(final byte[] data, final Properties params) throws AOException, IOException {
 		if (data == null) {
@@ -245,7 +229,7 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		}
 
 		if (!isSign(data)) {
-			throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
 		}
 
 		return new AOSignInfo(AOSignConstants.SIGN_FORMAT_PDF);
@@ -279,62 +263,9 @@ public final class AOPDFTriPhaseSigner implements AOSigner {
 		return true;
 	}
 
-	/** Construye una excepci&oacute;n a partir del mensaje interno de error
-	 * notificado por el servidor trif&aacute;sico.
-	 * @param msg Mensaje de error devuelto por el servidor trif&aacute;sico.
-	 * @param extraParams Configuraci&oacute;n aplicada en la operaci&oacute;n.
-	 * @return Excepci&oacute;n construida.
-	 */
-	private static AOException buildInternalException(final String msg, final Properties extraParams) {
-
-		AOException exception = null;
-		final int separatorPos = msg.indexOf(":"); //$NON-NLS-1$
-		if (msg.startsWith(CONFIG_NEEDED_ERROR_PREFIX)) {
-			final int separatorPos2 = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
-			final String errorCode = msg.substring(separatorPos + 1, separatorPos2);
-			final String errorMsg = msg.substring(separatorPos2 + 1);
-			if (PdfIsCertifiedException.REQUESTOR_MSG_CODE.equals(errorCode)) {
-				exception = new PdfIsCertifiedException(errorMsg);
-			}
-			else if (PdfHasUnregisteredSignaturesException.REQUESTOR_MSG_CODE.equals(errorCode)) {
-				exception =  new PdfHasUnregisteredSignaturesException(errorMsg);
-			}
-			else if (PdfFormModifiedException.REQUESTOR_MSG_CODE.equals(errorCode)) {
-				exception =  new PdfFormModifiedException(errorMsg);
-			}
-			else if (SuspectedPSAException.REQUESTOR_MSG_CODE.equals(errorCode)) {
-				exception =  new SuspectedPSAException(errorMsg);
-			}
-			else if (PdfIsPasswordProtectedException.REQUESTOR_MSG_CODE.equals(errorCode)
-					|| BadPdfPasswordException.REQUESTOR_MSG_CODE.equals(errorCode)) {
-				if (extraParams != null && (extraParams.containsKey(PdfExtraParams.OWNER_PASSWORD_STRING)
-						|| extraParams.containsKey(PdfExtraParams.USER_PASSWORD_STRING))) {
-					exception = new BadPdfPasswordException(errorMsg);
-				}
-				else {
-					exception = new PdfIsPasswordProtectedException(errorMsg);
-				}
-			}
-		}
-
-		if (exception == null) {
-			final int internalExceptionPos = msg.indexOf(":", separatorPos + 1); //$NON-NLS-1$
-			if (internalExceptionPos > 0) {
-				final String intMessage = msg.substring(internalExceptionPos + 1).trim();
-				exception = AOTriphaseException.parseException(intMessage);
-			}
-			else {
-				exception = new AOException(msg);
-			}
-		}
-
-		return exception;
-	}
-
     private static Properties getExtraParams(final Properties extraParams) {
     	final Properties newExtraParams = (Properties) extraParams.clone();
 
     	return newExtraParams;
     }
-
 }

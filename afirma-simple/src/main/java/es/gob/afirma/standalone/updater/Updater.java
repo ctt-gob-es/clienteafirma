@@ -28,6 +28,7 @@ import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.HttpManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.ui.tasks.SSLContextConfigurationTask;
 
 /** Utilidad para la gesti&oacute;n de actualizaciones de la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -187,8 +188,9 @@ public final class Updater {
 	}
 
 	/** Comprueba si hay actualizaciones del aplicativo, y en caso afirmativo lo notifica al usuario.
-	 * @param parent Componente padre para la modalidad. */
-	public static void checkForUpdates(final Object parent) {
+	 * @param parent Componente padre para la modalidad. 
+	 * @param sslContextConfigurationTask Hilo para preparado del contexto SSL*/
+	public static void checkForUpdates(final Object parent, SSLContextConfigurationTask sslContextConfigurationTask) {
 
 		// Miramos en la configuracion de la aplicacion que el usuario ha establecido mediante el UI.
 		boolean omitCheck = !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK);
@@ -204,10 +206,12 @@ public final class Updater {
 		}
 
 		if (!omitCheck) {
-			new Thread(() ->  {
+			new Thread(() ->  {				
 
 				final boolean newVersionAvailable;
 				try {
+					// Antes de realizar alguna comprobacion, se espera que el contexto SSL termine de confgurarse
+					sslContextConfigurationTask.join();
 					newVersionAvailable = isNewVersionAvailable();
 				}
 				catch (final Exception e) {

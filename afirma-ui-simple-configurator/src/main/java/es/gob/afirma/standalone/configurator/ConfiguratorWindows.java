@@ -49,6 +49,9 @@ final class ConfiguratorWindows implements Configurator {
 	private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 	private static final String CA_CERT_FILENAME = "Autofirma_ROOT.cer"; //$NON-NLS-1$
 
+	/** M&aacute;ximo n&uacute;mero de segundos que se esperar&aacute; a que finalicen los scripts. */
+	private static final long WAITING_TIME_IN_SECONDS = 10;
+
 	/**
 	 * N&uacute;mero de veces que se intentar&aacute; desinstalar el certificado del almac&eacute;n
 	 * de Firefox cuando sea necesario hacerlo.
@@ -76,91 +79,101 @@ final class ConfiguratorWindows implements Configurator {
 
 		window.print(Messages.getString("ConfiguratorWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
-			if (!checkSSLKeyStoreGenerated(appDir)) {
+		if (!checkSSLKeyStoreGenerated(appDir)) {
 
-				// Generacion del certificado pfx
-				if (!this.keyStorePath.isEmpty() && !this.certificatePath.isEmpty()){
+			// Generacion del certificado pfx
+			if (!this.keyStorePath.isEmpty() && !this.certificatePath.isEmpty()){
 
-					window.print(Messages.getString("ConfiguratorWindows.25")); //$NON-NLS-1$
+				window.print(Messages.getString("ConfiguratorWindows.25")); //$NON-NLS-1$
 
-					// Copiamos al directorio el almacen con la clave SSL
-					try {
-						copyFile(
-								new File(this.keyStorePath),
-								new File (appDir.getAbsolutePath(), KS_FILENAME));
-					}
-					catch (final Exception e) {
-						window.print(Messages.getString("ConfiguratorWindows.23") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-					}
+				// Copiamos al directorio el almacen con la clave SSL
+				try {
+					copyFile(
+							new File(this.keyStorePath),
+							new File (appDir.getAbsolutePath(), KS_FILENAME));
+				}
+				catch (final Exception e) {
+					window.print(Messages.getString("ConfiguratorWindows.23") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 
-					// Copiamos al directorio el certificado de CA
-					try {
-						final File certFile = new File(this.certificatePath);
-						copyFile(
-								certFile,
-								new File (appDir.getAbsolutePath(), CA_CERT_FILENAME));
-					}
-					catch (final Exception e) {
-						window.print(Messages.getString("ConfiguratorWindows.24") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				} else {
+				// Copiamos al directorio el certificado de CA
+				try {
+					final File certFile = new File(this.certificatePath);
+					copyFile(
+							certFile,
+							new File (appDir.getAbsolutePath(), CA_CERT_FILENAME));
+				}
+				catch (final Exception e) {
+					window.print(Messages.getString("ConfiguratorWindows.24") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			} else {
 
-					window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
+				window.print(Messages.getString("ConfiguratorWindows.5")); //$NON-NLS-1$
 
-					// Generamos un certificado de CA y un certificado SSL a partir de el
-					final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
+				// Generamos un certificado de CA y un certificado SSL a partir de el
+				final CertPack certPack = CertUtil.getCertPackForLocalhostSsl(
 						ConfiguratorUtil.CERT_ALIAS,
 						KS_PASSWORD
-					);
+						);
 
-					window.print(Messages.getString("ConfiguratorWindows.11")); //$NON-NLS-1$
+				window.print(Messages.getString("ConfiguratorWindows.11")); //$NON-NLS-1$
 
-					// Guardamos el PKCS#12 con la clave SSL generada
-					ConfiguratorUtil.installFile(
+				// Guardamos el PKCS#12 con la clave SSL generada
+				ConfiguratorUtil.installFile(
 						certPack.getPkcs12(),
 						new File(appDir, KS_FILENAME)
-					);
+						);
 
-					// Guardamos el certificado de CA generado
-					ConfiguratorUtil.installFile(
-							certPack.getCaCertificate().getEncoded(),
-							new File(appDir, CA_CERT_FILENAME));
+				// Guardamos el certificado de CA generado
+				ConfiguratorUtil.installFile(
+						certPack.getCaCertificate().getEncoded(),
+						new File(appDir, CA_CERT_FILENAME));
 
-					// En los despliegues JNLP nunca se proporcionan certificados. Ademas, en estos casos, el
-					// instalador no lo habra instalado en el almacen de Windows, asi que lo tendremos que
-					// hacer ahora
-					if (this.jnlpInstance) {
-						JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
-						window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
-						importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
-					}
+				// En los despliegues JNLP nunca se proporcionan certificados. Ademas, en estos casos, el
+				// instalador no lo habra instalado en el almacen de Windows, asi que lo tendremos que
+				// hacer ahora
+				if (this.jnlpInstance) {
+					JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
+					window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
+					importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
 				}
+			}
 
-				// Intentamos desinstalar cualquier certificado nuestro que pueda haber antes de instalar el nuevo
-				window.print(Messages.getString("ConfiguratorWindows.26")); //$NON-NLS-1$
-				ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(appDir, window, UNINSTALL_CERT_RETRIES);
+			// Intentamos desinstalar cualquier certificado nuestro que pueda haber antes de instalar el nuevo
+			window.print(Messages.getString("ConfiguratorWindows.26")); //$NON-NLS-1$
+			ConfiguratorFirefoxWindows.uninstallRootCAMozillaKeyStore(appDir, window, UNINSTALL_CERT_RETRIES);
 
-				// Instalamos el certificado de CA en el almacen de confianza de Firefox
-				window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
+			// Instalamos el certificado de CA en el almacen de confianza de Firefox
+			window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
+			try {
+				ConfiguratorFirefoxWindows.installCACertOnMozillaKeyStores(appDir, window);
+			}
+			catch(final MozillaProfileNotFoundException e) {
+				window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			if (this.firefoxSecurityRoots) {
+				window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
 				try {
-					ConfiguratorFirefoxWindows.installCACertOnMozillaKeyStores(appDir, window);
+					ConfiguratorFirefoxWindows.configureUseSystemTrustStore(true, window);
+				} catch (final MozillaProfileNotFoundException e) {
+					window.print(Messages.getString("ConfiguratorWindows.21") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				catch(final MozillaProfileNotFoundException e) {
-					window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+			}
+		}
+		else {
+			window.print(Messages.getString("ConfiguratorWindows.14")); //$NON-NLS-1$
+		}
 
-				if (this.firefoxSecurityRoots) {
-					window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
-					try {
-						ConfiguratorFirefoxWindows.configureUseSystemTrustStore(true, window);
-					} catch (final MozillaProfileNotFoundException e) {
-						window.print(Messages.getString("ConfiguratorWindows.21") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				}
-			}
-			else {
-				window.print(Messages.getString("ConfiguratorWindows.14")); //$NON-NLS-1$
-			}
+		try {
+			window.print(Messages.getString("ConfiguratorWindows.27")); //$NON-NLS-1$
+			final Path cmd = WindowsCmdExecutor.copyCmdFromResources("windows/autofirma-addpath.cmd"); //$NON-NLS-1$
+			WindowsCmdExecutor.executePathCmd(cmd, WAITING_TIME_IN_SECONDS, appDir.getAbsolutePath());
+			window.print(Messages.getString("ConfiguratorWindows.29")); //$NON-NLS-1$
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se pudo agregar correctamente la ruta de instalacion de la variable PATH", e); //$NON-NLS-1$
+			window.print(Messages.getString("ConfiguratorWindows.28")); //$NON-NLS-1$
+		}
 
 		window.print(Messages.getString("ConfiguratorWindows.8")); //$NON-NLS-1$
 	}
@@ -240,6 +253,7 @@ final class ConfiguratorWindows implements Configurator {
 
 		// Eliminamos el directorio alternativo en el que se instalan los certificados SSL
 		// durante el proceso de restauracion de la instalacion
+		LOGGER.info("Eliminamos el directorio alternativo de instalacion de certificados"); //$NON-NLS-1$
 		final File alternativeDir = getAlternativeApplicationDirectory();
 		if (alternativeDir.isDirectory()) {
 			try {
@@ -272,6 +286,15 @@ final class ConfiguratorWindows implements Configurator {
 			catch (final Exception e) {
 				LOGGER.log(Level.WARNING, "No se ha podido eliminar por completo el directorio alternativo para el certificado SSL", e); //$NON-NLS-1$
 			}
+		}
+
+		// Ejecutamos el script para el borrado de la ruta de la aplicacion en el PATH
+		LOGGER.info("Eliminamos la entrada de Autofirma en el PATH"); //$NON-NLS-1$
+		try {
+			final Path cmd = WindowsCmdExecutor.copyCmdFromResources("windows/autofirma-removepath.cmd"); //$NON-NLS-1$
+			WindowsCmdExecutor.executePathCmd(cmd, WAITING_TIME_IN_SECONDS, getApplicationDirectory(false).getAbsolutePath());
+		} catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se pudo eliminar correctamente la ruta de instalacion de la variable PATH", e); //$NON-NLS-1$
 		}
 
 		// No es necesario eliminar nada mas porque el proceso de desinstalacion de Windows

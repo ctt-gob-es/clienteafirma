@@ -57,6 +57,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -140,21 +142,21 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
         super(true);
         this.window = win;
         this.saf = sa;
-        createUI();
+        this.createUI();
     }
 
     /** Crea la interfaz grafica del panel. */
 	private void createUI() {
 
         if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
-            setBackground(LookAndFeelManager.DEFAULT_COLOR);
+            this.setBackground(LookAndFeelManager.DEFAULT_COLOR);
         }
 
-		setLayout(new GridBagLayout());
+		this.setLayout(new GridBagLayout());
 
         // Establecemos el que deberia ser el tamano minimo del panel antes de que se
         // muestren las barras de desplazamiento
-        setPreferredSize(new Dimension(MINIMUM_PANEL_WIDTH, MINIMUM_PANEL_HEIGHT));
+        this.setPreferredSize(new Dimension(MINIMUM_PANEL_WIDTH, MINIMUM_PANEL_HEIGHT));
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -174,14 +176,14 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
         // Panel adicional en el que se mostraran los botones de los plugins.
         // Este panel permanecera oculto si no hay botones
-        this.mainPluginsButtonsPanel = buildMainPluginsButtonsPanel();
+        this.mainPluginsButtonsPanel = this.buildMainPluginsButtonsPanel();
         c.weighty = 0.0;
         c.gridy++;
         this.add(this.mainPluginsButtonsPanel, c);
 
-        refreshPluginButtonsContainer();
+        this.refreshPluginButtonsContainer();
 
-        setVisible(true);
+        this.setVisible(true);
     }
 
     JFrame getWindow() {
@@ -224,7 +226,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 
     	// Mostramos el dialogo de espera
     	this.signWaitDialog = new CommonWaitDialog(
-			getSimpleAfirma().getMainFrame(),
+			this.getSimpleAfirma().getMainFrame(),
 			SimpleAfirmaMessages.getString("SignPanel.48"), //$NON-NLS-1$
 			SimpleAfirmaMessages.getString("SignPanel.50") //$NON-NLS-1$
 		);
@@ -306,18 +308,18 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     					this,
     					visibleSignature,
     					visibleStamp,
-    					getWindow());
+    					this.getWindow());
     		}
     		catch (final AOCancelledOperationException e) {
     			this.signWaitDialog.dispose();
 			}
     		catch (final Exception e) {
     			LOGGER.log(Level.WARNING, "No se pudo crear la firma visible PDF, se creara una firma invisible", e); //$NON-NLS-1$
-    			initSignTask(configs);
+    			this.initSignTask(configs);
 			}
     	}
     	else {
-    		initSignTask(this.signOperationConfigs);
+    		this.initSignTask(this.signOperationConfigs);
     	}
     }
 
@@ -328,7 +330,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     @Override
     public void initSignTask(final List<SignOperationConfig> signConfigs) {
 
-    	setCursor(new Cursor(Cursor.WAIT_CURSOR));
+    	this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
     	this.taskIsRunning = true;
 
@@ -367,13 +369,12 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     	// Marcamos la tarea como termiada para evitar mostrar el dialogo espera despues de su fin
 		this.taskIsRunning = false;
    		this.signWaitDialog.dispose();
-    	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
     /** M&eacute;todo para indicar a la clase que el <code>AOKeyStoreManager</code> est&aacute; listo para usarse. */
     public void notifyStoreReady() {
         if (this.signOperationConfigs != null && !this.signOperationConfigs.isEmpty()) {
-        	 this.saf.setSignMenuCommandEnabled(true);
             this.lowerPanel.updateSignButtonState(true);
         }
     }
@@ -405,16 +406,16 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	@Override
 	public void loadFiles(final File[] files, final SignOperationConfig generalSignConfig) {
 
-     	setCursor(new Cursor(Cursor.WAIT_CURSOR));
+     	this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
      	final File[] dataFiles = filterFiles(files);
      	if (dataFiles == null || dataFiles.length == 0) {
      		LOGGER.warning("No se ha cargado ningun fichero valido"); //$NON-NLS-1$
     		AOUIFactory.showErrorMessage(
-    				SimpleAfirmaMessages.getString("SimpleAfirma.12"), //$NON-NLS-1$,
+    				SimpleAfirmaMessages.getString("SignPanel.123"), //$NON-NLS-1$,
     				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE,
-    				null
+    				new AOException(ErrorCode.Internal.LOADING_LOCAL_FILE_ERROR)
     			);
      	}
      	else {
@@ -441,7 +442,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
      		this.signOperationConfigs = configs;
      	}
 
-      	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+      	this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}
 
 	/**
@@ -809,7 +810,7 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
     				e -> {
 						try {
 							final List<InputData> inputDatas = new ArrayList<>();
-							final List<SignOperationConfig> configs = getSignOperationConfigs();
+							final List<SignOperationConfig> configs = this.getSignOperationConfigs();
 							if (configs != null) {
 								for (final SignOperationConfig config : configs) {
 									final InputData data = new InputData();
@@ -916,23 +917,23 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	    UpperPanel(final LoadDataFileListener loadDataListener) {
 	        super(true);
 	        this.loadDataListener = loadDataListener;
-	        createUI();
+	        this.createUI();
 	    }
 
 		private void createUI() {
-	        setLayout(new BorderLayout(5, 5));
-	        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+	        this.setLayout(new BorderLayout(5, 5));
+	        this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-	        getSelectButton().setText(SimpleAfirmaMessages.getString("SignPanel.32")); //$NON-NLS-1$
-	        getSelectButton().setMnemonic('S');
-	        getSelectButton().getAccessibleContext().setAccessibleDescription(
+	        SignPanel.this.getSelectButton().setText(SimpleAfirmaMessages.getString("SignPanel.32")); //$NON-NLS-1$
+	        SignPanel.this.getSelectButton().setMnemonic('S');
+	        SignPanel.this.getSelectButton().getAccessibleContext().setAccessibleDescription(
 	    		SimpleAfirmaMessages.getString("SignPanel.33") //$NON-NLS-1$
 	        );
-	        getSelectButton().getAccessibleContext().setAccessibleName(
+	        SignPanel.this.getSelectButton().getAccessibleContext().setAccessibleName(
 	    		SimpleAfirmaMessages.getString("SignPanel.34") //$NON-NLS-1$
 	        );
-	        getSelectButton().requestFocusInWindow();
-	        getSelectButton().addActionListener(arg0 -> {
+	        SignPanel.this.getSelectButton().requestFocusInWindow();
+	        SignPanel.this.getSelectButton().addActionListener(arg0 -> {
 				final File[] files;
 				try {
 
@@ -958,27 +959,27 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        final JLabel welcomeLabel = new JLabel(SimpleAfirmaMessages.getString("SignPanel.14")); //$NON-NLS-1$
 	        welcomeLabel.setFocusable(false);
 	        welcomeLabel.setFont(welcomeLabel.getFont().deriveFont(Font.PLAIN, 26));
-	        welcomeLabel.setLabelFor(getSelectButton());
+	        welcomeLabel.setLabelFor(SignPanel.this.getSelectButton());
 	        this.add(welcomeLabel, BorderLayout.PAGE_START);
 
 	        final String intro = SimpleAfirmaMessages.getString("SignPanel.40"); //$NON-NLS-1$
 
 	        final JLabel introText = new JLabel(intro);
-	        introText.setLabelFor(getSelectButton());
+	        introText.setLabelFor(SignPanel.this.getSelectButton());
 	        introText.setFocusable(false);
-	        getAccessibleContext().setAccessibleDescription(intro);
+	        this.getAccessibleContext().setAccessibleDescription(intro);
 
 	        final JPanel introPanel = new JPanel(new BorderLayout());
 	        introPanel.add(introText, BorderLayout.PAGE_START);
 	        this.add(introPanel, BorderLayout.CENTER);
 
 	        final JPanel selectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT), true);
-	        selectPanel.add(getSelectButton());
+	        selectPanel.add(SignPanel.this.getSelectButton());
 	        this.add(selectPanel, BorderLayout.PAGE_END);
 
 	        // Configuramos el color
 	        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
-	            setBackground(LookAndFeelManager.DEFAULT_COLOR);
+	            this.setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            introPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            selectPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            welcomeLabel.setForeground(new Color(3399));
@@ -1003,12 +1004,12 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        super(true);
 	        this.loadDataListener = loadDataListener;
 	        this.signButton = new JButton();
-	        SwingUtilities.invokeLater(() -> createUI());
+	        SwingUtilities.invokeLater(() -> this.createUI());
 	    }
 
 	    void createUI() {
-	        setLayout(new BorderLayout(5, 5));
-	        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+	        this.setLayout(new BorderLayout(5, 5));
+	        this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
 	        // Identificamos el color de fondo
 	        Color bgColor = Color.WHITE;
@@ -1067,13 +1068,13 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        buttonPanel.add(this.signButton);
 	        this.signButton.addActionListener(
 	    		ae -> {
-					sign();
+					SignPanel.this.sign();
 				}
 			);
 
 	        // Establecemos la configuracion de color
 	        if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
-	            setBackground(LookAndFeelManager.DEFAULT_COLOR);
+	            this.setBackground(LookAndFeelManager.DEFAULT_COLOR);
 	            panel.setBackground(Color.DARK_GRAY);
 	            panel.setForeground(Color.LIGHT_GRAY);
 	            buttonPanel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
@@ -1093,8 +1094,8 @@ public final class SignPanel extends JPanel implements LoadDataFileListener, Sig
 	        			 configs));
 	         }
 
-	         add(this.filePanel);
-	         revalidate();
+	         this.add(this.filePanel);
+	         this.revalidate();
 	    }
 
 	    public void updateSignButtonState(final boolean enable) {

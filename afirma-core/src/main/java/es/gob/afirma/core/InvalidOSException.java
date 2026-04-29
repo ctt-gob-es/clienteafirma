@@ -9,23 +9,30 @@
 
 package es.gob.afirma.core;
 
-/** Indica que se necesita un sistema operativo distinto al actual.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class InvalidOSException extends RuntimeException {
+/**
+ * Indica que se necesita un sistema operativo distinto al actual.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
+public final class InvalidOSException extends AORuntimeException {
+
 	private static final long serialVersionUID = -6174267665607129065L;
 
 	/** Sistema operativo actual. */
 	private final String os;
 
-	/** Crea una nueva instancia de la excepci&oacute;n.
-	 * @param expectedOS Sistema operativo esperado */
+	/**
+	 * Crea una nueva instancia de la excepci&oacute;n.
+	 * @param expectedOS Sistema operativo esperado
+	 */
 	public InvalidOSException(final String expectedOS) {
-		super("Se esperaba el sistema operativo: " + expectedOS); //$NON-NLS-1$
+		super("Se esperaba el sistema operativo: " + expectedOS, ErrorCode.Functional.INCOMPATIBLE_OPERATING_SYSTEM); //$NON-NLS-1$
 		this.os = expectedOS;
 	}
 
-	/** Obtiene el sistema operativo esperado.
-	 * @return nombre del sistema operativo esperado */
+	/**
+	 * Obtiene el sistema operativo esperado.
+	 * @return nombre del sistema operativo esperado
+	 */
 	public String getExpectedOS() {
 		return this.os;
 	}

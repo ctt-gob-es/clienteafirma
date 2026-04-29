@@ -1,4 +1,4 @@
-/* Copyright (C) 2011 [Gobierno de Espana]
+/* Copyr0ight (C) 2011 [Gobierno de Espana]
  * This file is part of "Cliente @Firma".
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
  *   - the GNU General Public License as published by the Free Software Foundation;
@@ -11,8 +11,12 @@ package es.gob.afirma.standalone.configurator.common;
 
 import java.awt.Component;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.Set;
@@ -20,15 +24,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
-import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.misc.AOFileUtils;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
-import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
 import es.gob.afirma.standalone.configurator.common.xmlwise.Plist;
 import es.gob.afirma.standalone.configurator.common.xmlwise.XmlElement;
 import es.gob.afirma.standalone.configurator.common.xmlwise.XmlParseException;
@@ -38,71 +44,16 @@ public final class PreferencesPlistHandler {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-//	private static final String PREFERENCES_SIGNATURE_PUK_BASE64;
-//	private static final boolean ALLOW_UNSIGNED_PREFERENCES;
 	private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; //$NON-NLS-1$
 	private static final String PLIST_OPEN_TAG = "<plist version=\"1.0\">"; //$NON-NLS-1$
 	private static final String PLIST_CLOSE_TAG = "</plist>"; //$NON-NLS-1$
 	private static final String SMARTCARDS_KEY = "smartcards"; //$NON-NLS-1$
 
-//	static {
-//		final Properties p = new Properties();
-//		try {
-//			p.load(
-//				PreferencesPlistHandler.class.getResourceAsStream(
-//					"/properties/configuration.properties" //$NON-NLS-1$
-//				)
-//			);
-//		}
-//		catch(final Exception e) {
-//			LOGGER.severe(
-//				"No han podido cargarse las preferencias de configuracion, se usaran los valores por defecto: " + e //$NON-NLS-1$
-//			);
-//		}
-//		ALLOW_UNSIGNED_PREFERENCES = Boolean.parseBoolean(
-//			p.getProperty("allowUnsignedPreferencesFiles", "true") //$NON-NLS-1$ //$NON-NLS-2$
-//		);
-//		PREFERENCES_SIGNATURE_PUK_BASE64 = 	p.getProperty("preferencesSignaturePublicKey"); //$NON-NLS-1$
-//		if (!ALLOW_UNSIGNED_PREFERENCES && PREFERENCES_SIGNATURE_PUK_BASE64 == null) {
-//			throw new IllegalStateException(
-//				"Si no se permiten preferencias sin firmar es necesario configurar una clave publica de firmante" //$NON-NLS-1$
-//			);
-//		}
-//	}
-
-//	/**
-//	 * Importa las preferencias de la aplicaci&oacute;n desde un fichero PList descargado desde una URL.
-//	 * @param url URL para la descarga del fichero de importaci&oacute;n con las preferencias de la aplicaci&oacute;n.
-//	 * @param unprotected
-//	 *        {@code true} Si las preferencias no est&aacute;n protegidas,
-//	 *        {@code false} en caso contrario
-//	 * @throws IOException Si hay problemas con la descarga del fichero de preferencias.
-//	 * @throws InvalidPreferencesFileException Si las preferencias no son v&aacute;lidas por cualquier motivo.
-//	 * @throws AOInvalidFormatException Si no se puede obtener informac&oacute;n sobre la firma de las preferencias.
-//	 */
-//	public static void importPreferencesFromUrl(final String url, final boolean unprotected) throws IOException, InvalidPreferencesFileException, AOInvalidFormatException {
-//		if (url == null){
-//			throw new IllegalStateException("La URL de descarga del fichero de configuracion no puede ser nula"); //$NON-NLS-1$
-//		}
-//		final byte[] configData = DataDownloader.downloadData(url);
-//		try {
-//			XAdESValidator.validate(configData, true);
-//		}
-//		catch (final Exception e) {
-//			throw new InvalidPreferencesFileException(
-//					"La firma del fichero de preferencias no es valida" //$NON-NLS-1$
-//					);
-//		}
-////		final AOTreeModel tm = new AOXAdESSigner().getSignersStructure(configData, true);
-////		final AOSimpleSignInfo ssi = (AOSimpleSignInfo) ((AOTreeNode)AOTreeModel.getChild(tm.getRoot(), 0)).getUserObject();
-////		final X509Certificate signerCert = ssi.getCerts()[0];
-////		if (!Base64.encode(signerCert.getPublicKey().getEncoded()).equals(PREFERENCES_SIGNATURE_PUK_BASE64)) {
-////			throw new InvalidPreferencesFileException(
-////					"La firmante del fichero de preferencias no esta autorizado" //$NON-NLS-1$
-////					);
-////		}
-//		importUserPreferencesFromXml(new String(configData), unprotected);
-//	}
+	/**
+	 * Algoritmo de hash usado para calcular la huella del certificado de firma del
+	 * fichero de preferencias.
+	 */
+	private static final String PREF_CERT_HASH_ALGORITHM = "SHA-256"; //$NON-NLS-1$
 
 	/**
 	 * Importa las preferencias de la aplicaci&oacute;n desde un fichero PList.
@@ -111,105 +62,153 @@ public final class PreferencesPlistHandler {
 	 * @param unprotected
 	 *        {@code true} Si las preferencias no est&aacute;n protegidas,
 	 *        {@code false} en caso contrario
+	 * @throws AOException Cuando se produce un error durante la importaci&oacute;n.
 	 */
-	public static void importPreferences(final String configFile, final Component parent, final boolean unprotected) {
+	public static void importPreferences(final String configFile, final Component parent, final boolean unprotected) throws AOException {
 
 		if (configFile == null){
 			throw new IllegalStateException("El fichero de configuracion no puede ser nulo"); //$NON-NLS-1$
 		}
 
-		final byte[] configData;
+		final Document configDocument;
 		try (
 			final InputStream fis = new FileInputStream(configFile);
 			final InputStream bis = new BufferedInputStream(fis);
 		) {
-			configData = AOUtil.getDataFromInputStream(bis);
+			configDocument = SecureXmlBuilder.getSecureDocumentBuilder().parse(bis);
 		}
-		catch(final Exception e) {
-			LOGGER.log(Level.SEVERE, "No ha sido posible leer el fichero de configuracion", e); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(
-				ConfiguratorCommonMessages.getString("PreferencesPlistHandler.0"), //$NON-NLS-1$
-				ConfiguratorCommonMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-				AOUIFactory.ERROR_MESSAGE,
-				e);
-			return;
+		catch(final IOException e) {
+			throw new AOException("No ha sido posible leer el fichero de configuracion de las preferencias", e, ConfiguratorErrorCode.Internal.CANT_READ_PREFERENCES_FILE); //$NON-NLS-1$
+		}
+		catch (final SAXException e) {
+			throw new AOException("El fichero de configuracion no es XML", e, ConfiguratorErrorCode.Internal.INVALID_XML_PREFERENCES_FILE); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new AOException("Error interno al cargar el fichero de configuracion", e, ConfiguratorErrorCode.Internal.IMPORTING_PREFERENCES_ERROR); //$NON-NLS-1$
 		}
 
-		if (!AOFileUtils.isXML(configData)) {
-			LOGGER.severe("El fichero de preferencias no es XML"); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(
-					ConfiguratorCommonMessages.getString("PreferencesPlistHandler.9"), //$NON-NLS-1$
-					ConfiguratorCommonMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE,
-					null
-				);
-			return;
+		importPreferences(configDocument, parent, unprotected);
+	}
+
+	/**
+	 * Importa las preferencias de la aplicaci&oacute;n desde un fichero PList.
+	 * @param config Documento de importaci&oacute;n con las preferencias de la aplicaci&oacute;n.
+	 * @param parent Componente padre para la modalidad.
+	 * @param unprotected
+	 *        {@code true} Si las preferencias no est&aacute;n protegidas,
+	 *        {@code false} en caso contrario
+	 * @throws AOException Cuando se produce un error durante la importaci&oacute;n.
+	 */
+	public static void importPreferences(final byte[] config, final Component parent, final boolean unprotected) throws AOException {
+
+		if (config == null){
+			throw new IllegalStateException("El objeto de configuracion no puede ser nodo"); //$NON-NLS-1$
+		}
+
+		final Document configDocument;
+		try (
+			final InputStream fis = new ByteArrayInputStream(config);
+			final InputStream bis = new BufferedInputStream(fis);
+		) {
+			configDocument = SecureXmlBuilder.getSecureDocumentBuilder().parse(bis);
+		}
+		catch(final IOException e) {
+			throw new AOException("No ha sido posible leer la configuacion de las preferencias", e, ConfiguratorErrorCode.Internal.CANT_READ_PREFERENCES_FILE); //$NON-NLS-1$
+		}
+		catch (final SAXException e) {
+			throw new AOException("La configuracion no se tiene formato XML", e, ConfiguratorErrorCode.Internal.INVALID_XML_PREFERENCES_FILE); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new AOException("Error interno al cargar la configuracion", e, ConfiguratorErrorCode.Internal.IMPORTING_PREFERENCES_ERROR); //$NON-NLS-1$
+		}
+
+		importPreferences(configDocument, parent, unprotected);
+	}
+
+	/**
+	 * Importa las preferencias de la aplicaci&oacute;n desde un fichero PList.
+	 * @param configDocument Documento XML con las preferencias de la aplicaci&oacute;n.
+	 * @param parent Componente padre para la modalidad.
+	 * @param unprotected
+	 *        {@code true} Si las preferencias no est&aacute;n protegidas,
+	 *        {@code false} en caso contrario
+	 * @throws AOException Cuando se produce un error durante la importaci&oacute;n.
+	 */
+	public static void importPreferences(final Document configDocument, final Component parent, final boolean unprotected) throws AOException {
+
+		if (configDocument == null){
+			throw new IllegalStateException("La configuracion no puede ser nula"); //$NON-NLS-1$
 		}
 
 		String signMessage;
+		SignatureInfo signatureInfo = null;
 		try {
-			XAdESValidator.validate(configData, true);
+			signatureInfo = XAdESValidator.validate(configDocument, true);
 
-			try {
-				final AOTreeModel tm = new AOXAdESSigner().getSignersStructure(configData, true);
-				final AOSimpleSignInfo ssi = (AOSimpleSignInfo) ((AOTreeNode)AOTreeModel.getChild(tm.getRoot(), 0)).getUserObject();
-				final X509Certificate signerCert = ssi.getCerts()[0];
-				signMessage = ConfiguratorCommonMessages.getString("PreferencesPlistHandler.5", AOUtil.getCN(signerCert)); //$NON-NLS-1$
-				//			if (!ALLOW_UNSIGNED_PREFERENCES && !Base64.encode(signerCert.getPublicKey().getEncoded()).equals(PREFERENCES_SIGNATURE_PUK_BASE64)) {
-				//				LOGGER.severe("El firmante de las preferencias con el siguiente numero de serie no esta autorizado: " + signerCert.getSerialNumber()); //$NON-NLS-1$
-				//				AOUIFactory.showErrorMessage(
-				//						ConfiguratorCommonMessages.getString("PreferencesPlistHandler.6", AOUtil.getCN(signerCert)), //$NON-NLS-1$
-				//						ConfiguratorCommonMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-				//						AOUIFactory.ERROR_MESSAGE,
-				//						null);
-				//			}
-			}
-			catch (final AOInvalidFormatException e) {
-				LOGGER.log(Level.SEVERE, "No se ha podido extraer la informacion de la firma del fichero de configuracion", e); //$NON-NLS-1$
-				AOUIFactory.showErrorMessage(
-						ConfiguratorCommonMessages.getString("PreferencesPlistHandler.7"), //$NON-NLS-1$
-						ConfiguratorCommonMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-						AOUIFactory.ERROR_MESSAGE,
-						e);
-				return;
-			}
 		}
-		catch (final AOInvalidFormatException e) {
-			LOGGER.severe("El fichero de configuracion no esta firmado"); //$NON-NLS-1$
-			signMessage = ConfiguratorCommonMessages.getString("PreferencesPlistHandler.3"); //$NON-NLS-1$
+		catch (final AOInvalidSignatureFormatException e) {
+			LOGGER.info("El documento no esta firmado"); //$NON-NLS-1$
+		}
+		catch (final CertificateException e) {
+			throw new AOException("El certificado del firmante del fichero de preferencias no es valido", e, ConfiguratorErrorCode.Functional.INVALID_CERTIFICATE_SIGNER); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
-			LOGGER.severe("El fichero de configuracion contiene una firma invalida: " + e); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(
-					ConfiguratorCommonMessages.getString("PreferencesPlistHandler.4"), //$NON-NLS-1$
-					ConfiguratorCommonMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE,
-					null);
-			return;
+			throw new AOException("El fichero de configuracion contiene una firma invalida", e, ConfiguratorErrorCode.Functional.INVALID_PREFERENCES_FILE_SIGNATURE); //$NON-NLS-1$
+		}
+
+		// Comprobamos si es obligatoria la firma
+		final boolean requireSignedPreference = PreferencesManager.getBoolean(
+				PreferencesManager.ADMIN_PREFERENCE_REQUIRE_SIGNED_PREFERENCES,
+				PreferencesSource.SYSTEM_INTERNAL);
+
+		if (requireSignedPreference && signatureInfo != null) {
+			throw new AOException("Solo se admite la importacion de preferencias firmadas", ConfiguratorErrorCode.Functional.UNSIGNED_PREFERENCES_FILE); //$NON-NLS-1$
+		}
+
+		// Si las preferencias estan firmadas, obtenemos la informacion del firmante
+		if (signatureInfo != null) {
+			final X509Certificate signingCert = signatureInfo.getSigningCertificateChain()[0];
+			signMessage = ConfiguratorCommonMessages.getString("PreferencesPlistHandler.1", AOUtil.getCN(signingCert)); //$NON-NLS-1$
+			final String allowedCertHashB64 = PreferencesManager.get(
+					PreferencesManager.ADMIN_PREFERENCE_CERT_HASH_TO_SIGNED_PREFERENCES,
+					PreferencesSource.SYSTEM_INTERNAL);
+			if (allowedCertHashB64 != null) {
+				String signingCertHashB64;
+				try {
+					signingCertHashB64 = Base64.encode(MessageDigest.getInstance(PREF_CERT_HASH_ALGORITHM).digest(signingCert.getEncoded()));
+				}
+				catch (final Exception e) {
+					throw new AOException("El certificado del firmante del fichero de preferencias no se ha podido codificar",  //$NON-NLS-1$
+							e, ConfiguratorErrorCode.Functional.INVALID_CERTIFICATE_SIGNER);
+				}
+
+				if (!allowedCertHashB64.equals(signingCertHashB64)) {
+					throw new AOException("El certificado del firmante del fichero de preferencias no es el certificado autorizado", ConfiguratorErrorCode.Functional.INVALID_PREFERENCES_FILE_SIGNER); //$NON-NLS-1$
+				}
+			}
+		}
+		else {
+			signMessage = ConfiguratorCommonMessages.getString("PreferencesPlistHandler.0"); //$NON-NLS-1$
 		}
 
 
 		final int resp = AOUIFactory.showConfirmDialog(
 			parent,
-			ConfiguratorCommonMessages.getString("PreferencesPlistHandler.10", signMessage), //$NON-NLS-1$
-			ConfiguratorCommonMessages.getString("PreferencesPlistHandler.11"), //$NON-NLS-1$
+			ConfiguratorCommonMessages.getString("PreferencesPlistHandler.2", signMessage), //$NON-NLS-1$
+			ConfiguratorCommonMessages.getString("PreferencesPlistHandler.3"), //$NON-NLS-1$
 			AOUIFactory.YES_NO_OPTION,
 			AOUIFactory.WARNING_MESSAGE);
 
-		if (AOUIFactory.NO_OPTION == resp) {
+		if (AOUIFactory.YES_OPTION != resp) {
 			return;
 		}
 
 		try {
-			importUserPreferencesFromXml(new String(configData), unprotected);
+			importUserPreferencesFromXml(configDocument, unprotected);
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "El fichero de configuracion es invalido", e); //$NON-NLS-1$
-			AOUIFactory.showErrorMessage(
-				ConfiguratorCommonMessages.getString("PreferencesPlistHandler.8"), //$NON-NLS-1$
-				ConfiguratorCommonMessages.getString("PreferencesPlistHandler.1"), //$NON-NLS-1$
-				AOUIFactory.ERROR_MESSAGE,
-				e);
+			throw new AOException("El fichero de configuracion es invalido", ConfiguratorErrorCode.Internal.INVALID_FORMAT_PREFERENCES_FILE); //$NON-NLS-1$
 		}
 
 	}
@@ -220,7 +219,7 @@ public final class PreferencesPlistHandler {
 	 * @param unprotected Indica si las preferencias est&aacute;n protegidas o no
 	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido
 	 */
-	public static void importUserPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
+	private static void importUserPreferencesFromXml(final Document xml, final boolean unprotected) throws InvalidPreferencesFileException {
 		final Map<String, Object> properties = loadPreferencesFromXml(xml, unprotected);
 
 		// Registramos las tarjetas inteligentes que se encuentren en el XML
@@ -240,7 +239,7 @@ public final class PreferencesPlistHandler {
 	 * @return Mapa de preferencias cargadas.
 	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido.
 	 */
-	public static Map<String, Object> loadPreferencesFromXml(final String xml, final boolean unprotected) throws InvalidPreferencesFileException {
+	public static Map<String, Object> loadPreferencesFromXml(final Document xml, final boolean unprotected) throws InvalidPreferencesFileException {
 		final Map<String, Object> properties;
 		try {
 			properties = Plist.fromXml(xml);
@@ -257,13 +256,7 @@ public final class PreferencesPlistHandler {
 	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido
 	 */
 	public static void importSystemPreferencesFromXml(final byte[] xml) throws InvalidPreferencesFileException {
-		final Map<String, Object> properties;
-		try {
-			properties = Plist.fromXml(xml);
-		}
-		catch (final XmlParseException e) {
-			throw new InvalidPreferencesFileException("Error analizando el fichero XML: " + e, e); //$NON-NLS-1$
-		}
+		final Map<String, Object> properties = loadPreferencesFromXml(xml);
 
 		// Registramos las tarjetas inteligentes que se encuentren en el XML
 		if (properties.containsKey(SMARTCARDS_KEY)) {
@@ -273,6 +266,23 @@ public final class PreferencesPlistHandler {
 
 		checkPreferences(properties);
 		storeSystemPreferences(properties);
+	}
+
+	/**
+	 * Se cargan las preferencias del usuario desde un XML.
+	 * @param xml XML con la informaci&oacute;n.
+	 * @return Mapa de preferencias cargadas.
+	 * @throws InvalidPreferencesFileException error en caso de archivo no v&aacute;lido.
+	 */
+	public static Map<String, Object> loadPreferencesFromXml(final byte[] xml) throws InvalidPreferencesFileException {
+		final Map<String, Object> properties;
+		try {
+			properties = Plist.fromXml(xml);
+		}
+		catch (final XmlParseException e) {
+			throw new InvalidPreferencesFileException("Error analizando el fichero XML: " + e, e); //$NON-NLS-1$
+		}
+		return properties;
 	}
 
 	/**
@@ -357,7 +367,7 @@ public final class PreferencesPlistHandler {
 		}
 	}
 
-	/** Error de a&aacute;lisis del fichero de preferencias. */
+	/** Error de an&aacute;lisis del fichero de preferencias. */
 	public static class InvalidPreferencesFileException extends Exception {
 
 		private static final long serialVersionUID = 1L;

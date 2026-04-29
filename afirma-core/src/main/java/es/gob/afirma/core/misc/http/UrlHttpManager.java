@@ -18,6 +18,9 @@ import java.util.Properties;
  */
 public interface UrlHttpManager {
 
+	/** Tiempo de espera por defecto para descartar una conexi&oacute;n HTTP. */
+	int DEFAULT_TIMEOUT = -1;
+
 	/**
 	 * Lee una URL HTTP o HTTPS.
 	 * @param url URL a leer.
@@ -158,4 +161,23 @@ public interface UrlHttpManager {
 			Properties requestProperties,
 			HttpErrorProcessor httpProcessor,
 			SSLConfig sslConfig) throws IOException;
+
+	/**
+	 * Establece el timeout de lectura para la conexi&oacute;n.
+	 * @param readTimeout Timeout de lectura de la conexi&oacute;n en milisegundos. Se debe indicar
+	 * {@code DEFAULT_TIMEOUT} para respetar el valor por defecto y 0 para establecer una
+	 * espera ilimitada.
+	 * @see UrlHttpManager#DEFAULT_TIMEOUT
+	 */
+	void setReadTimeout(int readTimeout);
+
+	/**
+	 * Recupera el timeout de lectura para la conexi&oacute;n.
+	 * return Timeout de lectura de la conexi&oacute;n en milisegundos. Se debe indicar
+	 * {@code DEFAULT_TIMEOUT} para respetar el valor por defecto y 0 para establecer una
+	 * espera ilimitada.
+	 * @see UrlHttpManager#DEFAULT_TIMEOUT
+	 * @return Timeout de lectura para la conexi&oacute;n.
+	 */
+	int getReadTimeout();
 }

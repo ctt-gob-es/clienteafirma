@@ -275,4 +275,18 @@ public class TrustStoreManager {
 	public static File getJKSFile() {
 		return new File(Platform.getUserHome(), ".afirma" + File.separator + "TrustedCertsKeystore.jks"); //$NON-NLS-1$ //$NON-NLS-2$;
 	}
+	
+	/**
+	 * Comprueba si el certificado pasado por parametro existe ya en el almacen.
+	 * @param cert Certificado a comprobar.
+	 * @return true en caso de que exista, false n caso contrario.
+	 * @throws KeyStoreException Cuando nos se pueda cargar el almac&eacute;n.
+	 */
+	public boolean containsCert(final X509Certificate cert) throws KeyStoreException {
+	    if (this.ks == null) {
+	        return false;
+	    }
+	    return searchCert(cert) != null;
+	}
+
 }

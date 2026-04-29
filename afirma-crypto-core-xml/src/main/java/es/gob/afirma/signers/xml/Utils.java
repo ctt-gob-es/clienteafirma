@@ -25,7 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -210,15 +210,10 @@ public final class Utils {
                     continue;
                 }
             }
-            else if (Transform.BASE64.equals(transformType)) {
+            else if (Transform.BASE64.equals(transformType) || Transform.ENVELOPED.equals(transformType)) {
                 // La transformacion Base64 no necesita parametros
                 transformParam = null;
-            }
-            else if (Transform.ENVELOPED.equals(transformType)) {
-                // La transformacion Enveloped no necesita parametros
-                transformParam = null;
-            }
-            else {
+            } else {
                 LOGGER.warning("Tipo de transformacion no soportada: " + transformType); //$NON-NLS-1$
                 continue;
             }
@@ -235,7 +230,8 @@ public final class Utils {
         }
     }
 
-    /** Obtiene, de un nodo de referencia de tipo <i>Object</i>, la lista de
+    /**
+     * Obtiene, de un nodo de referencia de tipo <i>Object</i>, la lista de
      * transformaciones definidas. Si no tiene transformaciones definidas
      * devuelve {@code null}.
      * @param referenceNode Nodo de tipo referencia.
@@ -243,7 +239,8 @@ public final class Utils {
      * @return Listado de transformaciones.
      * @throws InvalidAlgorithmParameterException Cuando se encuentre un par&aacute;metro inv&aacute;lido para
      *                                            el algoritmo de transformaci&oacute;n.
-     * @throws NoSuchAlgorithmException Cuando se encuentre un algoritmo de transformaci&oacute;n no soportado. */
+     * @throws NoSuchAlgorithmException Cuando se encuentre un algoritmo de transformaci&oacute;n no soportado.
+     */
     public static List<Transform> getObjectReferenceTransforms(final Node referenceNode,
     		                                                   final String namespacePrefix) throws NoSuchAlgorithmException,
                                                                                                     InvalidAlgorithmParameterException {
@@ -293,7 +290,8 @@ public final class Utils {
         return algorithm;
     }
 
-    /** Recupera los par&aacute;metros de una transformaci&oacute;n. En el caso
+    /**
+     * Recupera los par&aacute;metros de una transformaci&oacute;n. En el caso
      * de las transformaciones XPATH y XPATH2 se devolver&aacute;n los
      * par&aacute;metros especificados y en las transformaciones Base64,
      * Enveloped y de Canonicalizaci&oacute;n (que no reciben par&aacute;metros)
@@ -303,7 +301,8 @@ public final class Utils {
      * @param namespacePrefix Prefijo del espacio de nombres XML.
      * @return Par&aacute;metros de la transformaci&oacute;n.
      * @throws InvalidAlgorithmParameterException Cuando no se especifiquen correctamente los
-     *                                            par&aacute;mnetros de las transformaciones XPATH y XPATH2. */
+     *                                            par&aacute;metros de las transformaciones XPATH y XPATH2.
+     */
     private static TransformParameterSpec getTransformParameterSpec(final Node transformNode,
     		                                                        final String namespacePrefix) throws InvalidAlgorithmParameterException {
 
@@ -359,24 +358,22 @@ public final class Utils {
 
                         Filter filter;
                         final Node filterNode = xpathTransformNode.getAttributes().getNamedItem("Filter"); //$NON-NLS-1$
-                        if (filterNode != null) {
-                            final String filterName = filterNode.getNodeValue();
-                            if (filterName.equals("subtract")) { //$NON-NLS-1$
-                                filter = Filter.SUBTRACT;
-                            }
-                            else if (filterName.equals("intersect")) { //$NON-NLS-1$
-                                filter = Filter.INTERSECT;
-                            }
-                            else if (filterName.equals("union")) { //$NON-NLS-1$
-                                filter = Filter.UNION;
-                            }
-                            else {
-                                throw new InvalidAlgorithmParameterException("El subtipo '" + filterName + "' de la transformacion XPATH2 no es valido"); //$NON-NLS-1$ //$NON-NLS-2$
-                            }
-                        }
-                        else {
+                        if (filterNode == null) {
                             throw new InvalidAlgorithmParameterException("No se ha declarado un subtipo para la transformacion XPATH2"); //$NON-NLS-1$
                         }
+						final String filterName = filterNode.getNodeValue();
+						if (filterName.equals("subtract")) { //$NON-NLS-1$
+						    filter = Filter.SUBTRACT;
+						}
+						else if (filterName.equals("intersect")) { //$NON-NLS-1$
+						    filter = Filter.INTERSECT;
+						}
+						else if (filterName.equals("union")) { //$NON-NLS-1$
+						    filter = Filter.UNION;
+						}
+						else {
+						    throw new InvalidAlgorithmParameterException("El subtipo '" + filterName + "' de la transformacion XPATH2 no es valido"); //$NON-NLS-1$ //$NON-NLS-2$
+						}
 
                         params = new XPathFilter2ParameterSpec(Collections.singletonList(new XPathType(xpathTransformNode.getTextContent(), filter)));
                         break;
@@ -421,12 +418,9 @@ public final class Utils {
             			"Las firmas XML Externally Detached necesitan la URI para referenciar a los datos firmados" //$NON-NLS-1$
             		);
             	}
-            }
-            else {
-            	if (uri != null) {
-            		LOGGER.warning("Se ignorara el parametro 'uri' ya que este solo se utiliza con el formato " + AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
-            	}
-            }
+            } else if (uri != null) {
+				LOGGER.warning("Se ignorara el parametro 'uri' ya que este solo se utiliza con el formato " + AOSignConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED); //$NON-NLS-1$
+			}
             if (!format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)
             	&& !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)
                 && !format.equalsIgnoreCase(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING)
@@ -496,7 +490,7 @@ public final class Utils {
      * @return Cadena de texto con el XML en forma de array de octetos. */
     public static byte[] writeXML(final Node node, final Map<String, String> props, final String styleHref, final String styleType) {
 
-        final Map<String, String> xmlProps = props != null ? props : new Hashtable<String, String>(0);
+        final Map<String, String> xmlProps = props != null ? props : new HashMap<String, String>(0);
 
         // La codificacion por defecto sera UTF-8
         final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ?
@@ -536,12 +530,10 @@ public final class Utils {
 
 		DOMImplementationLS domImplLS;
 		final Document doc = node.getOwnerDocument();
-		if (doc.getFeature("Core", "3.0") != null && doc.getFeature("LS", "3.0") != null) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        	domImplLS = (DOMImplementationLS) doc.getImplementation().getFeature("LS","3.0"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        else {
+		if (doc.getFeature("Core", "3.0") == null || doc.getFeature("LS", "3.0") == null) {
         	throw new RuntimeException("La implementacion DOM cargada no permite la serializacion"); //$NON-NLS-1$
         }
+		domImplLS = (DOMImplementationLS) doc.getImplementation().getFeature("LS","3.0"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final LSOutput output = domImplLS.createLSOutput();
         output.setCharacterStream(writer);
@@ -593,7 +585,7 @@ public final class Utils {
 
         byte[] pkcs1;
         try {
-            pkcs1 = Base64.decode(((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0)).getTextContent()); //$NON-NLS-1$
+            pkcs1 = Base64.decode(signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0).getTextContent()); //$NON-NLS-1$
         }
         catch (final Exception e) {
             LOGGER.log(Level.WARNING, "No se pudo extraer el PKCS#1 de una firma", e); //$NON-NLS-1$

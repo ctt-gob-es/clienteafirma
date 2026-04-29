@@ -34,6 +34,7 @@ import org.spongycastle.cms.CMSSignedData;
 import org.spongycastle.cms.SignerInformation;
 import org.spongycastle.cms.SignerInformationStore;
 
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.SigningLTSException;
 
 /** Utilidades para las multifirmas CAdES. */
@@ -48,12 +49,12 @@ public final class CAdESMultiUtil {
 	private static final ASN1ObjectIdentifier LONG_TERM_VALIDATION_OID = new ASN1ObjectIdentifier(
 			"0.4.0.1733.2.2"); //$NON-NLS-1$
 
-	private static final List<ASN1ObjectIdentifier> UNSUPPORTED_ATTRIBUTES = new ArrayList<>(8);
+	private static final List<ASN1ObjectIdentifier> LONG_TERM_ATTRIBUTES = new ArrayList<>(8);
 	static {
-		UNSUPPORTED_ATTRIBUTES.add(ARCHIVE_TIMESTAMP_V2_OID);
-		UNSUPPORTED_ATTRIBUTES.add(ARCHIVE_TIMESTAMP_V3_OID);
-		UNSUPPORTED_ATTRIBUTES.add(LONG_TERM_VALIDATION_OID);
-		UNSUPPORTED_ATTRIBUTES.add(PKCSObjectIdentifiers.id_aa_ets_archiveTimestamp);
+		LONG_TERM_ATTRIBUTES.add(ARCHIVE_TIMESTAMP_V2_OID);
+		LONG_TERM_ATTRIBUTES.add(ARCHIVE_TIMESTAMP_V3_OID);
+		LONG_TERM_ATTRIBUTES.add(LONG_TERM_VALIDATION_OID);
+		LONG_TERM_ATTRIBUTES.add(PKCSObjectIdentifiers.id_aa_ets_archiveTimestamp);
 	}
 
 	private CAdESMultiUtil() {
@@ -84,38 +85,38 @@ public final class CAdESMultiUtil {
 	/** Comprueba si hay atributos no soportados en un <code>SignedData</code> de CMS.
 	 * @param signedDataBytes <code>SignedData</code> de CMS.
 	 * @throws SigningLTSException Si hay atributos no soportados en el <code>SignedData</code> proporcionado.
-	 * @throws IOException Si no se puede tratar el <code>SignedData</code> proporcionado.
+	 * @throws AOInvalidSignatureFormatException Cuando los datos proporcionados no tengan un formato de firma v&aacute;lido.
 	 */
-	public static void checkUnsupportedAttributes(final byte[] signedDataBytes) throws SigningLTSException, IOException {
+	public static void checkLongTermAttributes(final byte[] signedDataBytes) throws SigningLTSException, AOInvalidSignatureFormatException {
 		final CMSSignedData signedData;
 		try {
 			signedData = new CMSSignedData(signedDataBytes);
 		}
 		catch (final CMSException e) {
-			throw new IOException(
+			throw new AOInvalidSignatureFormatException(
 				"La firma proporcionada no es un SignedData compatible CMS: " + e, e //$NON-NLS-1$
 			);
 		}
-		checkUnsupportedAttributes(signedData);
+		checkLongTermAttributes(signedData);
 	}
 
-	private static void checkUnsupportedAttributes(final CMSSignedData signedData) throws SigningLTSException {
+	private static void checkLongTermAttributes(final CMSSignedData signedData) throws SigningLTSException {
 		final SignerInformationStore signerInfos = signedData.getSignerInfos();
 		final Iterator<SignerInformation> signerInfoIt = signerInfos.iterator();
 		while (signerInfoIt.hasNext()) {
-			checkUnsupportedAttributes(signerInfoIt.next());
+			checkLongTermAttributes(signerInfoIt.next());
 		}
 	}
 
-    private static void checkUnsupportedAttributes(final SignerInformation signerInformation) throws SigningLTSException {
+    private static void checkLongTermAttributes(final SignerInformation signerInformation) throws SigningLTSException {
     	final AttributeTable at = signerInformation.getUnsignedAttributes();
     	if (at != null) {
 
     		// Identificados si la firma es de archivo
-    		for (final ASN1ObjectIdentifier unsupOid : UNSUPPORTED_ATTRIBUTES) {
+    		for (final ASN1ObjectIdentifier unsupOid : LONG_TERM_ATTRIBUTES) {
     			if (at.get(unsupOid) != null) {
         			throw new SigningLTSException(
-    					"No se soportan multifirmas de firmas con atributos longevos (encontrado OID=" + unsupOid + ")" //$NON-NLS-1$ //$NON-NLS-2$
+    					"No se permite la multifirma de firmas con atributos longevos (encontrado OID=" + unsupOid + ")" //$NON-NLS-1$ //$NON-NLS-2$
     				);
     			}
     		}
@@ -128,7 +129,7 @@ public final class CAdESMultiUtil {
      * @throws SigningLTSException Cuando el atributo impide agregar nuevas firmas.
      */
     static void checkUnsupported(final ASN1ObjectIdentifier oid) throws  SigningLTSException {
-    	for (final ASN1ObjectIdentifier unsupOid : UNSUPPORTED_ATTRIBUTES) {
+    	for (final ASN1ObjectIdentifier unsupOid : LONG_TERM_ATTRIBUTES) {
     		if (unsupOid.equals(oid)) {
     			throw new SigningLTSException(
 					"No se soportan multifirmas de firmas con atributos longevos (encontrado OID=" + oid + ")" //$NON-NLS-1$ //$NON-NLS-2$

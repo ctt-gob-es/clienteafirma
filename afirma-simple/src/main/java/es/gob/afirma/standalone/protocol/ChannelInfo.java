@@ -7,7 +7,12 @@ package es.gob.afirma.standalone.protocol;
 class ChannelInfo {
 
 	private final String idSession;
+
+	/** Listado de puertos en los que se deber&iacute;a intentar abrir le canal. */
 	private int[] ports;
+
+	/** &Iacute;ndice del siguiente puerto disponible. */
+	private int portIndex = 0;
 
 	/**
 	 * Crea la informaci&oacute;n del canal.
@@ -41,5 +46,17 @@ class ChannelInfo {
 	 */
 	public void setPorts(final int[] ports) {
 		this.ports = ports;
+	}
+
+	/**
+	 * Devuelve el siguiente puerto disponible del listado que no se haya
+	 * devuelto anteriormente y marca cualquier puerto anterior como no disponible.
+	 * @return El siguiente puerto disponible o {@code -1} si no hay m&aacute;s.
+	 */
+	public int nextPortAvailable() {
+		if (this.portIndex >= this.ports.length) {
+			return -1;
+		}
+		return this.ports[this.portIndex++];
 	}
 }

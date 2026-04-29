@@ -1,7 +1,7 @@
 package es.gob.afirma.plugin.hash;
 
 /**
- * Excepci&acute;n que denota un error en la generaci&oacute;n del documento
+ * Excepci&oacute;n que denota un error en la generaci&oacute;n del documento
  * con los hashes de un directorio o la carga de un documento de este tipo.
  */
 public class DocumentException extends Exception {

@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.net.URI;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -24,8 +25,12 @@ final class UtilActions {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String HELP_URI;
+	
 	static {
 		final Properties p = new Properties();
+		
+		String locale = Locale.getDefault().getLanguage() + "-" + Locale.getDefault().getCountry();
+		
 		try {
 			p.load(UtilActions.class.getResourceAsStream("/resources/selectiondialogutil.properties")); //$NON-NLS-1$
 		}
@@ -34,10 +39,12 @@ final class UtilActions {
 				"No se han podido cargar las propiedades del dialogo de seleccion de certificados, se utilizaran los valores por defecto: " + e //$NON-NLS-1$
 			);
 		}
-		HELP_URI = p.getProperty(
-			"helpUrl", //$NON-NLS-1$
-			"http://incidencias-ctt.administracionelectronica.gob.es/wiki/doku.php?id=forja-ctt_wiki:clienteafirma:adenda_-_uso_del_dialogo_grafico_de_seleccion_de_certificados" //$NON-NLS-1$
-		);
+		
+		String helpURIProperty = p.getProperty(
+				"helpUrl", //$NON-NLS-1$
+				"http://incidencias-ctt.administracionelectronica.gob.es/wiki/doku.php?id=forja-ctt_wiki:clienteafirma:adenda_-_uso_del_dialogo_grafico_de_seleccion_de_certificados" //$NON-NLS-1$
+			);
+		HELP_URI = helpURIProperty + "-" + locale;
 	}
 
 	private UtilActions() {

@@ -48,7 +48,7 @@
 		function generateUUID(){
 		    var d = new Date().getTime();
 		    if(window.performance && typeof window.performance.now === "function"){
-		        d += performance.now();; //use high-precision timer if available
+		        d += performance.now(); //use high-precision timer if available
 		    }
 		    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
 		        var r = (d + Math.random()*16)%16 | 0;
@@ -167,8 +167,12 @@
   </head>
 	<body>
 		<script type="text/javascript">
+			//AutoScript.setForceWSMode(true);
+			//SupportDialog.enableErrorDialog(false);
+			AutoScript.setServlets(
+					window.location.origin + "/afirma-signature-storage/StorageService",
+					window.location.origin + "/afirma-signature-retriever/RetrieveService");	
 			AutoScript.cargarAppAfirma();
-			AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService", window.location.origin + "/afirma-signature-retriever/RetrieveService");
 		</script>
 		
 		<fieldset><legend>Configuraci&oacute;n general</legend>

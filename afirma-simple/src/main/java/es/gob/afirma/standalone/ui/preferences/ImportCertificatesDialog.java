@@ -44,10 +44,12 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 
 final class ImportCertificatesDialog extends JDialog {
 
@@ -217,9 +219,9 @@ final class ImportCertificatesDialog extends JDialog {
 			AOUIFactory.showErrorMessage(
 					container,
 					SimpleAfirmaMessages.getString("TrustedCertificatesDialog.27"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE,
-					e);
+					new AOException(SimpleErrorCode.Internal.ERROR_LOAD_TRUSTED_CERT));
 		}
 	}
 
@@ -234,14 +236,11 @@ final class ImportCertificatesDialog extends JDialog {
 		String depuredDomain;
 		if (domain.toLowerCase(Locale.ENGLISH).startsWith(HTTPS_SCHEMA)) {
 			depuredDomain = domain;
+		} else if (domain.indexOf(SCHEMA_SEPARATOR) == -1) {
+			depuredDomain = HTTPS_SCHEMA + domain;
 		}
 		else {
-			if (domain.indexOf(SCHEMA_SEPARATOR) == -1) {
-				depuredDomain = HTTPS_SCHEMA + domain;
-			}
-			else {
-				depuredDomain = HTTPS_SCHEMA + domain.substring(domain.indexOf(SCHEMA_SEPARATOR) + SCHEMA_SEPARATOR.length());
-			}
+			depuredDomain = HTTPS_SCHEMA + domain.substring(domain.indexOf(SCHEMA_SEPARATOR) + SCHEMA_SEPARATOR.length());
 		}
 		return new URL(depuredDomain);
 	}
@@ -310,7 +309,7 @@ final class ImportCertificatesDialog extends JDialog {
 					SimpleAfirmaMessages.getString("TrustedCertificatesDialog.27"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 					JOptionPane.ERROR_MESSAGE,
-					e);
+					new AOException(SimpleErrorCode.Internal.ERROR_LOAD_TRUSTED_CERT));
 			return;
 		}
 

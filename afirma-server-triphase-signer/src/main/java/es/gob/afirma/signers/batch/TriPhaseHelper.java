@@ -15,13 +15,13 @@ import java.util.Properties;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 import es.gob.afirma.signers.batch.SingleSignConstants.DigestAlgorithm;
-import es.gob.afirma.signers.batch.xml.SingleSign;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.signer.processors.CAdESASiCSTriPhasePreProcessor;
@@ -217,7 +217,7 @@ public class TriPhaseHelper {
 	}
 
 
-	public static TriPhasePreProcessor getTriPhasePreProcessor(final SingleSign sSign) throws AOInvalidFormatException {
+	public static TriPhasePreProcessor getTriPhasePreProcessor(final SingleSign sSign) throws AOException {
 		if (sSign == null) {
 			throw new IllegalArgumentException("La firma no puede ser nula"); //$NON-NLS-1$
 		}
@@ -238,7 +238,7 @@ public class TriPhaseHelper {
 			case PKCS1:
 				return new Pkcs1TriPhasePreProcessor();
 			default:
-				throw new AOInvalidFormatException("Formato de firma no soportado: " + sSign.getSignFormat()); //$NON-NLS-1$
+				throw new AOException("Formato de firma no soportado: " + sSign.getSignFormat(), ErrorCode.Request.UNSUPPORTED_SIGNATURE_FORMAT); //$NON-NLS-1$
 		}
 	}
 

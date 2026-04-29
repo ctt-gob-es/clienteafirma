@@ -9,23 +9,32 @@
 
 package es.gob.afirma.core.misc.protocol;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
+
 /** Error en los par&aacute;metros de la URL recibida por la aplicaci&oacute;n. */
-public class ParameterException extends Exception {
+public class ParameterException extends AOException {
 
 	private static final long serialVersionUID = 976364958815642808L;
 
-	/** Construye una excepci&oacute;n de error en los par&aacute;metros de la URL
-	 * recibida por la aplicaci&oacute;n.
-	 * @param msg Mensaje de la excepci&oacute;n. */
-	public ParameterException(final String msg) {
-		super(msg);
-	}
-
-	/** Construye una excepci&oacute;n de error en los par&aacute;metros de la URL
+	/**
+	 * Construye una excepci&oacute;n de error en los par&aacute;metros de la URL
 	 * recibida por la aplicaci&oacute;n.
 	 * @param msg Mensaje de la excepci&oacute;n.
-	 * @param t Causa inicial de la excepci&oacute;n. */
-	public ParameterException(final String msg, final Throwable t) {
-		super(msg, t);
+	 * @param errorCode C&oacute;digo del error concreto que caus&oacute; la excepci&oacute;n.
+	 */
+	public ParameterException(final String msg, final ErrorCode errorCode) {
+		super(msg, errorCode);
+	}
+
+	/**
+	 * Construye una excepci&oacute;n de error en los par&aacute;metros de la URL
+	 * recibida por la aplicaci&oacute;n.
+	 * @param msg Mensaje de la excepci&oacute;n.
+	 * @param t Causa inicial de la excepci&oacute;n.
+	 * @param errorCode C&oacute;digo del error concreto que caus&oacute; la excepci&oacute;n.
+	 */
+	public ParameterException(final String msg, final Throwable t, final ErrorCode errorCode) {
+		super(msg, t, errorCode);
 	}
 }

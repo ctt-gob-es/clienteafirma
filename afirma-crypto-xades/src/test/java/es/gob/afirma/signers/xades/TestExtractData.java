@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 
 /**
@@ -42,7 +42,7 @@ public class TestExtractData {
 		byte[] data;
 		try {
 			data = this.signer.getData(signature);
-		} catch (final AOInvalidFormatException e) {
+		} catch (final AOInvalidSignatureFormatException e) {
 			Assert.fail("El fichero de pruebas no es una firma: " + e); //$NON-NLS-1$
 			return;
 		}
@@ -67,7 +67,7 @@ public class TestExtractData {
 		byte[] data;
 		try {
 			data = this.signer.getData(signature);
-		} catch (final AOInvalidFormatException e) {
+		} catch (final AOInvalidSignatureFormatException e) {
 			Assert.fail("El fichero de pruebas no es una firma: " + e); //$NON-NLS-1$
 			return;
 		}

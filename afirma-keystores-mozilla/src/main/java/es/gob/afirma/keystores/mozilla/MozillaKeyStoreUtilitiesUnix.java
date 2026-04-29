@@ -142,42 +142,63 @@ final class MozillaKeyStoreUtilitiesUnix {
 		);
 	}
 
-	/** Busca la &uacute;ltima versi&oacute;n de Firefox instalada en un sistema
+	/**
+	 * Busca la &uacute;ltima versi&oacute;n de Firefox instalada en un sistema
 	 * Linux o Solaris.
 	 * @param startDir Directorio de inicio para la b&uacute;squeda.
-	 * @return &Uacute;ltima versi&oacute;n instalada en el sistema. */
+	 * @return &Uacute;ltima versi&oacute;n instalada en el sistema o {@code null} si
+	 * no se pudo detectar.
+	 */
 	private static String searchLastFirefoxVersion(final String startDir) {
 
+		final String[] filenames = listFiles(startDir);
+		if (filenames == null) {
+			return null;
+		}
+
 		Version maxVersion = null;
-		final File directoryLib = new File(startDir);
-		if (directoryLib.isDirectory()) {
 
-			// Tomamos lo numeros de version de firefox identificados
-			final List<String> firefoxVersions = new ArrayList<>();
-			for (final String filename : directoryLib.list()) {
-				if (filename.startsWith("firefox-")) { //$NON-NLS-1$
-					firefoxVersions.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+		// Tomamos lo numeros de version de firefox identificados
+		final List<String> firefoxVersions = new ArrayList<>();
+		for (final String filename : filenames) {
+			if (filename.startsWith("firefox-")) { //$NON-NLS-1$
+				firefoxVersions.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
+		}
 
-			// Calculamos el numero de version mayor
-			for (final String versionText : firefoxVersions) {
-				Version version;
-				try {
-					version = new Version(versionText);
-				}
-				catch (final Exception e) {
-					LOGGER.warning(
+		// Calculamos el numero de version mayor
+		for (final String versionText : firefoxVersions) {
+			Version version;
+			try {
+				version = new Version(versionText);
+			}
+			catch (final Exception e) {
+				LOGGER.warning(
 						"Se encontro un numero de version de Firefox no soportado (" + versionText + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
-					);
-					continue;
-				}
-				if (maxVersion == null || version.compareTo(maxVersion) > 0) {
-					maxVersion = version;
-				}
+						);
+				continue;
+			}
+			if (maxVersion == null || version.compareTo(maxVersion) > 0) {
+				maxVersion = version;
 			}
 		}
 		return maxVersion != null ? maxVersion.toString() : null;
+	}
+
+	/**
+	 * Lista los ficheros de un directorio.
+	 * @param dir Ruta de directorio.
+	 * @return Listado de nombres de los ficheros del directorio o {@code null} si la ruta
+	 * no correspond&iacute;a a un directorio o si no se pudo listar su contenido.
+	 */
+	private static String[] listFiles(final String dir) {
+
+		String[] filenames = null;
+		final File directoryLib = new File(dir);
+		if (directoryLib.isDirectory()) {
+			filenames = directoryLib.list();
+		}
+		return filenames;
 	}
 
 	/** Recupera el listado de dependencias de la biblioteca "libsoftkn3.so" para

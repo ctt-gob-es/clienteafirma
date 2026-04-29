@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.MimeHelper;
@@ -49,8 +51,6 @@ public final class MassiveSignatureHelper {
     private static final String MODE = "mode"; //$NON-NLS-1$
     private static final String FORMAT = "format"; //$NON-NLS-1$
     private static final String MIME_TYPE = "mimeType"; //$NON-NLS-1$
-
-    private static final AOException SIGN_DATA_NOT_GENERATED = new AOException("No se generaron datos de firma"); //$NON-NLS-1$
 
 	/** Generador de huellas digitales utilizado internamente. */
     private static MessageDigest md = null;
@@ -94,7 +94,7 @@ public final class MassiveSignatureHelper {
         // Creamos el manejador de firma por defecto
         this.defaultSigner = AOSignerFactory.getSigner(this.massiveConfiguration.getDefaultFormat());
         if (this.defaultSigner == null) {
-            throw new AOException("Formato de firma no soportado: " + this.massiveConfiguration.getDefaultFormat()); //$NON-NLS-1$
+            throw new AOException("Formato de firma no soportado: " + this.massiveConfiguration.getDefaultFormat(), ErrorCode.Request.UNSUPPORTED_SIGNATURE_FORMAT); //$NON-NLS-1$
         }
         this.massiveSignSigner = this.defaultSigner;
     }
@@ -434,9 +434,6 @@ public final class MassiveSignatureHelper {
             config
         );
 
-        if (signData == null) {
-            throw SIGN_DATA_NOT_GENERATED;
-        }
         return signData;
     }
 
@@ -476,9 +473,7 @@ public final class MassiveSignatureHelper {
     		this.massiveConfiguration.getKeyEntry().getCertificateChain(),
     		config
 		);
-        if (signData == null) {
-            throw SIGN_DATA_NOT_GENERATED;
-        }
+
         return signData;
     }
 
@@ -511,9 +506,6 @@ public final class MassiveSignatureHelper {
     		config
 		);
 
-        if (signData == null) {
-            throw SIGN_DATA_NOT_GENERATED;
-        }
         return signData;
     }
 
@@ -574,9 +566,7 @@ public final class MassiveSignatureHelper {
     		this.massiveConfiguration.getKeyEntry().getCertificateChain(),
     		config
 		);
-        if (signData == null) {
-            throw SIGN_DATA_NOT_GENERATED;
-        }
+
         return signData;
     }
 
@@ -597,7 +587,7 @@ public final class MassiveSignatureHelper {
         AOSigner validSigner = signer;
         if (!this.massiveConfiguration.isOriginalFormat()) {
             if (!signer.isSign(signData)) {
-                throw new AOException("La firma introducida no se corresponde con el formato de firma especificado"); //$NON-NLS-1$
+                throw new AOInvalidSignatureFormatException("La firma introducida no se corresponde con el formato de firma especificado"); //$NON-NLS-1$
             }
         }
         else {
@@ -605,7 +595,7 @@ public final class MassiveSignatureHelper {
         	if (validSigner == null) {
         		validSigner = AOSignerFactory.getSigner(signData);
         		if (validSigner == null) {
-        			throw new AOException("La firma introducida no se corresponde con ning\u00FAn formato soportado"); //$NON-NLS-1$
+        			throw new AOException("La firma introducida no se corresponde con ning\u00FAn formato soportado", ErrorCode.Request.UNSUPPORTED_SIGNATURE_FORMAT); //$NON-NLS-1$
         		}
         	}
         }

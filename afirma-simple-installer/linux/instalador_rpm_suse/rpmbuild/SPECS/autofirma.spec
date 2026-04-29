@@ -1,9 +1,15 @@
 Name:           autofirma
-Version:        1.9
+Version:        1.10
 Release:        1
-Summary:        Aplicación de firma electrónica en escritorio y en trámites web
+Summary:        Aplicación de firma electrónica
+Summary(ca):    Aplicació de signatura electrònica
+Summary(eu):    Sinadura elektronikoaren aplikazioa
+Summary(ga):    Aplicación de firma electrónica
+Summary(va):    Aplicació de signatura electrònica
+Summary(en):    Application of electronic signature
 
 License:        GPLv2+ or EUPL 1.1
+
 
 # Fuentes obtenidos https://github.com/ctt-gob-es/clienteafirma/tags
 Source0:        sources.tar.gz
@@ -19,27 +25,27 @@ BuildArch: noarch
 %description 
 Aplicación para la firma electrónica de documentos locales y operaciones de firma desde navegador web compatibles con el Cliente @firma.
 
+%description -l ca
+Aplicació per a la signatura electrònica de documents locals i operacions de signatura des de navegador web compatibles amb el Client @firma.
+
+%description -l eu
+Dokumentu lokalen sinadura elektronikorako aplikazioa eta @firma Bezeroarekin bateragarriak diren sinadura eragiketak web nabigatzailetik.
+
+%description -l gl
+Aplicación para a firma electrónica de documentos locais e operacións de sinatura desde navegador web compatibles co Cliente @firma.
+
+%description -l va
+Aplicació per a la signatura electrònica de documents locals i operacions de signatura des de navegador web compatibles amb el Client @firma.
+
+%description -l en
+Application for electronic signature of local documents and signing operations from web browser compatible with the Client @firma.
+
 %pre
 if pgrep firefox; then
   pkill firefox;
 fi
 
 %build
-cat > %{name}.desktop <<EOF
-[Desktop Entry]
-Encoding=UTF-8
-Version=1.9
-Type=Application
-Terminal=false
-Categories=Office;Utilities;Signature;Java
-Exec=java -Djdk.tls.maxHandshakeMessageSize=65536 -jar %{_libdir}/%{name}/%{name}.jar %u
-Name=AutoFirma
-Icon=%{_libdir}/%{name}/%{name}.png
-GenericName=Herramienta de firma
-Comment=Herramienta de firma
-MimeType=x-scheme-handler/afirma
-EOF
-
 cat > %{name}.js <<EOF
 pref("network.protocol-handler.app.afirma","%{_bindir}/%{name}");
 pref("network.protocol-handler.warn-external.afirma",false);
@@ -50,40 +56,6 @@ cat > %{name} <<EOF
 #!/bin/bash
 java -Djdk.tls.maxHandshakeMessageSize=65536 -jar %{_libdir}/%{name}/%{name}.jar "\$@"
 EOF
-
-cat > es.gob.afirma.metainfo.xml <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<component type="desktop-application">
-  <id>es.gob.afirma</id>
-  <name>Autofirma</name>
-  <summary>Aplicación de firma electrónica.</summary>
-  <description>
-    <p>
-      Aplicación de firma electrónica. Proporciona una interfaz gráfica para la firma electrónica de documentos y puede ser ejecutada desde el navegador para la firma de procedimientos administrativos web de Administración Electrónica.
-    </p>
-  </description>
-  <url type="homepage">https://firmaelectronica.gob.es/Home/Descargas.html</url>
-  <project_license>EUPL-1.1 OR GPL-2.0-only</project_license>
-  <icon type="local" width="128" height="128">%{_libdir}/%{name}/%{name}.svg</icon>
-  <provides>
-    <binary>%{name}</binary>
-  </provides>
-  <releases>
-    <release version="1.9" date="2025-01-27" />
-  </releases>
-  <categories>
-    <category>Office</category>
-    <category>Utilities</category>
-    <category>Signature</category>
-    <category>Java</category>
-  </categories>
-  <launchable type="desktop-id">afirma.desktop</launchable>
-  <requires>
-    <id>libnss3-tools</id>
-  </requires>
-</component>
-EOF
-
 
 %install
 install -d -m 0755 %{buildroot}%{_libdir}/%{name}
@@ -99,12 +71,61 @@ install -m 0755 %{name}.jar %{buildroot}%{_libdir}/%{name}/
 install -m 0755 %{name}Configurador.jar %{buildroot}%{_libdir}/%{name}/
 install -m 0755 %{name} %{buildroot}%{_bindir}/
 install -m 0644 es.gob.afirma.metainfo.xml %{buildroot}/usr/share/metainfo
-install -m 0644 %{name}.desktop %{buildroot}/usr/share/applications
-install -m 0644 %{name}.desktop %{buildroot}/usr/local/share/applications
 install -m 0755 %{name}.js %{buildroot}%{_libdir}/firefox/defaults/pref
 
 %post
-java -Djava.awt.headless=true -jar %{_libdir}/%{name}/%{name}Configurador.jar -install
+
+# Establecemos la descripcion en el idioma del sistema
+if [ -z ${LANGUAGE+x} ]; then
+    CURRENT_LANG=${LANG:1:2}
+else
+    CURRENT_LANG=$(expr $LANGUAGE : '\([a-zA-Z@]*\)')
+fi
+
+echo "Procesamos la cadena de idioma: $CURRENT_LANG"
+
+if  [ ${CURRENT_LANG:1:2} == "en" ]; then
+    DESC="Signature Tool"
+    AFIRMA_LOCALE="en_US"
+elif [ $CURRENT_LANG == "ca" ]; then
+    DESC="Eina de signatura"
+    AFIRMA_LOCALE="ca_ES"
+elif [ $CURRENT_LANG == "eu" ]; then
+    DESC="Sinadura tresna"
+    AFIRMA_LOCALE="eu_ES"
+elif [ $CURRENT_LANG == "gl" ]; then
+    DESC="Ferramenta de firma"
+    AFIRMA_LOCALE="gl_ES"
+elif [ $CURRENT_LANG == "ca@valencia" ]; then
+    DESC="Eina de signatura"
+    AFIRMA_LOCALE="va_ES"
+else
+    DESC="Herramienta de firma"
+    AFIRMA_LOCALE="es_ES"
+fi
+
+# Creamos el archivo para la integracion como herramienta de escritorio
+cat > /usr/share/applications/%{name}.desktop <<EOF
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.10
+Type=Application
+Terminal=false
+Categories=Office;Utilities;Signature;Java
+Exec=java -Djdk.tls.maxHandshakeMessageSize=65536 -jar %{_libdir}/%{name}/%{name}.jar %u
+Name=AutoFirma
+Icon=%{_libdir}/%{name}/%{name}.png
+GenericName=$DESC
+Comment=$DESC
+MimeType=x-scheme-handler/afirma
+EOF
+
+# Damos permisos y copiamos el archivo
+chmod 755 /usr/share/applications/%{name}.desktop
+cp /usr/share/applications/%{name}.desktop /usr/local/share/applications/%{name}.desktop
+
+
+java -Djava.awt.headless=true -jar %{_libdir}/%{name}/%{name}Configurador.jar -install -default_language "$AFIRMA_LOCALE"
 
 if [ -e /usr/share/applications/mimeapps.list ]; then
   echo x-scheme-handler/afirma=%{name}.desktop >> /usr/share/applications/mimeapps.list
@@ -172,8 +193,6 @@ fi
 %dir %{_libdir}/%{name}
 %attr(0755, root, root) %{_bindir}/%{name}
 %attr(0755, -, -) /usr/share/metainfo/es.gob.afirma.metainfo.xml
-%attr(0755, -, -) /usr/share/applications/%{name}.desktop
-%attr(0755, -, -) /usr/local/share/applications/%{name}.desktop
 %attr(0755, -, -) %{_libdir}/firefox/defaults/pref/%{name}.js
 %attr(-, root, root) %{_libdir}/%{name}/*
 
@@ -216,6 +235,7 @@ fi
 - Se evita la caducidad del WebSocket durante las operaciones para evitar que se cierre la aplicación cuando tarda más de dos minutos en completarse. [INC 2027540]
 - Se mejora la identificación del error cuando se fuerza al uso de servidor intermedio en AutoFirma, pero no se proporciona la URL de los servicios.
 - Se permite declarar el algoritmo de hash como algoritmo de firma, de tal forma que AutoFirma elegirá el cifrado de la firma en base al tipo de clave del certificado.
+- Se inhabilita la operación getCurrentLog de AutoScript y se elimina la función de Autofirma.
 - Los enlaces y ejecutables de los distintos sistemas para su uso por consola ahora ejecutan directamente la lógica de consola para evitar configuraciones y logs innecesarios.
 - Se muestra en los ejemplos de sintaxis el nombre del ejecutable utilizado.
 - Se utiliza la operación, algoritmo, formato y configuración del formato indicados cuando se abre la interfaz gráfica (-gui) para ejecutar una operación por consola.

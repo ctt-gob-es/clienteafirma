@@ -1,6 +1,7 @@
 package es.gob.afirma.core.keystores;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 
 /**
  * Excepci&oacute;n que refleja que el usuario cancel&oacute; una operaci&oacute;n relacionada con un
@@ -16,6 +17,6 @@ public class AOCancelledSMOperationException extends AOException {
 	 * @param message Descripci&oacute;n del error.
 	 */
 	public AOCancelledSMOperationException(final String message) {
-		super(message);
+		super(message, ErrorCode.Functional.CANCELLED_OPERATION);
 	}
 }

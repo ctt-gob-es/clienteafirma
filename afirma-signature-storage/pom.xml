@@ -12,8 +12,12 @@
 	<parent>
 		<groupId>es.gob.afirma</groupId>
 		<artifactId>afirma-client</artifactId>
-		<version>1.9</version>
+		<version>1.9.1</version>
 	</parent>
+
+	<properties>
+		<java.version>1.7</java.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -55,6 +59,18 @@
 					<wtpversion>2.0</wtpversion>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<fork>true</fork>
+					<compilerArgument>-XDignore.symbol.file</compilerArgument>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>

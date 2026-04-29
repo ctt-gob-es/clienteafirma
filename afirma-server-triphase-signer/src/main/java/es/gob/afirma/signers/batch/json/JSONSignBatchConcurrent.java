@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.BatchException;
 import es.gob.afirma.signers.batch.ProcessResult;
@@ -161,8 +162,8 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 			errorsJson.put(buildJSONSingleResut(error));
 		}
 
-		for (String signatureId : trisigns.keySet().toArray(new String[0])) {
-			TriphaseData trisign = trisigns.get(signatureId);
+		for (final String signatureId : trisigns.keySet().toArray(new String[0])) {
+			final TriphaseData trisign = trisigns.get(signatureId);
 			trisignsJson.put(TriphaseDataParser.triphaseDataToJson(trisign));
 		}
 
@@ -267,7 +268,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 
 			final JSONSingleSign singleSign = getSingleSignById(signatureResult.getId());
 			if (singleSign == null) {
-				LOGGER.warning("No se encontro en el lote una firma de la que se obtuvo resultado: " + signatureResult.getId()); //$NON-NLS-1$
+				LOGGER.warning("No se encontro en el lote una firma de la que se obtuvo resultado: " + LoggerUtil.getTrimStr(signatureResult.getId())); //$NON-NLS-1$
 				continue;
 			}
 
@@ -285,7 +286,8 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 
 				if (this.stopOnError) {
 					LOGGER.severe(
-							"Error en una de las firmas del lote (" + signatureResult.getId() + "), se parara el proceso: " + signatureResult.getResult().getDescription() //$NON-NLS-1$ //$NON-NLS-2$
+							"Error en una de las firmas del lote (" + LoggerUtil.getTrimStr(signatureResult.getId()) //$NON-NLS-1$
+							+ "), se parara el proceso: " + LoggerUtil.getTrimStr(signatureResult.getResult().getDescription()) //$NON-NLS-1$
 							);
 					needStop = true;
 					stopExecution(executorService);
@@ -293,7 +295,8 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 				}
 				else {
 					LOGGER.log(Level.WARNING,
-							"Error en una de las firmas del lote (" + signatureResult.getId() + "), se continua con el siguiente elemento: " + signatureResult.getResult().getDescription()); //$NON-NLS-1$ //$NON-NLS-2$
+							"Error en una de las firmas del lote (" + LoggerUtil.getTrimStr(signatureResult.getId()) //$NON-NLS-1$
+							+ "), se continua con el siguiente elemento: " + LoggerUtil.getTrimStr(signatureResult.getResult().getDescription())); //$NON-NLS-1$
 				}
 			}
 		}
@@ -402,7 +405,7 @@ public final class JSONSignBatchConcurrent extends JSONSignBatch {
 							((BatchDocumentManager) this.documentManager).rollback(ss.getDataRef(), certChain, singleSignProps);
 						} catch (final IOException e) {
 							LOGGER.severe(
-									"No se pudo deshacer el guardado de una firma (" + ss.getId() + ") despues de la cancelacion del lote: " + e //$NON-NLS-1$ //$NON-NLS-2$
+									"No se pudo deshacer el guardado de una firma (" + LoggerUtil.getTrimStr(ss.getId()) + ") despues de la cancelacion del lote: " + e //$NON-NLS-1$ //$NON-NLS-2$
 									);
 						}
 					}

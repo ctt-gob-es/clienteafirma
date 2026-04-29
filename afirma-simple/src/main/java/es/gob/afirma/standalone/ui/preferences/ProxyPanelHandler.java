@@ -9,7 +9,6 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.SocketAddress;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,11 +18,14 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.ProxyConfig;
 import es.gob.afirma.standalone.ProxyConfig.ConfigType;
 import es.gob.afirma.standalone.ProxyUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager.PreferencesSource;
 
@@ -31,7 +33,8 @@ public class ProxyPanelHandler {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	static final String URL_CHECK_CONNECTION = "https://www.google.com"; //$NON-NLS-1$
+	//static final String URL_CHECK_CONNECTION = "https://www.google.com"; //$NON-NLS-1$
+	static final String URL_CHECK_CONNECTION = "https://firmaelectronica.gob.es/"; //$NON-NLS-1$
 
 	private final ProxyPanel view;
 
@@ -201,7 +204,7 @@ public class ProxyPanelHandler {
 							PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, cipheredPwd);
 						}
 					}
-					catch (final GeneralSecurityException e) {
+					catch (final Exception e) {
 						LOGGER.severe("Error cifrando la contrasena del Proxy: " + e); //$NON-NLS-1$
 						JOptionPane.showMessageDialog(this.view.getParent(), SimpleAfirmaMessages.getString("ProxyDialog.19")); //$NON-NLS-1$);
 						PreferencesManager.put(PreferencesManager.PREFERENCE_GENERAL_PROXY_PASSWORD, ""); //$NON-NLS-1$
@@ -318,13 +321,12 @@ public class ProxyPanelHandler {
 
 		// Comprobamos si no se puedo identificar el proxy
 		if (proxy == null) {
-			LOGGER.info("No se han detectado un proxy valido configurado en el sistema"); //$NON-NLS-1$
+			LOGGER.info("No se han detectado un proxy configurado en el sistema"); //$NON-NLS-1$
 			AOUIFactory.showMessageDialog(
 					this.view,
 					SimpleAfirmaMessages.getString("ProxyDialog.14"), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("ProxyDialog.11"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE
-					);
+					AOUIFactory.WARNING_MESSAGE);
 		}
 	}
 
@@ -357,43 +359,66 @@ public class ProxyPanelHandler {
 			if (this.parent != null) {
 				this.parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 			}
-			boolean connectionStatus = false;
-			try {
-				final Proxy proxy = new Proxy(
-						Proxy.Type.HTTP,
-						new InetSocketAddress(this.proxyHost, Integer.parseInt(this.proxyPort)));
-				final URL url = new URL(URL_CHECK_CONNECTION);
 
-				final HttpURLConnection uc = (HttpURLConnection) url.openConnection(proxy);
-				uc.connect();
-				connectionStatus = true;
-			}
-			catch (final Exception e) {
-				this.SUBLOGGER.log(Level.WARNING, "Error conectando con el proxy: " + e, e); //$NON-NLS-1$
-			    connectionStatus = false;
+			Proxy proxy;
+
+			if ((this.proxyHost == null || this.proxyHost.isEmpty())
+					&& (this.proxyPort == null || this.proxyPort.isEmpty())) {
+				proxy = Proxy.NO_PROXY;
+			} else {
+				try {
+					proxy = new Proxy(
+							Proxy.Type.HTTP,
+							new InetSocketAddress(this.proxyHost, Integer.parseInt(this.proxyPort)));
+				}
+				catch (final Exception e) {
+					this.SUBLOGGER.log(Level.WARNING, "La configuracion de proxy es erronea", e); //$NON-NLS-1$
+					showErrorMessage(
+							SimpleAfirmaMessages.getString("ProxyDialog.25"), //$NON-NLS-1$
+							SimpleErrorCode.Functional.INVALID_PROXY_CONFIG);
+					proxy = null;
+				}
 			}
 
-			if (connectionStatus) {
-				this.SUBLOGGER.info("Conexion proxy correcta"); //$NON-NLS-1$
-				AOUIFactory.showMessageDialog(
-					this.parent,
-					SimpleAfirmaMessages.getString("ProxyDialog.9"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
-					AOUIFactory.INFORMATION_MESSAGE
-				);
+			if (proxy != null) {
+				try {
+					final URL url = new URL(URL_CHECK_CONNECTION);
+
+					final HttpURLConnection uc = (HttpURLConnection) url.openConnection(proxy);
+					uc.connect();
+
+					this.SUBLOGGER.info("Conexion proxy correcta"); //$NON-NLS-1$
+					showSuccessMessage();
+				}
+				catch (final Exception e) {
+					this.SUBLOGGER.log(Level.WARNING, "Error conectando con el proxy", e); //$NON-NLS-1$
+					showErrorMessage(
+							SimpleAfirmaMessages.getString("ProxyDialog.10"), //$NON-NLS-1$
+							SimpleErrorCode.Communication.PROXY_CONNECTION);
+				}
 			}
-			else {
-				this.SUBLOGGER.info("Conexion proxy incorrecta"); //$NON-NLS-1$
-				AOUIFactory.showMessageDialog(
-					this.parent,
-					SimpleAfirmaMessages.getString("ProxyDialog.10"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
-					AOUIFactory.ERROR_MESSAGE
-				);
-			}
+
 			if (this.parent != null) {
 				this.parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
+		}
+
+		private void showSuccessMessage() {
+			AOUIFactory.showMessageDialog(
+					this.parent,
+					SimpleAfirmaMessages.getString("ProxyDialog.9"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
+					AOUIFactory.INFORMATION_MESSAGE);
+		}
+
+		private void showErrorMessage(final String errorMessage, final ErrorCode errorCode) {
+			AOUIFactory.showErrorMessage(
+					this.parent,
+					errorMessage,
+					SimpleAfirmaMessages.getString("ProxyDialog.8"), //$NON-NLS-1$
+					AOUIFactory.ERROR_MESSAGE,
+					new AOException(errorCode)
+				);
 		}
 	}
 }

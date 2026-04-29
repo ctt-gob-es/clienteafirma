@@ -26,7 +26,7 @@ public class InvalidSpongyCastleException extends InvalidLibraryException {
 	 * @param found Versi&oacute;n encontrada (actual) de SpongyCastle
 	 * @param e Excepci&oacute;n original */
 	public InvalidSpongyCastleException(final String expected, final String found, final Throwable e) {
-		super("Se necesitaba SpongyCastle version " + expected + ", pero se encontro la version " + found, e); //$NON-NLS-1$ //$NON-NLS-2$
+		super("Se necesitaba SpongyCastle version " + expected + ", pero se encontro la version " + found, e, BinaryErrorCode.ThirdParty.BOUNCYCASTLE_VERSION_NOT_SUPPORTED); //$NON-NLS-1$ //$NON-NLS-2$
 		this.exp = expected;
 		this.fnd = found;
 	}

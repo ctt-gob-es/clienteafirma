@@ -2,6 +2,7 @@ package es.gob.afirma.triphase.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,7 +18,6 @@ public class VersionService extends HttpServlet {
 	private static final long serialVersionUID = 4540594536500777002L;
 
 	private static final String VERSION_RESOURCE = "/version"; //$NON-NLS-1$
-	private static final String CHARSET = "utf-8"; //$NON-NLS-1$
 
 	@Override
 	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -27,7 +27,7 @@ public class VersionService extends HttpServlet {
 			is.read(version);
 		}
 
-		resp.getWriter().print(new String(version, CHARSET).trim());
+		resp.getWriter().print(new String(version, StandardCharsets.UTF_8).trim());
 		resp.getWriter().flush();
 	}
 }

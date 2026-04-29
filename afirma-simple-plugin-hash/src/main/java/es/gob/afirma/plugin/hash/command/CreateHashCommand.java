@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.plugin.hash.CreateHashDirDialog;
@@ -80,15 +79,17 @@ public class CreateHashCommand extends PluginCommandAction {
 				params.isRecursive());
 	}
 
-	/** Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales a trav&eacute;s de consola.
+	/**
+	 * Realizamos la operaci&oacute;n de creaci&oacute;n de huellas digitales a trav&eacute;s de consola.
 	 * @param params Par&aacute;metros de configuraci&oacute;n.
 	 * @return Si se ha indicado el fichero de salida, se devuelve la cadena texto con le mensaje del resultado;
 	 * si no, se devuelve el hash con la codificaci&oacute;n que se haya indicado.
 	 * @throws IllegalArgumentException Cuando falta algun par&aacute;metro necesario.
 	 * @throws IOException Cuando ocurre algun error en la lectura o guardado de ficheros.
-	 * @throws AOException Cuando ocurre algun error al procesar la petici&oacute;n. */
+	 * @throws HashCommandException Cuando ocurre algun error al procesar la petici&oacute;n.
+	 */
 	private static String createHashByCommandLine(final HashParameters params)
-			throws IllegalArgumentException, IOException, AOException {
+			throws IllegalArgumentException, IOException, HashCommandException {
 
 		final File inputFile = params.getMainFile();
 		if (inputFile == null) {
@@ -123,7 +124,7 @@ public class CreateHashCommand extends PluginCommandAction {
 				try {
 					hashesDocumentData = hashDocument.generate();
 				} catch (final DocumentException e) {
-					throw new AOException(Messages.getString("CommandLine.93"), e); //$NON-NLS-1$
+					throw new HashCommandException(Messages.getString("CommandLine.93"), e); //$NON-NLS-1$
 				}
 			}
 			// Si es un fichero
@@ -152,7 +153,7 @@ public class CreateHashCommand extends PluginCommandAction {
 			}
 		}
 		catch (final InterruptedException | ExecutionException e) {
-			throw new AOException(Messages.getString("CommandLine.94"), e); //$NON-NLS-1$
+			throw new HashCommandException(Messages.getString("CommandLine.94"), e); //$NON-NLS-1$
 		}
 
 		// Si se ha proporcionado un fichero de salida, se guarda el resultado de la firma en el.

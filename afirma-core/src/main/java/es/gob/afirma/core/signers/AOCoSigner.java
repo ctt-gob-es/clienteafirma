@@ -15,11 +15,14 @@ import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 
-/** Define los requerimientos de las clases capaces de efectuar cofirmas digitales.
- * @version 1.0 */
+/**
+ * Define los requerimientos de las clases capaces de efectuar cofirmas digitales.
+ * @version 1.1
+ */
 public interface AOCoSigner {
 
-    /** Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
+    /**
+     * Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
      * cofirma se necesitan los datos originales (que este m&eacute;todo
      * firmar&aacute; normalmente) y la firma sobre la que se realiza la cofirma
      * (a los que se agregar&aacute; el resultado de la nueva firma).<br>
@@ -31,18 +34,19 @@ public interface AOCoSigner {
      * @param certChain Cadena de certificados del firmante
      * @param extraParams Par&aacute;metros adicionales para la cofirma
      * @return Contenido firmado
-     * @throws AOException Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma o los datos */
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos.
+     */
     byte[] cosign(byte[] data,
     		      byte[] sign,
     		      String algorithm,
     		      PrivateKey key,
     		      final java.security.cert.Certificate[] certChain,
-    		      Properties extraParams) throws AOException,
-    		                                     IOException;
+    		      Properties extraParams) throws AOException, IOException;
 
 
-    /** Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
+    /**
+     * Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
      * cofirma se necesita el documento en el que se encuentra la firma sobre la
      * que se realiza la cofirma (a los que se agregar&aacute; el resultado de
      * la nueva firma).<br>
@@ -56,14 +60,15 @@ public interface AOCoSigner {
      *        Par&aacute;metros adicionales para la cofirma
      * @return Contenido firmado
      * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso
-     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma */
+     *         Cuando ocurre cualquier problema durante el proceso.
+     * @throws IOException
+     *         Cuando ocurren problemas relacionados con la lectura de los datos.
+     */
     byte[] cosign(byte[] sign,
     		      String algorithm,
     		      PrivateKey key,
     		      final java.security.cert.Certificate[] certChain,
-    		      Properties extraParams) throws AOException,
-    		                                     IOException;
+    		      Properties extraParams) throws AOException, IOException;
 
 
 }

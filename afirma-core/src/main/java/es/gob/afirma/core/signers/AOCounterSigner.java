@@ -15,11 +15,14 @@ import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 
-/** Define los requerimientos de las clases capaces de efectuar contrafirmas digitales.
- * @version 1.0 */
+/**
+ * Define los requerimientos de las clases capaces de efectuar contrafirmas digitales.
+ * @version 1.1
+ */
 public interface AOCounterSigner {
 
-    /** Contrafirma nodos de firma concretos de una firma electr&oacute;nica.<br>
+    /**
+     * Contrafirma nodos de firma concretos de una firma electr&oacute;nica.<br>
      * Los nodos que se deben firmar se indican en <code>targetType</code> y
      * pueden ser:
      * <ul>
@@ -40,7 +43,8 @@ public interface AOCounterSigner {
      * @param extraParams Par&aacute;metros adicionales para la contrafirma.
      * @return Contenido firmado
      * @throws AOException Cuando ocurre cualquier problema durante el proceso.
-     * @throws IOException Si ocurren problemas relacionados con la lectura de la firma. */
+     * @throws IOException Cuando ocurren problemas relacionados con la lectura de los datos.
+     */
     byte[] countersign(byte[] sign,
                               String algorithm,
                               CounterSignTarget targetType,

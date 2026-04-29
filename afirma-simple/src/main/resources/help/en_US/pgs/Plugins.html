@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Plugins</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="plugin, hash">
+  <meta name="description" content="Plugins.">
+ </head>
+ <body> 
+  <h2>Plugins</h2>
+  <p>A series of plugins are distributed along with Autofirma to add additional features to the application.</p>
+  <h3>Calculation and verification of fingerprints</h3>
+  <p>This plugin adds to Autofirma options to calculate the fingerprint (hash) of a file or all files in a directory and check those same traces that have been generated.</p>
+  <p>Once the plugin is installed, the &quot;Fingerprints&quot; option will appear in the Autofirma menu bar with the different operations that can be performed.</p>
+  <ul>
+  	<li><b> Calculate fingerprint: </b> It allows you to calculate the hash of a file and save it to disk. The format and extension of the hash file will vary according to the selected format.</li>
+  	<p align="center"><img src="../gfx/pluginhash_calculo_fichero_mini.png" alt="File Calculation Screen"></p>
+  	<ul>
+  		<li><b> File on which to calculate the fingerprint: </b> File we want to calculate the hash.</li>
+  		<li><b> Fingerprint algorithm: </b> Hash algorithm.</li>
+  		<li><b> Format of the fingerprint: </b> Coding used to store the hash:<ul>
+  				<li>Hexadecimal in ASCII (Base16): The footprint shall be stored as a hex chain termed &#39;h&#39;.</li>
+  				<li>Base64: The footprint will be stored at Base 64.</li>
+  				<li>Binary: The fingerprint shall be stored without coding.</li>
+  			</ul>
+  		</li>
+  		<li><b> Copy fingerprint to clipboard: </b> By activating this option, in addition to storing the hash in file, it will be copied to the clipboard. The hash shall be copied with the encoding of the selected format or, if the binary format was selected, in hexadecimal.</li>
+  	</ul><br><li><b> Check fingerprint: </b> Allows you to check the hash of a file.</li>
+  	<p align="center"><img src="../gfx/pluginhash_comprobacion_fichero_mini.png" alt="File Check Screen"></p>
+  	<ul>
+  		<li><b> Data file: </b> A file corresponding to the fingerprint to be checked.</li>
+  		<li><b> File containing the fingerprint: </b> File with fingerprint.</li>
+  	</ul><br><li><b> Calculate Digital Footprint in Directory: </b> It allows you to calculate the hash of the files in a directory.</li>
+  	<p align="center"><img src="../gfx/pluginhash_calculo_directorio_mini.png" alt="Directory hash calculation screen"></p>
+  	<ul>
+  		<li><b> Directory on which to calculate fingerprints: </b> Directory with the files that we want to calculate the fingerprint.</li>
+  		<li><b> Fingerprint algorithm: </b> Hash algorithm.</li>
+  		<li><b> Recursive: </b> When activated, the hash of the files located in the subdirectories of the selected directory will also be calculated.</li>
+  	</ul><br><li><b> Check Fingerprint in Directory: </b> It allows you to check the hash of the files in a directory.</li>
+  	<p align="center"><img src="../gfx/pluginhash_comprobacion_directorio_mini.png" alt="Directory Hash Check Screen"></p>
+  	<ul>
+  		<li><b> Directory: </b> Directory with the files to which the fingerprints you want to check correspond.</li>
+  		<li><b> Fingerprint file: </b> File with the fingerprints to be checked.</li>
+  	</ul>
+  </ul>
+  
+  <p>When you install the fingerprint plugin on Windows systems, you also add the options to generate and test fingerprints in the context menu of system files and directories.</p>
+  <p>The options that appear are:</p>
+  <ul>
+  	<li><b> Generate digital fingerprint: </b> This option appears in the context menu of all files and directories and allows the hash of the file or directory files to be generated.</li>
+  	<li><b> Check fingerprint: </b> This option appears in the context menu of the hashes files (.hash, .hashb64, .hashfiles and .hexhash) and allows you to select the file or directory from which you want to check the hash.</li>
+  </ul>
+ </body>
+</html>

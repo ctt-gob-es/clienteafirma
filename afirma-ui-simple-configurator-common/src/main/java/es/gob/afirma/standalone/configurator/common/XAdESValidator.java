@@ -7,6 +7,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,7 +29,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.dereference.CustomUriDereferencer;
@@ -43,25 +44,44 @@ public class XAdESValidator {
      * @param checkCertificates Indica si debe validarse la vigencia de los certificados.
      * @throws CertificateException Cuando se valide la vigencia del certificado no lo est&eacute;.
 	 * @throws InvalidSignatureException Cuando la firma no sea v&aacute;lida.
-	 * @throws AOInvalidFormatException Cuando los datos no est&eacute;n firmados con XAdES.
+	 * @throws AOInvalidSignatureFormatException Cuando los datos no est&eacute;n firmados con XAdES.
      */
 	public static void validate(final byte[] sign, final boolean checkCertificates)
-			throws CertificateException, InvalidSignatureException, AOInvalidFormatException {
+			throws CertificateException, InvalidSignatureException, AOInvalidSignatureFormatException {
 
         final Document doc;
         try {
             doc = SecureXmlBuilder.getSecureDocumentBuilder().parse(new ByteArrayInputStream(sign));
         }
         catch (final Exception e) {
-        	throw new AOInvalidFormatException("La firma no es XML", e); //$NON-NLS-1$
+        	throw new AOInvalidSignatureFormatException("La firma no es XML", e); //$NON-NLS-1$
         }
+
+        validate(doc, checkCertificates);
+	}
+
+	/**
+	 * Valida una firma XML y, opcionalmente, la vigencia de sus certificados. En caso de encontrar
+	 * m&aacute;s de una firma, se comprobar&aacute; que todas son v&aacute;lidas, pero s&oacute;lo
+	 * se recuperar&aacute; la informaci&oacute;n de la primera firma.
+     * @param sigDoc Firma XAdES a validar.
+     * @param checkCertificates Indica si debe validarse la vigencia de los certificados.
+     * @return Informaci&oacute;n de la firma.
+     * @throws CertificateException Cuando se valide la vigencia del certificado no lo est&eacute;.
+	 * @throws InvalidSignatureException Cuando la firma no sea v&aacute;lida.
+	 * @throws AOInvalidSignatureFormatException Cuando el documento no est&aacute; firmado.
+     */
+	public static SignatureInfo validate(final Document sigDoc, final boolean checkCertificates)
+			throws CertificateException, InvalidSignatureException, AOInvalidSignatureFormatException {
 
         // Obtenemos el elemento Signature
-        final NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
+        final NodeList nl = sigDoc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
         if (nl.getLength() == 0) {
-        	throw new AOInvalidFormatException("No se encontro la firma de los datos"); //$NON-NLS-1$
+        	throw new AOInvalidSignatureFormatException("El documento no esta firmado"); //$NON-NLS-1$
         }
 
+		// Validamos todas las firmas del documento
+		final ArrayList<X509Certificate> certificateChain = new ArrayList<>();
         try {
         	for (int i = 0; i < nl.getLength(); i++) {
         		final DOMValidateContext valContext = new DOMValidateContext(
@@ -77,10 +97,15 @@ public class XAdESValidator {
         			throw new InvalidSignatureException("El valor de la firma es invalido"); //$NON-NLS-1$
         		}
 
-        		if (checkCertificates) {
+        		// En la primera firma recorreremos los certificados para generar la cadena de firma que notificaremos.
+        		// Tambien lo recorreremos si hay que comprobar que todos los certificados sean validos
+        		if (i == 0 || checkCertificates) {
         			final XMLSignatureFactory signerFactory = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
         			final XMLSignature signature2 = signerFactory.unmarshalXMLSignature(valContext);
         			final KeyInfo keyInfo = signature2.getKeyInfo();
+        			if (keyInfo == null)  {
+        				throw new InvalidSignatureException("No se ha encontrado el KeyInfo de la firma"); //$NON-NLS-1$
+        			}
         			X509Certificate certImpl = null;
         			final Iterator<?> iter = keyInfo.getContent().iterator();
         			while (iter.hasNext()) {
@@ -92,12 +117,18 @@ public class XAdESValidator {
         					for (int i1 = 0; i1 < x509DataContent.size(); i1++) {
         						if (x509DataContent.get(i1) instanceof X509Certificate) {
         							certImpl = (X509Certificate) x509DataContent.get(i1);
-        							certImpl.checkValidity();
+        							if (checkCertificates) {
+        								certImpl.checkValidity();
+        							}
+        							if (i == 0) {
+        								certificateChain.add(certImpl);
+        							}
         						}
         					}
         				}
         			}
         		}
+
 
         		// Ahora miramos las referencias una a una
         		final Iterator<?> it = signature.getSignedInfo().getReferences().iterator();
@@ -109,9 +140,18 @@ public class XAdESValidator {
         		}
         	}
         }
+        catch (final CertificateException e) {
+        	throw e;
+        }
         catch (final Exception e) {
         	throw new InvalidSignatureException("No se ha podido validar la firma", e); //$NON-NLS-1$
         }
+
+        if (certificateChain.isEmpty()) {
+        	throw new InvalidSignatureException("No se han encontrado los certificados de firma"); //$NON-NLS-1$
+        }
+
+        return new SignatureInfo(certificateChain.toArray(new X509Certificate[0]));
 	}
 
 	static final class KeyValueKeySelector extends KeySelector {
@@ -149,10 +189,7 @@ public class XAdESValidator {
                     }
                     return new SimpleKeySelectorResult(publicKey);
                 }
-
-                // Si no hay KeyValue intentamos sacar la clave publica del primer Certificado
-                // que encontramos en X509Data
-                else if (xmlStructure instanceof X509Data) {
+				if (xmlStructure instanceof X509Data) {
                 	final List<?> x509DataObjects = ((X509Data)xmlStructure).getContent();
                 	for (final Object o : x509DataObjects) {
                 		if (o instanceof Certificate) {

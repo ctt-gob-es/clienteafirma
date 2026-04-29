@@ -47,6 +47,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
@@ -58,6 +59,7 @@ import es.gob.afirma.signers.xades.XAdESSigner;
 import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 
 /** Parte servidora del firmador trif&aacute;sico XAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -169,7 +171,7 @@ public final class XAdESTriPhaseSignerServerSide {
 
 		if (xml == null && (op == Op.COSIGN || op == Op.COUNTERSIGN)) {
 			LOGGER.severe("Solo se pueden cofirmar y contrafirmar firmas XML");  //$NON-NLS-1$
-			throw new AOException("Los datos introducidos no se corresponden con una firma XML"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("Los datos introducidos no se corresponden con una firma XML"); //$NON-NLS-1$
 		}
 
 		if (xml != null) {
@@ -188,7 +190,7 @@ public final class XAdESTriPhaseSignerServerSide {
 						&& XMLConstants.TAG_SIGNATURE.equals(xml.getNodeName());
 				if (rootIsSignature || signatureNodeList.getLength() > 0) {
 					LOGGER.severe("El XML ya esta firmado, por lo que no se permite volverlo a firmar (debe cofirmarse o contrafirmarse)");  //$NON-NLS-1$
-					throw new AOException("El XML ya esta firmado, por lo que no se permite volverlo a firmar (debe cofirmarse o contrafirmarse)"); //$NON-NLS-1$
+					throw new AOException("El XML ya esta firmado, por lo que no se permite volverlo a firmar (debe cofirmarse o contrafirmarse)", XMLErrorCode.Functional.TRI_SIGNING_SIGNATURE); //$NON-NLS-1$
 				}
 			}
 
@@ -381,7 +383,7 @@ public final class XAdESTriPhaseSignerServerSide {
 		}
 
 		if (signedInfos.isEmpty()) {
-			throw new XmlPreSignException("Se ha creado un nodo firma, pero no se ha encontrado en el postproceso"); //$NON-NLS-1$
+			throw new XmlPreSignException("Se ha creado un nodo de firma, pero no se ha encontrado en el postproceso"); //$NON-NLS-1$
 		}
 
 		return signedInfos;

@@ -35,9 +35,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyListener;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -58,11 +65,14 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.ui.preferences.PreferencesPanel.ValueTextPair;
 
@@ -81,7 +91,7 @@ final class PreferencesPanelPades extends JScrollPane {
 		final ResourceBundle policyBundle = ResourceBundle
 				.getBundle(POLICY_BUNDLE_NAME, Locale.getDefault());
 
-		POLICY_PADES_AGE_1_9  = new AdESPolicy(
+		POLICY_PADES_AGE_1_9  = new AdESPolicy(true,
 				policyBundle.getString("FirmaAGE19.policyIdentifier"), //$NON-NLS-1$
 				policyBundle.getString("FirmaAGE19.policyIdentifierHash.PAdES"), //$NON-NLS-1$
 				"SHA1", //$NON-NLS-1$
@@ -485,18 +495,72 @@ final class PreferencesPanelPades extends JScrollPane {
 	}
 
 	void checkPreferences() throws AOException {
-
 		loadPadesPolicy();
 
-		final AdESPolicy p = this.padesPolicyDlg.getSelectedPolicy();
-		if (p != null) {
-			// No nos interesa el resultado, solo si construye sin excepciones
-			try {
-				new Oid(p.getPolicyIdentifier().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			catch (final GSSException e) {
-				throw new AOException("El identificador debe ser un OID", e); //$NON-NLS-1$
-			}
+		if (!this.padesPolicyDlg.isNoPolicySelected()) {
+			final String identifier = this.padesPolicyDlg.getIdentifierField().getText().trim();
+		    final String hash       = this.padesPolicyDlg.getHashField().getText().trim();
+		    final String algo       = this.padesPolicyDlg.getHashAlgorithmField().getSelectedItem().toString().trim();
+		    final String qualifier  = this.padesPolicyDlg.getQualifierField().getText().trim();
+		    
+		    // 1) Identificador no nulo ni vacio
+	        if (identifier == null || identifier.isEmpty()) {
+	            throw new AOException(SimpleErrorCode.Functional.INVALID_POLICY_IDENTIFIER);
+	        }
+
+	        // 2) Identificador debe ser URI valida
+	        try {
+	            new URI(identifier);
+	        }
+	        catch (final URISyntaxException e) {
+	            throw new AOException(e, SimpleErrorCode.Functional.INVALID_POLICY_IDENTIFIER_URI);
+	        }
+	        
+	        if (!isValidOid(identifier)) {
+	            throw new AOException(SimpleErrorCode.Functional.INVALID_POLICY_IDENTIFIER_OID);
+	        }
+
+	        // 3) Huella y algoritmo
+	        if (hash == null || hash.isEmpty() || "0".equals(hash)) {
+	            // Sin huella: URI debe ser accesible y calcular digest
+	            try (InputStream is = new URI(identifier).toURL().openStream()) {
+	                final String algorithm = (algo == null || algo.isEmpty())
+	                    ? "SHA-512" //$NON-NLS-1$
+	                    : AOSignConstants.getDigestAlgorithmName(algo);
+	                MessageDigest.getInstance(algorithm)
+	                             .digest(AOUtil.getDataFromInputStream(is));
+	            }
+	            catch (final Exception e) {
+	                throw new AOException(e, 
+	                		SimpleErrorCode.Functional.UNREACHABLE_POLICY_IDENTIFIER_URI);
+	            }
+	        }
+	        else {
+	            // Con huella: algoritmo obligatorio
+	            if (algo == null || algo.isEmpty()) {
+	                throw new AOException(SimpleErrorCode.Functional.MISSING_DIGEST_ALGORITHM);
+	            }
+	            // Huella en Base64
+	            if (!Base64.isBase64(hash.getBytes())) {
+	                throw new AOException(
+	                    SimpleErrorCode.Functional.INVALID_POLICY_IDENTIFIER_HASH_BASE64);
+	            }
+	        }
+
+	        // 4) Calificador opcional: URL valida
+	        if (qualifier != null && !qualifier.isEmpty()) {
+	            try {
+	                // Esto valida esquema, host, sintaxis URL
+	                new URL(qualifier);
+	            }
+	            catch (final MalformedURLException e) {
+	                // Aqui lanzas tu AOException con el codigo adecuado
+	                throw new AOException(
+	                    e,
+	                    SimpleErrorCode.Functional.INVALID_POLICY_QUALIFIER_URL
+	                );
+	            }
+	        }
 		}
 	}
 
@@ -815,12 +879,37 @@ final class PreferencesPanelPades extends JScrollPane {
 
 				this.padesPolicyDlg.saveCurrentPolicy();
 
-			} catch (final Exception e) {
+			} catch (final AOException e) {
+				final String code = e.getErrorCode().getCode();
+			    int index;
+			    try {
+			        final int codeInt = Integer.parseInt(code);
+			        final int base    = Integer.parseInt(SimpleErrorCode.Functional.POLICY_DEFAULT_ERROR.getCode());
+			        index = codeInt - base;
+			        if (index < 0) {
+			            index = 0;
+			        }
+			    }
+			    catch (final Exception ex) {
+			        index = 0;
+			    }
+			    final String key = "PreferencesPanelPolicy." + index; //$NON-NLS-1$
 
-				AOUIFactory.showErrorMessage(
-						"<p>" + SimpleAfirmaMessages.getString("PreferencesPanel.7") + "</p>", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-						JOptionPane.ERROR_MESSAGE, e);
+			    // Intentamos obtener el mensaje, si no existe usamos el por defecto (0)
+			    String message;
+			    try {
+			        message = SimpleAfirmaMessages.getString(key);
+			    }
+			    catch (final MissingResourceException mre) {
+			        message = SimpleAfirmaMessages.getString("PreferencesPanelPolicy.0"); //$NON-NLS-1$
+			    }
+
+			    AOUIFactory.showErrorMessage(
+			        message,
+			        SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+			        AOUIFactory.ERROR_MESSAGE,
+			        e
+			    );
 				changePadesPolicyDlg(container);
 
 			}
@@ -831,4 +920,19 @@ final class PreferencesPanelPades extends JScrollPane {
 		this.padesPolicyDlg = null;
 	}
 
+	private boolean isValidOid(final String input) {
+        String oid = input;
+        if (input.toLowerCase().startsWith("urn:oid:")) { //$NON-NLS-1$
+            oid = input.substring("urn:oid:".length()); //$NON-NLS-1$
+        }
+        
+        try {
+			new Oid(oid.replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		catch (final GSSException e) {
+			return false;
+		}
+        
+        return true;
+    }
 }

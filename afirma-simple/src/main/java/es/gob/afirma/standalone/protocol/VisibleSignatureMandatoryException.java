@@ -8,32 +8,35 @@
  */
 package es.gob.afirma.standalone.protocol;
 
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.standalone.SimpleErrorCode;
+
 /**
  * Error producido cuando se cancela la introducci&oacute;n del area para mostrar la
  * firma visible cuando es obligatorio mostrarla.
  */
-public class VisibleSignatureMandatoryException extends Exception {
+public class VisibleSignatureMandatoryException extends AOException {
 
 	private static final long serialVersionUID = -1102815287789465969L;
 
 	/**
 	 * Construye una excepci&oacute;n de error debido a la obligatoriedad de mostrar
 	 * la firma en el documento.
-	 * 
+	 *
 	 * @param msg Mensaje de la excepci&oacute;n.
 	 */
 	public VisibleSignatureMandatoryException(final String msg) {
-		super(msg);
+		super(msg, SimpleErrorCode.Functional.VISIBLE_SIGNATURE_IS_MANDATORY);
 	}
 
 	/**
 	 * Construye una excepci&oacute;n de error debido a la obligatoriedad de mostrar
 	 * la firma en el documento.
-	 * 
+	 *
 	 * @param msg Mensaje de la excepci&oacute;n.
 	 * @param t   Causa inicial de la excepci&oacute;n.
 	 */
 	public VisibleSignatureMandatoryException(final String msg, final Throwable t) {
-		super(msg, t);
+		super(msg, t, SimpleErrorCode.Functional.VISIBLE_SIGNATURE_IS_MANDATORY);
 	}
 }

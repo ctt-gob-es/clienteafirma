@@ -17,14 +17,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import es.gob.afirma.core.misc.protocol.ParameterException;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
 
 /**
  * Clase encargada de parsear datos de tipo JSON.
  * @author Jose.Montero
- *
  */
 public class TriphaseDataParser {
 
@@ -108,7 +106,7 @@ public class TriphaseDataParser {
 	 * Genera un JSON con la descripci&oacute;n del mensaje trif&aacute;sico.
 	 * @param td objeto con los datos a generar.
 	 * @return JSON con la descripci&oacute;n.
-	 * */
+	 */
 	public static String triphaseDataToJsonString(final TriphaseData td) {
 
 		final JSONArray signInfos = new JSONArray();
@@ -149,11 +147,12 @@ public class TriphaseDataParser {
 		return tdObject.toString();
 	}
 
-	/** Analiza un JSON de entrada para obtener la lista de par&aacute;metros asociados
+	/**
+	 * Analiza un JSON de entrada para obtener la lista de par&aacute;metros asociados
 	 * @param json JSON con el listado de par&aacute;metros.
 	 * @return Devuelve una tabla <i>hash</i> con cada par&aacute;metro asociado a un valor
-	 * @throws ParameterException Cuando el JSON de entrada no es v&acute;lido. */
-	public static Map<String, String> parseParamsListJson(final byte[] json) throws ParameterException {
+	 */
+	public static Map<String, String> parseParamsListJson(final byte[] json) {
 
 		final Map<String, String> params = new HashMap<>();
 		final JSONArray elems;
@@ -163,17 +162,16 @@ public class TriphaseDataParser {
 
 		for (int i = 0; i < elems.length(); i++) {
 			final JSONObject element = elems.getJSONObject(i);
-			if (!element.has("k") || !element.has("v")) { //$NON-NLS-1$ //$NON-NLS-2$
-				throw new ParameterException("El JSON no tiene la forma esperada"); //$NON-NLS-1$
-			}
-			final String key = element.getString("k"); //$NON-NLS-1$
-			final String value = element.getString("v"); //$NON-NLS-1$
-			try {
-				params.put(key, URLDecoder.decode(value, DEFAULT_URL_ENCODING));
-			}
-			catch (final UnsupportedEncodingException e) {
-				Logger.getLogger("es.gob.afirma").warning("Codificacion no soportada para la URL (" + DEFAULT_URL_ENCODING + "): " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-				params.put(key, value);
+			if (element.has("k") && element.has("v")) { //$NON-NLS-1$ //$NON-NLS-2$
+				final String key = element.getString("k"); //$NON-NLS-1$
+				final String value = element.getString("v"); //$NON-NLS-1$
+				try {
+					params.put(key, URLDecoder.decode(value, DEFAULT_URL_ENCODING));
+				}
+				catch (final UnsupportedEncodingException e) {
+					Logger.getLogger("es.gob.afirma").warning("Codificacion no soportada para la URL (" + DEFAULT_URL_ENCODING + "): " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+					params.put(key, value);
+				}
 			}
 		}
 		return params;

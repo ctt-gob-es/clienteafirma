@@ -25,42 +25,50 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.ciphers.ServerCipher;
+import es.gob.afirma.ciphers.ServerCipherFactory;
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOControlledException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.CustomRuntimeConfigNeededException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
 import es.gob.afirma.core.RuntimePasswordNeededException;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.LockedKeyStoreException;
 import es.gob.afirma.core.keystores.PinException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.http.ConnectionConfig;
+import es.gob.afirma.core.misc.http.UrlHttpManager;
+import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOTriphaseException;
+import es.gob.afirma.core.signers.AOTriphaseSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
-import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 import es.gob.afirma.core.signers.OptionalDataInterface;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.CertificateFilter;
+import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.EncodedCertificateFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
@@ -81,6 +89,7 @@ import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
@@ -96,12 +105,11 @@ import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.ui.DataDebugDialog;
+import es.gob.afirma.standalone.ui.ProgressInfoDialogManager;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
 
 final class ProtocolInvocationLauncherSign {
-
-	public static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -122,21 +130,17 @@ final class ProtocolInvocationLauncherSign {
 	 * <i>socket</i> local.
 	 */
 	static StringBuilder processSign(final UrlParametersToSign options,
-			final int protocolVersion, final PrivateKeyEntry pkeSelected) throws SocketOperationException {
+			final ProtocolVersion protocolVersion, final PrivateKeyEntry pkeSelected) throws SocketOperationException {
 		if (options == null) {
 			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NULL_URI;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(SimpleErrorCode.Request.REQUEST_URI_NOT_FOUND);
 		}
 
-		// Comprobamos si soportamos la version del protocolo indicada
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
-			LOGGER.severe(String.format(
-					"Version de protocolo no soportada (%1d). Version actual: %2d. Hay que actualizar la aplicacion.", //$NON-NLS-1$
-					Integer.valueOf(protocolVersion),
-					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
-			throw new SocketOperationException(errorCode);
+        // Comprobamos si soportamos la version del protocolo indicada
+		if (!ProtocolInvocationLauncher.isCompatibleWith(protocolVersion)) {
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Hay que actualizar la aplicacion.", //$NON-NLS-1$
+					protocolVersion.toString()));
+			throw new SocketOperationException(SimpleErrorCode.Request.UNSUPPORTED_PROTOCOL_VERSION);
 		}
 
 		// Comprobamos si se exige una version minima del Cliente
@@ -144,8 +148,7 @@ final class ProtocolInvocationLauncherSign {
 			final String minimumRequestedVersion = options.getMinimumClientVersion();
 			final Version requestedVersion = new Version(minimumRequestedVersion);
 			if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_MINIMUM_VERSION_NON_SATISTIED;
-				throw new SocketOperationException(errorCode);
+   				throw new SocketOperationException(SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED);
 			}
 		}
 
@@ -166,7 +169,16 @@ final class ProtocolInvocationLauncherSign {
 		final SignDataProcessor processor = selectProcessor(
 				protocolVersion,
 				operation);
-		processor.setCipherKey(options.getDesKey());
+
+		if (options.getCipherConfig() != null) {
+			try {
+				final ServerCipher serverCipher = ServerCipherFactory.newServerCipher(options.getCipherConfig());
+				processor.setServerCipher(serverCipher);
+			} catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "Error al instanciar el cifrador de datos. CipherConfig: " + LoggerUtil.getTrimBytes(options.getCipherConfig()), e); //$NON-NLS-1$
+				throw new SocketOperationException(SimpleErrorCode.Internal.POSTPROCESING_SIGNATURE);
+			}
+		}
 
 		final List<SignOperation> operations = processor.preProcess(operation);
 		final boolean isMassiveSign = operations.size() > 1;
@@ -176,18 +188,18 @@ final class ProtocolInvocationLauncherSign {
 			try {
 				results.add(sign(op, options, isMassiveSign, pkeSelected));
 			}
-			catch (final VisibleSignatureMandatoryException e) {
-				LOGGER.log(Level.SEVERE, "No se cumplieron los requisitos para firma visible PDF: " + e); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_VISIBLE_SIGNATURE;
-				throw new SocketOperationException(errorCode, e);
-			}
 			catch (final SocketOperationException e) {
 				LOGGER.log(Level.SEVERE, "Se identifico un error en una operacion de firma", e); //$NON-NLS-1$
 				// Salvo que el procesador indique que se permiten los errores, se relanza para
 				// bloquear la ejecucion
 				if (!processor.isErrorsAllowed()) {
+					ProgressInfoDialogManager.hideProgressDialog();
 					throw e;
 				}
+			}
+			catch (final RuntimeException e) {
+				ProgressInfoDialogManager.hideProgressDialog();
+				throw e;
 			}
 		}
 
@@ -197,19 +209,17 @@ final class ProtocolInvocationLauncherSign {
 		}
 		catch (final EncryptingException e) {
 			LOGGER.log(Level.SEVERE, "Error en el cifrado de los datos a enviar", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA;
-			throw new SocketOperationException(errorCode, e);
+			throw new SocketOperationException(e, e.getErrorCode());
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Error en el postprocesador de los datos a enviar", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_POSTPROCESSING_DATA;
-			throw new SocketOperationException(errorCode);
+			throw new SocketOperationException(SimpleErrorCode.Internal.POSTPROCESING_SIGNATURE);
 		}
 
 		return dataToSend;
 	}
 
-	private static SignDataProcessor selectProcessor(final int protocolVersion,
+	private static SignDataProcessor selectProcessor(final ProtocolVersion protocolVersion,
 			final SignOperation operation) {
 
 		List<AfirmaPlugin> plugins;
@@ -225,7 +235,7 @@ final class ProtocolInvocationLauncherSign {
 				try {
 					final PluginInfo pluginInfo = plugin.getInfo();
 					if (PermissionChecker.check(pluginInfo, Permission.INLINE_PROCESS)) {
-						final SignDataProcessor processor = plugin.getInlineProcessor(protocolVersion);
+						final SignDataProcessor processor = plugin.getInlineProcessor(protocolVersion.getMajorVersion());
 						if (processor == null) {
 							LOGGER.warning(String.format(
 									"El plugin '%s' definio que procesaba las peticiones del navegador, pero no declaro ningun procesador", //$NON-NLS-1$
@@ -248,7 +258,7 @@ final class ProtocolInvocationLauncherSign {
 
 	private static SignResult sign(final SignOperation signOperation, final UrlParametersToSign options,
 			final boolean isMassiveSign, final PrivateKeyEntry pkeSelected)
-					throws SocketOperationException, VisibleSignatureMandatoryException {
+					throws SocketOperationException {
 
 		byte[] data = signOperation.getData();
 		String format = signOperation.getFormat();
@@ -265,36 +275,24 @@ final class ProtocolInvocationLauncherSign {
 		if (!AOSignConstants.SIGN_FORMAT_AUTO.equalsIgnoreCase(format)) {
 			signer = AOSignerFactory.getSigner(format);
 			if (signer == null) {
-				LOGGER.severe("No hay un firmador configurado para el formato: " + format); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_FORMAT;
+				LOGGER.severe("No se soporta el formato de firma indicado: " + LoggerUtil.getTrimStr(format)); //$NON-NLS-1$
+				final ErrorCode errorCode = ErrorCode.Request.UNSUPPORTED_SIGNATURE_FORMAT;
 				throw new SocketOperationException(errorCode);
 			}
 		}
 
-		final String lastSelectedKeyStore = KeyStorePreferencesManager.getLastSelectedKeystore();
-		final boolean useDefaultStore = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS);
+		if (signer instanceof AOTriphaseSigner) {
 
-		// Si hay marcado un almacen como el ultimo seleccionado, lo usamos (este es el caso en el que se llaman
-		// varias operaciones de firma dentro de la misma invocacion a la aplicacion)
-		AOKeyStore aoks = null;
-		if (lastSelectedKeyStore != null && !lastSelectedKeyStore.isEmpty()) {
-			aoks = SimpleKeyStoreManager.getLastSelectedKeystore();
-		}
-		// Si no, si el usuario definio un almacen por defecto para usarlo en las llamadas a la aplicacion, lo usamos
-		else if (useDefaultStore) {
-			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
-			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
-				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore);
+			ConnectionConfig connectionConfig = null;
+			final int serviceTimeout = options.getServiceTimeout();
+
+			if (serviceTimeout >= 0) {
+				connectionConfig = new ConnectionConfig();
+				connectionConfig.setReadTimeout(serviceTimeout);
 			}
-		}
-		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
-		else {
-			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore());
-		}
 
-		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
-		if (aoks == null) {
-			aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(Platform.getOS());
+			final UrlHttpManager httpConnection = ProtocolInvocationLauncherUtil.getConfiguredHttpConnection(connectionConfig);
+			((AOTriphaseSigner) signer).setHttpConnection(httpConnection);
 		}
 
 		// Comprobamos si es necesario pedir datos de entrada al usuario
@@ -340,6 +338,9 @@ final class ProtocolInvocationLauncherSign {
 						if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 							MacUtils.focusApplication();
 						}
+
+						ProgressInfoDialogManager.hideProgressDialog();
+
 						selectedDataFile = AOUIFactory.getLoadFiles(
 								dialogTitle,
 								extraParams.getProperty(AfirmaExtraParams.LOAD_FILE_CURRENT_DIR), // currentDir
@@ -352,8 +353,7 @@ final class ProtocolInvocationLauncherSign {
 										null //Parent
 								)[0];
 					} catch (final AOCancelledOperationException e) {
-						LOGGER.info("Carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
-						throw new SocketOperationException(RESULT_CANCEL);
+						throw e;
 					}
 
 					// Asignamos el nombre del fichero firmado para devolverlo a la aplicacion
@@ -371,19 +371,19 @@ final class ProtocolInvocationLauncherSign {
 						}
 					} catch (final Exception e) {
 						LOGGER.severe("Error en la lectura de los datos a firmar: " + e); //$NON-NLS-1$
-						final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_READ_DATA;
-						throw new SocketOperationException(errorCode, e);
+						final ErrorCode errorCode = ErrorCode.Internal.LOADING_DATA_ERROR;
+						throw new SocketOperationException(e, errorCode);
 					}
+
 		}
 
-		// En no haber fijado aun el firmador significa que se selecciono el formato AUTO y
+		// No haber fijado aun el firmador significa que se selecciono el formato AUTO y
 		// es necesario identificar cual es el que se deberia usar
 		if (signer == null) {
 			format = ProtocolInvocationLauncherUtil.identifyFormatFromData(data, cryptoOperation);
 			if (format == null) {
-				LOGGER.severe(
-						"Los datos no se corresponden con una firma electronica o no se pudieron analizar"); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNKNOWN_SIGNER;
+				LOGGER.severe("Los datos no se corresponden con una firma electronica o no se pudieron analizar"); //$NON-NLS-1$
+				final ErrorCode errorCode = SimpleErrorCode.Functional.CANT_IDENTIFY_SIGNATURE_FORMAT;
 				throw new SocketOperationException(errorCode);
 			}
 			signer = AOSignerFactory.getSigner(format);
@@ -408,11 +408,17 @@ final class ProtocolInvocationLauncherSign {
 		// Si se ha pedido comprobar las firmas antes de agregarle la nueva firma, lo hacemos ahora
 		if (data != null &&
 				Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.CHECK_SIGNATURES))) {
+
+			// Si debe ser una operacion sin interfaz grafica, omitimos el dialogo de espera de la comprobacion de firmas
+			if (!Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
+				ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.0")); //$NON-NLS-1$
+			}
 			final SignValider validator = SignValiderFactory.getSignValider(signer);
 			SignValidity validity = null;
 			if (validator != null) {
-				// Establecemos una validacion relajada para que nos informen cuando la firma presenta
-				// problemas que requiririan la intervencion del usuario para operar con ella
+				// Establecemos una validacion relajada para que, en caso de encontrar problemas con las
+				// firmas previas, no falle este proceso de firma, sino que se nos informen si se pudiese
+				// continuar mediante la intervencion del usuario
 				validator.setRelaxed(true);
 				if (signer instanceof AOPDFSigner || signer instanceof AOPDFTriPhaseSigner) {
 					configurePdfSignature(extraParams);
@@ -428,22 +434,21 @@ final class ProtocolInvocationLauncherSign {
 					} catch (final RuntimeConfigNeededException e) {
 						LOGGER.warning("La validacion de la firma ha revelado una situacion que requiere la intervencion del usuario: " + e); //$NON-NLS-1$
 
-						// Se requiere confirmacion por parte del usuario
+						// Si se necesita confirmacion del usuario, pero no hay interfaces graficas
 						if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
-							LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario. Se abortara la operacion"); //$NON-NLS-1$
-							throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CONFIRMATION_NEEDED, e.getMessage(), e);
+							LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario durante la validacion de la firma. Se abortara la operacion"); //$NON-NLS-1$
+							throw new SocketOperationException(e);
 						}
 
+						// Se requiere confirmacion por parte del usuario
 						if (e.getRequestType() == RequestType.CONFIRM) {
 							final int result = AOUIFactory.showConfirmDialog(null, SimpleAfirmaMessages.getString(e.getRequestorText()),
 									SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
-							if (result == JOptionPane.YES_OPTION) {
-								extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
-							}
-							else {
+							if (result != JOptionPane.YES_OPTION) {
 								LOGGER.log(Level.SEVERE, "El usuario ha cancelado la operacion despues de la advertencia: " + SimpleAfirmaMessages.getString(e.getRequestorText())); //$NON-NLS-1$
-								throw new SocketOperationException(RESULT_CANCEL);
+								throw new AOCancelledOperationException();
 							}
+							extraParams.setProperty(e.getParam(), Boolean.TRUE.toString());
 						}
 						// Se requiere ua contrasena por parte del usuario
 						else if (e.getRequestType() == RequestType.PASSWORD) {
@@ -464,8 +469,9 @@ final class ProtocolInvocationLauncherSign {
 							}
 						}
 						else {
-							LOGGER.severe("No se puede gestionar la solicitud de datos necesaria para completar la firma"); //$NON-NLS-1$
-							throw new SocketOperationException(e.getRequestorText(), e.getMessage(), e);
+							LOGGER.severe("No se reconoce el tipo de datos solicitado para completar la validacion de la firma: " + LoggerUtil.getTrimStr(e.getRequestType().name()) //$NON-NLS-1$
+								+ ": " + LoggerUtil.getTrimStr(e.getRequestorText())); //$NON-NLS-1$
+							throw new SocketOperationException(e.getMessage(), e, SimpleErrorCode.Functional.VALIDATOR_REQUIREMENT_NOT_SUPPORTED);
 						}
 					}
 				} while (validity == null);
@@ -476,10 +482,13 @@ final class ProtocolInvocationLauncherSign {
 				if (validity.getValidity() == SIGN_DETAIL_TYPE.KO &&
 						(cryptoOperation != Operation.SIGN || validity.getError() != VALIDITY_ERROR.NO_SIGN)) {
 					LOGGER.severe("La firma indicada no es valida: " + validity); //$NON-NLS-1$
-					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
-					throw new SocketOperationException(errorCode);
+					final ErrorCode errorCode = validity.getErrorCode() != null
+							? validity.getErrorCode()
+							: ErrorCode.Functional.INVALID_SIGNATURE;
+					throw new SocketOperationException(validity.getErrorException(), errorCode);
 				}
 			}
+
 		}
 
 		// Una vez se tienen todos los parametros necesarios expandimos los extraParams
@@ -489,10 +498,9 @@ final class ProtocolInvocationLauncherSign {
 					extraParams,
 					data,
 					format);
-		} catch (final IncompatiblePolicyException e) {
+		} catch (final SignaturePolicyIncompatibilityException e) {
 			LOGGER.info("Se ha indicado una politica no compatible: " + e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_POLICY;
-			throw new SocketOperationException(errorCode, e);
+			throw new SocketOperationException(e);
 		}
 
 		final CertFilterManager filterManager = new CertFilterManager(extraParams);
@@ -505,9 +513,40 @@ final class ProtocolInvocationLauncherSign {
 				checkShowRubricDialogIsCanceled(extraParams);
 			}
 		} catch (final AOCancelledOperationException e) {
-			LOGGER.info("El usuario ha cancelado el proceso de firma."); //$NON-NLS-1$
-			throw new VisibleSignatureMandatoryException(
-					"Es obligatorio mostrar la firma en el documento PDF", e); //$NON-NLS-1$
+			LOGGER.info("El usuario ha cancelado el dialogo de firma visible"); //$NON-NLS-1$
+			throw new SocketOperationException(new VisibleSignatureMandatoryException(
+					"Es obligatorio mostrar la firma en el documento PDF")); //$NON-NLS-1$
+		}
+
+		// Si debe ser una operacion sin interfaz grafica, omitimos el dialogo de espera de la carga del almacen
+		if (!Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
+			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.2")); //$NON-NLS-1$
+		}
+
+		final String lastSelectedKeyStore = KeyStorePreferencesManager.getLastSelectedKeystore();
+		final boolean useDefaultStore = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS);
+
+		// Si hay marcado un almacen como el ultimo seleccionado, lo usamos (este es el caso en el que se llaman
+		// varias operaciones de firma dentro de la misma invocacion a la aplicacion)
+		AOKeyStore aoks = null;
+		if (lastSelectedKeyStore != null && !lastSelectedKeyStore.isEmpty()) {
+			aoks = SimpleKeyStoreManager.getLastSelectedKeystore();
+		}
+		// Si no, si el usuario definio un almacen por defecto para usarlo en las llamadas a la aplicacion, lo usamos
+		else if (useDefaultStore) {
+			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
+			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
+				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore, true);
+			}
+		}
+		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
+		else {
+			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore(), true);
+		}
+
+		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
+		if (aoks == null) {
+			aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(Platform.getOS());
 		}
 
 		PrivateKeyEntry pke = null;
@@ -519,12 +558,10 @@ final class ProtocolInvocationLauncherSign {
 				&& ProtocolInvocationLauncher.getStickyKeyEntry() != null
 				&& pkeSelected == null) {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
+		} else if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
+			keyStoreLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
 		} else {
-			if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
-				keyStoreLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
-			} else {
-				keyStoreLib = options.getDefaultKeyStoreLib();
-			}
+			keyStoreLib = options.getDefaultKeyStoreLib();
 		}
 
 		final boolean stickySignatory = options.getSticky();
@@ -542,8 +579,8 @@ final class ProtocolInvocationLauncherSign {
 			certEncoded = pke.getCertificateChain()[0].getEncoded();
 		} catch (final CertificateEncodingException e) {
 			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
-			throw new SocketOperationException(errorCode, e);
+			final ErrorCode errorCode = ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE;
+			throw new SocketOperationException(e, errorCode);
 		}
 
 		final SignResult result = new SignResult();
@@ -568,22 +605,22 @@ final class ProtocolInvocationLauncherSign {
 		PrivateKeyEntry pke = pkeSelected;
 
 		if (pkeSelected == null) {
-			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
+			AOKeyStoreManager ksm;
 
-			LOGGER.info("Obtenido gestor de almacenes de claves: " + aoks); //$NON-NLS-1$
-			final AOKeyStoreManager ksm;
 			try {
-				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(aoks, // Store
-						keyStoreLib, // Lib
-						null, // Description
-						pwc, // PasswordCallback
-						null // Parent
-						);
-			} catch (final Exception e) {
-				LOGGER.log(Level.SEVERE, "Error obteniendo el AOKeyStoreManager", e); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-				throw new SocketOperationException(errorCode, e);
+				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, keyStoreLib);
 			}
+			catch (final AOCancelledOperationException e) {
+				LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+				throw e;
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "Error en la carga del almacen", e); //$NON-NLS-1$
+				final ErrorCode errorCode = e instanceof AOControlledException ? ((AOControlledException) e).getErrorCode() : KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR;
+				throw new SocketOperationException(e, errorCode);
+			}
+
+			LOGGER.info("Almacen de claves cargado"); //$NON-NLS-1$
 
 			LOGGER.info("Cargando dialogo de seleccion de certificados..."); //$NON-NLS-1$
 			try {
@@ -593,6 +630,7 @@ final class ProtocolInvocationLauncherSign {
 					final File file = new File(keyStoreLib);
 					libName = file.getName();
 				}
+				ProgressInfoDialogManager.hideProgressDialog();
 				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 						ksm,
 						null,
@@ -601,9 +639,14 @@ final class ProtocolInvocationLauncherSign {
 						true, // checkValidity
 						filterManager.getFilters(),
 						filterManager.isMandatoryCertificate(),
-						libName);
+						libName,
+						true); // invocationFromBrowser
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
+
+				LOGGER.info("Mostramos el dialogo de seleccion de certificados"); //$NON-NLS-1$
 				dialog.show();
+
+				LOGGER.info("Certificado seleccionado por el usuario"); //$NON-NLS-1$
 
 				// Obtenemos el almacen del certificado seleccionado (que puede no ser el mismo
 				// que se indico originalmente por haberlo cambiado desde el dialogo de
@@ -613,18 +656,18 @@ final class ProtocolInvocationLauncherSign {
 				pke = currentKsm.getKeyEntry(context.getAlias());
 			}
 			catch (final AOCancelledOperationException e) {
-				LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
-				throw new SocketOperationException(RESULT_CANCEL);
+				LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+				throw e;
 			}
 			catch (final AOCertificatesNotFoundException e) {
-				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE;
-				throw new SocketOperationException(errorCode);
+				LOGGER.warning("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
+				final ErrorCode errorCode = SimpleErrorCode.Functional.NO_CERTS_FOUND_SIGNING;
+				throw new SocketOperationException(e, errorCode);
 			}
 			catch (final Exception e) {
-				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-				throw new SocketOperationException(errorCode, e);
+				LOGGER.log(Level.SEVERE, "Error al mostrar el dialogo de seleccion de certificados", e); //$NON-NLS-1$
+				final ErrorCode errorCode = e instanceof AOControlledException ? ((AOControlledException) e).getErrorCode() : KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR;
+				throw new SocketOperationException(e, errorCode);
 			}
 		}
 
@@ -635,12 +678,17 @@ final class ProtocolInvocationLauncherSign {
 			signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, keyType);
 		}
 		catch (final Exception e) {
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INCOMPATIBLE_KEY_TYPE;
-			throw new SocketOperationException(errorCode, e);
+			final ErrorCode errorCode = ErrorCode.Internal.INVALID_SIGNING_KEY;
+			throw new SocketOperationException(e, errorCode);
 		}
 
 		// Si se pidio cachear la referencia a clave, se hace. Si no, se libera la que hubiese
 		ProtocolInvocationLauncher.setStickyKeyEntry(stickySignatory ? pke : null);
+
+		// Si debe ser una operacion sin interfaz grafica, omitimos el dialogo de espera de firma
+		if (!Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
+			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.1")); //$NON-NLS-1$
+		}
 
 		// Ejecutamos la firma
 		byte[] sign;
@@ -649,12 +697,9 @@ final class ProtocolInvocationLauncherSign {
 		}
 		catch (final LockedKeyStoreException e) {
 			LOGGER.log(Level.SEVERE, "El almacen de claves esta bloqueado", e); //$NON-NLS-1$
-
 			// En este caso no dejamos prefijado el certificado
 			ProtocolInvocationLauncher.setStickyKeyEntry(null);
-
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_LOCKED_KEYSTORE;
-			throw new SocketOperationException(errorCode, e);
+			throw new SocketOperationException(e);
 		}
 		catch (final PinException e) {
 			LOGGER.warning("PIN invalido. Reintentamos la operacion: " + e); //$NON-NLS-1$
@@ -673,6 +718,8 @@ final class ProtocolInvocationLauncherSign {
 					filters, filters != null, true);
 			return selectCertAndSign(null, aoks, keyStoreLib, newFilterManager, stickySignatory,
 					data, signatureAlgorithm, signer, cryptoOperation, extraParams);
+		} finally {
+			ProgressInfoDialogManager.hideProgressDialog();
 		}
 
 		return new SignOperationResult(sign, pke);
@@ -695,7 +742,15 @@ final class ProtocolInvocationLauncherSign {
 			final PrivateKeyEntry pke, final Properties extraParams) throws SocketOperationException, PinException, LockedKeyStoreException {
 
 		byte[] signature;
+
 		try {
+
+			try {
+				SimpleAfirma.getSSLContextConfigurationTask().join();
+			} catch (final InterruptedException e) {
+				LOGGER.warning("No se ha podido configurar correctamente el contexto SSL: " + e); //$NON-NLS-1$
+			}
+
 			try {
 				switch (cryptoOperation) {
 				case SIGN:
@@ -730,8 +785,7 @@ final class ProtocolInvocationLauncherSign {
 					break;
 				default:
 					LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
-					final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION;
-					throw new SocketOperationException(errorCode);
+					throw new SocketOperationException(SimpleErrorCode.Request.UNSUPPORTED_OPERATION);
 				}
 			}
 			catch (final AOTriphaseException tex) {
@@ -742,59 +796,58 @@ final class ProtocolInvocationLauncherSign {
 			throw e;
 		}
 		catch (final IllegalArgumentException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_PARAMS;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Se ha recibido algun parametro de firma invalido o no compatible", e); //$NON-NLS-1$
+			final ErrorCode errorCode = SimpleErrorCode.Request.INVALID_FORMAT_SIGNATURE_PARAM;
+			throw new SocketOperationException(e, errorCode);
 		}
 		catch (final AOTriphaseException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_RECOVER_SERVER_DOCUMENT;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Error durante la operacion de firma trifasica", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final InvalidPdfException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_PDF;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Los datos no son un documento PDF", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final InvalidXMLException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_XML;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Los datos no son un XML", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final AOFormatFileException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_DATA;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "El formato de los datos no es valido para esta operacion", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final InvalidEFacturaDataException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_FACTURAE;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Los datos no son una factura electronica", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final EFacturaAlreadySignedException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_FACE_ALREADY_SIGNED;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "La factura electronica ya estaba firmada", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final ContainsNoDataException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGN_WITHOUT_DATA;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "La firma no contiene los datos a firmar ni un hash que se pueda reutilizar", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
-		catch (final AOInvalidFormatException e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_SIGN_DATA;
-			throw new SocketOperationException(errorCode, e);
+		catch (final AOInvalidSignatureFormatException e) {
+			LOGGER.log(Level.SEVERE, "La firma no es compatible con el formato de firma utilizado", e); //$NON-NLS-1$
+			throw new SocketOperationException(e);
 		}
 		catch (final RuntimeConfigNeededException e) {
 			LOGGER.warning("No se puede completar la firma sin intervencion del usuario: " + e); //$NON-NLS-1$
 
-			// Se requiere confirmacion por parte del usuario
-			if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
-				LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario. Se abortara la operacion"); //$NON-NLS-1$
-				throw new SocketOperationException(ProtocolInvocationLauncherErrorManager.ERROR_CONFIRMATION_NEEDED, e.getMessage(), e);
+			// Si la operacion ya fue denegada, no es necesario pedir confirmacion
+			if (e.isDenied()) {
+				LOGGER.severe("La operacion no puede realizarse sin permiso expreso del usuario o la aplicacion: " + e); //$NON-NLS-1$
+				throw new SocketOperationException(e);
 			}
 
+			// Si se necesita confirmacion del usuario, pero no hay interfaces graficas
+			if (Boolean.parseBoolean(extraParams.getProperty(AfirmaExtraParams.HEADLESS))) {
+				LOGGER.severe("No se pueden mostrar dialogos para pedir datos del usuario durante la firma. Se abortara la operacion"); //$NON-NLS-1$
+				throw new SocketOperationException(e);
+			}
+
+			// Se requiere confirmacion por parte del usuario
 			if (e.getRequestType() == RequestType.CONFIRM) {
 				final int result = AOUIFactory.showConfirmDialog(null, SimpleAfirmaMessages.getString(e.getRequestorText()),
 						SimpleAfirmaMessages.getString("SignPanelSignTask.4"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$
@@ -828,36 +881,34 @@ final class ProtocolInvocationLauncherSign {
 				}
 			}
 			else {
-				LOGGER.severe("No se puede gestionar la solicitud de datos necesaria para completar la firma"); //$NON-NLS-1$
-				throw new SocketOperationException(e.getRequestorText(), e.getMessage(), e);
+				LOGGER.severe("No se reconoce el tipo de datos solicitado para completar la firma: " + LoggerUtil.getTrimStr(e.getRequestType().name()) //$NON-NLS-1$
+					+ ": " + LoggerUtil.getTrimStr(e.getRequestorText())); //$NON-NLS-1$
+				throw new SocketOperationException(e.getMessage(), e, SimpleErrorCode.Functional.SIGNER_REQUIREMENT_NOT_SUPPORTED);
 			}
 
 			LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
-			throw new SocketOperationException(RESULT_CANCEL);
+			throw new AOCancelledOperationException();
 		}
 		catch (final UnsupportedOperationException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_OPERATION;
-			throw new SocketOperationException(errorCode, e);
+			throw new SocketOperationException(e, SimpleErrorCode.Request.UNSUPPORTED_OPERATION);
 		}
 		catch (final InvalidSignatureException e) {
 			LOGGER.log(Level.SEVERE, "La firma de entrada no es valida", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_INVALID_SIGNATURE;
-			throw new SocketOperationException(errorCode, e);
+			throw new SocketOperationException(e);
 		}
 		catch (final AOCancelledOperationException e) {
-			LOGGER.log(Level.SEVERE, "Operacion cancelada por el usuario", e); //$NON-NLS-1$
-			throw new SocketOperationException(RESULT_CANCEL);
+			LOGGER.log(Level.SEVERE, "Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
+			throw e;
 		}
 		catch (final AOException e) {
 			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED;
-			throw new SocketOperationException(errorCode, e);
+			throw new SocketOperationException(e);
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.SEVERE, "Error al realizar la operacion de firma", e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_SIGNATURE_FAILED;
-			throw new SocketOperationException(errorCode, e);
+			LOGGER.log(Level.SEVERE, "Error desconocido al realizar la operacion de firma", e); //$NON-NLS-1$
+			final ErrorCode errorCode = ErrorCode.Internal.UNKNOWN_SIGNING_ERROR;
+			throw new SocketOperationException(e, errorCode);
 		}
 
 		return signature;

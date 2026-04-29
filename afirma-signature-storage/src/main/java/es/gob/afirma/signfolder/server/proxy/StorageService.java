@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.util.Hashtable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -99,7 +100,7 @@ public final class StorageService extends HttpServlet {
 			sis.close();
 
 			// Separamos los parametros y sus valores
-			final Hashtable<String, String> params = new Hashtable<String, String>();
+			final Hashtable<String, String> params = new Hashtable<>();
 			final String[] urlParams = new String(baos.toByteArray()).split("&"); //$NON-NLS-1$
 			for (final String param : urlParams) {
 				final int equalsPos = param.indexOf('=');
@@ -156,11 +157,17 @@ public final class StorageService extends HttpServlet {
 			return;
 		}
 
+		if (id.indexOf('.') > -1 || id.indexOf('/') > -1 || id.indexOf('\\') > -1) {
+			LOGGER.log(Level.WARNING, "Se han encontrado caracteres no validos en el identificador de datos"); //$NON-NLS-1$
+			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID));
+			return;
+		}
+
 		LOGGER.info("Se solicita guardar un fichero con el identificador: " + id); //$NON-NLS-1$
 
 		String dataText;
 		if (data == null || data.isEmpty()) {
-			LOGGER.severe(ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA));
+			LOGGER.warning("No se le han porcionado los datos al servicio. Se transmite el error a traves del fichero"); //$NON-NLS-1$
 			// Si no se indican los datos, se transmite el error en texto plano
 			// a traves del fichero generado
 			dataText = ErrorManager.genError(ErrorManager.ERROR_MISSING_DATA);
@@ -169,7 +176,8 @@ public final class StorageService extends HttpServlet {
 			dataText = URLDecoder.decode(data, DEFAULT_ENCODING);
 			if (StorageConfig.getMaxDataSize() > 0 && dataText.getBytes().length > StorageConfig.getMaxDataSize() && !StorageConfig.DEBUG) {
 				LOGGER.warning(
-					"El tamano de los datos (" + dataText.getBytes().length + ") es mayor de lo permitido: " + StorageConfig.getMaxDataSize() //$NON-NLS-1$ //$NON-NLS-2$
+					"El tamano de los datos (" + dataText.getBytes().length + ") es mayor de lo permitido: " + StorageConfig.getMaxDataSize()  //$NON-NLS-1$ //$NON-NLS-2$
+					+ ". Se transmite el error a traves del fichero." //$NON-NLS-1$
 				);
 				dataText = ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA);
 			}
@@ -179,14 +187,25 @@ public final class StorageService extends HttpServlet {
 			StorageConfig.getTempDir().mkdirs();
 		}
 
-		final File outFile = new File(StorageConfig.getTempDir(), id);
+		File outFile;
 		try {
-			final OutputStream fos = new FileOutputStream(outFile);
-			final BufferedOutputStream bos = new BufferedOutputStream(fos);
+			outFile = composeTargetFile(StorageConfig.getTempDir(), id);
+		}
+		catch (final SecurityException e) {
+			LOGGER.log(Level.WARNING, "Se ha intentado acceder a un fichero fuera del path configurado", e); //$NON-NLS-1$
+			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID));
+			return;
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se ha podido componer la ruta del fichero a guardar"); //$NON-NLS-1$
+			out.println(ErrorManager.genError(ErrorManager.ERROR_INVALID_DATA_ID));
+			return;
+		}
+
+		try (final OutputStream fos = new FileOutputStream(outFile);
+			final BufferedOutputStream bos = new BufferedOutputStream(fos); ){
 			bos.write(dataText.getBytes());
 			bos.flush();
-			bos.close();
-			fos.close();
 		}
 		catch (final IOException e) {
 			LOGGER.severe("No se ha podido generar el fichero temporal para el envio de datos a la web: " + e); //$NON-NLS-1$
@@ -197,6 +216,26 @@ public final class StorageService extends HttpServlet {
 		LOGGER.info("Se guardo correctamente el fichero: " + outFile.getAbsolutePath()); //$NON-NLS-1$
 
 		out.print(SUCCESS);
+	}
+
+	/**
+	 * Compone el fichero de destino que se debe recuperar.
+	 * @param baseDir Directorio base del fichero.
+	 * @param filename Nombre del fichero.
+	 * @return Fichero de destino.
+	 * @throws IOException Cuando no se pueda componer la ruta del fichero.
+	 * @throws SecurityException Cuando se trate de cargar un fichero fuera
+	 * del directorio base.
+	 */
+	private static File composeTargetFile(final File baseDir, final String filename)
+			throws IOException, SecurityException {
+
+		final File targetFile = new File(baseDir, filename).getCanonicalFile();
+		if (!baseDir.equals(targetFile.getParentFile())) {
+			throw new SecurityException("El fichero solicitado no esta en el raiz del directorio"); //$NON-NLS-1$
+		}
+
+		return targetFile;
 	}
 
 	/**

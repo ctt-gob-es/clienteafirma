@@ -23,11 +23,14 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.core.RuntimeConfigNeededException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
+import es.gob.afirma.signers.pades.common.PdfIsCertifiedException;
 import es.gob.afirma.signers.pades.common.PdfIsPasswordProtectedException;
 
 /** Pruebas de firma trif&aacute;sica. */
@@ -41,6 +44,7 @@ public class TestPdfTriphase {
 
 	private static final String PDF_FILENAME = "TEST_PDF.pdf"; //$NON-NLS-1$
 	private static final String PDF_WITH_PASSWORD_FILENAME = "TEST_PDF_Password.pdf"; //$NON-NLS-1$
+	private static final String PDF_CERTIFIED_TYPE1_FILENAME = "TEST_PDF_Certified_Type1.pdf"; //$NON-NLS-1$
 
 	private static final String PROPERTY_NAME_ATTACH = "attach"; //$NON-NLS-1$
 	private static final String PROPERTY_NAME_ATTACH_FILENAME = "attachFileName"; //$NON-NLS-1$
@@ -62,6 +66,7 @@ public class TestPdfTriphase {
 	private Properties serverConfig;
 
 	private byte[] data;
+	private byte[] certifiedType1Pdf;
 	private byte[] protectedData;
 
 	/** Carga el almac&acute;n de pruebas.
@@ -86,6 +91,8 @@ public class TestPdfTriphase {
 		this.data = loadFile(PDF_FILENAME);
 
 		this.protectedData = loadFile(PDF_WITH_PASSWORD_FILENAME);
+
+		this.certifiedType1Pdf = loadFile(PDF_CERTIFIED_TYPE1_FILENAME);
 	}
 
 	/** Prueba de validaci&oacute;n de formato.
@@ -127,6 +134,65 @@ public class TestPdfTriphase {
 
 		final File tempFile = savePdfTempFile(result);
 		System.out.println("La firma se ha guardado en: " + tempFile.getAbsolutePath()); //$NON-NLS-1$
+	}
+
+
+	/** Prueba de firma trif&aacute;sica de un PDF certificado.
+	 * @throws Exception En cualquier error. */
+	@Test
+	@Ignore
+	public void testFirmaPdfCertificado() throws Exception {
+		final AOSigner signer = new AOPDFTriPhaseSigner();
+
+		final Properties config = new Properties();
+		for (final String key : this.serverConfig.keySet().toArray(new String[this.serverConfig.size()])) {
+			config.setProperty(key, this.serverConfig.getProperty(key));
+		}
+
+		// Firma sin indicar comportamiento con el PDF certificado
+		try {
+			signer.sign(
+					this.certifiedType1Pdf,
+					"SHA512withRSA",  //$NON-NLS-1$
+					this.pke.getPrivateKey(),
+					this.pke.getCertificateChain(),
+					config
+					);
+		}
+		catch (final Exception e) {
+			Assert.assertTrue("La excepcion debia notificar que el documento esta certificado", e instanceof PdfIsCertifiedException); //$NON-NLS-1$
+			Assert.assertFalse("La excepcion debia dar lugar a que el usuario confirmase la operacion", ((PdfIsCertifiedException) e).isDenied()); //$NON-NLS-1$
+		}
+
+		System.setProperty("disableSslChecks", "false");
+
+		// Firma prohibiendo la firma del PDF certificado
+		try {
+			config.setProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS, Boolean.FALSE.toString());
+			signer.sign(
+					this.certifiedType1Pdf,
+					"SHA512withRSA",  //$NON-NLS-1$
+					this.pke.getPrivateKey(),
+					this.pke.getCertificateChain(),
+					config
+					);
+		}
+		catch (final Exception e) {
+			Assert.assertTrue("La excepcion no debe pedir confirmacion al usuario", !(e instanceof RuntimeConfigNeededException)); //$NON-NLS-1$
+		}
+
+		// Firma forzando la firma del PDF certificado
+		config.setProperty(PdfExtraParams.ALLOW_SIGNING_CERTIFIED_PDFS, Boolean.TRUE.toString());
+		final byte[] result = signer.sign(
+				this.certifiedType1Pdf,
+				"SHA512withRSA",  //$NON-NLS-1$
+				this.pke.getPrivateKey(),
+				this.pke.getCertificateChain(),
+				config
+				);
+
+		Assert.assertNotNull("Error durante el proceso de firma, resultado nulo", result); //$NON-NLS-1$
+		Assert.assertFalse("Se recibio un codigo de error desde el servidor", new String(result).startsWith("ERR-")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/** Prueba de firma trifasica PDF con los mismos par&aacute;metros que se usan para la firma PAdES en
@@ -328,5 +394,55 @@ public class TestPdfTriphase {
 			}
 		}
 
+	}
+
+	/**
+	 * Construye la excepci&oacute;n interna notificada por una excepci&oacute;n
+	 * en el servicio de firma trif&aacute;sica.
+	 * @param ex Excepci&oacute;n del servicio de firma trif&aacute;sica.
+	 * @return Excepci&oacute;n interna o, si no se pudo obtener, la misma
+	 * excepci&oacute;n recibida por par&aacute;metro.
+	 */
+	static Exception getInternalException(final AOTriphaseException ex) {
+
+		Class<Exception> exceptionClass;
+		try {
+			exceptionClass = (Class<Exception>) Class.forName(ex.getServerExceptionClassname(), false, TestPdfTriphase.class.getClassLoader());
+		}
+		catch (final Throwable e) {
+			return ex;
+		}
+
+		if (!exceptionClass.isAssignableFrom(RuntimeConfigNeededException.class)) {
+			return ex;
+		}
+
+		// Buscamos algun constructor que nos permita generar la excepcion
+		try {
+			return exceptionClass.
+					getDeclaredConstructor(String.class).
+					newInstance(ex.getMessage());
+		}
+		catch (final Exception e) { /* No hacemos nada */}
+		try {
+			return exceptionClass.
+					getDeclaredConstructor(String.class, Throwable.class).
+					newInstance(ex.getMessage(), null);
+		}
+		catch (final Exception e) { /* No hacemos nada */}
+		try {
+			return exceptionClass.
+					getDeclaredConstructor(Throwable.class).
+					newInstance((Throwable) null);
+		}
+		catch (final Exception e) { /* No hacemos nada */}
+		try {
+			return exceptionClass.
+					getDeclaredConstructor().
+					newInstance();
+		}
+		catch (final Exception e) { /* No hacemos nada */}
+
+		return ex;
 	}
 }

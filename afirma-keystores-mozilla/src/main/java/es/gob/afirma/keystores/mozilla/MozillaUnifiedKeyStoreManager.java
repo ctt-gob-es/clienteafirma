@@ -28,8 +28,8 @@ import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
  *  v&iacute;a NSS en el que se tratan de forma unificada los m&oacute;dulos internos y externos. */
 public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
-    private static final String ONLY_PKCS11 = "es.gob.afirma.keystores.mozilla.LoadSscdOnly"; //$NON-NLS-1$
-    private static final String ONLY_PKCS11_ENV = "AFIRMA_NSS_LOAD_SSCD_ONLY"; //$NON-NLS-1$
+    protected static final String ONLY_PKCS11 = "es.gob.afirma.keystores.mozilla.LoadSscdOnly"; //$NON-NLS-1$
+    protected static final String ONLY_PKCS11_ENV = "AFIRMA_NSS_LOAD_SSCD_ONLY"; //$NON-NLS-1$
 
     /** Propiedad de sistema que indica que hay que a&ntilde;adir el PKCS#11 nativo de DNIe aunque no
      * est&eacute; declarado como m&oacute;dulo externo en Mozilla. */
@@ -39,12 +39,12 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
      * est&eacute; declarado como m&oacute;dulo externo en Mozilla. */
     protected static final String INCLUDE_NATIVE_DNIE_P11_ENV = "AFIRMA_NSS_INCLUDE_NATIVE_DNIE_PKCS11"; //$NON-NLS-1$
 
-	private PasswordCallback passwordCallback = null;
-	private Object[] configParams = null;
+    protected PasswordCallback passwordCallback = null;
+    protected Object[] configParams = null;
 
 	/** Indica si el almacen se cargo previamente. */
-	private boolean initialized = false;
-	private boolean preferredKsAdded = false;
+    protected boolean initialized = false;
+    protected boolean preferredKsAdded = false;
 
 	/** Crea un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de Firefox. */
 	public MozillaUnifiedKeyStoreManager() {
@@ -68,7 +68,11 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		// parte de una operacion de refresco del almacen
 		removeAll();
 
-		final Object parentComponent = this.configParams != null && this.configParams.length > 0 ? this.configParams[0] : null;
+		Object parentComponent = null;
+
+		if (this.configParams != null && this.configParams.length > 0) {
+			parentComponent = this.configParams[0];
+		}
 
 		if (!Boolean.getBoolean(ONLY_PKCS11) && !Boolean.parseBoolean(System.getenv(ONLY_PKCS11_ENV))) {
 			// Primero anadimos el almacen principal NSS
@@ -137,23 +141,21 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 				}
 				catch (final Exception ex) {
 					// En ciertos sistemas Linux fallan las inicializaciones la primera vez por culpa de PC/SC, reintentamos
-					if (Platform.OS.LINUX.equals(Platform.getOS())) {
-						try {
-							internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
-						}
-						catch (final AOCancelledOperationException exc) {
-							LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + exc); //$NON-NLS-1$ //$NON-NLS-2$
-							continue;
-						}
-						catch(final Exception e) {
-							LOGGER.warning(
-								"No se ha podido inicializar el PKCS#11 '" + descr + "' tras haberlo intentado dos veces: " + ex + ", " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							);
-							continue;
-						}
-					}
-					else {
+					if (!Platform.OS.LINUX.equals(Platform.getOS())) {
 						LOGGER.warning("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+						continue;
+					}
+					try {
+						internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
+					}
+					catch (final AOCancelledOperationException exc) {
+						LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + exc); //$NON-NLS-1$ //$NON-NLS-2$
+						continue;
+					}
+					catch(final Exception e) {
+						LOGGER.warning(
+							"No se ha podido inicializar el PKCS#11 '" + descr + "' tras haberlo intentado dos veces: " + ex + ", " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						);
 						continue;
 					}
 				}
@@ -189,7 +191,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
      * @throws IOException Si se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *                     almac&eacute;n de certificados.
      * @throws AOCancelledOperationException Cuando se cancela el di&aacute;logo de inserci&oacute;n de PIN. */
-	private static void internalInitStore(final AOKeyStoreManager tmpKsm,
+	protected static void internalInitStore(final AOKeyStoreManager tmpKsm,
 			                              final String descr,
 			                              final Object parentComponent,
 			                              final boolean forceReset,

@@ -10,6 +10,7 @@ package es.gob.afirma.signers.batch.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -25,7 +26,6 @@ public class RequestParameters extends HashMap<String, String> {
 	private static final long serialVersionUID = 6942017463741129394L;
 
 	private RequestParameters() {
-		super();
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class RequestParameters extends HashMap<String, String> {
 		final StringBuilder buffer = new StringBuilder(1048576);
 
 		int n = 0;
-		request.setCharacterEncoding("utf-8"); //$NON-NLS-1$
+		request.setCharacterEncoding(StandardCharsets.UTF_8.name());
 		try (final BufferedReader reader = request.getReader(); ) {
 			while ((n = reader.read(block, 0, block.length)) > 0) {
 				int startParams = 0;
@@ -113,7 +113,9 @@ public class RequestParameters extends HashMap<String, String> {
 		if (sep == -1) {
 			throw new IllegalArgumentException("La peticion no esta bien formada"); //$NON-NLS-1$
 		}
-		params.put(param.substring(0, sep), param.substring(sep + 1));
+		final String key = param.substring(0, sep);
+		final String value = param.substring(sep + 1);
+		params.put(key, value);
 		param.setLength(0);
 	}
 

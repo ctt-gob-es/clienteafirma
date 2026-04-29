@@ -17,14 +17,18 @@ import java.io.InputStream;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.so.macos.MacUtils;
+import es.gob.afirma.standalone.ui.ProgressInfoDialogManager;
 
 final class ProtocolInvocationLauncherLoad {
 
@@ -34,8 +38,6 @@ final class ProtocolInvocationLauncherLoad {
 	private static final char LOAD_SEPARATOR = ':';
 
 	private static final char MULTILOAD_SEPARATOR = '|';
-
-	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -47,26 +49,17 @@ final class ProtocolInvocationLauncherLoad {
 	/** Procesa un lote de firma en invocaci&oacute;n por protocolo.
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
-	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
-	 *                 <code>false</code> para usar servidor intermedio.
 	 * @return Datos cargados o mensaje de error.
 	 * @throws SocketOperationException Si hay errores en la
 	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
 	static String processLoad(final UrlParametersToLoad options,
-			final int protocolVersion,
-			final boolean bySocket) throws SocketOperationException {
+			final ProtocolVersion protocolVersion) throws SocketOperationException {
 
         // Comprobamos si soportamos la version del protocolo indicada
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
-			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
-					Integer.valueOf(protocolVersion),
-					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+		if (!ProtocolInvocationLauncher.isCompatibleWith(protocolVersion)) {
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Hay que actualizar la aplicacion.", //$NON-NLS-1$
+					protocolVersion.toString()));
+			throw new SocketOperationException(SimpleErrorCode.Request.UNSUPPORTED_PROTOCOL_VERSION);
 		}
 
         // Comprobamos si se exige una version minima del Cliente
@@ -74,12 +67,7 @@ final class ProtocolInvocationLauncherLoad {
         	final String minimumRequestedVersion = options.getMinimumClientVersion();
         	final Version requestedVersion = new Version(minimumRequestedVersion);
         	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
-        		final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_MINIMUM_VERSION_NON_SATISTIED;
-    			ProtocolInvocationLauncherErrorManager.showError(errorCode);
-    			if (!bySocket){
-    				throw new SocketOperationException(errorCode);
-    			}
-    			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+   				throw new SocketOperationException(SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED);
         	}
         }
 
@@ -91,7 +79,7 @@ final class ProtocolInvocationLauncherLoad {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				MacUtils.focusApplication();
 			}
-
+			ProgressInfoDialogManager.hideProgressDialog();
 			selectedDataFiles = AOUIFactory.getLoadFiles(options.getTitle(),
 					options.getFilepath(),
 					null,
@@ -103,11 +91,7 @@ final class ProtocolInvocationLauncherLoad {
 					null);
 
 		} catch (final AOCancelledOperationException e) {
-			LOGGER.info("carga de datos de firma cancelada por el usuario: " + e); //$NON-NLS-1$
-			if (!bySocket) {
-				throw new SocketOperationException(getResultCancel());
-			}
-			return getResultCancel();
+			throw e;
 		}
 
 		// Preparamos el buffer para enviar el resultado
@@ -140,19 +124,11 @@ final class ProtocolInvocationLauncherLoad {
 			}
 		} catch (final Exception e) {
 			LOGGER.severe("Error en la lectura de los datos a cargar: " + e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_LOAD_DATA;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			final ErrorCode errorCode = SimpleErrorCode.Internal.CANT_LOAD_FILE;
+			throw new SocketOperationException(errorCode);
 		}
 
 		return dataToSend.toString();
-	}
-
-	public static String getResultCancel() {
-		return RESULT_CANCEL;
 	}
 
 }

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Komando-lerroko erabilera</title>
+  <meta name="AppleTitle" content="Ayuda de Autofirma">
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png">
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+ </head>
+ <body> 
+  <h2>Komando-lerroko erabilera</h2>
+  <p>Autofirmak komando-lerroen bidez erabiltzeko aukera ematen du, eta sinaduraren, loteen sinaduraren eta hasheak sortu eta egiaztatzearen funtzionalitateak ematen ditu.<p>Komando-lerroko Autofirma exekutatzeko erabili beharreko exekutagarria edo script-a sistemaren arabera aldatzen da:<ul>
+    <li>Windows</li>
+	  <ul>
+	    <li>Instalazio-prozesuak Autofirmaren direktorioan kopiatzen du &quot;AutofirmaCommandLine&quot; exekutagarria, eta, ahal izanez gero, direktorioa <i> sartzen du path-an. </i> Erabili komando-lerrotik exekutagarri hau onartzen diren eragiketak egiteko.</li>
+	  </ul>
+	<li>Linux</li>
+	  <ul>
+	    <li>Instalazio-prozesuak &quot;/usr/bin&quot; direktorioan &quot;autofirma&quot; script-a sortzen du. Erabili script hau aplikazioa exekutatzeko, nahi duzun eragiketaren parametroak zuzenean emanez.</li>
+	  </ul>
+	<li>makOS</li>
+	  <ul>
+	    <li>Komando-lerroko aplikazioa erabiltzeko, aplikazioaren direktorioan &quot;AutofirmaCommandLine&quot; script bat sortzen da aplikazioaren barruan. Aplikazioaren barneko &quot;Resources&quot; direktorioan sartuz exekuta daiteke script hori (normalean, &quot;/Applications/Autofirma.app/Contents/MacOS&quot;). Garrantzitsua da <b> tarteak izan ditzaketen parametroak komatxo bakunen artean pasatzea komandoan. </b></li>
+	  </ul>
+  </ul>
+  <p>Adibidez, Autofirma exekuta daiteke, eta komando-lerroaren bidez eskura dauden eragiketak zerrendatu, &quot;-help&quot; komandoaren bidez, honela:</p><span> Windowsen: </span><ul><li><code> AutofirmaCommandLine – help </code></li></ul><span> Linuxen: </span><ul><li><code> /usr/bin/Autofirma –help </code></li></ul><span> Mac-en: </span><ul><li><code> /Applications/Autofirma.app/Contents/MacOS/AutofirmaCommandLine –help </code></li></ul>
+  <p>Horrek ondorio hauek ekarriko lituzke:</p>
+  <div style="background-color: black; color: white; width: 50%"><code><pre>
+Dokumentuak sinatzeko tresna.
+
+Sintaxia: Autofirma cmd [aukerak...]
+
+cmd komandoak:
+
+  sign (fitxategiaren sinadura)
+  kosign (fitxategiaren kosinadura)
+  countersign (fitxategiaren baieztapena)
+  listaliasak (biltegian dauden ezizenen zerrenda)
+  verify (sinadura edo ziurtagiri baten baliozkotze-informazioa duen panel bat irekitzen du)
+  batchsign (fitxategi-sorten sinadura/sinadura anitza)
+  createdigest (hatz-aztarna digitalak sortzea interfaze grafikoarekin)
+  checkdigest-a (hatz-marka digitalak egiaztatzea interfaze grafikoarekin)
+
+Erabili &quot;Autofirma cmd -help&quot; &quot;cmd&quot; komandoaren sintaxia ikusteko
+    </pre></code></div>
+
+  <p>Eragiketaren baten konfigurazio-aukerak zerrendatzeko, &quot;-help&quot; komandoa erabil dezakezu horietako edozeinetan. Adibidez:</p>
+  <ul><li><code> AutofirmaCommandLine sign –help </code></li></ul>
+
+  <p>Horrek ondorio hauek ekarriko lituzke:</p>
+  <div style="background-color: black; color: white; width: 50%"><code><pre>
+Sintaxia: Autofirma sign [aukerak...]
+
+Aukerak:
+  -gui (Ingurune grafikoarekin egiten du eragiketa). Lehentasuna du -certgui-ren aldean)
+  -certgui (elkarrizketa grafiko bat erabiltzen du sinadura-ziurtagiria hautatzeko)
+  -i inputfile (Sarrera-fitxategiaren ibilbidea)
+  -o outputfile (irteera-fitxategiaren ibilbidea)
+  -algorithm algo (sinadura-algoritmoa)
+  -format (sinadura-formatua ezartzen du)
+         auto (Formatua hautatzea, sarrera-fitxategiaren arabera)
+         cades (CAdES formatua)
+         pades (PAdES formatua)
+         xades (XAdES formatua)
+         facturae (faktura elektronikoaren sinadura)
+  -config extraParams (Properties, testu lauan, eragiketaren konfigurazioarekin)
+  -store (Gakoen biltegia ezartzen du. Lehenespenez, sistemarena)
+         auto (Sistemaren gakoen biltegia)
+         windows (Windowseko gakoen biltegia)
+         mac (makOS gakoen biltegia)
+         mozilla (Mozilla Firefox-en gakoen biltegia)
+         NAN (NAN elektronikoa)
+         pkcs12:p12file (PKCS#12 biltegia) &quot;p12file&quot; biltegiaren ibilbidea da)
+         pkcs11:p11file (PKCS#11 biltegia) &quot;p11file&quot; kontrolatzailearen ibilbidea da)
+
+  -password password (biltegiko pasahitza ezartzen du)
+  -alias alias(sinadura-ziurtagiriaren ezizena)
+  -filter filter (sinadura-ziurtagiria hautatzeko iragazkia)
+  -xml (formateatu erantzuna XML gisa)
+    </pre></code></div>
+  
+  <p><code> -config </code> konfigurazio-parametroari esker, &quot;\n&quot; bidez kateatutako konfigurazio-propietateen zerrenda bat eman dakioke. Propietate horietako bakoitzak formatu gakoa = balioa izango du.</p>
+  <p>Hona hemen konfigurazio-parametroaren adibide bat:</p>
+    <ul><li><code> -config &quot;format=XAdES Enveloping\nsignerClaimedRol=Zuzendaria\nxadesNamespace=http://uri.etsi.org/01903/v1.4.1# </code></li></ul>
+  <p>Konfigurazio-aukerak aldatu egiten dira sinadura-formatu batetik bestera. Ondoren, sinadura-formatu bakoitzerako konfigurazio-aukerak deskribatzen dira.</p>
+  
+  <h3>CAdES sinadurak konfiguratzeko aukerak</h3>
+  <p>Hona hemen CAdES sinadurek onartutako konfigurazio-propietateak. Aukera horietako batzuek ez dute eraginik izango ez duten sinaduretan, hala nola kontrbaieztapenetan.</p>  
+  <ul>
+  <li style="margin-top: 15pt"><code> mode: </code></li>
+  	<ul>
+  	<li><code> Esplicit: </code> Sinadurak ez ditu jasoko sinatutako datuak. <code> Mode </code> propietatea adierazten ez bada, automatikoki konfiguratzen da portaera hori.</li>
+  	<li><code> inplizt: </code> Sinadurak ez ditu jasoko sinatutako datuak. Sinadurak barnean jasoko du sinatutako datuen kopia bat. Balio hori erabiltzeak sinadura handiak sor ditzake. Sinaduren kasuan, jabetza hori ez da kontuan hartuko datuak jatorrizko sinaduran jasota dauden edo datuak ematen ez diren.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>contentTypeOid: </code></li>
+  <ul>
+  	<li>Sinatutako datu-motaren identifikatzailea.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>contentDescription: </code></li>
+  <ul>
+  	<li>Sinatutako datu-motaren testu-deskribapena.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>includeMimeTypeAttribute: </code></li>
+  <ul>
+ 	<li><code> true: </code> id-aa-ets-mimeType atributua sartzen da sinaduran, CAdES v2.1.1 eta hortik gorakoak (baseline sinaduretan balio du). Mimetype balioa <code> mimetype </code> propietatetik hartuko da, edo, sartzen ez bada, <code> contentTypeOid propietatetik estrapolatuko da. </code> Ezin bada, balio horiek aurreko sinaduretakoren batetik lortzen saiatu behar da (sinadurak badira). Ezin bada, datuen analisi-mota lortuko da (agian ez da zuzena edo zehatza izango). Mota ezin bada inola ere lortu, mimetype application/octet-stream erabiliko da.</li>
+ 	<li><code> false: </code> id-aa-ets-mimeType atributua ez da sartzen sinaduran. Lehenetsitako balioa.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>mimeType: </code></li>
+  <ul>
+  	<li>Sinatu beharreko datuen MIME-Type. <code>includeMimeTypeAttribute</code> propietatea adierazten denean bakarrik sartzen da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>policyIdentifier: </code></li>
+  <ul>
+  	<li>Sinadura-politikaren identifikatzailea, CAdES-EPES sinadurak sortzeko beharrezkoa.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>policyIdentifierHash: </code></li>
+  <ul>
+  	<li>64. oinarri-katea, sinadura-politikaren aztarna digitalarekin. Nahitaezkoa da propietate hori adieraztea, baldin eta policyIdentifier ere adierazi bazuen, eta, halaber, nahitaezkoa da <code> policyIdentifierHashAlgorithm propietateari balioa ematea. </code></li>
+  </ul>	
+  <li style="margin-top: 10pt"><code> policyIdentifierHashAlgorithm: </code></li>
+  	<ul>
+  	<li><code> SHA1: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA1 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-256: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-256 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-384: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-384 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-512: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-512 algoritmoaren bidez kalkulatu zela.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>policyQualifier: </code></li>
+  <ul>
+  	<li>Dokumentua atzitzeko URLa (normalean PDF), sinadura-politikaren testu-deskribapena duena. Propietate hori aukerakoa da, baita CAdES-EPES sinadurak sortu nahi badira ere.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> includeOnlySignningCertificate: </code></li>
+  	<ul>
+  	<li><code> true: </code> Sinatzailean sinatzailearen ziurtagiria bakarrik sartu behar dela adierazten du.</li>
+  	<li><code> false: </code> Sinatzailearen ziurtagiriaren ziurtapen-kate osoa sartu behar dela adierazten du. Lehenetsitako balioa.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>policyQualifier: </code></li>
+  <ul>
+  	<li>Dokumentua atzitzeko URLa (normalean PDF), sinadura-politikaren testu-deskribapena duena. Propietate hori aukerakoa da, baita CAdES-EPES sinadurak sortu nahi badira ere.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCity: </code></li>
+  <ul>
+  	<li>Sinatu den hiriari eremu bat gehitzen dio sinadurari. Kodetzeak UTF-8 izan behar du.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionPostalCode: </code></li>
+  <ul>
+  	<li>Sinadurari eremu bat gehitzen dio, sinadura egiten den posta-kodearekin. Kodetzeak UTF-8 izan behar du.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCountry: </code></li>
+  <ul>
+  	<li>Sinadurari eremu bat gehitzen dio sinadura egiten den herrialdearekin. Kodetzeak UTF-8 izan behar du.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signerClaimedRoles: </code></li>
+  <ul>
+  	<li>Sinatzaileari dagozkion karguak dituzten eremuak gehitzen dizkio sinatzaileari. Karguak &quot;|&quot; karakterearekin bereizi behar dira (eta hori ezin da egon inongo karguren testuan bertan).</li>
+  </ul>		
+  <li style="margin-top: 10pt"><code>commitmentTypeIndications: </code></li>
+  <ul>
+  	<li>Aitortuko den CommitmentTypeIndications zenbakia. Arrazoi horiek ematen dira sinatzeko. Balio zehatzak honela zehazten dira: commitmentTypeIndicationnIdentifier eta commitmentTypeIndicationnDescription. Kasu horretan, ‘n’ 0-tik hasi eta propietate honetan adierazitako balioraino doa, ken 1.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li>
+  	<ul>
+  	<li><code> 1: </code> Ezartzen du CommitmentTypeIndications n zenbakia (zerotik zenbatuta) &quot;Jatorri-proba&quot; dela.</li>
+  	<li><code> 2: </code> Ezartzen du CommitmentTypeIndications n zenbakia (zerotik hasita zenbatuta) &quot;Jasotze-proba&quot; dela.</li>
+  	<li><code> 3: </code> Ezartzen du CommitmentTypeIndications n zenbakia (zerotik hasita zenbatuta) &quot;Entrega-proba&quot; dela.</li>
+  	<li><code> 4: </code> Ezartzen du CommitmentTypeIndications n zenbakia (zerotik zenbatuta) &quot;Bidalketa-proba&quot; dela.</li>
+  	<li><code> 5: </code> Ezartzen du CommitmentTypeIndications n zenbakia (zerotik hasita zenbatuta) &quot;Onarpen-proba&quot; dela.</li>
+  	<li><code> 6: </code> Ezartzen du CommitmentTypeIndications n zenbakia (zerotik zenbatuta) &quot;Sortze-proba&quot; dela.</li>
+	</ul>
+   <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>CommitmentTypeQualifiers</code>:</li>
+  <ul>
+  	<li>&#39;|&#39; karaktereak bereizitako testu-adierazleen zerrenda, CommitmentTypeIndication n zenbakiaren (aukerako atributua) kalifikatzaile gehigarri gisa aurkezten direnak. Normalean, OID dira. Zerrendako elementuek ezin dute &#39;|&#39; karakterea izan (bereizle gisa erabiltzen baita).</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li>
+  	<ul>
+  	<li><code>true</code>: Sinaduran SigningCertificateV2 atributua sartuko da.</li>
+  	<li><code>false</code>: (edo beste balioren bat): Sinaduran SigningCertificate atributua sartuko da.</li>
+  	<li>Zehaztu gabe: SigningCertificate sartuko da sinadurak SHA1 sinadura-algoritmo bat erabiltzen badu, eta SigningCertificateV2 gainerako algoritmoetarako.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li>
+  	<ul>
+  	<li><code>true</code>: Longevo artxiboko sinadurak berrestea/berrestea onartzen da, nahiz eta sinadura horiek ez diren baliozkoak izango gerora.</li>
+  	<li><code>false</code>: (edo beste balioren bat): Ez da onartzen longevo artxiboko sinadurak berrestea/baieztatzea.</li>
+	</ul>
+  </ul>
+  
+  
+  
+  <h3>XAdES sinadurak konfiguratzeko aukerak</h3>
+  <p>Hona hemen XAdES sinadurek onartzen dituzten konfigurazio-propietateak. Aukera horietako batzuek ez dute eraginik izango ez duten sinaduretan, hala nola kontrbaieztapenetan.</p>  
+  <ul>
+  <li style="margin-top: 10pt"><code>insertEnvelopedSignatureOnNodeByXPath: </code></li>
+  <ul>
+  	<li>XPath (v1) adierazpena. Enveloped enpresa baten kasuan, sinadura-nodoa zein nodotan txertatu behar den adierazten du. Adierazpenak nodo bat baino gehiago itzultzen baditu, lehenengoa bakarrik erabiltzen da. Adierazpenak nodoak itzultzen ez baditu edo gaizki eraikita badago, salbuespen bat ezarriko da. Propietate horrek Enveloped sinaduretan bakarrik du eragina.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>useManifest: </code></li>
+  	<ul>
+  	<li><code> true: </code> Erabili XMLDSig-en Manifest bat sinadura-erreferentziekin, erreferentzia horiek zuzenean sinatu beharrean. Ez du sinadurarik egiten. Horri esker, hautazkoa da erreferentzien helburua eta aztarna digitalak egiaztatzea.</li>
+  	<li><code> false: </code> Sinadurak normalean sortzen ditu, Manifestik gabe (portaera lehenetsia).</li>
+	</ul>
+   <li style="margin-top: 10pt"><code>uri<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>URI, manifest enpresa baten barruan sinatu nahi diren datuei buruzkoa. ‘n’ (e) k sinatu nahi direnen erreferentzia-zenbakia adierazten du, ‘1’ (e) tik hasita.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>precalculatedHashAlgorithm</code>:</li>
+  	<ul>
+  	<li><code> SHA1: </code> Adierazten du manifestean aipatutako datuen aztarna digitalak SHA1 algoritmoaren bidez kalkulatu zirela.</li>
+  	<li><code> SHA-256: </code> Adierazten du manifestean aipatutako datuen aztarna digitalak SHA-256 algoritmoaren bidez kalkulatu zirela.</li>
+  	<li><code> SHA-384: </code> Adierazten du manifestean aipatutako datuen aztarna digitalak SHA-284 algoritmoaren bidez kalkulatu zirela.</li>
+  	<li><code> SHA-512: </code> Adierazten du manifestean aipatutako datuen aztarna digitalak SHA-512 algoritmoaren bidez kalkulatu zirela.</li>
+	</ul>
+<li style="margin-top: 10pt"><code>md<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>64. oinarria, ‘n’ erreferentziarekin lotutako datuen aztarna digitalarekin. Mailagainaren algoritmoa aurrefabrikatedHashAlgorithm-en adierazitakoa izango da <code> </code></li>
+  </ul>
+
+  <li style="margin-top: 10pt"><code>mimetype<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>MIME-Type, manifest sinadura bateko ‘n’ erreferentziari lotutako datuak. Propietate hori adierazten ez bada, &quot;application/octet-stream&quot; mota erabiliko da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>contentTypeOid<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>OID edo URN, manifest sinadura batean ‘n’ erreferentziarako sinatutako datu-motakoa. Propietate hori mimetypen propietatearen osagarria da (ez da baztertzailea). <code> <i> <b> </b> </i> </code></li>
+  </ul>
+  <li style="margin-top: 10pt"><code>encoding<i><b>n</b></i></code>:</li>
+  <ul>
+  	<li>‘n’ erreferentzia-zenbakiari lotutako datuak manifest sinadura batean kodetzea. Propietate hori gaizki erabiliz gero, sinadura baliogabea sor daiteke.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>addKeyInfoKeyValue: </code></li>
+  	<ul>
+  	<li><code> true: </code> KeyValue nodoa XAdES-ren KeyInfo barruan sartzen da (portaera lehenetsia).</li>
+  	<li><code> false: </code> Ez da sartzen KeyValue nodoa XAdES-ren KeyInfo barruan.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>addKeyInfoKeyName: </code></li>
+  	<ul>
+  	<li><code> true: </code> KeyName nodoa XAdES-ren KeyInfo barruan sartzen da.</li>
+  	<li><code> false: </code> Ez da sartzen KeyName nodoa XAdES-ren KeyInfo barruan (portaera lehenetsia).</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>avoidXpathExtraTransformsOnEnveloped: </code></li>
+  	<ul>
+  	<li><code> true: </code> XPATH2 transformazioa sartzea eragozten du. Normalean, kosinadurak ahalbidetzeko eransten da, eta dokumentuaren sinadura guztiak ezabatzen ditu edukia bakarrik uzteko. OHARRA: Sinaduretako batek, gutxienez, XPATH transformazioa ez duen dokumentu bat sinatzean, sinadura-dokumentu bat sortuko da, eta sinadura-balidatzaileek oker balidatu ahal izango dute. Hori dela eta, sinatze-eragiketan bakarrik erabil daiteke jabetza hori (ez sinatze-eragiketan).</li>
+  	<li><code> false: </code> XPATH2 transformazioak aukera ematen du kosinadurak egiteko, dokumentuaren sinadura guztiak ezabatuz, edukia bakarrik uzteko (portaera lehenetsia).</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>format: </code></li>
+  	<ul>
+  	<li><code> XAdES Enveloping: </code> Enveloping formatuko sinadurak sortzen ditu. Formatu hori erabiltzen da, lehenespenez, bat bera ere adierazten ez denean.</li>
+  	<li><code> XAdES Enveloped: </code> Enveloped formatuko sinadurak sortzen ditu.</li>
+  	<li><code> XAdES Detached: </code> Internally Detached formatuko sinadurak sortzen ditu.</li>
+  	<li><code> XAdES Exterally Detached: sinadurak sortzen ditu </code> Exterally Detached formatuan.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>includeOnlySignningCertificate: </code></li>
+  	<ul>
+  	<li><code> true: </code> Sinatzailean sinatzailearen ziurtagiria bakarrik sartu behar dela adierazten du.</li>
+  	<li><code> false: </code> Sinatzailearen ziurtagiriaren ziurtapen-kate osoa sartu behar dela adierazten du. Lehenetsitako balioa.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>policyIdentifier: </code></li>
+  <ul>
+  	<li>XAdES-EPES sinadurak sortzeko behar den sinadura-politikaren identifikatzailea (normalean, URL bat politikarantz, XML formatu prozesagarrian).</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>policyIdentifierHash: </code></li>
+  <ul>
+  	<li>64. oinarri-katea, sinadura-politikaren aztarna digitalarekin. Propietate hori nahitaez adierazi behar da, baldin eta policyIdentifier ere adierazi bazuen, eta, halaber, nahitaezkoa da <code> policyIdentifierHashAlgorithm propietateari balioa ematea. </code></li>
+  </ul>	
+  <li style="margin-top: 10pt"><code> policyIdentifierHashAlgorithm: </code></li>
+  	<ul>
+  	<li><code> SHA1: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA1 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-256: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-256 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-384: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-384 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-512: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-512 algoritmoaren bidez kalkulatu zela.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>policyQualifier: </code></li>
+  <ul>
+  	<li>Dokumentua atzitzeko URLa (normalean PDF), sinadura-politikaren testu-deskribapena duena. Propietate hori aukerakoa da, baita XAdES-EPES sinadurak sortu nahi badira ere.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>policyDescription: </code></li>
+  <ul>
+  	<li>Sinadura-politikaren testu-deskribapena. XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da. Propietate hori aukerakoa da, baita XAdES-EPES sinadurak sortu nahi badira ere.</li>
+  </ul>		
+  <li style="margin-top: 10pt"><code>signerClaimedRoles: </code></li>
+  <ul>
+  	<li>Sinatzaileari dagozkion karguak dituzten eremuak gehitzen dizkio sinatzaileari. Karguak &quot;|&quot; karakterearekin bereizi behar dira (eta hori ezin da egon inongo karguren testuan bertan). XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCity: </code></li>
+  <ul>
+  	<li>Sinatu den hiriari eremu bat gehitzen dio sinadurari. XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionProvince: </code></li>
+  <ul>
+  	<li>Sinadurari sinadura zein probintziatan egiten den adierazten duen eremu bat gehitzen dio. XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signatureProductionPostalCode: </code></li>
+  <ul>
+  	<li>Sinadurari eremu bat gehitzen dio, sinadura egiten den posta-kodearekin. XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signatureProductionCountry: </code></li>
+  <ul>
+  	<li>Sinadurari eremu bat gehitzen dio sinadura egiten den herrialdearekin. XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>referencesDigestMethod: </code></li>
+  	<ul>
+  	<li>http://www.w3.org/2000/09/xmldsig#sha1: SHA1 algoritmoa erabiltzen du sinatutako XML erreferentzien aztarna digitalak kalkulatzeko.</li>
+  	<li>http://www.w3.org/2001/04/xmlenc#sha256: SHA-256 algoritmoa erabiltzen du sinatutako XML erreferentzien aztarna digitalak kalkulatzeko.</li>
+  	<li>http://www.w3.org/2001/04/xmlenc#sha512: SHA-512 algoritmoa erabiltzen du sinatutako XML erreferentzien aztarna digitalak kalkulatzeko. Hau da portaera lehenetsia.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>mimeType: </code></li>
+  <ul>
+  	<li>Sinatu beharreko datuen MIME-Type. Propietate hori adierazten ez bada, sistema mota hautematen saiatzen da, eta hurbilekoena ezartzen du (agian ez da zuzena izango).</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>encoding: </code></li>
+  <ul>
+  	<li>URI, sinatu beharreko datuen kodifikazioarekin (ikus XMLDSig-eko Object elementuaren dokumentazioa, informazio gehiago izateko). Propietate hori gaizki erabiliz gero, sinadura baliogabea sor daiteke. Aldez aurretik Base64-n kodetutako datuak ematen badira, baina haien forma deskodetutzat hartu nahi badira, balio hori a http://www.w3.org/2000/09/xmldsig#base64 ezarri behar da eta benetako tasa zehaztu <code> behar da mimeType propietatean. </code> Adibidez, PNG irudi bat sinatzeko, sinadura haren forma bitar zuzenari buruzkoa izan dadin, Base64n zuzenean kodetutako irudia eman daiteke, encodinga http://www.w3.org/2000/09/xmldsig#base64 eta mimeType (image/png) adieraziz. Balioak URI bat izan behar du beti.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>outputXmlEncoding: </code></li>
+  <ul>
+  	<li>Irteerako XMLa kodetzea. Balio hori adierazten ez bada, sarrerako XMLtik abiatuta detektatzen saiatu behar da (sinatu beharreko datuak XML badira).</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>contentTypeOid: </code></li>
+  <ul>
+  	<li>OID edo URN, OID motakoa, sinatutako datu-motaren identifikatzailearekin. Propietate hori <code> mimeType propietatearen osagarria da (ez da baztertzailea). </code></li>
+  </ul>
+  <li style="margin-top: 10pt"><code>canonicalizationAlgorithm: </code></li>
+  	<ul>
+  	<li>http://www.w3.org/TR/2001/REC-xml-c14n-20010315: XML 1.0 XML kanonizatu inklusiboarekin sinatzen da (balio lehenetsia).</li>
+  	<li>http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments: XML 1.0 kanonizatu inklusiboarekin sinatzen da, iruzkinekin.</li>
+  	<li>http://www.w3.org/2001/10/xml-exc-c14n#: XML 1.0 kanonizatu esklusiboarekin sinatzen da.</li>
+  	<li>http://www.w3.org/2001/10/xml-exc-c14n#WithComments: XML 1.0 kanonizatuarekin sinatzen da, iruzkinekin.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>xadesNamespace: </code></li>
+  	<ul>
+  	<li>http://uri.etsi.org/01903/v1.3.2#: XAdES-en 1.3.2 bertsioari dagokion XAdES-en izen-espazioa definitzeko URLa. Hau da balio lehenetsia.</li>
+  	<li>http://uri.etsi.org/01903/v1.4.1#: XAdES-ren 1.4.1 bertsioari dagokion XAdES-izenen espazioa definitzeko URLa. Propietate hori ezartzen bada, litekeena da <code> signedPropertiesTypeUrl </code> propietatea ere ezarri behar izatea, XAdES-ren bertsioan inkoherentziak saihesteko.</li>
+	</ul>
+ <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl: </code></li>
+  	<ul>
+  	<li>http://uri.etsi.org/01903#SignedProperties: XAdES-ren sinatutako propietateen (Signed Properties) mota definitzeko URLa. Hau da balio lehenetsia.</li>
+  	<li>http://uri.etsi.org/01903/1.3.2#SignedProperties: XAdES v1.3.2 bertsioan sinatutako propietateen (Signed Properties) mota definitzeko URLa.</li>
+  	<li>http://uri.etsi.org/01903/1.4.1#SignedProperties: XAdES v1.4.1-en sinatutako propietateen (Signed Properties) definizioaren URLa. Propietate hori ezartzen bada, baliteke <code> xadesNamespace </code> propietatea ere ezarri behar izatea, XAdES-ren bertsioan inkoherentziak saihesteko.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>ignoreStyleSheets: </code></li>
+  	<ul>
+  	<li><code> true: </code> Estilo-orriak dituen XML bat sinatzen bada, ez onartu orri horiek sinatu gabe utziz.</li>
+  	<li><code> false: </code> Estilo-orriak dituen XML bat sinatzen bada, estilo-orriak ere sinatzen ditu (balio lehenetsia, estilo-orrien sinadurari buruzko ohar gehigarriak kontsultatu).</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>avoidBase64Transforms: </code></li>
+  	<ul>
+  	<li><code> true: </code> Ez du adierazten Base64 transformaziorik, ezta beharrezkoak badira ere.</li>
+  	<li><code> false: </code> Base64 transformazioak adierazten ditu, Base64n sinatu beharreko datuak (balio lehenetsia) barnean kodetu direnean.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>headless: </code></li>
+  	<ul>
+  	<li><code> true: </code> Erabiltzaileari elkarrizketa grafiko osagarriak agertzea eragozten du (adibidez, ibilbide erlatiboekin lotutako estilo-orriak dereferentziatzeko).</li>
+  	<li><code> false: </code> Erabiltzaileari elkarrizketa grafiko osagarriak erakusteko aukera ematen du.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>xmlTransforms: </code></li>
+  <ul>
+  	<li>Sinatutako edukiari aplikatu beharreko transformazio-kopurua. Ondoren, XMLTransformnType parametro-kopuru bera adierazi behar da, n-ren ordez ondoz ondoko ordinal bat jarrita, 0-n hasita (ikus transformazio gehigarrien adierazpenari buruzko ohar gehigarriak).</li>
+  </ul>
+ <li style="margin-top: 10pt"><code>xmlTransformnType: </code></li>
+  	<ul>
+  	<li>http://www.w3.org/2000/09/xmldsig#base64: Sinatzeko ematen diren datuak Base64n kodetuta daudela adierazten du, eta aldaketa gehigarri hori adierazi behar dela, sinatu aurretik deskodetu daitezen. Base64 transformazio hori bezeroaren sinadura-metodoen bidez datuak pasatzeko behar den transformazioaren osagarria da.</li>
+  	<li>http://www.w3.org/TR/1999/REC-xpath-19991116: Edukia XPATH transformazio honen bidez prozesatu behar da sinatu aurretik. XML edukia sinatzen denean bakarrik aplika daiteke.</li>
+  	<li>http://www.w3.org/2002/06/xmldsig-filter2: Edukia XPATH2 transformazio honen bidez prozesatu behar da, sinatu aurretik. XML edukia sinatzen denean bakarrik aplika daiteke.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>xmlTransformnSubtype: </code></li>
+  <ul>
+  	<li>n transformazioaren azpimota. Onartutako balioak eta horien funtzionalitateak xmlTransformnType aukeran adierazitako balioaren araberakoak dira.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>xmlTransformnBody: </code></li>
+  <ul>
+  	<li>n transformazioaren gorputza. Balio onartuak eta haien funtzionalitateak xmlTransformnType eta xmlTransformnSubtype ereduetan adierazitako balioen araberakoak dira.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>nodeToSign: </code></li>
+  <ul>
+  	<li>XML batean sinatu nahi den nodoaren identifikatzailea (&quot;Id&quot; atributuaren bidez ezarria).</li>
+  </ul>	
+<li style="margin-top: 10pt"><code>commitmentTypeIndications: </code></li>
+  <ul>
+  	<li>Aitortuko den CommitmentTypeIndications zenbakia. Arrazoi horiek ematen dira sinatzeko. Balio zehatzak commitmentTypeIndicationnIdentifier eta commitmentTypeIndicationnDescription bidez zehazten dira, non ‘n’ 0(e)tik propietate honetan adierazitako 1(e)ra doan.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Identifier</code>:</li>
+  	<ul>
+  	<li><code> 1: </code> Ezartzen du CommitmentTypeIndications n zenbakia <i> <b> (zerotik zenbatuta) </b> </i> &quot;Jatorri-proba&quot; dela.</li>
+  	<li><code> 2: </code> Ezartzen du CommitmentTypeIndications n zenbakia <i> <b> (zerotik hasita zenbatuta) </b> </i> &quot;Jasotze-proba&quot; dela.</li>
+  	<li><code> 3: </code> Ezartzen du CommitmentTypeIndications n zenbakia <i> <b> (zerotik hasita zenbatuta) </b> </i> &quot;Entrega-proba&quot; dela.</li>
+  	<li><code> 4: </code> Ezartzen du CommitmentTypeIndications n zenbakia <i> <b> (zerotik zenbatuta) </b> </i> &quot;Bidalketa-proba&quot; dela.</li>
+  	<li><code> 5: </code> Ezartzen du CommitmentTypeIndications n zenbakia <i> <b> (zerotik hasita zenbatuta) </b> </i> &quot;Onarpen-proba&quot; dela.</li>
+  	<li><code> 6: </code> Ezartzen du CommitmentTypeIndications n zenbakia <i> <b> (zerotik zenbatuta) </b> </i> &quot;Sortze-proba&quot; dela.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>Description</code>:</li>
+  <ul>
+  	<li>CommitmentTypeIndications n zenbakiaren deskribapena ezartzen <i> <b> du. </b> </i> Atributu hori aukerakoa da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>DocumentationReferences</code>:</li>
+  <ul>
+  	<li>&#39;|&#39; karaktereak bereizten dituen URL zerrenda, CommitmentTypeIndication número <i> <b> n </b> </i> (aukerako atributua) dokumentuaren erreferentzia gisa aurkezten direnak. Zerrendako URLek ezin dute &#39;|&#39; karakterea izan (bereizle gisa erabiltzen baita).</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>commitmentTypeIndication<i><b>n</b></i>CommitmentTypeQualifiers</code>:</li>
+  <ul>
+  	<li>&#39;|&#39; karaktereak bereizitako testu-adierazleen zerrenda, CommitmentTypeIndication n zenbakiaren (aukerako <i> <b> atributua) </b> </i> kalifikatzaile gehigarri gisa aurkezten direnak. Normalean, OID dira. Zerrendako elementuek ezin dute &#39;|&#39; karakterea izan (bereizle gisa erabiltzen baita).</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowSignLTSignature</code>:</li>
+  	<ul>
+  	<li><code>true</code>: Longevo artxiboko sinadurak berrestea/berrestea onartzen da, nahiz eta sinadura horiek ez diren baliozkoak izango gerora.</li>
+  	<li><code>false</code>: (edo beste balioren bat): Ez da onartzen longevo artxiboko sinadurak berrestea/baieztatzea.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>avoidAGEPolicyIncompatibilities</code>:</li>
+  	<ul>
+  	<li><code>true</code>: EAOren sinadura-politika ez da deklaratuko eragiketaren emaitza politika horrekin bateraezina izango bada.</li>
+  	<li><code>false</code>: (edo beste balioren bat): Emaitza politikarekin bateragarria ez denean, ezin da Estatuko Administrazio Orokorraren sinadura-politikarekin berretsi.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>allowXadesEnvelopedWithoutXPath</code>:</li>
+  <ul>
+  	<li><code>true</code>: XPath transformaziorik ez duen eta, beraz, baliogabetuta geratuko den sinadura bat sinatzeko aukera ematen du. Sinadura berrian, ordea, XPath eraldaketa txertatuko da.</li>
+  	<li><code>false</code>:	Ezin dira sinatu XPath transformaziorik ez duten sinadurak..</li>
+  </ul>
+  </ul>
+
+
+  <h3>Faktura elektronikoko sinadurak konfiguratzeko aukerak</h3>
+  <p>Hona hemen faktura elektronikoko sinadurek (FacturaE) onartzen dituzten konfigurazio-propietateak.</p>  
+  <ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCity: </code></li>
+  <ul>
+  	<li>Sinatu den hiriari eremu bat gehitzen dio sinadurari. XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionProvince: </code></li>
+  <ul>
+  	<li>Sinadurari sinadura zein probintziatan egiten den adierazten duen eremu bat gehitzen dio. XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signatureProductionPostalCode: </code></li>
+  <ul>
+  	<li>Sinadurari eremu bat gehitzen dio, sinadura egiten den posta-kodearekin. XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signatureProductionCountry: </code></li>
+  <ul>
+  	<li>Sinadurari eremu bat gehitzen dio sinadura egiten den herrialdearekin. XML bat sinatzen bada, erabilitako testuaren kodifikazioa sinatutako XMLra egokitu behar da.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>xadesNamespace: </code></li>
+  <ul>
+  	<li>XAdES-en izen-espazioa definitzeko URLa (propietate hori erabiltzeak baldintzatu egin dezake XAdES-ren bertsio-deklarazioa). Propietate hori ezartzen bada, litekeena da signedPropertiesTypeUrl propietatea ere ezarri behar izatea, XAdES-ren bertsioan inkoherentziak saihesteko.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signedPropertiesTypeUrl: </code></li>
+  <ul>
+  	<li>XAdES-ren sinatutako propietateen (Signed Properties) mota definitzeko URLa. Propietate hori ezartzen bada, baliteke <code> xadesNamespace </code> propietatea ere ezarri behar izatea, XAdES-ren bertsioan inkoherentziak saihesteko. Ezartzen ez bada, balio lehenetsia erabiltzen da: http://uri.etsi.org/01903#SignedProperties.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>signerClaimedRoles: </code></li>
+  	<ul>
+  	<li><code> igorlea: </code> Adierazten du sinatzailea dela fakturaren igorlea. Hau da balio lehenetsia.</li>
+  	<li><code> hartzailea: </code> Adierazten du sinatzailea dela fakturaren hartzailea.</li>
+  	<li><code> Hirugarrena: </code> Adierazten du sinatzailea hirugarren bat dela fakturari dagokionez.</li>
+  	<li><code> supplier: </code> Adierazten du sinatzailea dela fakturaren igorlea.</li>
+  	<li><code> customer: </code> Adierazten du sinatzailea dela fakturaren hartzailea.</li>
+  	<li><code> third party: </code> Adierazten du sinatzailea hirugarren bat dela fakturari dagokionez.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>policyIdentifier: </code></li>
+  <ul>
+  	<li>http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf: 3.1 sinatze-politikaren identifikatzailea. Hau da balio lehenetsia.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code> policyIdentifierHash: </code></li>
+  <ul>
+  	<li><code> Ohixl6upD6av8N7pEvDABhEL6hM=: </code> 3.1 sinadura-politika konfiguratzeko aztarna digitala. Hau da balio lehenetsia.</li>
+  </ul>	
+  <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm: </code></li>
+  	<ul>
+  	<li><code> SHA1: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA1 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-256: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-256 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-384: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-384 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-512: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-512 algoritmoaren bidez kalkulatu zela.</li>
+	</ul>
+  </ul>
+
+
+  <h3>PAdES sinadurak konfiguratzeko aukerak</h3>
+  <p>Hona hemen PAdES sinadurek onartzen dituzten konfigurazio-propietateak.</p>
+  <ul>  
+  <li style="margin-top: 10pt"><code>includeOnlySignningCertificate: </code></li>
+  	<ul>
+  	<li><code> true: </code> Sinatzailean sinatzailearen ziurtagiria bakarrik sartu behar dela adierazten du.</li>
+  	<li><code> false: </code> Sinatzailearen ziurtagiriaren ziurtapen-kate osoa sartu behar dela adierazten du. Lehenetsitako balioa.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>alwaysCreateRevision: </code></li>
+  	<ul>
+  	<li><code> true: </code> Beti sortuko du berrikusketa bat sinatzean. Dokumentuak PDF 1.7 zehaztapena bete behar du (ISO 32000-1:2008)</li>
+  	<li><code> false: </code> Ez du berrikusterik sortuko lehen sinaduran, eta bai hurrengoetan.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>signatureField: </code></li>
+  <ul>
+  	<li>Sinadura sartzeko lehendik dagoen sinadura-eremuaren izena.</li>
+  </ul>
+   <li style="margin-top: 10pt"><code>signaturePages: </code></li>
+  <ul>
+  	<li>Sinadura zein orrialdetan bistaratu behar den adierazten du.</li>
+  	<li>Balio hauek onartzen ditu:</li>
+  	<ul>
+	  <li><code> all: </code> Ikusten den sinadura dokumentuaren orri guztietan agertzen dela adierazteko, balio hori eman behar zaio.</li>
+	  <li><code> append: </code> Ikusten den sinadurak agiriaren amaieran erantsitako orri zuri batean agertu behar badu, balio hori eman behar zaio.</li>
+	  <li>Orrialdea edo orrialdeen zerrenda: Aukera honetan, sinadura ikusgai agertuko den orria edo orri-tartea hauta daiteke. Sinadura ikusgai jartzeko orrialde bat edo gehiago adierazi nahi izanez gero, orri batetik bestera komak bereizita adieraz daiteke (1,4,7: <code> </code> 1., 4. eta 7. orrialdeetan estanpatzen da, edo orri-tarte bat adierazten da gidoi baten bidez (1-8: <code> </code> Orrialdeetan estanpatzen da, 1etik 8ra). Aurreko paragrafoan azaltzen den bezala, balio negatiboa duten orriak adieraz daitezke. Balio negatiboa amaieratik hasiko da (1,-1: <code> </code> Lehenengo eta azken orrialdeetan ezarriko da).</li>
+  	</ul>
+  </ul>
+  <li style="margin-top: 10pt"><code>signaturePositionOnPageLowerLeftX: </code></li>
+  <ul>
+  	<li>Zenbaki osoa, koordenatu horizontalarekin, orriaren beheko ezkerreko izkinatik ikusten den sinaduraren eremuaren beheko ezkerreko izkinara.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signaturePositionOnPageLowerLeftY: </code></li>
+  <ul>
+  	<li>Zenbaki osoa, koordenatu bertikalarekin, orriaren beheko ezkerreko izkinatik ikusten den sinaduraren eremuaren beheko ezkerreko izkinara.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signaturePositionOnPageUpperRightX: </code></li>
+  <ul>
+  	<li>Zenbaki osoa, koordenatu horizontalarekin, orriaren beheko ezkerreko izkinatik ikusten den sinaduraren eremuaren goiko eskuineko izkinara.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signaturePositionOnPageUpperRightY: </code></li>
+  <ul>
+  	<li>Zenbaki osoa, koordenatu bertikalarekin, orriaren beheko ezkerreko izkinatik ikusten den sinaduraren eremuaren goiko eskuineko izkinara.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureRubricImage: </code></li>
+  <ul>
+  	<li>Erakutsi beharreko irudiaren JPEG irudia duen fitxategiaren ibilbidea, PDF sinadura ikusgarrian aplikatu beharrekoa. Irudiaren 64. oinarria ere adieraz daiteke zuzenean.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>layer2Text: </code></li>
+  <ul>
+  	<li>Ikusteko moduko sinadura-eremuan bistaratzeko testua.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>layer2FontFamily: </code></li>
+  <ul>
+  	<li><code> 0: </code> Ikus daitekeen sinaduraren testua Courier iturriarekin bistaratuko da. Hau da balio lehenetsia.</li>
+  	<li><code> 1: </code> Sinadura ikusgarriaren testua Helvetica iturriarekin bistaratuko da.</li>
+  	<li><code> 2: </code> Ikusten den sinaduraren testua Times Roman iturriarekin bistaratuko da.</li>
+  	<li><code> 3: </code> Ikusten den sinaduraren testua Symbol letrarekin bistaratuko da.</li>
+  	<li><code> 4: </code> Ikusten den sinaduraren testua ZapfDingBats iturriarekin bistaratuko da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>layer2FontSize: </code></li>
+  <ul>
+  	<li>Sinadura ikusgarriaren testuaren letra-tamaina.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>layer2FontStyle: </code></li>
+  <ul>
+  	<li><code> 0: </code> Estilorik gabe ikus daitekeen sinaduraren testua. Lehenetsitako balioa.</li>
+  	<li><code> 1: </code> Sinaduraren testua letra lodiz ikus daiteke.</li>
+  	<li><code> 2: </code> Letra etzanez ikus daitekeen sinaduraren testua.</li>
+  	<li><code> 4: </code> Sinadura ikusgaiaren testua azpimarratuta.</li>
+  	<li><code> 8: </code> Sinadura ikusgai ezabatuaren testua.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>layer2FontColor: </code></li>
+  <ul>
+  	<li><code> Black: </code> Estilorik gabe ikus daitekeen sinaduraren testua. Lehenetsitako balioa.</li>
+  	<li><code> white: </code> Ikus daitekeen sinaduraren testua zuria izango da.</li>
+  	<li><code> gray: </code> Ikusten den sinaduraren testua grisa izango da.</li>
+  	<li><code> lightGray: </code> Ikusten den sinaduraren testua gris argia izango da.</li>
+  	<li><code> DarkGray: </code> Ikusten den sinaduraren testua gris iluna izango da.</li>
+  	<li><code> sarea: </code> Ikusten den sinaduraren testua gorria izango da.</li>
+  	<li><code> pinka: </code> Ikus daitekeen sinaduraren testua arrosa kolorekoa izango da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>obfuscateCertText: </code></li>
+  <ul>
+  	<li><code> true: </code> Ziurtagiritik CN edo DNtik atera eta PDF sinadura ikusgarrian erakusten diren erabiltzaile-identifikatzaileak inprimatzen dira. Izengoitiaren ziurtagirietako datuak ez dira inprimatzen. Hau da balio lehenetsia.</li>
+  	<li><code> false: </code> Ziurtagiriei buruzko informazioa ez da ofusatzen.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>obfuscationMask: </code></li>
+  <ul>
+  	<li>Erabiltzaile-identifikatzaileak PDF sinadura ikusgarrietan ofusatzeko irizpideak. Eredu hau erakutsi behar duzu:</li>
+		<ul><li><code> karaktere; luzetara; digituak; posizioak; desplazamendua </code></li></ul>
+	<li>Eredu horretan:</li>
+	<ul>
+	  <li><code> Ezaugarriak: </code> Karaktereak ofusatzeko erabiltzen den karakterea da.</li>
+	  <li><code> Luzetarakoak: </code> Testu-kate batek izan behar dituen gutxieneko digitu-kopurua, ofuskatu egin behar dela jo dadin.</li>
+	  <li><code> posizioak: </code> Zer karaktere bistaratu behar diren adierazten duten posizioen zerrenda. Zerrenda <code> true/false </code> segida batez adierazten da, komaz (&#39;,&#39;) bereizita. Segida <code> horretan, karakterea erakutsi behar dela eta ez dela <code> faltsutu </code> behar adierazten da. </code></li>
+	  <li><code> desplazamendua: </code> Adierazi maskararen posizioen desplazamendua onartzen den adierazitako karaktere guztiak bistaratzeko (true) <code> edo </code> errespetatu behar den (false). <code> </code></li>
+	</ul>
+  </ul>
+  <li style="margin-top: 10pt"><code>visibleSignature: </code></li>
+  <ul>
+  	<li><code> default: </code> Ageriko PDF sinadura egingo da, baldin eta eremuarekin eta sinadura-orriarekin parametroak eman badira. Hau da balio lehenetsia.</li>
+  	<li><code> want: </code> Erabiltzaileak ikus daitekeen sinadura-eremua hautatu behar du. Prozesua bertan behera utziz gero:</li>
+	<ul>
+	  <li>Eskaerak sinadura-eremu ikusgaiaren parametroak ere baditu (kokapena eta orria), parametro horiek erabiliko dira eta sinatzeko prozesuarekin jarraituko da.</li>
+	  <li>Eskaerak ez baditu kontuan hartzen ageriko sinadura-eremuaren parametroak, bertan behera utziko da sinadura-prozesua.</li>
+    </ul>
+	<li><code> optional: </code> Erabiltzaileak aukera dezake ikusteko moduko sinadura-eremua sartu nahi duen edo ez. Prozesua bertan behera utziz gero:</li>
+	<ul>
+	  <li>Eskaerak sinadura-eremu ikusgaiaren parametroak ere baditu (kokapena eta orria), parametro horiek erabiliko dira eta sinatzeko prozesuarekin jarraituko da.</li>
+	  <li>Eskaerak ez baditu kontuan hartzen ageriko sinadura-eremuaren parametroak, sinadura ez-ikusgai bat egingo da.</li>
+    </ul>
+  </ul>
+  <li style="margin-top: 10pt"><code>visibleAppearance: </code></li>
+  <ul>
+  	<li><code> default: </code> PDF sinadura ikusgarriaren itxura lehenetsia aplikatuko da, edo, itxuraren parametroak eman baziren, konfiguratutako itxura. Hau da balio lehenetsia.</li>
+  	<li><code> custom: </code> Erabiltzaileak sinadura ikusgarriaren itxura hauta dezake. Prozesua bertan behera utziz gero, itxura lehenetsia erabiliko da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureRotation: </code></li>
+  <ul>
+  	<li><code> 0: </code> Ez du eteten sinadura-eremuko testua. Hau da balio lehenetsia.</li>
+  	<li><code> 90: </code> Ordu-zentzuan 90 gradu txandakatzen ditu sinadura-eremuko testuak. Ez da kontuan hartuko sinadura-irudiaren edozein konfigurazio.</li>
+  	<li><code> 180: </code> 180 gradu hausten ditu ordu-norabidean sinadura-eremuko testuak. Ez da kontuan hartuko sinadura-irudiaren edozein konfigurazio.</li>
+  	<li><code> 270: </code> 270 gradu hautsi dira ordu-norabidean sinadura-eremuko testua. Ez da kontuan hartuko sinadura-irudiaren edozein konfigurazio.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>includeQuestionMark: </code></li>
+  <ul>
+  	<li><code> true: </code> PDF irakurleari sinadura ikusgarriaren ondoan marka bat erakustea, balioztatzean lortutako emaitza adierazten duena. Marka honen itxura erabilitako PDF irakurgailuaren araberakoa da erabat, eta horrek erabakitzen du agertzen den. Adibidez, baliteke marka ez bistaratzea sinaduran hondoko irudi bat definituz gero.</li>
+  	<li><code> false: </code> Ez du uzten baliozkotzearen emaitza duen marka erakusten. Hau da balio lehenetsia.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>image: </code></li>
+  <ul>
+  	<li>JPEG irudi-fitxategiaren bidea, sinatu aurretik dokumentuan txertatu beharrekoa. Irudiaren 64. oinarria ere adieraz daiteke zuzenean. Propietate hori dokumentuaren lehen sinaduran baino ezin da erabili.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePage: </code></li>
+  <ul>
+  	<li>Irudia txertatzeko PDF dokumentuaren orrialdearen zenbakia.</li>
+  	<li><code> 0: </code> Txertatu orri guztietan</li>
+  	<li><code> -1: </code> Txertatu irudia azken orrialdean.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePositionOnPageLowerLeftX: </code></li>
+  <ul>
+  	<li>Zenbaki osoa, koordenatu horizontalarekin, orriaren beheko ezkerreko izkinatik irudiaren beheko ezkerreko izkinara.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePositionOnPageLowerLeftY: </code></li>
+  <ul>
+  	<li>Zenbaki osoa, koordenatu bertikalarekin, orriaren beheko ezkerreko izkinatik irudiaren beheko ezkerreko izkinara.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePositionOnPageUpperRightX: </code></li>
+  <ul>
+  	<li>Zenbaki osoa, koordenatu horizontalarekin, orriaren beheko ezkerreko izkinatik irudiaren goiko eskuineko izkinara.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>imagePositionOnPageUpperRightY: </code></li>
+  <ul>
+  	<li>Zenbaki osoa, koordenatu bertikalarekin, orriaren beheko ezkerreko izkinatik irudiaren goiko eskuineko izkinara.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>attach: </code></li>
+  <ul>
+  	<li>PDFan erantsi beharreko edukia duen fitxategiaren bidea. Datuen 64. oinarria ere zuzenean adieraz daiteke. attachFileName ezarri behar da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>attachFileName: </code></li>
+  <ul>
+  	<li>Fitxategi erantsiari esleitu beharreko izena.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>attachDescription: </code></li>
+  <ul>
+  	<li>Erantsitako dokumentuaren deskribapena.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>certificationLevel: </code></li>
+  <ul>
+  	<li><code> 0: </code> Sinadura ziurtatu gabe. Hau onespen-sinadura bat litzateke. Lehenetsitako balioa da.</li>
+  	<li><code> 1: </code> Egilearen sinadura ziurtatua. Sinadura ziurtatu mota horren ondoren, ezin da aldaketarik egin dokumentuan (ezin da sinadurarik gehitu, ez eta formulariorik bete ere).</li>
+  	<li><code> 2: </code> Formularioetarako egilearen sinadura ziurtatua. Sinadura ziurtatu mota horren ondoren, formulario-eremuak bakarrik bete daitezke (ezin da sinadurarik gehitu).</li>
+  	<li><code> 3: </code> Sinadura ziurtatu komuna. Sinadura ziurtatu mota horren ondoren, formularioko eremuak betetzea eta onespen-sinadurak sortzea besterik ez da onartzen.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>compressPdf: </code></li>
+  <ul>
+  	<li><code> true: </code> Konprimitu sinatutako PDFa, tamaina txikiagoa har dezan. PDF v4 edo berriagoa bada bakarrik aplikatzen da. Hau da balio lehenetsia.</li>
+  	<li><code> false: </code> Inoiz ez da konprimitzen sinatutako PDFa.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>pdfVersion: </code></li>
+  <ul>
+  	<li><code> -1: </code> Sinatzen den PDFaren bertsioa errespetatzen dela adierazten da.</li>
+  	<li><code> 2: </code> Irteerako PDFaren bertsioa 1.2 dela adierazten da.</li>
+  	<li><code> 3: </code> Irteerako PDFaren bertsioa 1.3 dela adierazten da.</li>
+  	<li><code> 4: </code> Irteerako PDFaren bertsioa 1.4 dela adierazten da.</li>
+  	<li><code> 5: </code> Irteerako PDFaren bertsioa 1.5 dela adierazten da.</li>
+  	<li><code> 6: </code> Irteerako PDFaren bertsioa 1.6 dela adierazten da.</li>
+  	<li><code> 7: </code> Irteerako PDFaren bertsioa 1.7 dela adierazten da.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureSubFilter: </code></li>
+  <ul>
+  	<li>Azpiiragazki deklaratua. Lehenespenez, oinarrizko sinadurak erabiltzen dira (adbe.pkcs7.detached. &quot;ETSI.CAdES.detached&quot; katea erabil daiteke BES sinadurak sortzeko.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signReason: </code></li>
+  <ul>
+  	<li>Sinadura egiteko arrazoia.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signatureProductionCity: </code></li>
+  <ul>
+  	<li>Zein hiritan sinatzen den.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signerContact: </code></li>
+  <ul>
+  	<li>Sinatzailearen harremanetarako informazioa.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signerClaimedRoles: </code></li>
+  <ul>
+  	<li>Sinatzaileak aitortutako rolen zerrenda (&quot;|&quot; -z bereizita).</li>
+  </ul>  
+  <li style="margin-top: 10pt"><code>policyIdentifier: </code></li>
+  <ul>
+  	<li>XAdES-EPES sinadurak sortzeko behar den sinadura-politikaren identifikatzailea (normalean, URL bat politikarantz, XML formatu prozesagarrian).</li>
+  </ul>  
+  <li style="margin-top: 10pt"><code> policyIdentifierHash: </code></li>
+  <ul>
+  	<li>64. oinarriko testua, sinadura-politikaren aztarna digitalarekin. Nahitaez adierazi behar da propietate hori, baldin eta policyIdentifier-en adierazitako balioa ez bada unibertsalki eskuragarria. Propietate horri balioa ematen bazaio, nahitaezkoa da <code> policyIdentifierHashAlgorithm propietateari balioa ematea. </code></li>
+  </ul>
+  <li style="margin-top: 10pt"><code>policyIdentifierHashAlgorithm: </code></li>
+  	<ul>
+  	<li><code> SHA1: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA1 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-256: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-256 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-384: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-384 algoritmoaren bidez kalkulatu zela.</li>
+  	<li><code> SHA-512: </code> Adierazten du <code> policyIdentifierHash </code> propietatean adierazitako aztarna digitala SHA-512 algoritmoaren bidez kalkulatu zela.</li>
+	</ul>
+  <li style="margin-top: 10pt"><code>policyQualifier: </code></li>
+  <ul>
+  	<li>Sinadura-politikaren testu-deskribapena duen dokumenturako URLa.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>ownerPassword: </code></li>
+  <ul>
+  	<li>PDFa irekitzeko pasahitza. Ez da onartzen ziurtagiriz edo AES-256 algoritmoaz zifratutako PDF dokumentuen sinadura.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>headless: </code></li>
+  <ul>
+  	<li><code> true: </code> Ez du sinadura prozesua eteten erabiltzailearen interakzioa eskatzeko.</li>
+  	<li><code> false: </code> Erabiltzaileari elkarrizketak erakusten dizkio, baimena edo sinatzeko datu osagarriren bat behar badu. Hau da balio lehenetsia.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowSigningCertifiedPdfs: </code></li>
+  <ul>
+  	<li><code> true: </code> PDF dokumentu ziurtatuak sinatzeko aukera ematen du. Emaitzak PDFaren aurreko sinadurak baliogabetu ditzake.</li>
+  	<li><code> false: </code> Errore bat sortzen du PDF dokumentu ziurtatuak sinatzean.</li>
+  	<li>Ez da aipatzen: Sarrerako PDF dokumentua ziurtatuta dagoela detektatuz gero, erabiltzaileari ohartaraziko zaio sinadurak aurreko sinadurak baliogabetu ditzakeela, eta aukera emango zaio eragiketa sinatu edo bertan behera utzi erabakitzeko.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowSigningCertifiedPdfs: </code></li>
+  <ul>
+  	<li><code> true: </code> PDF dokumentu ziurtatuak sinatzeko aukera ematen du. Emaitzak PDFaren aurreko sinadurak baliogabetu ditzake.</li>
+  	<li><code> false: </code> Errore bat sortzen du PDF dokumentu ziurtatuak sinatzean.</li>
+  	<li>Ez da aipatzen: Sarrerako PDF dokumentua ziurtatuta dagoela detektatuz gero, erabiltzaileari ohartaraziko zaio sinadurak aurreko sinadurak baliogabetu ditzakeela, eta aukera emango zaio eragiketa sinatu edo bertan behera utzi erabakitzeko.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowCosigningUnregisteredSignatures: </code></li>
+  <ul>
+  	<li><code> true: </code> Aurrez erregistratu gabeko sinadurak dituzten PDF dokumentuak sinatzeko aukera ematen du.</li>
+  	<li><code> false: </code> Ez du aukerarik ematen aurrez erregistratu gabeko sinadurak dituzten PDF dokumentuak sinatzeko.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signingCertificateV2: </code></li>
+  <ul>
+  	<li><code> true: </code> signingCertificateV2 atributua erabiltzen da sinaduretan.</li>
+  	<li><code> false: </code> signingCertificateV1 atributua erabiltzen da sinaduretan.</li>
+  	<li>Ez da aipatzen: signingCertificateV1 atributua erabiltzen da SHA1 eta RSA sinaduretan, eta signingCertificateV2 gainerakoetan.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signReservedSize: </code></li>
+  <ul>
+  	<li>PDFan sartuko den sinaduraren tamaina maximoa, bytetan. Besterik adierazi ezean, 27000.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>signingCertificateV2: </code></li>
+  <ul>
+  	<li><code> true: </code> signingCertificateV2 atributua erabiltzen da sinaduretan.</li>
+  	<li><code> false: </code> signingCertificateV1 atributua erabiltzen da sinaduretan.</li>
+  	<li>Ez da aipatzen: signingCertificateV1 atributua erabiltzen da SHA1 eta RSA sinaduretan, eta signingCertificateV2 gainerakoetan.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowShadowAttack: </code></li>
+  <ul>
+  	<li><code> true: </code> Ez da PDF Shadow Attack-en egiaztapenik egingo aurreko sinadurak baliozkotzean.</li>
+  	<li><code> false: </code> PDF Shadow Attack egiaztapena egingo da aurretiko sinadurak baliozkotzen diren bitartean, eta, antzemanez gero, sinadura baliogabetzat emango da.</li>
+  	<li>Ez da aipatzen: PDF Shadow Attack egiaztapena egingo da aurretiko sinadurak baliozkotzen diren bitartean, eta, antzemanez gero, erabiltzaileari galdetuko zaio eragiketarekin jarraitu behar den.</li>
+  </ul>
+  <li style="margin-top: 10pt"><code>allowModifiedForm </code></li>
+  <ul>
+  	<li><code> true: </code> Ez da egiaztatu behar dokumentuko formularioetako aldaketarik, ez eta PDF Shadow Attack-ik ere, aurreko sinadurak baliozkotzen diren bitartean.</li>
+  	<li><code> false: </code> Dokumentuaren formularioetan aldaketak egin direla egiaztatuko da aurretiko sinadurak baliozkotzen diren bitartean, eta, halakorik atzemanez gero, sinadura baliogabetzat emango da.</li>
+  	<li>Ez da aipatzen: Dokumentuaren formularioetan aldaketak egin direla egiaztatuko da aurretiko sinadurak baliozkotzen diren bitartean, eta, halakorik detektatuz gero, erabiltzaileari galdetuko zaio eragiketarekin jarraitu behar den.</li>
+  </ul>
+  </ul>
+ </body>
+</html>

@@ -474,7 +474,7 @@ public final class KeyStoreUtilities {
 		return false;
 	}
 
-	private static AOKeyStoreManager getDnieKeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+	private static AOKeyStoreManager getDnieKeyStoreManager(final Object parentComponent) throws KeystoreAlternativeException, IOException {
 		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			AOKeyStore.DNIEJAVA,
 			null,
@@ -487,7 +487,7 @@ public final class KeyStoreUtilities {
 		return tmpKsm;
 	}
 
-	private static AOKeyStoreManager getCeres430KeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+	private static AOKeyStoreManager getCeres430KeyStoreManager(final Object parentComponent) throws KeystoreAlternativeException, IOException {
 		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			AOKeyStore.CERES_430, // Store
 			null,             // Lib (null)
@@ -500,7 +500,7 @@ public final class KeyStoreUtilities {
 		return tmpKsm;
 	}
 
-	private static AOKeyStoreManager getCeresKeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+	private static AOKeyStoreManager getCeresKeyStoreManager(final Object parentComponent) throws KeystoreAlternativeException, IOException {
 		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			AOKeyStore.CERES, // Store
 			null,             // Lib (null)
@@ -513,7 +513,7 @@ public final class KeyStoreUtilities {
 		return tmpKsm;
 	}
 
-	private static AOKeyStoreManager getSmartCafeKeyStoreManager(final Object parentComponent) throws AOKeystoreAlternativeException, IOException {
+	private static AOKeyStoreManager getSmartCafeKeyStoreManager(final Object parentComponent) throws KeystoreAlternativeException, IOException {
 		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			AOKeyStore.SMARTCAFE, // Store
 			null,                 // Lib (null)

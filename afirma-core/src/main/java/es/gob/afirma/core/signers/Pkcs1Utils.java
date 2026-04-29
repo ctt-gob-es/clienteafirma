@@ -78,7 +78,7 @@ public final class Pkcs1Utils {
             // check number of components in the read sequence
             // and trailing data
             if (values.length != 2 || in.available() != 0) {
-                throw new IOException("Invalid encoding for signature");
+                throw new IOException("Invalid encoding for signature"); //$NON-NLS-1$
             }
 
             final BigInteger r = values[0].getPositiveBigInteger();
@@ -97,7 +97,7 @@ public final class Pkcs1Utils {
             return result;
 
         } catch (final Exception e) {
-            throw new SignatureException("Invalid encoding for signature", e);
+            throw new SignatureException("Invalid encoding for signature", e); //$NON-NLS-1$
         }
     }
 

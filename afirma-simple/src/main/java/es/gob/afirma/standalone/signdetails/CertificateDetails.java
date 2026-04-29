@@ -42,7 +42,7 @@ public class CertificateDetails {
 		catch (final Exception e) {
 			validationMessage = SimpleAfirmaMessages.getString("ValidationInfoDialog.4"); //$NON-NLS-1$
 		}
-		this.validityResult.put("Validacion", validationMessage); //$NON-NLS-1$
+		this.validityResult.put(SimpleAfirmaMessages.getString("ValidationInfoDialog.68"), validationMessage); //$NON-NLS-1$
 	}
 
 	public String getName() {

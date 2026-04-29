@@ -19,11 +19,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.ui.LanguageManager;
 import es.gob.afirma.standalone.updater.Updater;
 
 /** Gestor de los recursos de las diferentes formas de ayuda de la aplicaci&oacute;n,
@@ -70,37 +75,71 @@ public final class HelpResourceManager {
     	try (final InputStream indexIs = ClassLoader.getSystemResourceAsStream(INDEX_HELP_FILENAME);
     			final InputStreamReader isr = new InputStreamReader(indexIs);
     			final BufferedReader index = new BufferedReader(isr);) {
-
+    		
+    		
     		// Leemos la siguiente entrada
     		String filePath;
     		while ((filePath = index.readLine()) != null) {
     			if (!filePath.trim().isEmpty()) {
-
-    				// Cargamos el recurso
-    				try (final InputStream fileIs = ClassLoader.getSystemResourceAsStream(INTERNAL_HELP_DIR_NAME + filePath)) {
-
-    					final File resourceFile = new File(helpDir, filePath.replace("/", File.separator)); //$NON-NLS-1$
-
-    					// Si no existia el directorio en el que se debe guardar, se crea
-    					if (!resourceFile.getParentFile().exists()) {
-    						resourceFile.getParentFile().mkdirs();
-    					}
-
-    					// Creamos el fichero local
-    					try (final FileOutputStream fos = new FileOutputStream(resourceFile)) {
-    						fos.write(AOUtil.getDataFromInputStream(fileIs));
-    					}
-    				}
-    				catch (final Exception e) {
-    					LOGGER.log(Level.WARNING, "No se ha encontrado o no ha podido leerse el fichero de ayuda " + LoggerUtil.getCleanUserHomePath(filePath), e); //$NON-NLS-1$
-    				}
+   				
+	    				// Cargamos el recurso
+	    				try (final InputStream fileIs = ClassLoader.getSystemResourceAsStream(INTERNAL_HELP_DIR_NAME + filePath)) {
+	
+	    					final File resourceFile = new File(helpDir, filePath.replace("/", File.separator)); //$NON-NLS-1$
+	    					
+	    					if (!isFromDefaultImportedLanguageFile(resourceFile, filePath)) {
+	    					
+		    					// Si no existia el directorio en el que se debe guardar, se crea
+		    					if (!resourceFile.getParentFile().exists()) {
+		    						resourceFile.getParentFile().mkdirs();
+		    					}
+		
+		    					// Creamos el fichero local
+		    					try (final FileOutputStream fos = new FileOutputStream(resourceFile)) {
+		    						fos.write(AOUtil.getDataFromInputStream(fileIs));
+		    					}
+	    					}
+	    				}
+	    				catch (final Exception e) {
+	    					LOGGER.log(Level.WARNING, "No se ha encontrado o no ha podido leerse el fichero de ayuda " + LoggerUtil.getCleanUserHomePath(filePath), e); //$NON-NLS-1$
+	    				}
+    				
     			}
     		}
-
 
     	}
 
 	}
+	
+	public static void extractImportedResources(final File helpDir) throws IOException {
+		
+		final File helpInstallDir = new File(DesktopUtil.getApplicationDirectory() + File.separator + "help"); //$NON-NLS-1$
+
+		if (!helpInstallDir.isDirectory()) {
+            return;
+        }
+
+        final Path helpDirPath = helpDir.toPath();
+
+        copyFromInstallDir(helpInstallDir.toPath(), helpDirPath);
+
+	}
+	
+    private static void copyFromInstallDir(final Path helpInstallDir, final Path helpDirPath) throws IOException {
+        final File[] files = helpInstallDir.toFile().listFiles();
+        if (files == null) return;
+
+        for (final File f : files) {
+            if (f.isDirectory()) {
+                final Path newFile = helpDirPath.resolve(f.getName());
+                Files.createDirectories(newFile);
+                copyFromInstallDir(f.toPath(), newFile);
+            }
+            else {
+                Files.copy(f.toPath(), helpDirPath.resolve(f.getName()), StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+    }
 
     /** Crea el directorio de usuario del programa si no existe, */
     private static void createHelpDir(final File helpDir) {
@@ -181,4 +220,28 @@ public final class HelpResourceManager {
         }
         return "file:///" + launcherTempFile.getAbsolutePath().replace("\\", "/");  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     }
+    
+    private static boolean isFromDefaultImportedLanguageFile(final File resourceFile, final String filePath) {
+    	
+    	boolean isFromImportedLanguage = false;
+    	
+    	if (resourceFile.exists()) {
+	    	final Locale [] importedLocales = LanguageManager.getImportedLocales();
+	    	
+	    	if (importedLocales != null && importedLocales.length > 0) {
+	    		
+	    		for (final Locale l : importedLocales) {
+	    			final String localeStr = l.toString();
+	    			
+	    			if (filePath.startsWith(localeStr + "/")  //$NON-NLS-1$
+	    				|| resourceFile.getName().equals("index_" + localeStr + ".html")) {  //$NON-NLS-1$//$NON-NLS-2$
+	    				isFromImportedLanguage = true;
+	    			}
+	    		}
+	    	}
+    	}
+    	return isFromImportedLanguage;
+    }
+    
+    
 }

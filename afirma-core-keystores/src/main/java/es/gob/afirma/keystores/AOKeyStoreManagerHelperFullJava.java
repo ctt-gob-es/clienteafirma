@@ -131,7 +131,7 @@ final class AOKeyStoreManagerHelperFullJava {
             ks = KeyStore.getInstance(store.getProviderName());
         }
         catch (final Exception e) {
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen 100% Java para " + store.toString() + ": " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen 100% Java para " + store.toString() + ": " + e, e, KeyStoreErrorCode.Internal.LOADING_JMULTICARD_KEYSTORE_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         LOGGER.info("Cargando KeyStore 100% Java para " + store.toString()); //$NON-NLS-1$
@@ -140,12 +140,12 @@ final class AOKeyStoreManagerHelperFullJava {
 		}
 		catch (final NoSuchAlgorithmException e) {
 			throw new AOKeyStoreManagerException(
-    			"Error de algoritmo al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
+    			"Error de algoritmo al obtener el almacen 100% Java para " + store.toString() + ": " + e, e, KeyStoreErrorCode.Internal.LOADING_JMULTICARD_KEYSTORE_ERROR  //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		catch (final CertificateException e) {
 			throw new AOKeyStoreManagerException(
-				"Error de certificado al obtener el almacen 100% Java para " + store.toString() + ": " + e, e  //$NON-NLS-1$ //$NON-NLS-2$
+				"Error de certificado al obtener el almacen 100% Java para " + store.toString() + ": " + e, e, KeyStoreErrorCode.Internal.LOADING_JMULTICARD_KEYSTORE_ERROR  //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 

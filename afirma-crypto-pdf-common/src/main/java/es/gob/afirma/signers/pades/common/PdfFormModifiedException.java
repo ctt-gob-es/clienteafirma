@@ -25,6 +25,6 @@ public final class PdfFormModifiedException extends RuntimeConfigNeededException
 	public static final String REQUESTOR_MSG_CODE = "signingModifiedPdfForm"; //$NON-NLS-1$
 
 	public PdfFormModifiedException(final String msg) {
-		super(msg, RequestType.CONFIRM, REQUESTOR_MSG_CODE, PdfExtraParams.ALLOW_SIGN_MODIFIED_FORM);
+		super(msg, RequestType.CONFIRM, REQUESTOR_MSG_CODE, PdfExtraParams.ALLOW_SIGN_MODIFIED_FORM, PdfErrorCode.Internal.SIGNING_PDF_WITH_MODIFIED_FORM);
 	}
 }

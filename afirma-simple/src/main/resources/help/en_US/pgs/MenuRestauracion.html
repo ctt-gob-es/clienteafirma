@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Restoring installation</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="Restoring, Intalacion">
+  <meta name="description" content="Restore installation.">
+ </head>
+ <body> 
+  <h2>Installation restore panel</h2>
+  <p>From this panel it is possible to restore the Autofirma installation to correct problems affecting communication between web browsers and the application. The most common cases are: a new web browser has been installed after the installation of Autofirma, more users have been created on the computer or more user profiles for a browser, the profile of a user has been reset, etc.</p>
+  <p align="center"><img src="../gfx/menurestaurar_mini.png" alt="Screen for restoring the installation"></p>
+  <h3>Options available in the panel:</h3>
+  <ul>
+   <li><b> Set up Firefox to rely on system root certificates: </b><p>By activating this option (only available in Windows and macOS), the restore process is allowed to configure Firefox in such a way that the browser will rely on the certificates installed in the root certificate store of the system (Trusted Authorities). In this way, Autofirma will continue to operate in this browser even if new profiles are set up, the profile is cleaned or if the trust certificate is removed from the browser store. If this box is left off, this setting will be removed if it is already established.</p>
+   </li>
+  </ul>
+  <p>By pressing the &quot;Start Restoration&quot; button, the restoration process will begin.</p>
+  <p><b> WARNING FOR MICROSOFT WINDOWS USERS: </b> If a message appears when running the installation process indicating &quot;The code execution cannot proceed because it was not found VCRUNTIME140.dll. This problem can be solved by reinstalling the program&quot;, you must install the <a target="_blank" href="https://www.microsoft.com/es-es/download/details.aspx?id=48145"> redistributable execution environment of Microsoft Visual C++ 2015 </a> and re-run the operation in order to complete the restoration.</p>
+ </body>
+</html>

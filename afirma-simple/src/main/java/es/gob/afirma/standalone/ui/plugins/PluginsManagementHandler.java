@@ -6,10 +6,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,22 +24,26 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.plugins.AfirmaPlugin;
 import es.gob.afirma.standalone.plugins.Permission;
 import es.gob.afirma.standalone.plugins.PluginControlledException;
 import es.gob.afirma.standalone.plugins.PluginInfo;
+import es.gob.afirma.standalone.plugins.manager.AOPluginException;
 import es.gob.afirma.standalone.plugins.manager.JarNoSignedException;
 import es.gob.afirma.standalone.plugins.manager.JarVerifier;
 import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginInstalledException;
+import es.gob.afirma.standalone.plugins.manager.PluginManagerError;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsPreferences;
-import es.gob.afirma.standalone.so.macos.MacUtils;
 
 /**
  * Manegador de eventos de PluginsManagementPanel.
@@ -54,6 +60,26 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	private final PluginsManager pluginsManager;
 
 	private List<AfirmaPlugin> pluginsList;
+
+    private static final Set<ErrorCode> DEFINED_PLUGINS_ERRORS = new HashSet<>();
+
+    static {
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Internal.UNINSTALL_PLUGIN_ERROR);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Internal.ERROR_IN_PLUGIN);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Internal.CANT_REMOVE_LOADED_PLUGIN);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Internal.PLUGIN_DIRECTORY_ERROR);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Internal.PLUGIN_LOAD_ERROR);
+
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Functional.MALFORMED_PLUGIN_SERVICE);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Functional.NO_PLUGIN_FOUND);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Functional.MULTIPLE_PLUGINS_FOUND);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Functional.BUTTON_NO_ACTION);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Functional.BUTTON_NO_WINDOW);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Functional.INVALID_ACTION_CLASS);
+    	DEFINED_PLUGINS_ERRORS.add(SimpleErrorCode.Functional.INVALID_PLUGIN_FILE);
+    	DEFINED_PLUGINS_ERRORS.add(PluginManagerError.Functional.ALREADY_INSTALLED_PLUGIN);
+    	DEFINED_PLUGINS_ERRORS.add(SimpleErrorCode.Functional.PLUGIN_FILE_NOT_FOUND);
+    }
 
 	/**
 	 * Construye el objeto para la gesti&oacute;n de los eventos del di&aacute;logo de
@@ -124,9 +150,14 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		try {
 			plugin = PluginsManager.loadPluginFromFiles(new File[] { pluginFile });
 		}
-		catch (final Exception e) {
+		catch (final AOPluginException e) {
 			LOGGER.log(Level.WARNING, "No se pudo cargar el plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.0"), null); //$NON-NLS-1$
+			showError(e);
+			return;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Error al cargar el plugin", e); //$NON-NLS-1$
+			showError(new AOPluginException(PluginManagerError.Internal.PLUGIN_LOAD_ERROR));
 			return;
 		}
 
@@ -172,7 +203,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 		catch (final PluginControlledException e) {
 			LOGGER.log(Level.WARNING, "El propio plugin devolvio un error durante su instalacion", e); //$NON-NLS-1$
-			showError(e.getLocalizedMessage(), e);
+			showError(new AOPluginException(e.getMessage(), e, PluginManagerError.Internal.ERROR_IN_PLUGIN));
 			return;
 		}
 		catch (final PluginInstalledException e) {
@@ -180,7 +211,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			// Preguntamos si se desea susituir la version instalada del plugin por la nueva
 			final int option = JOptionPane.showConfirmDialog(
 					this.view,
-					String.format(SimpleAfirmaMessages.getString("PluginsManagementHandler.1"), info.getName()), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("PluginsManagementHandler.1", info.getName()), //$NON-NLS-1$
 					SimpleAfirmaMessages.getString("PluginsManagementHandler.16"), //$NON-NLS-1$
 					JOptionPane.YES_NO_CANCEL_OPTION);
 			if (option != JOptionPane.YES_OPTION) {
@@ -189,16 +220,26 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			try {
 				removeLoadedPlugin(info);
 				plugin = this.pluginsManager.installPlugin(pluginFile, info.getInternalName());
-			}
-			catch (final Exception e2) {
-				LOGGER.log(Level.WARNING, "No se ha podido reemplazar la version preexistente del plugin", e2); //$NON-NLS-1$
-				showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.15"), e2); //$NON-NLS-1$
+			} catch (final AOException aoException) {
+				LOGGER.log(Level.WARNING, "No se ha podido reemplazar la version preexistente del plugin", aoException); //$NON-NLS-1$
+				showError(aoException);
+				return;
+			} catch (final IOException e1) {
+				LOGGER.log(Level.WARNING, "Ocurrio un problema con los ficheros o directorio del plugin", e); //$NON-NLS-1$
+				showError(new AOPluginException(e.getMessage(), e, PluginManagerError.Internal.PLUGIN_DIRECTORY_ERROR));
+				return;
+			} catch (final PluginControlledException e1) {
+				LOGGER.log(Level.WARNING, "El propio plugin devolvio un error durante su instalacion", e); //$NON-NLS-1$
+				showError(new AOPluginException(e.getMessage(), e, PluginManagerError.Internal.ERROR_IN_PLUGIN));
 				return;
 			}
-		}
-		catch (final Exception e) {
+		} catch (final IOException e) {
+			LOGGER.log(Level.WARNING, "Ocurrio un problema con los ficheros o directorio del plugin", e); //$NON-NLS-1$
+			showError(new AOPluginException(e.getMessage(), e, PluginManagerError.Internal.PLUGIN_DIRECTORY_ERROR));
+			return;
+		} catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Ocurrio un error al instalar el plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.2"), e); //$NON-NLS-1$
+			showError(new AOPluginException(e.getMessage(), e, PluginManagerError.Internal.PLUGIN_LOAD_ERROR));
 			return;
 		}
 
@@ -237,9 +278,14 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 					JOptionPane.ERROR_MESSAGE);
 			return option == JOptionPane.YES_OPTION;
 		}
+		catch (final FileNotFoundException e) {
+			LOGGER.log(Level.WARNING, "No se ha encontrado el archivo de plugin", e); //$NON-NLS-1$
+			showError(new AOException(SimpleErrorCode.Functional.PLUGIN_FILE_NOT_FOUND));
+			return false;
+		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Ocurrio un error durante la lectura del fichero de plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.24"), e); //$NON-NLS-1$
+			showError(new AOException(SimpleErrorCode.Functional.INVALID_PLUGIN_FILE));
 			return false;
 		}
 
@@ -322,7 +368,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 				removePlugin(previousPlugin);
 			}
 			catch (final Exception e) {
-				throw new PluginException("Error al eliminar la version preexistente del plugin", e); //$NON-NLS-1$
+				throw new PluginException("Error al eliminar la version preexistente del plugin", e, PluginManagerError.Internal.CANT_REMOVE_LOADED_PLUGIN); //$NON-NLS-1$
 			}
 		}
 		// Si no esta, sera un resto residual de un plugin y tendremos que eliminar su directorio
@@ -330,7 +376,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			try {
 				this.pluginsManager.forceRemove(info.getInternalName());
 			} catch (final IOException e) {
-				throw new PluginException("No se pudo eliminar el directorio residual del plugin anterior", e); //$NON-NLS-1$
+				throw new PluginException("No se pudo eliminar el directorio residual del plugin anterior", e, PluginManagerError.Internal.CANT_REMOVE_LOADED_PLUGIN); //$NON-NLS-1$
 			}
 		}
 	}
@@ -349,9 +395,10 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 
 		// Pedimos confirmacion para el borrado
-		if (JOptionPane.OK_OPTION != JOptionPane.showConfirmDialog(this.view.getParentWindow(),
-				String.format(SimpleAfirmaMessages.getString("PluginsManagementHandler.5"), //$NON-NLS-1$
-						plugin.getInfo().getName()))) {
+		if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(this.view.getParentWindow(),
+				SimpleAfirmaMessages.getString("PluginsManagementHandler.5", plugin.getInfo().getName()), //$NON-NLS-1$
+				SimpleAfirmaMessages.getString("PluginsManagementHandler.14"), //$NON-NLS-1$
+				JOptionPane.YES_NO_CANCEL_OPTION)) {
 			return;
 		}
 
@@ -360,7 +407,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 			removePlugin(plugin);
 		} catch (final IOException e) {
 			LOGGER.log(Level.SEVERE, "Ocurrio un error al desinstalar el plugin", e); //$NON-NLS-1$
-			showError(SimpleAfirmaMessages.getString("PluginsManagementHandler.6"), e); //$NON-NLS-1$
+			showError(new AOPluginException(PluginManagerError.Internal.UNINSTALL_PLUGIN_ERROR));
 			return;
 		}
 
@@ -399,17 +446,8 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	 */
 	private static void resetApplication() {
 
-		File currentFile;
-		try {
-			currentFile = new File(PluginsManagementHandler.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-		}
-		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se ha podido identificar el fichero ejecutable", e); //$NON-NLS-1$
-			return;
-		}
-
 		// Compone el comando necesario para arrancar la aplicacion
-		final List<String> command = getCommand(currentFile);
+		final List<String> command = DesktopUtil.getResetApplicationCommand();
 
 		// Ejecutamos una nueva instancia de la aplicacion
 		if (command != null) {
@@ -442,53 +480,7 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 		}
 	}
 
-	/**
-	 * Devuelve el comando necesario para ejecutar la aplicaci&oacute;n o {@code null}
-	 * si no hay una forma efectiva de ejecutarla
-	 * @param currentFile Fichero o directorio con la aplicaci&oacute;n.
-	 * @return Par&aacute;meros para la ejecuci&oacute;n de la aplicaci&oacute;n.
-	 */
-	private static List<String> getCommand(final File currentFile) {
-
-		// La aplicacion se ejecutan las clases Java. No va a poder ejecutarse sin las
-		// dependencias, por lo que se omite
-		if (currentFile.isDirectory()) {
-			return null;
-		}
-
-		// La aplicacion se ejecuta desde un JAR
-		List<String> command;
-		if (currentFile.getName().toLowerCase().endsWith(".jar")) { //$NON-NLS-1$
-
-			// Si ese JAR forma parte de un ejecutable macOS, usamos el ejecutable
-			final File appMac = MacUtils.getMacApp(currentFile);
-			if (appMac != null && appMac.isFile()) {
-				command = new ArrayList<>();
-				command.add(appMac.getAbsolutePath());
-			}
-			else {
-				final String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				command = new ArrayList<>();
-				command.add(java);
-				command.add("-jar"); //$NON-NLS-1$
-				command.add(currentFile.getPath());
-			}
-		}
-		// La aplicacion es un ejecutable de Windows
-		else if (currentFile.getName().toLowerCase().endsWith(".exe")) { //$NON-NLS-1$
-			command = new ArrayList<>();
-			command.add(currentFile.getPath());
-		}
-		// En cualquier otro caso, no reiniciamos
-		else {
-			command = null;
-		}
-
-		return command;
-	}
-
 	void configPlugin() {
-
 		final AfirmaPlugin plugin = this.view.getPluginsList().getSelectedValue();
 
 		final PluginsPreferences preferences = PluginsPreferences.getInstance(plugin);
@@ -519,8 +511,38 @@ public class PluginsManagementHandler implements KeyListener, ListSelectionListe
 	private static void showError(final String message, final Throwable t) {
 		AOUIFactory.showErrorMessage(message,
 				SimpleAfirmaMessages.getString("PluginsManagementHandler.7"), //$NON-NLS-1$
-				JOptionPane.ERROR_MESSAGE,
+				AOUIFactory.ERROR_MESSAGE,
 				t);
+	}
+
+	private static void showError(final Throwable t) {
+		final String msg = extractMessageFromException(t);
+		showError(msg, t);
+	}
+
+	private static String extractMessageFromException(final Throwable t) {
+		String message = null;
+
+		if (t instanceof AOException) {
+			message = getErrorMessage((AOException) t);
+		} else {
+			message = SimpleAfirmaMessages.getString("PluginManagementError.240000"); //$NON-NLS-1$
+		}
+		return message;
+	}
+
+	private static String getErrorMessage(final AOException exception) {
+
+	    ErrorCode errorCode;
+	    if (DEFINED_PLUGINS_ERRORS.contains(exception.getErrorCode())) {
+	    	errorCode = exception.getErrorCode();
+	    } else {
+	    	errorCode = PluginManagerError.Internal.PLUGIN_ERROR;
+	    }
+
+	    final String key = "PluginManagementError." + errorCode.getCode(); //$NON-NLS-1$
+
+	    return SimpleAfirmaMessages.getString(key);
 	}
 
 	/**

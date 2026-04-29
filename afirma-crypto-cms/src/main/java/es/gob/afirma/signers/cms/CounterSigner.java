@@ -60,10 +60,12 @@ import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
-/** Contrafirma digital PKCS#7/CMS SignedData La
+/**
+ * Contrafirma digital PKCS#7/CMS SignedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
  * crear un mensaje SignedData de SpongyCastle pero con la
- * peculiaridad de que es una Contrafirma. */
+ * peculiaridad de que es una Contrafirma.
+ */
 final class CounterSigner {
 
     private int actualIndex = 0;
@@ -71,7 +73,8 @@ final class CounterSigner {
     private Map<String, byte[]> atrib2 = new HashMap<>();
     private Map<String, byte[]> uatrib2 = new HashMap<>();
 
-    /** Constructor de la clase. Se crea una contrafirma a partir de los datos
+    /**
+     * Constructor de la clase. Se crea una contrafirma a partir de los datos
      * del firmante, el archivo que se firma y del archivo que contiene las
      * firmas.<br>
      * @param parameters Par&aacute;metros necesarios que contienen tanto la firma del
@@ -92,7 +95,8 @@ final class CounterSigner {
      * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de
      *                                                 firma.
      * @throws AOException Cuando ocurre cualquier error no contemplado por el resto de
-     *                     las excepciones declaradas */
+     *                     las excepciones declaradas
+     */
     byte[] counterSigner(final P7ContentSignerParameters parameters,
                                 final byte[] data,
                                 final CounterSignTarget targetType,
@@ -385,7 +389,7 @@ final class CounterSigner {
                 }
             }
             // FIRMA DEL NODO ACTUAL
-            signerInfosU.add(unsignedAtributte(parameters, signerInfo, key, certChain));
+            signerInfosU.add(generateCounterSignSignedInfo(parameters, signerInfo, key, certChain));
 
             // FIRMA DE CADA UNO DE LOS HIJOS
             ASN1Set a1;
@@ -416,7 +420,7 @@ final class CounterSigner {
 			        // anadimos el que hay
 			        contexExpecific.add(signerInfosU.get(0));
 			        // creamos el de la contrafirma.
-			        signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
+			        signerInfosU2.add(generateCounterSignSignedInfo(parameters, signerInfo, key, certChain));
 			        final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
 			        contexExpecific.add(uAtrib);
 
@@ -444,7 +448,7 @@ final class CounterSigner {
 			        );
         }
 
-		signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
+		signerInfosU2.add(generateCounterSignSignedInfo(parameters, signerInfo, key, certChain));
 		final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
 		return new SignerInfo(
 		    	   signerInfo.getSID(),
@@ -538,7 +542,7 @@ final class CounterSigner {
 			        // anadimos el que hay
 			        contexExpecific.add(signerInfosU.get(0));
 			        // creamos el de la contrafirma.
-			        signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
+			        signerInfosU2.add(generateCounterSignSignedInfo(parameters, signerInfo, key, certChain));
 			        final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
 			        contexExpecific.add(uAtrib);
 
@@ -564,7 +568,7 @@ final class CounterSigner {
 			                       generateUnsignerInfoFromCounter(uAtrib) // unsignedAttr
 			        );
         }
-		signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
+		signerInfosU2.add(generateCounterSignSignedInfo(parameters, signerInfo, key, certChain));
 		final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
 		return new SignerInfo(signerInfo.getSID(),
 		                       signerInfo.getDigestAlgorithm(),
@@ -589,13 +593,15 @@ final class CounterSigner {
      *         Contrafirmados.
      * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
      * @throws java.io.IOException Si hay errores en la lectura de datos.
-     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados. */
+     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados.
+     * @throws AOException Cuando se produce un error en la firma PKCS#1 de la contrafirma.
+     */
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final PrivateKey key,
                                                        final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException,
                                                                                                                 IOException,
-                                                                                                                CertificateException {
+                                                                                                                CertificateException, AOException {
         final List<Object> attributes = new ArrayList<>();
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
@@ -622,7 +628,7 @@ final class CounterSigner {
                 }
             }
             // FIRMA DEL NODO ACTUAL
-            signerInfosU.add(unsignedAtributte(parameters, signerInfo, key, certChain));
+            signerInfosU.add(generateCounterSignSignedInfo(parameters, signerInfo, key, certChain));
 
             // FIRMA DE CADA UNO DE LOS HIJOS
 
@@ -651,7 +657,7 @@ final class CounterSigner {
 			        // anadimos el que hay
 			        contexExpecific.add(signerInfosU.get(0));
 			        // creamos el de la contrafirma.
-			        signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
+			        signerInfosU2.add(generateCounterSignSignedInfo(parameters, signerInfo, key, certChain));
 			        final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
 			        contexExpecific.add(uAtrib);
 
@@ -678,7 +684,7 @@ final class CounterSigner {
 			   generateUnsignerInfoFromCounter(uAtrib) // unsignedAttr
 			);
         }
-		signerInfosU2.add(unsignedAtributte(parameters, signerInfo, key, certChain));
+		signerInfosU2.add(generateCounterSignSignedInfo(parameters, signerInfo, key, certChain));
 		final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
 		return new SignerInfo(
 			signerInfo.getSID(),
@@ -824,7 +830,7 @@ final class CounterSigner {
      * @return Los datos necesarios para generar la firma referente a los datos
      *         del usuario.
      * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario. */
-    private ASN1Set generateSignerInfo(final X509Certificate cert,
+    private ASN1Set generateSignedAttributes(final X509Certificate cert,
     		                           final String digestAlgorithm,
     		                           final byte[] datos) throws NoSuchAlgorithmException {
         // // ATRIBUTOS
@@ -938,13 +944,15 @@ final class CounterSigner {
      * @return <code>SignerInfo</code> contrafirmado.
      * @throws java.security.NoSuchAlgorithmException Cuando el JRE no soporta alg&uacute;n algoritmo necesario.
      * @throws java.io.IOException Si hay errores en la lectura de datos.
-     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados. */
-    private SignerInfo unsignedAtributte(final P7ContentSignerParameters parameters,
+     * @throws java.security.cert.CertificateException Si hay problemas en el tratamiento de los certificados.
+     * @throws AOException Cuando no se puede realizar la firma
+     */
+    private SignerInfo generateCounterSignSignedInfo(final P7ContentSignerParameters parameters,
                                          final SignerInfo si,
                                          final PrivateKey key,
                                          final java.security.cert.Certificate[] certChain) throws NoSuchAlgorithmException,
                                                                                                   IOException,
-                                                                                                  CertificateException {
+                                                                                                  CertificateException, AOException {
         // // UNAUTHENTICATEDATTRIBUTES
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
@@ -953,7 +961,7 @@ final class CounterSigner {
 
         // ATRIBUTOS FINALES
 
-        final ASN1Set signedAttr = generateSignerInfo((X509Certificate) certChain[0], digestAlgorithm, si.getEncryptedDigest().getOctets());
+        final ASN1Set signedAttr = generateSignedAttributes((X509Certificate) certChain[0], digestAlgorithm, si.getEncryptedDigest().getOctets());
         final ASN1Set unsignedAttr = generateUnsignerInfo();
 
         // 5. SIGNERINFO
@@ -979,13 +987,7 @@ final class CounterSigner {
 					AOAlgorithmID.getOID(signatureAlgorithm)
 		);
 
-        final ASN1OctetString sign2;
-        try {
-            sign2 = CmsUtil.firma(signatureAlgorithm, key, this.signedAttr2);
-        }
-        catch (final Exception ex) {
-            throw new IOException("Error realizando la firma: " + ex, ex); //$NON-NLS-1$
-        }
+        final ASN1OctetString sign2 = CmsUtil.firma(signatureAlgorithm, key, this.signedAttr2);
 
         return new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unsignedAttr);
 

@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.standalone.so.macos.MacUtils;
 
 /** Utilidades generales y de control del autoarranque de Autofirma en el inicio de Windows.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -348,4 +349,73 @@ public final class DesktopUtil {
 			return file;
 		}
 	}
+	
+	/**
+	 * Si es posible, devuelve el comando a ejecutar para arrancar la aplicaci&oacute;n.
+	 * Si no se encuentra un modo de arrancar la nueva instancia de la aplicaci&oacute;n,
+	 * no se hace nada.
+	 * @return Comando de arranque.
+	 */
+	public static List<String> getResetApplicationCommand() {
+
+		File currentFile;
+		try {
+			currentFile = new File(DesktopUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se ha podido identificar el fichero ejecutable", e); //$NON-NLS-1$
+			return null;
+		}
+
+		// Compone el comando necesario para arrancar la aplicacion
+		final List<String> command = getCommand(currentFile);
+
+		return command;
+	}
+
+	/**
+	 * Devuelve el comando necesario para ejecutar la aplicaci&oacute;n o {@code null}
+	 * si no hay una forma efectiva de ejecutarla
+	 * @param currentFile Fichero o directorio con la aplicaci&oacute;n.
+	 * @return Par&aacute;meros para la ejecuci&oacute;n de la aplicaci&oacute;n.
+	 */
+	public static List<String> getCommand(final File currentFile) {
+
+		// La aplicacion se ejecutan las clases Java. No va a poder ejecutarse sin las
+		// dependencias, por lo que se omite
+		if (currentFile.isDirectory()) {
+			return null;
+		}
+
+		// La aplicacion se ejecuta desde un JAR
+		List<String> command;
+		if (currentFile.getName().toLowerCase().endsWith(".jar")) { //$NON-NLS-1$
+
+			// Si ese JAR forma parte de un ejecutable macOS, usamos el ejecutable
+			final File appMac = MacUtils.getMacApp(currentFile);
+			if (appMac != null && appMac.isFile()) {
+				command = new ArrayList<>();
+				command.add(appMac.getAbsolutePath());
+			}
+			else {
+				final String java = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				command = new ArrayList<>();
+				command.add(java);
+				command.add("-jar"); //$NON-NLS-1$
+				command.add(currentFile.getPath());
+			}
+		}
+		// La aplicacion es un ejecutable de Windows
+		else if (currentFile.getName().toLowerCase().endsWith(".exe")) { //$NON-NLS-1$
+			command = new ArrayList<>();
+			command.add(currentFile.getPath());
+		}
+		// En cualquier otro caso, no reiniciamos
+		else {
+			command = null;
+		}
+
+		return command;
+	}
+
 }

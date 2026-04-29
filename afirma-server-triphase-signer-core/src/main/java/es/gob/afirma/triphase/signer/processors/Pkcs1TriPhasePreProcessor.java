@@ -22,6 +22,7 @@ import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.core.signers.TriphaseData.TriSign;
+import es.gob.afirma.triphase.signer.TriphaseErrorCode;
 
 /** Procesador de firmas trif&aacute;sicas PKCS#1.
  * @author Tom&aacute;s Garc&iacute;a Mer&aacute;s. */
@@ -99,7 +100,7 @@ public final class Pkcs1TriPhasePreProcessor implements TriPhasePreProcessor {
 		// Cargamos la configuracion de la operacion
 		if (triphaseData.getSignsCount() < 1) {
 			LOGGER.severe("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
-			throw new AOException("No se ha encontrado la informacion de firma en la peticion"); //$NON-NLS-1$
+			throw new AOException("No se ha encontrado la informacion de firma en la peticion", TriphaseErrorCode.Request.MALFORMED_PRESIGN); //$NON-NLS-1$
 		}
 
 		final TriSign config = triphaseData.getSign(0);

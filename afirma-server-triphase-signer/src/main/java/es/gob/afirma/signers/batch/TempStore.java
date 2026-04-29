@@ -11,8 +11,6 @@ package es.gob.afirma.signers.batch;
 
 import java.io.IOException;
 
-import es.gob.afirma.signers.batch.xml.SingleSign;
-
 public interface TempStore {
 
 	void store(final byte[] data, final SingleSign ss, final String batchId) throws IOException;

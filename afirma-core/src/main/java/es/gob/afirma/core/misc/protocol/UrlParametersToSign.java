@@ -9,7 +9,10 @@
 
 package es.gob.afirma.core.misc.protocol;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -17,9 +20,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.ExtraParamsProcessor;
-import es.gob.afirma.core.signers.ExtraParamsProcessor.IncompatiblePolicyException;
 
 /** Par&aacute;metros de la URL de llamada a la aplicaci&oacute;n. */
 public final class UrlParametersToSign extends UrlParameters {
@@ -93,7 +97,7 @@ public final class UrlParametersToSign extends UrlParameters {
 	/** Opci&oacute;n de configuraci&oacute;n que determina si se debe ignorar
 	 * cualquier certificado prefijado. */
 	private boolean resetSticky;
-	
+
 	/** Nombre de aplicaci&oacute;n o dominio desde que se realiza la llamada. */
 	private String appName;
 
@@ -194,15 +198,22 @@ public final class UrlParametersToSign extends UrlParameters {
 	public boolean getResetSticky() {
 		return this.resetSticky;
 	}
-	
+
+	/**
+	 * Establece el nombre con el que se identifica la aplicaci&oacute;n.
+	 * @param appName Nombre de la aplicaci&oacute;n.
+	 */
 	public void setAppName(final String appName) {
 		this.appName = appName;
 	}
 
+	/**
+	 * Obtiene el nombre con el que se identifica la aplicaci&oacute;n.
+	 * @return Nombre de la aplicaci&oacute;n o {@code null} si no lo ha informado.
+	 */
 	public String getAppName() {
 		return this.appName;
 	}
-
 
 	public void setSignParameters(final Map<String, String> params) throws ParameterException {
 
@@ -217,13 +228,13 @@ public final class UrlParametersToSign extends UrlParameters {
 
 		if (sessionId != null) {
 			if (sessionId.length() > MAX_ID_LENGTH) {
-				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres."); //$NON-NLS-1$ //$NON-NLS-2$
+				throw new ParameterException("La longitud del identificador de la operacion es mayor de " + MAX_ID_LENGTH + " caracteres.", ErrorCode.Request.INVALID_SESSION_ID_TO_SIGN); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			// Comprobamos que el identificador de sesion de la firma sea alfanumerico (se usara como nombre de fichero)
 			for (final char c : sessionId.toLowerCase(Locale.ENGLISH).toCharArray()) {
 				if ((c < 'a' || c > 'z') && (c < '0' || c > '9')) {
-					throw new ParameterException("El identificador de la firma debe ser alfanumerico."); //$NON-NLS-1$
+					throw new ParameterException("El identificador de la firma debe ser alfanumerico.", ErrorCode.Request.INVALID_SESSION_ID_TO_SIGN); //$NON-NLS-1$
 				}
 			}
 
@@ -235,11 +246,15 @@ public final class UrlParametersToSign extends UrlParameters {
 			setMinimumProtocolVersion(params.get(VER_PARAM));
 		}
 		else {
-			setMinimumProtocolVersion(Integer.toString(ProtocolVersion.VERSION_0.getVersion()));
+			setMinimumProtocolVersion(ProtocolVersion.VERSION_0);
 		}
-		
+
 		if (params.containsKey(APP_NAME_PARAM)) {
-			this.appName = params.get(APP_NAME_PARAM);
+			try {
+				this.appName = URLDecoder.decode(params.get(APP_NAME_PARAM), StandardCharsets.UTF_8.name());
+			} catch (final UnsupportedEncodingException e) {
+				this.appName = params.get(APP_NAME_PARAM);
+			}
 		}
 
 		// Tomamos el tipo de operacion
@@ -261,23 +276,23 @@ public final class UrlParametersToSign extends UrlParameters {
 				try {
 					storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
 				}
-				catch (final ParameterLocalAccessRequestedException e) {
-					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e); //$NON-NLS-1$
+				catch (final LocalAccessRequestException e) {
+					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e, ErrorCode.Request.LOCAL_STORAGE_URL_TO_SIGN_BATCH); //$NON-NLS-1$
 				}
-				catch (final ParameterException e) {
-					throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e); //$NON-NLS-1$
+				catch (final IllegalArgumentException e) {
+					throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e, ErrorCode.Request.INVALID_STORAGE_URL_TO_SIGN_BATCH); //$NON-NLS-1$
 				}
 				setStorageServletUrl(storageServletUrl);
 			}
 			// Si no se encuentra a pesar de tener todos los parametros, falla la operacion
 			else if (params.containsKey(ID_PARAM)) {
-				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion"); //$NON-NLS-1$
+				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion", ErrorCode.Request.STORAGE_URL_TO_SIGN_BATCH_NOT_FOUND); //$NON-NLS-1$
 			}
 		}
 
 		// Comprobamos que se ha especificado el formato
 		if (!params.containsKey(FORMAT_PARAM)) {
-			throw new ParameterException("No se ha recibido el formato de firma"); //$NON-NLS-1$
+			throw new ParameterException("No se ha recibido el formato de firma", ErrorCode.Request.SIGNATURE_FORMAT_NOT_FOUND); //$NON-NLS-1$
 		}
 
 		final String format = params.get(FORMAT_PARAM);
@@ -285,11 +300,11 @@ public final class UrlParametersToSign extends UrlParameters {
 
 		// Comprobamos que se ha especificado el algoritmo
 		if (!params.containsKey(ALGORITHM_PARAM)) {
-			throw new ParameterException("No se ha recibido el algoritmo de firma"); //$NON-NLS-1$
+			throw new ParameterException("No se ha recibido el algoritmo de firma", ErrorCode.Request.SIGNATURE_ALGORITHM_NOT_FOUND); //$NON-NLS-1$
 		}
 		final String algo = params.get(ALGORITHM_PARAM);
 		if (!SUPPORTED_SIGNATURE_ALGORITHMS.contains(algo)) {
-			throw new ParameterException("Algoritmo de firma no soportado: " + algo); //$NON-NLS-1$
+			throw new ParameterException("Algoritmo de firma no soportado: " + algo, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
 		}
 
 		setSignAlgorithm(algo);
@@ -337,9 +352,9 @@ public final class UrlParametersToSign extends UrlParameters {
 	/** Expande los <code>extraParams</code> configurados en la URL que lo permitran. Por ejemplo,
 	 * la pol&iacute;tica de firma establecida mediante "expPolicy" se expandir&aacute; a los
 	 * valores correspondientes de la pol&iacute;tica.
-	 * @throws IncompatiblePolicyException Cuando se hayan proporcionado par&aacute;metros
+	 * @throws SignaturePolicyIncompatibilityException Cuando se hayan proporcionado par&aacute;metros
 	 *                                     incompatibles con la pol&iacute;tica de firma configurada. */
-	public void expandExtraParams() throws IncompatiblePolicyException {
+	public void expandExtraParams() throws SignaturePolicyIncompatibilityException {
 		setExtraParams(
 				ExtraParamsProcessor.expandProperties(
 						getExtraParams(),

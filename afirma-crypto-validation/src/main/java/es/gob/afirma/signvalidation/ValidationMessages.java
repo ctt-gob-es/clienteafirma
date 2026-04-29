@@ -9,15 +9,30 @@
 
 package es.gob.afirma.signvalidation;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.MissingResourceException;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
+import es.gob.afirma.core.ui.LanguageManager;
 
 /** Gesti&oacute;n de mensajes del aplicativo. */
 public final class ValidationMessages {
 
-    private static final String BUNDLE_NAME = "validationmessages"; //$NON-NLS-1$
-    private static ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME/*, Locale.getDefault()*/);
+    private static final String BUNDLE_NAME = "validationmessages.validationmessages"; //$NON-NLS-1$
+    private static final String BUNDLE_BASENAME = "validationmessages"; //$NON-NLS-1$
+    private static ResourceBundle bundle;
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    
+    static {
+    	updateLocale();
+    }
 
     private ValidationMessages() { /* No permitimos la instanciacion */ }
 
@@ -28,9 +43,23 @@ public final class ValidationMessages {
         try {
             return bundle.getString(key);
         }
-        catch (final MissingResourceException e) {
-            return '!' + key + '!';
-        }
+        catch (final Exception e) {
+			try {
+				final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+				final ResourceBundle temporalBundle;
+
+				if (LanguageManager.isDefaultLocale(baseLocale)) {
+					temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
+				} else {
+					temporalBundle = setImportedLangResource();
+				}
+
+				return temporalBundle.getString(key);
+
+			} catch (final Exception e1) {
+				return '!' + key + '!';
+			}
+		}
     }
 
     /** Recupera el texto identificado con la clave proporcionada y sustituye las
@@ -50,7 +79,25 @@ public final class ValidationMessages {
             text = bundle.getString(key);
         }
         catch (final Exception e) {
-            return '!' + key + '!';
+        	if(!LanguageManager.isDefaultLocale(Locale.getDefault())) {
+        		try {
+					final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
+					final ResourceBundle temporalBundle;
+					
+					if(LanguageManager.isDefaultLocale(baseLocale)) {
+						temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
+					} else {
+						temporalBundle = setImportedLangResource();
+					}
+					
+					text = temporalBundle.getString(key);
+					
+				} catch (final Exception e1) {
+					return '!' + key + '!';
+				}          	
+        	}
+        	
+			return '!' + key + '!';   
         }
 
         if (params != null && params.length > 0) {
@@ -65,7 +112,25 @@ public final class ValidationMessages {
     }
 
     /** Cambia la localizaci&oacute;n a la establecida por defecto. */
-    static void changeLocale() {
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
+    public static void updateLocale() {
+    	if (LanguageManager.isDefaultLocale(Locale.getDefault()) && !LanguageManager.existDefaultLocaleNewVersion()) {
+    		bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
+    	} else {
+    		bundle = setImportedLangResource();
+    	}
     }
+    
+    private static ResourceBundle setImportedLangResource() {
+    	final File localeDir = new File(LanguageManager.getLanguagesDir(), Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry()); //$NON-NLS-1$
+		final File file = new File(localeDir, BUNDLE_BASENAME + "_" + Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry() + ".properties"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
+        	return new PropertyResourceBundle(reader);
+        } catch (final FileNotFoundException e) {
+			LOGGER.severe("Recurso para validationmessages no encontrado: "+ e); //$NON-NLS-1$
+		} catch (final IOException e) {
+			LOGGER.severe("Error al leer el recurso para validationmessages: "+ e); //$NON-NLS-1$
+		}
+        return null;
+    }
+
 }

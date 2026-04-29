@@ -44,7 +44,7 @@ final class AOKeyStoreManagerHelperJava {
 		}
 		catch (final Exception e) {
 			throw new AOKeyStoreManagerException(
-				"No se ha podido obtener el almacen JavaKeyStore", e); //$NON-NLS-1$
+				"No se ha podido obtener el almacen JavaKeyStore", e, KeyStoreErrorCode.Internal.LOADING_JAVA_KEYSTORE_ERROR); //$NON-NLS-1$
 		}
 
 		// TODO: Revisar si el KeyStore de Java requiere contrasena
@@ -59,11 +59,11 @@ final class AOKeyStoreManagerHelperJava {
 		}
 		catch (final CertificateException e) {
 			throw new AOKeyStoreManagerException(
-				"No se han podido cargar los certificados del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
+				"No se han podido cargar los certificados del almacen JavaKeyStore solicitado", e, KeyStoreErrorCode.Internal.LOADING_JAVA_KEYSTORE_ERROR); //$NON-NLS-1$
 		}
 		catch (final NoSuchAlgorithmException e) {
 			throw new AOKeyStoreManagerException(
-				"No se ha podido verificar la integridad del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
+				"No se ha podido verificar la integridad del almacen JavaKeyStore solicitado", e, KeyStoreErrorCode.Internal.LOADING_JAVA_KEYSTORE_ERROR); //$NON-NLS-1$
 		}
 
 		return ks;

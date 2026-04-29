@@ -26,8 +26,9 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.signers.batch.xml.SingleSign;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.triphase.server.ConfigManager;
+import es.gob.afirma.triphase.server.FileSystemUtils;
 
 final class TempStoreFileSystem implements TempStore {
 
@@ -37,7 +38,7 @@ final class TempStoreFileSystem implements TempStore {
 
 	private static File tempDir;
 
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 	private static final MessageDigest MD;
 	static {
 		try {
@@ -53,7 +54,8 @@ final class TempStoreFileSystem implements TempStore {
 			tempDir = ConfigManager.getTempDir();
 		}
 		else {
-			tempDir = BatchConfigManager.getTempDir();
+			final String defaultDir = System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
+			tempDir = new File(defaultDir);
 		}
 	}
 
@@ -64,13 +66,15 @@ final class TempStoreFileSystem implements TempStore {
 	@Override
 	public void store(final byte[] dataToSave, final SingleSign ss, final String batchId) throws IOException {
 		store(dataToSave, getFilename(ss, batchId));
-		LOGGER.fine("Firma '" + ss.getId() + "' almacenada temporalmente en " + getFilename(ss, batchId)); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.fine("Firma '" + LoggerUtil.getTrimStr(ss.getId()) + "' almacenada temporalmente en " + getFilename(ss, batchId)); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
 	public void store(final byte[] dataToSave, final String filename) throws IOException {
+
+		final File outFile = composeTargetFile(tempDir, filename);
 		try (
-			final OutputStream fos = new FileOutputStream(new File(tempDir, filename));
+			final OutputStream fos = new FileOutputStream(outFile);
 			final BufferedOutputStream bos = new BufferedOutputStream(
 				fos,
 				dataToSave.length
@@ -81,6 +85,20 @@ final class TempStoreFileSystem implements TempStore {
 			// Cerramos explicitamente
 			bos.close();
 		}
+	}
+
+	private static File composeTargetFile(final File baseDir, final String filename) throws IOException {
+		File targetFile;
+		try {
+			targetFile = FileSystemUtils.composeTargetFile(baseDir, filename);
+		}
+		catch (final SecurityException e) {
+			throw new IOException("Se intento componer una ruta de fichero fuera del directorio destino", e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new IOException("No se pudo componer la ruta del fichero destino", e); //$NON-NLS-1$
+		}
+		return targetFile;
 	}
 
 	@Override
@@ -108,9 +126,11 @@ final class TempStoreFileSystem implements TempStore {
 			}
 		}
 
+		final File inFile = composeTargetFile(tempDir, filename);
+
 		byte[] ret;
 		try (
-			final InputStream fis = new FileInputStream(new File(tempDir, filename));
+			final InputStream fis = new FileInputStream(inFile);
 			final InputStream bis = new BufferedInputStream(fis);
 		) {
 			ret = AOUtil.getDataFromInputStream(bis);
@@ -125,7 +145,12 @@ final class TempStoreFileSystem implements TempStore {
 
 	@Override
 	public void delete(final String filename) {
-		new File(tempDir, filename).delete();
+		try {
+			final File targetFile = composeTargetFile(tempDir, filename);
+			targetFile.delete();
+		} catch (final IOException e) {
+			LOGGER.warning("No se pudo eliminar un fichero: " + e); //$NON-NLS-1$
+		}
 	}
 
 	private static String getFilename(final SingleSign ss, final String batchId) {

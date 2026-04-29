@@ -39,21 +39,21 @@ public final class SslSecurityManager {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] {
-		new X509TrustManager() {
-			@Override
-			public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-				return null;
+			new X509TrustManager() {
+				@Override
+				public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+					return null;
+				}
+				@Override
+				public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
+				@Override
+				public void checkServerTrusted(final X509Certificate[] certs, final String authType) {  /* No hacemos nada */  }
+
 			}
-			@Override
-			public void checkClientTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */ }
-			@Override
-			public void checkServerTrusted(final X509Certificate[] certs, final String authType) { /* No hacemos nada */  }
+		};
 
-		}
-	};
+	static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
 
-		static final HostnameVerifier DUMMY_HOSTNAME_VERIFIER = new HostnameVerifier() {
-		@Override
 		public boolean verify(final String hostname, final SSLSession session) {
 			return true;
 		}
@@ -222,17 +222,20 @@ public final class SslSecurityManager {
 	/**
 	 * Configura los almacenes de confianza de Java y Autofirma para la validaci&oacute;n de las
 	 * conexiones SSL.
+	 * @return Indica si el almac&eacute;n de confianza de la aplicaci&oacute;n existe y se
+	 * configur&aacute; correctamente.
 	 * @throws IOException Cuando falla la lectura del almac&eacute;n del cliente.
 	 * @throws GeneralSecurityException Cuando falla la carga del almac&eacute;n.
 	 */
-	public static void configureAfirmaTrustManagers() throws IOException, GeneralSecurityException {
+	public static boolean configureAfirmaTrustManagers() throws IOException, GeneralSecurityException {
 
 		final File trustStoreFile = TrustStoreManager.getJKSFile();
 
 		// Si no encontramos el almacen de confianza del Cliente @firma, no modificamos
 		// la configuracion SSL
 		if (!trustStoreFile.isFile()) {
-			return;
+			LOGGER.info("No se ha encontrado un almacen de confianza SSL de la aplicacion"); //$NON-NLS-1$
+			return false;
 		}
 
 		// Cargamos el almacen en memoria para no requerir ya el fichero
@@ -251,7 +254,8 @@ public final class SslSecurityManager {
 
 		// Agregamos los trustmanagers del Cliente @firma
 		if (trustStore.aliases() == null || !trustStore.aliases().hasMoreElements()) {
-			return;
+			LOGGER.info("No se han encontrado certificados en el almacen de confianza SSL de la aplicacion"); //$NON-NLS-1$
+			return false;
 		}
 
 		final X509TrustManager[] trustManagers = new X509TrustManager[2];
@@ -278,6 +282,8 @@ public final class SslSecurityManager {
 
 		// Declaramos haber configurado el almacen de confianza del cliente @firma
 		afirmaTrustStoreConfigured = true;
+
+		return true;
 	}
 
 	/**

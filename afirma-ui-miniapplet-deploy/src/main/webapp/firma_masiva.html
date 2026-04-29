@@ -4,7 +4,7 @@
 	<title>P&aacute;gina de prueba de firma masiva</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 	<!-- <script type="text/javascript" src="js/miniapplet_1_6_5.js"></script> -->
-	<script type="text/javascript" src="js/autoscript.js"></script>
+	<script type="text/javascript" src="js/autoscript_1_9_1.js"></script>
 	<script type="text/javascript">
 	
 		// Compression: packed
@@ -161,7 +161,8 @@
 					var data = docs[indiceN3];
 					
 					var paramsParam = "";
-					paramsParam = paramsParam + "mode=explicit";
+					paramsParam += "mode=explicit";
+					paramsParam += "\nfilters=expiredCertificates:true";
 
 					if (indiceN3 + 1 == docs.length) {
 						document.getElementById("newDocParam").value = (indiceN3 + 1) + " Preparando resultado...";

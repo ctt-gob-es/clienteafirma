@@ -112,7 +112,9 @@ final class ConfirmImportCertDialog extends JDialog  {
 		final JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 11, 560, 227);
 
-		final String[] columnNames = { "Nombre", "Emitido por", "Fecha de expiracion" };  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		final String[] columnNames = { SimpleAfirmaMessages.getString("TrustedCertificatesDialog.33"),  //$NON-NLS-1$
+										SimpleAfirmaMessages.getString("TrustedCertificatesDialog.34"),  //$NON-NLS-1$
+										SimpleAfirmaMessages.getString("TrustedCertificatesDialog.35") };  //$NON-NLS-1$
 		final DefaultTableModel model = new DefaultTableModel(null, columnNames) {
 			/** Serial Id. */
 			private static final long serialVersionUID = -8796402986663262751L;

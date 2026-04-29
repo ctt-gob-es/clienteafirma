@@ -15,10 +15,13 @@ import java.security.cert.Certificate;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 
-/** Utilidad para la firma en una operaci&oacute;n trif&aacute;sica.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+/**
+ * Utilidad para la firma en una operaci&oacute;n trif&aacute;sica.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
+ */
 public final class TriphaseDataSigner {
 
 	/** Nombre de la propiedad para almac&eacute;n de prefirmas. */
@@ -34,7 +37,8 @@ public final class TriphaseDataSigner {
 		// No instanciable
 	}
 
-	/** Realiza la operaci&oacute;n de Firma (PKCS#1) sobre una sesi&oacute;n de firma
+	/**
+	 * Realiza la operaci&oacute;n de Firma (PKCS#1) sobre una sesi&oacute;n de firma
 	 * trif&aacute;sica.
 	 * @param signer Firmador PKCS#1.
 	 * @param algorithm Algoritmo de firma.
@@ -44,7 +48,8 @@ public final class TriphaseDataSigner {
 	 * @param extraParams Par&aacute;metros adicionales (aqu&iacute; solo aplican a la
 	 *                    firma PKCS#1.
 	 * @return Sesi&oacute;n trif&aacute;sica con las firmas PKCS#1 incluidas.
-	 * @throws AOException Si ocurre cualquier error durante la firma. */
+	 * @throws AOException Si ocurre cualquier error durante la firma.
+	 */
 	public static TriphaseData doSign(final AOPkcs1Signer signer,
 			                          final String algorithm,
 			                          final PrivateKey key,
@@ -53,7 +58,7 @@ public final class TriphaseDataSigner {
 			                          final Properties extraParams) throws AOException {
 
 		if (triphaseData.getSignsCount() < 1) {
-			throw new AOException("No se han recibido prefirmas que firmar");  //$NON-NLS-1$
+			throw new AOException("No se han recibido prefirmas que firmar", ErrorCode.ThirdParty.PRESIGNS_NOT_FOUND);  //$NON-NLS-1$
 		}
 
 		for (int i = 0; i < triphaseData.getSignsCount(); i++) {
@@ -61,7 +66,7 @@ public final class TriphaseDataSigner {
 			final String base64PreSign = signConfig.getProperty(PROPERTY_NAME_PRESIGN);
 			if (base64PreSign == null) {
 				throw new AOException(
-					"El servidor no ha devuelto la prefirma numero " + i //$NON-NLS-1$
+					"El servidor no ha devuelto la prefirma numero " + i, ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE //$NON-NLS-1$
 				);
 			}
 
@@ -70,7 +75,7 @@ public final class TriphaseDataSigner {
 				preSign = Base64.decode(base64PreSign);
 			}
 			catch (final IOException e) {
-				throw new AOException("Error decodificando la prefirma: " + e, e); //$NON-NLS-1$
+				throw new AOException("Error decodificando la prefirma: " + e, e, ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE); //$NON-NLS-1$
 			}
 
 			final String signatureAlgorithm = AOSignConstants.composeSignatureAlgorithmName(algorithm, key.getAlgorithm());

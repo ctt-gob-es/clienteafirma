@@ -39,6 +39,9 @@ final class PostSigner {
 
 	/** Identificador de la operaci&oacute;n de postfirma en servidor. */
 	private static final String OPERATION_POSTSIGN = "post"; //$NON-NLS-1$
+	
+	/** Timeout de espera para descartar la lectura de petici&oacute;n. */
+	private static final String SERVICE_TIMEOUT_PARAM = "servicetimeout"; //$NON-NLS-1$
 
 	private PostSigner() {
 		// No instanciable

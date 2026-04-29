@@ -290,7 +290,7 @@ final class ConfiguratorLinux implements Configurator {
 		try {
 			GraphicsEnvironment.getLocalGraphicsEnvironment();
 		}
-		catch (final UnsatisfiedLinkError e) {
+		catch (final Throwable e) {
 			headless = true;
 		}
 		return headless;

@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-client</artifactId>
-	<version>1.9</version>
+	<version>1.9.1</version>
 	<packaging>pom</packaging>
 	
 	<name>afirma-client</name>
@@ -14,7 +14,7 @@
 	
 	<developers>
 		<developer>
-			<name>Secretaría General de Administración Digital</name>
+			<name>Agencia Estatal de Administración Digital</name>
 			<email>soporte.afirma@correo.gob.es</email>
 			<organization>Gobierno de España</organization>
 			<organizationUrl>https://administracionelectronica.gob.es</organizationUrl>
@@ -37,30 +37,27 @@
 		<developerConnection>scm:git:ssh://github.com/ctt-gob-es/clienteafirma.git</developerConnection>
 		<url>https://github.com/ctt-gob-es/clienteafirma</url>
 	</scm>
-	
-	<distributionManagement>
-	  <snapshotRepository>
-		<id>ossrh</id>
-		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-	  </snapshotRepository>
-	  <repository>
-		<id>ossrh</id>
-		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-	  </repository>
-	</distributionManagement>
-	
-	<properties>
-		<clienteafirma.version>1.9</clienteafirma.version>
-		<triphase.service.version>2.8.1</triphase.service.version>
-		<jmulticard.version>2.0</jmulticard.version>
-		<afirma.lib.itext.version>1.6</afirma.lib.itext.version>
-		<afirma.lib.others.version>0.0.8</afirma.lib.others.version>
-		<spongycastle.version>1.58.0.0</spongycastle.version>
-		<afirma.legible.version>1_8_0</afirma.legible.version>
-		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
 
-		<jdk.version>1.7</jdk.version>
+	<properties>
+		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+		<jdk.version>1.8</jdk.version>
+		<clienteafirma.version>1.9.1</clienteafirma.version>
+		<afirma.legible.version>1_9_1</afirma.legible.version>
+		<triphase.service.version>2.9.1</triphase.service.version>
+		<jmulticard.version>2.1</jmulticard.version>
 		
+		<afirma.lib.itext.version>1.7</afirma.lib.itext.version>
+		<afirma.lib.others.version>0.0.10</afirma.lib.others.version>
+		<spongycastle.version>1.58.0.0</spongycastle.version>
+		
+		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+		<central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
+
+		<!-- test-dependencies -->		
 		<junit.version>4.13.2</junit.version>
 	</properties>
 
@@ -154,7 +151,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.10.1</version>
+					<version>${maven-compiler-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -180,9 +177,10 @@
 				<module>afirma-crypto-batch-client</module>
 				<module>afirma-crypto-cadestri-client</module>
 				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
-				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-cipher2</module>
 				<module>afirma-crypto-core-pkcs7-tsp</module>
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
@@ -198,17 +196,12 @@
 				<module>afirma-keystores-mozilla</module>
 				<module>afirma-keystores-jmulticard-ui</module>
 				<module>afirma-ui-utils</module>
-				<module>afirma-ui-core-jse</module>
-				<module>afirma-ui-core-jse-keystores</module>
 				<module>afirma-core-massive</module>
-				<module>afirma-ui-simple-configurator-common</module>
 				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
-				<module>afirma-simple-plugin-hash</module>
-				<module>afirma-simple-plugin-validatecerts</module>
 			</modules>
 			
       		<build>
@@ -236,6 +229,39 @@
 
 		<!-- ===== Construccion para la generacion de aplicaciones finales y servicios ===== -->
 		<profile>
+			<id>autofirma</id>
+			<modules>
+				<!-- Modulos core -->
+				<module>afirma-ui-simple-configurator-common</module>
+				<module>afirma-ui-core-jse</module>
+				<module>afirma-ui-core-jse-keystores</module>
+				<!-- Aplicaciones -->
+				<module>afirma-simple</module>
+				<module>afirma-ui-simple-configurator</module>
+				
+			</modules>
+			
+			<!-- Las instrucciones de construccion particulares estan dentro de cada modulo.
+			     Aqui se agregan unas genericas por si fuese necesario -->
+			<build>
+       			<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+							<fork>true</fork>
+							<debug>false</debug>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+			
+		</profile>
+		
+		<!-- ===== Construccion para la generacion de aplicaciones finales y servicios ===== -->
+		<profile>
 			<id>env-install</id>
 			<activation>
 				<property>
@@ -245,9 +271,18 @@
 			</activation>
 			
 			<modules>
+				<!-- Modulos core -->
+				<module>afirma-ui-simple-configurator-common</module>
+				<module>afirma-ui-core-jse</module>
+				<module>afirma-ui-core-jse-keystores</module>
+
 				<!-- Aplicaciones -->
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
+				
+				<!-- Plugins -->
+				<module>afirma-simple-plugin-hash</module>
+				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Servicios -->
 				<module>afirma-server-triphase-signer</module>
@@ -286,9 +321,11 @@
 				<module>afirma-crypto-batch-client</module>
 				<module>afirma-crypto-cadestri-client</module>
 				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
-				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-cipher2</module>
+				<module>afirma-crypto-core-pkcs7-tsp</module>
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
 				<module>afirma-crypto-padestri-client</module>
@@ -312,12 +349,14 @@
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
-				<module>afirma-simple-plugin-hash</module>
-				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Aplicaciones -->
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
+				
+				<!-- Plugins -->
+				<module>afirma-simple-plugin-hash</module>
+				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Servicios -->
 				<module>afirma-server-triphase-signer</module>
@@ -358,11 +397,11 @@
 				<module>afirma-core-prefs</module>
 				<module>afirma-crypto-batch-client</module>
 				<module>afirma-crypto-cadestri-client</module>
-				<module>afirma-crypto-cipher</module>
 				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
-				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-cipher2</module>
 				<module>afirma-crypto-core-pkcs7-tsp</module>
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
@@ -374,7 +413,6 @@
 				<module>afirma-crypto-xadestri-client</module>
 				<module>afirma-crypto-xmlsignature</module>
 				<module>afirma-crypto-ooxml</module>
-				<module>afirma-crypto-jarverifier</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
 				<module>afirma-keystores-jmulticard-ui</module>
@@ -388,13 +426,7 @@
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
-				<module>afirma-simple-plugin-hash</module>
-				<module>afirma-simple-plugin-validatecerts</module>
 				
-				<!-- Servicios -->
-				<module>afirma-server-triphase-signer</module>
-				<module>afirma-signature-retriever</module>
-				<module>afirma-signature-storage</module>
 			</modules>
 			
 			<distributionManagement>
@@ -449,9 +481,10 @@
 				<module>afirma-crypto-batch-client</module>
 				<module>afirma-crypto-cadestri-client</module>
 				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cms</module>
 				<module>afirma-crypto-cades</module>
 				<module>afirma-crypto-cades-multi</module>
-				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-cipher2</module>
 				<module>afirma-crypto-core-pkcs7-tsp</module>
 				<module>afirma-crypto-core-xml</module>
 				<module>afirma-crypto-odf</module>
@@ -476,13 +509,14 @@
 				<module>afirma-server-triphase-signer-document</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
-				<module>afirma-simple-plugin-hash</module>
-				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Aplicaciones -->
-				<module>afirma-ui-miniapplet</module>
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>
+				
+				<!-- Plugins -->
+				<module>afirma-simple-plugin-hash</module>
+				<module>afirma-simple-plugin-validatecerts</module>
 				
 				<!-- Servicios -->
 				<module>afirma-server-triphase-signer</module>
@@ -495,7 +529,7 @@
 					<plugin>
 					  <groupId>org.apache.maven.plugins</groupId>
 					  <artifactId>maven-source-plugin</artifactId>
-					  <version>2.2.1</version>
+					  <version>${maven-source-plugin.version}</version>
 					  <executions>
 						<execution>
 						  <id>attach-sources</id>
@@ -508,7 +542,7 @@
 					<plugin>
 					  <groupId>org.apache.maven.plugins</groupId>
 					  <artifactId>maven-javadoc-plugin</artifactId>
-					  <version>2.9.1</version>
+					  <version>${maven-javadoc-plugin.version}</version>
 					  <executions>
 						<execution>
 						  <id>attach-javadocs</id>
@@ -536,7 +570,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-release-plugin</artifactId>
-						<version>2.5.3</version>
+						<version>${maven-release-plugin.version}</version>
 						<configuration>
 							<tagNameFormat>${project.name}_@{project.version}</tagNameFormat>
 						</configuration>
@@ -545,7 +579,7 @@
 					<plugin>
 					  <groupId>org.apache.maven.plugins</groupId>
 					  <artifactId>maven-gpg-plugin</artifactId>
-					  <version>3.1.0</version>
+					  <version>${maven-gpg-plugin.version}</version>
 					  <executions>
 						<execution>
 						  <id>sign-artifacts</id>
@@ -556,6 +590,17 @@
 						</execution>
 					  </executions>
 					</plugin>
+
+					<plugin>
+					  <groupId>org.sonatype.central</groupId>
+					  <artifactId>central-publishing-maven-plugin</artifactId>
+					  <version>${central-publishing-maven-plugin.version}</version>
+					  <extensions>true</extensions>
+					  <configuration>
+						<publishingServerId>central</publishingServerId>
+					  </configuration>
+					</plugin>
+					
 				</plugins>
 			</build>
 		</profile>

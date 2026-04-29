@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Propietats de les signatures i marques visibles PDF</title> 
+  <meta name="AppleTitle" content="Ayuda de Autofirma" /> 
+  <meta name="AppleIcon" content="AutofirmaHelpIcon.png" /> 
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+ </head> 
+ <body>
+  <h2>Propietats de les signatures visibles PDF</h2> 
+  <p>En habilitar la creació de signatures visibles PDF, es donarà a l&apos;usuari la possibilitat de seleccionar una àrea de signatura sobre el PDF que vagi a signar en format PAdES.</p> 
+  <p align="center"> <img src="../gfx/menufirmaspadesvisible1_mini.png" alt="Ventana de selección de posición de firma" /> </p> 
+  <p> Aquest menú permet utilitzar el ratolí per a seleccionar una àrea rectangular d&apos;una de les pàgines del PDF. </p> 
+  <ul> 
+   <li><b>X</b>: Nombre de píxels en l&apos;eix X en el comença l&apos;àrea de signatura.</li> 
+   <li><b>I</b>: Nombre de píxels en l&apos;eix I en el comença l&apos;àrea de signatura.</li> 
+   <li><b>Amplària</b>: Nombre de píxels que s&apos;estén en horitzontal l&apos;àrea de signatura.</li> 
+   <li><b>Altura</b>: Nombre de píxels que s&apos;estén en vertical l&apos;àrea de signatura.</li> 
+   <li><b>(Previsualització de la pàgina del PDF)</b>: L&apos;usuari ha de fer clic sostingut i arrossegar el ratolí sobre aquest àrea per a seleccionar l&apos;àrea visible de signatura. Les posicions i la grandària de l&apos;àrea de signatura s&apos;expressa en píxels respecte a l&apos;escala en la qual es mostra la imatge de la pàgina.</li> 
+   <li><b>&lt;&lt;</b>: Botó per a desplaçar la visualització a la primera pàgina del PDF.</li> 
+   <li><b>&lt;</b>: Botó per a desplaçar la visualització a la pàgina anterior del PDF. Pot reproduir-se aquest comportament prement la tecla &quot;cursor esquerre&quot; del seu teclat.</li> 
+   <li><b>&gt;</b>: Botó per a desplaçar la visualització a la següent pàgina del PDF. Pot reproduir-se aquest comportament prement la tecla &quot;cursor dret&quot; del seu teclat. Si ens trobem en l&apos;última pàgina del PDF aquesta opció ens permetrà crear una pàgina en blanc al final del document en la qual es podrà inserir la signatura.</li> 
+   <li><b>&gt;&gt;</b>: Botó per a desplaçar la visualització a l&apos;última pàgina del PDF.</li> 
+  </ul> 
+  <p> En aquesta mateixa finestra, en la part inferior, es permet indicar la pàgina o pàgines on ha d&apos;aparèixer la signatura visible. Les opcions que es permeten són les següents: </p> 
+  <ul> 
+   <li> <b>Pàgina actual</b>: La signatura visible apareixerà en la pàgina que s&apos;hagi seleccionat en el selector de posició superior. </li> 
+   <li> <b>Totes les pàgines</b>: La signatura visible apareixerà en totes les pàgines del document. </li> 
+   <li> <b>Selecció de pàgines</b>: En aquesta opció es permet seleccionar la pàgina o rang de pàgines on apareixerà la signatura visible. Si es desitja indicar una pàgina o diverses pàgines on estampar la signatura visible, és possible indicant pàgina a pàgina amb una separació de comes (<code>1,4,7</code>: S&apos;estampa en les pàgines 1, 4 i 7) o indicant un rang de pàgines a través d&apos;un guió (<code>1-8</code>: S&apos;estampa en les pàgines des de la 1 fins a la 8). També es permet indicar les pàgines segons la seva posició des del final del document. Per a això s&apos;utilitzarà la posició amb un valor negatiu (<code>-2</code>: Estamparà la signatura en la penúltima pàgina). Aquests mecanismes es poden combinar. Per exemple: 
+    <ul> 
+     <li><i>3-6, 8, 10--1</i>: Indica que s&apos;estamparà en les pàgines des de la 3 a la 6, en la 8 i des de la 10 a l&apos;última pàgina.</li> 
+    </ul> </li> 
+  </ul> 
+  <p> El botó que conté un signe d&apos;interrogació (<b>?</b>) permet obrir la pàgina d&apos;ajuda per a la signatura visible. </p> 
+  <p> L&apos;àrea de signatura desaparecera en canviar de pantalla del PDF. Seleccioni l&apos;àrea per a la signatura visible del PDF i a continuació, premi el botó <b>Següent</b>. </p> 
+  <p> A continuació, es mostrarà una nova finestra en la qual l&apos;usuari podrà configurar l&apos;aspecte de la signatura. </p> 
+  <p align="center"> <img src="../gfx/menufirmaspadesvisible2_mini.png" alt="Ventana de configuración del aspecto de firma" /> </p> 
+  <p> Aquesta interfície permet configurar les següents propietats per a la signatura visible: </p> 
+  <ul> 
+   <li><b>Vista prèvia</b>. Pot configurar-se el fitxer d&apos;imatge prement sobre la previsualització de la signatura. No es permeten imatges amb transparències.</li> 
+   <li><b>Configuració de signatura:</b></li> 
+   <ul> 
+    <li><b>Imatge de signatura:</b> Ruta de la imatge amb la rúbrica de signatura. Pot seleccionar-se mitjançant el botó <b>Examinar</b> i eliminar-se mitjançant el botó <b>Netejar</b>. No s&apos;admeten transparències en la imatge i s&apos;ometran en cas de trobar-se.</li> 
+    <li><b>Text de signatura: </b> Text a mostrar en la signatura del PDF. Per a la configuració del text que es desitja mostrar en la signatura és possible utilitzar una sèrie de paraules clau que seran substituïdes pels textos apropiats del titular o emissor del certificat de signatura en el moment de signar. Aquestes són:</li> 
+    <ul> 
+     <p></p> 
+     <li><b>$$SUBJECTCN$$</b> 
+      <ul> 
+       <li>Nom comú (CN, Common Name) dins del X.500 Principal del titular del certificat de signatura.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$ISSUERCN$$</b> 
+      <ul> 
+       <li>Nom comú (CN, Common Name) dins del X.500 Principal de l&apos;emissor del certificat de signatura.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$CERTSERIAL$$</b> 
+      <ul> 
+       <li>Número de sèrie del certificat de signatura.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$SIGNDATE=PATRÓ$$</b> 
+      <ul> 
+       <li>Data de la signatura, on PATRÓ ha d&apos;indicar el format en el qual ha de mostrar-se la data, seguint l&apos;esquema definit per Oracle per a la classe SimpleDateFormat.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$GIVENNAME$$</b> 
+      <ul> 
+       <li>Nom del titular (G, Given Name) declarat en el certificat. Aquest valor podria no aparèixer en el certificat, i en aquest cas, el patró se substituirà per cadena buida.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$SURNAME$$</b> 
+      <ul> 
+       <li>Cognoms del titular (SN, Surname) declarat en el certificat. Aquest valor podria no aparèixer en el certificat, i en aquest cas, el patró se substituirà per cadena buida.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$ORGANIZATION$$</b> 
+      <ul> 
+       <li>Organització (O, Organization) del titular declarada en el certificat. Aquest valor podria no aparèixer en el certificat, i en aquest cas, el patró se substituirà per cadena buida.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$PSEUDONYM$$</b> 
+      <ul> 
+       <li>Pseudònim del certificat. Aquest valor podria no aparèixer en el certificat, i en aquest cas, el patró se substituirà per cadena buida.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$OU$$</b> 
+      <ul> 
+       <li>Unitat Organitzativa (OU, Organization Unit) del certificat. Aquest valor podria no aparèixer en el certificat, i en aquest cas, el patró se substituirà per cadena buida.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$OUS$$</b> 
+      <ul> 
+       <li>Llistat d&apos;Unitats Organitzatives del certificat. En cas que hi hagués més d&apos;una, es presentarien totes separades per &quot;, &quot;. El certificat podria no tenir definides Unitats Organitzatives, i en aquest cas, el patró se substituirà per cadena buida.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$TITLE$$</b> 
+      <ul> 
+       <li>Informació sobre el lloc o rol del titular del certificat. Aquest valor podria no aparèixer en el certificat, i en aquest cas, el patró se substituirà per cadena buida.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$REASON$$</b> 
+      <ul> 
+       <li>Raó per la qual se signa el PDF, configurada l&apos;operació de signatura mitjançant la propietat &quot;signatureReason&quot;. El patró se substituirà per cadena buida si no s&apos;hagués establert aquest valor.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$LOCATION$$</b> 
+      <ul> 
+       <li>Ciutat en la qual se signa el PDF, configurada l&apos;operació de signatura mitjançant la propietat &quot;signatureProductionCity&quot;. El patró se substituirà per cadena buida si no s&apos;hagués establert aquest valor.</li> 
+      </ul></li> 
+     <p></p> 
+     <p></p> 
+     <li><b>$$CONTACT$$</b> 
+      <ul> 
+       <li>Informació de contacte del signant del PDF, configurada l&apos;operació de signatura mitjançant la propietat &quot;signatureContact&quot;. El patró se substituirà per cadena buida si no s&apos;hagués establert aquest valor.</li> 
+      </ul></li> 
+     <p></p> 
+    </ul> 
+    <li>Al text se li poden aplicar les següents opcions de format:</li> 
+    <ul> 
+     <li>Font de lletra.</li> 
+     <li>Grandària de lletra.</li> 
+     <li>Rotació del text.</li> 
+     <li>Estil de font (Negreta, Cursiva, Subratllat o Ratllat).</li> 
+     <li>Color del text.</li> 
+    </ul> 
+    <p>La casella &quot;Recordar configuració&quot; permet guardar la configuració establerta (text, imatge i estils) per a utilitzar-la en les següents signatures. El botó &quot;Restaurar configuració per defecte&quot; retornarà la configuració del panell als valors per defecte.</p> 
+   </ul> 
+   <p> Si no es desitja agregar una signatura visible al PDF, abans de prémer el botó signar en la pantalla de signatura, asseguri&apos;s que no es troba seleccionada la casella &quot;Fer la signatura visible dins del PDF&quot;. </p> 
+   <br /> 
+   <h2>Propietats de les marques visibles</h2> 
+   <p>En habilitar la inserció de marques visibles en el PDF, es donarà a l&apos;usuari la possibilitat de seleccionar una àrea sobre el PDF que vagi a signar.</p> 
+   <p align="center"> <img src="../gfx/menufirmaspadesvisible3_mini.png" alt="Ventana de selección de posición de marca" /> </p> 
+   <p> Aquest menú permet utilitzar el ratolí per a seleccionar una àrea rectangular en una o totes les pàgines del PDF. </p> 
+   <ul> 
+    <li><b>Seleccionar imatge:</b> En prémer aquest botó s&apos;obrirà una finestra en la qual podrà seleccionar la imatge de marca. No s&apos;admeten transparències en la imatge i s&apos;ometran en cas de trobar-se</li> 
+    <li><b>X</b>: Nombre de píxels en l&apos;eix X en el qual situar la marca.</li> 
+    <li><b>I</b>: Nombre de píxels en l&apos;eix I en el qual situar la marca.</li> 
+    <li><b>Amplària</b>: Nombre de píxels que s&apos;ha d&apos;estendre en horitzontal la marca.</li> 
+    <li><b>Altura</b>: Nombre de píxels que s&apos;ha d&apos;estendre en vertical la marca.</li> 
+    <li><b>(Previsualització de la pàgina del PDF):</b> L&apos;usuari ha de fer clic sostingut i arrossegar el ratolí sobre aquest àrea per a seleccionar l&apos;àrea en el qual es col·locarà la marca.</li> 
+    <li><b>&lt;&lt;:</b> Botó per a desplaçar la visualització a la primera pàgina del PDF.</li> 
+    <li><b>&lt;:</b> Botó per a desplaçar la visualització a la pàgina anterior del PDF. Pot reproduir-se aquest comportament prement la tecla &quot;cursor esquerre&quot; del seu teclat.</li> 
+    <li><b>&gt;:</b> Botó per a desplaçar la visualització a la següent pàgina del PDF. Pot reproduir-se aquest comportament prement la tecla &quot;cursor dret&quot; del seu teclat.</li> 
+    <li><b>&gt;&gt;:</b> Botó per a desplaçar la visualització a l&apos;última pàgina del PDF.</li> 
+    <li><b>Incloure imatge en totes les pàgines:</b> Casella per a seleccionar que la marca s&apos;insereixi en totes les pàgines del PDF.</li> 
+   </ul> 
+   <p> L&apos;àrea de marca desaparecera en canviar de pàgina del PDF. Seleccioni la pàgina, imatge i àrea per a la marca visible en el PDF i a continuació, premi el botó <b>Acceptar</b>. </p> 
+   <p> Si no es desitja agregar una marca visible al PDF, abans de prémer el botó signar en la pantalla de signatura, asseguri&apos;s que no es troba seleccionada la casella &quot;<b>Inserir una marca visible dins del PDF</b>&quot;. </p> 
+  </ul>  
+ </body>
+</html>

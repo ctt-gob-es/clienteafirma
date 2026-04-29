@@ -10,6 +10,7 @@
 package es.gob.afirma.core.misc.protocol;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +20,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.http.DataDownloader;
 
@@ -55,6 +57,9 @@ public abstract class UrlParameters {
 	/** Par&aacute;metro de entrada con la clave para el cifrado del documento. */
 	protected static final String KEY_PARAM = "key"; //$NON-NLS-1$
 
+	/** Par&aacute;metro de entrada con la clave AES para el cifrado del documento. */
+	protected static final String CIPHER_PARAM = "cipher"; //$NON-NLS-1$
+
 	/** Par&aacute;metro de entrada con el identificador del fichero remoto de datos. */
 	protected static final String FILE_ID_PARAM = "fileid"; //$NON-NLS-1$
 
@@ -71,21 +76,25 @@ public abstract class UrlParameters {
 
 	/** Versi&oacute;n m&iacute;nima de cliente requetida. */
 	protected static final String MINIMUM_CLIENT_VERSION_PARAM = "mcv"; //$NON-NLS-1$
-	
+
 	/** Nombre de aplicaci&oacute;n o dominio desde el que se realiza la llamada. */
 	protected static final String APP_NAME_PARAM = "appname"; //$NON-NLS-1$
+
+	/** Tiempo de espera para la lectura de peticiones. */
+	protected static final String SERVICE_TIMEOUT_PARAM = "servicetimeout"; //$NON-NLS-1$
 
 	/** Codificaci&oacute;n por defecto. */
 	private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
 	protected byte[] data = null;
 	private String fileId = null;
-	private byte[] desKey = null;
+	private byte[] cipherConfig = null;
 	private URL retrieveServletUrl = null;
 	private URL storageServerUrl = null;
 	private String id = null;
 	private String minimumClientVersion = null;
 	private boolean activeWaiting = false;
+	private int serviceTimeout = -1;
 
 	private String defaultKeyStore = null;
 	private String defaultKeyStoreLib = null;
@@ -160,12 +169,6 @@ public abstract class UrlParameters {
 		this.fileId = fileId;
 	}
 
-	/** Establece la clave DES de cifrado de los datos a subir al servidor intermedio.
-	 * @param key Clave DES de cifrado de los datos a subir al servidor intermedio */
-	private void setDesKey(final byte[] key) {
-		this.desKey = key != null ? Arrays.copyOf(key, key.length) : null;
-	}
-
 	/** Establece la URL de subida al servidor intermedio.
 	 * @param retrieveServletUrl URL de subida al servidor intermedio */
 	void setRetrieveServletUrl(final URL retrieveServletUrl) {
@@ -182,12 +185,6 @@ public abstract class UrlParameters {
 	 * @return Identificador de los datos en el servidor intermedio */
 	public String getFileId() {
 		return this.fileId;
-	}
-
-	/** Obtiene la clave DES de cifrado de los datos a subir al servidor intermedio.
-	 * @return Clave DES de cifrado de los datos a subir al servidor intermedio */
-	public byte[] getDesKey() {
-		return this.desKey != null ? Arrays.copyOf(this.desKey, this.desKey.length) : null;
 	}
 
 	/** Obtiene la URL de subida al servidor intermedio.
@@ -250,15 +247,62 @@ public abstract class UrlParameters {
 		this.id = sessionId;
 	}
 
-	void setCommonParameters(final Map<String, String> params) throws ParameterException {
+	void setCipherConfig(final byte[] cipherConfig) {
+		this.cipherConfig = cipherConfig;
+	}
 
-		setDesKey(verifyCipherKey(params));
+	public byte [] getCipherConfig() {
+		return this.cipherConfig;
+	}
+
+	void setServiceTimeout(final int serviceTimeout) {
+		this.serviceTimeout = serviceTimeout;
+	}
+
+	public int getServiceTimeout() {
+		return this.serviceTimeout;
+	}
+
+	void setCommonParameters(final Map<String, String> params) throws ParameterException, ParameterLocalAccessRequestedException{
+
+		if (params.containsKey(CIPHER_PARAM)) {
+			try {
+				byte[] decodedCipherConfig = Base64.decode(params.get(CIPHER_PARAM).replace("_", "/").replace("-", "+"));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				if (params.containsKey(KEY_PARAM)) {
+					final String cipherKeyDES = verifyDESCipherKey(params);
+					if (cipherKeyDES != null) {
+						decodedCipherConfig = addLegacyDesConfig(decodedCipherConfig, cipherKeyDES);
+					}
+				}
+				setCipherConfig(decodedCipherConfig);
+			} catch (final IOException e) {
+				throw new ParameterException("El JSON para la clave de cifrado no esta formado correctamente",  //$NON-NLS-1$
+												ErrorCode.Request.UNSUPPORTED_CIPHER_KEY);
+			}
+		} else if (params.containsKey(KEY_PARAM)) {
+			final String cipherKeyDES = verifyDESCipherKey(params);
+			if (cipherKeyDES != null) {
+				setCipherConfig(createDesJSON(cipherKeyDES).getBytes());
+			}
+		}
 
 		setActiveWaiting(params.containsKey(ACTIVE_WAITING_PARAM) &&
 				Boolean.parseBoolean(params.get(ACTIVE_WAITING_PARAM)));
 
 		if (params.containsKey(MINIMUM_CLIENT_VERSION_PARAM)) {
 			setMinimumClientVersion(params.get(MINIMUM_CLIENT_VERSION_PARAM));
+		}
+
+		if (params.containsKey(SERVICE_TIMEOUT_PARAM)) {
+			try {
+				final int servTimeout = Integer.parseInt(params.get(SERVICE_TIMEOUT_PARAM));
+				if (servTimeout >= 0) {
+					setServiceTimeout(servTimeout);
+				}
+			} catch (final Exception e) {
+				throw new ParameterException("El valor del parametro del tiempo de espera de lectura de los servicios no es valido",  //$NON-NLS-1$
+						ErrorCode.Request.UNSUPPORTED_CIPHER_KEY);
+			}
 		}
 
 		// Comprobamos que se nos hayan indicado los datos o, en su defecto, el
@@ -272,7 +316,8 @@ public abstract class UrlParameters {
 
 				if (!params.containsKey(RETRIEVE_SERVLET_PARAM)) {
 					throw new ParameterException(
-						"No se ha recibido la direccion del servlet para la recuperacion de los datos a firmar" //$NON-NLS-1$
+						"No se ha recibido la direccion del servlet para la recuperacion de los datos a firmar", //$NON-NLS-1$
+						ErrorCode.Request.RETRIEVE_URL_TO_SIGN_NOT_FOUND
 					);
 				}
 
@@ -283,14 +328,15 @@ public abstract class UrlParameters {
 						)
 					);
 				}
-				catch (final ParameterLocalAccessRequestedException e) {
+				catch (final LocalAccessRequestException e) {
 					throw new ParameterLocalAccessRequestedException(
-						"La URL del servicio de recuperacion de datos no puede ser local", e //$NON-NLS-1$
+						"La URL del servicio de recuperacion de datos no puede ser local", e, ErrorCode.Request.LOCAL_RETRIEVE_URL //$NON-NLS-1$
 					);
 				}
-				catch (final ParameterException e) {
+				catch (final IllegalArgumentException e) {
 					throw new ParameterException(
-						"Error al validar la URL del servlet de recuperacion: " + e, e //$NON-NLS-1$
+						"Error al validar la URL del servlet de recuperacion: " + e, e, //$NON-NLS-1$
+						ErrorCode.Request.INVALID_RETRIEVE_URL_TO_SIGN
 					);
 				}
 			}
@@ -299,7 +345,8 @@ public abstract class UrlParameters {
 			final String dataPrm = params.get(DATA_PARAM);
 			if (dataPrm.startsWith("file:/")) { //$NON-NLS-1$
 				throw new ParameterException(
-					"No se permite la lectura de ficheros locales: " + dataPrm //$NON-NLS-1$
+					"No se permite la lectura de ficheros locales: " + dataPrm, //$NON-NLS-1$
+					ErrorCode.Request.RETRIEVE_URL_TO_SIGN_CANT_BE_LOCAL
 				);
 			}
 			try {
@@ -314,17 +361,34 @@ public abstract class UrlParameters {
 			}
 			catch (final Exception e) {
 				throw new ParameterException(
-					"No se han podido obtener los datos: " + e, e //$NON-NLS-1$
+					"No se han podido obtener los datos: " + e, e, //$NON-NLS-1$
+					ErrorCode.Internal.LOADING_LOCAL_FILE_ERROR
 				);
 			}
 		}
+	}
+
+	/**
+	 * Agrega una propiedad adicional al JSON de configuraci&oacute;n en la que se
+	 * indica la clave DES necesaria para la compatibilidad con el JavaScript antiguo.
+	 * @param config JSON de configuraci&oacute;n de cifrado decodificado.
+	 * @param cipherKeyDES Clave DES.
+	 * @return Configuraci&oacute;n de cifrado de entrada junto con la clave DES.
+	 */
+	private static byte[] addLegacyDesConfig(final byte[] config, final String cipherKeyDES) {
+
+		String configJson = new String(config);
+		configJson = configJson.substring(0, configJson.length() - 1)
+				+ ",legacydes:\"" + cipherKeyDES + "\"}"; //$NON-NLS-1$ //$NON-NLS-2$
+
+		return configJson.getBytes();
 	}
 
 	/** Extrae y verifica la clave de cifrado de los par&aacute;metros de entrada.
 	 *  @param params Par&aacute;metros extra&iacute;dos de la URI.
 	 *  @return Clave de cifrado o <code>null</code> si no se declar&oacute; un valor en los par&aacute;metros.
 	 *  @throws ParameterException Cuando la clave de cifrado es err&oacute;nea. */
-	private static byte[] verifyCipherKey(final Map<String, String> params) throws ParameterException {
+	private static String verifyDESCipherKey(final Map<String, String> params) throws ParameterException {
 
 		// Comprobamos que se ha especificado la clave de cifrado
 		if (!params.containsKey(KEY_PARAM)) {
@@ -339,16 +403,28 @@ public abstract class UrlParameters {
 
 		// Comprobamos que la clave de cifrado tenga la longitud correcta
 		if (key.length() != CIPHER_KEY_LENGTH) {
-			throw new ParameterException("La longitud de la clave de cifrado no es correcta"); //$NON-NLS-1$
+			throw new ParameterException("La longitud de la clave de cifrado no es correcta", ErrorCode.Request.UNSUPPORTED_CIPHER_KEY); //$NON-NLS-1$
 		}
-		return key.getBytes();
+
+		return key;
 	}
 
-	/** Valida una URL para asegurar que cumple con los requisitos m&iacute;nimos de seguridad.
+	/** Forma un JSON con el algoritmo DES y su clave
+	 *  @param desKey ClaveDES.
+	 *  @return JSON con algoritmo y clave. */
+	private static String createDesJSON(final String desKey) {
+
+		return "{algo:\"DES\", key:\"" + desKey + "\"}";  //$NON-NLS-1$//$NON-NLS-2$
+	}
+
+	/**
+	 * Valida una URL para asegurar que cumple con los requisitos m&iacute;nimos de seguridad.
 	 * @param url URL que se desea validar.
 	 * @return URL formada y validada.
-	 * @throws ParameterException Cuando ocurre alg&uacute;n problema al validar la URL. */
-	protected static URL validateURL(final String url) throws ParameterException {
+	 * @throws IllegalArgumentException Cuando ocurre alg&uacute;n problema al validar la URL.
+	 * @throws LocalAccessRequestException Cuando la URL usa los dominios localhost o 127.0.0.1.
+	 */
+	protected static URL validateURL(final String url) throws IllegalArgumentException, LocalAccessRequestException {
 
 		// Comprobamos que la URL sea valida
 		final URL servletUrl;
@@ -356,25 +432,25 @@ public abstract class UrlParameters {
 			servletUrl = new URL(URLDecoder.decode(url, DEFAULT_ENCODING));
 		}
 		catch (final Exception e) {
-			throw new ParameterException(
+			throw new IllegalArgumentException(
 				"La URL proporcionada para el servlet no es valida (" + url + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		// Comprobamos que el protocolo este soportado
 		if (!"http".equals(servletUrl.getProtocol()) && !"https".equals(servletUrl.getProtocol())) { //$NON-NLS-1$ //$NON-NLS-2$
-			throw new ParameterException(
+			throw new IllegalArgumentException(
 				"El protocolo de la URL proporcionada para el servlet no esta soportado: " + servletUrl.getProtocol() //$NON-NLS-1$
 			);
 		}
 		// Comprobamos que la URL sea una llamada al servlet y que no sea local
 		if ("localhost".equals(servletUrl.getHost()) || "127.0.0.1".equals(servletUrl.getHost())) { //$NON-NLS-1$ //$NON-NLS-2$
-			throw new ParameterLocalAccessRequestedException(
+			throw new LocalAccessRequestException(
 				"El host de la URL proporcionada para el Servlet es local" //$NON-NLS-1$
 			);
 		}
 		// El servlet no puede recibir parametros
 		if (servletUrl.toString().indexOf('?') != -1 || servletUrl.toString().indexOf('=') != -1) {
-			throw new ParameterException("Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
 		}
 		return servletUrl;
 	}
@@ -453,5 +529,13 @@ public abstract class UrlParameters {
 			cleanedpath = null;
 		}
 		return cleanedpath;
+	}
+
+	protected static class LocalAccessRequestException extends Exception {
+		private static final long serialVersionUID = -2823729189870521694L;
+
+		protected LocalAccessRequestException(final String msg) {
+			super(msg);
+		}
 	}
 }

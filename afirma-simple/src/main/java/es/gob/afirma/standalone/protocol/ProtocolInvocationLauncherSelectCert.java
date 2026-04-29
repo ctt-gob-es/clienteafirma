@@ -16,31 +16,36 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.PasswordCallback;
+import javax.net.ssl.SSLHandshakeException;
 
+import es.gob.afirma.ciphers.ServerCipher;
+import es.gob.afirma.ciphers.ServerCipherFactory;
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOControlledException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.CertificateFilter;
+import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.SimpleKeyStoreManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
-import es.gob.afirma.standalone.crypto.CypherDataManager;
 import es.gob.afirma.standalone.so.macos.MacUtils;
+import es.gob.afirma.standalone.ui.ProgressInfoDialogManager;
 
 final class ProtocolInvocationLauncherSelectCert {
-
-	private static final String RESULT_CANCEL = "CANCEL"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -52,37 +57,23 @@ final class ProtocolInvocationLauncherSelectCert {
 	 * por protocolo.
 	 * @param options Par&aacute;metros de la operaci&oacute;n.
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
-	 * @param bySocket <code>true</code> para usar comunicaci&oacute;n por <i>socket</i> local,
-	 *                 <code>false</code> para usar servidor intermedio.
 	 * @return Certificado en base 64 o mensaje de error.
 	 * @throws SocketOperationException Si hay errores en la
-	 *                                  comunicaci&oacute;n por <i>socket</i> local. */
+	 *                                  comunicaci&oacute;n por <i>socket</i> local. 
+	 * @throws SSLHandshakeException Error al realizar conexi&oacute;n segura con el servidor */
 	static String processSelectCert(final UrlParametersToSelectCert options,
-			final int protocolVersion,
-			final boolean bySocket) throws SocketOperationException {
+			final ProtocolVersion protocolVersion) throws SocketOperationException, SSLHandshakeException {
 
 		if (options == null) {
-			LOGGER.severe("Las opciones de firma son nulas"); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NULL_URI;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			LOGGER.severe("Las opciones de seleccion de certificado son nulas"); //$NON-NLS-1$
+			throw new SocketOperationException(SimpleErrorCode.Request.REQUEST_URI_NOT_FOUND);
 		}
 
         // Comprobamos si soportamos la version del protocolo indicada
-		if (!ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.support(protocolVersion)) {
-			LOGGER.severe(String.format(
-					"Version de protocolo no soportada (%1s). Version actual: %s2. Hay que actualizar la aplicacion.", //$NON-NLS-1$
-					Integer.valueOf(protocolVersion),
-					Integer.valueOf(ProtocolInvocationLauncher.MAX_PROTOCOL_VERSION_SUPPORTED.getVersion())));
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_UNSUPPORTED_PROCEDURE;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+		if (!ProtocolInvocationLauncher.isCompatibleWith(protocolVersion)) {
+			LOGGER.severe(String.format("Version de protocolo no soportada (%1s). Hay que actualizar la aplicacion.", //$NON-NLS-1$
+					protocolVersion.toString()));
+			throw new SocketOperationException(SimpleErrorCode.Request.UNSUPPORTED_PROTOCOL_VERSION);
 		}
 
         // Comprobamos si se exige una version minima del Cliente
@@ -90,14 +81,14 @@ final class ProtocolInvocationLauncherSelectCert {
         	final String minimumRequestedVersion = options.getMinimumClientVersion();
         	final Version requestedVersion = new Version(minimumRequestedVersion);
         	if (requestedVersion.greaterThan(SimpleAfirma.getVersion())) {
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_MINIMUM_VERSION_NON_SATISTIED;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode);
-				if (!bySocket){
-					throw new SocketOperationException(errorCode);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+        		throw new SocketOperationException(SimpleErrorCode.Functional.MINIMUM_VERSION_NON_SATISTIED);
         	}
         }
+
+		// Si debe ser una operacion sin interfaz grafica, omitimos el dialogo de espera de la carga del almacen
+		if (!Boolean.parseBoolean(options.getExtraParams().getProperty(AfirmaExtraParams.HEADLESS))) {
+			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.2")); //$NON-NLS-1$
+		}
 
         final String lastSelectedKeyStore = KeyStorePreferencesManager.getLastSelectedKeystore();
 		final boolean useDefaultStore = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS);
@@ -112,12 +103,12 @@ final class ProtocolInvocationLauncherSelectCert {
 		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
-				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore);
+				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore, true);
 			}
 		}
 		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
 		else {
-			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore());
+			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore(), true);
 		}
 
 		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
@@ -142,25 +133,17 @@ final class ProtocolInvocationLauncherSelectCert {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
 
 		} else {
-
-			final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
-			final AOKeyStoreManager ksm;
+			AOKeyStoreManager ksm;
 			try {
-				ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-						aoks, // Store
-						aoksLib, // Lib
-						null, // Description
-						pwc, // PasswordCallback
-						null // Parent
-				);
-			} catch (final Exception e) {
+				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, aoksLib);
+			}
+			catch (final AOCancelledOperationException e) {
+				throw e;
+			}
+			catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, "Error obteniendo el AOKeyStoreManager", e); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-				if (!bySocket){
-					throw new SocketOperationException(errorCode);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+				final ErrorCode errorCode = e instanceof AOControlledException ? ((AOControlledException) e).getErrorCode() : KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR;
+				throw new SocketOperationException(e, errorCode);
 			}
 
 			LOGGER.info("Obtenido gestor de almacenes de claves: " + ksm); //$NON-NLS-1$
@@ -172,6 +155,7 @@ final class ProtocolInvocationLauncherSelectCert {
 					final File file = new File(aoksLib);
 					libName = file.getName();
 				}
+				ProgressInfoDialogManager.hideProgressDialog();
 				final AOKeyStoreDialog dialog = new AOKeyStoreDialog(
 					ksm,
 					null,
@@ -180,7 +164,8 @@ final class ProtocolInvocationLauncherSelectCert {
 					true, // checkValidity
 					filters,
 					mandatoryCertificate,
-					libName
+					libName,
+					true
 				);
 				dialog.allowOpenExternalStores(filterManager.isExternalStoresOpeningAllowed());
 				dialog.show();
@@ -199,29 +184,16 @@ final class ProtocolInvocationLauncherSelectCert {
 				}
 			}
 			catch (final AOCancelledOperationException e) {
-				LOGGER.severe("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
-				if (!bySocket) {
-					throw new SocketOperationException(getResultCancel());
-				}
-				return getResultCancel();
+				throw e;
 			}
 			catch (final AOCertificatesNotFoundException e) {
 				LOGGER.severe("No hay certificados validos en el almacen: " + e); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_NO_CERTIFICATES_KEYSTORE;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-				if (!bySocket){
-					throw new SocketOperationException(errorCode);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+				throw new SocketOperationException(SimpleErrorCode.Functional.NO_CERTS_FOUND_SELECTING_CERT);
 			}
 			catch (final Exception e) {
 				LOGGER.severe("Error al mostrar el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_CANNOT_ACCESS_KEYSTORE;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-				if (!bySocket){
-					throw new SocketOperationException(errorCode);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+				final ErrorCode errorCode = e instanceof AOControlledException ? ((AOControlledException) e).getErrorCode() : KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR;
+				throw new SocketOperationException(errorCode);
 			}
 
 		}
@@ -233,32 +205,32 @@ final class ProtocolInvocationLauncherSelectCert {
 			certEncoded = pke.getCertificateChain()[0].getEncoded();
 		} catch (final CertificateEncodingException e) {
 			LOGGER.severe("Error en la decodificacion del certificado de firma: " + e); //$NON-NLS-1$
-			final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_DECODING_CERTIFICATE;
-			ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-			if (!bySocket){
-				throw new SocketOperationException(errorCode);
-			}
-			return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+			throw new SocketOperationException(e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE);
 		}
 
 		String dataToSend;
-		if (options.getDesKey() != null) {
+
+		// Si hay configuracion de cifrado y somos compatibles, ciframos el resultado para la subida al servidor intermedio
+		ServerCipher cipher = null;
+		if (options.getCipherConfig()!= null) {
 			try {
-				// El CipherData devuelve los datos directamente en Base64
-				dataToSend = CypherDataManager.cipherData(certEncoded, options.getDesKey());
+				cipher = ServerCipherFactory.newServerCipher(options.getCipherConfig());
+			}
+			catch (final Exception e) {
+				LOGGER.severe("No se soporta la configuracion de cifrado proporcionada. Es posible que deba actualzar la aplicacion: " + e); //$NON-NLS-1$
+				throw new SocketOperationException(e, SimpleErrorCode.Internal.ENCRIPTING_SELECTED_CERT);
+			}
+		}
+
+		if (cipher != null) {
+			try {
+				dataToSend = cipher.cipherData(certEncoded);
 			} catch (final Exception e) {
-				LOGGER.severe("Error en el cifrado de los datos a enviar: " + e); //$NON-NLS-1$
-				final String errorCode = ProtocolInvocationLauncherErrorManager.ERROR_ENCRIPTING_DATA;
-				ProtocolInvocationLauncherErrorManager.showError(errorCode, e);
-				if (!bySocket){
-					throw new SocketOperationException(errorCode);
-				}
-				return ProtocolInvocationLauncherErrorManager.getErrorMessage(errorCode);
+				LOGGER.severe("Error en el cifrado del certificado seleccionado para el envio: " + e); //$NON-NLS-1$
+				throw new SocketOperationException(e, SimpleErrorCode.Internal.ENCRIPTING_SELECTED_CERT);
 			}
 		} else {
-			LOGGER.warning(
-					"Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado" //$NON-NLS-1$
-			);
+			LOGGER.warning("Se omite el cifrado de los datos resultantes por no haberse proporcionado una clave de cifrado"); //$NON-NLS-1$
 			dataToSend = Base64.encode(certEncoded, true);
 		}
 
@@ -272,12 +244,22 @@ final class ProtocolInvocationLauncherSelectCert {
 			synchronized (IntermediateServerUtil.getUniqueSemaphoreInstance()) {
 				try {
 					LOGGER.info("Enviamos el resultado de la operacion de seleccion de certificado al servidor intermedio"); //$NON-NLS-1$
+					try {
+						SimpleAfirma.getSSLContextConfigurationTask().join();
+					} catch (final InterruptedException e) {
+						LOGGER.warning("No se ha podido configurar correctamente el contexto SSL: " + e); //$NON-NLS-1$
+					}
 					IntermediateServerUtil.sendData(dataToSend, options.getStorageServletUrl().toString(), options.getId());
+				}
+				catch (final SSLHandshakeException e) {
+					LOGGER.log(Level.SEVERE, "Error al realizar una conexion segura con el servidor", e); //$NON-NLS-1$
+					throw e;
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.SEVERE, "Error al enviar los datos al servidor", e); //$NON-NLS-1$
-					ProtocolInvocationLauncherErrorManager.showError(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT, e);
-					return ProtocolInvocationLauncherErrorManager.getErrorMessage(ProtocolInvocationLauncherErrorManager.ERROR_SENDING_RESULT);
+					final ErrorCode errorCode = SimpleErrorCode.Communication.SENDING_RESULT_OPERATION;
+					ProtocolInvocationLauncherErrorManager.showError(protocolVersion, errorCode);
+					return ProtocolInvocationLauncherErrorManager.getErrorMessage(protocolVersion, errorCode);
 				}
 			}
 		}
@@ -288,9 +270,5 @@ final class ProtocolInvocationLauncherSelectCert {
 		}
 
 		return dataToSend;
-	}
-
-	public static String getResultCancel() {
-		return RESULT_CANCEL;
 	}
 }

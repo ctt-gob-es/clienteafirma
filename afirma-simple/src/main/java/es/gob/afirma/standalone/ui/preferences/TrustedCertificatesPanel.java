@@ -29,11 +29,13 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.misc.http.TrustStoreManager;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.ui.core.jse.certificateselection.CertificateUtils;
 
 final class TrustedCertificatesPanel extends JPanel  {
@@ -131,7 +133,9 @@ final class TrustedCertificatesPanel extends JPanel  {
 
 	private void createImportedCertsTable() {
 
-		  final String[] columnNames = { "Nombre", "Emitido por", "Fecha de expiracion" };  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		  final String[] columnNames = { SimpleAfirmaMessages.getString("TrustedCertificatesDialog.33"),  //$NON-NLS-1$
+				  						SimpleAfirmaMessages.getString("TrustedCertificatesDialog.34"),  //$NON-NLS-1$
+				  						SimpleAfirmaMessages.getString("TrustedCertificatesDialog.35") };  //$NON-NLS-1$
 		  this.model = new DefaultTableModel(null, columnNames) {
 			  /** Serial Id. */
 			private static final long serialVersionUID = -3513927556747399446L;
@@ -218,7 +222,7 @@ final class TrustedCertificatesPanel extends JPanel  {
     				SimpleAfirmaMessages.getString("TrustedCertificatesDialog.27"), //$NON-NLS-1$
     				SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
     				JOptionPane.ERROR_MESSAGE,
-    				e);
+    				new AOException(SimpleErrorCode.Internal.ERROR_LOAD_TRUSTED_CERT));
     		result = null;
     	}
 

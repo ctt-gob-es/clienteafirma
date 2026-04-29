@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Autofirma</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+  <meta name="KEYWORDS" content="firmar, CAdES, XAdES, PAdES, ODF, OOXML formato">
+  <meta name="description" content="Firma electr&oacute;nica de ficheros.">
+  <style>
+	
+	.bold {
+		font-weight: bold;
+	}
+
+  </style>
+ </head>
+ <body>
+  <h2>Pantalla de firma</h2>
+  <p>
+   Desde esta pantalla puede selecionar los documentos o directorios que desea firmar.
+  </p>
+  <p align="center">
+   <img src="../gfx/pantallafirma1_mini.png" alt="Pantalla para la selecci&oacute;n y firma de documentos">
+  </p>
+  <p>
+   Puede seleccionar uno o varios documentos pulsando el bot&oacute;n "Seleccionar ficheros a firmar" o arr&aacute;strando los documentos y/o directorios al &aacute;rea indicada 
+   (el recuadro de color gris oscuro).
+  </p>
+  <p>
+  	Al cargar los documentos a firmar, se le mostrar&aacute;n ciertos detalles sobre estos, que variar&aacute;n seg&uacute;n se seleccione un &uacute;nico fichero o varios:
+  </p>
+  <p align="center">
+   <img src="../gfx/pantallafirma4_mini.png" alt="Pantalla para la selecci&oacute;n y firma de documentos con un fichero cargado">
+   <img src="../gfx/pantallafirma3_mini.png" alt="Pantalla para la selecci&oacute;n y firma con m&uacute;ltiples ficheros cargados">
+  </p>
+  <p>
+   En el recuadro habilitado para arrastrar los documentos que deseaban firmar le habr&aacute; aparecido la informaci&oacute;n 
+   del fichero o ficheros que haya seleccionado.
+  </p>
+  <p>
+   Si s&oacute;lo seleccion&oacute; un fichero y dispone de una aplicaci&oacute;n predeterminada para este tipo de documentos, le
+   aparecer&aacute; el bot&oacute;n "Ver fichero" con el que podr&aacute; abrirlo. Además, le aparecer&aacute; la informaci&oacute;n relativa
+   al fichero y a la firma que se va a generar (formato, atributos de firma y opciones de firma). En el caso de haber configurado
+   datos para el formato de firma seleccionado que se vaya a incluir en la propia firma, como la pol&iacute;tica de firma, se
+   mostrar&aacute; un enlace "Ver todos..." desde la que se podr&aacute;n visualizar todos los atributos de firma definidos.
+  </p>
+  <p> 
+   Si se seleccionaron varios ficheros o directorios, puede hacer doble clic sobre ellos para abrirlos o pulsar con el bot&oacute;n
+   secundario del rat&oacute;n para ver las opciones de "Ver fichero" y "Ver los atributos de firma".
+  </p>
+  <p>
+   El bot&oacute;n "Firmar" situado en el lado inferior de la pantalla le permitir&aacute; firmar el documento.
+   Si el almac&eacute;n de certificados de su sistema operativo todav&iacute;a no hubiese terminado de cargarse, el
+   bot&oacute;n aparecer&aacute; deshabilitado y con una imagen animada de espera. En ese caso, por favor, espere a que
+   esta desaparezca y se habilite el bot&oacute;n. 
+  </p>
+  <p>
+   Una vez pulsado el bot&oacute;n, el programa generar&aacute; una firma para cada documento seleccionado. Para cada tipo
+   de documento se generar&aacute; la firma con el formato establecido a desde el <a href="MenuPreferencias.html">panel de
+   preferencias</a>.
+   </p>
+   <p>
+   En caso de que se desee firmar en otro formato distinto el fichero ya seleccionado, se permitir&aacute; modificar seleccionando el enlace "(Cambiar)"  que se encuentra junto a la información sobre el formato. Al seleccionarlo, se abrir&aacute; la siguiente ventana donde se permite elegir el formato deseado:
+   </p>
+   <p align="center">
+   <img src="../gfx/dialogocambioformato.png" alt="Pantalla para la selecci&oacute;n del formato de firma">
+   </p>
+   <p>
+   Los tipos de documento que se distinguen y los formatos de firma que admiten se muestran en la siguiente
+   tabla:
+  </p>
+  <table>
+   <tr><th>Tipo de documento</th><th>Icono</th><th>Formatos de firma (resaltado el por defecto)</th></tr>
+   <tr><td>PDF</td><td><img src="../../shrd/icon_pdf.png" alt="Icono de documento Adobe PDF"></td><td><strong>PAdES</strong>, CAdES y XAdES.</td></tr>
+   <tr><td>XML</td><td><img src="../../shrd/icon_xml.png" alt="Icono de documento XML"></td><td><strong>XAdES</strong> y CAdES.</td></tr>
+   <tr><td>Factura electr&oacute;nica</td><td><img src="../../shrd/icon_facturae.png" alt="Icono de factura electr&oacute;nica"></td><td><strong>FacturaE</strong>, CAdES y XAdES.</td></tr>
+   <tr><td>OOXML</td><td><img src="../../shrd/icon_office_win.png" alt="Icono de documento OOXML"></td><td><strong>CAdES</strong>, XAdES y OOXML (Office Open XML).</td></tr>
+   <tr><td>ODF</td><td><img src="../../shrd/icon_openoffice.png" alt="Icono de documento ODF"></td><td><strong>CAdES</strong>, XAdES y ODF (Open Document Format).</td></tr>
+   <tr><td>Resto de documentos</td><td><img src="../../shrd/icon_binary.png" alt="Icono de documento binario"></td><td><strong>CAdES</strong> y XAdES.</td></tr>
+   <tr><td>Firma electr&oacute;nica</td><td><img src="../../shrd/icon_sign.png" alt="Icono de firma electr&oacute;nica"></td><td>El mismo de la firma original.</td></tr>
+  </table>
+  <p>
+  Como excepci&oacute;n a este &uacute;ltimo caso, no se puede volver a firmar una factura electr&oacute;nica ya firmada en formato Factura-e.
+  </p>
+  <p>
+   Al firmar ficheros, se mostrar&aacute; una ventana para el guardado de la firma generada si s&oacute;lo se
+   seleccion&oacute; un documento o un di&aacute;logo para seleccionar el directorio de salida si se seleccionaron
+   varios. Tras guardar las firmas, se mostrar&aacute; la <a href="PantallaDetalle.html">pantalla de detalle de firma</a>. 
+  </p>
+  <p>
+   El proceso de firma puede verse alterado por los plugins instalados en Autofirma. Consulte el apartado de
+   <a href="MenuPlugins.html">gesti&oacute;n de plugins</a> para saber m&aacute;s sobre ellos. 
+  </p>
+  <p>
+   De forma complementaria a los botones y elementos gr&aacute;ficos, puede usar tambi&eacute;n la barra de men&uacute; o los 
+   siguientes aceleradores de teclado:
+  </p>
+  <ul>
+   <li><code>Control (&#x2318; en macOS) + S</code> : Seleccionar fichero.</li>
+   <li><code>Control (&#x2318; en macOS) + F</code> : Firmar el fichero seleccionado.</li>
+  </ul>
+
+  <h3>Configuraci&oacute;n de los formatos de firma</h3>
+  <p>
+  Puede configurar el formato de firma a utilizar por cada tipo de fichero y las particularidades de estos formatos, as&iacute;
+  como el comportamiento general de la aplicaci&oacute;n, a partir del <a href="MenuPreferencias.html">panel de preferencias</a>
+  disponible a trav&eacute;s del men&uacute; Opciones.
+  </p>
+  <p>
+  Algunos formatos u opciones de firma pueden hacer aparecer opciones de configuraci&oacute;n adicionales en la propia
+  ventana de firma:
+  </p>
+  <ul>
+    <li>
+     <h4>Opciones de firma PDF:</h4>
+     <p>
+	   La firma PDF de un &uacute;nico documento permite configurar el que la firma se muestre en el documento. Para ello
+	   ser&aacute; necesario marcar la casilla "Hacer la firma visible dentro del PDF".
+     </p>
+     <p>
+	   Tambi&eacute;n es posible insertar una marca visible en el PDF al tiempo de realizar la firma. Esta opci&oacute;n
+	   modificar&aacute; el PDF agreg&aacute;ndole la imagen seleccionada y, seguidamente, lo firmar&aacute;. Para usar
+	   esta funci&oacute;n ser&aacute; necesario marcar la casilla "Insertar marca visible en el PDF".  Esta casilla
+	   estar&aacute; deshabilitada si el documento PDF ya est&aacute; firmado, ya que la inserci&oacute;n de una marca
+	   invalidar&iacute;a las firmas anteriores.
+     </p>
+     <p>
+	   Otra opci&oacute;n disponible ser&iacute;a la de generar un PDF certificado, ser&aacute; posible si la firma a realizar es formato PAdES y el documento
+	   no est&aacute; previamente firmado. Se realiza al marcar la casilla "Generar PDF certificado", y se aplica al documento el nivel
+	   de certificaci&oacute;n seleccionado en la lista de opciones bajo dicha casilla.
+	   El listado de opciones estar&aacute; deshabilitado si la casilla "Generar PDF certificado" no est&aacute; habilitada.
+     </p>
+     <p>
+	   Estas opci&oacute;nes aparecer&aacute;n marcadas o no por defecto seg&uacute;n se haya establecido en el <a href="MenuPreferencias.html">panel de preferencias</a>. Al
+	   seleccionar cualquiera de estas casillas, se nos mostrar&aacute; el panel de <a href="VentanaPdfVisible.html">Propiedades de elementos visibles en PDF</a>.
+     </p>
+    </li>
+    <li>
+     <h4>Agregar una nueva firma a un documento:</h4>
+     <p>
+       Al agregar una nueva firma binaria o XML a un documento de firma, se permite configurar si la nueva firma se
+       realizar&aacute; sobre el propio documento (cofirma) o sobre las firmas ya introducidas (contrafirma). Esta
+       opci&oacute;n puede configurarse desde el panel de preferencias de los formatos CAdES y XAdES. Cuando aplique,
+       Autofirma mostrar&aacute; al usuario un bot&oacute;n "Opciones Avanzadas" desde el que poder acceder directamente
+       a estas opciones de configuraci&oacute;n.
+     </p>
+   </li>
+  </ul>
+  <p>
+   En los procesos de firma de m&uacute;ltiples documentos se omite cualquier configuraci&oacute;n que obligue a detener
+   el proceso de firma. As&iacute;, por ejemplo, se omitir&aacute; la solicitud de contrase&ntilde;a de los PDF y la
+   configuraci&oacute;n de firma visible y marca visible se pedir&aacute; una &uacute;nica vez y se aplicar&aacute; a todos
+   los documentos con la misma configuraci&oacute;n.
+  </p>
+ </body>
+</html>

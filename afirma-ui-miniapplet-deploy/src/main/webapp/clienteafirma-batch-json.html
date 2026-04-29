@@ -18,8 +18,8 @@
 		document.getElementById('result').value = JSON.stringify(jsonBatch);
 	}
 
-	function showLogCallback(errorType, errorMessage) {
-		showLog("Type: " + errorType + "\nMessage: " + errorMessage);
+	function showLogCallback(errorType, errorMessage, errorCode) {
+		showLog("Type: " + errorType + "\nMessage: " + errorMessage + "\nCode: " + errorCode);
 	}
 
 	function createBatchConf() {
@@ -96,8 +96,9 @@
 	
 	function doSignBatch() {
 		try {
-			
 			AutoScript.setLocalBatchProcess(false);
+			
+			AutoScript.setServiceTimeout(0);
 			
 			AutoScript
 					.signBatchProcess(
@@ -165,6 +166,11 @@
 		dataField.value = null;
 	}
 
+	function setStickySignatory() {
+		var isSticky = document.getElementById("sticky").checked;
+		AutoScript.setStickySignatory(isSticky);
+	}
+	
 	function addExtraParam(newParamId, listParamsId) {
 		var paramsList = document.getElementById(listParamsId);
 		paramsList.value = paramsList.value
@@ -240,18 +246,21 @@
 </head>
 <body>
 	<script type="text/javascript">
+	
 			//AutoScript.setForceWSMode(true);
-			AutoScript.cargarAppAfirma();
+			//SupportDialog.enableErrorDialog(false);
 			AutoScript.setServlets(
-					window.location.origin + "/afirma-signature-storage/StorageService", 
-					window.location.origin + "/afirma-signature-retriever/RetrieveService");
-		</script>
+				window.location.origin + "/afirma-signature-storage/StorageService", 
+				window.location.origin + "/afirma-signature-retriever/RetrieveService");
+			AutoScript.cargarAppAfirma();
+	</script>
 
 	<fieldset style="margin-bottom:30px;">
 		<legend>Configuraci&oacute;n de la operaci&oacute;n</legend>
 
 		<div>
-			<input type="checkbox" id="stopOnError" />Parar en caso de error
+			<input type="checkbox" id="stopOnError" />Parar en caso de error<br>
+			<input id="sticky" type="checkbox" onchange="setStickySignatory();" />Cachear certificado
 		</div>
 	</fieldset>
 

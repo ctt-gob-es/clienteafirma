@@ -41,6 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
@@ -50,6 +51,7 @@ import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.CertificateFilter;
+import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.MultipleCertificateFilter;
 import es.gob.afirma.keystores.filters.PseudonymFilter;
 import es.gob.afirma.keystores.filters.SkipAuthDNIeFilter;
@@ -244,7 +246,9 @@ final class PreferencesPanelKeystores extends JScrollPane {
 				// Si no se identifico el tipo de almacen, no intentamos mostrar ningun contenido
 				if (ks == null) {
 					AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.36"), //$NON-NLS-1$
-	    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), AOUIFactory.ERROR_MESSAGE, null); //$NON-NLS-1$
+	    										SimpleAfirmaMessages.getString("SimpleAfirma.7"),  //$NON-NLS-1$
+	    										AOUIFactory.ERROR_MESSAGE, 
+	    										new AOException(KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR));
 					return;
 				}
 
@@ -291,9 +295,9 @@ final class PreferencesPanelKeystores extends JScrollPane {
 				} catch (final Exception kse) {
 						AOUIFactory.showErrorMessage(
 						SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.20"), //$NON-NLS-1$
-						SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.18", ks.toString()), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE,
-						kse
+						new AOException(KeyStoreErrorCode.Internal.LOADING_KEYSTORE_INTERNAL_ERROR)
 						);
 						Logger.getLogger("es.gob.afirma").warning("Error al recuperar el almacen por defecto seleccionado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 				}
@@ -650,8 +654,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
     		if (smartCardName.isEmpty()
     			|| smartCardP11Path.isEmpty() ) {
     			AOUIFactory.showErrorMessage(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27"), //$NON-NLS-1$
-    					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-    					AOUIFactory.ERROR_MESSAGE,
+    					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
+    					AOUIFactory.WARNING_MESSAGE,
     					new Exception(SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.27")) //$NON-NLS-1$
     					);
 

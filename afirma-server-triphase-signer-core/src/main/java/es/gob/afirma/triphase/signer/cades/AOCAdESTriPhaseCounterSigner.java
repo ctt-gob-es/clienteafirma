@@ -51,7 +51,8 @@ import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
@@ -61,7 +62,9 @@ import es.gob.afirma.signers.cades.CAdESParameters;
 import es.gob.afirma.signers.cades.CAdESUtils;
 import es.gob.afirma.signers.multi.cades.CAdESMultiUtil;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
+import es.gob.afirma.signers.pkcs7.BinaryErrorCode;
 import es.gob.afirma.signers.pkcs7.SigUtils;
+import es.gob.afirma.triphase.signer.TriphaseErrorCode;
 import es.gob.afirma.triphase.signer.processors.TriPhaseUtil;
 
 /** Contrafirmador CAdES trif&aacute;sico.
@@ -230,7 +233,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 			encodedId = digest(siValue);
 		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido generar un identificador asociado a la firma", e); //$NON-NLS-1$
+			throw new AOException("No se ha podido generar un identificador asociado a la firma", e, BinaryErrorCode.Internal.INTERNAL_BINARY_SIGNING_ERROR); //$NON-NLS-1$
 		}
 		return Base64.encode(encodedId);
 	}
@@ -249,7 +252,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 		return md.digest(data);
 	}
 
-	private static SignedData loadSignature(final byte[] signature) throws IOException, AOFormatFileException {
+	private static SignedData loadSignature(final byte[] signature) throws IOException, AOInvalidSignatureFormatException {
 
 		// Leemos los datos originales (la firma que nos llega)
     	final ASN1Sequence dsq;
@@ -263,7 +266,7 @@ public final class AOCAdESTriPhaseCounterSigner {
         // Pasamos el primer elemento de la secuencia original, que es el OID de SignedData
         final Object o = pkcs7RootSequenceElements.nextElement();
         if (!(o instanceof ASN1ObjectIdentifier) && ((ASN1ObjectIdentifier)o).equals(PKCSObjectIdentifiers.signedData)) {
-			throw new AOFormatFileException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
 		}
 
         // Obtenemos el Context-Specific
@@ -317,9 +320,9 @@ public final class AOCAdESTriPhaseCounterSigner {
 					true  // Es contrafirma
 					);
 		} catch (final CertificateEncodingException e) {
-			throw new AOException("No se ha podido codificar el certificado proporcionadoSe ha encontrado un algoritmo no valido", e); //$NON-NLS-1$
+			throw new AOException("No se ha podido codificar el certificado proporcionado", e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
-			throw new AOException("Se ha proporcionado un algoritmo de huella no soportado", e); //$NON-NLS-1$
+			throw new AOException("Se ha proporcionado un algoritmo de huella no soportado", e, ErrorCode.Request.UNSUPPORTED_SIGNATURE_ALGORITHM); //$NON-NLS-1$
 		}
 
 		// Devolvemos la prefirma codificada
@@ -411,7 +414,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 		try {
 			certificates = CAdESMultiUtil.addCertificates(signedData, certChain);
 		} catch (final Exception e) {
-			throw new AOException("Error en la codificacion de los certificados de firma", e); //$NON-NLS-1$
+			throw new AOException("Error en la codificacion de los certificados de firma", e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		}
 		return certificates;
 	}
@@ -420,15 +423,15 @@ public final class AOCAdESTriPhaseCounterSigner {
 	 * Obtiene el SignedData con la informaci&oacute;n de la firma.
 	 * @param sign Firma de la que obtener la informaci&acute;n de la firma.
 	 * @return SignedData con la informaci&oacute;n de la firma.
-	 * @throws AOFormatFileException Cuando la firma no tiene un formato soportado.
+	 * @throws AOInvalidSignatureFormatException Cuando la firma no tiene un formato soportado.
 	 */
-	private static SignedData getSignedData(final byte[] sign) throws AOFormatFileException {
+	private static SignedData getSignedData(final byte[] sign) throws AOInvalidSignatureFormatException {
 		final ASN1Sequence dsq = ASN1Sequence.getInstance(sign);
 		final Enumeration<?> e = dsq.getObjects();
 		// Elemento con el OID SignedData
 		final Object o = e.nextElement();
         if (!(o instanceof ASN1ObjectIdentifier) && ((ASN1ObjectIdentifier)o).equals(PKCSObjectIdentifiers.signedData)) {
-			throw new AOFormatFileException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("No se ha encontrado un SignedData en los datos a contrafirmar"); //$NON-NLS-1$
 		}
 		// SignedData
 		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
@@ -450,7 +453,7 @@ public final class AOCAdESTriPhaseCounterSigner {
 			encodedCert = ASN1Primitive.fromByteArray(signerCertificate.getTBSCertificate());
 		}
 		catch (final Exception e) {
-			throw new AOException("Error en la codificacion del certificado", e); //$NON-NLS-1$
+			throw new AOException("Error en la codificacion del certificado", e, ErrorCode.Internal.ENCODING_SIGNING_CERTIFICATE); //$NON-NLS-1$
 		}
 		final TBSCertificate tbs = TBSCertificate.getInstance(encodedCert);
 		final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(
@@ -652,7 +655,7 @@ public final class AOCAdESTriPhaseCounterSigner {
         // Recuperamos de la informacion de firma trifasica la prefirma de esa contrafirma
         final List<TriSign> triSigns = triphaseData.getTriSigns(presignId);
         if (triSigns == null || triSigns.isEmpty()) {
-        	throw new AOException("No se ha encontrado la informacion de prefirma de una de las firmas"); //$NON-NLS-1$
+        	throw new AOException("No se ha encontrado la informacion de prefirma de una de las firmas", TriphaseErrorCode.Request.MALFORMED_PRESIGN); //$NON-NLS-1$
         }
 
         final ASN1Set signedAttr = getSignedAttributes(triSigns);
@@ -676,7 +679,7 @@ public final class AOCAdESTriPhaseCounterSigner {
         	signValue = new DEROctetString(pkcs1);
         }
         catch (final Exception ex) {
-        	throw new AOException("No se ha recibido el PKCS#1 de la contrafirma o se ha indicado un valor incorrectamente codificado", ex); //$NON-NLS-1$
+        	throw new AOException("No se ha recibido el PKCS#1 de la contrafirma o se ha indicado un valor incorrectamente codificado", ex, TriphaseErrorCode.Request.MALFORMED_PRESIGN); //$NON-NLS-1$
         }
 		return signValue;
 
@@ -697,7 +700,7 @@ public final class AOCAdESTriPhaseCounterSigner {
         	signedAttr = (ASN1Set) ASN1Primitive.fromByteArray(preSign);
         }
         catch (final Exception ex) {
-        	throw new AOException("No se ha recibido la prefirma de la contrafirma o se ha indicado un valor incorrectamente codificado", ex); //$NON-NLS-1$
+        	throw new AOException("No se ha recibido la prefirma de la contrafirma o se ha indicado un valor incorrectamente codificado", ex, TriphaseErrorCode.Request.MALFORMED_PRESIGN); //$NON-NLS-1$
         }
         return signedAttr;
 	}

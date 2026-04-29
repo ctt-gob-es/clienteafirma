@@ -27,7 +27,7 @@ import org.spongycastle.asn1.cms.SignerInfo;
 import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 
-import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
 
 /** Clase que obtiene el contenido de un fichero en formato SignedData. de CMS o
  * CADES. */
@@ -43,9 +43,9 @@ public final class ObtainContentSignedData {
 	 * tanto en CADES como en CMS. Si la firma no contiene los datos, devuelve <code>null</code>.
 	 * @param data Datos que contienen la firma.
 	 * @return El contenido firmado o {@code null} si no es una firma con contenido..
-	 * @throws AOInvalidFormatException Cuando los datos proporcionados no tienen la estructura
+	 * @throws AOInvalidSignatureFormatException Cuando los datos proporcionados no tienen la estructura
 	 *                                  b&aacute;sica de firma ASN.1. */
-	public static byte[] obtainData(final byte[] data) throws AOInvalidFormatException {
+	public static byte[] obtainData(final byte[] data) throws AOInvalidSignatureFormatException {
 		byte[] contenido = null;
 
 		ASN1ObjectIdentifier doi;
@@ -66,7 +66,7 @@ public final class ObtainContentSignedData {
 			doj = (ASN1TaggedObject) e.nextElement();
 		}
 		catch (final Exception e) {
-			throw new AOInvalidFormatException("Error al parsear la firma ASN.1: " + e, e); //$NON-NLS-1$
+			throw new AOInvalidSignatureFormatException("Error al parsear la firma ASN.1: " + e, e); //$NON-NLS-1$
 		}
 
 		// buscamos si es signedData

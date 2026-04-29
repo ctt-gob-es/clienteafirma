@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
@@ -93,8 +94,8 @@ public final class ExtraParamsProcessor {
      * </ul>
 	 * @param params Par&aacute;metros definidos para la operaci&oacute;n.
 	 * @return Propiedades expandidas.
-	 * @throws IncompatiblePolicyException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
-	public static Properties expandProperties(final Properties params) throws IncompatiblePolicyException {
+	 * @throws SignaturePolicyIncompatibilityException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
+	public static Properties expandProperties(final Properties params) throws SignaturePolicyIncompatibilityException {
 		return expandProperties(params, null, null);
 	}
 
@@ -118,8 +119,8 @@ public final class ExtraParamsProcessor {
 	 * @param signedData Datos firmados.
 	 * @param format Formato de firma.
 	 * @return Propiedades expandidas.
-	 * @throws IncompatiblePolicyException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
-	public static Properties expandProperties(final Properties params, final byte[] signedData, final String format) throws IncompatiblePolicyException {
+	 * @throws SignaturePolicyIncompatibilityException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
+	public static Properties expandProperties(final Properties params, final byte[] signedData, final String format) throws SignaturePolicyIncompatibilityException {
 		final Properties p = new Properties();
 		for (final String key : params.keySet().toArray(new String[params.size()])) {
 			p.setProperty(key, params.getProperty(key));
@@ -132,8 +133,8 @@ public final class ExtraParamsProcessor {
 	 * @param p Propiedades configuradas.
 	 * @param signedData Datos firmados.
 	 * @param format Formato de firma.
-	 * @throws IncompatiblePolicyException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
-	private static void expandPolicyKeys(final Properties p, final byte[] signedData, final String format) throws IncompatiblePolicyException {
+	 * @throws SignaturePolicyIncompatibilityException Si el formato de firma es incompatible con la pol&iacute;tica indicada. */
+	private static void expandPolicyKeys(final Properties p, final byte[] signedData, final String format) throws SignaturePolicyIncompatibilityException {
 		if (!p.containsKey(EXPANDIBLE_POLICY_KEY)) {
 			return;
 		}
@@ -143,7 +144,7 @@ public final class ExtraParamsProcessor {
 		// Comprobamos que se trate de una politica reconocida que admita la expansion de atributos
 		if (!isSupportedPolicy(policyName)) {
 			p.remove(EXPANDIBLE_POLICY_KEY);
-			throw new IncompatiblePolicyException("No se soporta la expansion de atributos para la politica: " + policyName); //$NON-NLS-1$
+			throw new SignaturePolicyIncompatibilityException("No se soporta la expansion de atributos para la politica: " + policyName); //$NON-NLS-1$
 		}
 
 		// Normalizamos el nombre de formato para simplificar las comprobaciones futuras
@@ -169,7 +170,7 @@ public final class ExtraParamsProcessor {
 		// Cualquier otra combinacion no esta soportada
 		else {
 			p.remove(EXPANDIBLE_POLICY_KEY);
-			throw new IncompatiblePolicyException(String.format(
+			throw new SignaturePolicyIncompatibilityException(String.format(
 					"El formato de firma %1s no esta soportado por la politica %2s", //$NON-NLS-1$
 					format, policyName));
 		}
@@ -291,28 +292,18 @@ public final class ExtraParamsProcessor {
 	 * no permitido por la pol&iacute;tica de firma de la AGE.
 	 */
 	private static void setPAdESPolicyAGEAttributes(final String policyName, final Properties params)
-			throws IncompatiblePolicyException {
+			throws SignaturePolicyIncompatibilityException {
 
 		// El subfiltro de las PAdES acorde politica de la AGE debe ser el de CAdES Detached de la ETSI. Si se
 		// declara otro, se lanza un error
 		if (params.containsKey("signatureSubFilter") && //$NON-NLS-1$
 				!ETSI_CADES_DETACHED.equals(params.getProperty("signatureSubFilter"))) { //$NON-NLS-1$
-			throw new IncompatiblePolicyException("En PAdES con politica firma AGE debe usarse siempre el filtro '" + //$NON-NLS-1$
+			throw new SignaturePolicyIncompatibilityException("En PAdES con politica firma AGE debe usarse siempre el filtro '" + //$NON-NLS-1$
 				ETSI_CADES_DETACHED + "'"); //$NON-NLS-1$
 		}
 		params.setProperty("signatureSubFilter", ETSI_CADES_DETACHED); //$NON-NLS-1$
 
 		AdESPolicyPropertiesManager.setProperties(params, policyName, AdESPolicyPropertiesManager.FORMAT_PADES);
-	}
-
-	/** Pol&iacute;tica de firma incompatible con el formato o la configuraci&oacute;n de firma. */
-	public static final class IncompatiblePolicyException extends Exception {
-
-		private static final long serialVersionUID = -6420193548487585455L;
-
-		IncompatiblePolicyException(final String description) {
-			super(description);
-		}
 	}
 
 	/** Establece propiedades de firma concretas para cuando el formato indicado sea "AUTO".

@@ -19,14 +19,14 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.signers.TriphaseData;
 import es.gob.afirma.signers.batch.ProcessResult;
+import es.gob.afirma.signers.batch.SingleSign;
 import es.gob.afirma.signers.batch.ProcessResult.Result;
 import es.gob.afirma.signers.batch.SingleSignConstants;
-import es.gob.afirma.signers.batch.SingleSignConstants.SignFormat;
-import es.gob.afirma.signers.batch.SingleSignConstants.SignSubOperation;
 import es.gob.afirma.signers.batch.TempStore;
-import es.gob.afirma.signers.batch.xml.SingleSign;
+import es.gob.afirma.triphase.server.ConfigManager;
 import es.gob.afirma.triphase.server.cache.DocumentCacheManager;
 import es.gob.afirma.triphase.server.document.DocumentManager;
 
@@ -40,7 +40,7 @@ public final class JSONSingleSign extends SingleSign {
 	private static final String JSON_ELEMENT_SUBOPERATION = "suboperation"; //$NON-NLS-1$
 	private static final String JSON_ELEMENT_EXTRAPARAMS = "extraparams"; //$NON-NLS-1$
 
-	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	static final Logger LOGGER = Logger.getLogger(ConfigManager.LOGGER_NAME);
 
 	private DocumentManager documentManager;
 
@@ -48,47 +48,6 @@ public final class JSONSingleSign extends SingleSign {
 	 * @param id Identificador de la firma. */
 	JSONSingleSign(final String id) {
 		this.id = id;
-	}
-
-	/** Crea una definici&oacute;n de tarea de firma electr&oacute;nica &uacute;nica.
-	 * @param id Identificador de la firma.
-	 * @param dataSrc Datos a firmar.
-	 * @param fmt Formato de firma.
-	 * @param subOp Tipo de firma a realizar.
-	 * @param xParams Opciones adicionales de la firma.
-	 * @param ss Objeto para guardar la firma una vez completada. */
-	public JSONSingleSign(final String id,
-			          final String dataSrc,
-			          final SignFormat fmt,
-			          final SignSubOperation subOp,
-			          final Properties xParams,
-			          final DocumentManager ss) {
-
-		if (dataSrc == null) {
-			throw new IllegalArgumentException(
-				"El origen de los datos a firmar no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-
-		if (fmt == null) {
-			throw new IllegalArgumentException(
-				"El formato de firma no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-
-		if (ss == null) {
-			throw new IllegalArgumentException(
-				"El objeto de guardado de firma no puede ser nulo" //$NON-NLS-1$
-			);
-		}
-
-		this.dataRef = dataSrc;
-		this.format = fmt;
-
-		this.id = id;
-
-		this.subOperation = subOp;
-		this.documentManager = ss;
 	}
 
 	@Override
@@ -121,7 +80,7 @@ public final class JSONSingleSign extends SingleSign {
 		}
 		catch (final IOException e) {
 			LOGGER.severe(
-				"Error convirtiendo los parametros adicionales de la firma '" + getId() + "' a Base64: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"Error convirtiendo los parametros adicionales de la firma '" + LoggerUtil.getTrimStr(getId()) + "' a Base64: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		sb.append("\",\n"); //$NON-NLS-1$
@@ -147,12 +106,14 @@ public final class JSONSingleSign extends SingleSign {
 		return JSONSingleSignPreProcessor.doPreProcess(this, certChain, algorithm, docManager, docCacheManager);
 	}
 
-	/** Obtiene la tarea de preproceso de firma para ser ejecutada en paralelo.
+	/**
+	 * Obtiene la tarea de preproceso de firma para ser ejecutada en paralelo.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param algorithm Algoritmo de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @param docCacheManager Gestor para el guardado de datos en cach&eacute;.
-	 * @return Tarea de preproceso de firma para ser ejecutada en paralelo. */
+	 * @return Tarea de preproceso de firma para ser ejecutada en paralelo.
+	 */
 	Callable<PreprocessResult> getPreProcessCallable(final X509Certificate[] certChain,
                                                   final SingleSignConstants.DigestAlgorithm algorithm,
                                                   final DocumentManager docManager,
@@ -160,7 +121,8 @@ public final class JSONSingleSign extends SingleSign {
 		return new PreProcessCallable(this, certChain, algorithm, docManager, docCacheManager);
 	}
 
-	/** Realiza el proceso de postfirma, incluyendo la subida o guardado de datos.
+	/**
+	 * Realiza el proceso de postfirma, incluyendo la subida o guardado de datos.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param td Datos trif&aacute;sicos relativos <b>&uacute;nicamente</b> a esta firma.
 	 *           Debe serializarse como un JSON con esta forma (ejemplo):
@@ -194,7 +156,9 @@ public final class JSONSingleSign extends SingleSign {
 	 * @param docCacheManager Gestor para la carga de datos desde cach&eacute;.
 	 * @throws AOException Si hay problemas en la propia firma electr&oacute;nica.
 	 * @throws IOException Si hay problemas en la obtenci&oacute;n, tratamiento o gradado de datos.
-	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario. */
+	 * @throws NoSuchAlgorithmException Si no se soporta alg&uacute;n algoritmo necesario.
+	 * @throws SaveDataException Si no se puede guardar la firma.
+	 */
 	void doPostProcess(final X509Certificate[] certChain,
 			                  final TriphaseData td,
 			                  final SingleSignConstants.DigestAlgorithm algorithm,
@@ -202,13 +166,14 @@ public final class JSONSingleSign extends SingleSign {
 			                  final DocumentManager docManager,
 			                  final DocumentCacheManager docCacheManager) throws IOException,
 			                                               AOException,
-			                                               NoSuchAlgorithmException {
+			                                               NoSuchAlgorithmException, SaveDataException {
 		JSONSingleSignPostProcessor.doPostProcess(
 			this, certChain, td, algorithm, batchId, docManager, docCacheManager
 		);
 	}
 
-	/** Obtiene la tarea de postproceso de firma para ser ejecutada en paralelo.
+	/**
+	 * Obtiene la tarea de postproceso de firma para ser ejecutada en paralelo.
 	 * @param certChain Cadena de certificados del firmante.
 	 * @param td Datos trif&aacute;sicos relativos <b>&uacute;nicamente</b> a esta firma.
 	 *           Debe serializarse como un JSON con esta forma (ejemplo):
@@ -234,7 +199,8 @@ public final class JSONSingleSign extends SingleSign {
 	 * @param batchId Identificador del lote de firma.
 	 * @param docManager Gestor de documentos con el que procesar el lote.
 	 * @param docCacheManager Gestor para la carga de datos desde cach&eacute;.
-	 * @return Tarea de postproceso de firma para ser ejecutada en paralelo. */
+	 * @return Tarea de postproceso de firma para ser ejecutada en paralelo.
+	 */
 	Callable<ResultSingleSign> getPostProcessCallable(final X509Certificate[] certChain,
 			                                                          final TriphaseData td,
 			                                                          final SingleSignConstants.DigestAlgorithm algorithm,
@@ -310,7 +276,7 @@ public final class JSONSingleSign extends SingleSign {
 				result = new PreprocessResult(presignature);
 			}
 			catch (final Exception e) {
-				LOGGER.log(Level.WARNING, "Error en la pretfirma del documento: " + this.ss.getId(), e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "Error en la pretfirma del documento: " + LoggerUtil.getTrimStr(this.ss.getId()), e); //$NON-NLS-1$
 				final ProcessResult errorResult = new ProcessResult(Result.ERROR_PRE, e.getMessage());
 				errorResult.setId(this.ss.getId());
 				final ResultSingleSign singleResult = new ResultSingleSign(this.ss.getId(), false, errorResult);
@@ -355,7 +321,7 @@ public final class JSONSingleSign extends SingleSign {
 														this.docCacheManager);
 			}
 			catch(final Exception e) {
-				LOGGER.log(Level.WARNING, "Error en la postfirma del documento: " + this.ss.getId(), e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "Error en la postfirma del documento: " + LoggerUtil.getTrimStr(this.ss.getId()), e); //$NON-NLS-1$
 				final ProcessResult result = new ProcessResult(Result.ERROR_POST, e.getMessage());
 				return new ResultSingleSign(this.ss.getId(), false, result);
 			}
@@ -388,7 +354,7 @@ public final class JSONSingleSign extends SingleSign {
 				this.documentManager.storeDocument(this.ss.getDataRef(), this.certChain, dataToSave, singleSignProps);
 			}
 			catch(final Exception e) {
-				LOGGER.log(Level.WARNING, "No se puede almacenar la firma del documento: " + this.ss.getId(), e); //$NON-NLS-1$
+				LOGGER.log(Level.WARNING, "No se puede almacenar la firma del documento: " + LoggerUtil.getTrimStr(this.ss.getId()), e); //$NON-NLS-1$
 				final ProcessResult result = new ProcessResult(Result.DONE_BUT_ERROR_SAVING, "Error al almacenar la firma del documento"); //$NON-NLS-1$
 				return new ResultSingleSign(this.ss.getId(), false, result);
 			}

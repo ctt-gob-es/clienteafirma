@@ -31,19 +31,24 @@ import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+import javax.xml.parsers.DocumentBuilder;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOInvalidSignatureFormatException;
+import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.SigningLTSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xml.Utils;
 import es.gob.afirma.signers.xml.XMLConstants;
+import es.gob.afirma.signers.xml.XMLErrorCode;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormat;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormatImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifier;
@@ -145,12 +150,20 @@ public final class XAdESCounterSigner {
 			                  final Properties xParams,
 			                  final URIDereferencer uriDereferencer) throws AOException {
 
-		Document signDocument;
+		final DocumentBuilder docBuilder;
 		try {
-			signDocument = Utils.getNewDocumentBuilder().parse(new ByteArrayInputStream(sign));
+			docBuilder = Utils.getNewDocumentBuilder();
 		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido cargar el documento de firmas", e); //$NON-NLS-1$
+			throw new AOException("No se ha podido obtener el constructor de firma XML", e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
+		}
+
+		Document signDocument;
+		try {
+			signDocument = docBuilder.parse(new ByteArrayInputStream(sign));
+		}
+		catch (final Exception e) {
+			throw new AOInvalidSignatureFormatException("El documento no No se ha podido cargar el documento de firmas", e); //$NON-NLS-1$
 		}
 
 		return countersign(signDocument, algorithm, targetType, targets, key, certChain, xParams, uriDereferencer);
@@ -288,7 +301,7 @@ public final class XAdESCounterSigner {
 			}
 		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido realizar la contrafirma: " + e, e); //$NON-NLS-1$
+			throw new AOException("No se ha podido realizar la contrafirma: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 
 		// Obtenemos todas las firmas del documento
@@ -306,10 +319,11 @@ public final class XAdESCounterSigner {
 				// Si se indico expresamente que no se debia permitir la contrafirma de
 				// firmas de archivo, se lanza una excepcion bloqueando la ejecucion.
 				// Si no, se informa debidamente para que se consulte al usuario
+				final SigningLTSException ex = new SigningLTSException("La contrafirma de firmas de archivo podria invalidar el sello de archivo si se aplicase a contrafirmas internas", e, true); //$NON-NLS-1$
 				if (allowSignLts != null) {
-					throw new AOException(e.getMessage());
+					ex.setDenied(true);
 				}
-				throw new SigningLTSException("La contrafirma de firmas de archivo podria invalidar el sello de archivo si se aplicase a contrafirmas internas", e, true); //$NON-NLS-1$
+				throw ex;
 			}
 		}
 
@@ -366,7 +380,7 @@ public final class XAdESCounterSigner {
 			throw e;
 		}
 		catch (final Exception e) {
-			throw new AOException("Error al generar la contrafirma", e); //$NON-NLS-1$
+			throw new AOException("Error al generar la contrafirma", e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 
 		// si el documento recibido no estaba cofirmado se elimina el nodo raiz
@@ -435,9 +449,13 @@ public final class XAdESCounterSigner {
 			}
 		} catch (final AOException e) {
 			throw e;
-		} catch (final Exception e) {
+		} catch (final DOMException e) {
 			throw new AOException(
-					"No se ha podido realizar la contrafirma de hojas", e); //$NON-NLS-1$
+					"No se pudieron identificar las firmas del documento", e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			throw new AOException(
+					"No se ha podido realizar la contrafirma de hojas", e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 	}
 
@@ -463,24 +481,28 @@ public final class XAdESCounterSigner {
 		// descarta las posiciones que esten repetidas
 		final List<Integer> targetsList = new ArrayList<>();
 		for (int i = 0; i < tgts.length; i++) {
-			if (!targetsList.contains(tgts[i])) {
+			if (tgts[i] != null && !targetsList.contains(tgts[i])) {
 				targetsList.add((Integer) tgts[i]);
 			}
 		}
-		final Object[] targets = targetsList.toArray();
+		final int[] targets = new int[targetsList.size()];
+		for (int i = 0; i < targetsList.size(); i++) {
+			targets[i] = targetsList.get(i).intValue();
+		}
+
 
 		// obtiene los nodos indicados en targets
 		final Element[] nodes = new Element[targets.length];
 		try {
 			for (int i = 0; i < targets.length; i++) {
-				nodes[i] = (Element) signaturesList.item(((Integer) targets[i]).intValue());
+				nodes[i] = (Element) signaturesList.item(targets[i]);
 				if (nodes[i] == null) {
-					throw new AOException("Posicion de nodo no valida."); //$NON-NLS-1$
+					throw new AOException("Posicion de nodo no valida.", ErrorCode.Request.INVALID_COUNTERSIGNATURE_INDEX); //$NON-NLS-1$
 				}
 			}
 		}
 		catch (final ClassCastException e) {
-			throw new AOException("Valor de nodo no valido", e); //$NON-NLS-1$
+			throw new AOException("Valor de nodo no valido", e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 
 		// y crea sus contrafirmas
@@ -490,9 +512,10 @@ public final class XAdESCounterSigner {
 			}
 		} catch (final AOException e) {
 			throw e;
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			throw new AOException(
-					"No se ha podido realizar la contrafirma de nodos", e); //$NON-NLS-1$
+					"No se ha podido realizar la contrafirma de los nodos", e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 	}
 
@@ -575,7 +598,7 @@ public final class XAdESCounterSigner {
 			throw e;
 		} catch (final Exception e) {
 			throw new AOException(
-					"No se ha podido realizar la contrafirma del arbol", e); //$NON-NLS-1$
+					"No se ha podido realizar la contrafirma del arbol", e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 	}
 
@@ -616,7 +639,7 @@ public final class XAdESCounterSigner {
 		final Element signedPropertiesReference = XAdESUtil.getSignedPropertiesReference(signature);
 		final Element signedPropertiesElement = XAdESUtil.getSignedPropertiesElement(signature, signedPropertiesReference);
 		if (signedPropertiesElement == null) {
-			throw new AOException("No se han encontrado los atributos firmados de la firma original"); //$NON-NLS-1$
+			throw new AOMalformedSignatureException("No se han encontrado los atributos firmados de la firma original"); //$NON-NLS-1$
 		}
 
 		String xadesPrefix = signedPropertiesElement.getPrefix();
@@ -685,7 +708,8 @@ public final class XAdESCounterSigner {
 		}
 		catch (final Exception e) {
 			throw new AOException(
-				"No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e //$NON-NLS-1$ //$NON-NLS-2$
+				"No se ha podido obtener un generador de huellas digitales para el algoritmo " + digestMethodAlgorithm, //$NON-NLS-1$
+				e, XMLErrorCode.Request.INVALID_REFERENCES_HASH_ALGORITHM_URI
 			);
 		}
 		final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
@@ -711,7 +735,7 @@ public final class XAdESCounterSigner {
 			);
 		}
 		catch (final Exception e) {
-			throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
+			throw new AOException("No se ha podido realizar la contrafirma", e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 
 		// Comprobamos el perfil de firma que hay que aplicar
@@ -800,7 +824,7 @@ public final class XAdESCounterSigner {
 			throw e;
 		}
 		catch (final Exception e) {
-			throw new AOException("Error al generar la contrafirma XAdES", e); //$NON-NLS-1$
+			throw new AOException("Error al generar la contrafirma XAdES", e, XMLErrorCode.Internal.UNKWNON_XML_SIGNING_ERROR); //$NON-NLS-1$
 		}
 	}
 

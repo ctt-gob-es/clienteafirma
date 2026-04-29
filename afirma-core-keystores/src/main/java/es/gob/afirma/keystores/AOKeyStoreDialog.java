@@ -38,7 +38,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String[] EXTS = new String[] { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String[] EXTS = { "pfx", "p12" }; //$NON-NLS-1$ //$NON-NLS-2$
 	private static final String EXTS_DESC = " (*.p12, *.pfx)"; //$NON-NLS-1$
 
 	private final AggregatedKeyStoreManager ksm;
@@ -54,6 +54,8 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	private boolean allowExternalStores = true;
 
 	private final String libFileName;
+
+	private final boolean invocationFromBrowser;
 
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
      * @param ksm Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
@@ -147,6 +149,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
 		this.mandatoryCertificate = mandatoryCertificate;
 		this.libFileName = null;
+		this.invocationFromBrowser = false;
 	}
 
     /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
@@ -184,6 +187,47 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
 		this.mandatoryCertificate = mandatoryCertificate;
 		this.libFileName = libFileName;
+		this.invocationFromBrowser = false;
+	}
+
+    /** Crea un di&aacute;logo para la selecci&oacute;n de un certificado.
+     * @param ksm Gestor de los almac&eacute;nes de certificados entre los que se selecciona.
+     * @param parentComponent Componente gr&aacute;fico sobre el que mostrar los di&aacute;logos.
+     * @param checkPrivateKeys Indica si se debe comprobar que el certificado tiene clave
+     *                         privada o no, para no mostrar aquellos que carezcan de ella.
+     * @param showExpiredCertificates Indica si se deben o no mostrar los certificados caducados o
+     *                                aun no v&aacute;lidos.
+     * @param checkValidity Indica si se debe comprobar la validez temporal de un
+     *                      certificado al ser seleccionado.
+     * @param certFilters Filtros sobre los certificados a mostrar.
+     * @param mandatoryCertificate Indica si los certificados disponibles (tras aplicar el
+     *                             filtro) debe ser solo uno.
+     * @param libFileName Nombre del archivo de la librer&iacute;a en caso de que se seleccione un almacen de este tipo.
+     * @param invocationFromBrowser Si se indica a true, quiere decir que se esta llamando desde un navegador.
+     * */
+	public AOKeyStoreDialog(final AOKeyStoreManager ksm,
+			                final Object parentComponent,
+                            final boolean checkPrivateKeys,
+                            final boolean showExpiredCertificates,
+                            final boolean checkValidity,
+                            final List<? extends CertificateFilter> certFilters,
+                            final boolean mandatoryCertificate,
+                            final String libFileName,
+                            final boolean invocationFromBrowser) {
+
+		if (ksm == null) {
+    		throw new IllegalArgumentException("El almacen de claves no puede ser nulo"); //$NON-NLS-1$
+    	}
+
+		this.ksm = new AggregatedKeyStoreManager(ksm);
+		this.parentComponent = parentComponent;
+		this.checkPrivateKeys = checkPrivateKeys;
+		this.checkValidity = checkValidity;
+		this.showExpiredCertificates = showExpiredCertificates;
+		this.certFilters = certFilters != null ? new ArrayList<>(certFilters) : null;
+		this.mandatoryCertificate = mandatoryCertificate;
+		this.libFileName = libFileName;
+		this.invocationFromBrowser = invocationFromBrowser;
 	}
 
 	@Override
@@ -232,7 +276,13 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			switch (keyStoreId) {
 			// Almacen de Firefox
 			case KEYSTORE_ID_MOZILLA:
-				newKsm = openMozillaKeyStore(parent);
+
+				if (!this.invocationFromBrowser) {
+					newKsm = openMozillaKeyStore(parent);
+				} else {
+					newKsm = openMozillaWithOSKeyStore(parent);
+				}
+
 				if (newKsm != null) {
 					KeyStorePreferencesManager.setLastSelectedKeystore(AOKeyStore.MOZ_UNI.getName());
 				}
@@ -281,7 +331,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 					boolean stopOperation = false;
 					while (!stopOperation) {
 						try {
-							if (changeKeyStoreManager(keyStoreId, parent) == false) {
+							if (!changeKeyStoreManager(keyStoreId, parent)) {
 								stopOperation = true;
 							}
 						} catch (final AOCancelledOperationException aoce) {
@@ -342,7 +392,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 					boolean stopOperation = false;
 					while (!stopOperation) {
 						try {
-							if (changeKeyStoreManagerToPKCS11(parent, ksName, ksLibPath) == false) {
+							if (!changeKeyStoreManagerToPKCS11(parent, ksName, ksLibPath)) {
 								stopOperation = true;
 							}
 						} catch (final AOCancelledOperationException aoce) {
@@ -448,6 +498,34 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 				null,
 				null,
 				AOKeyStore.MOZ_UNI.getStorePasswordCallback(parent),
+				parent
+			);
+		}
+		catch (final AOCancelledOperationException e) {
+			throw e;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves de Mozilla: " + e, e); //$NON-NLS-1$
+			throw e;
+		}
+	}
+
+	/**
+	 * Carga el almac&eacute;n de claves del &uacute;ltimo perfil de Mozilla activo e incluye el propio del sistema.
+	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
+	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra el almac&eacute;n,
+	 * si no se pudo cargar o si se cancel&oacute; la carga.
+	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
+	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
+	 */
+	private static AOKeyStoreManager openMozillaWithOSKeyStore(final Object parent) throws Exception {
+
+		try {
+			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.MOZ_UNI_WITH_OS,
+				null,
+				null,
+				AOKeyStore.MOZ_UNI_WITH_OS.getStorePasswordCallback(parent),
 				parent
 			);
 		}
@@ -619,11 +697,11 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra un DNIe insertado,
 	 * si no se pudo cargar o si se cancel&oacute; la carga.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
-	 * @throws AOKeystoreAlternativeException Cuando no se identifica el sistema operativo como uno de
+	 * @throws KeystoreAlternativeException Cuando no se identifica el sistema operativo como uno de
 	 * los soportados.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openSystemKeyStore(final Object parent) throws AOKeystoreAlternativeException,
+	private static AOKeyStoreManager openSystemKeyStore(final Object parent) throws KeystoreAlternativeException,
 		                                                                               Exception {
 		final AOKeyStore ks;
 		final Platform.OS currentOs = Platform.getOS();
@@ -637,7 +715,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			ks = AOKeyStore.APPLE;
 		}
 		else {
-			throw new AOKeystoreAlternativeException(null, "No se ha podido identificar un almacen del sistema compatible"); //$NON-NLS-1$
+			throw new KeystoreAlternativeException(null, "No se ha podido identificar un almacen del sistema compatible", KeyStoreErrorCode.Internal.UNDEFINED_DEFAULT_KEYSTORE); //$NON-NLS-1$
 		}
 
 		try {
@@ -668,7 +746,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 			}
 			catch (final Exception e) {
 				LOGGER.severe("No se ha podido extraer la clave del almacen: " + e); //$NON-NLS-1$
-				throw new AOException("No se ha podido extraer la clave del almacen", e); //$NON-NLS-1$
+				throw new AOException("No se ha podido extraer la clave del almacen", e, KeyStoreErrorCode.Internal.LOADING_PRIVATE_KEY_ERROR); //$NON-NLS-1$
 			}
 		}
 

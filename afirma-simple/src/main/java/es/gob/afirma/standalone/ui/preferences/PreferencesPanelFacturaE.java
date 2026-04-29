@@ -41,7 +41,6 @@ import javax.swing.JTextField;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.Oid;
 
-import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -56,14 +55,14 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 
 	private static final long serialVersionUID = 4299378019540627483L;
 
-	private static final String FACTURAE_ROL_EMISOR = "Emisor"; //$NON-NLS-1$
-	private static final String FACTURAE_ROL_RECEPTOR = "Receptor"; //$NON-NLS-1$
-	private static final String FACTURAE_ROL_TERCERO = "Tercero"; //$NON-NLS-1$
+	private static final RoleItem FACTURAE_ROL_EMISOR = new RoleItem(SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.5"), "Emisor"); //$NON-NLS-1$
+	private static final RoleItem FACTURAE_ROL_RECEPTOR = new RoleItem(SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.6"), "Receptor"); //$NON-NLS-1$
+	private static final RoleItem FACTURAE_ROL_TERCERO = new RoleItem(SimpleAfirmaMessages.getString("PreferencesPanelFacturaE.7"), "Tercero"); //$NON-NLS-1$
 
 	private static final String SIGN_FORMAT_FACTURAE = AOSignConstants.SIGN_FORMAT_FACTURAE;
 
 	private static final String POLICY_FACTURAE_31_NAME = "3.1"; //$NON-NLS-1$
-	private static final AdESPolicy POLICY_FACTURAE_31 = new AdESPolicy(
+	private static final AdESPolicy POLICY_FACTURAE_31 = new AdESPolicy(true,
 		"http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf", //$NON-NLS-1$
 		"Ohixl6upD6av8N7pEvDABhEL6hM=", //$NON-NLS-1$
 		"SHA1", //$NON-NLS-1$
@@ -71,7 +70,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	);
 
 	private static final String POLICY_FACTURAE_30_NAME = "3.0"; //$NON-NLS-1$
-	private static final AdESPolicy POLICY_FACTURAE_30 = new AdESPolicy(
+	private static final AdESPolicy POLICY_FACTURAE_30 = new AdESPolicy(true,
 		"http://www.facturae.es/politica de firma formato facturae/politica de firma formato facturae v3_0.pdf", //$NON-NLS-1$
 		"xmfh8D/Ec/hHeE1IB4zPd61zHIY=", //$NON-NLS-1$
 		"SHA1", //$NON-NLS-1$
@@ -83,13 +82,13 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	private final JTextField facturaeSignatureProductionPostalCode = new JTextField();
 	private final JTextField facturaeSignatureProductionCountry = new JTextField();
 
-	private final JComboBox<Object> facturaeRol = new JComboBox<>(
-		new Object[] {
+	private final RoleItem [] roleItems = new RoleItem[] {
 			FACTURAE_ROL_EMISOR,
 			FACTURAE_ROL_RECEPTOR,
 			FACTURAE_ROL_TERCERO
-		}
-	);
+	};
+
+	private final JComboBox<Object> facturaeRol = new JComboBox<>(this.roleItems);
 
 	private final JPanel panelPolicies = new JPanel();
 	private PolicyPanel facturaePolicyPanel;
@@ -289,7 +288,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	/** Guarda las preferencias de FacturaE. */
 	void savePreferences() {
 
-		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNER_ROLE, this.facturaeRol.getSelectedItem().toString());
+		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNER_ROLE, ((RoleItem) this.facturaeRol.getSelectedItem()).getValue());
 
 		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY, this.facturaeSignatureProductionCity.getText());
 		PreferencesManager.put(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_PROVINCE, this.facturaeSignatureProductionProvince.getText());
@@ -324,9 +323,14 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	}
 
 	void loadPreferences() {
-		this.facturaeRol.setSelectedItem(
-			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNER_ROLE)
-		);
+
+		final String signerRoleValue = PreferencesManager.get(PREFERENCE_FACTURAE_SIGNER_ROLE);
+
+		for (final RoleItem item : this.roleItems) {
+			if (item.getValue().equals(signerRoleValue)) {
+				this.facturaeRol.setSelectedItem(item);
+			}
+		}
 
 		this.facturaeSignatureProductionCity.setText(
 			PreferencesManager.get(PREFERENCE_FACTURAE_SIGNATURE_PRODUCTION_CITY)
@@ -494,15 +498,15 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 		return adesPolicy;
 	}
 
-	void checkPreferences() throws AOException {
+	void checkPreferences() throws ConfigurationException {
 		final AdESPolicy p = this.facturaePolicyPanel.getSelectedPolicy();
-		if (p != null) {
+		if (p != null && !p.isPredefined()) {
 			// No nos interesa el resultado, solo si construye sin excepciones
 			try {
 				new Oid(p.getPolicyIdentifier().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			catch (final GSSException e) {
-				throw new AOException("El identificador debe ser un OID", e); //$NON-NLS-1$
+				throw new ConfigurationException("El identificador debe ser un OID", e); //$NON-NLS-1$
 			}
 		}
 	}

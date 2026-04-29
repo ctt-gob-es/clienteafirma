@@ -27,12 +27,12 @@
     <opt>-Xms512m -Xmx8g</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.9.0.0</fileVersion>
-    <txtFileVersion>1.9</txtFileVersion>
+    <fileVersion>1.10.0.0</fileVersion>
+    <txtFileVersion>1.10</txtFileVersion>
     <fileDescription>Autofirma</fileDescription>
     <copyright>Gobierno de España</copyright>
-    <productVersion>1.9.0.0</productVersion>
-    <txtProductVersion>1.9</txtProductVersion>
+    <productVersion>1.10.0.0</productVersion>
+    <txtProductVersion>1.10</txtProductVersion>
     <productName>Autofirma</productName>
     <companyName>Gobierno de España</companyName>
     <internalName>Autofirma</internalName>

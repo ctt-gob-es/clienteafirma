@@ -220,4 +220,16 @@ public class Xmlwise
 		return new XmlElement(createDocument(xml).getDocumentElement());
 	}
 
+	/**
+	 * Creates a document from a string and transforms it into an XmlElement tree.
+	 *
+	 * @param xml the xml as a string.
+	 * @return an XmlElement tree rendered from the file.
+	 * @throws XmlParseException if parsing the xml failed to validate for some reason.
+	 */
+	public static XmlElement createXml(final Document xml) throws XmlParseException
+	{
+		return new XmlElement(xml.getDocumentElement());
+	}
+
 }

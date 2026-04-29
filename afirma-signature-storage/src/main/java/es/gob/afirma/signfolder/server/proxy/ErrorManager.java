@@ -22,16 +22,18 @@ final class ErrorManager {
 	static final String ERROR_UNSUPPORTED_OPERATION_NAME = "ERR-01"; //$NON-NLS-1$
 	static final String ERROR_MISSING_DATA               = "ERR-02"; //$NON-NLS-1$
 	static final String ERROR_MISSING_DATA_ID            = "ERR-05"; //$NON-NLS-1$
+	static final String ERROR_INVALID_DATA_ID            = "ERR-06"; //$NON-NLS-1$
 	static final String ERROR_INVALID_DATA               = "ERR-07"; //$NON-NLS-1$
 	static final String ERROR_COMMUNICATING_WITH_WEB	 = "ERR-18"; //$NON-NLS-1$
 	static final String ERROR_MISSING_SYNTAX_VERSION	 = "ERR-20"; //$NON-NLS-1$
 
-	private static final AbstractMap<String, String> ERRORS = new HashMap<String, String>();
+	private static final AbstractMap<String, String> ERRORS = new HashMap<>();
 	static {
 		ERRORS.put(ERROR_MISSING_OPERATION_NAME,     "No se ha indicado c\u00F3digo de operaci\u00F3n");                          //$NON-NLS-1$
 		ERRORS.put(ERROR_UNSUPPORTED_OPERATION_NAME, "C\u00F3digo de operaci\u00F3n no soportado");                               //$NON-NLS-1$
 		ERRORS.put(ERROR_MISSING_DATA,               "No se han proporcionado los datos de la operaci\u00F3n");                   //$NON-NLS-1$
 		ERRORS.put(ERROR_MISSING_DATA_ID,            "No se ha proporcionado un identificador para los datos");                   //$NON-NLS-1$
+		ERRORS.put(ERROR_INVALID_DATA_ID,            "El identificador para los datos es inv\u00E1lido");                         //$NON-NLS-1$
 		ERRORS.put(ERROR_INVALID_DATA,               "Los datos solicitados o enviados son inv\u00E1lidos");                      //$NON-NLS-1$
 		ERRORS.put(ERROR_COMMUNICATING_WITH_WEB,     "No se ha podido enviar la firma generada a la Web de origen");              //$NON-NLS-1$
 		ERRORS.put(ERROR_MISSING_SYNTAX_VERSION,     "No se ha indicado la versi\u00F3n de la sintaxis de la operaci\u00F3n");    //$NON-NLS-1$
