@@ -82,7 +82,7 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	private final JTextField facturaeSignatureProductionPostalCode = new JTextField();
 	private final JTextField facturaeSignatureProductionCountry = new JTextField();
 
-	private final RoleItem [] roleItems = new RoleItem[] {
+	private final RoleItem [] roleItems = {
 			FACTURAE_ROL_EMISOR,
 			FACTURAE_ROL_RECEPTOR,
 			FACTURAE_ROL_TERCERO
@@ -465,10 +465,10 @@ final class PreferencesPanelFacturaE extends JScrollPane {
 	private static AdESPolicy getFacturaEPreferedPolicy() {
 
 		final String policy = PreferencesManager.get(PreferencesManager.PREFERENCE_FACTURAE_POLICY);
-		if (policy.equals(POLICY_FACTURAE_30_NAME)) {
+		if (POLICY_FACTURAE_30_NAME.equals(policy)) {
 			return POLICY_FACTURAE_30;
 		}
-		else if (policy.equals(POLICY_FACTURAE_31_NAME)) {
+		if (POLICY_FACTURAE_31_NAME.equals(policy)) {
 			return POLICY_FACTURAE_31;
 		}
 		return null;

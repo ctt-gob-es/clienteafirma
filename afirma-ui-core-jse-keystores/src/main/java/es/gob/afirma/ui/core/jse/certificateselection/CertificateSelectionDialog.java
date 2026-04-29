@@ -19,11 +19,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
@@ -71,7 +73,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 					                  final String dialogSubHeadline,
 						              final boolean showControlButons,
 						              final boolean disableCertificateSelection) {
-		
+
 		// Al instanciar el dialogo, se actualiza el Locale por si se hubiera modificado el idioma
 		CertificateSelectionDialogMessages.updateLocale();
 
@@ -143,7 +145,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		}
 
 		this.certDialog = this.optionPane.createDialog(
-			this.parent,
+			this.parent != null && this.parent.isShowing() ? this.parent : null,
 			title
 		);
 
@@ -166,32 +168,75 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 						new Dimension((int) this.certDialog.getSize().getWidth(), screenHeight));
 			}
 		}
-		this.certDialog.setVisible(true);
+
+		boolean dialogShowed = false;
+		boolean certsShowed = false;
+		String selectedAlias = null;
+
+		// Si la operacion no se ejecuta en un hilo de eventos, se muestra el dialogo en el hilo
+		// de eventos y se espera a que se cierre para continuar con la ejecucion
+		if (!SwingUtilities.isEventDispatchThread()) {
+	    	try {
+	    		final AtomicReference<Boolean> certShowedReference = new AtomicReference<>();
+		    	final AtomicReference<String> selectedCertAliasReference = new AtomicReference<>();
+		    	SwingUtilities.invokeAndWait(() -> {
+		    		this.certDialog.setVisible(true);
+
+		    		// Comprobamos el numero de certificados que se mostraban en el dialogo
+		    		certShowedReference.set(new Boolean(this.csd.getShowedCertsCount() > 0));
+
+		    		// Si el usuario cancelo el dialogo, establecemos que no se selecciono ningun certificado
+		    		if (this.optionPane.getValue() == null || ((Integer) this.optionPane.getValue()).intValue() != JOptionPane.OK_OPTION) {
+		    			selectedCertAliasReference.set(null);
+		    		}
+		    		// En caso contrario, obtenemos el alias del certificado seleccionado
+		    		else {
+		    			selectedCertAliasReference.set(this.csd.getSelectedCertificateAlias());
+		    		}
+		    	});
+		        dialogShowed = true;
+		        certsShowed = certShowedReference.get().booleanValue();
+		        selectedAlias = selectedCertAliasReference.get();
+
+			} catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "Error mostrando el dialogo de seleccion de certificados en un hilo de eventos separado. Se ejecutara normalmente", e); //$NON-NLS-1$
+				dialogShowed = false;
+			}
+	    }
+
+		// Si no se ha mostrado ya el dialogo (por estar en el hilo de eventos o por fallar al mostrarse
+		// anteriormente), se muestra ahora
+		if (!dialogShowed) {
+			this.certDialog.setVisible(true);
+
+			// Comprobamos el numero de certificados que se mostraban en el dialogo
+			certsShowed = this.csd.getShowedCertsCount() > 0;
+
+			// Si el usuario cancelo el dialogo, establecemos que no se selecciono ningun certificado
+			if (this.optionPane.getValue() == null || ((Integer) this.optionPane.getValue()).intValue() != JOptionPane.OK_OPTION) {
+				selectedAlias = null;
+			}
+			// En caso contrario, obtenemos el alias del certificado seleccionado
+			else {
+				selectedAlias = this.csd.getSelectedCertificateAlias();
+			}
+		}
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
-
-		// Si en el dialogo mostrado, no habia ningun certificado, independientemente del modo de
-		// cerrar el dialogo, consideramos que el problema es que el usuario no tiene certificados
-		// validos
-		if (this.csd.getShowedCertsCount() == 0) {
-			throw new CertificatesNotFoundException("No habia certificados validos en el almacen del usuario"); //$NON-NLS-1$
-		}
-
-		// Si el usuario cancelo el dialogo, lo cerramos
-		if (this.optionPane.getValue() == null || ((Integer) this.optionPane.getValue()).intValue() != JOptionPane.OK_OPTION) {
-			this.certDialog.dispose();
-			return null;
-		}
-
-		// Obtenemos el alias del certificado seleccionado
-		final String selectedAlias = this.csd.getSelectedCertificateAlias();
 
 		// Guardamos la vista seleccionada
 		this.csd.savePreferredCertificateView();
 
-		// Cerramos el dialogo
+		// Liberamos los recursos del dialogo
 		this.certDialog.dispose();
 		this.certDialog = null;
+
+		// Si no se llegaron a mostrad certificados en el dialogo, independientemente del modo de
+		// cerrarlo, consideramos que el problema es que el usuario no tiene certificados
+		// validos
+		if (!certsShowed) {
+			throw new CertificatesNotFoundException("No habia certificados validos en el almacen del usuario"); //$NON-NLS-1$
+		}
 
 		return selectedAlias;
 	}
@@ -288,28 +333,23 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 		}
 	}
 
-	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = new Comparator<NameCertificateBean>() {
-
-		@Override
-		public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
-			if (o1 == null && o2 == null) {
-				return 0;
-			}
-			if (o1 == null) {
-				return 1;
-			}
-			else if (o2 == null) {
-				return -1;
-			}
-			else{
-				return o1.getName().compareToIgnoreCase(o2.getName());
-			}
+	private static final Comparator<NameCertificateBean> CERT_NAME_COMPARATOR = (o1, o2) -> {
+		if (o1 == null && o2 == null) {
+			return 0;
 		}
+		if (o1 == null) {
+			return 1;
+		}
+		if (o2 == null) {
+			return -1;
+		}
+		return o1.getName().compareToIgnoreCase(o2.getName());
 	};
 
 	private static final class CertOptionPane extends JOptionPane {
 
-		private static final long serialVersionUID = 1L;
+		/** Serial Id. */
+		private static final long serialVersionUID = -7271848812314524669L;
 
 		private final CertificateSelectionPanel selectionPanel;
 
