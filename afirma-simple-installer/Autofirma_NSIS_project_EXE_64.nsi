@@ -211,11 +211,10 @@ Section "Autofirma" sPrograma
 	SectionIn RO
 	StrCpy $PATH "Autofirma"
 
-	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
-	System::Call 'kernel32::GetCurrentProcess()i.r0'
-	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
-	pop $3
-	${If} $1 != 1
+	; Comprobamos que el sistema sea de 64bits y salimos en caso contrario
+	Call isSystem64Arch
+	Pop $0
+	${If} $0 != "true"
 		MessageBox MB_OK $(CANT_INSTALL_64_BITS)
 		Quit
 	${EndIf}
@@ -224,15 +223,25 @@ Section "Autofirma" sPrograma
 	;su numero de version y se dejara configurado el registro a 32 o 64 bits segun corresponda
 	Call CheckVersionInstalled
 	Pop $R1
+	Pop $R2
+
 	${If} $R1 != ""
+	
 		; Si es la misma version o superior, detenemos el proceso. Si no, se elimina.
-		${VersionCheckNew} $R1 ${VERSION} "$R2"
-		${If} $R2 = 0
-		  MessageBox MB_OK  $(INSTALLED_VERSION)
+		${VersionCheckNew} $R1 ${VERSION} "$R3"
+		${If} $R3 = 0
+		  MessageBox MB_OK $(INSTALLED_VERSION)
 		  Quit
-		${ElseIf} $R2 <> 2
-		  MessageBox MB_OK  $(NEWEST_VERSION)
+		${ElseIf} $R3 <> 2
+		  MessageBox MB_OK $(NEWEST_VERSION)
 		  Quit
+		${EndIf}
+
+		; Eliminamos la version encontrada, indicando su arquitectura para que se busque la correcta
+		${If} $R2 == 32
+		  SetRegView 32
+		${ElseIf} $R2 == 64
+		  SetRegView 64
 		${EndIf}
 		Call RemoveOldVersions
 	${EndIf}
@@ -264,7 +273,7 @@ Section "Autofirma" sPrograma
 
 	;Copiamos la JRE en caso de que no se vaya usar el JRE instalado en el sistema
 	${If} $INSTALL_JRE == "true" 
-		File /r java64\jre
+        File /r java64\jre
     ${EndIf}
 
 	;Hacemos que la instalacion se realice para todos los usuarios del sistema
@@ -379,6 +388,9 @@ Section "Autofirma" sPrograma
 	  ;MessageBox MB_OK "Error en la importación: $0"
 	;${EndIf}
 
+	; Refrescamos el entorno para que asuman los cambios en el escritorio, menu inicio, asociacion de ficheros...
+	Call RefreshShell
+
 SectionEnd
 
 Section "Java Runtime Environment" sJRE
@@ -445,17 +457,33 @@ Function .onSelChange
 	
 FunctionEnd
 
-!define CERT_STORE_CERTIFICATE_CONTEXT  1
-!define CERT_NAME_ISSUER_FLAG           1
-!define CERT_NAME_SIMPLE_DISPLAY_TYPE   4
+;Function isSystem64Arch
+; Comprueba si el systema es de 64 bits.
+; Uso:
+;   Call isSystem64Arch
+;   Pop $R0
+;		 - $R0 sera "true" si el sistema es de 64 bits.
+Function isSystem64Arch
+    Push $R0
+	Push $R1
+	Push $0
+	Push $1
+	Push $2
+	
+	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
+	System::Call 'kernel32::GetCurrentProcess()i.r0'
+	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
+	Pop $R1
 
-!define CERT_QUERY_OBJECT_FILE 1
-!define CERT_QUERY_CONTENT_FLAG_ALL 16382
-!define CERT_QUERY_FORMAT_FLAG_ALL 14
-!define CERT_STORE_PROV_SYSTEM 10
-!define CERT_STORE_OPEN_EXISTING_FLAG 0x4000
-!define CERT_SYSTEM_STORE_LOCAL_MACHINE 0x20000
-!define CERT_STORE_ADD_ALWAYS 4
+	IntCmp $1 1 0 +2
+	  StrCpy $R0 "true" 
+
+	Pop $2
+	Pop $1
+	Pop $0
+	Pop $R1
+    Exch $R0
+FunctionEnd
 
 ;Function isValidJavaVersionAvailable
 ; Check if its available by PATH a compatible Java version (8+).
@@ -581,32 +609,46 @@ FunctionEnd
 ;		 - $R0 is "true" if the Java architecture is 64-bit o "false" otherwise.
 Function isJava64Arch
 
-  Push $0
-  Push $1
+  Push $R0
+  Push $R1
 
   ; Ejecutamos "java -version", que devolvera un resultado valido si java esta en el PATH
   nsExec::ExecToStack 'java -Xinternalversion'
-  Pop $0 ; Codigo de salida
-  StrCmp $0 "error" novalidjava
-  StrCmp $0 "timeout" novalidjava
-  Pop $0 ; Texto de salida
+  Pop $R0 ; Codigo de salida
+  StrCmp $R0 "error" novalidjava
+  StrCmp $R0 "timeout" novalidjava
+  Pop $R0 ; Texto de salida
 
   ; Consideraremos que es un Java de 64 bits si la cadena de salida contiene la subcadena "64-Bit"
-  Push $0
+  Push $R0
   Push "64-Bit"
   Call StrContains
-  Pop $1
-  StrCpy $0 "true"
-  StrCmp $1 "" novalidjava return
+  Pop $R1
+  StrCpy $R0 "true"
+  StrCmp $R1 "" novalidjava return
 
   novalidjava:
-    StrCpy $0 "false"
+    StrCpy $R0 "false"
   
   return:
-    Pop $1
-    Exch $0
+    Pop $R1
+    Exch $R0
 
 FunctionEnd
+
+
+!define CERT_STORE_CERTIFICATE_CONTEXT  1
+!define CERT_NAME_ISSUER_FLAG           1
+!define CERT_NAME_SIMPLE_DISPLAY_TYPE   4
+
+!define CERT_QUERY_OBJECT_FILE 1
+!define CERT_QUERY_CONTENT_FLAG_ALL 16382
+!define CERT_QUERY_FORMAT_FLAG_ALL 14
+!define CERT_STORE_PROV_SYSTEM 10
+!define CERT_STORE_OPEN_EXISTING_FLAG 0x4000
+!define CERT_SYSTEM_STORE_LOCAL_MACHINE 0x20000
+!define CERT_STORE_ADD_ALWAYS 4
+
 
 ;Function AddCertificateToStore
 
@@ -647,25 +689,104 @@ Function AddCertificateToStore
  
 FunctionEnd
 
-;Identifica la version instalada de Autofirma.
-;Devuelve la cadena con el numero de version y deja el registro configurado
-;para la arquitectura correspondiente a la version identificada
+;Function CheckVersionInstalled
+; Identifica si hay una version instalada de Autofirma y su arquitectura.
+; Uso:
+;   Call CheckVersionInstalled
+;   Pop $R0		; Version de la aplicacion instalada o cadena vacia si no se encontro
+;   Pop $R1		; Arquitectura (32 o 64) de la version encontrada o cadena vacia si no se encontro
 Function CheckVersionInstalled
+    Push $R0
+    Push $R1
 
-  ;Buscamos en 64 bits			  
-  SetRegView 64
-  ReadRegStr $R0 HKLM "SOFTWARE\$PATH" "Version"
+	; Vamos a buscar la aplicacion primero con en la vista de registro por defecto
+	SetRegView 64
+	Call CheckVersionInstalledByRegistry
+	Pop $R0
 
-  ;Si lo hemos encontrado ya, salimos 
-  IfErrors +2
-	Goto End
+	; Si se encontro una version instalada, salimos ya
+	${If} $R0 != ""
+	  StrCpy $R1 64
+	  Goto End
+	${EndIf}
+	
+	; Si no se ha encontrado, probamos a buscar en la vista de 32 bits
+	SetRegView 32
+	Call CheckVersionInstalledByRegistry
+	Pop $R0
 
-  ;Buscamos en 32 bits
-  SetRegView 32
-  ReadRegStr $R0 HKLM "SOFTWARE\$PATH" "Version"
- 
+	${If} $R0 != ""
+	  StrCpy $R1 32
+    ${EndIf}
+
   End:
-	Push $R0 ; output
+    Exch $R1 ; Arquitectura
+    Exch
+	Exch $R0 ; Version o cadena vacia si no se encontro
+FunctionEnd
+
+;Function CheckVersionInstalledByRegistry
+; Identifica si hay una version instalada de la aplicacion para la vista de registro seleccionada.
+; Uso:
+;   Call CheckVersionInstalledByRegistry
+;   Pop $R0		; Version de la aplicacion instalada o cadena vacia si no se encontro
+Function CheckVersionInstalledByRegistry
+    Push $R0
+	Push $0
+	Push $1
+	Push $2
+	Push $3
+	Push $4
+
+	; Comprobamos en la entrada de registro del instalador EXE
+	ClearErrors
+	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
+
+	${If} ${Errors}
+		Goto CheckMsiEntry
+	${EndIf}  
+	
+	; Se ha encontrado la entrada, se busca la version
+	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
+	Goto End
+	
+	; Comprobamos si se encuentra instalada la aplicacion en los registros del instalador MSI
+	CheckMsiEntry:
+		; Recorremos todas las entradas suceptibles de ser la de la aplicacion
+		${registry::Open} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" "/K=0 /V=1 /S=0 /B=1 /N='DisplayName'" $0
+		; Si no habia ninguna entrada, damos por finalizada la busqueda. Si no, leemos la primera
+		StrCmp $0 0 0 CheckRegistryLoop
+		Goto End
+
+	; Bucle de busqueda de la entrada de la aplicacion
+	CheckRegistryLoop:
+		; Leemos la entrada
+		${registry::Find} "$0" $1 $2 $3 $4
+
+		; Si ya no hay mas entradas, salimos del bucle
+		StrCmp $4 '' Close
+
+		; Si no es una clave valida, pasamos a la siguiente
+		StrCmp $4 "REG_SZ" 0 CheckRegistryLoop
+		; Comprobamos si el nombre la aplicacion de la entrada es el de la nuestra (Autofirma o AutoFirma). Si no, pasamos a la siguiente
+		StrCmp $3 "Autofirma" +2 0
+		StrCmp $3 "AutoFirma" 0 CheckRegistryLoop
+		; Leemos la version
+		ReadRegStr $R0 HKLM $1 "DisplayVersion"
+	
+	; Salida del bucle
+	Close:
+		${registry::Close} "$0"
+		${registry::Unload}
+
+  	; Fin de la ejecucion
+    End:
+      Pop $4
+	  Pop $3
+	  Pop $2
+	  Pop $1
+	  Pop $0
+	  Exch $R0 ; Version
 FunctionEnd
 
 Function VersionCheck
@@ -954,6 +1075,9 @@ Section "uninstall"
 	;Borrar accesos directos del escritorio y menu inicio
 	Delete "$DESKTOP\Autofirma.lnk"
 	RMDir /r $SMPROGRAMS\$PATH
+
+	; Refrescamos el entorno para que asuman los cambios en el escritorio, menu inicio, asociacion de ficheros...
+	Call un.RefreshShell
 	
 	;Eliminamos las entradas de registro en la vista de 64 bits
 	SetRegView 64
@@ -962,6 +1086,7 @@ Section "uninstall"
 	;Eliminamos las entradas de registro en la vista de 32 bits
 	SetRegView 32
 	Call un.UninstallFromRegistry
+
 
 SectionEnd
 
@@ -1009,21 +1134,33 @@ FunctionEnd
 !insertmacro StrContains ""
 !insertmacro StrContains "un."
 
+;Function RemoveOldVersions
+;
 ; Funcion para eliminar versiones anteriores de Autofirma. Las versiones se
 ; buscan a traves del registro, para lo cual afecta si se tiene configurada la
 ; vista de 32 o 64 bits
 ; Uso:
 ;   Call RemoveOldVersions
 Function RemoveOldVersions
+    Push $R0
+    Push $R1
+	Push $R2
+    Push $0
+    Push $1
+    Push $2
+    Push $3
+    Push $4
+    Push $5
+    Push $6
   
 	; Comprueba que este ya instalada
 	ClearErrors
 	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
 
 	${If} ${Errors}
-		Goto CheckAutofirmaVersion
+		Goto CheckMsiEntry
 	${EndIf}
-	
+
 	; Se ha encontrado Autofirma instalado
 	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
 	${VersionCheckNew} $R1 ${VERSION} "$R2"
@@ -1038,24 +1175,29 @@ Function RemoveOldVersions
 	Goto End
 	
 	; No se encontro Autofirma instalado por el primer metodo, lo comprobamos de otra forma
-	CheckAutofirmaVersion:
+	CheckMsiEntry:
+	
 		${registry::Open} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" "/K=0 /V=1 /S=0 /B=1 /N='DisplayName'" $0
-		StrCmp $0 0 0 searchAutofirmaLoop
+		StrCmp $0 0 0 CheckRegistryLoop
 		Goto End
 
-		searchAutofirmaLoop:
+	CheckRegistryLoop:
+		
+		; Leemos la entrada
 		${registry::Find} "$0" $1 $2 $3 $4
 
-		; Si hemos terminado la busqueda, salimos del bucle
-		StrCmp $4 '' close
+		; Si ya no hay mas entradas, salimos del bucle
+		StrCmp $4 '' Close
 
-		; Si hemos encontrado el registro, obtenemos la cadena de desinstalacion, preparamos las variables y dejamos de repetir el bucle
-		StrCmp $4 "REG_SZ" 0 searchAutofirmaLoop
-		StrCmp $3 "AutoFirma" +2 0
-		StrCmp $3 "Autofirma" 0 searchAutofirmaLoop
+		; Si no es una clave valida, pasamos a la siguiente
+		StrCmp $4 "REG_SZ" 0 CheckRegistryLoop
+
+		; Comprobamos si el nombre la aplicacion de la entrada es el de la nuestra (Autofirma o AutoFirma). Si no, pasamos a la siguiente
+		StrCmp $3 "Autofirma" +2 0
+		StrCmp $3 "AutoFirma" 0 CheckRegistryLoop
 		ReadRegStr $R0 HKLM $1 "UninstallString"
-		
-		close:
+
+	close:
 		${registry::Close} "$0"
 		${registry::Unload}
 
@@ -1174,6 +1316,16 @@ Function RemoveOldVersions
 
 	End:
 	
+    Push $6
+    Push $5
+    Push $4
+    Push $3
+    Push $2
+    Push $1
+    Push $0
+	Push $R2
+    Push $R1
+	Push $R0
 FunctionEnd
 
 ; Funcion para copiar los valores de una clave de registro a otra.
@@ -1318,3 +1470,22 @@ done:
 FunctionEnd
 !macroend
 !insertmacro StrStr ""
+
+
+!define SHCNE_ASSOCCHANGED 0x08000000
+!define SHCNF_IDLIST 0
+
+; RefreshShell - Refresca el entorno para que Windows perciba los cambios (iconos, menu inicio...)
+; Basado en el ejemplo de jerome tremblay: https://nsis.sourceforge.io/Refresh_shell_icons
+
+; Uso:
+;	Call RefreshShell
+
+!macro RefreshShell un
+Function ${un}RefreshShell
+  System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v \
+    (${SHCNE_ASSOCCHANGED}, ${SHCNF_IDLIST}, 0, 0)'
+FunctionEnd
+!macroend
+!insertmacro RefreshShell ""
+!insertmacro RefreshShell "un."

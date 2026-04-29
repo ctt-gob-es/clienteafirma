@@ -218,15 +218,22 @@ Section "Autofirma" sPrograma
 	;su numero de version y se dejara configurado el registro a 32 o 64 bits segun corresponda
 	Call CheckVersionInstalled
 	Pop $R1
+	Pop $R2
 	${If} $R1 != ""
 		; Si es la misma version o superior, detenemos el proceso. Si no, se elimina.
-		${VersionCheckNew} $R1 ${VERSION} "$R2"
-		${If} $R2 = 0
+		${VersionCheckNew} $R1 ${VERSION} "$R3"
+		${If} $R3 = 0
 		  MessageBox MB_OK $(INSTALLED_VERSION)
 		  Quit
-		${ElseIf} $R2 <> 2
+		${ElseIf} $R3 <> 2
 		  MessageBox MB_OK $(NEWEST_VERSION)
 		  Quit
+		${EndIf}
+		; Eliminamos la version encontrada, indicando su arquitectura para que se busque la correcta
+		${If} $R2 == 32
+		  SetRegView 32
+		${ElseIf} $R2 == 64
+		  SetRegView 64
 		${EndIf}
 		Call RemoveOldVersions
 	${EndIf}
@@ -371,7 +378,10 @@ Section "Autofirma" sPrograma
 	Pop $0
 	;${If} $0 != success
 	  ;MessageBox MB_OK "Error en la importación: $0"
-	;${EndIf}                            
+	;${EndIf}
+
+	; Refrescamos el entorno para que asuman los cambios en el escritorio, menu inicio, asociacion de ficheros...
+	Call RefreshShell                    
 
 SectionEnd
 
@@ -440,18 +450,6 @@ Function .onSelChange
 	Pop $0
 	
 FunctionEnd
-
-!define CERT_STORE_CERTIFICATE_CONTEXT  1
-!define CERT_NAME_ISSUER_FLAG           1
-!define CERT_NAME_SIMPLE_DISPLAY_TYPE   4
-
-!define CERT_QUERY_OBJECT_FILE 1
-!define CERT_QUERY_CONTENT_FLAG_ALL 16382
-!define CERT_QUERY_FORMAT_FLAG_ALL 14
-!define CERT_STORE_PROV_SYSTEM 10
-!define CERT_STORE_OPEN_EXISTING_FLAG 0x4000
-!define CERT_SYSTEM_STORE_LOCAL_MACHINE 0x20000
-!define CERT_STORE_ADD_ALWAYS 4
 
  ;Function isValidJavaVersionAvailable
 ; Check if its available by PATH a compatible Java version (8+).
@@ -559,6 +557,21 @@ Function GetJavaVersion
 	Exch $0
 
 FunctionEnd
+
+
+!define CERT_STORE_CERTIFICATE_CONTEXT  1
+!define CERT_NAME_ISSUER_FLAG           1
+!define CERT_NAME_SIMPLE_DISPLAY_TYPE   4
+
+!define CERT_QUERY_OBJECT_FILE 1
+!define CERT_QUERY_CONTENT_FLAG_ALL 16382
+!define CERT_QUERY_FORMAT_FLAG_ALL 14
+!define CERT_STORE_PROV_SYSTEM 10
+!define CERT_STORE_OPEN_EXISTING_FLAG 0x4000
+!define CERT_SYSTEM_STORE_LOCAL_MACHINE 0x20000
+!define CERT_STORE_ADD_ALWAYS 4
+
+
 ;Function AddCertificateToStore
 
 Function AddCertificateToStore
@@ -598,30 +611,144 @@ Function AddCertificateToStore
  
 FunctionEnd
  
-;Identifica la version instalada de Autofirma.
-;Devuelve la cadena con el numero de version y deja el registro configurado
-;para la arquitectura correspondiente a la version identificada
-Function CheckVersionInstalled
+;Function CheckVersionInstalled
+; Identifica la version instalada de Autofirma y su arquitectura.
+; Uso:
+;   Call CheckVersionInstalled
+;   Pop $R0		; Version de la aplicacion instalada o cadena vacia si no se encontro
+;   Pop $R1		; Arquitectura (32 o 64) de la version encontrada o cadena vacia si no se encontro
+Function CheckVersionInstalled 
+  Push $R0
+  Push $R1
+  Push $R2
 
   ;Buscamos en 64 bits (solo en sistemas de 64 bits)
-  System::Call 'kernel32::GetCurrentProcess()i.r0'
-  System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
-  pop $3
-  ${If} $1 = 1
+  Call isSystem64Arch
+  Pop $R2
+  ${If} $R2 == "true"
 	SetRegView 64
-	ReadRegStr $R0 HKLM "SOFTWARE\$PATH" "Version"
+	Call CheckVersionInstalledByRegistry
+	Pop $R0
 
-	;Si lo hemos encontrado ya, salimos 
-	IfErrors +2
+	; Si se encontro la version de 64 instalada, salimos ya
+	${If} $R0 != ""
+	  StrCpy $R1 64
 	  Goto End
+	${EndIf}
+
   ${EndIf}
 
-  ;Buscamos en 32 bits
-  SetRegView 32
-  ReadRegStr $R0 HKLM "SOFTWARE\$PATH" "Version"
+	; Si no se ha encontrado, probamos a buscar en la vista de 32 bits
+	SetRegView 32
+	Call CheckVersionInstalledByRegistry
+	Pop $R0
+
+	${If} $R0 != ""
+	  StrCpy $R1 32
+    ${EndIf}
  
   End:
-	Push $R0 ; output
+	; Devolvemos a la pila los valores
+	Pop $R2
+    Exch $R1 ; Arquitectura
+    Exch
+	Exch $R0 ; Version o cadena vacia si no se encontro
+FunctionEnd
+
+;Function isSystem64Arch
+; Comprueba si el systema es de 64 bits.
+; Uso:
+;   Call isSystem64Arch
+;   Pop $R0
+;		 - $R0 sera "true" si el sistema es de 64 bits.
+!macro isSystem64Arch un
+Function ${un}isSystem64Arch
+    Push $R0
+	Push $R1
+	Push $0
+	Push $1
+	Push $2
+	
+	;Comprobamos que el sistema sea de 64bits y salimos en caso contrario
+	System::Call 'kernel32::GetCurrentProcess()i.r0'
+	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
+	Pop $R1
+
+	IntCmp $1 1 0 +2
+	  StrCpy $R0 "true" 
+
+	Pop $2
+	Pop $1
+	Pop $0
+	Pop $R1
+    Exch $R0
+FunctionEnd
+!macroend
+!insertmacro isSystem64Arch ""
+!insertmacro isSystem64Arch "un."
+
+;Function CheckVersionInstalledByRegistry
+; Identifica si hay una version instalada de la aplicacion para la vista de registro seleccionada.
+; Uso:
+;   Call CheckVersionInstalledByRegistry
+;   Pop $R0		; Version de la aplicacion instalada o cadena vacia si no se encontro
+Function CheckVersionInstalledByRegistry
+    Push $R0
+	Push $0
+	Push $1
+	Push $2
+	Push $3
+	Push $4
+
+	; Comprobamos en la entrada de registro del instalador EXE
+	ClearErrors
+	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
+
+	${If} ${Errors}
+		Goto CheckMsiEntry
+	${EndIf}  
+	
+	; Se ha encontrado la entrada, se busca la version
+	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
+	Goto End
+	
+	; Comprobamos si se encuentra instalada la aplicacion en los registros del instalador MSI
+	CheckMsiEntry:
+		; Recorremos todas las entradas suceptibles de ser la de la aplicacion
+		${registry::Open} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" "/K=0 /V=1 /S=0 /B=1 /N='DisplayName'" $0
+		; Si no habia ninguna entrada, damos por finalizada la busqueda. Si no, leemos la primera
+		StrCmp $0 0 0 CheckRegistryLoop
+		Goto End
+
+	; Bucle de busqueda de la entrada de la aplicacion
+	CheckRegistryLoop:
+		; Leemos la entrada
+		${registry::Find} "$0" $1 $2 $3 $4
+
+		; Si ya no hay mas entradas, salimos del bucle
+		StrCmp $4 '' Close
+
+		; Si no es una clave valida, pasamos a la siguiente
+		StrCmp $4 "REG_SZ" 0 CheckRegistryLoop
+		; Comprobamos si el nombre la aplicacion de la entrada es el de la nuestra (Autofirma o AutoFirma). Si no, pasamos a la siguiente
+		StrCmp $3 "Autofirma" +2 0
+		StrCmp $3 "AutoFirma" 0 CheckRegistryLoop
+		; Leemos la version
+		ReadRegStr $R0 HKLM $1 "DisplayVersion"
+	
+	; Salida del bucle
+	Close:
+		${registry::Close} "$0"
+		${registry::Unload}
+
+  	; Fin de la ejecucion
+    End:
+      Pop $4
+	  Pop $3
+	  Pop $2
+	  Pop $1
+	  Pop $0
+	  Exch $R0 ; Version
 FunctionEnd
 
 Function VersionCheck
@@ -911,11 +1038,13 @@ Section "uninstall"
 	Delete "$DESKTOP\Autofirma.lnk"
 	RMDir /r $SMPROGRAMS\$PATH
 	
-	;Eliminamos las entradas de registro en la vista de 64 bits (solo en Windows 64 bits)
-	System::Call 'kernel32::GetCurrentProcess()i.r0'
-	System::Call 'kernel32::IsWow64Process(ir0,*i.r1)i.r2?e'
-	pop $3
-	IntCmp $1 1 0 +3 0
+	; Refrescamos el entorno para que asuman los cambios en el escritorio, menu inicio, asociacion de ficheros...
+	Call un.RefreshShell
+	
+	;Si el sistema es de 64 bits, eliminamos las entradas de registro en la vista de 64 bits
+	Call un.isSystem64Arch
+	Pop $1
+	StrCmp $1 "true" 0 +3
 	  SetRegView 64
 	  Call un.UninstallFromRegistry
 
@@ -969,6 +1098,8 @@ FunctionEnd
 !insertmacro StrContains ""
 !insertmacro StrContains "un."		  
 
+;Function RemoveOldVersions
+;
 ; Funcion para eliminar versiones anteriores de Autofirma. Las versiones se
 ; buscan a traves del registro, para lo cual afecta si se tiene configurada la
 ; vista de 32 o 64 bits
@@ -1279,3 +1410,22 @@ done:
 FunctionEnd
 !macroend
 !insertmacro StrStr ""
+
+
+!define SHCNE_ASSOCCHANGED 0x08000000
+!define SHCNF_IDLIST 0
+
+; RefreshShell - Refresca el entorno para que Windows perciba los cambios (iconos, menu inicio...)
+; Basado en el ejemplo de jerome tremblay: https://nsis.sourceforge.io/Refresh_shell_icons
+
+; Uso:
+;	Call RefreshShell
+
+!macro RefreshShell un
+Function ${un}RefreshShell
+  System::Call 'shell32.dll::SHChangeNotify(i, i, i, i) v \
+    (${SHCNE_ASSOCCHANGED}, ${SHCNF_IDLIST}, 0, 0)'
+FunctionEnd
+!macroend
+!insertmacro RefreshShell ""
+!insertmacro RefreshShell "un."

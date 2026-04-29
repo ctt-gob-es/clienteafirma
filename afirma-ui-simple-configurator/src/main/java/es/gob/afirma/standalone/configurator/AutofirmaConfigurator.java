@@ -457,7 +457,7 @@ public class AutofirmaConfigurator implements ConsoleListener {
 						if (i < args.length - 1) {
 							this.languagePath = args[++i];
 						}
-					} else if (DEFAULT_LANGUAGE.equalsIgnoreCase(arg) && (i < args.length - 1)) {
+					} else if (DEFAULT_LANGUAGE.equalsIgnoreCase(arg) && i < args.length - 1) {
 						this.defaultLanguage = args[++i];
 					}
 				}

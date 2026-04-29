@@ -165,10 +165,11 @@ final class ConfiguratorWindows implements Configurator {
 			window.print(Messages.getString("ConfiguratorWindows.14")); //$NON-NLS-1$
 		}
 
+		// Agregamos la ruta de la aplicacion al PATH para que se puedan ejecutar los comandos desde cualquier ubicacion
 		try {
 			window.print(Messages.getString("ConfiguratorWindows.27")); //$NON-NLS-1$
-			final Path cmd = WindowsCmdExecutor.copyCmdFromResources("windows/autofirma-addpath.cmd"); //$NON-NLS-1$
-			WindowsCmdExecutor.executePathCmd(cmd, WAITING_TIME_IN_SECONDS, appDir.getAbsolutePath());
+			final Path cmd = WindowsCmdExecutor.copyCmdFromResources("windows/autofirma-addpath.ps1"); //$NON-NLS-1$
+			WindowsCmdExecutor.executePathPs(cmd, WAITING_TIME_IN_SECONDS, appDir.getAbsolutePath());
 			window.print(Messages.getString("ConfiguratorWindows.29")); //$NON-NLS-1$
 		} catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se pudo agregar correctamente la ruta de instalacion de la variable PATH", e); //$NON-NLS-1$
@@ -291,8 +292,8 @@ final class ConfiguratorWindows implements Configurator {
 		// Ejecutamos el script para el borrado de la ruta de la aplicacion en el PATH
 		LOGGER.info("Eliminamos la entrada de Autofirma en el PATH"); //$NON-NLS-1$
 		try {
-			final Path cmd = WindowsCmdExecutor.copyCmdFromResources("windows/autofirma-removepath.cmd"); //$NON-NLS-1$
-			WindowsCmdExecutor.executePathCmd(cmd, WAITING_TIME_IN_SECONDS, getApplicationDirectory(false).getAbsolutePath());
+			final Path cmd = WindowsCmdExecutor.copyCmdFromResources("windows/autofirma-removepath.ps1"); //$NON-NLS-1$
+			WindowsCmdExecutor.executePathPs(cmd, WAITING_TIME_IN_SECONDS, getApplicationDirectory(false).getAbsolutePath());
 		} catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se pudo eliminar correctamente la ruta de instalacion de la variable PATH", e); //$NON-NLS-1$
 		}

@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.configurator.common;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -612,7 +613,7 @@ public final class PreferencesManager {
 	/** Indica si se permite la importaci&oacute;n de ficheros de preferencias sin firmar. */
 	public static final String ADMIN_PREFERENCE_REQUIRE_SIGNED_PREFERENCES = "requireSignedPrerefences"; //$NON-NLS-1$
 
-	/** Indica si hash en base 64 del certificado de firma de los ficheros de preferencias. */
+	/** Indica el hash en base 64 del certificado de firma de los ficheros de preferencias. */
 	public static final String ADMIN_PREFERENCE_CERT_HASH_TO_SIGNED_PREFERENCES = "certHashToSignedPrerefences"; //$NON-NLS-1$
 
 	/** Indica si cargar el almacen con los certificados de confianza importados en Autofirma. */
@@ -683,8 +684,8 @@ public final class PreferencesManager {
 
 		// Cargamos los valores por defecto de la aplicacion
 		DEFAULT_PREFERENCES = new Properties();
-		try {
-			DEFAULT_PREFERENCES.load(PreferencesManager.class.getResourceAsStream("/properties/preferences.properties")); //$NON-NLS-1$
+		try (InputStream is = PreferencesManager.class.getResourceAsStream("/properties/preferences.properties")) { //$NON-NLS-1$
+			DEFAULT_PREFERENCES.load(is);
 		}
 		catch (final Exception e) {
 			LOGGER.severe(
