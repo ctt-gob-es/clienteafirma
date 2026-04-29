@@ -81,7 +81,7 @@ final class PreferencesPanelGeneral extends JScrollPane {
 	private final JCheckBox massiveOverwrite = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.160")); //$NON-NLS-1$
 
 	private final JCheckBox secureConnections = new JCheckBox(SimpleAfirmaMessages.getString("PreferencesPanel.173")); //$NON-NLS-1$
-	
+
 	private final JButton trustedCertificatesButton = new JButton(SimpleAfirmaMessages.getString("PreferencesPanel.194")); //$NON-NLS-1$
 
 	private final DisposableInterface disposableInterface;
@@ -773,11 +773,16 @@ final class PreferencesPanelGeneral extends JScrollPane {
 		this.massiveOverwrite.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_MASSIVE_OVERWRITE));
 
 		this.secureConnections.setSelected(PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_SECURE_CONNECTIONS));
-		
-		boolean allowPersonalTruststore = PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE);
-		
+
+		// Cargamos de las preferencias del sistema si se debe permitir el uso del almacen de confianza de Autofirma.
+		// Si no se encontro un valor definido, se utilizara el valor por defecto
+		final String allowPersonalTruststoreString = PreferencesManager.get(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE, PreferencesSource.SYSTEM);
+		final boolean allowPersonalTruststore = allowPersonalTruststoreString == null
+				? PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE, PreferencesSource.DEFAULT)
+				: Boolean.parseBoolean(allowPersonalTruststoreString);
+
 		this.trustedCertificatesButton.setEnabled(allowPersonalTruststore);
-		
+
 		if (!allowPersonalTruststore) {
 			this.trustedCertificatesButton.getAccessibleContext().setAccessibleDescription(
 					SimpleAfirmaMessages.getString("PreferencesPanel.212") //$NON-NLS-1$
