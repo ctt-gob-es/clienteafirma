@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.gob.afirma</groupId>
 	<artifactId>afirma-client</artifactId>
-	<version>1.10</version>
+	<version>1.9.1</version>
 	<packaging>pom</packaging>
 	
 	<name>afirma-client</name>
@@ -40,9 +40,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-		<jdk.version>1.7</jdk.version>
-		<clienteafirma.version>1.10</clienteafirma.version>
-		<afirma.legible.version>1_10_0</afirma.legible.version>
+		<jdk.version>1.8</jdk.version>
+		<clienteafirma.version>1.9.1</clienteafirma.version>
+		<afirma.legible.version>1_9_1</afirma.legible.version>
 		<triphase.service.version>2.9.1</triphase.service.version>
 		<jmulticard.version>2.1</jmulticard.version>
 		
@@ -194,6 +194,7 @@
 				<module>afirma-crypto-ooxml</module>
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-jmulticard-ui</module>
 				<module>afirma-ui-utils</module>
 				<module>afirma-core-massive</module>
 				<module>afirma-server-triphase-signer-cache</module>
@@ -231,7 +232,6 @@
 			<id>autofirma</id>
 			<modules>
 				<!-- Modulos core -->
-				<module>afirma-keystores-jmulticard-ui</module>
 				<module>afirma-ui-simple-configurator-common</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>
@@ -271,6 +271,11 @@
 			</activation>
 			
 			<modules>
+				<!-- Modulos core -->
+				<module>afirma-ui-simple-configurator-common</module>
+				<module>afirma-ui-core-jse</module>
+				<module>afirma-ui-core-jse-keystores</module>
+
 				<!-- Aplicaciones -->
 				<module>afirma-simple</module>
 				<module>afirma-ui-simple-configurator</module>

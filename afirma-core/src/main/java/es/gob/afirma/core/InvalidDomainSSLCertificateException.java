@@ -19,14 +19,15 @@ import java.net.URL;
 public class InvalidDomainSSLCertificateException extends IOException {
 
     private static final long serialVersionUID = 825249824660706387L;
-    
-    private String url;
-    
+
+    private final String url;
+
     /**
      * Crea la excepci&oacute;n a partir de otra excepci&oacute;n.
      * @param e excepci&oacute;n.
+     * @param url URL del dominio que se comprob&oacute;.
      */
-    public InvalidDomainSSLCertificateException(final IOException e, String url) {
+    public InvalidDomainSSLCertificateException(final IOException e, final String url) {
         super(e);
         this.url = url;
     }
@@ -39,10 +40,10 @@ public class InvalidDomainSSLCertificateException extends IOException {
 		URL url = null;
 		try {
 			url = new URL(this.url);
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			return ""; //$NON-NLS-1$
 		}
 		return url.getHost();
 	}
-    
+
 }

@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -59,6 +60,7 @@ public class WindowsCmdExecutor {
 	/**
 	 * Ejecuta un script p&aacute;sandole los par&aacute;metros proporcionados.
 	 * @param cmdPath Ruta del script.
+	 * @param seconds Segundos m&aacute;ximos para la ejecuci&oacute;n.
 	 * @param params Listado de par&aacute;metros.
 	 * @throws IOException Cuando ocurre un error durante la ejecuci&oacute;n.
 	 * @throws InterruptedException Cuando se interrumpe la ejecuci&oacute;n de script.
@@ -76,9 +78,7 @@ public class WindowsCmdExecutor {
 		processParams.add("/c"); //$NON-NLS-1$
 		processParams.add(cmdPath.toAbsolutePath().toString());
 		if (params != null) {
-			for (final String param : params) {
-				processParams.add(param);
-			}
+			Collections.addAll(processParams, params);
 		}
 
 		final ProcessBuilder pb = new ProcessBuilder(processParams.toArray(new String[0]));
