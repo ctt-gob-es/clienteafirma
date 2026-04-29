@@ -385,7 +385,8 @@ public final class SignatureService extends HttpServlet {
 				catch (final Throwable e) {
 					final String errorMessage = "Error al recuperar el documento"; //$NON-NLS-1$
 					LOGGER.log(Level.WARNING, errorMessage, e);
-					out.print(AOTriphaseException.parsePresignException(ErrorManager.RECOVERING_DOCUMENT_ERROR, errorMessage, e).toString());
+					final AOTriphaseException ex = AOTriphaseException.parsePresignException(ErrorManager.RECOVERING_DOCUMENT_ERROR, errorMessage, e);
+					out.print(ErrorManager.getErrorMessage(ErrorManager.RECOVERING_DOCUMENT_ERROR, ex.getErrorCode().getCode()));
 					out.flush();
 					return;
 				}
