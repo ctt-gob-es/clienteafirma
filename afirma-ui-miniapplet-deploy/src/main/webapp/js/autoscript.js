@@ -2077,6 +2077,9 @@ var AutoScript = ( function ( window, undefined ) {
 			 * (new WebSocket(urlRequest)) es necesario arrancar la aplicacion.  */
 			var ws = "";
 			
+			/** Referencias que se usaran temporalmente mientras se trata de abrir el Websocket. */			
+			var websocketsClients = new Array();
+			
 			/** Operacion que se manda a ejecutar. */
 			var currentOperation = "";
 			
@@ -2485,7 +2488,15 @@ var AutoScript = ( function ( window, undefined ) {
 					if (retries > 0) {
 						// Tratamos de conectar al websocket a traves de cualquiera de los posibles puertos
 						for (var i = 0; !connected && i < ports.length; i++) {
-							createWebSocket(ports[i]);
+							// Intentamos abrir el puerto si no hay un intento en marcha
+							if (!websocketsClients[i]
+								|| websocketsClients[i].readyState === WebSocket.CLOSED
+								|| websocketsClients[i].readyState === WebSocket.CLOSING) {
+									
+								websocketsClients[i] = createWebSocket(ports[i]);
+							} else {
+								console.log("El anterior websocket en el puerto " + ports[i] + " sigue intentandolo, asi que no creamos otro");
+						}
 						}
 
 						setTimeout(waitAppAndProcessRequest, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, retries - 1, url, successCB, errorCB);
@@ -2504,7 +2515,7 @@ var AutoScript = ( function ( window, undefined ) {
 						if (!enabled) {
 							errorCB("es.gob.afirma.standalone.ApplicationNotFoundException", ErrorCode.Request.WEBSOCKET_INVOICE_APP.message, errorCode);
 						}
-					}			
+					}
 				}
 				else {
 					// Enviamos la peticion
@@ -2519,6 +2530,8 @@ var AutoScript = ( function ( window, undefined ) {
 			function createWebSocket(port) {
 				var webSocket;
 				
+				console.log("Creamos WebSocket en el puerto " + port + "\nEstado anterior: " + connected + "\nSocket definido: " + ws);
+				
 				try {
 					webSocket = new WebSocket(URL_REQUEST_PREFIX  + port);
 				}
@@ -2529,17 +2542,28 @@ var AutoScript = ( function ( window, undefined ) {
 				
 				webSocket.onopen = function() {
 					
+					// Si ya se habia abierto el websocket, lo respetamos
+					if (connected || !!ws) {
+						console.log("El socket ya estaba abierto y no se actualizara");
+						// Cerramos este socket, asegurandonos de que no se lanza ninguna
+						// ningun evento
+						this.onclose = function() {}
+						this.close();
+						return;
+					}
+					
 					// Indicamos que la conexion esta activa y que el WebSocket activo es el actual 
 					connected = true;
 					ws = this;
-					console.log("Se abre el socket en el puerto " + port);
+					websocketsClients.length = 0;
+					console.log("Se abre el socket en " + this.url);
 				};
 				
 				webSocket.onclose = function(e) {
 					if (ws != null && ws === this) {
 						connected = false;
+						console.log("Se cierra el socket. Codigo WebSocket de cierre en '" + ws.url + "': " + (e ? e.code : null));
 						ws = null;
-						console.log("Se cierra el socket. Codigo WebSocket de cierre: " + (e ? e.code : null));
 						processErrorResponse("java.lang.InterruptedException", ErrorCode.Communication.WEBSOCKET_CLOSE);
 					}
 				};
