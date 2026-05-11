@@ -360,7 +360,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         Utils.checkIllegalParams(format, mode, false, uri, precalculatedHashAlgorithm, false);
 
         // Un externally detached con URL permite los datos nulos o vacios
-        if ((data == null || data.length == 0) && !(format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED) && uri != null)) {
+        if ((data == null || data.length == 0) && (!format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED) || uri == null)) {
             throw new IllegalArgumentException("No se han indicado los datos a firmar"); //$NON-NLS-1$
         }
 
@@ -540,9 +540,11 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
 
         // Firma Explicita
+        // XXX: Esta logica se mantiene por compatibilidad. No deberia usarse, ya que no corresponde a un comportamiento
+        // estandar. El proceso de firma explicita difinido no firma los datos, sino su hash. Estas referencias se
+        // calculan usando el algoritmo de hash "SHA-1" que es considera ya un algoritmo no seguro. Esta funcionalidad
+        // esta deprecada y podria eliminarse en cualquier momento.
         else {
-            // ESTE BLOQUE CONTIENE EL PROCESO A SEGUIR EN EL MODO EXPLICITO,
-            // ESTO ES, NO FIRMAMOS LOS DATOS SINO SU HASH
             byte[] digestValue = null;
             // Si la URI no es nula recogemos los datos de fuera
             if (uri != null) {
@@ -1230,13 +1232,10 @@ public final class AOXMLDSigSigner implements AOSigner {
             if (AOXMLDSigSigner.isDetached(rootSig)) {
                 final Element firstChild = (Element) rootSig.getFirstChild();
                 // si el documento es un xml se extrae como tal
-                if (firstChild.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
-                    elementRes = (Element) firstChild.getFirstChild();
-                }
-                // si el documento es binario se deshace la codificacion en Base64
-                else {
+                if (!firstChild.getAttribute(MIMETYPE_STR).equals("text/xml")) {
                     return Base64.decode(firstChild.getTextContent());
                 }
+				elementRes = (Element) firstChild.getFirstChild();
             }
 
             // si es enveloped
@@ -1259,12 +1258,10 @@ public final class AOXMLDSigSigner implements AOSigner {
                 // obtiene el nodo Object de la primera firma
                 final Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
                 // si el documento es un xml se extrae como tal
-                if (object.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$
-                    elementRes = (Element) object.getFirstChild();
-                }
-                else {
+                if (!object.getAttribute(MIMETYPE_STR).equals("text/xml")) {
                     return Base64.decode(object.getTextContent());
                 }
+				elementRes = (Element) object.getFirstChild();
             }
         }
         catch (final Exception ex) {

@@ -15,7 +15,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 
 /** Resultado de la validaci&oacute;n de un certificado X.509.
- * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
+ * Clase cedida por YoHago.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public enum ValidationResult {
 
@@ -58,7 +58,7 @@ public enum ValidationResult {
 	private static final int CODE_CANNOT_DOWNLOAD_CRL = 11;
 
 	private final int resultCode;
-	private ValidationResult(final int code) {
+	ValidationResult(final int code) {
 		if (code < CODE_VALID || code > CODE_CANNOT_DOWNLOAD_CRL) {
 			throw new IllegalArgumentException(
 				"El codigo de resultado debe estar comprendido entre 0 y 11: " + code //$NON-NLS-1$

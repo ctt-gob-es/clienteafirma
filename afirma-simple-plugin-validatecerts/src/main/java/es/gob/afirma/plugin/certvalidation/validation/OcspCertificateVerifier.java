@@ -16,7 +16,7 @@ import java.util.List;
 
 /** Validador de certificados X.509v3 por verificaci&oacute;n de revocaci&oacute;n contra
  * OCSP y de periodo de validez contra el reloj del sistema.
- * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
+ * Clase cedida por YoHago.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class OcspCertificateVerifier extends CertificateVerifier {
 

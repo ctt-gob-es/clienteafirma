@@ -13,7 +13,7 @@ import java.security.cert.X509Certificate;
 
 /** Validador de certificados X.509v3 por verificaci&oacute;n de listas de revocaci&oacute;n
  * y de periodo de validez contra el reloj del sistema.
- * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
+ * Clase cedida por YoHago.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CrlCertificateVerifier extends CertificateVerifier {
 
@@ -21,7 +21,7 @@ public final class CrlCertificateVerifier extends CertificateVerifier {
 	public ValidationResult verifyRevocation(final X509Certificate cert) {
 		return CrlHelper.verifyCertificateCRLs(
 			cert,
-			this.getIssuerCert() != null ? this.getIssuerCert().getPublicKey() : null,
+			getIssuerCert() != null ? getIssuerCert().getPublicKey() : null,
 			null
 		);
 	}

@@ -60,7 +60,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import es.gob.afirma.core.misc.AOUtil;
 
 /** Utilidades varias para el servicio OCSP.
- * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
+ * Clase cedida por YoHago.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class OcspHelper {
 

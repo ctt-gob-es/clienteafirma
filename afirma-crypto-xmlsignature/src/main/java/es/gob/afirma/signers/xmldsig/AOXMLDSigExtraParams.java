@@ -21,8 +21,13 @@ final class AOXMLDSigExtraParams {
      * &Uacute;nicamente aplica a firmas <i>enveloped</i>. */
     static final String AVOID_XPATH_EXTRA_TRANSFORMS_ON_ENVELOPED = "avoidXpathExtraTransformsOnEnveloped";//$NON-NLS-1$
 
-    /** Modo de firma. */
-    static final String MODE = "mode"; //$NON-NLS-1$
+    /**
+     * Modo de firma.
+     * @deprecated La firma explicita no se ajusta a los estándares de firma. Valorese el uso de firmas
+     * XAdES Externally Detached o firmas "XAdES Detached".
+     */
+    @Deprecated
+	static final String MODE = "mode"; //$NON-NLS-1$
 
     /** Formato de firma. */
     static final String FORMAT = "format"; //$NON-NLS-1$

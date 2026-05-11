@@ -45,7 +45,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.DataDownloader;
 
 /** Utilidades varias para el uso de lista de revocaci&oacute;n de certificados.
- * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
+ * Clase cedida por YoHago.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class CrlHelper {
 

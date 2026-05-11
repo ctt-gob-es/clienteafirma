@@ -220,7 +220,7 @@
 					
 					MiniApplet.sign(
 						(data != undefined && data != null && data != "") ? data : null,
-						"SHA1withRSA",
+						"SHA256withRSA",
 						"Adobe PDF",
 						paramsParam,
 						showSignResultCallback2,
@@ -233,8 +233,6 @@
 						showLog("Error: " + e);
 					}
 				}
-			} else {
-				return;
 			}
 		}
 

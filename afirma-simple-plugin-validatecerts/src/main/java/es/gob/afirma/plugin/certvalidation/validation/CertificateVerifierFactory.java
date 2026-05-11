@@ -17,7 +17,7 @@ import java.util.zip.CRC32;
 
 
 /** Factor&iacute;a para la obtenci&oacute;n de un validador de certificados.
- * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
+ * Clase cedida por YoHago.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CertificateVerifierFactory {
 

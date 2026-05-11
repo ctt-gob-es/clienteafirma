@@ -26,7 +26,7 @@ import es.gob.afirma.core.misc.AOUtil;
 /** Validador gen&eacute;rico de certificados X&#46;509.
  * Como clase base comprueba &uacute;nicamente el
  * periodo de validez contra el reloj del sistema y la firma por parte de la CA.
- * Clase cedida por <a href="http://www.yohago.com/">YoHago</a>.
+ * Clase cedida por YoHago.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public abstract class CertificateVerifier implements CertificateVerificable {
 
