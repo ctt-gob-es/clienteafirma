@@ -14,7 +14,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
@@ -29,6 +29,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.tsp.pkcs7.TsaParams;
 import es.gob.afirma.signers.xml.Utils;
@@ -43,21 +44,16 @@ public final class XAdESTspUtil {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static DocumentBuilderFactory D_FACTORY = DocumentBuilderFactory.newInstance();
+	private static DocumentBuilder D_FACTORY;
     static {
 	    try {
-			D_FACTORY.setFeature(
-				javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING,
-				Boolean.TRUE.booleanValue()
-			);
+			D_FACTORY = SecureXmlBuilder.getSecureDocumentBuilder();
 		}
 	    catch (final ParserConfigurationException e) {
 			LOGGER.warning(
 				"No se ha podido habilitar el proceso seguro en la factoria DOM: " + e //$NON-NLS-1$
 			);
 		}
-	    D_FACTORY.setValidating(false);
-	    D_FACTORY.setNamespaceAware(true);
     }
 
 	private XAdESTspUtil() {
@@ -85,13 +81,13 @@ public final class XAdESTspUtil {
 
 		final Document doc;
 		try {
-			doc = D_FACTORY.newDocumentBuilder().parse(
+			doc = D_FACTORY.parse(
 				new ByteArrayInputStream(
 					xml
 				)
 			);
 		}
-		catch (SAXException | IOException | ParserConfigurationException e) {
+		catch (SAXException | IOException e) {
 			throw new AOInvalidSignatureFormatException(
 				"No se puede analizar la firma para agregar el sello de tiempo: " + e, //$NON-NLS-1$
 				e
@@ -137,7 +133,7 @@ public final class XAdESTspUtil {
 
 		final Element tspNode;
 		try {
-			tspNode = D_FACTORY.newDocumentBuilder().parse(
+			tspNode = D_FACTORY.parse(
 				new ByteArrayInputStream(
 					(
 						"<xades:UnsignedProperties xmlns:xades=\"http://uri.etsi.org/01903/v1.3.2#\">\n" + //$NON-NLS-1$
@@ -152,7 +148,7 @@ public final class XAdESTspUtil {
 				)
 			) .getDocumentElement();
 		}
-		catch (SAXException | IOException | ParserConfigurationException e) {
+		catch (SAXException | IOException e) {
 			throw new AOException(
 				"Error creando el nodo XML de sello de tiempo: " + e, e, XMLErrorCode.Internal.INTERNAL_XML_SIGNING_ERROR //$NON-NLS-1$
 			);

@@ -44,7 +44,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -60,6 +59,7 @@ import org.w3c.dom.Element;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.standalone.plugins.UIFactory;
 
@@ -516,8 +516,7 @@ public final class CheckHashDirDialog extends JDialog implements KeyListener {
 	public static String generateXMLReport(final HashReport mapReport)
 			throws ParserConfigurationException, TransformerException {
 
-		final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-		final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+		final DocumentBuilder docBuilder = SecureXmlBuilder.getSecureDocumentBuilder();
 
 		// Elemento raiz
 		final Document doc = docBuilder.newDocument();
@@ -678,7 +677,7 @@ public final class CheckHashDirDialog extends JDialog implements KeyListener {
 		return icon;
 	}
 
-	class CheckResult {
+	static class CheckResult {
 
 		private final Exception exception;
 		private final HashReport report;

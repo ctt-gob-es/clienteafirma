@@ -36,7 +36,6 @@ import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLValidateContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -51,6 +50,7 @@ import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.xades.XAdESCoSigner;
 import es.gob.afirma.signers.xades.XAdESCounterSigner;
@@ -152,9 +152,7 @@ public final class XAdESTriPhaseSignerServerSide {
 			try {
 
 				// Si los datos eran XML, comprobamos y almacenamos las firmas previas
-				final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-				dbf.setNamespaceAware(true);
-				xml = dbf.newDocumentBuilder().parse(
+				xml = SecureXmlBuilder.getSecureDocumentBuilder().parse(
 						new ByteArrayInputStream(data)
 						);
 				if (xml.getXmlEncoding() != null) {
@@ -336,10 +334,8 @@ public final class XAdESTriPhaseSignerServerSide {
 			                                                                          MarshalException,
 			                                                                          XMLSignatureException,
 			                                                                          XmlPreSignException {
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
 
-		final NodeList signatureNodeList = dbf.newDocumentBuilder().parse(
+		final NodeList signatureNodeList = SecureXmlBuilder.getSecureDocumentBuilder().parse(
 			new ByteArrayInputStream(xmlSign)
 		).getElementsByTagNameNS(
 			XMLSignature.XMLNS,

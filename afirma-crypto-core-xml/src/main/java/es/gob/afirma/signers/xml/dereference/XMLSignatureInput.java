@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -41,6 +40,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import nu.xom.converters.DOMConverter;
 
 /** Class XMLSignatureInput.
@@ -93,8 +93,6 @@ final class XMLSignatureInput {
     private final List<NodeFilter> nodeFilters = new ArrayList<>();
 
     private final boolean needsToBeExpanded = false;
-
-    private DocumentBuilderFactory dfactory;
 
     /** Construct a XMLSignatureInput from a subtree rooted by rootNode. This
      * method included the node and <I>all</I> his descendants in the output.
@@ -248,13 +246,8 @@ final class XMLSignatureInput {
     }
 
     void convertToNodes() throws ParserConfigurationException, IOException, SAXException {
-        if (this.dfactory == null) {
-            this.dfactory = DocumentBuilderFactory.newInstance();
-            this.dfactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
-            this.dfactory.setValidating(false);
-            this.dfactory.setNamespaceAware(true);
-        }
-        final DocumentBuilder db = this.dfactory.newDocumentBuilder();
+        
+        final DocumentBuilder db = SecureXmlBuilder.getSecureDocumentBuilder();
         // select all nodes, also the comments.
         try {
         	// Se ignoran los errores (como en org.apache.xml.security.utils.IgnoreAllErrorHandler)

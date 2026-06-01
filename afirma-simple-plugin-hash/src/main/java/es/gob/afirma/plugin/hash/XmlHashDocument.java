@@ -12,7 +12,6 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -32,6 +31,7 @@ import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 
 /**
  * Documento XML con los hashes de los ficheros de un directorio. El documento seguir&aacute;
@@ -78,10 +78,9 @@ public class XmlHashDocument extends HashDocument {
 	@Override
 	public byte[] generate() throws DocumentException {
 
-		final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		final DocumentBuilder docBuilder;
 		try {
-			docBuilder = docFactory.newDocumentBuilder();
+			docBuilder = SecureXmlBuilder.getSecureDocumentBuilder();
 		}
 		catch (final Exception e) {
 			throw new DocumentException("No se puede componer el documento XML", e); //$NON-NLS-1$
@@ -147,8 +146,7 @@ public class XmlHashDocument extends HashDocument {
 
 		Document doc;
 		try {
-			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			final DocumentBuilder builder = factory.newDocumentBuilder();
+			final DocumentBuilder builder = SecureXmlBuilder.getSecureDocumentBuilder();
 
 			try (InputStream is = new ByteArrayInputStream(document)) {
 				validateAgainstXSD(is, CheckHashDirDialog.class.getResourceAsStream("/schemas/folderhashes.xsd")); //$NON-NLS-1$
