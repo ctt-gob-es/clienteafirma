@@ -298,8 +298,8 @@ final class RestoreConfigFirefox {
 	 * @throws KeyStoreException Cuando ocurre un error durante la importaci&oacute;n. */
 	static void installRootCAMozillaKeyStore(final File targetDir, final File certFile)
 			throws MozillaProfileNotFoundException, IOException, KeyStoreException {
-
-		final ArrayList<File> firefoxProfilesDir = getFirefoxProfilesDir();
+		final List<String> userDirPaths = getUsersDirectories();
+		final List <File> firefoxProfilesDir = getMozillaUsersProfilesPath(userDirPaths);
 		if (firefoxProfilesDir == null || firefoxProfilesDir.isEmpty()) {
 			throw new MozillaProfileNotFoundException();
 		}
@@ -777,7 +777,6 @@ final class RestoreConfigFirefox {
 	  * @throws IOException Cuando no se pueda canonizar el nombre de fichero hijo.
 	  */
 	 private static boolean isParent(final File parentDir, final File childFile) throws IOException {
-
 		 final File parent = parentDir.getCanonicalFile();
 		 File intermediateDir = childFile.getCanonicalFile();
 		 while (intermediateDir != null && !intermediateDir.equals(parent)) {
@@ -785,42 +784,6 @@ final class RestoreConfigFirefox {
 		 }
 		 return intermediateDir != null;
 	 }
-
-	/**
-	 * Obtiene los perfiles de usuarios de Firefox en Windows
-	 * @return Array de Files con los perfiles de usuarios de Firefox
-	 */
-	private static ArrayList<File> getFirefoxProfilesDir() {
-
-		final ArrayList<File> fileList = new ArrayList<>();
-
-		// Se obtienen todos los usuarios para los que se va a instalar el
-		// certificado en Firefox
-		final File usersBaseDir = new File(USERS_WINDOWS_PATH);
-		final String[] userDirNames = usersBaseDir.list((current, name) -> new File(current, name).isDirectory());
-
-		try {
-			for(final String userDirName : userDirNames) {
-				// Nos saltamos siempre el usuario por defecto del sistema para evitar corromperlo
-				if (DEFAULT_WINDOWS_USER_NAME.equalsIgnoreCase(userDirName)) {
-					continue;
-				}
-
-				if(new File(USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH).exists()) {
-					fileList.add(
-							new File(
-									MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
-											USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH)
-							).getParentFile());
-					LOGGER.info("Fichero de perfiles de Firefox: " + LoggerUtil.getCleanUserHomePath(USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH)); //$NON-NLS-1$
-				}
-			}
-		}
-		catch (final Exception e) {
-			LOGGER.warning("No se encontro el directorio de perfiles de Mozilla Firefox: " + e); //$NON-NLS-1$
-		}
-		return fileList;
-	}
 
 	/** Devuelve un listado con los directorios donde se encuentra el fichero <i>profiles.ini</i>
 	 * de firefox en Linux y en Windows.
