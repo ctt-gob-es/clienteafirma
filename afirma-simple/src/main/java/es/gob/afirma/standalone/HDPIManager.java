@@ -20,39 +20,39 @@ final class HDPIManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private static String executeWmicCommand() {
+    private static String executeWmicCommand() throws IOException {
 
     	final Runtime rt = Runtime.getRuntime();
     	final String[] commands = { "wmic", "csproduct", "get", "name" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-		try {
-			final Process proc = rt.exec(commands);
-			final BufferedReader stdInput = new BufferedReader(
-				new InputStreamReader(proc.getInputStream())
-			);
-			String s = null;
-			// Obtenemos la segunda linea que ser el nombre de modelo
-			// (la primera es el nombre de la columna)
-			while ((s = stdInput.readLine()) != null) {
-			    if(!s.equals("Name") && s.length() > 0) { //$NON-NLS-1$
-			    	return s.trim();
-			    }
-			}
-		}
-		catch (final IOException e) {
-			LOGGER.warning(
-               "Error en la ejecucion del comando " + commands.toString() + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
-            );
-		}
+    	final Process proc = rt.exec(commands);
+    	final BufferedReader stdInput = new BufferedReader(
+    			new InputStreamReader(proc.getInputStream())
+    			);
+    	String s = null;
+    	// Obtenemos la segunda linea que ser el nombre de modelo
+    	// (la primera es el nombre de la columna)
+    	while ((s = stdInput.readLine()) != null) {
+    		if(!s.equals("Name") && s.length() > 0) { //$NON-NLS-1$
+    			return s.trim();
+    		}
+    	}
 		return null;
     }
 
 
-	/** Indica si el dispositivo actual tiene pantalla HIDPI.
-	 * @return <code>true</code> si se est&aacute; ejecutando sobre un dispositivo HIDPI,
+	/** Indica si el dispositivo actual tiene pantalla HDPI.
+	 * @return <code>true</code> si se est&aacute; ejecutando sobre un dispositivo HDPI,
 	 *         <code>false</code> en caso contrario. */
 	public static boolean isHDPIDevice() {
-		final String modelName = executeWmicCommand();
+		String modelName;
+		try {
+			modelName = executeWmicCommand();
+		}
+		catch (final Exception e) {
+			LOGGER.info("El dispositivo no requiere un Look&Feel distinto al por defecto: " + e); //$NON-NLS-1$
+			return false;
+		}
 		// En caso de ser una surface con HIDPI se utiliza el Look&Feel Metal.
     	// En caso contrario se utiliza Nimbus.
 		final BufferedReader br = new BufferedReader(

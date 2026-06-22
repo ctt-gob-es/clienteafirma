@@ -1248,23 +1248,25 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	/** Imprime a traves del log la informacion b&aacute;sica del sistema. */
 	private static void printSystemInfo() {
 
-    	// Logs de informacion basica
-		final StringBuilder info = new StringBuilder(390).append("Autofirma ").append(getVersion()) //$NON-NLS-1$
-		.append("\nResolucion DPI de pantalla: ").append(DesktopUtil.getDPI()) //$NON-NLS-1$
-		.append("\nSistema operativo: ").append(System.getProperty("os.name")) //$NON-NLS-1$ //$NON-NLS-2$
-		.append("\nVersion del SO: ").append(System.getProperty("os.version")) //$NON-NLS-1$ //$NON-NLS-2$
-		.append("\nVersion de Java: ").append(System.getProperty("java.version")) //$NON-NLS-1$ //$NON-NLS-2$
-		.append("\nArquitectura del JRE: ").append(Platform.getJavaArch()) //$NON-NLS-1$
-		.append("\nJava Vendor: ").append(System.getProperty("java.vm.vendor")) //$NON-NLS-1$ //$NON-NLS-2$
-		.append("\nLocalizacion por defecto: ").append(Locale.getDefault()) //$NON-NLS-1$
-				.append("\nTamano actual en memoria: ").append(Runtime.getRuntime().totalMemory() / (1024 * 1024)) //$NON-NLS-1$
-				.append("MB") //$NON-NLS-1$
-				.append("\nTamano maximo de memoria: ").append(Runtime.getRuntime().maxMemory() / (1024 * 1024)) //$NON-NLS-1$
-				.append("MB") //$NON-NLS-1$
-				.append("\nMemoria actualmente libre: ").append(Runtime.getRuntime().freeMemory() / (1024 * 1024)) //$NON-NLS-1$
-				.append("MB"); //$NON-NLS-1$
+		new Thread(() -> {
+			// Logs de informacion basica
+			final StringBuilder info = new StringBuilder(390).append("Autofirma ").append(getVersion()) //$NON-NLS-1$
+			.append("\nResolucion DPI de pantalla: ").append(DesktopUtil.getDPI()) //$NON-NLS-1$
+			.append("\nSistema operativo: ").append(System.getProperty("os.name")) //$NON-NLS-1$ //$NON-NLS-2$
+			.append("\nVersion del SO: ").append(System.getProperty("os.version")) //$NON-NLS-1$ //$NON-NLS-2$
+			.append("\nVersion de Java: ").append(System.getProperty("java.version")) //$NON-NLS-1$ //$NON-NLS-2$
+			.append("\nArquitectura del JRE: ").append(Platform.getJavaArch()) //$NON-NLS-1$
+			.append("\nJava Vendor: ").append(System.getProperty("java.vm.vendor")) //$NON-NLS-1$ //$NON-NLS-2$
+			.append("\nLocalizacion por defecto: ").append(Locale.getDefault()) //$NON-NLS-1$
+					.append("\nTamano actual en memoria: ").append(Runtime.getRuntime().totalMemory() / (1024 * 1024)) //$NON-NLS-1$
+					.append("MB") //$NON-NLS-1$
+					.append("\nTamano maximo de memoria: ").append(Runtime.getRuntime().maxMemory() / (1024 * 1024)) //$NON-NLS-1$
+					.append("MB") //$NON-NLS-1$
+					.append("\nMemoria actualmente libre: ").append(Runtime.getRuntime().freeMemory() / (1024 * 1024)) //$NON-NLS-1$
+					.append("MB"); //$NON-NLS-1$
 
-		LOGGER.info(info.toString());
+			LOGGER.info(info.toString());
+		}).start();
 	}
 
 	/**
