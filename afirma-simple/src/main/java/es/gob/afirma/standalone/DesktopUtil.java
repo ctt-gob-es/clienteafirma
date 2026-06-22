@@ -296,34 +296,126 @@ public final class DesktopUtil {
 	 * @return DPI de la pantalla principal. */
 	public static int getDPI() {
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			final String[] cmd = {"wmic", "desktopmonitor", "get", "PixelsPerXLogicalInch"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			final ProcessBuilder builder = new ProcessBuilder(cmd);
-			try {
-				final Process process = builder.start();
-				process.waitFor();
-				try (
-					final BufferedReader bufferedReader = new BoundedBufferedReader(
-						new InputStreamReader(process.getInputStream())
-					);
-				) {
-					String line;
-					int dpi = 0;
-					while ((line = bufferedReader.readLine()) != null) {
-						try {
-							dpi = Integer.parseInt(line.trim());
-							break;
+			// Intentamos primero la forma mas eficiente: consultar el registro de Windows directamente
+			int dpi = getDpiFromRegistry();
+			if (dpi > 0) {
+				return dpi;
+			}
+
+			// Como segunda opcion, probamos con wmic
+			dpi = getDpiFromWmic();
+			if (dpi > 0) {
+				return dpi;
+			}
+
+			// Como tercera opcion, probamos con PowerShell
+			dpi = getDpiFromPowerShell();
+			if (dpi > 0) {
+				return dpi;
+			}
+		}
+		return 0;
+	}
+
+	private static int getDpiFromRegistry() {
+		int dpi = getDpiFromRegistryKey("HKCU\\Control Panel\\Desktop\\WindowMetrics", "AppliedDPI"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (dpi == 0) {
+			dpi = getDpiFromRegistryKey("HKLM\\SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current\\Software\\Fonts", "LogPixels"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return dpi;
+	}
+
+	private static int getDpiFromRegistryKey(final String key, final String value) {
+		try {
+			final Process p = new ProcessBuilder(
+				"reg", "query", key, "/v", value //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			).start();
+			try (
+				final BufferedReader bufferedReader = new BoundedBufferedReader(
+					new InputStreamReader(p.getInputStream())
+				);
+			) {
+				String line;
+				while ((line = bufferedReader.readLine()) != null) {
+					if (line.contains(value)) {
+						final String[] tokens = line.trim().split("\\s+"); //$NON-NLS-1$
+						if (tokens.length >= 3) {
+							try {
+								return Integer.decode(tokens[tokens.length - 1]).intValue();
+							}
+							catch (final Exception e) {
+								// Ignoramos
+							}
 						}
-						catch (final Exception e) {
-							continue;
-						}
-		            }
-		            return dpi;
+					}
 				}
 			}
-			catch (final Exception e) {
-				LOGGER.log(	Level.SEVERE, "Error obteniendo DPI: " + e); //$NON-NLS-1$
-				return 0;
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.FINE, "No se pudo obtener el DPI del registro de Windows (" + key + "\\" + value + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+		return 0;
+	}
+
+
+	private static int getDpiFromWmic() {
+		final String[] cmd = {"wmic", "desktopmonitor", "get", "PixelsPerXLogicalInch"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final ProcessBuilder builder = new ProcessBuilder(cmd);
+		try {
+			final Process process = builder.start();
+			process.waitFor();
+			try (
+					final BufferedReader bufferedReader = new BoundedBufferedReader(
+							new InputStreamReader(process.getInputStream())
+							);
+					) {
+				String line;
+				while ((line = bufferedReader.readLine()) != null) {
+					try {
+						final int dpi = Integer.parseInt(line.trim());
+						if (dpi > 0) {
+							return dpi;
+						}
+					}
+					catch (final Exception e) {
+						continue;
+					}
+				}
 			}
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "Error obteniendo DPI con wmic: " + e); //$NON-NLS-1$
+		}
+
+		return 0;
+	}
+
+	private static int getDpiFromPowerShell() {
+		try {
+			final Process p = new ProcessBuilder(
+				"powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_DesktopMonitor | Select-Object -ExpandProperty PixelsPerXLogicalInch" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			).start();
+			try (
+				final BufferedReader bufferedReader = new BoundedBufferedReader(
+					new InputStreamReader(p.getInputStream())
+				);
+			) {
+				String line;
+				while ((line = bufferedReader.readLine()) != null) {
+					try {
+						final int dpi = Integer.parseInt(line.trim());
+						if (dpi > 0) {
+							return dpi;
+						}
+					}
+					catch (final Exception e) {
+						// Ignoramos
+					}
+				}
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.FINE, "No se pudo obtener el DPI con PowerShell: " + e); //$NON-NLS-1$
 		}
 		return 0;
 	}
@@ -349,7 +441,7 @@ public final class DesktopUtil {
 			return file;
 		}
 	}
-	
+
 	/**
 	 * Si es posible, devuelve el comando a ejecutar para arrancar la aplicaci&oacute;n.
 	 * Si no se encuentra un modo de arrancar la nueva instancia de la aplicaci&oacute;n,
@@ -367,10 +459,7 @@ public final class DesktopUtil {
 			return null;
 		}
 
-		// Compone el comando necesario para arrancar la aplicacion
-		final List<String> command = getCommand(currentFile);
-
-		return command;
+		return getCommand(currentFile);
 	}
 
 	/**
