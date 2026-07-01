@@ -25,6 +25,7 @@ import org.w3c.dom.NodeList;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.SecureXmlBuilder;
+import es.gob.afirma.core.misc.protocol.UrlParameters.LocalAccessRequestConfirmException;
 
 /** Utilidades para en an&aacute;lisis de URL de invocaci&oacute;n por protocolo. */
 public final class ProtocolInvocationUriParserUtil {
@@ -44,9 +45,10 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
 	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
 	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. 
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.*/
 	public static UrlParametersToSave getParametersToSave(final Map<String, String> params,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		final UrlParametersToSave ret = new UrlParametersToSave(servicesRequired);
 
 		ret.setCommonParameters(params);
@@ -62,9 +64,10 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
 	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
 	 * @return Par&aacute;metros.
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. 
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.*/
 	public static UrlParametersForBatch getParametersToBatch(final Map<String, String> params,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		final UrlParametersForBatch ret = new UrlParametersForBatch(servicesRequired);
 		ret.setCommonParameters(params);
 		ret.setBatchParameters(params);
@@ -76,8 +79,9 @@ public final class ProtocolInvocationUriParserUtil {
 	 * es err&oacute;neo se lanzar&aacute; una excepci&oacute;n.
 	 * @param params Par&aacute;metros de con la configuraci&oacute;n de la operaci&oacute;n.
 	 * @return Par&aacute;metros
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
-	public static UrlParametersToLoad getParametersToLoad(final Map<String, String> params) throws ParameterException {
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. 
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.*/
+	public static UrlParametersToLoad getParametersToLoad(final Map<String, String> params) throws ParameterException, LocalAccessRequestConfirmException {
 		final UrlParametersToLoad ret = new UrlParametersToLoad();
 
 		ret.setCommonParameters(params);
@@ -140,9 +144,10 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
 	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
 	 * @return Par&aacute;metros para la operaci&oacute;n de firma.
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. 
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.*/
 	public static UrlParametersToSign getParametersToSign(final Map<String, String> params,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		final UrlParametersToSign ret = new UrlParametersToSign(servicesRequired);
 		ret.setCommonParameters(params);
 		ret.setSignParameters(params);
@@ -156,9 +161,10 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
 	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
 	 * @return Par&aacute;metros para la operaci&oacute;n de firma y guardado.
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. 
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.*/
 	public static UrlParametersToSignAndSave getParametersToSignAndSave(final Map<String, String> params,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		final UrlParametersToSignAndSave ret = new UrlParametersToSignAndSave(servicesRequired);
 		ret.setCommonParameters(params);
 		ret.setSignAndSaveParameters(params);
@@ -171,9 +177,10 @@ public final class ProtocolInvocationUriParserUtil {
 	 * @param servicesRequired Indica si es obligatorio que los par&acute;metros incluyan la
 	 * configuraci&oacute;n del servicio de comunicaci&oacute;n.
 	 * @return Par&aacute;metros para la operaci&oacute;n de selecci&oacute;n de certificado.
-	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. */
+	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto. 
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.*/
 	public static UrlParametersToSelectCert getParametersToSelectCert(final Map<String, String> params,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		final UrlParametersToSelectCert ret = new UrlParametersToSelectCert(servicesRequired);
 		ret.setCommonParameters(params);
 		ret.setSelectCertParameters(params);
