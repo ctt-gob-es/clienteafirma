@@ -269,7 +269,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 								).toString()
 						);
 			}
-			catch (final LocalAccessRequestException e) {
+			catch (final LocalAccessRequestConfirmException e) {
 				throw new ParameterLocalAccessRequestedException("La URL del servicio de postfirma de lote no puede ser local", e, ErrorCode.Request.LOCAL_POSTSIGN_BATCH_URL); //$NON-NLS-1$
 			}
 			catch (final IllegalArgumentException e) {
@@ -283,7 +283,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 								).toString()
 						);
 			}
-			catch (final LocalAccessRequestException e) {
+			catch (final LocalAccessRequestConfirmException e) {
 				throw new ParameterLocalAccessRequestedException("La URL del servicio de prefirma de lote no puede ser local", e, ErrorCode.Request.LOCAL_PRESIGN_BATCH_URL); //$NON-NLS-1$
 			}
 			catch (final IllegalArgumentException e) {
@@ -300,7 +300,7 @@ public final class UrlParametersForBatch extends UrlParameters {
 				try {
 					storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
 				}
-				catch (final LocalAccessRequestException e) {
+				catch (final LocalAccessRequestConfirmException e) {
 					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e, ErrorCode.Request.LOCAL_STORAGE_URL_TO_SIGN_BATCH); //$NON-NLS-1$
 				}
 				catch (final IllegalArgumentException e) {

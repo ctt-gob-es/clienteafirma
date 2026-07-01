@@ -276,7 +276,7 @@ public final class UrlParametersToSign extends UrlParameters {
 				try {
 					storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
 				}
-				catch (final LocalAccessRequestException e) {
+				catch (final LocalAccessRequestConfirmException e) {
 					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e, ErrorCode.Request.LOCAL_STORAGE_URL_TO_SIGN_BATCH); //$NON-NLS-1$
 				}
 				catch (final IllegalArgumentException e) {

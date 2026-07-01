@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.protocol.UrlParameters.LocalAccessRequestConfirmException;
 
 /** Clase de utilidad para el an&aacute;lisis sint&aacute;ctico de URL.
  * @author Alberto Mart&iacute;nez */
@@ -31,8 +32,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param uri URL de llamada.
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToSign getParametersToSign(final String uri) throws ParameterException {
+	public static UrlParametersToSign getParametersToSign(final String uri) throws ParameterException, LocalAccessRequestConfirmException {
 		return getParametersToSign(uri, false);
 	}
 
@@ -43,9 +45,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException 
 	 */
 	public static UrlParametersToSign getParametersToSign(final String uri,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToSign(
 				parserUri(uri), servicesRequired);
 	}
@@ -56,8 +59,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param xml XML de entrada
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToSign getParametersToSign(final byte[] xml) throws AOException {
+	public static UrlParametersToSign getParametersToSign(final byte[] xml) throws AOException, LocalAccessRequestConfirmException {
 		return getParametersToSign(xml, false);
 	}
 
@@ -69,9 +73,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
 	public static UrlParametersToSign getParametersToSign(final byte[] xml,
-			final boolean servicesRequired) throws AOException {
+			final boolean servicesRequired) throws AOException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToSign(
 				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
@@ -82,8 +87,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param uri URL de llamada.
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToSignAndSave getParametersToSignAndSave(final String uri) throws ParameterException {
+	public static UrlParametersToSignAndSave getParametersToSignAndSave(final String uri) throws ParameterException, LocalAccessRequestConfirmException {
 		return getParametersToSignAndSave(uri, false);
 	}
 
@@ -95,9 +101,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException 
 	 */
 	public static UrlParametersToSignAndSave getParametersToSignAndSave(final String uri,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToSignAndSave(
 				parserUri(uri), servicesRequired);
 	}
@@ -108,8 +115,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param xml XML de entrada
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToSignAndSave getParametersToSignAndSave(final byte[] xml) throws AOException {
+	public static UrlParametersToSignAndSave getParametersToSignAndSave(final byte[] xml) throws AOException, LocalAccessRequestConfirmException {
 		return getParametersToSignAndSave(xml, false);
 	}
 
@@ -121,9 +129,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
 	public static UrlParametersToSignAndSave getParametersToSignAndSave(final byte[] xml,
-			final boolean servicesRequired) throws AOException {
+			final boolean servicesRequired) throws AOException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToSignAndSave(
 				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
@@ -134,8 +143,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param uri URL de llamada.
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToSelectCert getParametersToSelectCert(final String uri) throws ParameterException {
+	public static UrlParametersToSelectCert getParametersToSelectCert(final String uri) throws ParameterException, LocalAccessRequestConfirmException {
 		return getParametersToSelectCert(uri, false);
 	}
 
@@ -147,9 +157,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
 	public static UrlParametersToSelectCert getParametersToSelectCert(final String uri,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToSelectCert(
 				parserUri(uri), servicesRequired);
 	}
@@ -160,8 +171,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param xml XML de entrada
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToSelectCert getParametersToSelectCert(final byte[] xml) throws AOException {
+	public static UrlParametersToSelectCert getParametersToSelectCert(final byte[] xml) throws AOException, LocalAccessRequestConfirmException {
 		return getParametersToSelectCert(xml, false);
 	}
 
@@ -173,9 +185,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
 	public static UrlParametersToSelectCert getParametersToSelectCert(final byte[] xml,
-			final boolean servicesRequired) throws AOException {
+			final boolean servicesRequired) throws AOException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToSelectCert(
 				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
@@ -187,8 +200,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param xml XML con los par&aacute;metros
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToSave getParametersToSave(final byte[] xml) throws AOException {
+	public static UrlParametersToSave getParametersToSave(final byte[] xml) throws AOException, LocalAccessRequestConfirmException {
 		return getParametersToSave(xml, false);
 	}
 
@@ -201,9 +215,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
 	public static UrlParametersToSave getParametersToSave(final byte[] xml,
-			final boolean servicesRequired) throws AOException {
+			final boolean servicesRequired) throws AOException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToSave(
 				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
@@ -215,8 +230,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param uri Url de llamada
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToSave getParametersToSave(final String uri) throws ParameterException {
+	public static UrlParametersToSave getParametersToSave(final String uri) throws ParameterException, LocalAccessRequestConfirmException {
 		return getParametersToSave(uri, false);
 	}
 
@@ -229,9 +245,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
 	public static UrlParametersToSave getParametersToSave(final String uri,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToSave(parserUri(uri), servicesRequired);
 	}
 
@@ -242,8 +259,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param xml XML con los par&aacute;metros
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersForBatch getParametersToBatch(final byte[] xml) throws AOException {
+	public static UrlParametersForBatch getParametersToBatch(final byte[] xml) throws AOException, LocalAccessRequestConfirmException {
 		return getParametersToBatch(xml, false);
 	}
 
@@ -256,9 +274,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
 	public static UrlParametersForBatch getParametersToBatch(final byte[] xml,
-			final boolean servicesRequired) throws AOException {
+			final boolean servicesRequired) throws AOException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToBatch(
 				ProtocolInvocationUriParserUtil.parseXml(xml), servicesRequired);
 	}
@@ -269,8 +288,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param uri URL de llamada.
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersForBatch getParametersToBatch(final String uri) throws ParameterException {
+	public static UrlParametersForBatch getParametersToBatch(final String uri) throws ParameterException, LocalAccessRequestConfirmException {
 		return getParametersToBatch(uri, false);
 	}
 
@@ -282,9 +302,10 @@ public final class ProtocolInvocationUriParser {
 	 * est&eacute;n los servicios de comunicaci%oacute;n.
 	 * @return Par&aacute;metros.
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
 	public static UrlParametersForBatch getParametersToBatch(final String uri,
-			final boolean servicesRequired) throws ParameterException {
+			final boolean servicesRequired) throws ParameterException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToBatch(parserUri(uri), servicesRequired);
 	}
 
@@ -295,8 +316,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param uri Url de llamada
 	 * @return Par&aacute;metros
 	 * @throws ParameterException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToLoad getParametersToLoad(final String uri) throws ParameterException {
+	public static UrlParametersToLoad getParametersToLoad(final String uri) throws ParameterException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToLoad(parserUri(uri));
 	}
 
@@ -307,8 +329,9 @@ public final class ProtocolInvocationUriParser {
 	 * @param xml XML de entrada
 	 * @return Par&aacute;metros
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
+	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
 	 */
-	public static UrlParametersToLoad getParametersToLoad(final byte[] xml) throws AOException {
+	public static UrlParametersToLoad getParametersToLoad(final byte[] xml) throws AOException, LocalAccessRequestConfirmException {
 		return ProtocolInvocationUriParserUtil.getParametersToLoad(ProtocolInvocationUriParserUtil.parseXml(xml));
 	}
 
