@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Eliminamos cualquier instalacion previa de la aplicacion antes de copiar la nueva.
+#
+# En sistemas de archivos que no distinguen mayusculas de minusculas (APFS por
+# defecto en macOS), el nuevo paquete "Autofirma.app" se fusionaria con un
+# "AutoFirma.app" antiguo (nomenclatura de versiones anteriores a la 1.9) en
+# lugar de sustituirlo. El bundle resultante contiene ficheros obsoletos que
+# invalidan el sello de la firma de codigo ("a sealed resource is missing or
+# invalid") y Gatekeeper impide abrir la aplicacion tras el primer reinicio.
+for APP_DIR in "/Applications/Autofirma.app" "/Applications/AutoFirma.app"; do
+	if [ -d "$APP_DIR" ]; then
+		rm -rf "$APP_DIR"
+	fi
+done
+
+exit 0
