@@ -192,18 +192,20 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
      * @throws IOException Si se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *                     almac&eacute;n de certificados.
      * @throws AOCancelledOperationException Cuando se cancela el di&aacute;logo de inserci&oacute;n de PIN. */
-	protected static void internalInitStore(final AOKeyStoreManager tmpKsm,
+	protected void internalInitStore(final AOKeyStoreManager tmpKsm,
 			                              final String descr,
 			                              final Object parentComponent,
 			                              final boolean forceReset,
 			                              final String libName) throws AOKeyStoreManagerException, IOException {
+
 		tmpKsm.init(
 			AOKeyStore.PKCS11,
 			null,
-			new UIPasswordCallback(
-				FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + descr, //$NON-NLS-1$ //$NON-NLS-2$
-				parentComponent
-			),
+			this.passwordCallback != null ?
+					this.passwordCallback
+					: new UIPasswordCallback(
+							FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + descr, //$NON-NLS-1$ //$NON-NLS-2$
+							parentComponent),
 			new String[] {
 				libName, descr.toString()
 			},
