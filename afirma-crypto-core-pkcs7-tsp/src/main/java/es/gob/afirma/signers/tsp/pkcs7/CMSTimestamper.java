@@ -447,6 +447,7 @@ public final class CMSTimestamper {
 			}
     	}
     	else {
+    		LOGGER.warning("No se ha configurado almacen de confianza para el sello de tiempo; se aceptara cualquier certificado SSL"); //$NON-NLS-1$
     		trustManagers = new TrustManager[] {
     			new X509TrustManager() {
 					@Override
