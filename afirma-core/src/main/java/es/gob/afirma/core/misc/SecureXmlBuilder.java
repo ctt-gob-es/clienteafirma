@@ -54,6 +54,15 @@ public class SecureXmlBuilder {
 				}
 			}
 
+			// Prohibimos la declaracion DOCTYPE para prevenir ataques de expansion
+			// de entidades internas (billion laughs / XML bomb)
+			try {
+				SECURE_BUILDER_FACTORY.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				Logger.getLogger("es.gob.afirma").log(Level.WARNING, "No se ha podido prohibir la declaracion DOCTYPE en la factoria XML: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
 			SECURE_BUILDER_FACTORY.setValidating(false);
 			SECURE_BUILDER_FACTORY.setNamespaceAware(true);
 		}
@@ -89,6 +98,16 @@ public class SecureXmlBuilder {
 				Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
 						Level.FINE,
 						"No se ha podido establecer una caracteristica de seguridad en la factoria SAX XML: " + e); //$NON-NLS-1$
+			}
+
+			// Prohibimos la declaracion DOCTYPE en SAX tambien
+			try {
+				SAX_FACTORY.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				Logger.getLogger("es.gob.afirma").log( //$NON-NLS-1$
+						Level.FINE,
+						"No se ha podido prohibir la declaracion DOCTYPE en la factoria SAX XML: " + e); //$NON-NLS-1$
 			}
 
 			SAX_FACTORY.setValidating(false);
