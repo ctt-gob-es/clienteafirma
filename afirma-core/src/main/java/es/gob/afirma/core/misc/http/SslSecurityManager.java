@@ -83,6 +83,8 @@ public final class SslSecurityManager {
 	 * @throws GeneralSecurityException Si hay problemas al desactivar el uso de almacen de claves. */
 	public static void disableSslChecks(final HttpsURLConnection conn) throws GeneralSecurityException {
 
+		LOGGER.warning("Se deshabilitan las comprobaciones SSL para la conexion: " + conn.getURL()); //$NON-NLS-1$
+
 		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
 		sc.init(null, DUMMY_TRUST_MANAGER, secureRandom);
 
@@ -94,6 +96,7 @@ public final class SslSecurityManager {
 	 * cualquier certificado.
 	 * @throws GeneralSecurityException Si hay problemas al desactivar el uso de almacen de claves. */
 	public static void disableSslChecks() throws GeneralSecurityException {
+		LOGGER.warning("Se deshabilitan las comprobaciones SSL globalmente"); //$NON-NLS-1$
 		setTrustManagerAndKeyManager(
 			DUMMY_TRUST_MANAGER,
 			DUMMY_HOSTNAME_VERIFIER,
