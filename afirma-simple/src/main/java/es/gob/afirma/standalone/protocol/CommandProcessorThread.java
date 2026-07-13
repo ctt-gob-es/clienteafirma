@@ -69,9 +69,9 @@ class CommandProcessorThread extends Thread {
 	private static final String SAVE = "afirma://save?"; //$NON-NLS-1$
 	private static final String SAVE2 = "afirma://save/?"; //$NON-NLS-1$
 
-	private final static List<String> request = new ArrayList<>();
-	private final static List<String> toSend = new ArrayList<>();
-	private static int parts = 0;
+	private final List<String> request = new ArrayList<>();
+	private final List<String> toSend = new ArrayList<>();
+	private int parts = 0;
 
 	private final Socket localSocket;
 
@@ -418,7 +418,7 @@ class CommandProcessorThread extends Thread {
 
 	/** Calcula en cuantas partes hay que realizar el env&iacute;o de la operaci&oacute;n y divide la respuesta en dichas partes.
 	 * @param operationResult La operaci&oacute;n resultante que hay que dividir. */
-	private static void calculateNumberPartsResponse(final String operationResult) {
+	private void calculateNumberPartsResponse(final String operationResult) {
 
 		parts = (int) Math.ceil(operationResult.length() / (double) RESPONSE_MAX_SIZE);
 		LOGGER.info("Se mandaran " + parts + "partes");  //$NON-NLS-1$//$NON-NLS-2$
@@ -435,7 +435,7 @@ class CommandProcessorThread extends Thread {
 
 	/** Reinicia las variables de control si se realiza una nueva llamada y hay que descartar
 	 * todas las las operaciones pendientes. */
-	private static void reset(){
+	private void reset(){
 		request.clear();
 		toSend.clear();
 		parts = 0;
