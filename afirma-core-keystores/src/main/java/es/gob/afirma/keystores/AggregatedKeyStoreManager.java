@@ -29,10 +29,15 @@ import es.gob.afirma.core.misc.AOUtil;
 public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 
 	private final List<AOKeyStoreManager> ksms = new ArrayList<>();
+	
+	protected boolean smartCardAdded;
 
 	AggregatedKeyStoreManager(final AOKeyStoreManager mainKsm) {
 		if (mainKsm == null) {
 			throw new IllegalArgumentException("El gestor principal de almacenes no puede ser nulo"); //$NON-NLS-1$
+		}
+		if (mainKsm instanceof AggregatedKeyStoreManager && ((AggregatedKeyStoreManager) mainKsm).isSmartCardAdded()) {
+			this.smartCardAdded = true;
 		}
 		addKeyStoreManager(mainKsm);
 		setKeyStoreType(mainKsm.getType());
@@ -250,4 +255,13 @@ public class AggregatedKeyStoreManager extends AOKeyStoreManager {
 		this.ksms.clear();
 		setKeyStoreType(null);
 	}
+
+	public boolean isSmartCardAdded() {
+		return this.smartCardAdded;
+	}
+
+	public void setSmartCardAdded(boolean smartCardAdded) {
+		this.smartCardAdded = smartCardAdded;
+	}
+	
 }

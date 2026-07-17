@@ -2,8 +2,6 @@ package es.gob.afirma.standalone.ui.tasks;
 
 import java.util.logging.Logger;
 
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.keystores.AOKeyStore;
@@ -59,12 +57,10 @@ public class LoadKeystoreTask extends Thread{
     	LOGGER.info("Iniciando hilo para la carga de almacen: " + this.keystore.getName()); //$NON-NLS-1$
 
     	try {
-    		final PasswordCallback pwc = this.keystore.getStorePasswordCallback(null);
-
     		this.keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(this.keystore, // Store
 					null, // Lib
 					null, // Description
-					pwc, // PasswordCallback
+					null, // PasswordCallback
 					null // Parent
 					);
     	} catch (final Exception e) {

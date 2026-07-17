@@ -16,8 +16,6 @@ import java.io.InputStream;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso al almacen de claves de Windows en el que
  * se da prioridad al uso de los certificados del DNIe y CERES desde los almacenes preferentes
@@ -27,12 +25,6 @@ public class CAPIUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 	private static final String SYSTEM_PROPERTY_USERNAME = "user.name"; //$NON-NLS-1$
 	private static final String ENVIRONMENT_PROPERTY_USERPROFILE = "USERPROFILE"; //$NON-NLS-1$
 	private static final String TEMPORARY_PROFILE_NAME = "TEMP"; //$NON-NLS-1$
-	
-	/** Nombres del controlador nativo de DNIe en sistemas no-Linux (Windows, OS X, etc.). */
-	private static final String[] DNI_P11_FILES = {
-		"DNIe_P11_x64.dll", //$NON-NLS-1$
-		"DNIe_P11.dll" //$NON-NLS-1$
-	};
 
 	private PasswordCallback passwordCallback = null;
 	private Object[] configParams = null;
@@ -89,42 +81,13 @@ public class CAPIUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		if (forceReset || !this.initialized) {
 			try {
 				preferredKsPresent = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
+				setSmartCardAdded(preferredKsPresent);
 			}
 			catch (final AOCancelledOperationException e) {
 				LOGGER.info("Se cancelo el uso del driver Java: " + e); //$NON-NLS-1$
 				preferredKsPresent = true;
 			}
 		}
-		
-		// Comprobamos si existe el PKCS#11 para el DNIe en el sistema y en caso afirmativo,
-		// utilizarlo en lugar el de Windows para evitar problemas al realizar firmas consecutivas.
-		for (String file : DNI_P11_FILES) {
-			final String pkcs11Path = Platform.getSystemLibDir() + "\\" + file; //$NON-NLS-1$
-			if (new File(pkcs11Path).exists()) {
-				final AOKeyStoreManager tmpKsm = new AOKeyStoreManager();
-				try {
-					internalInitStore(tmpKsm, "PKCS#11", parentComponent, forceReset, pkcs11Path); //$NON-NLS-1$
-				}
-				catch (final AOCancelledOperationException ex) {
-					LOGGER.warning(
-						"Se cancelo el acceso al PKCS#11 del DNIe, se continuara con el siguiente: " + ex //$NON-NLS-1$
-					);
-					continue;
-				}
-				catch (final Exception ex) {
-					LOGGER.warning(
-							"No se ha podido inicializar el PKCS#11: " + ex //$NON-NLS-1$
-					);
-					continue;
-				}
-				addKeyStoreManager(tmpKsm);
-
-				LOGGER.info(
-					"El almacen externo PKCS#11 ha podido inicializarse correctamente" //$NON-NLS-1$
-				);
-				break;
-			}		
-		}	
 
 		// Si estamos en un perfil temporal, cargaremos las tarjetas que encontremos a
 		// partir de su PKCS#12
@@ -189,34 +152,4 @@ public class CAPIUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 	}
 	
-	/** Inicializa un almac&eacute;n externo PKCS#11, mostrando un di&aacute;logo de inserci&oacute;n de PIN al usuario
-	 * si es necesario.
-	 * @param tmpKsm Gestor del almac&eacute;n.
-	 * @param descr Nombre descriptivo del almac&eacute;n.
-	 * @param parentComponent Componente padre sobre el que mostrar componentes gr&aacute;ficos.
-	 * @param forceReset Indica si se debe forzar al reinicio del almac&eacute;n si ya estaba iniciado.
-	 * @param libName Nombre del m&oacute;dulo PKCS#11 del almac&eacute;n.
-     * @throws AOKeyStoreManagerException Cuando ocurre cualquier problema durante la inicializaci&oacute;n
-     * @throws IOException Si se ha insertado una contrase&ntilde;a incorrecta para la apertura del
-     *                     almac&eacute;n de certificados.
-     * @throws AOCancelledOperationException Cuando se cancela el di&aacute;logo de inserci&oacute;n de PIN. */
-	private static void internalInitStore(final AOKeyStoreManager tmpKsm,
-			                              final String descr,
-			                              final Object parentComponent,
-			                              final boolean forceReset,
-			                              final String libName) throws AOKeyStoreManagerException, IOException {
-		tmpKsm.init(
-			AOKeyStore.PKCS11,
-			null,
-			new UIPasswordCallback(
-				descr,
-				parentComponent
-			),
-			new String[] {
-				libName, descr.toString()
-			},
-			forceReset
-		);
-	}
-
 }

@@ -33,7 +33,11 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.AggregatedKeyStoreManager;
+import es.gob.afirma.keystores.DNIePKCS11KeyStoreManager;
+import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.KeystoreAlternativeException;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
@@ -266,5 +270,29 @@ final class ProtocolInvocationLauncherUtil {
 				null // Parent
 				);
 
+	}
+	
+	/**
+	 * Obtiene el almacen del DNIe mediante su PKCS#11
+	 * @return Almac&eacute;n de DNIe.
+	 * @throws KeystoreAlternativeException si ocurre un error al acceder o validar el keystore alternativo.
+	 * @throws IOException si se produce un error de entrada/salida durante la lectura o escritura de datos.
+	 */
+    public static AggregatedKeyStoreManager getDNIePKCS11KeyStoreManager() throws KeystoreAlternativeException, IOException {
+
+    	final AggregatedKeyStoreManager ksmCapi = new DNIePKCS11KeyStoreManager();
+		try {
+			ksmCapi.init(AOKeyStore.PKCS11, null, null, null, false);
+		}
+		catch (final AOKeyStoreManagerException e) {
+			throw new KeystoreAlternativeException(
+                 AOKeyStore.PKCS11,
+                 "Error al obtener almacen PKCS11: " + e, //$NON-NLS-1$
+                 e,
+                 KeyStoreErrorCode.Internal.LOADING_WINDOWS_KEYSTORE_ERROR
+             );
+		}
+
+		return ksmCapi;
 	}
 }

@@ -10,12 +10,16 @@
 package es.gob.afirma.standalone;
 
 import java.awt.Component;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
 
+import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.AggregatedKeyStoreManager;
+import es.gob.afirma.keystores.DNIePKCS11KeyStoreManager;
 import es.gob.afirma.keystores.KeystoreAlternativeException;
 
 final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
@@ -42,6 +46,10 @@ final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
 
         try {
         	this.ksm = SimpleKeyStoreManager.getKeyStore(this.dnie, this.forced, this.parent);
+        	if (this.ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) this.ksm).isSmartCardAdded()) {
+	        	AggregatedKeyStoreManager dniePkcs11Aksm = getDNIePKCS11KeyStoreManager();
+	        	((AggregatedKeyStoreManager) this.ksm).addKeyStoreManager(dniePkcs11Aksm);
+        	}
         }
         catch (final NoDnieFoundException e) {
         	// No se pudo cargar el DNIe y era obligatorio su uso. En ese caso, no cargamos ningun almacen
@@ -59,5 +67,23 @@ final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
             this.simpleAFirma.setKeyStoreManager(this.ksm);
         }
     }
+    
+	/**
+	 * Obtiene el almacen del DNIe mediante su PKCS#11
+	 * @return Almac&eacute;n de DNIe.
+	 * @throws KeystoreAlternativeException si ocurre un error al acceder o validar el keystore alternativo.
+	 * @throws IOException si se produce un error de entrada/salida durante la lectura o escritura de datos.
+	 */
+    public static AggregatedKeyStoreManager getDNIePKCS11KeyStoreManager() {
+
+    	final AggregatedKeyStoreManager ksmCapi = new DNIePKCS11KeyStoreManager();
+		try {
+			ksmCapi.init(AOKeyStore.PKCS11, null, null, null, false);
+		}
+		catch (final Exception e) {
+            Logger.getLogger("es.gob.afirma").severe("Error al cargar DNIe mediante su PKCS#11"); //$NON-NLS-1$ //$NON-NLS-2$          
+		} 
+		return ksmCapi;
+	}
 
 }

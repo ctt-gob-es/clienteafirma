@@ -34,6 +34,7 @@ import es.gob.afirma.keystores.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreDialog;
 import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AggregatedKeyStoreManager;
 import es.gob.afirma.keystores.CertificateFilter;
 import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.filters.CertFilterManager;
@@ -136,6 +137,10 @@ final class ProtocolInvocationLauncherSelectCert {
 			AOKeyStoreManager ksm;
 			try {
 				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, aoksLib);
+	        	if (ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) ksm).isSmartCardAdded()) {
+		        	AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager();
+		        	((AggregatedKeyStoreManager) ksm).addKeyStoreManager(dniePkcs11Aksm);
+	        	}
 			}
 			catch (final AOCancelledOperationException e) {
 				throw e;

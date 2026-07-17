@@ -11,6 +11,8 @@ package es.gob.afirma.keystores.mozilla;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -54,6 +56,8 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 		if (this.configParams != null && this.configParams.length > 0) {
 			parentComponent = this.configParams[0];
 		}
+		
+		List<String> nssThumbprints = new ArrayList<String>();
 
 		// Agregamos el almacen interno de Mozilla
 		if (!Boolean.getBoolean(ONLY_PKCS11) && !Boolean.parseBoolean(System.getenv(ONLY_PKCS11_ENV))) {
@@ -61,6 +65,7 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 			final AOKeyStoreManager ksm = getNssKeyStoreManager();
 			try {
 				ksm.init(type, store, pssCallBack, this.configParams, forceReset);
+				nssThumbprints = KeyStoreUtilities.getCertificateThumbprints(ksm);
 			}
 			catch(final Exception e) {
 				LOGGER.severe(
@@ -72,10 +77,17 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 		}
 
 		//Agregamos el almacen del SO si aplica
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+		if (Platform.OS.WINDOWS.equals(Platform.getOS()) && !this.initialized) {
 			LOGGER.info("Agregamos las entradas del almacen de claves de Windows"); //$NON-NLS-1$
 			try {
 				final AOKeyStoreManager osKeystore = AOKeyStoreManagerFactory.getWindowsMyCapiKeyStoreManager(true);
+				
+				// Antes de agregar el almacen, comprobamos los certificados que ya existan
+				// en NSS para desactivarlos en el almacen Windows y asi evitar certificados duplicados				
+		        for (final String thumbprint : nssThumbprints) {
+		        	osKeystore.deactivateEntry(thumbprint);
+				}
+				
 				addKeyStoreManager(osKeystore);
 			} catch (final Exception e) {
 				LOGGER.severe("No se ha podido agregar el almacen de Windows: " + e); //$NON-NLS-1$
@@ -97,6 +109,7 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 		if (forceReset || !this.initialized) {
 			try {
 				this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
+				setSmartCardAdded(this.preferredKsAdded);
 			}
 			catch (final AOCancelledOperationException e) {
 				LOGGER.info("Se cancelo el uso del driver Java: " + e); //$NON-NLS-1$

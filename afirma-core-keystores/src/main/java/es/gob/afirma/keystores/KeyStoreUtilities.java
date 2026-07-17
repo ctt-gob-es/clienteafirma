@@ -14,8 +14,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -621,6 +625,68 @@ public final class KeyStoreUtilities {
         }
         return null;
     }
+    
+    /**
+     * Obtiene las huellas de certificados de un almac&eacute;n.
+     * @param ksm Almac&eacute;n del cual obtener las huellas.
+     * @return Lista de huellas de certificados.
+     */
+	public static List<String> getCertificateThumbprints(final AOKeyStoreManager ksm) {
+
+		final List<String> thumbprints = new ArrayList<>();
+
+		if (ksm == null) {
+			return thumbprints;
+		}
+
+		final MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
+		}
+		catch (final NoSuchAlgorithmException e) {
+			LOGGER.warning(
+					"No se ha podido instanciar SHA1 para calcular huellas de certificados: " + e //$NON-NLS-1$
+			);
+			return thumbprints;
+	    }
+
+		final String[] aliases;
+		try {
+			aliases = ksm.getAliases();
+		}
+		catch (final Exception e) {
+			LOGGER.warning(
+					"No se han podido obtener los alias del almacen PKCS#11 del DNIe: " + e //$NON-NLS-1$
+			);
+		return thumbprints;
+	    }
+
+		for (final String alias : aliases) {
+			try {
+				final X509Certificate cert = ksm.getCertificate(alias);
+				if (cert != null) {
+					thumbprints.add(
+							AOUtil.hexify(
+								md.digest(cert.getEncoded()),
+								false
+							)
+					);
+				}
+	        }
+			catch (final CertificateEncodingException e) {
+				LOGGER.warning(
+						"No se ha podido calcular la huella del certificado del DNIe: " + e //$NON-NLS-1$
+				);
+	        }
+			catch (final Exception e) {
+				LOGGER.warning(
+						"No se ha podido procesar el certificado del alias '" + alias + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
+		}
+
+		return thumbprints;
+	}
 
     /** Manejador para la gesti&oacute;n de la contrase&ntilde;a (y otros di&aacute;logos)
      * de un almac&eacute;n de claves. */

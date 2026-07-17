@@ -95,6 +95,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		if (forceReset || !this.initialized) {
 			try {
 				this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
+				setSmartCardAdded(this.preferredKsAdded);
 			}
 			catch (final AOCancelledOperationException e) {
 				LOGGER.info("Se cancelo el uso del driver Java: " + e); //$NON-NLS-1$
