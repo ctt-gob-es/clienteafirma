@@ -63,7 +63,7 @@ final class RestoreConfigFirefox {
 	private static final String NSS_LINUX_CHROME_PATH = "/.pki/nssdb";//$NON-NLS-1$
 	//TODO: En Chromium ahora solo se instalara el certificado de confianza para el perfil activo
 	private static final String NSS_LINUX_CHROMIUM_PATH = "/snap/chromium/current/.pki/nssdb";//$NON-NLS-1$
-	private static final String[] NSS_DIR_SUBPATH = new String[] {
+	private static final String[] NSS_DIR_SUBPATH = {
 			NSS_LINUX_CHROME_PATH,
 			NSS_LINUX_CHROMIUM_PATH
 	};
@@ -629,7 +629,7 @@ final class RestoreConfigFirefox {
 
 			final String profilesIniPath = USERS_WINDOWS_PATH + userDirName + WINDOWS_MOZILLA_PATH;
 			if (new File(profilesIniPath).exists()) {
-				LOGGER.info("Se ha encontrado el perfil de Firefox: " + profilesIniPath); //$NON-NLS-1$
+				LOGGER.info("Se ha encontrado el perfil de Firefox: " + LoggerUtil.getCleanUserHomePath(profilesIniPath)); //$NON-NLS-1$
 				MozillaKeyStoreUtilities.getMozillaUserProfileDirectoryWindows(
 						profilesIniPath
 						);
