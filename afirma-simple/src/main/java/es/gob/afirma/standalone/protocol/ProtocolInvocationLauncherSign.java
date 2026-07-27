@@ -605,13 +605,22 @@ final class ProtocolInvocationLauncherSign {
 
 		PrivateKeyEntry pke = pkeSelected;
 
+
+		LOGGER.info(" =============== ESTABLECEMOS EL CERTIFICADO PARA FIRMAR");
+
 		if (pkeSelected == null) {
+
+			LOGGER.info(" =============== EL CERTIFICADO NO ESTABA PRESELECCIONADO");
+
 			AOKeyStoreManager ksm;
 
 			try {
 				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, keyStoreLib);
 	        	if (ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) ksm).isSmartCardAdded()) {
-		        	AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager();
+
+	        		LOGGER.info(" =============== NO HABIA UNA TARJETA ANTERIOR EN EL ALMACEN");
+
+		        	final AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager(null);
 		        	((AggregatedKeyStoreManager) ksm).addKeyStoreManager(dniePkcs11Aksm);
 	        	}
 			}
@@ -658,6 +667,9 @@ final class ProtocolInvocationLauncherSign {
 				// seleccion)
 				final CertificateContext context = dialog.getSelectedCertificateContext();
 				final KeyStoreManager currentKsm = context.getKeyStoreManager();
+
+				LOGGER.info("==================== Vamos a recuperar el keyentry del almacen: " + currentKsm); //$NON-NLS-1$
+
 				pke = currentKsm.getKeyEntry(context.getAlias());
 			}
 			catch (final AOCancelledOperationException e) {

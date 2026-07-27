@@ -537,13 +537,13 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		// Agregamos los almacenes dependientes de sistema
 		if (Platform.OS.WINDOWS.equals(os)) {
 			ksComboBox.addItem(new RegisteredKeystore(AOKeyStore.WINDOWS));
-			if (SimpleKeyStoreManager.isFirefoxAvailable()) {
+			if (SimpleKeyStoreManager.existFirefoxProfiles()) {
 				ksComboBox.addItem(new RegisteredKeystore(AOKeyStore.MOZ_UNI));
 			}
 		}
 		else if (Platform.OS.MACOSX.equals(os)) {
 			ksComboBox.addItem(new RegisteredKeystore(AOKeyStore.APPLE));
-			if (SimpleKeyStoreManager.isFirefoxAvailable()) {
+			if (SimpleKeyStoreManager.existFirefoxProfiles()) {
 				ksComboBox.addItem(new RegisteredKeystore(AOKeyStore.MOZ_UNI));
 			}
 		}

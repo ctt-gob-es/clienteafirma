@@ -22,7 +22,7 @@ import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 /** Representa a un <i>AOKeyStoreManager</i> para acceso al almacen de claves del DNIe
  *  mediante su PKCS#11 */
 public class DNIePKCS11KeyStoreManager extends AggregatedKeyStoreManager {
-	
+
 	/** Nombres del controlador nativo de DNIe en sistemas no-Linux (Windows, OS X, etc.). */
 	private static final String[] DNI_P11_FILES = {
 		"DNIe_P11_x64.dll", //$NON-NLS-1$
@@ -53,7 +53,7 @@ public class DNIePKCS11KeyStoreManager extends AggregatedKeyStoreManager {
 
 		// Vaciamos el listado de almacenes agregados
 		removeAll();
-		
+
 		// Se carga el almacen de DNIe con su PKCS#11
 		if (!this.initialized) {
 			final AOKeyStoreManager dniePkcs11Ksm = initDniePkcs11(forceReset);
@@ -63,7 +63,7 @@ public class DNIePKCS11KeyStoreManager extends AggregatedKeyStoreManager {
 			    addKeyStoreManager(dniePkcs11Ksm);
 			}
 		}
-		
+
 		// El DNIe con PKCS#11 siempre tendra preferencia al MiniDriver de Windows
 		setPreferred(true);
 
@@ -74,12 +74,12 @@ public class DNIePKCS11KeyStoreManager extends AggregatedKeyStoreManager {
 	public void refresh() throws IOException {
 		init(AOKeyStore.PKCS11, null, this.passwordCallback, this.configParams, true);
 	}
-	
+
 	/**
 	 * Inicializa el almac&eacute;n del DNIe mediante su PKCS#11.
 	 * @param forceReset Indica si se debe forzar al reinicio del almac&eacute;n si ya estaba iniciado.
 	 */
-	private static AOKeyStoreManager initDniePkcs11(final boolean forceReset) {
+	private AOKeyStoreManager initDniePkcs11(final boolean forceReset) {
 
 		for (final String file : DNI_P11_FILES) {
 
@@ -121,7 +121,7 @@ public class DNIePKCS11KeyStoreManager extends AggregatedKeyStoreManager {
 
 		return null;
 	}
-	
+
 	/** Inicializa un almac&eacute;n externo PKCS#11, mostrando un di&aacute;logo de inserci&oacute;n de PIN al usuario
 	 * si es necesario.
 	 * @param tmpKsm Gestor del almac&eacute;n.
@@ -132,17 +132,16 @@ public class DNIePKCS11KeyStoreManager extends AggregatedKeyStoreManager {
      * @throws IOException Si se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *                     almac&eacute;n de certificados.
      * @throws AOCancelledOperationException Cuando se cancela el di&aacute;logo de inserci&oacute;n de PIN. */
-	private static void internalInitStore(final AOKeyStoreManager tmpKsm,
+	private void internalInitStore(final AOKeyStoreManager tmpKsm,
 			                              final String descr,
 			                              final boolean forceReset,
 			                              final String libName) throws AOKeyStoreManagerException, IOException {
 		tmpKsm.init(
 			AOKeyStore.PKCS11,
 			null,
-			new UIPasswordCallback(
-					descr,
-					null
-				),
+			this.passwordCallback != null
+				? this.passwordCallback
+				: new UIPasswordCallback(descr, null),
 			new String[] {
 				libName, descr.toString()
 			},

@@ -25,6 +25,7 @@ public class KeyStoreErrorCode {
 		public static final ErrorCode LOADING_JMULTICARD_KEYSTORE_ERROR			= new ErrorCode("201114", "Error al cargar el almacen de certificados con JMulticard"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode LOADING_FILE_CERTSTORE_ERROR				= new ErrorCode("201115", "Error al cargar un certificado desde fichero"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode UNDEFINED_DEFAULT_KEYSTORE				= new ErrorCode("201116", "No hay definido un almacen de claves por defecto para este sistema operativo"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode LOADING_PKCS11_DNIE_ERROR					= new ErrorCode("201117", "Error al cargar el DNIe a traves de su PKCS#11"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static class ThirdParty {

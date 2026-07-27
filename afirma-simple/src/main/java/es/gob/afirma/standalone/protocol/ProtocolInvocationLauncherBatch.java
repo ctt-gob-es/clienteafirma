@@ -125,11 +125,7 @@ final class ProtocolInvocationLauncherBatch {
 		try {
 			operationResult = sign(options, aoks, useDefaultStore, filterManager, protocolVersion);
 		}
-		catch (final AOCancelledOperationException e) {
-			ProgressInfoDialogManager.hideProgressDialog();
-			throw e;
-		}
-		catch (final SocketOperationException e) {
+		catch (final AOCancelledOperationException | SocketOperationException e) {
 			ProgressInfoDialogManager.hideProgressDialog();
 			throw e;
 		}
@@ -249,7 +245,7 @@ final class ProtocolInvocationLauncherBatch {
 			try {
 				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, aoksLib);
 	        	if (ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) ksm).isSmartCardAdded()) {
-		        	AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager();
+		        	final AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager(null);
 		        	((AggregatedKeyStoreManager) ksm).addKeyStoreManager(dniePkcs11Aksm);
 	        	}
 			}

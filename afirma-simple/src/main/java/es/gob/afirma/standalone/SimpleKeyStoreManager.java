@@ -248,22 +248,21 @@ public final class SimpleKeyStoreManager {
 		);
     }
 
-    /** Indica si est&aacute; disponible el almac&eacute;n de claves de Mozilla Firefox.
-     * @return <code>true</code> si est&aacute; disponible el almac&eacute;n de claves de Mozilla Firefox,
+    /**
+     * Indica si existen perfiles de mozilla disponibles.
+     * @return <code>true</code> si se ha encontrado un fichero de perfiles de Mozilla Firefox,
      *         <code>false</code> en caso contrario. */
-    public static boolean isFirefoxAvailable() {
-		final String mozProfileDir;
-		final String nssLibDir;
+    public static boolean existFirefoxProfiles() {
+		final String mozProfilesInitPath;
 		try {
-			mozProfileDir = MozillaKeyStoreUtilities.getMozillaUserProfileDirectory();
-			nssLibDir = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+			mozProfilesInitPath = MozillaKeyStoreUtilities.getProfilesIniPath();
 		}
 		catch(final Exception e) {
-			LOGGER.warning("No se ha podido obtener el directorio de NSS del usuario: " + e); //$NON-NLS-1$
+			LOGGER.warning("No se ha podido obtener el fichero de perfiles de Mozilla: " + e); //$NON-NLS-1$
 			return false;
 		}
 
-		return mozProfileDir != null && nssLibDir != null;
+		return mozProfilesInitPath != null;
     }
 
     /**
@@ -350,7 +349,7 @@ public final class SimpleKeyStoreManager {
     			final OS os = Platform.getOS();
     			// Si desinstalan Firefox que no se quede una seleccion mala
     			if (AOKeyStore.MOZ_UNI.equals(ks)) {
-    				if (isFirefoxAvailable()) {
+    				if (existFirefoxProfiles()) {
     					return ks;
     				}
 					return AOKeyStore.getDefaultKeyStoreTypeByOs(os);

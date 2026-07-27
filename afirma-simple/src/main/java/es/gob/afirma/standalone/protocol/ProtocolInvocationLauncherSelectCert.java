@@ -60,7 +60,7 @@ final class ProtocolInvocationLauncherSelectCert {
 	 * @param protocolVersion Versi&oacute;n del protocolo de comunicaci&oacute;n.
 	 * @return Certificado en base 64 o mensaje de error.
 	 * @throws SocketOperationException Si hay errores en la
-	 *                                  comunicaci&oacute;n por <i>socket</i> local. 
+	 *                                  comunicaci&oacute;n por <i>socket</i> local.
 	 * @throws SSLHandshakeException Error al realizar conexi&oacute;n segura con el servidor */
 	static String processSelectCert(final UrlParametersToSelectCert options,
 			final ProtocolVersion protocolVersion) throws SocketOperationException, SSLHandshakeException {
@@ -138,7 +138,7 @@ final class ProtocolInvocationLauncherSelectCert {
 			try {
 				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, aoksLib);
 	        	if (ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) ksm).isSmartCardAdded()) {
-		        	AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager();
+		        	final AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager(null);
 		        	((AggregatedKeyStoreManager) ksm).addKeyStoreManager(dniePkcs11Aksm);
 	        	}
 			}

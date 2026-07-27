@@ -480,7 +480,7 @@ public final class MozillaKeyStoreUtilities {
 		return new String[0];
 	}
 
-	private static String getProfilesIniPath() {
+	public static String getProfilesIniPath() {
 		String profilesIniPath = null;
 		// Miramos primero la variable de entorno 'AFIRMA_PROFILES_INI'
 		if (Boolean.getBoolean(USE_ENV_VARS) ||

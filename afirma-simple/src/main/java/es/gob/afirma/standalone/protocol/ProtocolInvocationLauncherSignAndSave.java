@@ -619,7 +619,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 			try {
 				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, keyStoreLib);
 	        	if (ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) ksm).isSmartCardAdded()) {
-		        	AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager();
+		        	final AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager(null);
 		        	((AggregatedKeyStoreManager) ksm).addKeyStoreManager(dniePkcs11Aksm);
 	        	}
 			}
@@ -1004,7 +1004,7 @@ final class ProtocolInvocationLauncherSignAndSave {
 			final String visibleSignature = extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE) != null
 					? extraParams.get(PdfExtraParams.VISIBLE_SIGNATURE).toString()
 					: null;
-			final boolean want = PdfExtraParams.VISIBLE_SIGNATURE_VALUE_WANT.equalsIgnoreCase(visibleSignature) == true;
+			final boolean want = PdfExtraParams.VISIBLE_SIGNATURE_VALUE_WANT.equalsIgnoreCase(visibleSignature);
 
 			// Comprobamos si se han indicado la lista de atributos del area de firma
 			// visible.

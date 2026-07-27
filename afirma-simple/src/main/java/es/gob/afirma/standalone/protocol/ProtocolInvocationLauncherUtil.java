@@ -9,6 +9,7 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import java.awt.Component;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -39,8 +40,10 @@ import es.gob.afirma.keystores.AggregatedKeyStoreManager;
 import es.gob.afirma.keystores.DNIePKCS11KeyStoreManager;
 import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.KeystoreAlternativeException;
+import es.gob.afirma.keystores.jmulticard.ui.UIPasswordCallbackAccessibility;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.plugins.SignOperation.Operation;
 import es.gob.afirma.standalone.ui.tasks.LoadKeystoreTask;
@@ -271,28 +274,43 @@ final class ProtocolInvocationLauncherUtil {
 				);
 
 	}
-	
+
 	/**
 	 * Obtiene el almacen del DNIe mediante su PKCS#11
 	 * @return Almac&eacute;n de DNIe.
 	 * @throws KeystoreAlternativeException si ocurre un error al acceder o validar el keystore alternativo.
 	 * @throws IOException si se produce un error de entrada/salida durante la lectura o escritura de datos.
 	 */
-    public static AggregatedKeyStoreManager getDNIePKCS11KeyStoreManager() throws KeystoreAlternativeException, IOException {
+    public static AggregatedKeyStoreManager getDNIePKCS11KeyStoreManager(final Component parent) throws KeystoreAlternativeException, IOException {
 
-    	final AggregatedKeyStoreManager ksmCapi = new DNIePKCS11KeyStoreManager();
+    	final AggregatedKeyStoreManager dniKsm = new DNIePKCS11KeyStoreManager();
 		try {
-			ksmCapi.init(AOKeyStore.PKCS11, null, null, null, false);
+			final String prompt = SimpleAfirmaMessages.getString("DNIePasswordCallback.1"); //$NON-NLS-1$
+			final String title = SimpleAfirmaMessages.getString("DNIePasswordCallback.3"); //$NON-NLS-1$
+			final PasswordCallback psc = new UIPasswordCallbackAccessibility(
+					prompt,
+					parent,
+					prompt,
+					'P',
+					title,
+					"/images/dnie.png", //$NON-NLS-1$
+					true,
+					true
+				);
+
+			LOGGER.info(" ================== Establecemos el PasswordCallback de DNIe para que se use en la carga del PKCS#11");
+
+			dniKsm.init(AOKeyStore.PKCS11, null, psc, null, false);
 		}
 		catch (final AOKeyStoreManagerException e) {
 			throw new KeystoreAlternativeException(
                  AOKeyStore.PKCS11,
                  "Error al obtener almacen PKCS11: " + e, //$NON-NLS-1$
                  e,
-                 KeyStoreErrorCode.Internal.LOADING_WINDOWS_KEYSTORE_ERROR
+                 KeyStoreErrorCode.Internal.LOADING_PKCS11_DNIE_ERROR
              );
 		}
 
-		return ksmCapi;
+		return dniKsm;
 	}
 }
