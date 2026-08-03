@@ -1,1 +1,3 @@
 /target/
+/src/test/resources/sensible
+/src/test/java/es/gob/afirma/signers/pades/sensible
