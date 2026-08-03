@@ -23,7 +23,6 @@ public final class TestPDFX {
 	private final static String TEST_FILE_A3B = "PDF-A3B.pdf"; //$NON-NLS-1$
 
 	private final static String TEST_FILE_A1B_SIGNED = "PDFA1BSIGNED.pdf"; //$NON-NLS-1$
-	//private final static String TEST_FILE = "Monitorio_29-02-2016 tipoA.pdf"; //$NON-NLS-1$
 
 	private final static String DEFAULT_SIGNATURE_ALGORITHM = "SHA512withRSA"; //$NON-NLS-1$
 
