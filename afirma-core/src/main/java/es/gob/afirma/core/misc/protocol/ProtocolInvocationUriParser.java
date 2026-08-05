@@ -309,7 +309,8 @@ public final class ProtocolInvocationUriParser {
 	 * @throws AOException Si alg&uacute;n par&aacute;metro proporcionado es incorrecto.
 	 */
 	public static UrlParametersToLoad getParametersToLoad(final byte[] xml) throws AOException {
-		return ProtocolInvocationUriParserUtil.getParametersToLoad(ProtocolInvocationUriParserUtil.parseXml(xml));
+		return ProtocolInvocationUriParserUtil.getParametersToLoad(
+				ProtocolInvocationUriParserUtil.parseXml(xml));
 	}
 
 	/**
@@ -339,7 +340,6 @@ public final class ProtocolInvocationUriParser {
 				}
 			}
 		}
-
 
 		Logger.getLogger("es.gob.afirma").info("URI recibida: " + (uri.length() <= 300 ? uri : uri.substring(0, 300) + "...")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 

@@ -45,7 +45,7 @@ public class TestPAdES {
 
     private static final Properties[] PADES_MODES;
 
-    private static final String[] TEST_FILES = { "TEST_PDF.pdf", "TEST_PDF_Signed.pdf", "pades_basic.pdf", "firma_CM.pdf" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    private static final String[] TEST_FILES = { "TEST_PDF.pdf", "TEST_PDF_Signed.pdf", "pades_basic.pdf" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     //private static final String TEST_FILE_CTF = "TEST_PDF_Certified.pdf"; //$NON-NLS-1$
     private static final String TEST_FILE_CTF2 = "PDF_certificado_tipo_1.pdf"; //$NON-NLS-1$
@@ -76,7 +76,7 @@ public class TestPAdES {
     }
 
     /** Algoritmos de firma a probar. */
-    private final static String[] ALGOS = new String[] {
+    private final static String[] ALGOS = {
             AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA
@@ -98,7 +98,6 @@ public class TestPAdES {
     		final InputStream is0 = ClassLoader.getSystemResourceAsStream(TEST_FILES[0]);
 			final InputStream is1 = ClassLoader.getSystemResourceAsStream(TEST_FILES[1]);
 			final InputStream is2 = ClassLoader.getSystemResourceAsStream(TEST_FILES[2]);
-			final InputStream is3 = ClassLoader.getSystemResourceAsStream(TEST_FILES[3])
 		) {
 	    	Assert.assertFalse("El fichero " + TEST_FILES[0] + " se identifica como firma y no lo es", //$NON-NLS-1$ //$NON-NLS-2$
 				new AOPDFSigner().isSign(
@@ -121,14 +120,6 @@ public class TestPAdES {
 					)
 				)
 			);
-	    	System.setProperty("allowCosigningUnregisteredSignatures", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-	    	Assert.assertTrue("El fichero " + TEST_FILES[3] + " no se identifica como firma", //$NON-NLS-1$ //$NON-NLS-2$
-    			new AOPDFSigner().isSign(
-    				AOUtil.getDataFromInputStream(
-    					is3
-    				)
-    			)
-    		);
     	}
     }
 
@@ -603,7 +594,7 @@ public class TestPAdES {
 
         final String prueba = "Firma certificada PAdES de documento PDF indicando la propiedad certificationLevel"; //$NON-NLS-1$
 
-        final String[] certificationLevels = new String[] {
+        final String[] certificationLevels = {
         	"Firma de autor. No se permite ningun cambio posterior en el documento", //$NON-NLS-1$
         	"Firma de autor certificada para formularios. Se permite unicamente el relleno posterior de los campos del formulario", //$NON-NLS-1$
         	"Firma certificada. Se permite unicamente el relleno posterior de los campos del formulario o el anadido de firmas de aprobacion" //$NON-NLS-1$

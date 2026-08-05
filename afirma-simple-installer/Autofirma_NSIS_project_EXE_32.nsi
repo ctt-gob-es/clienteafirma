@@ -42,6 +42,7 @@ VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
   ;Pagina donde mostramos el contrato de licencia 
   !insertmacro MUI_PAGE_LICENSE $(LICENSE)
   ;Pagina donde se selecciona el directorio donde instalar nuestra aplicacion
+  !define MUI_PAGE_CUSTOMFUNCTION_PRE DirectoryPre
   !insertmacro MUI_PAGE_DIRECTORY
   ;Pagina personalizada con las opciones de configuracion
   Page custom createConfigPage leaveConfigPage
@@ -70,10 +71,19 @@ Var Shorcut_Integration_Checkbox_State
 Var Firefox_Integration_Checkbox
 Var Firefox_Integration_Checkbox_State
 
-;Parametro que indica si se encuentra alguna versión de JRE instalada en el sistema.
+;Parametro que indica si se encuentra alguna version de JRE instalada en el sistema.
 Var INSTALL_JRE 
 
+;Variable que indica si se trata de una actualizacion
+Var IS_UPDATE
+
 !define SECTION_ON ${SF_SELECTED} # 0x1
+
+Function DirectoryPre
+  ${If} $IS_UPDATE == "true"
+    Abort
+  ${EndIf}
+FunctionEnd
 
 Function createConfigPage
   !insertmacro MUI_HEADER_TEXT $(ADV_OPTIONS) $(INT_OPTIONS)
@@ -398,6 +408,34 @@ SectionEnd
 Function .onInit
 
 	StrCpy $PATH "Autofirma"
+
+	; Por defecto no es una actualizacion
+	StrCpy $IS_UPDATE "false"
+
+	; Comprobamos si ya existe una version de Autofirma instalada.
+	Call CheckVersionInstalled
+	Pop $R1
+	Pop $R2
+
+	${If} $R1 != ""
+		; Si hay una version instalada, comprobamos si es anterior a la actual
+		${VersionCheckNew} $R1 ${VERSION} "$R3"
+		${If} $R3 == 2
+			StrCpy $IS_UPDATE "true"
+
+			; Leemos el directorio de instalacion de la version anterior
+			${If} $R2 == 32
+				SetRegView 32
+			${ElseIf} $R2 == 64
+				SetRegView 64
+			${EndIf}
+			ReadRegStr $R0 HKLM "SOFTWARE\$PATH" "InstallDir"
+			${If} $R0 != ""
+				StrCpy $INSTDIR $R0
+			${EndIf}
+			SetRegView 32
+		${EndIf}
+	${EndIf}
 
 	; Establecemos los textos del dialogo de seleccion de idioma
 	!define MUI_LANGDLL_WINDOWTITLE "Instalador de $PATH"
