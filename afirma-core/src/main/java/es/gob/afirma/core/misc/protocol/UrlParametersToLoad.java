@@ -198,5 +198,4 @@ public final class UrlParametersToLoad extends UrlParameters {
 			setFilepath(null);
 		}
 	}
-
 }

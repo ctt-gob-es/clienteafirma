@@ -179,7 +179,6 @@ final class ProtocolInvocationLauncherErrorManager {
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.PRESIGN_BATCH_URL_NOT_FOUND, ERROR_PARAMS);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.POSTSIGN_BATCH_URL_NOT_FOUND, ERROR_PARAMS);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.RETRIEVE_URL_TO_SAVE_NOT_FOUND, ERROR_PARAMS);
-		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.RETRIEVE_URL_TO_SIGN_CANT_BE_LOCAL, ERROR_PARAMS);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.RETRIEVE_URL_TO_SIGN_NOT_FOUND, ERROR_PARAMS);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.SIGNATURE_ALGORITHM_NOT_FOUND, ERROR_PARAMS);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.SIGNATURE_FORMAT_NOT_FOUND, ERROR_PARAMS);
@@ -213,10 +212,7 @@ final class ProtocolInvocationLauncherErrorManager {
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_RETRIEVE_URL, ERROR_LOCAL_ACCESS_BLOCKED);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_PRESIGN_BATCH_URL, ERROR_LOCAL_ACCESS_BLOCKED);
 		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_POSTSIGN_BATCH_URL, ERROR_LOCAL_ACCESS_BLOCKED);
-		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_STORAGE_URL_TO_SAVE, ERROR_LOCAL_ACCESS_BLOCKED);
-		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_STORAGE_URL_TO_SELECT_CERT, ERROR_LOCAL_ACCESS_BLOCKED);
-		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_STORAGE_URL_TO_SIGN, ERROR_LOCAL_ACCESS_BLOCKED);
-		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_STORAGE_URL_TO_SIGN_BATCH, ERROR_LOCAL_ACCESS_BLOCKED);
+		OLD_ERRORS_ASSOCIATION.put(ErrorCode.Request.LOCAL_STORAGE_URL, ERROR_LOCAL_ACCESS_BLOCKED);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.NEEDS_UPDATED_VERSION, ERROR_OBSOLETE_APP);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.DECRYPTING_PARAMS_ERROR, ERROR_DECRYPTING_DATA);
 		OLD_ERRORS_ASSOCIATION.put(SimpleErrorCode.Internal.ERROR_RECIVED_FROM_CLIENT, ERROR_RECOVERING_DATA);
@@ -275,17 +271,17 @@ final class ProtocolInvocationLauncherErrorManager {
 	}
 
 	private static final ProtocolVersion PROTOCOL_VERSION_WITH_ERROR_CODES = ProtocolVersion.getInstance(ProtocolVersion.VERSION_4_1);
-	
+
 	static void showError(final ProtocolVersion protocolVersion, final ErrorCode errorCode) {
-		showError(protocolVersion, errorCode, null);
+		showError(protocolVersion, errorCode, (String[]) null);
 	}
 
-	static void showError(final ProtocolVersion protocolVersion, final ErrorCode errorCode, String ... params) {
+	static void showError(final ProtocolVersion protocolVersion, final ErrorCode errorCode, final String ... params) {
 
 		ProgressInfoDialogManager.hideProgressDialog();
 
 		 String message = getText(errorCode);
-		
+
 		 if (params != null) {
 	            for (int i = 0; i < params.length; i++) {
 	                if (params[i] != null) {

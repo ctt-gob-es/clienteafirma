@@ -194,6 +194,7 @@ public class ErrorCode {
 		public static final ErrorCode UNSUPPORTED_CIPHER_KEY				= new ErrorCode("600009", "La clave de cifrado recibida no esta soportada"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode LOCAL_RETRIEVE_URL					= new ErrorCode("600010", "La URL del servlet de recuperacion no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_READ_TIMEOUT					= new ErrorCode("600012", "El tiempo de espera de lectura de los servicios no es valido"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode LOCAL_STORAGE_URL						= new ErrorCode("600013", "La URL del servlet de guardado no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode DATA_NOT_FOUND						= new ErrorCode("600100", "No se ha recibido los datos en la peticion ni el id del fichero a descargar para la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode RETRIEVE_URL_TO_SIGN_NOT_FOUND		= new ErrorCode("600101", "No se ha recibido la URL del servlet para descargar la informacion de la operacion de firma"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -210,23 +211,19 @@ public class ErrorCode {
 		public static final ErrorCode INVALID_TIMESTAMP_HASH_ALGORITHM		= new ErrorCode("600113", "El algoritmo de huella para el sello de tiempo no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode INVALID_RETRIEVE_URL_TO_SIGN			= new ErrorCode("600116", "La URL del servlet de descarga para la operacion de firma esta mal formado"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode RETRIEVE_URL_TO_SIGN_CANT_BE_LOCAL	= new ErrorCode("600117", "La URL del servlet de descarga para la operacion de firma no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$
+		public static final ErrorCode TRIPHASE_SERVICE_URL_CANT_BE_LOCAL	= new ErrorCode("600117", "La URL del servlet de descarga para la operacion de firma no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_STORAGE_URL_TO_SIGN			= new ErrorCode("600118", "La URL del servlet de guardado para la operacion de firma esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode LOCAL_STORAGE_URL_TO_SIGN				= new ErrorCode("600119", "La URL del servlet de guardado para la operacion de firma no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_SESSION_ID_TO_SIGN			= new ErrorCode("600120", "El id de sesion recibido para la firma no es valido"); //$NON-NLS-1$ //$NON-NLS-2$
-
 
 		public static final ErrorCode STORAGE_URL_TO_SELECT_CERT_NOT_FOUND	= new ErrorCode("600200", "No se ha recibido la URL del servlet para guardar el certificado en la operacion de enviar certificado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_SESSION_ID_TO_SELECT_CERT		= new ErrorCode("600201", "El id de sesion recibido para la seleccion de certificado no es valido"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_STORAGE_URL_TO_SELECT_CERT	= new ErrorCode("600202", "La URL del servlet de guardado para la operacion de seleccion de certificado esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode LOCAL_STORAGE_URL_TO_SELECT_CERT		= new ErrorCode("600203", "La URL del servlet de guardado para la operacion de seleccion de certificado no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode DATA_TO_SAVE_NOT_FOUND				= new ErrorCode("600300", "No se ha recibido los datos en la peticion ni el id del fichero a descargar para la operacion de guardado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode RETRIEVE_URL_TO_SAVE_NOT_FOUND		= new ErrorCode("600301", "No se ha recibido la URL del servlet para descargar la informacion de la operacion de guardado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode STORAGE_URL_TO_SAVE_NOT_FOUND			= new ErrorCode("600302", "No se ha recibido la URL del servlet para guardar la firma en la operacion de guardado"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_SESSION_ID_TO_SAVE			= new ErrorCode("600303", "El id de sesion recibido para el guardado de datos no es valido"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_STORAGE_URL_TO_SAVE			= new ErrorCode("600304", "La URL del servlet de guardado para la operacion de guargado esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode LOCAL_STORAGE_URL_TO_SAVE				= new ErrorCode("600305", "La URL del servlet de guardado para la operacion de guardado no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode FILENAME_TO_SAVE_NOT_FOUND			= new ErrorCode("600306", "No se ha recibido el nombre por defecto para el fichero de datos a guardar"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode FILE_EXTENSION_TO_SAVE_NOT_FOUND		= new ErrorCode("600307", "No se ha recibido la extension por defecto para el fichero de datos a guardar"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -238,7 +235,6 @@ public class ErrorCode {
 
 		public static final ErrorCode INVALID_SESSION_ID_TO_SIGN_BATCH		= new ErrorCode("600410", "El id de sesion recibido no es valido"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode INVALID_STORAGE_URL_TO_SIGN_BATCH		= new ErrorCode("600411", "La URL del servlet de guardado para la operacion de firma de lotes esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
-		public static final ErrorCode LOCAL_STORAGE_URL_TO_SIGN_BATCH		= new ErrorCode("600412", "La URL del servlet de guardado para la operacion de firma de lotes no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		public static final ErrorCode INVALID_PRESIGN_BATCH_URL				= new ErrorCode("600413", "La URL de prefirma de la firma de lotes esta mal formada"); //$NON-NLS-1$ //$NON-NLS-2$
 		public static final ErrorCode LOCAL_PRESIGN_BATCH_URL				= new ErrorCode("600414", "La URL de prefirma de la firma de lotes no puede ser local"); //$NON-NLS-1$ //$NON-NLS-2$

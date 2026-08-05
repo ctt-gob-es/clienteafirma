@@ -53,7 +53,7 @@ public final class UrlParametersToSign extends UrlParameters {
 	 * Par&aacute;metros reconocidos. Se utilizaran para identificar los parametros desconocidos
 	 * introducidos por el JavaScript.
 	 */
-	private static final String[] KNOWN_PARAMETERS = new String[] {
+	private static final String[] KNOWN_PARAMETERS = {
 			FORMAT_PARAM, ALGORITHM_PARAM, ID_PARAM, VER_PARAM, STICKY_PARAM, RESET_STICKY_PARAM,
 			PROPERTIES_PARAM, DATA_PARAM, GZIPPED_DATA_PARAM, RETRIEVE_SERVLET_PARAM,
 			STORAGE_SERVLET_PARAM, KEY_PARAM, FILE_ID_PARAM, KEYSTORE_OLD_PARAM, KEYSTORE_PARAM,
@@ -276,17 +276,14 @@ public final class UrlParametersToSign extends UrlParameters {
 				try {
 					storageServletUrl = validateURL(params.get(STORAGE_SERVLET_PARAM));
 				}
-				catch (final LocalAccessRequestConfirmException e) {
-					throw new ParameterLocalAccessRequestedException("La URL del servicio de guardado no puede ser local", e, ErrorCode.Request.LOCAL_STORAGE_URL_TO_SIGN_BATCH); //$NON-NLS-1$
-				}
 				catch (final IllegalArgumentException e) {
-					throw new ParameterException("Error al validar la URL del servicio de guardado: " + e, e, ErrorCode.Request.INVALID_STORAGE_URL_TO_SIGN_BATCH); //$NON-NLS-1$
+					throw new ParameterException("Error al validar la URL del servicio de guardado del servidor intermedio: " + e, e, ErrorCode.Request.INVALID_STORAGE_URL_TO_SIGN); //$NON-NLS-1$
 				}
 				setStorageServletUrl(storageServletUrl);
 			}
 			// Si no se encuentra a pesar de tener todos los parametros, falla la operacion
 			else if (params.containsKey(ID_PARAM)) {
-				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion", ErrorCode.Request.STORAGE_URL_TO_SIGN_BATCH_NOT_FOUND); //$NON-NLS-1$
+				throw new ParameterException("No se ha recibido la direccion del servlet para el guardado del resultado de la operacion en el servidor intermedio", ErrorCode.Request.STORAGE_URL_TO_SIGN_NOT_FOUND); //$NON-NLS-1$
 			}
 		}
 

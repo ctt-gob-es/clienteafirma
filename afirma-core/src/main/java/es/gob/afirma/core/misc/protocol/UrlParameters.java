@@ -11,12 +11,8 @@ package es.gob.afirma.core.misc.protocol;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
@@ -26,15 +22,15 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.http.DataDownloader;
-import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.core.ui.CoreMessages;
 
 /** Par&aacute;metros habitualmente comunes para todas las operaciones. */
 public abstract class UrlParameters {
 
 	protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	/** Codificaci&oacute;n por defecto. */
+	private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
 	/** Par&aacute;metro de entrada con las opciones de configuraci&oacute;n de la firma. */
 	protected static final String PROPERTIES_PARAM = "properties"; //$NON-NLS-1$
@@ -90,9 +86,6 @@ public abstract class UrlParameters {
 	/** Tiempo de espera para la lectura de peticiones. */
 	protected static final String SERVICE_TIMEOUT_PARAM = "servicetimeout"; //$NON-NLS-1$
 
-	/** Codificaci&oacute;n por defecto. */
-	private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
-
 	protected byte[] data = null;
 	private String fileId = null;
 	private byte[] cipherConfig = null;
@@ -107,9 +100,6 @@ public abstract class UrlParameters {
 	private String defaultKeyStoreLib = null;
 	private Properties extraParams = null;
 	private String filename = null;
-	
-	/** Variable para registrar si el usuario ha confirmado que permite el acceso local durante la sesion. */
-	private static boolean localAccessConfirmed = false;
 
 	/**
 	 * Obtiene los par&aacute;metros adicionales de la firma.
@@ -273,7 +263,7 @@ public abstract class UrlParameters {
 		return this.serviceTimeout;
 	}
 
-	void setCommonParameters(final Map<String, String> params) throws ParameterException, ParameterLocalAccessRequestedException, LocalAccessRequestConfirmException{
+	void setCommonParameters(final Map<String, String> params) throws ParameterException {
 
 		if (params.containsKey(CIPHER_PARAM)) {
 			try {
@@ -338,11 +328,6 @@ public abstract class UrlParameters {
 						)
 					);
 				}
-				catch (final ParameterLocalAccessRequestedException e) {
-					throw new ParameterLocalAccessRequestedException(
-						"La URL del servicio de recuperacion de datos no puede ser local", e, ErrorCode.Request.LOCAL_RETRIEVE_URL //$NON-NLS-1$
-					);
-				}
 				catch (final IllegalArgumentException e) {
 					throw new ParameterException(
 						"Error al validar la URL del servlet de recuperacion: " + e, e, //$NON-NLS-1$
@@ -356,7 +341,7 @@ public abstract class UrlParameters {
 			if (dataPrm.startsWith("file:/")) { //$NON-NLS-1$
 				throw new ParameterException(
 					"No se permite la lectura de ficheros locales: " + dataPrm, //$NON-NLS-1$
-					ErrorCode.Request.RETRIEVE_URL_TO_SIGN_CANT_BE_LOCAL
+					ErrorCode.Request.LOCAL_RETRIEVE_URL
 				);
 			}
 			try {
@@ -425,107 +410,6 @@ public abstract class UrlParameters {
 	private static String createDesJSON(final String desKey) {
 
 		return "{algo:\"DES\", key:\"" + desKey + "\"}";  //$NON-NLS-1$//$NON-NLS-2$
-	}
-
-	/**
-	 * Valida una URL para asegurar que cumple con los requisitos m&iacute;nimos de seguridad.
-	 * @param url URL que se desea validar.
-	 * @return URL formada y validada.
-	 * @throws IllegalArgumentException Cuando ocurre alg&uacute;n problema al validar la URL.
-	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
-	 * @throws LocalAccessRequestException Cuando la URL usa los dominios localhost o 127.0.0.1.
-	 */
-	protected static URL validateURL(final String url) throws IllegalArgumentException, ParameterLocalAccessRequestedException, LocalAccessRequestConfirmException {
-
-		// Comprobamos que la URL sea valida
-		final URL servletUrl;
-		try {
-			servletUrl = new URL(URLDecoder.decode(url, DEFAULT_ENCODING));
-		}
-		catch (final Exception e) {
-			throw new IllegalArgumentException(
-				"La URL proporcionada para el servlet no es valida (" + url + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
-			);
-		}
-		// Comprobamos que el protocolo este soportado
-		if (!"http".equals(servletUrl.getProtocol()) && !"https".equals(servletUrl.getProtocol())) { //$NON-NLS-1$ //$NON-NLS-2$
-			throw new IllegalArgumentException(
-				"El protocolo de la URL proporcionada para el servlet no esta soportado: " + servletUrl.getProtocol() //$NON-NLS-1$
-			);
-		}
-		// El servlet no puede recibir parametros
-		if (servletUrl.toString().indexOf('?') != -1 || servletUrl.toString().indexOf('=') != -1) {
-			throw new IllegalArgumentException("Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
-		}
-		// Comprobamos que la URL sea una llamada al servlet y que no sea local
-		final String host = servletUrl.getHost();
-		if (host == null || host.trim().isEmpty()) {
-			throw new ParameterLocalAccessRequestedException(
-				"El host de la URL proporcionada no es valido", ErrorCode.Request.LOCAL_RETRIEVE_URL //$NON-NLS-1$
-			);
-		}
-		
-		checkLocalhost(host);
-		
-		return servletUrl;
-	}
-	
-	/**
-	 * Comprueba que el host indicado no sea local y, en caso de serlo, que el usuario
-	 * est&aacute; de acuerdo con su uso.
-	 * @param host Host de URL.
-	 * @throws ParameterLocalAccessRequestedException Cuando el host es local y el usuario no ha confirmado su uso.
-	 * @throws LocalAccessRequestConfirmException Excepcion para confirmar acceso desde un host local.
-	 */
-	private static void checkLocalhost(String host) throws LocalAccessRequestConfirmException {
-
-		final String lowerHost = host.toLowerCase().trim();
-		boolean isLocal = false;
-		String localReason = null;
-		if ("localhost".equals(lowerHost) || "127.0.0.1".equals(lowerHost) || "0.0.0.0".equals(lowerHost) || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				"[::1]".equals(lowerHost) || "::1".equals(lowerHost) || "[::]".equals(lowerHost) || "::".equals(lowerHost) || //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				"localhost.localdomain".equals(lowerHost)) { //$NON-NLS-1$
-			isLocal = true;
-			localReason = "La URL proporcionada se corresponde utiliza un identificador del host local"; //$NON-NLS-1$
-		}
-
-		if (!isLocal) {
-			try {
-				final InetAddress inetAddress = InetAddress.getByName(host);
-				if (inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress()) {
-					isLocal = true;
-					localReason = "La URL proporcionada se resuelve al host local"; //$NON-NLS-1$
-				}
-				else if (NetworkInterface.getByInetAddress(inetAddress) != null) {
-					isLocal = true;
-					localReason = "El host de la URL proporcionada se corresponde con una interfaz de red local"; //$NON-NLS-1$
-				}
-			}
-			catch (final UnknownHostException e) {
-				LOGGER.log(Level.WARNING, "No se pudo resolver el host para verificar si es local: " + host, e); //$NON-NLS-1$
-			}
-			catch (final SocketException e) {
-				LOGGER.log(Level.WARNING, "Error al comprobar si la direccion pertenece a una interfaz local: " + host, e); //$NON-NLS-1$
-			}
-		}
-
-		if (isLocal && !localAccessConfirmed) {
-			if (Platform.OS.ANDROID.equals(Platform.getOS())) {
-				throw new LocalAccessRequestConfirmException(localReason);
-			}
-			final int choice = AOUIFactory.showConfirmDialog(
-					null,
-					CoreMessages.getString("UrlParameters.2"), //$NON-NLS-1$
-					CoreMessages.getString("UrlParameters.1"), //$NON-NLS-1$
-					AOUIFactory.YES_NO_OPTION,
-					AOUIFactory.WARNING_MESSAGE
-			);
-			if (choice != AOUIFactory.YES_OPTION) {
-				throw new LocalAccessRequestConfirmException(localReason);
-			}
-			localAccessConfirmed = true;
-		}
-					
 	}
 
 	protected static String getKeyStoreName(final Map<String, String> params) {
@@ -604,10 +488,50 @@ public abstract class UrlParameters {
 		return cleanedpath;
 	}
 
-	protected static class LocalAccessRequestConfirmException extends Exception {
+
+	/**
+	 * Valida una URL para asegurar que cumple con los requisitos m&iacute;nimos de seguridad.
+	 * @param url URL que se desea validar.
+	 * @return URL formada y validada.
+	 * @throws IllegalArgumentException Cuando ocurre alg&uacute;n problema al validar la URL.
+	 */
+	protected static URL validateURL(final String url) throws IllegalArgumentException {
+
+		// Comprobamos que la URL sea valida
+		final URL servletUrl;
+		try {
+			servletUrl = new URL(URLDecoder.decode(url, DEFAULT_ENCODING));
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException(
+				"La URL proporcionada para el servlet no es valida (" + url + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+		// Comprobamos que el protocolo este soportado
+		if (!"http".equals(servletUrl.getProtocol()) && !"https".equals(servletUrl.getProtocol())) { //$NON-NLS-1$ //$NON-NLS-2$
+			throw new IllegalArgumentException(
+				"El protocolo de la URL proporcionada para el servlet no esta soportado: " + servletUrl.getProtocol() //$NON-NLS-1$
+			);
+		}
+		// El servlet no puede recibir parametros
+		if (servletUrl.toString().indexOf('?') != -1 || servletUrl.toString().indexOf('=') != -1) {
+			throw new IllegalArgumentException("Se han encontrado parametros en la URL del servlet"); //$NON-NLS-1$
+		}
+		final String host = servletUrl.getHost();
+		if (host == null || host.trim().isEmpty()) {
+			throw new IllegalArgumentException("El host de la URL proporcionada no es valido"); //$NON-NLS-1$
+		}
+
+		return servletUrl;
+	}
+
+	/**
+	 * Excepcion que se&ntilde;ala cuando se ha denegado el acceso a un servicio local.
+	 */
+	protected static class LocalAccessNotAllowedException extends Exception {
 		private static final long serialVersionUID = -2823729189870521694L;
 
-		protected LocalAccessRequestConfirmException(final String msg) {
+		protected LocalAccessNotAllowedException(final String msg) {
 			super(msg);
 		}
 	}
