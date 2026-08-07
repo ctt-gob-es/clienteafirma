@@ -39,6 +39,19 @@ final class ConfiguratorFirefoxLinux {
 
 	private static final String PROFILES_INI_RELATIVE_PATH = ".mozilla/firefox/profiles.ini";//$NON-NLS-1$
 	private static final String PROFILES_INI_RELATIVE_PATH_UBUNTU_22 = "snap/firefox/common/.mozilla/firefox/profiles.ini"; //$NON-NLS-1$
+	// Directorio de Firefox 147 y superiores
+	private static final String PROFILES_INI_RELATIVE_PATH_XDG = ".config/mozilla/firefox/profiles.ini"; //$NON-NLS-1$
+
+	/** Rutas relativas al directorio del usuario en las que puede encontrarse un
+	 * fichero <i>profiles.ini</i> de Mozilla. Se comprueban <b>todas</b>, no solo
+	 * la primera que exista: en un mismo sistema pueden convivir la
+	 * instalaci&oacute;n Snap y la nativa, cada una con sus propios perfiles, y el
+	 * certificado de CA debe quedar instalado en los de las dos. */
+	private static final String[] PROFILES_INI_RELATIVE_PATHS = new String[] {
+			PROFILES_INI_RELATIVE_PATH_UBUNTU_22,
+			PROFILES_INI_RELATIVE_PATH_XDG,
+			PROFILES_INI_RELATIVE_PATH
+	};
 
 	private static final String NSS_CHROME_PATH = "/.pki/nssdb"; //$NON-NLS-1$
 	private static final String NSS_CHROMIUM_PATH = "/snap/chromium/current/.pki/nssdb"; //$NON-NLS-1$
@@ -348,12 +361,9 @@ final class ConfiguratorFirefoxLinux {
 		final List<File> profilesIniFiles = new ArrayList<>();
 		for (final String userDir : userDirs){
 
-			File mozillaPath = new File(userDir, PROFILES_INI_RELATIVE_PATH_UBUNTU_22);
-			if (mozillaPath.isFile()) {
-				profilesIniFiles.add(mozillaPath);
-			} else {
-				mozillaPath = new File(userDir, PROFILES_INI_RELATIVE_PATH);
-				if (mozillaPath.isFile()){
+			for (final String relativePath : PROFILES_INI_RELATIVE_PATHS) {
+				final File mozillaPath = new File(userDir, relativePath);
+				if (mozillaPath.isFile()) {
 					profilesIniFiles.add(mozillaPath);
 				}
 			}
