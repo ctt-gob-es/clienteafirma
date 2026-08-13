@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -160,10 +159,6 @@ public final class DesktopUtil {
 	 */
 	public static File getApplicationDirectory() {
 
-		if (isJnlpDeployment()) {
-			return getJNLPApplicationDirectory();
-		}
-
 		// Identificamos el directorio de instalacion
 		try {
 			return new File(
@@ -199,27 +194,6 @@ public final class DesktopUtil {
 			filename = "Autofirma"; //$NON-NLS-1$
 		}
 		return filename;
-	}
-
-	/**
-	 * Obtiene el directorio de aplicaci&oacute;n que corresponde cuando se
-	 * ejecuta la aplicaci&oacute;n mediante un despliegue es JNLP.
-	 * @return Directorio de aplicaci&oacute;n.
-	 */
-	public static File getJNLPApplicationDirectory() {
-		if (Platform.getOS() == Platform.OS.WINDOWS) {
-			final File appDir = getWindowsAlternativeAppDir();
-			if (appDir.isDirectory() || appDir.mkdirs()) {
-				return appDir;
-			}
-		}
-		else if (Platform.getOS() == Platform.OS.MACOSX) {
-			final File appDir = getMacOsXAlternativeAppDir();
-			if (appDir.isDirectory() || appDir.mkdirs()) {
-				return appDir;
-			}
-		}
-		return new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 	}
 
 	/**
@@ -268,28 +242,6 @@ public final class DesktopUtil {
 			appDir = getMacOsXAlternativeAppDir();
 		}
 		return appDir;
-	}
-
-	/**
-	 * Comprueba si estamos en un despliegue JNLP de la aplicaci&oacute;n.
-	 * @return {@code true} si estamos en un despliegue JNLP, {@code false}
-	 * en caso contrario.
-	 */
-	private static boolean isJnlpDeployment() {
-
-		// Para comprobar si estamos en un despliegue JNLP sin crear una dependencia
-		// con javaws, hacemos una llamada equivalente a:
-		//     javax.jnlp.ServiceManager.lookup("javax.jnlp.ExtendedService");
-		// Si falla la llamda, no estamos en un despliegue JNLP
-		try {
-			final Class<?> serviceManagerClass = Class.forName("javax.jnlp.ServiceManager"); //$NON-NLS-1$
-			final Method lookupMethod = serviceManagerClass.getMethod("lookup", String.class); //$NON-NLS-1$
-			lookupMethod.invoke(null, "javax.jnlp.ExtendedService"); //$NON-NLS-1$
-		}
-		catch (final Throwable e) {
-			return false;
-		}
-		return true;
 	}
 
 	/** Recupera el DPI de la pantalla principal.
