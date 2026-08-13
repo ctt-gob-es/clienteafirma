@@ -243,17 +243,6 @@ public final class Platform {
      * devolver&aacute; {@code null}. Copiado de com.sun.deploy.config.Config.
      * @return Directorio del entorno de ejecuci&oacute;n de Java. */
     private static String recoverJavaHome() {
-        String ret = null;
-        try {
-            ret = System.getProperty("jnlpx.home"); //$NON-NLS-1$
-        }
-        catch (final Exception e) {
-            LOGGER.warning("No se ha podido leer la variable 'jnlpx.home': " + e); //$NON-NLS-1$
-        }
-        if (ret != null) {
-            return ret.substring(0, ret.lastIndexOf(File.separator));
-        }
-
         try {
             return System.getProperty("java.home"); //$NON-NLS-1$
         }
