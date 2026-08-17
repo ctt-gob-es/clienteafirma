@@ -34,13 +34,13 @@ if [ -d /etc/icecat ] ; then
    if [ ! -d /etc/icecat/pref ] ; then
       mkdir /etc/icecat/pref
    fi
-   ln -s /etc/firefox/pref/Autofirma.js /etc/icecat/pref/Autofirma.js
+   ln -s /etc/firefox/pref/AutoFirma.js /etc/icecat/pref/AutoFirma.js
 fi
 if [ -d /etc/firefox-esr ] ; then
    if [ ! -d /etc/firefox-esr/pref ] ; then
       mkdir /etc/firefox-esr/pref
    fi
-   ln -s /etc/firefox/pref/Autofirma.js /etc/firefox-esr/pref/Autofirma.js
+   ln -s /etc/firefox/pref/AutoFirma.js /etc/firefox-esr/pref/AutoFirma.js
 fi
 
 # Definimos la aplicacion autofirma como la de por defecto para abrir los x/handler (no es necesario porque se define en el fichero de control)
