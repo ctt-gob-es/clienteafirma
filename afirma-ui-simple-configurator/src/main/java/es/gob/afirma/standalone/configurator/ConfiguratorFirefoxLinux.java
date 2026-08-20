@@ -37,7 +37,11 @@ final class ConfiguratorFirefoxLinux {
 	private static final String CERTUTIL_EXE = "certutil"; //$NON-NLS-1$
 	private static final String CERTUTIL_RELATIVE_PATH = "certutil" + File.separator + CERTUTIL_EXE; //$NON-NLS-1$
 
-	private static final String PROFILES_INI_RELATIVE_PATH = ".mozilla/firefox/profiles.ini";//$NON-NLS-1$
+	private static final String[] PROFILES_INI_RELATIVE_PATH = new String[] {
+		".config/mozilla/firefox/profiles.ini",
+		".mozilla/firefox/profiles.ini",
+		"snap/firefox/common/.mozilla/firefox/profiles.ini",
+	};
 	private static final String PROFILES_INI_RELATIVE_PATH_UBUNTU_22 = "snap/firefox/common/.mozilla/firefox/profiles.ini"; //$NON-NLS-1$
 
 	private static final String NSS_CHROME_PATH = "/.pki/nssdb"; //$NON-NLS-1$
@@ -346,14 +350,10 @@ final class ConfiguratorFirefoxLinux {
 	private static List<File> getMozillaProfilesIniPaths(final String[] userDirs){
 
 		final List<File> profilesIniFiles = new ArrayList<>();
-		for (final String userDir : userDirs){
-
-			File mozillaPath = new File(userDir, PROFILES_INI_RELATIVE_PATH_UBUNTU_22);
-			if (mozillaPath.isFile()) {
-				profilesIniFiles.add(mozillaPath);
-			} else {
-				mozillaPath = new File(userDir, PROFILES_INI_RELATIVE_PATH);
-				if (mozillaPath.isFile()){
+		for (final String userDir : userDirs) {
+			for (final String p : PROFILES_INI_RELATIVE_PATH) {
+				File mozillaPath = new File(userDir, p);
+				if (mozillaPath.isFile()) {
 					profilesIniFiles.add(mozillaPath);
 				}
 			}
