@@ -29,9 +29,11 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.InvalidOSException;
 import es.gob.afirma.core.misc.Platform;
 
-/** Gestor de claves del llavero de Apple OS X.
- * OS X necesita su propio gestor por la peculiaridades en la recuperaci&oacute;n de claves privadas
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+/**
+ * Gestor de claves del llavero de Apple OS X.
+ * OS X necesita su propio gestor por las peculiaridades en la recuperaci&oacute;n de claves privadas
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
 final class AppleKeyStoreManager extends AOKeyStoreManager {
 
 	AppleKeyStoreManager() {
@@ -61,13 +63,14 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 			throw new IllegalArgumentException("El alias no puede ser nulo"); //$NON-NLS-1$
 		}
 		if (getKeyStore().containsAlias(alias)) {
-            PrivateKey key = null;
+            PrivateKey key;
             try {
                 LOGGER.info("Llavero de Mac OS X, se tratan directamente las claves privadas"); //$NON-NLS-1$
                 key = (PrivateKey) getKeyStore().getKey(alias, "dummy".toCharArray()); //$NON-NLS-1$
             }
             catch (final Exception e) {
             	LOGGER.warning("Error recuperando directamente la clave privada en Mac OS X: " + e); //$NON-NLS-1$
+				throw new KeyStoreException("No se ha podido recuperar la clave privada del certificado", e); //$NON-NLS-1$
             }
             if (key == null) {
             	throw new UnsupportedOperationException("La entrada no tiene clave privada"); //$NON-NLS-1$
@@ -155,7 +158,7 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 				LOGGER.warning(String.format("No se pudo cargar el certificado con alias '%1s'", al)); //$NON-NLS-1$
 			}
 		}
-		setCachedAliases(tmpAliases.toArray(new String[tmpAliases.size()]));
+		setCachedAliases(tmpAliases.toArray(new String[0]));
 	}
 
 }
