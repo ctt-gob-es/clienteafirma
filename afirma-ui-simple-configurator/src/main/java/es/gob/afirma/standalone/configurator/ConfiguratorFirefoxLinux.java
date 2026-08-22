@@ -50,8 +50,37 @@ final class ConfiguratorFirefoxLinux {
 
 	private static final String CERTUTIL_RESOURCE = "/linux/certutil.linux.zip"; //$NON-NLS-1$
 
+	/** Ficheros que denotan un almac&eacute;n NSS ya inicializado, en sus dos formatos:
+	 * <i>sql</i> (<code>cert9.db</code>, <code>pkcs11.txt</code>) y el antiguo
+	 * <i>dbm</i> (<code>cert8.db</code>). */
+	private static final String[] NSS_KEYSTORE_FILES = new String[] {
+			"cert9.db", //$NON-NLS-1$
+			"pkcs11.txt", //$NON-NLS-1$
+			"cert8.db" //$NON-NLS-1$
+	};
+
 	private ConfiguratorFirefoxLinux() {
 		// No instanciable
+	}
+
+	/** Indica si un directorio contiene ya un almac&eacute;n NSS.
+	 * <p>
+	 * Hace falta porque <code>certutil</code> <b>crea</b> el almac&eacute;n indicado con
+	 * <code>-d</code> cuando no existe, tanto al a&ntilde;adir un certificado con
+	 * <code>-A</code> como al borrarlo con <code>-D</code>. Sobre un directorio sin
+	 * almac&eacute;n, los comandos que genera este configurador no rellenan nada: lo
+	 * fabrican.
+	 * </p>
+	 * @param dir Directorio del perfil o del almac&eacute;n.
+	 * @return <code>true</code> si el directorio ya tiene un almac&eacute;n NSS,
+	 *         <code>false</code> en caso contrario. */
+	private static boolean hasNssKeyStore(final File dir) {
+		for (final String keystoreFile : NSS_KEYSTORE_FILES) {
+			if (new File(dir, keystoreFile).isFile()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -92,6 +121,14 @@ final class ConfiguratorFirefoxLinux {
 
 				final String keystorePath = userDir + nssSubpath;
 				if (!new File(keystorePath).isDirectory()) {
+					continue;
+				}
+
+				// Si el directorio existe pero todavia no tiene almacen, certutil lo
+				// crearia. El almacen de un usuario lo tiene que crear su navegador.
+				if (!hasNssKeyStore(new File(keystorePath))) {
+					LOGGER.info("Se omite un directorio NSS sin almacen inicializado: " //$NON-NLS-1$
+							+ keystorePath);
 					continue;
 				}
 
@@ -239,6 +276,16 @@ final class ConfiguratorFirefoxLinux {
 
 		for (final File profileDir : profilesDir) {
 			if (!profileDir.isDirectory()) {
+				continue;
+			}
+
+			// profiles.ini declara perfiles que el navegador puede no haber abierto nunca,
+			// y esos no tienen almacen. Sobre ellos certutil no anadiria el certificado:
+			// crearia el almacen entero, y el navegador se encontraria despues un almacen
+			// que no ha hecho el.
+			if (!hasNssKeyStore(profileDir)) {
+				LOGGER.info("Se omite un perfil de Mozilla sin almacen NSS inicializado: " //$NON-NLS-1$
+						+ profileDir.getAbsolutePath());
 				continue;
 			}
 
