@@ -59,6 +59,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 		nssPaths.add(systemLibDir + "/nss"); //$NON-NLS-1$
 		nssPaths.add(systemLibDir);
 		nssPaths.add(systemLibDir + "/firefox"); //$NON-NLS-1$
+		nssPaths.add(systemLibDir + "/firefox-esr");//$NON-NLS-1$
 
 		// Preserve backwards-compatibility on https://github.com/ctt-gob-es/clienteafirma/issues/27#issuecomment-488402089
 		String firefoxVersion = searchLastFirefoxVersion(systemLibDir);
