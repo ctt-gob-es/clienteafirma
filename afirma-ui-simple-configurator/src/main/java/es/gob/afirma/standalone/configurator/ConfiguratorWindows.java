@@ -59,15 +59,13 @@ final class ConfiguratorWindows implements Configurator {
 	private static final int UNINSTALL_CERT_RETRIES = 3;
 
 	private final boolean jnlpInstance;
-	private final boolean firefoxSecurityRoots;
 	private final String certificatePath;
 	private final String keyStorePath;
 
 	private final ConfiguratorFirefoxWindows firefoxConfigurator;
 
-	public ConfiguratorWindows(final boolean jnlpInstance, final boolean firefoxSecurityRoots, final String certificatePath, final String keyStorePath) {
+	public ConfiguratorWindows(final boolean jnlpInstance, final String certificatePath, final String keyStorePath) {
 		this.jnlpInstance = jnlpInstance;
-		this.firefoxSecurityRoots = firefoxSecurityRoots;
 		this.certificatePath = certificatePath;
 		this.keyStorePath = keyStorePath;
 		this.firefoxConfigurator = new ConfiguratorFirefoxWindows();
@@ -144,7 +142,7 @@ final class ConfiguratorWindows implements Configurator {
 
 			// Intentamos desinstalar cualquier certificado nuestro que pueda haber antes de instalar el nuevo
 			window.print(Messages.getString("ConfiguratorWindows.26")); //$NON-NLS-1$
-			firefoxConfigurator.uninstallRootCAMozillaKeyStore(appDir, window, UNINSTALL_CERT_RETRIES);
+			firefoxConfigurator.uninstallRootCAMozillaKeyStore(appDir, UNINSTALL_CERT_RETRIES);
 
 			// Instalamos el certificado de CA en el almacen de confianza de Firefox
 			window.print(Messages.getString("ConfiguratorWindows.9")); //$NON-NLS-1$
@@ -153,15 +151,6 @@ final class ConfiguratorWindows implements Configurator {
 			}
 			catch(final MozillaProfileNotFoundException e) {
 				window.print(Messages.getString("ConfiguratorWindows.12") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			if (this.firefoxSecurityRoots) {
-				window.print(Messages.getString("ConfiguratorWindows.22")); //$NON-NLS-1$
-				try {
-					firefoxConfigurator.configureUseSystemTrustStore(true, window);
-				} catch (final MozillaProfileNotFoundException e) {
-					window.print(Messages.getString("ConfiguratorWindows.21") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				}
 			}
 		}
 		else {
@@ -231,8 +220,7 @@ final class ConfiguratorWindows implements Configurator {
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		firefoxConfigurator.uninstallRootCAMozillaKeyStore(
 				getApplicationDirectory(this.jnlpInstance),
-				console,
-				UNINSTALL_CERT_RETRIES);
+                UNINSTALL_CERT_RETRIES);
 
 		// Listamos los plugins instalados
 		List<AfirmaPlugin> plugins = null;

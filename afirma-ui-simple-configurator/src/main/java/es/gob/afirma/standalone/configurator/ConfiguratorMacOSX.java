@@ -71,14 +71,6 @@ final class ConfiguratorMacOSX implements Configurator {
     /** Directorios de los usuarios del sistema. */
     private static String[] userDirs = null;
 
-    private final boolean headless;
-    private final boolean firefoxSecurityRoots;
-
-    public ConfiguratorMacOSX(final boolean headless, final boolean firefoxSecurityRoots) {
-		this.headless = headless;
-    	this.firefoxSecurityRoots = firefoxSecurityRoots;
-	}
-
 	@Override
 	public void configure(final Console console) throws IOException, GeneralSecurityException {
 
@@ -93,32 +85,6 @@ final class ConfiguratorMacOSX implements Configurator {
 		// Creamos los nuevos certificados SSL y los instalamos en los almacenes de confianza,
 		// eliminando versiones anteriores si es necesario
 		configureSSL(resourcesDir, console);
-
-		// Si se ha configurado en modo headless, se usaran los parametros de configuracion
-		// ya proporcionados y se configurara Firefox para que confie en los certificados
-		// raiz del llavero del sistema segun se haya indicado
-		boolean needConfigureFirefoxSecurityRoots;
-		if (this.headless) {
-			needConfigureFirefoxSecurityRoots = this.firefoxSecurityRoots;
-		}
-		// Si se ha pedido ejecutar con interfaz grafica, le preguntaremos al usuario que desea hacer
-		else {
-			final int result = JOptionPane.showConfirmDialog(
-					console.getParentComponent(),
-					Messages.getString("ConfiguratorMacOSX.23"), //$NON-NLS-1$
-					Messages.getString("ConfiguratorMacOSX.24"), //$NON-NLS-1$
-					JOptionPane.YES_NO_OPTION);
-			needConfigureFirefoxSecurityRoots = result == JOptionPane.YES_OPTION;
-		}
-
-		if (needConfigureFirefoxSecurityRoots) {
-			console.print(Messages.getString("ConfiguratorMacOSX.22")); //$NON-NLS-1$
-			try {
-				ConfiguratorFirefoxMac.configureUseSystemTrustStore(true, userDirs, console);
-			} catch (final MozillaProfileNotFoundException e) {
-				console.print(Messages.getString("ConfiguratorMacOSX.21") + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-		}
 
 		console.print(Messages.getString("ConfiguratorMacOSX.8")); //$NON-NLS-1$
 		LOGGER.info("Finalizado"); //$NON-NLS-1$

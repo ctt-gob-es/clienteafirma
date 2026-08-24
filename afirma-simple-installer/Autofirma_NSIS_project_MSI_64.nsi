@@ -116,8 +116,6 @@ XPStyle on
 Var PATH
 ;Parametro que indica si se debe crear el acceso directo en el escritorio
 Var CREATE_ICON
-;Parametro que indica si se debe activar el uso del almacen del sistema en Firefox
-Var FIREFOX_SECURITY_ROOTS
 ;Parametro que indica la ruta del certificado a pasar por el administrador
 Var CERTIFICATE_PATH
 ;Parametro que indica la ruta del almacen de claves a pasar por el administrador
@@ -337,11 +335,6 @@ Section "Autofirma" sPrograma
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
 		Delete "$INSTDIR\$PATH\autofirma.pfx"
 
-	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
-	StrCpy $R4 ""
-	StrCmp $FIREFOX_SECURITY_ROOTS "true" 0 +2
-		StrCpy $R4 "-firefox_roots"
-
 	; Comprobamos si el administrador le ha pasado el parametro con el certificado
 	StrCpy $R5 ""
 	StrCmp $CERTIFICATE_PATH "false" +2
@@ -398,7 +391,6 @@ Function .onInit
 	;Para que el metodo GetOptions no de problemas, se deben proporcionar los parametros con un delimitador inicial como '/'
 	;Este delimitador se agrega en el .wxs del instalador MSI
 	${GetOptions} $R0 "/CREATE_ICON=" $CREATE_ICON
-	${GetOptions} $R0 "/FIREFOX_SECURITY_ROOTS=" $FIREFOX_SECURITY_ROOTS
 	${GetOptions} $R0 "/CERTIFICATE_PATH=" $CERTIFICATE_PATH
 	${GetOptions} $R0 "/KEYSTORE_PATH=" $KEYSTORE_PATH
 	${GetOptions} $R0 "/CONFIG_PATH=" $CONFIG_PATH

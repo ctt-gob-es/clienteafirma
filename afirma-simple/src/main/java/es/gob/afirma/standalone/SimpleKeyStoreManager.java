@@ -250,15 +250,14 @@ public final class SimpleKeyStoreManager {
 		);
     }
 
-    /**
-     * Indica si existen perfiles de mozilla disponibles.
-     * @return <code>true</code> si se ha encontrado un fichero de perfiles de Mozilla Firefox,
-     *         <code>false</code> en caso contrario. */
-    public static boolean existFirefoxProfiles() {
+	/**
+	 * Indica si existen perfiles de mozilla disponibles.
+	 * @return <code>true</code> si se ha encontrado un fichero de perfiles de Mozilla Firefox,
+	 *         <code>false</code> en caso contrario. */
+	public static boolean existFirefoxProfiles() {
 		final String mozProfilesInitPath;
 		try {
-			mozProfileDir = MozillaKeyStoreUtilities.getActiveProfilePath();
-			nssLibDir = MozillaKeyStoreUtilities.getSystemNSSLibDir(AOKeyStore.MOZ_UNI);
+			mozProfilesInitPath = MozillaKeyStoreUtilities.getProfilesIniPath();
 		}
 		catch(final Exception e) {
 			LOGGER.warning("No se ha podido obtener el fichero de perfiles de Mozilla: " + e); //$NON-NLS-1$
@@ -266,7 +265,7 @@ public final class SimpleKeyStoreManager {
 		}
 
 		return mozProfilesInitPath != null;
-    }
+	}
 
     /**
      * Recupera el repositorio con el nombre indicado. Si no existe un <code>KeyStore</code> con

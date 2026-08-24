@@ -56,9 +56,6 @@ public class AutofirmaConfigurator implements ConsoleListener {
 	/** Indica que se realiza una carga mediante JNLP. */
 	public static final String PARAMETER_JNLP_INSTANCE = "-jnlp"; //$NON-NLS-1$
 
-	/** Indica que debe habilitarse el que Firefox utilice los certificados de confianza del sistema. */
-	public static final String PARAMETER_FIREFOX_SECURITY_ROOTS = "-firefox_roots"; //$NON-NLS-1$
-
 	/** Indica la ruta del certificado pasado por el administrador. */
 	public static final String PARAMETER_CERTIFICATE_PATH = "-certificate_path"; //$NON-NLS-1$
 
@@ -79,7 +76,7 @@ public class AutofirmaConfigurator implements ConsoleListener {
 
 	private static final String PLUGINS_DIRNAME = "plugins"; //$NON-NLS-1$
 
-	private Configurator configurator;
+	private final Configurator configurator;
 
 	private final ConfigArgs config;
 
@@ -163,14 +160,14 @@ public class AutofirmaConfigurator implements ConsoleListener {
 		}
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(jnlpDeployment, this.config.isFirefoxSecurityRoots(),
+			this.configurator = new ConfiguratorWindows(jnlpDeployment,
 					this.config.getCertificatePath(), this.config.getKeystorePath());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux(jnlpDeployment);
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
-            this.configurator = new ConfiguratorMacOSX(this.config.isHeadless(), this.config.isFirefoxSecurityRoots());
+            this.configurator = new ConfiguratorMacOSX();
         }
 		else {
 			LOGGER.warning(
@@ -300,7 +297,7 @@ public class AutofirmaConfigurator implements ConsoleListener {
 		}
 
 		if (!config.getDefaultLanguage().isEmpty()) {
-			Locale locale = null;
+			Locale locale;
             try {
     			final String[] parts = config.getDefaultLanguage().split("_", 2); //$NON-NLS-1$
             	final String lang = parts[0];
@@ -371,6 +368,7 @@ public class AutofirmaConfigurator implements ConsoleListener {
 		for (final Locale l : LanguageManager.AFIRMA_DEFAULT_LOCALES) {
 			if (locale.equals(l)) {
 				existsLocale = true;
+				break;
 			}
 		}
 		final Locale [] importedLocales = LanguageManager.getImportedLocales();
@@ -378,6 +376,7 @@ public class AutofirmaConfigurator implements ConsoleListener {
 			for (final Locale l : LanguageManager.getImportedLocales()) {
 				if (locale.equals(l)) {
 					existsLocale = true;
+					break;
 				}
 			}
 		}
@@ -418,7 +417,6 @@ public class AutofirmaConfigurator implements ConsoleListener {
 		private boolean needKeep = false;
 		private boolean headless = false;
 		private boolean jnlpInstance = false;
-		private boolean firefoxSecurityRoots = false;
 		private String certificatePath = ""; //$NON-NLS-1$
 		private String keystorePath = ""; //$NON-NLS-1$
 		private String configPath = ""; //$NON-NLS-1$
@@ -441,8 +439,6 @@ public class AutofirmaConfigurator implements ConsoleListener {
 						this.headless = true;
 					} else if (PARAMETER_JNLP_INSTANCE.equalsIgnoreCase(arg)) {
 						this.jnlpInstance = true;
-					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
-						this.firefoxSecurityRoots = true;
 					} else if (PARAMETER_CERTIFICATE_PATH.equalsIgnoreCase(arg)) {
 						if (i < args.length - 1) {
 							this.certificatePath = args[++i];
@@ -478,10 +474,6 @@ public class AutofirmaConfigurator implements ConsoleListener {
 
 		public boolean isJnlpInstance() {
 			return this.jnlpInstance;
-		}
-
-		public boolean isFirefoxSecurityRoots() {
-			return this.firefoxSecurityRoots;
 		}
 
 		public String getCertificatePath() {

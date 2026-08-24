@@ -67,8 +67,6 @@ Var StartMenu_Integration_Checkbox
 Var StartMenu_Integration_Checkbox_State
 Var Shorcut_Integration_Checkbox
 Var Shorcut_Integration_Checkbox_State
-Var Firefox_Integration_Checkbox
-Var Firefox_Integration_Checkbox_State
 
 ; Parametro que indica si se encuentra alguna version de JRE instalada en el sistema.
 Var INSTALL_JRE 
@@ -101,18 +99,12 @@ Function createConfigPage
   ${NSD_CreateCheckbox} 0 17u 100% 10u $(CREATE_SHORTCUT)
   Pop $Shorcut_Integration_Checkbox
 
-  ${NSD_CreateCheckbox} 0 34u 100% 10u $(CONF_FIREFOX_CERT)
-  Pop $Firefox_Integration_Checkbox
-  
   ; Restablecemos el valor por si hubiese cambio de pantalla
   ${If} $StartMenu_Integration_Checkbox_State == ${BST_CHECKED}
     ${NSD_Check} $StartMenu_Integration_Checkbox
   ${EndIf}
   ${If} $Shorcut_Integration_Checkbox_State == ${BST_CHECKED}
     ${NSD_Check} $Shorcut_Integration_Checkbox
-  ${EndIf}
-  ${If} $Firefox_Integration_Checkbox_State == ${BST_CHECKED}
-    ${NSD_Check} $Firefox_Integration_Checkbox
   ${EndIf}
   
   ; Establecemos el mismo comportamiento al pulsar Atras en la pagina que al continuar
@@ -126,7 +118,6 @@ Function leaveConfigPage
 
 	${NSD_GetState} $StartMenu_Integration_Checkbox $StartMenu_Integration_Checkbox_State
 	${NSD_GetState} $Shorcut_Integration_Checkbox $Shorcut_Integration_Checkbox_State
-	${NSD_GetState} $Firefox_Integration_Checkbox $Firefox_Integration_Checkbox_State
 
 FunctionEnd
 
@@ -359,14 +350,7 @@ Section "Autofirma" sPrograma
 	IfFileExists "$INSTDIR\$PATH\autofirma.pfx" 0 +2
 		Delete "$INSTDIR\$PATH\autofirma.pfx"
 
-	; Configuramos la aplicacion (generacion de certificados) e importacion en Firefox
-	StrCpy $R0 ""
-	${If} $Firefox_Integration_Checkbox_State == ${BST_CHECKED}
-		StrCpy $R0 "-firefox_roots"
-	${Endif}
-	
 	StrCpy $R1 ""
-
 	${If} $LANGUAGE == 3082
 		StrCpy $R1 "-default_language es_ES"
 	${ElseIf} $LANGUAGE == 1027
@@ -384,7 +368,7 @@ Section "Autofirma" sPrograma
 	${EndIf}
 	
 	IfFileExists "$INSTDIR\$PATH\AutofirmaConfigurador.exe" 0 +2
-		ExecWait '"$INSTDIR\$PATH\AutofirmaConfigurador.exe" $R0 $R1 /passive'
+		ExecWait '"$INSTDIR\$PATH\AutofirmaConfigurador.exe" $R1 /passive'
 	
 	; Eliminamos los certificados de versiones previas del sistema
 	Call DeleteCertificateOnInstall

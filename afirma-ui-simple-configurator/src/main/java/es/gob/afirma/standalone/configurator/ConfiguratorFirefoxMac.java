@@ -12,13 +12,9 @@ package es.gob.afirma.standalone.configurator;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -44,15 +40,6 @@ final class ConfiguratorFirefoxMac {
 	private static final String COMMAND_EXPORT_PATH = "export PATH=$PATH:";//$NON-NLS-1$
 	private static final String COMMAND_EXPORT_LIBRARY_LD = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:";//$NON-NLS-1$
 
-	private static final String CUSTOM_PROFILE_PREFERENCES_FILENAME = "user.js"; //$NON-NLS-1$
-	private static final String MOZ_PREFERENCE_FILE_HEADER =
-			"// === PROPIEDADES PERSONALIZADAS DE CONFIGURACION ===\r\n"; //$NON-NLS-1$
-	private static final String MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER =
-			"\r\n// Confianza en los certificados raices del almacen del sistema\r\n"; //$NON-NLS-1$
-	private static final String MOZ_PREFERENCE_ENTERPRISE_ROOTS = "security.enterprise_roots.enabled"; //$NON-NLS-1$
-
-	private static final String BREAK_LINE = "\r\n"; //$NON-NLS-1$
-
 	private ConfiguratorFirefoxMac() {
 		// No instanciable
 	}
@@ -64,15 +51,14 @@ final class ConfiguratorFirefoxMac {
 	 * @param scriptFile Fichero al que agregar al final el script de desinstalaci&oacute;n.
 	 * @param console Consola sobre la que mostrar los mensajes al usuario.
 	 * @throws MozillaProfileNotFoundException No se ha encontrado el directorio de perfiles de Mozilla.
-	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
-	 */
+     */
 	static void installOnMozillaKeyStore(final File appDir, final String[] userDirs, final File scriptFile, final Console console)
-			throws MozillaProfileNotFoundException, IOException {
+			throws MozillaProfileNotFoundException {
 
 		// Preparamos CertUtil para realizar la operacion
 		File certutilFile;
 		try {
-			certutilFile = prepareCertUtil(appDir, scriptFile);
+			certutilFile = prepareCertUtil(appDir);
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se pudo preparar CertUtil para la instalacion del certificado SSL en Mozilla Firefox. Se aborta la operacion", e); //$NON-NLS-1$
@@ -114,7 +100,7 @@ final class ConfiguratorFirefoxMac {
 		// Preparamos CertUtil para realizar la operacion
 		File certutilFile;
 		try {
-			certutilFile = prepareCertUtil(appDir, scriptFile);
+			certutilFile = prepareCertUtil(appDir);
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se pudo preparar CertUtil para la desinstalacion del certificado SSL en Mozilla Firefox. Se aborta la operacion: " + e); //$NON-NLS-1$
@@ -129,7 +115,7 @@ final class ConfiguratorFirefoxMac {
 		for (final File profileDir : profileDirs) {
 
 			// Generamos el script para eliminar el certificado del almacen de Mozilla
-			generateUninstallScript(appDir, profileDir, certutilFile, scriptFile);
+			generateUninstallScript(profileDir, certutilFile, scriptFile);
 
 			try {
 				ConfiguratorMacOSX.executeScriptFile(scriptFile, true, false);
@@ -144,7 +130,7 @@ final class ConfiguratorFirefoxMac {
 	 * Genera el script para la instalaci&oacute;n de los certificados. En caso de error,
 	 * permite al usuario reintentarlo.
 	 * @param appDir Directorio de instalaci&oacute;n.
-	 * @param profileDirs Directorios de perfil de Mozilla.
+	 * @param profileDir Directorio de perfil de Mozilla.
 	 * @param certUtilFile Fichero del ejecutable certUtil.
 	 * @param scriptFile Fichero al que agregar el script.
 	 */
@@ -230,16 +216,14 @@ final class ConfiguratorFirefoxMac {
 
 	/**
 	 * Genera el script de desinstalaci&oacute;n de los certificados de la aplicaci&oacute;n.
-	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @param profileDir Listado de directorio de perfil de usuario de Mozilla Firefox.
 	 * @param certUtilFile Fichero del ejecutable certUtil.
 	 * @param scriptFile Fichero al final del cual donde se almacenar&aacute; el script de desinstalaci&oacute;n.
 	 * @throws IOException Cuando se produce un error al generar el script.
 	 */
-	private static void generateUninstallScript(final File appDir,
-			final File profileDir,
-            final File certUtilFile,
-			final File scriptFile) throws IOException {
+	private static void generateUninstallScript(final File profileDir,
+	                                            final File certUtilFile,
+	                                            final File scriptFile) throws IOException {
 
 		if (!profileDir.isDirectory()) {
 			return;
@@ -280,10 +264,9 @@ final class ConfiguratorFirefoxMac {
 
 	/** Obtiene una referencia a una instancia de CertUtil v&aacute;lida para su ejecuci&oacute;n.
 	 * @param appDir Ruta del ejecutable CertUtil.
-	 * @param scriptFile <i>Script</i> para exportar el <code>LD_LIBRARY_PATH</code>.
 	 * @return certutilFile Fichero ejecutable CertUtil.
 	 * @throws IOException Se lanza cuando CertUtil no existe o no se puede ejecutar. */
-	private static File prepareCertUtil(final File appDir, final File scriptFile) throws IOException {
+	private static File prepareCertUtil(final File appDir) throws IOException {
 
 		final File certutilFile = new File(appDir, CERTUTIL_RELATIVE_PATH);
 		if (!certutilFile.isFile()) {
@@ -392,97 +375,6 @@ final class ConfiguratorFirefoxMac {
 		return path.replace(" ", "\\ "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/**
-	 * Configur el que se habilite o deshabilite el uso del almac&eacute;n de cofianza del
-	 * sistema operativo como almacen de confianza de Firefox.
-	 * @param enable {@code true} para habilitar la confianza en los certificados ra&iacute;z del
-	 * almac&eacute;n de confianza del sistema adem&aacute;s de en los suyos propios,
-	 * {@code false} en de que s&oacute;lo se desee confiar en el almac&eacute;n del navegador.
-	 * @param userDirs Listado de directorios de de usuarios del sistema.
-	 * @param window Consola en la que se mostrar&aacute;n los mensajes de progreso.
-	 * @throws IOException Cuando no se puede crear o editar la configuraci&oacute;n.
-	 * @throws MozillaProfileNotFoundException Cuando no se han encontrado perfiles de Firefox.
-	 */
-	static void configureUseSystemTrustStore(final boolean enable, final String[] userDirs, final Console window)
-			throws IOException, MozillaProfileNotFoundException {
-
-		// Obtenemos el listado de perfiles de Firefox
-		final File[] mozillaProfileDirs = getMozillaUsersProfiles(userDirs);
-
-		if (mozillaProfileDirs == null || mozillaProfileDirs.length == 0) {
-			throw new MozillaProfileNotFoundException("No se han encontrado perfiles de Mozilla en el sistema"); //$NON-NLS-1$
-		}
-
-		if (enable) {
-			window.print(Messages.getString("ConfiguratorWindows.19")); //$NON-NLS-1$
-		}
-		else {
-			window.print(Messages.getString("ConfiguratorWindows.20")); //$NON-NLS-1$
-		}
-
-		// Las preferencias personalizadas se establecen a traves de un fichero user.js en el
-		// directorio de perfil de Firefox. Por cada directorio, comprobamos si existe este
-		// fichero. Si no existe, se crea con la propiedad personalizada. Si existe, se modifica
-		// el valor que tuviese, o se agrega la propiedad si no estuviera.
-		for (final File profileDir : mozillaProfileDirs) {
-			final File customPrefsFile = new File(profileDir, CUSTOM_PROFILE_PREFERENCES_FILENAME);
-
-			// Si existe el fichero, comprobamos si existe la propiedad
-			if (customPrefsFile.isFile()) {
-
-				// Buscamos la propiedad en el fichero y, si existe, cambiamos su valor
-				boolean propertyFound = false;
-				final StringBuilder customFileContent = new StringBuilder();
-				try (InputStream is = new FileInputStream(customPrefsFile);
-						Reader isr = new InputStreamReader(is);
-						BufferedReader br = new BufferedReader(isr);) {
-
-					String line;
-					while ((line = br.readLine()) != null) {
-						if (line.contains(MOZ_PREFERENCE_ENTERPRISE_ROOTS)) {
-							propertyFound = true;
-							customFileContent.append(getUseSystemTrustStoreConfigContent(enable));
-						}
-						else {
-							customFileContent.append(line).append(BREAK_LINE);
-						}
-					}
-				}
-
-				// Si no existe la linea de configuracion, la agregamos
-				if (!propertyFound) {
-					customFileContent.append(MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER)
-						.append(getUseSystemTrustStoreConfigContent(enable));
-				}
-
-				// Rescribimos el fichero
-				try (OutputStream fos = new FileOutputStream(customPrefsFile)) {
-					fos.write(customFileContent.toString().getBytes(StandardCharsets.UTF_8));
-				}
-			}
-			// Si no existe el fichero, lo creamos con la propiedad
-			else {
-				try (OutputStream fos = new FileOutputStream(customPrefsFile)) {
-					final String content = MOZ_PREFERENCE_FILE_HEADER
-							+ MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER
-							+ getUseSystemTrustStoreConfigContent(enable);
-					fos.write(content.getBytes(StandardCharsets.UTF_8));
-				}
-			}
-		}
-	}
-
-	/**
-	 * Obtiene la l&iacute;nea de configuraci&oacute;n para activar o desactivar el uso del
-	 * almac&eacute;n de confianza del sistema.
-	 * @param enable {@code true} para habilitar el almac&eacute;n de confianza del sistema,
-	 * {@code false} para desactivarlo.
-	 * @return L&iacute;nea de configuraci&oacute;n.
-	 */
-	private static String getUseSystemTrustStoreConfigContent(final boolean enable) {
-		return "user_pref(\"" + MOZ_PREFERENCE_ENTERPRISE_ROOTS //$NON-NLS-1$
-				+ "\", " + enable + ");" + BREAK_LINE; //$NON-NLS-1$ //$NON-NLS-2$
-	}
 }
 
 

@@ -44,9 +44,6 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 	/** Indica que la operacion que se debe realizar es la de desinstalaci&oacute;n. */
 	public static final String PARAMETER_UNINSTALL = "-uninstall"; //$NON-NLS-1$
 
-	/** Indica que debe habilitarse el que Firefox utilice los certificados de confianza del sistema. */
-	public static final String PARAMETER_FIREFOX_SECURITY_ROOTS = "-firefox_roots"; //$NON-NLS-1$
-
 	/** Indica la ruta del certificado pasado por el administrador. */
 	public static final String PARAMETER_CERTIFICATE_PATH = "-certificate_path"; //$NON-NLS-1$
 
@@ -67,11 +64,9 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 
 	private static final String PLUGINS_DIRNAME = "plugins"; //$NON-NLS-1$
 
-	private Configurator configurator;
+	private final Configurator configurator;
 
-	private final ConfigArgs config;
-
-	private Console console;
+    private Console console;
 
 	static {
 		// Instalamos el registro a disco
@@ -125,29 +120,19 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 
 	/**
 	 * Configurador silencioso de la aplicaci&oacute;n.
-	 * @param args Argumentos para configurar la ejecuci&oacute;n del proceso.
-	 */
-	public AutofirmaConfiguratorSilent(final String[] args) {
-		this(new ConfigArgs(args));
-	}
-
-	/**
-	 * Configurador silencioso de la aplicaci&oacute;n.
 	 * @param config Argumentos para configurar la ejecuci&oacute;n del proceso.
 	 */
 	public AutofirmaConfiguratorSilent(final ConfigArgs config) {
 
-		this.config = config;
-
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(false, this.config.isFirefoxSecurityRoots(),
-					this.config.getCertificatePath(), this.config.getKeystorePath());
+        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+			this.configurator = new ConfiguratorWindows(false,
+					config.getCertificatePath(), config.getKeystorePath());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
 		    this.configurator = new ConfiguratorLinux(false);
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
-            this.configurator = new ConfiguratorMacOSX(true, this.config.isFirefoxSecurityRoots());
+            this.configurator = new ConfiguratorMacOSX();
         }
 		else {
 			LOGGER.warning(
@@ -265,7 +250,7 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 		}
 
 		if (!config.getDefaultLanguage().isEmpty()) {
-			Locale locale = null;
+			Locale locale;
             try {
     			final String[] parts = config.getDefaultLanguage().split("_", 2); //$NON-NLS-1$
             	final String lang = parts[0];
@@ -327,6 +312,7 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 		for (final Locale l : LanguageManager.AFIRMA_DEFAULT_LOCALES) {
 			if (locale.equals(l)) {
 				existsLocale = true;
+				break;
 			}
 		}
 		final Locale [] importedLocales = LanguageManager.getImportedLocales();
@@ -334,6 +320,7 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 			for (final Locale l : LanguageManager.getImportedLocales()) {
 				if (locale.equals(l)) {
 					existsLocale = true;
+					break;
 				}
 			}
 		}
@@ -350,7 +337,6 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 	private static class ConfigArgs {
 
 		private Operation op = Operation.INSTALLATION;
-		private boolean firefoxSecurityRoots = false;
 		private String certificatePath = ""; //$NON-NLS-1$
 		private String keystorePath = ""; //$NON-NLS-1$
 		private String configPath = ""; //$NON-NLS-1$
@@ -367,8 +353,6 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 						this.op = Operation.INSTALLATION;
 					} else if (PARAMETER_UNINSTALL.equalsIgnoreCase(arg)) {
 						this.op = Operation.UNINSTALLATION;
-					} else if (PARAMETER_FIREFOX_SECURITY_ROOTS.equalsIgnoreCase(arg)) {
-						this.firefoxSecurityRoots = true;
 					} else if (PARAMETER_CERTIFICATE_PATH.equalsIgnoreCase(arg)) {
 						if (i < args.length - 1) {
 							this.certificatePath = args[++i];
@@ -400,10 +384,6 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 
 		public boolean isUninstallation() {
 			return this.op == Operation.UNINSTALLATION;
-		}
-
-		public boolean isFirefoxSecurityRoots() {
-			return this.firefoxSecurityRoots;
 		}
 
 		public String getCertificatePath() {

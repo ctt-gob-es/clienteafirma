@@ -9,17 +9,12 @@
 
 package es.gob.afirma.standalone.configurator;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
@@ -45,15 +40,6 @@ final class ConfiguratorFirefoxWindows {
 	private static final String CERTUTIL_DIR = "certutil"; //$NON-NLS-1$
 	private static final String CERTUTIL_EXE = "certutil.exe"; //$NON-NLS-1$
 	private static final String CERTUTIL_RESOURCE = "/windows/certutil.windows.zip"; //$NON-NLS-1$
-
-	private static final String CUSTOM_PROFILE_PREFERENCES_FILENAME = "user.js"; //$NON-NLS-1$
-	private static final String MOZ_PREFERENCE_FILE_HEADER =
-			"// === PROPIEDADES PERSONALIZADAS DE CONFIGURACION ===\r\n"; //$NON-NLS-1$
-	private static final String MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER =
-			"\r\n// Confianza en los certificados raices del almacen del sistema\r\n"; //$NON-NLS-1$
-	private static final String MOZ_PREFERENCE_ENTERPRISE_ROOTS = "security.enterprise_roots.enabled"; //$NON-NLS-1$
-
-	private static final String BREAK_LINE = "\r\n"; //$NON-NLS-1$
 
 	/** Nombre del usuario por defecto en Windows. Este usuario es el que se usa como base para
 	 * crear nuevos usuarios y no se deber&iacute;a tocar. */
@@ -149,8 +135,7 @@ final class ConfiguratorFirefoxWindows {
 			try {
 				executeCertUtilToImport(
 						appDir,
-						profile,
-						window
+						profile
 				);
 			}
 			catch (Exception e) {
@@ -174,10 +159,9 @@ final class ConfiguratorFirefoxWindows {
 	 * Desinstala un certificado de los almacenes de autoridades de confianza
 	 * de Firefox de todos los perfiles de todos los usuarios del sistema.
 	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
-	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
 	 * @param iterations N&uacute;mero de veces que se debe repetir el proceso.
 	 */
-	void uninstallRootCAMozillaKeyStore(final File appDir, final Console console, final int iterations) {
+	void uninstallRootCAMozillaKeyStore(final File appDir, final int iterations) {
 
 		if (iterations <= 0) {
 			return;
@@ -206,7 +190,7 @@ final class ConfiguratorFirefoxWindows {
 		for (final MozillaProfile profile : mozillaProfiles) {
 			for (int i = 0; i < iterations; i++) {
 				try {
-					uninstallCACertFromMozillaKeyStore(appDir, profile, console);
+					uninstallCACertFromMozillaKeyStore(appDir, profile);
 				}
 				catch (final Exception e) {
 					LOGGER.log(Level.WARNING, "No se pudo desinstalar o no se encontro el certificado SSL raiz del almacen de Mozilla Firefox", e); //$NON-NLS-1$
@@ -236,11 +220,9 @@ final class ConfiguratorFirefoxWindows {
 	 * confianza SSL en un perfil de Mozilla.
 	 * @param appDir Directorio en el que se encuentra el certificado a importar.
 	 * @param profile Perfil de Mozilla.
-	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
 	 * @throws GeneralSecurityException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore. */
 	private static void executeCertUtilToImport(final File appDir,
-			                                    final MozillaProfile profile,
-			                                    final Console console)
+			                                    final MozillaProfile profile)
 			                                    		throws GeneralSecurityException {
 
 		final File certutilExe =
@@ -263,7 +245,7 @@ final class ConfiguratorFirefoxWindows {
 		};
 
 		try {
-			execCertUtilCommandLine(appDir, certutilCommands, console, profile.getName());
+			execCertUtilCommandLine(certutilCommands);
 		}
 		catch (final AOCancelledOperationException e) {
 			throw new KeyStoreException(
@@ -285,10 +267,9 @@ final class ConfiguratorFirefoxWindows {
 	 * SSL de Firefox.
 	 * @param appDir Directorio padre en el que se encuentra el directorio de certUtil.
 	 * @param profile Perfil de Mozilla.
-	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
 	 * @throws GeneralSecurityException Cuando no se puede ejecutar.
 	 */
-	private static void uninstallCACertFromMozillaKeyStore(final File appDir, final MozillaProfile profile, final Console console)
+	private static void uninstallCACertFromMozillaKeyStore(final File appDir, final MozillaProfile profile)
 			throws GeneralSecurityException {
 
 		final File certutilFile = new File(appDir, CERTUTIL_DIR + File.separator + CERTUTIL_EXE);
@@ -299,7 +280,7 @@ final class ConfiguratorFirefoxWindows {
 		final String profileReference = (sqlDb ? "sql:" : "") + profile.getProfileDir().getAbsolutePath(); //$NON-NLS-1$ //$NON-NLS-2$
 
 		try {
-			deleteCertificate(ConfiguratorUtil.CERT_ALIAS, certutilFile, appDir, profileReference, console, profile.getName());
+			deleteCertificate(ConfiguratorUtil.CERT_ALIAS, certutilFile, profileReference);
 		}
 		catch (final Exception e) {
 			LOGGER.warning("No se encontro o no se pudo borrar el certificado '" + ConfiguratorUtil.CERT_ALIAS //$NON-NLS-1$
@@ -307,7 +288,7 @@ final class ConfiguratorFirefoxWindows {
 					+ profile.getProfileDir().getAbsolutePath() + "'. Se buscara con el alias " + CERT_ALIAS); //$NON-NLS-1$
 
 			try {
-				deleteCertificate(CERT_ALIAS, certutilFile, appDir, profileReference, console, profile.getName());
+				deleteCertificate(CERT_ALIAS, certutilFile, profileReference);
 			}
 			catch (final Exception e2) {
 				throw new KeyStoreException("No se encontro o no se pudo borrar el certificado de CA en el perfil de usuario de Firefox " + profile.getProfileDir().getAbsolutePath(), e2); //$NON-NLS-1$
@@ -315,7 +296,7 @@ final class ConfiguratorFirefoxWindows {
 		}
 	}
 
-	private static void deleteCertificate(final String alias, final File certutilFile, final File appDir, final String profileReference, final Console console, final String profileName) throws IOException {
+	private static void deleteCertificate(final String alias, final File certutilFile, final String profileReference) throws IOException {
 
 		final String[] certutilCommands = new String[] {
 				escapePath(certutilFile.getAbsolutePath()),
@@ -326,18 +307,15 @@ final class ConfiguratorFirefoxWindows {
 				"\"" + alias + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 		};
 
-		execCertUtilCommandLine(appDir, certutilCommands, console, profileName);
+		execCertUtilCommandLine(certutilCommands);
 	}
 
 	/**
 	 * Ejecuta Mozilla CertUtil como comando del sistema.
-	 * @param appDir Directorio de instalaci&oacute;n de la aplicaci&oacute;n.
 	 * @param command Comando a ejecutar, con el nombre de comando y sus par&aacute;metros separados en un array.
-	 * @param console Consola a trav&eacute;s de la que imprimir los mensajes de usuario.
-	 * @param profileName Nombre del perfil de Firefox.
 	 * @throws IOException Si no se pudo realizar la propia ejecuci&oacute;n.
 	 */
-	private static void execCertUtilCommandLine(final File appDir, final String[] command, final Console console, final String profileName)
+	private static void execCertUtilCommandLine(final String[] command)
 			throws IOException {
 
 		LOGGER.info("Se ejecutara el siguiente comando:\n" + printCommand(command)); //$NON-NLS-1$
@@ -514,96 +492,4 @@ final class ConfiguratorFirefoxWindows {
 		}
 		return sb.toString();
 	}
-
-	/**
-	 * Configur el que se habilite o deshabilite el uso del almac&eacute;n de cofianza del
-	 * sistema operativo como almacen de confianza de Firefox.
-	 * @param enable {@code true} para habilitar la confianza en los certificados ra&iacute;z del
-	 * almac&eacute;n de confianza del sistema adem&aacute;s de en los suyos propios,
-	 * {@code false} en de que s&oacute;lo se desee confiar en el almac&eacute;n del navegador.
-	 * @param window Consola en la que se mostrar&aacute;n los mensajes de progreso.
-	 * @throws IOException Cuando no se puede crear o editar la configuraci&oacute;n.
-	 * @throws MozillaProfileNotFoundException Cuando no se han encontrado perfiles de Firefox.
-	 */
-	void configureUseSystemTrustStore(final boolean enable, final Console window) throws IOException, MozillaProfileNotFoundException {
-
-		// Obtenemos el listado de perfiles de Firefox
-		final MozillaProfile[] mozillaProfiles = getAllMozillaProfiles();
-
-		if (mozillaProfiles == null || mozillaProfiles.length == 0) {
-			throw new MozillaProfileNotFoundException("No se han encontrado perfiles de Mozilla en el sistema"); //$NON-NLS-1$
-		}
-
-		if (enable) {
-			window.print(Messages.getString("ConfiguratorWindows.19")); //$NON-NLS-1$
-		}
-		else {
-			window.print(Messages.getString("ConfiguratorWindows.20")); //$NON-NLS-1$
-		}
-
-		// Las preferencias personalizadas se establecen a traves de un fichero user.js en el
-		// directorio de perfil de Firefox. Por cada directorio, comprobamos si existe este
-		// fichero. Si no existe, se crea con la propiedad personalizada. Si existe, se modifica
-		// el valor que tuviese, o se agrega la propiedad si no estuviera.
-		for (final MozillaProfile profile : mozillaProfiles) {
-			File profileDir = profile.getProfileDir();
-			final File customPrefsFile = new File(profileDir, CUSTOM_PROFILE_PREFERENCES_FILENAME);
-
-			// Si existe el fichero, comprobamos si existe la propiedad
-			if (customPrefsFile.isFile()) {
-
-				// Buscamos la propiedad en el fichero y, si existe, cambiamos su valor
-				boolean propertyFound = false;
-				final StringBuilder customFileContent = new StringBuilder();
-				try (InputStream is = new FileInputStream(customPrefsFile);
-						Reader isr = new InputStreamReader(is);
-						BufferedReader br = new BufferedReader(isr);) {
-
-					String line;
-					while ((line = br.readLine()) != null) {
-						if (line.contains(MOZ_PREFERENCE_ENTERPRISE_ROOTS)) {
-							propertyFound = true;
-							customFileContent.append(getUseSystemTrustStoreConfigContent(enable));
-						}
-						else {
-							customFileContent.append(line).append(BREAK_LINE);
-						}
-					}
-				}
-
-				// Si no existe la linea de configuracion, la agregamos
-				if (!propertyFound) {
-					customFileContent.append(MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER)
-						.append(getUseSystemTrustStoreConfigContent(enable));
-				}
-
-				// Rescribimos el fichero
-				try (OutputStream fos = new FileOutputStream(customPrefsFile)) {
-					fos.write(customFileContent.toString().getBytes(StandardCharsets.UTF_8));
-				}
-			}
-			// Si no existe el fichero, lo creamos con la propiedad
-			else {
-				try (OutputStream fos = new FileOutputStream(customPrefsFile)) {
-					final String content = MOZ_PREFERENCE_FILE_HEADER
-							+ MOZ_PREFERENCE_ENTERPRISE_ROOTS_HEADER
-							+ getUseSystemTrustStoreConfigContent(enable);
-					fos.write(content.getBytes(StandardCharsets.UTF_8));
-				}
-			}
-		}
-	}
-
-	/**
-	 * Obtiene la l&iacute;nea de configuraci&oacute;n para activar o desactivar el uso del
-	 * almac&eacute;n de confianza del sistema.
-	 * @param enable {@code true} para habilitar el almac&eacute;n de confianza del sistema,
-	 * {@code false} para desactivarlo.
-	 * @return L&iacute;nea de configuraci&oacute;n.
-	 */
-	private static String getUseSystemTrustStoreConfigContent(final boolean enable) {
-		return "user_pref(\"" + MOZ_PREFERENCE_ENTERPRISE_ROOTS //$NON-NLS-1$
-				+ "\", " + enable + ");" + BREAK_LINE; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
 }

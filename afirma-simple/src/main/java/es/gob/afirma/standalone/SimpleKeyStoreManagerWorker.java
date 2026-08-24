@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.PasswordCallback;
 import javax.swing.SwingWorker;
 
 import es.gob.afirma.keystores.AOKeyStore;
@@ -21,6 +22,7 @@ import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AggregatedKeyStoreManager;
 import es.gob.afirma.keystores.DNIePKCS11KeyStoreManager;
 import es.gob.afirma.keystores.KeystoreAlternativeException;
+import es.gob.afirma.keystores.jmulticard.ui.UIPasswordCallbackAccessibility;
 
 final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
 
@@ -74,15 +76,29 @@ final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
 	 * @throws KeystoreAlternativeException si ocurre un error al acceder o validar el keystore alternativo.
 	 * @throws IOException si se produce un error de entrada/salida durante la lectura o escritura de datos.
 	 */
-    public static AggregatedKeyStoreManager getDNIePKCS11KeyStoreManager() {
+    public AggregatedKeyStoreManager getDNIePKCS11KeyStoreManager() {
+
+        final String prompt = SimpleAfirmaMessages.getString("DNIePasswordCallback.1"); //$NON-NLS-1$
+        final String title = SimpleAfirmaMessages.getString("DNIePasswordCallback.3"); //$NON-NLS-1$
+        final PasswordCallback psc = new UIPasswordCallbackAccessibility(
+                prompt,
+                this.parent,
+                prompt,
+                'P',
+                title,
+                "/images/dnie.png", //$NON-NLS-1$
+                true,
+                true
+        );
 
     	final AggregatedKeyStoreManager ksmCapi = new DNIePKCS11KeyStoreManager();
 		try {
-			ksmCapi.init(AOKeyStore.PKCS11, null, null, null, false);
+			ksmCapi.init(AOKeyStore.PKCS11, null, psc, null, false);
 		}
 		catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("Error al cargar DNIe mediante su PKCS#11"); //$NON-NLS-1$ //$NON-NLS-2$          
-		} 
+		}
+
 		return ksmCapi;
 	}
 
