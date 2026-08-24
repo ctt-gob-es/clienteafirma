@@ -243,6 +243,12 @@ var AutoScript = ( function ( window, undefined ) {
 
 		var KEYSTORE_MOZILLA = "MOZ_UNI";
 
+		var KEYSTORE_NSS_CHROME = "NSS_CHROME";
+
+		var KEYSTORE_NSS_CHROMIUM = "NSS_CHROMIUM";
+
+		var KEYSTORE_NSS_BRAVE = "NSS_BRAVE";
+		
 		var KEYSTORE_SHARED_NSS = "SHARED_NSS";
 
 		var KEYSTORE_JAVA = "JAVA";
@@ -656,8 +662,17 @@ var AutoScript = ( function ( window, undefined ) {
 		/** Obtiene el nombre del almacen que corresponde al presente navegador o, si se debe acceder
 		 * al almacen del sistema, se devuelve null. */
 		function getDefaultKeystore() {
-			if(Platform.isFirefox()){
+			if (Platform.isFirefox()) {
 				return KEYSTORE_MOZILLA;
+			}
+			if (Platform.isDesktopLinux()) {
+				if (Platform.isChrome()) {
+					return KEYSTORE_NSS_CHROME;
+				} else if (Platform.isChromium()) {
+					return KEYSTORE_NSS_CHROMIUM;
+				} else if (Platform.isBrave()) {
+					return KEYSTORE_NSS_BRAVE;
+				}
 			}
 			return null;
 		}
@@ -984,7 +999,7 @@ var AutoScript = ( function ( window, undefined ) {
 			// Usamos el modo de invocacion mas apropiado segun el entorno
 			
 			// Redireccion del navegador
-			if (Platform.isChrome() || Platform.isIOS() || (Platform.isAndroid() && Platform.isFirefox())) {
+			if (Platform.isChromiumBasedBrowser() || Platform.isIOS() || (Platform.isAndroid() && Platform.isFirefox())) {
 				// Usamos document.location porque tiene mejor soporte por los navegadores que
 				// window.location que es el mecanismo estandar
 				document.location = url;
@@ -1387,10 +1402,94 @@ var AutoScript = ( function ( window, undefined ) {
 				return (myNav.indexOf('Firefox') != -1) ? (60 >= parseInt(myNav.split('Firefox')[1])) : false;
 			}
 
-			/** Indica si el navegador es Chrome. */
+			function getUserAgent() {
+				return typeof navigator != "undefined" && typeof navigator.userAgent == "string" ?
+					navigator.userAgent.toUpperCase() : "";
+			}
+			
+			function getBrowserBrands() {
+				return typeof navigator != "undefined" && typeof navigator.userAgentData != "undefined" ?
+					navigator.userAgentData.brands : "";
+			}
+
+			function getAppVersion() {
+				return typeof navigator != "undefined" && typeof navigator.appVersion == "string" ?
+					navigator.appVersion.toUpperCase() : "";
+			}
+
+			/** Indica si el sistema operativo es Linux de escritorio. */
+			function isDesktopLinux() {
+				var userAgent = getUserAgent();
+				var appVersion = getAppVersion();
+				return userAgent.indexOf("ANDROID") == -1 &&
+					appVersion.indexOf("ANDROID") == -1 &&
+					userAgent.indexOf("SILK/") == -1 &&
+					userAgent.indexOf("KFJWI") == -1 &&
+					userAgent.indexOf("KFJWA") == -1 &&
+					userAgent.indexOf("KFTT") == -1 &&
+					userAgent.indexOf("KFOT") == -1 &&
+					userAgent.indexOf("KINDLE FIRE") == -1 &&
+					(userAgent.indexOf("LINUX") != -1 || userAgent.indexOf("X11") != -1);
+			}
+
+			/** Indica si el navegador es un derivado de Chromium distinto de Chrome. */
+			function isOtherChromiumBrowser(userAgent) {
+				return userAgent.indexOf("EDG/") != -1 ||
+					userAgent.indexOf("EDGE/") != -1 ||
+					userAgent.indexOf("OPR/") != -1 ||
+					userAgent.indexOf("VIVALDI/") != -1;
+			}
+
+			/** Indica si se accede desde Chromium. */
+			function isChromium() {
+				var hasChromiumBrand = false;
+				var brands = getBrowserBrands();
+				if (!!brands) {
+					for (var i = 0; i < brands.length; i++) {
+						if (brands[i].brand.toUpperCase() == "CHROMIUM") {
+							hasChromiumBrand = true;
+						}
+					}
+				} 
+				// Consideramos que si solo tiene la marca Chromium y la generica, es que es Chromium a secas
+				return hasChromiumBrand && !!brands && brands.length == 2;
+			}
+
+			/** Indica si se accede desde Chrome. */
 			function isChrome() {
-				return navigator.userAgent.toUpperCase().indexOf("CHROME/") != -1 ||
-					navigator.userAgent.toUpperCase().indexOf("CHROMIUM") != -1;
+				var hasChromeBrand = false;
+				var brands = getBrowserBrands();
+				if (!!brands) {
+					for (var i = 0; i < brands.length; i++) {
+						if (brands[i].brand.toUpperCase() == "GOOGLE CHROME") {
+							hasChromeBrand = true;
+						}
+					}
+				} 
+				return hasChromeBrand;
+			}
+			
+			/** Indica si se accede desde Brave. */
+			function isBrave() {
+				var hasBraveBrand = false;
+				var brands = getBrowserBrands();
+				if (!!brands) {
+					for (var i = 0; i < brands.length; i++) {
+						if (brands[i].brand.toUpperCase() == "BRAVE") {
+							hasBraveBrand = true;
+						}
+					}
+				} 
+				return hasBraveBrand;
+			}
+
+			/** Indica si se accede desde un navegador basado en Chromium. */
+			function isChromiumBasedBrowser() {
+				var userAgent = getUserAgent();
+				return isChrome() ||
+					isBrave() ||
+					isChromium() ||
+					isOtherChromiumBrowser(userAgent);
 			}
 			
 			/* Metodos que publicamos del objeto */
@@ -1403,7 +1502,11 @@ var AutoScript = ( function ( window, undefined ) {
 				isSafari10 : isSafari10,
 				isFirefox : isFirefox,
 				isFirefox60orLower : isFirefox60orLower,
-				isChrome : isChrome				
+				isDesktopLinux : isDesktopLinux,
+				isChromium : isChromium,
+				isChrome : isChrome,
+				isBrave : isBrave,
+				isChromiumBasedBrowser : isChromiumBasedBrowser
 			};
 		})(window, undefined);
 		
@@ -2655,8 +2758,6 @@ var AutoScript = ( function ( window, undefined ) {
 					return;
 				}
 				
-console.log(" === Respuesta del socket: " + (data.length > 20 ? data.substring(0, 20) : data));
-				
 				// Se recibe un mensaje de espera, la operacion solicitada no ha terminado aun
 				if (data == "#wait") {
 					setTimeout(function() {
@@ -2898,10 +2999,7 @@ console.log(" === Respuesta del socket: " + (data.length > 20 ? data.substring(0
 			 * Procesa la respuesta de una operacion de firma.
 			 */
 			function processSignResponse(data) {
-
-				
-console.log(" === La procesamos como respuesta de firma");
-								
+			
 				// Si no se proporciona funcion de exito, no se procesa la respuesta
 				if (!successCallback) {
 					console.log("No se ha proporcionado funcion callback para procesar el resultado de la firma");
@@ -2932,9 +3030,6 @@ console.log(" === La procesamos como respuesta de firma");
 				if (!!successCallback) {
 					var responseSuccessCallback = successCallback;
 					setCallbacks(null, null);
-					
-console.log(" === Llamamos al metodo callback de respuesta: " + responseSuccessCallback);
-					
 					responseSuccessCallback(signature, certificate, extraInfo);
 				}
 				else {
@@ -3500,7 +3595,7 @@ console.log(" === Llamamos al metodo callback de respuesta: " + responseSuccessC
 					// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa
 					// que ha llegado al final y no se quede en espera
 					httpRequest.send("echo=-idsession=" + idSession + "@EOF");
-					//console.log("probamos puerto " +currentPort)
+					//console.log("Probamos puerto " + currentPort)
 				}
 			}
 
@@ -3604,7 +3699,6 @@ console.log(" === Llamamos al metodo callback de respuesta: " + responseSuccessC
 						// Faltan mas peticiones por enviar
 						if (Base64.decode(httpRequest.responseText, true) == "MORE_DATA_NEED") {
 							if (recibidos < iFinal ){
-								//console.log("recibido el fragmento "+recibidos + "de "+iFinal)
 								executeOperationRecursive(url, i+1, iFinal);
 							}
 						}
@@ -3612,7 +3706,6 @@ console.log(" === Llamamos al metodo callback de respuesta: " + responseSuccessC
 						// Respuesta es OK
 						else if (Base64.decode(httpRequest.responseText, true) == "OK") {
 							if(recibidos == iFinal){
-								//console.log("recibido todo, realizamos la operacion");
 								recibidos = 0;
 								doFirm();
 							}
@@ -3642,7 +3735,6 @@ console.log(" === Llamamos al metodo callback de respuesta: " + responseSuccessC
 				}
 				// Se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
 				httpRequest.send("fragment=@" + i + "@" + iFinal + "@"  + Base64.encode(urlToSend, true) + "idsession=" + idSession +"@EOF");
-				//console.log("mandado parte "+i+" de"+iFinal);
 	
 			}
 			
@@ -3714,7 +3806,6 @@ console.log(" === Llamamos al metodo callback de respuesta: " + responseSuccessC
 							errorServiceResponseFunction("java.lang.OutOfMemoryError", "Problema de memoria en servidor", ErrorCode.Request.SOCKET_MEMORY_ERROR);
 							return;
 						}
-						//console.log("recibida la parte " + part);
 						totalResponseRequest += Base64.decode(httpRequest.responseText, true);
 						// Si estan todas las partes llamamos al successcallback
 						if (part == totalParts) {
@@ -3766,7 +3857,6 @@ console.log(" === Llamamos al metodo callback de respuesta: " + responseSuccessC
 				if (part <= totalParts){
 					// se anade EOF para que cuando el socket SSL lea la peticion del buffer sepa que ha llegado al final y no se quede en espera
 					httpRequest.send("send=@"+part+"@"+totalParts+"idsession=" + idSession +"@EOF");
-					//console.log("solicitarmos la parte "+part+" de "+ totalParts)
 				}
 			}
 			
@@ -5681,6 +5771,9 @@ console.log(" === Llamamos al metodo callback de respuesta: " + responseSuccessC
 			KEYSTORE_PKCS12 : KEYSTORE_PKCS12,
 			KEYSTORE_PKCS11 : KEYSTORE_PKCS11,
 			KEYSTORE_MOZILLA : KEYSTORE_MOZILLA,
+			KEYSTORE_NSS_CHROME : KEYSTORE_NSS_CHROME,
+			KEYSTORE_NSS_CHROMIUM : KEYSTORE_NSS_CHROMIUM,
+			KEYSTORE_NSS_BRAVE : KEYSTORE_NSS_BRAVE,
 			KEYSTORE_SHARED_NSS : KEYSTORE_SHARED_NSS,
 			KEYSTORE_JAVA : KEYSTORE_JAVA,
 			KEYSTORE_JCEKS : KEYSTORE_JCEKS,

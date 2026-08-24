@@ -36,6 +36,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilitiesOsX;
 import es.gob.afirma.keystores.mozilla.apple.ShellScript;
@@ -202,7 +203,7 @@ final class ConfiguratorMacOSX implements Configurator {
 		try {
 			ConfiguratorFirefoxMac.installOnMozillaKeyStore(appDir, userHomes, scriptFile, console);
 			LOGGER.info("Configuracion de NSS"); //$NON-NLS-1$
-			MozillaKeyStoreUtilitiesOsX.configureMacNSS(MozillaKeyStoreUtilities.getSystemNSSLibDir());
+			MozillaKeyStoreUtilitiesOsX.configureMacNSS(MozillaKeyStoreUtilities.getSystemNSSLibDir(AOKeyStore.MOZ_UNI));
 
 			executeScriptFile(scriptFile, true, true);
 		}
@@ -408,7 +409,6 @@ final class ConfiguratorMacOSX implements Configurator {
 
 	/**
 	 * Desinstala del Llavero de macOS los certificados de confianza de la aplicaci&oacute;n.
-	 * @param keyChainPhrase Contrase&ntilde;a del Llavero.
 	 */
 	private static void uninstallRootCAMacOSXKeyStore() {
 
@@ -739,13 +739,5 @@ final class ConfiguratorMacOSX implements Configurator {
 	@Override
 	public File getAlternativeApplicationDirectory() {
 		return getResourcesDirectory();
-	}
-
-	static class InvalidPasswordException extends SecurityException {
-
-		/** Serial Id. */
-		private static final long serialVersionUID = -9058805499745499488L;
-
-		// Unicamente usaremos el constructor por defecto
 	}
 }

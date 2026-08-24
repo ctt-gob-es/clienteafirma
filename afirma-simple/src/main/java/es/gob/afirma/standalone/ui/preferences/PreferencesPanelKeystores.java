@@ -596,7 +596,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
 	/**
 	 * M&eacute;todo para probar las conexiones hacia el almac&eaucte;n de tarjeta inteligente
-	 * @param preferencesPanelKeystores panel padre donde mostrar el di&aacute;logo
+	 * @param container panel padre donde mostrar el di&aacute;logo.
 	 */
 	 void connectSmartCard(final Container container) {
 
@@ -875,7 +875,7 @@ final class PreferencesPanelKeystores extends JScrollPane {
 
     /**
      * Comprueba si ya hay una tarjeta inteligente con el mismo controlador registrada con el mismo nombre.
-     * @param newName Nombre del nuevo controlador.
+     * @param newLib Nombre de la librer&iacute;a del nuevo controlador.
      * @return True en caso de que ya se encuentre el controlador registrado, false en caso contrario.
      */
     private boolean checkDuplicatedLib(final String newLib) {

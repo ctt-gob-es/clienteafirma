@@ -26,6 +26,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.keystores.KeyStoreType;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
@@ -268,50 +269,36 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
-	public boolean changeKeyStoreManager(final int keyStoreId, final Object parent) {
+	public boolean changeKeyStoreManager(final KeyStoreType ksType, final Object parent) {
 
 		AOKeyStoreManager newKsm = null;
 
+		AOKeyStore storeType = ksType != null ? AOKeyStore.valueOf(ksType.getId()) : null;
 		try {
-			switch (keyStoreId) {
-			// Almacen de Firefox
-			case KEYSTORE_ID_MOZILLA:
+			switch (storeType) {
+				// Almacen del navegador
+				case MOZ_UNI:
+				case MOZ_UNI_WITH_OS:
+				case NSS_CHROME:
+				case NSS_CHROMIUM:
+				case NSS_BRAVE:
+					newKsm = openBrowserKeyStore(storeType, parent);
+					break;
 
-				if (!this.invocationFromBrowser) {
-					newKsm = openMozillaKeyStore(parent);
-				} else {
-					newKsm = openMozillaWithOSKeyStore(parent);
-				}
+				// Almacen PKCS#12
+				case PKCS12:
+					newKsm = openPkcs12KeyStore(parent, null);
+					break;
 
-				if (newKsm != null) {
-					KeyStorePreferencesManager.setLastSelectedKeystore(AOKeyStore.MOZ_UNI.getName());
-				}
-				break;
+				// DNIe
+				case DNIEJAVA:
+					newKsm = openDnieKeyStore(parent);
+					break;
 
-			// Almacen PKCS#12
-			case KEYSTORE_ID_PKCS12:
-				newKsm = openPkcs12KeyStore(parent, null);
-				if (newKsm != null) {
-					KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
-				}
-				break;
-
-			// DNIe
-			case KEYSTORE_ID_DNIE:
-				newKsm = openDnieKeyStore(parent);
-				if (newKsm != null) {
-					KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
-				}
-				break;
-
-			// Almacen del sistema
-			case KEYSTORE_ID_SYSTEM:
-			default:
-				newKsm = openSystemKeyStore(parent);
-				if (newKsm != null) {
-					KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
-				}
-				break;
+				// Almacen del sistema
+				default:
+					newKsm = openSystemKeyStore(parent);
+					break;
 			}
 		}
 		catch (final AOCancelledOperationException e) {
@@ -331,7 +318,7 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 					boolean stopOperation = false;
 					while (!stopOperation) {
 						try {
-							if (!changeKeyStoreManager(keyStoreId, parent)) {
+							if (!changeKeyStoreManager(ksType, parent)) {
 								stopOperation = true;
 							}
 						} catch (final AOCancelledOperationException aoce) {
@@ -359,6 +346,11 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 				e
 			);
 			return false;
+		}
+
+		// Marcamos el almacen seleccionado como el ultimo usado para que se cargue por defecto la proxima vez
+		if (newKsm != null) {
+			KeyStorePreferencesManager.setLastSelectedKeystore(newKsm.getType().getName());
 		}
 
 		// Establece el nuevo almacen cargado como el actual
@@ -434,39 +426,66 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	@Override
-	public int[] getAvailablesKeyStores() {
+	public KeyStoreType[] getAvailablesKeyStores() {
 
 		// En linux no se puede cambiar entre el almacen central del sistema y el almacen de
 		// Mozilla por un error en NSS que sigue cargando el almacen que ya tuviese aunque se le
-		// indique otro. Por eso, solo damos la opcion de almacen central o almacen de Firefox,
-		// segun el almacen que se cargue primero
-		int[] keystoreTypes;
+		// indique otro. Por eso, solo permitiremos seleccionar un almacen NSS, que sera el que se
+		// use por defecto o el primero que se identifique, empezando por los propios de navegadores
+		// y usando por defecto el del sistema
+		ArrayList<KeyStoreType> keystoreTypes = new ArrayList<>();
 		if (Platform.getOS() == Platform.OS.LINUX) {
-			if (this.ksm.getType() == AOKeyStore.SHARED_NSS ||
-					this.ksm.getKeyStoreManagers().size() > 0 && this.ksm.getKeyStoreManagers().get(0).getType() == AOKeyStore.SHARED_NSS) {
-				keystoreTypes = new int[] {
-					KEYSTORE_ID_SYSTEM,
-					KEYSTORE_ID_PKCS12,
-					KEYSTORE_ID_DNIE
-				};
+			if (containsKeystore(this.ksm, AOKeyStore.MOZ_UNI)) {
+				keystoreTypes.add(new KeyStoreType(AOKeyStore.MOZ_UNI.name(), KeyStoreType.MOZILLA));
+			}
+			else if (containsKeystore(this.ksm, AOKeyStore.NSS_CHROME)) {
+				keystoreTypes.add(new KeyStoreType(AOKeyStore.NSS_CHROME.name(), KeyStoreType.BROWSER));
+			}
+			else if (containsKeystore(this.ksm, AOKeyStore.NSS_CHROMIUM)) {
+				keystoreTypes.add(new KeyStoreType(AOKeyStore.NSS_CHROMIUM.name(), KeyStoreType.BROWSER));
+			}
+			else if (containsKeystore(this.ksm, AOKeyStore.NSS_BRAVE)) {
+				keystoreTypes.add(new KeyStoreType(AOKeyStore.NSS_BRAVE.name(), KeyStoreType.BROWSER));
 			}
 			else {
-				keystoreTypes = new int[] {
-					KEYSTORE_ID_MOZILLA,
-					KEYSTORE_ID_PKCS12,
-					KEYSTORE_ID_DNIE
-				};
+				keystoreTypes.add(new KeyStoreType(AOKeyStore.SHARED_NSS.name(), KeyStoreType.SYSTEM));
+			}
+        }
+		else {
+			if (Platform.getOS() == Platform.OS.WINDOWS) {
+				keystoreTypes.add(new KeyStoreType(AOKeyStore.WINDOWS.name(), KeyStoreType.SYSTEM));
+			}
+			else if (Platform.getOS() == Platform.OS.MACOSX) {
+				keystoreTypes.add(new KeyStoreType(AOKeyStore.APPLE.name(), KeyStoreType.SYSTEM));
+			}
+			keystoreTypes.add(new KeyStoreType(
+					invocationFromBrowser ? AOKeyStore.MOZ_UNI_WITH_OS.name() : AOKeyStore.MOZ_UNI.name(),
+					KeyStoreType.MOZILLA));
+        }
+
+		// Todos los sistemas tienen soporte para PKCS#12 y DNIe
+        keystoreTypes.add(new KeyStoreType(AOKeyStore.PKCS12.name(), KeyStoreType.PKCS12));
+        keystoreTypes.add(new KeyStoreType(AOKeyStore.DNIEJAVA.name(), KeyStoreType.DNIE));
+
+		return keystoreTypes.toArray(new KeyStoreType[0]);
+	}
+
+	private static boolean containsKeystore(AggregatedKeyStoreManager ksm, AOKeyStore storeType) {
+		if (ksm == null) {
+			return false;
+		}
+		if (ksm.getType() == storeType) {
+			return true;
+		}
+		final List<AOKeyStoreManager> ksmList = ksm.getKeyStoreManagers();
+		if (ksmList != null && ksmList.size() > 0) {
+			for (final AOKeyStoreManager k : ksmList) {
+				if (k.getType() == storeType) {
+					return true;
+				}
 			}
 		}
-		else {
-			keystoreTypes = new int[] {
-				KEYSTORE_ID_SYSTEM,
-				KEYSTORE_ID_MOZILLA,
-				KEYSTORE_ID_PKCS12,
-				KEYSTORE_ID_DNIE
-			};
-		}
-		return keystoreTypes;
+		return false;
 	}
 
 	@Override
@@ -483,61 +502,33 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
 	}
 
 	/**
-	 * Carga el almac&eacute;n de claves del &uacute;ltimo perfil de Mozilla activo.
+	 * Carga el almac&eacute;n de claves de un navegador.
+	 * @param storeType Tipo de almac&eacute;n de claves del navegador.
 	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
 	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra el almac&eacute;n,
 	 * si no se pudo cargar o si se cancel&oacute; la carga.
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
 	 */
-	private static AOKeyStoreManager openMozillaKeyStore(final Object parent) throws Exception {
+	private static AOKeyStoreManager openBrowserKeyStore(final AOKeyStore storeType, final Object parent) throws Exception {
 
 		try {
 			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
-				AOKeyStore.MOZ_UNI,
-				null,
-				null,
-				AOKeyStore.MOZ_UNI.getStorePasswordCallback(parent),
-				parent
+					storeType,
+					null,
+					null,
+					storeType.getStorePasswordCallback(parent),
+					parent
 			);
 		}
 		catch (final AOCancelledOperationException e) {
 			throw e;
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves de Mozilla: " + e, e); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves del navegador: " + e, e); //$NON-NLS-1$
 			throw e;
 		}
 	}
-
-	/**
-	 * Carga el almac&eacute;n de claves del &uacute;ltimo perfil de Mozilla activo e incluye el propio del sistema.
-	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
-	 * @return Gestor del almac&eacute;n de claves o {@code null} si no se encuentra el almac&eacute;n,
-	 * si no se pudo cargar o si se cancel&oacute; la carga.
-	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
-	 * @throws Exception Cuando no se puede cargar el almac&eacute;n de claves.
-	 */
-	private static AOKeyStoreManager openMozillaWithOSKeyStore(final Object parent) throws Exception {
-
-		try {
-			return AOKeyStoreManagerFactory.getAOKeyStoreManager(
-				AOKeyStore.MOZ_UNI_WITH_OS,
-				null,
-				null,
-				AOKeyStore.MOZ_UNI_WITH_OS.getStorePasswordCallback(parent),
-				parent
-			);
-		}
-		catch (final AOCancelledOperationException e) {
-			throw e;
-		}
-		catch (final Exception e) {
-			LOGGER.log(Level.WARNING,"No se ha podido cargar el almacen de claves de Mozilla: " + e, e); //$NON-NLS-1$
-			throw e;
-		}
-	}
-
 
 	/**
 	 * Permite seleccionar un fichero PKCS#12, introducir su contrase&ntilde;a y cargarlo.

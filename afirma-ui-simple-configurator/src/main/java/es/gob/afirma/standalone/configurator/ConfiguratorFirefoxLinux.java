@@ -15,7 +15,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +25,7 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
+import java.util.Arrays;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -41,11 +41,15 @@ final class ConfiguratorFirefoxLinux {
 	private static final String PROFILES_INI_RELATIVE_PATH_2 = ".config/mozilla/firefox/profiles.ini";//$NON-NLS-1$
 	private static final String PROFILES_INI_RELATIVE_PATH_UBUNTU_22 = "snap/firefox/common/.mozilla/firefox/profiles.ini"; //$NON-NLS-1$
 
-	private static final String NSS_CHROME_PATH = "/.pki/nssdb"; //$NON-NLS-1$
-	private static final String NSS_CHROMIUM_PATH = "/snap/chromium/current/.pki/nssdb"; //$NON-NLS-1$
+	/** Listado de rutas conocidas, relativas al directorio de usuario, de almacenes NSS en Linux. */
 	private static final String[] NSS_DIR_SUBPATH = new String[] {
-			NSS_CHROME_PATH,
-			NSS_CHROMIUM_PATH
+			"/.pki/nssdb",	// Ruta clasica del almacen del sistema //$NON-NLS-1$
+			"/.local/share/pki/nssdb", // Ruta clasica de almacen del sistema en Ubuntu //$NON-NLS-1$
+			"/snap/chromium/current/.local/share/pki/nssdb", // Ruta clasica de Chromium en Ubuntu //$NON-NLS-1$
+			"/snap/chromium/current/.pki/nssdb", // Ruta clasica de Chromium en Ubuntu (Antigua) //$NON-NLS-1$
+			"/.var/app/org.chromium.Chromium/data/pki/nssdb", // Ruta clasica de Chromium  en Fedora //$NON-NLS-1$
+			"/snap/brave/current/.local/share/pki/nssdb", // Ruta clasica de Brave en Ubuntu //$NON-NLS-1$
+			"/.var/app/com.brave.Browser/data/pki/nssdb" // Ruta clasica de Brave en Fedora //$NON-NLS-1$
 	};
 	private static final String PROFILE_INI_PATH_PREFIX = "Path="; //$NON-NLS-1$
 
@@ -98,6 +102,8 @@ final class ConfiguratorFirefoxLinux {
 
 				final String profileReference = escapePath("sql:" + keystorePath); //$NON-NLS-1$
 
+				LOGGER.info("Se intentara instalar el certificado de confianza en el directorio: " + keystorePath);
+
 				// Agregamos el comando de instalacion
 				installCommands.add(new String[] {
 						certUtilPath,
@@ -137,12 +143,11 @@ final class ConfiguratorFirefoxLinux {
 	 * @param usersDirs Directorios de usuario.
 	 * @param installScriptFile Fichero al que agregar el script de instalaci&oacute;n.
 	 * @param uninstallScriptFile Fichero al que agregar el script de desinstalaci&oacute;n.
-	 * @throws IOException Cuando ocurre un error al crear los scripts.
 	 * @throws MozillaProfileNotFoundException No se han encontrado directorios de perfil de Mozilla.
 	 */
 	static void createScriptsToMozillaKeyStore(final File appDir, final String[] usersDirs,
 			final File installScriptFile, final File uninstallScriptFile)
-			throws MozillaProfileNotFoundException, IOException {
+			throws MozillaProfileNotFoundException {
 
 		// Comprobamos que certutil este disponible y, si no, copiamos una version propia
 		String certUtilPath;
@@ -228,15 +233,13 @@ final class ConfiguratorFirefoxLinux {
 	 * @param installScriptFile Fichero al que agregar el script de instalaci&oacute;n.
 	 * @param uninstallScriptFile Fichero al que agregar el script de desinstalaci&oacute;n.
 	 * @throws IOException Cuando ocurre un error en el tratamiento de datos.
-	 * @throws GeneralSecurityException Cuando ocurre un error en la inserci&oacute;n del certificado en el KeyStore.
-	 */
+     */
 	private static void writeScriptsToMozillaKeyStore(
 												final String certUtilAbsolutePath,
 			                                    final File certDir,
 			                                    final List<File> profilesDir,
 		                               			final File installScriptFile,
-		                               			final File uninstallScriptFile) throws IOException,
-	                                                                             GeneralSecurityException {
+		                               			final File uninstallScriptFile) throws IOException {
 
 		for (final File profileDir : profilesDir) {
 			if (!profileDir.isDirectory()) {
@@ -249,7 +252,7 @@ final class ConfiguratorFirefoxLinux {
 			final String profileReference = escapePath((sqlDb ? "sql:" : "") + profileDir.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// Creamos el script de instalacion
-			final String[] installCACommands = new String[] {
+			final List<String> installCACommands = new ArrayList<>(Arrays.asList(
 					certUtilAbsolutePath,
 					"-A", //$NON-NLS-1$
 					"-d", //$NON-NLS-1$
@@ -260,19 +263,20 @@ final class ConfiguratorFirefoxLinux {
 					"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
 					"-t", //$NON-NLS-1$
 					"\"C,,\"" //$NON-NLS-1$
-			};
-			createScript(installCACommands, installScriptFile);
+			));
 
 			// Generamos el script de desinstalacion
-			final String[] uninstallCACommans = new String[] {
+			final List<String> uninstallCACommands = new ArrayList<>(Arrays.asList(
 					certUtilAbsolutePath,
 					"-D", //$NON-NLS-1$
 					"-d", //$NON-NLS-1$
 					profileReference,
 					"-n", //$NON-NLS-1$
 					"\"" + ConfiguratorUtil.CERT_ALIAS + "\"" //$NON-NLS-1$ //$NON-NLS-2$
-			};
-			createScript(uninstallCACommans, uninstallScriptFile);
+			));
+
+			createScript(installCACommands.toArray(new String[0]), installScriptFile);
+			createScript(uninstallCACommands.toArray(new String[0]), uninstallScriptFile);
 		}
 	}
 
@@ -306,7 +310,7 @@ final class ConfiguratorFirefoxLinux {
 	private static List<File> getProfiles(final String[] userDirs) {
 
 		final List <File> mozillaProfilesIniPaths = getMozillaProfilesIniPaths(userDirs);
-		if (mozillaProfilesIniPaths == null || mozillaProfilesIniPaths.isEmpty()) {
+		if (mozillaProfilesIniPaths.isEmpty()) {
 			return null;
 		}
 
@@ -319,7 +323,7 @@ final class ConfiguratorFirefoxLinux {
 					new InputStreamReader(resIs),
 					256, // Maximo 256 lineas de salida (256 perfiles por "profiles.ini")
 					2048 // Maximo 2048 caracteres por linea
-				);
+				)
 			) {
 				while ((line = resReader.readLine()) != null) {
 					if (line.startsWith(PROFILE_INI_PATH_PREFIX)){

@@ -484,3 +484,5 @@ final class ConfiguratorFirefoxMac {
 				+ "\", " + enable + ");" + BREAK_LINE; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
+
+

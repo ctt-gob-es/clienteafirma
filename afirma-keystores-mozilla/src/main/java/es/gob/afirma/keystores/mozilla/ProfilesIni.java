@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * Almacena la configuraci&oacute;n de perfiles de Mozilla Firefox.
  */
-class ProfilesIni {
+public class ProfilesIni {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -27,7 +27,7 @@ class ProfilesIni {
     private static final String PROFILES_ATTR_START_WITH_LAST_PROFILE = "startwithlastprofile="; //$NON-NLS-1$
     private static final String PROFILES_ATTR_LOCKED = "locked="; //$NON-NLS-1$
 
-	private final List<FirefoxProfile> profilesList;
+	private final List<MozillaProfile> profilesList;
 	private GeneralInfo generalInfo;
 	private StateInfo stateInfo;
 
@@ -36,7 +36,7 @@ class ProfilesIni {
 	 * @param profilesIniFile Fichero de perfiles de Mozilla.
 	 * @throws IOException Cuando ocurre un error en la lectura o forma del fichero de perfil.
 	 */
-	ProfilesIni(final File profilesIniFile) throws IOException {
+	public ProfilesIni(final File profilesIniFile) throws IOException {
 		this.profilesList = new ArrayList<>();
 		this.generalInfo = new GeneralInfo();
 		this.stateInfo = null;
@@ -100,7 +100,7 @@ class ProfilesIni {
 	}
 
 
-	public List<FirefoxProfile> getProfilesList() {
+	public List<MozillaProfile> getProfilesList() {
 		return this.profilesList != null ? new ArrayList<>(this.profilesList) : null;
 	}
 
@@ -119,9 +119,9 @@ class ProfilesIni {
 	 * @return Informaci&oacute;n del perfil de Firefox.
 	 * @throws IOException Cuando se produce alg&uacute;n error en la lectura.
 	 */
-	private static FirefoxProfile readProfile(final BufferedReader in, final File baseDir) throws IOException {
+	private static MozillaProfile readProfile(final BufferedReader in, final File baseDir) throws IOException {
 
-		final FirefoxProfile profile = new FirefoxProfile();
+		final MozillaProfile profile = new MozillaProfile();
 
 		String line;
 		while ((line = in.readLine()) != null && !line.trim().isEmpty() && !line.trim().startsWith("[")) { //$NON-NLS-1$
@@ -144,7 +144,7 @@ class ProfilesIni {
 						);
 			}
 			else if (line.toLowerCase().startsWith(PROFILES_ATTR_DEFAULT)) {
-				profile.setDefault(
+				profile.setActive(
 						line.substring(PROFILES_ATTR_DEFAULT.length()).equals("1") //$NON-NLS-1$
 						);
 			}
@@ -167,16 +167,22 @@ class ProfilesIni {
 			throw new IllegalStateException("No se ha encontrado la informacion obligatoria del perfil"); //$NON-NLS-1$
 		}
 
-		// Componemos la ruta absoluta del perfil
-		profile.setAbsolutePath(profile.isRelative() ?
-				new File(baseDir, profile.getPath()).getAbsolutePath() :
-					profile.getPath());
+		// Componemos la ruta del perfil
+		File profileDir = profile.isRelative()
+				? new File(baseDir, profile.getPath())
+				: new File(profile.getPath());
+
+		// Si el perfil no existe, lo descartamos
+		if (!profileDir.isDirectory()) {
+			throw new IllegalStateException("No se ha encontrado el directorio de perfil en el sistema"); //$NON-NLS-1$
+		}
+		profile.setProfileDir(profileDir);
 
 		// Comprobamos si existe el fichero de bloqueo
 		profile.setLocked(
-				new File(profile.getAbsolutePath(), "lock").exists() || // En UNIX //$NON-NLS-1$
-				Files.isSymbolicLink(new File(profile.getAbsolutePath(), "lock").toPath()) || // En UNIX y Firefox 69 o superiores //$NON-NLS-1$
-				new File(profile.getAbsolutePath(), "parent.lock").exists() // En Windows //$NON-NLS-1$
+				new File(profile.getProfileDir(), "lock").exists() || // En UNIX //$NON-NLS-1$
+				Files.isSymbolicLink(new File(profile.getProfileDir(), "lock").toPath()) || // En UNIX y Firefox 69 o superiores //$NON-NLS-1$
+				new File(profile.getProfileDir(), "parent.lock").exists() // En Windows //$NON-NLS-1$
 				);
 
 		return profile;
@@ -245,78 +251,7 @@ class ProfilesIni {
 		return info;
 	}
 
-	/** Almacena la configuraci&oacute;n para la identificaci&oacute;n de un
-	 * perfil de Mozilla Firefox. */
-	static final class FirefoxProfile {
 
-		private String name = null;
-
-		String getName() {
-			return this.name;
-		}
-
-		void setName(final String n) {
-			this.name = n;
-		}
-
-		private boolean relative = true;
-
-		boolean isRelative() {
-			return this.relative;
-		}
-
-		void setRelative(final boolean r) {
-			this.relative = r;
-		}
-
-		private String path = null;
-
-		String getPath() {
-			return this.path;
-		}
-
-		void setPath(final String p) {
-			this.path = p;
-		}
-
-		private String absolutePath = null;
-
-		String getAbsolutePath() {
-			return this.absolutePath;
-		}
-
-		void setAbsolutePath(final String ap) {
-			this.absolutePath = ap;
-		}
-
-		private boolean def = false;
-
-		boolean isDefault() {
-			return this.def;
-		}
-
-		void setDefault(final boolean d) {
-			this.def = d;
-		}
-
-		private boolean locked = false;
-
-		boolean isLocked() {
-			return this.locked;
-		}
-
-		void setLocked(final boolean lock) {
-			this.locked = lock;
-		}
-
-		@Override
-		public String toString() {
-			return "Perfil de Firefox" + //$NON-NLS-1$
-					(this.locked ? " bloqueado" : " no bloqueado") + //$NON-NLS-1$ //$NON-NLS-2$
-					(this.def ? " y por defecto " : "") + //$NON-NLS-1$ //$NON-NLS-2$
-					(this.absolutePath != null ? " situado en: " + this.absolutePath : ""); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-	}
 
 	/** Almacena la informaci&oacute;n general del fichero "profiles.ini". */
 	static final class GeneralInfo {

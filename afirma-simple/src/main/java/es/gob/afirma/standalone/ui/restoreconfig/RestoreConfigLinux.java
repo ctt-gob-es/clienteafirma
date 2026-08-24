@@ -10,19 +10,12 @@
 package es.gob.afirma.standalone.ui.restoreconfig;
 
 import java.awt.Component;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +25,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.keystores.mozilla.MozillaProfile;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 import es.gob.afirma.standalone.ui.restoreconfig.CertUtil.CertPack;
@@ -49,20 +43,25 @@ final class RestoreConfigLinux implements RestoreConfig {
     private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
     private static final String PROTOCOL_HANDLER_CONFIG_FILE = "autofirma.js"; //$NON-NLS-1$
     private static final String DEFAULT_PROTOCOL_HANDLER_CONFIG_DIR = "/etc/firefox/pref"; //$NON-NLS-1$
-    static final String EXPORT_PATH = "export PATH=$PATH:"; //$NON-NLS-1$
-    static final String EXPORT_LD_LIBRARY ="export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"; //$NON-NLS-1$
+
+	private RestoreConfigFirefoxLinux firefoxConfigRestaurator = null;
 
 	@Override
 	public void restore(final RestoreConfigPanel configPanel) {
 
+		// Creamos un nuevo restaurador de configuracion de Firefox,
+		// que se usara en la reinstalacion del certificado raiz. Se crea nuevo cada ejecucion por si se hubiesen
+		// creado nuevos perfiles de Firefox desde la ultima ejecucion
+		this.firefoxConfigRestaurator = new RestoreConfigFirefoxLinux(configPanel);
+
 		final File appDir = RestoreConfigUtil.getApplicationDirectory();
 
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.3", appDir.getAbsolutePath())); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.3", appDir != null ? appDir.getAbsolutePath() : null)); //$NON-NLS-1$
 
 		// Verifica si se tiene permisos para escribir en el directorio de instalacion
 		// y establece como directorio de trabajo otro distinto en caso de no tenerlos
 		File workingDir;
-		if(Files.isWritable(appDir.toPath())) {
+		if (appDir != null && Files.isWritable(appDir.toPath())) {
 			workingDir = appDir;
 		} else {
 			try {
@@ -76,18 +75,18 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 		LOGGER.info("Directorio de trabajo: " + LoggerUtil.getCleanUserHomePath(workingDir.getAbsolutePath())); //$NON-NLS-1$
 
-		List<String> usersDir = null;
+		List<File> userHomeDirs = null;
 		try {
-			usersDir = getSystemUsersHomes();
+			userHomeDirs = getSystemUsersHomes();
 		} catch (final IOException e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.6")); //$NON-NLS-1$
 			LOGGER.log(Level.WARNING, "No se puede utilizar el directorio alternativo de trabajo"); //$NON-NLS-1$
 		}
 
 		// Se restaura la instalacion de los certificados SSL
-		if (usersDir != null) {
+		if (userHomeDirs != null) {
 			try {
-				restoreSslCertificates(appDir, workingDir, usersDir, configPanel);
+				restoreSslCertificates(appDir, workingDir, userHomeDirs, configPanel);
 			}
 			catch (final AOCancelledOperationException e) {
 				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.19")); //$NON-NLS-1$
@@ -106,7 +105,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 		}
 	}
 
-	private static void restoreSslCertificates(final File appDir, final File workingDir, final List<String> usersDir, final RestoreConfigPanel configPanel) {
+	private void restoreSslCertificates(final File appDir, final File workingDir, final List<File> userHomeDirs, final RestoreConfigPanel configPanel) {
 
 		File rootCertFile = null;
 
@@ -178,27 +177,23 @@ final class RestoreConfigLinux implements RestoreConfig {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.14")); //$NON-NLS-1$
 		}
 
-		// Copiamos a disco CertUtil
-		try {
-			RestoreConfigFirefox.copyConfigurationFiles(workingDir);
-		} catch (final IOException e) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.17")); //$NON-NLS-1$
-			LOGGER.log(Level.SEVERE, "No se pudo copiar certUtil al directorio de trabajo. Se omitira la instalacion de los certificados: " + e, e); //$NON-NLS-1$
-			return;
-		}
-
-		LOGGER.info("Se va a instalar el certificado CA raiz en Google Chrome"); //$NON-NLS-1$
+		// Notificamos que vamos a restaurar el certificado de confianza en el almacen del sistema
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.9")); //$NON-NLS-1$
-		closeChrome(configPanel);
+
+		// Desinstalamos previamente los certificados que haya actualmente
+		LOGGER.info("Se va a desinstalar el certificado CA raiz SSL en los almacenes NSS encontrados en sistema"); //$NON-NLS-1$
+		firefoxConfigRestaurator.uninstallRootCAFromNSSKeystores(workingDir, userHomeDirs);
+
+		LOGGER.info("Se va a instalar el certificado CA raiz SSL de los almacenes NSS encontrados en sistema"); //$NON-NLS-1$
 		try {
-			RestoreConfigFirefox.installRootCAChromeKeyStore(workingDir, rootCertFile, usersDir);
+			firefoxConfigRestaurator.installRootCAInNSSKeyStore(workingDir, rootCertFile, userHomeDirs);
 		}
 		catch (final Exception e) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.10")); //$NON-NLS-1$
 			LOGGER.log(Level.WARNING, "Error al instalar el certificado de confianza en el almacen del sistema: " + e, e); //$NON-NLS-1$
 		}
 
-		LOGGER.info("Se va a instalar el certificado CA raiz en Mozilla Firefox"); //$NON-NLS-1$
+		// Notificamos que vamos a restaurar el certificado de confianza en el almacen de Firefox
 		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.13")); //$NON-NLS-1$
 
 		// Obligamos a que se cierre Firefox antes de manipular el certificado en su almacen
@@ -207,19 +202,49 @@ final class RestoreConfigLinux implements RestoreConfig {
 		// Si no se ha cerrado el navegador, es muy probable que no se pueda instalar el certificado de confianza,
 		// asi que mostramos un mensaje advirtiendolo
 		if (!closed) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.45")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.45")); //$NON-NLS-1$
 		}
 
-		// Desinstalamos previamente los certificados que haya actualmente
-		RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(workingDir);
-		try {
-			RestoreConfigFirefox.installRootCAMozillaKeyStore(workingDir, rootCertFile, usersDir);
-		} catch (final MozillaProfileNotFoundException e) {
+		// para cada usuario tenemos sus distintos directorios de perfiles
+		final List<MozillaProfile> profiles = firefoxConfigRestaurator.getMozillaProfiles(userHomeDirs);
+		if (profiles.isEmpty()) {
 			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.12")); //$NON-NLS-1$
-			LOGGER.warning("Error al obtener los perfiles de usuario de Mozilla Firefox: " + e); //$NON-NLS-1$
-		} catch (final Exception e) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.18")); //$NON-NLS-1$
-			LOGGER.log(Level.WARNING, "Error al instalar el certificado de confianza en el almacen de Firefox: " + e, e); //$NON-NLS-1$
+			LOGGER.warning("No se han encontrado perfiles de usuario de Mozilla Firefox"); //$NON-NLS-1$
+		}
+		else {
+			LOGGER.info("Se va a instalar el certificado CA raiz en los perfiles de Mozilla Firefox"); //$NON-NLS-1$
+			boolean error = false;
+			for (MozillaProfile profile : profiles) {
+
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.48", profile.getName())); //$NON-NLS-1$
+
+				try {
+					firefoxConfigRestaurator.uninstallRootCAMozillaKeyStore(workingDir, profile);
+				}
+				catch (final Exception e) {
+					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.30", profile.getName())); //$NON-NLS-1$
+					LOGGER.log(Level.WARNING, "Error al desinstalar el certificado de confianza anterior en el perfil: " + profile.getName(), e); //$NON-NLS-1$
+				}
+
+				try {
+					firefoxConfigRestaurator.installRootCAMozillaKeyStore(workingDir, rootCertFile, profile);
+				}
+				catch (final PasswordProtectedException e) {
+					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigLinux.24", profile.getName())); //$NON-NLS-1$
+					LOGGER.log(Level.WARNING, "No se ha podido instalar el certificado de confianza por estar protegido el perfil: " + profile.getName(), e); //$NON-NLS-1$
+					error = true;
+				}
+				catch (final Exception e) {
+					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.31", profile.getName())); //$NON-NLS-1$
+					LOGGER.log(Level.WARNING, "Error al instalar el certificado de confianza en el perfil: " + profile.getName(), e); //$NON-NLS-1$
+					error = true;
+				}
+
+				profile.reset();
+			}
+			if (error) {
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.47")); //$NON-NLS-1$
+			}
 		}
 	}
 
@@ -228,9 +253,11 @@ final class RestoreConfigLinux implements RestoreConfig {
 	 * s&oacute;lo el del usuario local.
 	 * @return Listado con directorios de usuarios.
      * @throws IOException Cuando no se puede obtener el listado de directorios. */
-	private static List<String> getSystemUsersHomes() throws IOException {
+	private static List<File> getSystemUsersHomes() throws IOException {
 
 		boolean searchAllUser = true;
+
+		// Comprobamos si tenemos permisos de administrador para poder operar sobre todos los usuarios del sistema
 		try {
 			final Process p = executeProcess("id", "-u"); //$NON-NLS-1$ //$NON-NLS-2$
 			p.waitFor();
@@ -249,9 +276,9 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 		// Si no somos administradores, operamos solo sobre el directorio del usuario local
 		if (!searchAllUser) {
-			final List<String> userDirs = new ArrayList<>();
+			final List<File> userDirs = new ArrayList<>();
 			try {
-				userDirs.add(System.getProperty("user.home")); //$NON-NLS-1$
+				userDirs.add(new File(System.getProperty("user.home"))); //$NON-NLS-1$
 			}
 			catch (final Exception e) {
 				throw new IOException("No se pudo identificar el directorio del usuario", e); //$NON-NLS-1$
@@ -272,7 +299,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 			String line;
 			// arraylist con todos los directorios de usuario
-			final List<String> usersDir = new ArrayList<>();
+			final Set<File> usersDir = new HashSet<>();
 			try (
 					final InputStream resIs = process.getInputStream();
 					final BufferedReader resReader = new BoundedBufferedReader(
@@ -281,13 +308,15 @@ final class RestoreConfigLinux implements RestoreConfig {
 							2048 // Maximo 2048 caracteres por linea
 							);
 					) {
+
+				// Filtramos los directorios de usuario que contengan la cadena "home/" para evitar directorios de sistema
 				while ((line = resReader.readLine()) != null) {
-					if(line.toLowerCase().contains("home/") && !usersDir.contains(line)) { //$NON-NLS-1$
-						usersDir.add(line);
+					if (line.toLowerCase().contains("home/") && !usersDir.contains(new File(line))) {
+						usersDir.add(new File(line));
 					}
 				}
 			}
-			return usersDir;
+			return Arrays.asList(usersDir.toArray(new File[0]));
 		}
 		catch (final Exception e) {
 			LOGGER.severe("Error al obtener el listado de directorios de usuarios del sistema: " + e); //$NON-NLS-1$
@@ -352,31 +381,6 @@ final class RestoreConfigLinux implements RestoreConfig {
 		}
 
 		return option == JOptionPane.OK_OPTION;
-	}
-
-	/**
-	 * Pide al usuario que cierre el navegador Google Chrome y no permite continuar hasta que lo hace.
-	 * @param parent Componente padre sobre el que mostrar los di&aacute;logos gr&aacute;ficos.
-	 */
-	private static void closeChrome(final Component parent) {
-
-		if (isProcessRunningLinux("/opt/google/chrome/chrome").booleanValue()) { //$NON-NLS-1$
-			JOptionPane.showMessageDialog(
-					parent,
-					SimpleAfirmaMessages.getString("RestoreApplication.8"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
-					JOptionPane.WARNING_MESSAGE);
-		}
-
-		int option = JOptionPane.OK_OPTION;
-		while (option == JOptionPane.OK_OPTION
-				&& isProcessRunningLinux("/opt/google/chrome/chrome").booleanValue()) { //$NON-NLS-1$
-			option = JOptionPane.showConfirmDialog(
-					parent,
-					SimpleAfirmaMessages.getString("RestoreApplication.11"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreApplication.9"), //$NON-NLS-1$
-					JOptionPane.OK_CANCEL_OPTION);
-		}
 	}
 
 	/**
@@ -458,7 +462,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 		for (final String firefoxPreferencesPath : paths) {
 			if (new File(firefoxPreferencesPath).isDirectory()) {
 				scriptContent.append("cp -f \"") .append(configFile.getAbsolutePath()).append("\" \"") //$NON-NLS-1$ //$NON-NLS-2$
-				.append(firefoxPreferencesPath + File.separator + PROTOCOL_HANDLER_CONFIG_FILE).append("\"\n"); //$NON-NLS-1$
+				.append(firefoxPreferencesPath).append(File.separator).append(PROTOCOL_HANDLER_CONFIG_FILE).append("\"\n"); //$NON-NLS-1$
 			}
 		}
 
@@ -489,7 +493,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 
 		// Eliminamos la copia del fichero en el directorio de configuracion
 		try {
-			process = executeProcess("rm", scriptFile.getAbsolutePath()); //$NON-NLS-1$
+			executeProcess("rm", scriptFile.getAbsolutePath()); //$NON-NLS-1$
 		} catch (final IOException e) {
 			LOGGER.fine("No se pudo eliminar la copia del fichero " + configFile.getName() + " del directorio de trabajo"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -502,7 +506,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 	 * @throws IOException Cuando no se puede obtener el directorio alternativo.
 	 */
 	static File getLinuxAlternativeAppDir() throws IOException {
-		String userHome = null;
+		String userHome;
 		try {
 			userHome = System.getProperty("user.home"); //$NON-NLS-1$
 		}
@@ -527,7 +531,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 			for (final String particle : command) {
 				buffer.append(particle).append(" "); //$NON-NLS-1$
 			}
-			LOGGER.info("Ejecutamos el comando:\n" + buffer.toString()); //$NON-NLS-1$
+			LOGGER.info("Ejecutamos el comando:\n" + LoggerUtil.getCleanUserHomePath(buffer.toString())); //$NON-NLS-1$
 		}
 		return new ProcessBuilder(command).start();
 	}

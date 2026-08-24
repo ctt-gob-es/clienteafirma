@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.mozilla.bintutil.ElfParser;
 
 final class MozillaKeyStoreUtilitiesUnix {
@@ -29,7 +30,7 @@ final class MozillaKeyStoreUtilitiesUnix {
 
 	private static final String SOFTOKN3_SO = "libsoftokn3.so"; //$NON-NLS-1$
 
-	private static final String[] NSS_PATHS = getNssPaths();
+	private static String[] NSS_PATHS = null;
 
 	private static final String[] SQLITE_LIBS = {
 		"mozsqlite3.so",  //$NON-NLS-1$
@@ -42,71 +43,93 @@ final class MozillaKeyStoreUtilitiesUnix {
 		// No instanciable
 	}
 
-	private static String[] getNssPaths() {
-		final List<String> nssPaths = new ArrayList<>();
-		final String javaArch = Platform.getJavaArch();
-		final String systemLibDir = Platform.getSystemLibDir();
+	private static String[] getNssPaths(AOKeyStore ksType) {
 
-		if ("64".equals(javaArch)) { //$NON-NLS-1$
-			nssPaths.add("/usr/lib/x86_64-linux-gnu/nss"); //$NON-NLS-1$
-			nssPaths.add("/usr/lib/x86_64-linux-gnu"); //$NON-NLS-1$
-		}
-		else if("32".equals(javaArch)) { //$NON-NLS-1$
-			nssPaths.add("/usr/lib/i386-linux-gnu/nss"); /* En algunos Ubuntu y Debian 32 */ //$NON-NLS-1$
-			nssPaths.add("/usr/lib/i386-linux-gnu"); //$NON-NLS-1$
-		}
+		if (NSS_PATHS == null) {
 
-		nssPaths.add(systemLibDir + "/nss"); //$NON-NLS-1$
-		nssPaths.add(systemLibDir);
-		nssPaths.add(systemLibDir + "/firefox"); //$NON-NLS-1$
+			final List<String> nssPaths = new ArrayList<>();
+			final String javaArch = Platform.getJavaArch();
+			final String systemLibDir = Platform.getSystemLibDir();
 
-		// Preserve backwards-compatibility on https://github.com/ctt-gob-es/clienteafirma/issues/27#issuecomment-488402089
-		String firefoxVersion = searchLastFirefoxVersion(systemLibDir);
-		if (firefoxVersion != null) {
-			nssPaths.add(systemLibDir + "/firefox-" + firefoxVersion);  //$NON-NLS-1$
-		}
-		nssPaths.add(systemLibDir + "/thunderbird"); //$NON-NLS-1$
-
-		if (isDirectory("/lib" + javaArch)) { //$NON-NLS-1$
-			nssPaths.add("/lib" + javaArch); //$NON-NLS-1$
-		}
-		else {
-			nssPaths.add("/lib"); //$NON-NLS-1$
-		}
-
-		nssPaths.add("/opt/firefox"); //$NON-NLS-1$
-
-		// Preserve backwards-compatibility on https://github.com/ctt-gob-es/clienteafirma/issues/27#issuecomment-488402089
-		if (isDirectory("/usr/lib" + javaArch)) { //$NON-NLS-1$
-			nssPaths.add("/usr/lib" + javaArch); //$NON-NLS-1$
-		}
-		else {
-			nssPaths.add("/usr/lib"); //$NON-NLS-1$
-		}
-
-		firefoxVersion = searchLastFirefoxVersion("/opt"); //$NON-NLS-1$
-		if (firefoxVersion != null) {
-			nssPaths.add("/opt/firefox-" + firefoxVersion); //$NON-NLS-1$
-		}
-
-		nssPaths.add("/opt/fedora-ds/clients/lib"); //$NON-NLS-1$
-
-		// NSS de Chrome cuando no hay NSS de Mozilla de la misma arquitectura
-		nssPaths.add("/opt/google/chrome"); //$NON-NLS-1$
-
-		for (int i = nssPaths.size() - 1; i >= 0; i--) {
-			if (!isDirectory(nssPaths.get(i))) {
-				nssPaths.remove(i);
+			// Agregamos los directorios de NSS conocidos de los propios navegadores
+			if (ksType == AOKeyStore.MOZ_UNI || ksType == AOKeyStore.MOZ_UNI_WITH_OS) {
+				nssPaths.add("/snap/firefox/current/usr/lib/firefox"); // Directorio Ubuntu
+			} else if (ksType == AOKeyStore.NSS_CHROMIUM) {
+				nssPaths.add("/snap/chromium/current/usr/lib/x86_64-linux-gnu"); // Directorio Ubuntu
+			} else if (ksType == AOKeyStore.NSS_BRAVE) {
+				nssPaths.add("/snap/brave/current/usr/lib/x86_64-linux-gnu"); // Directorio Ubuntu
 			}
+
+			// Agregamos los directorios genericos de NSS, que no dependen del tipo de navegador
+			if ("64".equals(javaArch)) { //$NON-NLS-1$
+				nssPaths.add("/usr/lib/x86_64-linux-gnu/nss"); //$NON-NLS-1$
+				nssPaths.add("/usr/lib/x86_64-linux-gnu"); //$NON-NLS-1$
+			} else if ("32".equals(javaArch)) { //$NON-NLS-1$
+				nssPaths.add("/usr/lib/i386-linux-gnu/nss"); /* En algunos Ubuntu y Debian 32 */ //$NON-NLS-1$
+				nssPaths.add("/usr/lib/i386-linux-gnu"); //$NON-NLS-1$
+			}
+
+			// A partir de aqui, agregamos los directorios en los que historizamente se ha encontrado NSS
+			nssPaths.add(systemLibDir + "/nss"); //$NON-NLS-1$
+			nssPaths.add(systemLibDir);
+			nssPaths.add(systemLibDir + "/firefox"); //$NON-NLS-1$
+
+			// Preserve backwards-compatibility on https://github.com/ctt-gob-es/clienteafirma/issues/27#issuecomment-488402089
+			String firefoxVersion = searchLastFirefoxVersion(systemLibDir);
+			if (firefoxVersion != null) {
+				nssPaths.add(systemLibDir + "/firefox-" + firefoxVersion);  //$NON-NLS-1$
+			}
+			nssPaths.add(systemLibDir + "/thunderbird"); //$NON-NLS-1$
+
+			if (isDirectory("/lib" + javaArch)) { //$NON-NLS-1$
+				nssPaths.add("/lib" + javaArch); //$NON-NLS-1$
+			} else {
+				nssPaths.add("/lib"); //$NON-NLS-1$
+			}
+
+			nssPaths.add("/opt/firefox"); //$NON-NLS-1$
+
+			// Preserve backwards-compatibility on https://github.com/ctt-gob-es/clienteafirma/issues/27#issuecomment-488402089
+			if (isDirectory("/usr/lib" + javaArch)) { //$NON-NLS-1$
+				nssPaths.add("/usr/lib" + javaArch); //$NON-NLS-1$
+			} else {
+				nssPaths.add("/usr/lib"); //$NON-NLS-1$
+			}
+
+			firefoxVersion = searchLastFirefoxVersion("/opt"); //$NON-NLS-1$
+			if (firefoxVersion != null) {
+				nssPaths.add("/opt/firefox-" + firefoxVersion); //$NON-NLS-1$
+			}
+
+			nssPaths.add("/opt/fedora-ds/clients/lib"); //$NON-NLS-1$
+
+			// NSS de Chrome cuando no hay NSS de Mozilla de la misma arquitectura
+			nssPaths.add("/opt/google/chrome"); //$NON-NLS-1$
+
+			for (int i = nssPaths.size() - 1; i >= 0; i--) {
+				if (!isDirectory(nssPaths.get(i))) {
+					nssPaths.remove(i);
+				}
+			}
+
+			NSS_PATHS = nssPaths.toArray(new String[0]);
 		}
-		return nssPaths.toArray(new String[0]);
+
+		return NSS_PATHS;
 	}
 
-	static String getNSSLibDirUnix() throws FileNotFoundException {
+	/**
+	 * Obtiene el directorio donde se encuentra la biblioteca NSS en sistemas UNIX (Linux, Solaris). Si se indica un
+	 * tipo de almac&eacute;n de claves, se priorizar&aacute; la b&uacute;squeda en los directorios de ese navegador.
+	 * @param ksType Tipo de almac&eacute;n de claves.
+	 * @return Directorio donde se encuentra la biblioteca NSS.
+	 * @throws FileNotFoundException Si no se encuentra la biblioteca NSS en el sistema.
+	 */
+	static String getNSSLibDirUnix(final AOKeyStore ksType) throws FileNotFoundException {
 
 		String nssLibDir = null;
 
-		for (final String path : NSS_PATHS) {
+		for (final String path : getNssPaths(ksType)) {
 			final File tmpFile = new File(path, SOFTOKN3_SO);
 			if (tmpFile.isFile() && ElfParser.archMatches(tmpFile)) {
 				nssLibDir = path;
@@ -118,9 +141,9 @@ final class MozillaKeyStoreUtilitiesUnix {
 			throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX"); //$NON-NLS-1$
 		}
 
-		LOGGER.info("Se usara el NSS encontrado en '" + nssLibDir + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Se usara el NSS encontrado en '" + LoggerUtil.getCleanUserHomePath(nssLibDir) + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		for (final String path : NSS_PATHS) {
+		for (final String path : getNssPaths(ksType)) {
 			final File dir = new File(path);
 			for (final String tailingLib: SQLITE_LIBS) {
 				final File library = new File(dir, tailingLib);
@@ -217,6 +240,29 @@ final class MozillaKeyStoreUtilitiesUnix {
 			nssPath + "libmozsqlite3.so", // Firefox 3 y superior //$NON-NLS-1$
 			nssPath + "libsqlite3.so.0"   // Variante de SQLite en ciertos Debian //$NON-NLS-1$
 		};
+	}
+
+	/**
+	 * Devuelve el directorio donde se encuentra un almac&eacute;n de certificados NSS.
+	 * @param possiblePaths Listado de rutas posibles, relativas al directorio del usuario, donde se puede encontrar
+	 *                         el almac&eacute;n.
+	 * @return Directorio del almac&eacute;n de certificados NSS o {@code null} si no se encuentra.
+	 */
+	public static File getNssProfileDir(String[] possiblePaths) {
+		final String userHome = Platform.getUserHome();
+		File chromeKeyStoreDir;
+		for (String possiblePath : possiblePaths) {
+			try {
+				chromeKeyStoreDir = new File(userHome, possiblePath)
+						.getCanonicalFile();
+			} catch (IOException e) {
+				continue;
+			}
+			if (chromeKeyStoreDir.isDirectory()) {
+				return chromeKeyStoreDir;
+			}
+		}
+		return null;
 	}
 
 	/**

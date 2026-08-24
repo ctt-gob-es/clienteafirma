@@ -305,7 +305,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	 * @param ksType Tipo de almac&eacute;n de claves.
 	 * @param ksName Nombrede almac&eacute;n de claves
 	 * @param ksLibPath Librer&iacute;a de almac&eacute;n de claves.  */
-	public void changeKeyStore(final int ksType, final String ksName, final String ksLibPath) {
+	public void changeKeyStore(final es.gob.afirma.core.keystores.KeyStoreType ksType, final String ksName, final String ksLibPath) {
 
 		// Ya que el cambio de dialogo puede hacer aparecer otros nuevos (como alguno
 		// de seleccion de fichero o de solicitud de PIN), dejamos de obligar a que
