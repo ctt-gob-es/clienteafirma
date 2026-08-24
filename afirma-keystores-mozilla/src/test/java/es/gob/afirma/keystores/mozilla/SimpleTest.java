@@ -1,18 +1,17 @@
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.security.KeyStore;
+import java.security.*;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.Provider;
-import java.security.Security;
-import java.security.Signature;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -33,9 +32,11 @@ public final class SimpleTest {
      * @param args No se usa.
      * @throws Exception En cualquier error. */
     public static void main(final String[] args) throws Exception {
-    	System.out.println(MozillaKeyStoreUtilities.getMozillaUserProfileDirectory());
+    	System.out.println(MozillaKeyStoreUtilities.getActiveProfilePath());
     	//new SimpleTest().testDirectNssUsage();
-    	new SimpleTest().testKeyStoreManagerCreation();
+    	//new SimpleTest().testKeyStoreManagerCreation();
+		//new SimpleTest().testLoadAndSignWithMozillaUnifiedKeyStoreWithPassword();
+		new SimpleTest().testLoadUbuntuMozillaKeyStoreWithPassword();
     }
 
 
@@ -115,7 +116,7 @@ public final class SimpleTest {
      */
     @SuppressWarnings("static-method")
     @Test
-    @Ignore // Necesita NSS
+    //@Ignore // Necesita NSS
     public void testLoadAndSignWithMozillaUnifiedKeyStoreWithPassword() throws Exception {
 
     	System.setProperty(
@@ -141,7 +142,6 @@ public final class SimpleTest {
 			null // Parent
 		);
 
-
     	System.out.println("Certificados:"); //$NON-NLS-1$
     	System.out.println("-------------"); //$NON-NLS-1$
     	final String[] aliases = ksm.getAliases();
@@ -149,10 +149,7 @@ public final class SimpleTest {
     		System.out.println(AOUtil.getCN(ksm.getCertificate(alias)));
     	}
 
-    	if (aliases.length < 1) {
-    		System.out.println("No hay certificados"); //$NON-NLS-1$
-    		return;
-    	}
+//		Assert.assertTrue("No se han encontrado certificados en el almacén", aliases.length > 0); //$NON-NLS-1$
 
     	System.out.println("============="); //$NON-NLS-1$
 
@@ -164,20 +161,97 @@ public final class SimpleTest {
 
     	final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(
     			"SHA512", pke.getPrivateKey().getAlgorithm());
-    	final Signature sig = Signature.getInstance(signAlgorithm);
-    	sig.initSign(
-			ksm.getKeyEntry(
-				aliases[0]
-			).getPrivateKey()
-		);
-    	sig.update("Hola".getBytes()); //$NON-NLS-1$
 
+		final Signature sig = Signature.getInstance(signAlgorithm);
+		try {
+			sig.initSign(
+					ksm.getKeyEntry(
+							aliases[0]
+					).getPrivateKey()
+			);
+			sig.update("Hola".getBytes()); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+	//		Assert.fail("Error al inicializar la firma: " + e); //$NON-NLS-1$
+		}
 
     	provider = sig.getProvider();
     	System.out.println("Proveedor firma: " + provider.getName() + ": " + provider.getInfo()); //$NON-NLS-1$ //$NON-NLS-2$
 
-    	System.out.println("Firma: " + AOUtil.hexify(sig.sign(), false)); //$NON-NLS-1$
+		try {
+			System.out.println("Firma: " + AOUtil.hexify(sig.sign(), false)); //$NON-NLS-1$
+		} catch (SignatureException e) {
+			Assert.fail("Error al realizar la firma: " + e); //$NON-NLS-1$
+		}
     }
+
+	/**
+	 * Prueba de la obtenci&oacute;n de almac&eacute;n y alias con el almac&eacute;n
+	 * interno de Mozilla NSS (Almac&eacute;n interno + dispositivos PKCS#11) con
+	 * contrase&ntilde;a.
+	 * @throws Exception En cualquier error.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	//@Ignore // Necesita NSS
+	public void testLoadUbuntuMozillaKeyStoreWithPassword() throws Exception {
+
+		final PasswordCallback callback = new CachePasswordCallback("1111".toCharArray());
+
+		String path;
+		if (Platform.getOS() == Platform.OS.WINDOWS) {
+			path = "C:/Users/carlos.gamuci/Documents/Afirma/Repositorios_Github/clienteafirma/afirma-keystores-mozilla/src/test/resources/Profiles/jo7t9mah.default"; //$NON-NLS-1$
+			path = KeyStoreUtilities.getWindowsShortName(path).replace("\\", "/");
+		}
+		else {
+			path = "/home/prueba/snap/firefox/common/.mozilla/firefox/jo7t9mah.default"; //$NON-NLS-1$
+		}
+
+		GenericNssKeyStoreManager ksm = new GenericNssKeyStoreManager(AOKeyStore.NSS_CHROME, path);
+		ksm.init(AOKeyStore.NSS_CHROME, null, callback, null, false);
+
+		System.out.println("Certificados:"); //$NON-NLS-1$
+		System.out.println("-------------"); //$NON-NLS-1$
+		final String[] aliases = ksm.getAliases();
+		for (final String alias : aliases) {
+			System.out.println(AOUtil.getCN(ksm.getCertificate(alias)));
+		}
+
+//		Assert.assertTrue("No se han encontrado certificados en el almacén", aliases.length > 0); //$NON-NLS-1$
+
+		System.out.println("============="); //$NON-NLS-1$
+
+
+		Provider provider = ksm.getKeyStore().getProvider();
+		System.out.println("Proveedor almacen: " + provider.getName() + ": " + provider.getInfo()); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final PrivateKeyEntry pke = ksm.getKeyEntry(aliases[0]);
+
+		final String signAlgorithm = AOSignConstants.composeSignatureAlgorithmName(
+				"SHA512", pke.getPrivateKey().getAlgorithm());
+
+		final Signature sig = Signature.getInstance(signAlgorithm);
+		try {
+			sig.initSign(
+					ksm.getKeyEntry(
+							aliases[0]
+					).getPrivateKey()
+			);
+			sig.update("Hola".getBytes()); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			//		Assert.fail("Error al inicializar la firma: " + e); //$NON-NLS-1$
+		}
+
+		provider = sig.getProvider();
+		System.out.println("Proveedor firma: " + provider.getName() + ": " + provider.getInfo()); //$NON-NLS-1$ //$NON-NLS-2$
+
+		try {
+			System.out.println("Firma: " + AOUtil.hexify(sig.sign(), false)); //$NON-NLS-1$
+		} catch (SignatureException e) {
+			Assert.fail("Error al realizar la firma: " + e); //$NON-NLS-1$
+		}
+	}
 
     /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con NSS de systema.
      * @throws Exception En cualquier error. */
@@ -214,10 +288,11 @@ public final class SimpleTest {
     public void testDirectNssUsage() throws Exception {
     	final KeyStore keyStore = KeyStore.getInstance(
 			"PKCS11", //$NON-NLS-1$
-			loadNSS(
-				KeyStoreUtilities.getWindowsShortName("c:\\program files (x86)\\mozilla firefox"), //$NON-NLS-1$
-				KeyStoreUtilities.getWindowsShortName("C:\\Users\\tgarciameras\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\9xk45g11.default").replace("\\", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			)
+				loadNSS(
+						"Afirma_NSS_MOZILLA",
+						KeyStoreUtilities.getWindowsShortName("c:\\program files (x86)\\mozilla firefox"), //$NON-NLS-1$
+						KeyStoreUtilities.getWindowsShortName("C:\\Users\\tgarciameras\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\9xk45g11.default").replace("\\", "/") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				)
 		);
     	keyStore.load(null, new char[0]);
     	final Enumeration<String> aliases = keyStore.aliases();
@@ -226,7 +301,7 @@ public final class SimpleTest {
     	}
     }
 
-	static Provider loadNSS(final String nssDirectory, final String mozProfileDir) throws AOException,
+	static Provider loadNSS(final String providerName, final String nssDirectory, final String mozProfileDir) throws AOException,
 	                                                                                      InstantiationException,
 	                                                                                      IllegalAccessException,
 	                                                                                      IllegalArgumentException,
@@ -236,8 +311,9 @@ public final class SimpleTest {
 	                                                                                      ClassNotFoundException {
 
 		final String p11NSSConfigFile = MozillaKeyStoreUtilities.createPKCS11NSSConfig(
-			mozProfileDir,
-			nssDirectory
+				providerName,
+				mozProfileDir,
+				nssDirectory
 		);
 
 		Logger.getLogger("es.gob.afirma").info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile); //$NON-NLS-1$ //$NON-NLS-2$

@@ -176,6 +176,30 @@ public enum AOKeyStore {
 		null, // Al igual que en el DNIe el PIN se pide al firmar
 		null  // Sin password para el almacen en si
 	),
+	/** Almac&eacute;n NSS del navegador Chrome en Linux. */
+	NSS_CHROME(
+		"Almacen NSS de Chrome", //$NON-NLS-1$
+		19,
+		"PKCS11", //$NON-NLS-1$
+		NullPasswordCallback.getInstance(),
+		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.15", "NSS de Chrome")) //$NON-NLS-1$ //$NON-NLS-2$
+	),
+	/** Almac&eacute;n NSS del navegador Chrome en Linux. */
+	NSS_CHROMIUM(
+		"Almacen NSS de Chromium", //$NON-NLS-1$
+		20,
+		"PKCS11", //$NON-NLS-1$
+		NullPasswordCallback.getInstance(),
+		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.15", "NSS de Chromium")) //$NON-NLS-1$ //$NON-NLS-2$
+	),
+	/** Almac&eacute;n NSS del navegador Chrome en Linux. */
+	NSS_BRAVE(
+			"Almacen NSS de Brave", //$NON-NLS-1$
+			21,
+			"PKCS11", //$NON-NLS-1$
+			NullPasswordCallback.getInstance(),
+			new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.15", "NSS de Brave")) //$NON-NLS-1$ //$NON-NLS-2$
+	),
 	/** Otro tipo de almac&eacute;n (deber&aacute;n inicializarse manualmente sus par&aacute;metros operativos). */
 	OTHER;
 

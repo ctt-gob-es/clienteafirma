@@ -79,8 +79,10 @@ final class RestoreConfigUtil {
 		}
 	}
 
-	/** Recupera el directorio en el que se encuentra la aplicaci&oacute;n actual.
-	 * @return Directorio de ejecuci&oacute;n. */
+	/**
+	 * Recupera el directorio en el que se encuentra la aplicaci&oacute;n actual.
+	 * @return Directorio de ejecuci&oacute;n.
+	 */
 	static File getApplicationDirectory() {
 		try {
 			return new File(RestoreConfigUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();

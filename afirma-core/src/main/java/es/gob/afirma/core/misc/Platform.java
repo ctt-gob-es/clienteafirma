@@ -180,9 +180,10 @@ public final class Platform {
         return os;
     }
 
-    /** Recupera la arquitectura de la JVM en ejecuci&oacute;n seg&uacute;n las
+    /** Indica si la arquitectura de la JVM en ejecuci&oacute;n es de 32 o 64 bits seg&uacute;n las
      * propiedades de Java.
-     * @return Arquitectura de la JVM. */
+     * @return Arquitectura de la JVM (32 o 64).
+     */
     public static String getJavaArch() {
         if (javaArch == null) {
         	try {

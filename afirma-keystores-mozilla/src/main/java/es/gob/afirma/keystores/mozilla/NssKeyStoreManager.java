@@ -65,7 +65,6 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 			}
 			catch (final Exception e) {
 				LOGGER.warning("No se ha podido obtener el KeyStore PKCS#11 NSS del proveedor SunPKCS11: " + e); //$NON-NLS-1$
-				keyStore = null;
 			}
 		}
 
@@ -75,22 +74,19 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 			}
 			catch (final Exception e) {
 				LOGGER.info(
-					"No se ha podido abrir el almacen sin contrasena, se intentara proporcionando una : " + e //$NON-NLS-1$
+					"No se ha podido abrir el almacen sin contrasena, se intentara proporcionando una: " + e //$NON-NLS-1$
 				);
 				try {
 					keyStore.load(null, pssCallBack != null
-						? pssCallBack.getPassword()
+							? pssCallBack.getPassword()
 							: new UIPasswordCallback(FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.0"), //$NON-NLS-1$
-								this.parentComponent).getPassword());
+							this.parentComponent).getPassword());
 				}
 				catch (final AOCancelledOperationException e1) {
-					keyStore = null;
 					throw e1;
 				}
 				catch (final Exception e2) {
-					LOGGER.warning(
-						"No se ha podido abrir el almacen PKCS#11 NSS del proveedor SunPKCS11: " + e2 //$NON-NLS-1$
-					);
+					LOGGER.log(Level.WARNING,"No se ha podido abrir el almacen NSS", e2); //$NON-NLS-1$
 					keyStore = null;
 				}
 			}

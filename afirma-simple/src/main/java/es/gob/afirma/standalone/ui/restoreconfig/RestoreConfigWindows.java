@@ -25,6 +25,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,6 +37,7 @@ import com.sun.jna.platform.win32.WinReg;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.keystores.mozilla.MozillaProfile;
 import es.gob.afirma.standalone.DesktopUtil;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
@@ -61,24 +63,23 @@ final class RestoreConfigWindows implements RestoreConfig {
 	private static final String REPLACE_PATH_BAT = "$$PATH_BAT$$"; //$NON-NLS-1$
 
 	/**
-     * Caracter de salto de l&iacute;nea para los mensajes de la consola de restauraci&oacute;n
-     */
-	static final String NEWLINE = System.getProperty("line.separator"); //$NON-NLS-1$
-
-	/**
 	 * Ruta de operaci&oacute;n de la aplicaci&oacute;n
 	 */
 	private final static File appDir = RestoreConfigUtil.getApplicationDirectory();
 
+	private RestoreConfigFirefoxWindows firefoxConfigRestaurator = null;
+
 	@Override
 	public void restore(final RestoreConfigPanel configPanel) {
 
+		// Creamos un nuevo restaurador de configuracion de Firefox para Windows,
+		// que se usara en la instalacion del certificado raiz. Se crea nuevo cada ejecucion por si se hubiesen
+		// creado nuevos perfiles de Firefox desde la ultima ejecucion
+		this.firefoxConfigRestaurator = new RestoreConfigFirefoxWindows();
+
 		// Identificamos el directorio de instalacion
 		LOGGER.info("Ruta de appDir: " + LoggerUtil.getCleanUserHomePath(appDir.getAbsolutePath())); //$NON-NLS-1$
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.3", appDir.getAbsolutePath())); //$NON-NLS-1$
-
-		// Comprobamos si se debe configurar Firefox para que use el almacen de confianza del sistema
-		final boolean firefoxSecurityRoots = configPanel.firefoxIntegrationCb.isSelected();
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.3", appDir.getAbsolutePath())); //$NON-NLS-1$
 
 		// Verifica si se tiene permisos para escribir en el directorio de instalacion
 		boolean usingAlternativeDirectory;
@@ -106,18 +107,18 @@ final class RestoreConfigWindows implements RestoreConfig {
 		// Regeneramos los certificados que sean necesario (raiz y ssl) y los guardamos en disco
 		CertificateFile sslRoot;
 		if (needRebuildCerts) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.38")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.38")); //$NON-NLS-1$
 			try {
 				sslRoot = rebuildCertificates(configPanel, workingDirectory);
 			}
 			catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, "No se han podido regenerar los certificados necesarios. No se instalaran en los almacenes de confianza", e); //$NON-NLS-1$
-				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.33")); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.33")); //$NON-NLS-1$
 				sslRoot = null;
 			}
 		}
 		else {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.39")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.39")); //$NON-NLS-1$
 			try {
 				// Si vamos a trabajar desde un directorio distinto al de instalacion,
 				// copiamos los certificados
@@ -129,20 +130,18 @@ final class RestoreConfigWindows implements RestoreConfig {
 			}
 			catch (final Exception e) {
 				LOGGER.log(Level.WARNING, "No se ha podido cargar el certificado de CA del directorio de instalacion. No se instalara en los almacenes de confianza", e); //$NON-NLS-1$
-				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.4")); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.4")); //$NON-NLS-1$
 				sslRoot = null;
 			}
 		}
 
 		// Instalacion del certificado raiz en Windows
 		if (sslRoot != null) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.18")); //$NON-NLS-1$
 			installRootCAWindowsKeystore(configPanel, sslRoot);
 		}
 
 		// Instalacion del certificado raiz en Firefox
 		if (sslRoot != null) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.13")); //$NON-NLS-1$
 			installRootCAMozillaKeystore(configPanel, sslRoot, workingDirectory);
 		}
 
@@ -151,45 +150,40 @@ final class RestoreConfigWindows implements RestoreConfig {
 		if (!usingAlternativeDirectory) {
 			final File alternativeDir = DesktopUtil.getWindowsAlternativeAppDir();
 			if (alternativeDir.exists()) {
-				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.36")); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.36")); //$NON-NLS-1$
 				try {
 					copyCerts(workingDirectory, alternativeDir);
 
 				} catch (final IOException e) {
 					LOGGER.log(Level.WARNING, "No se ha podido copiar el almacen del certificado SSL al directorio alternativo de instalacion", e); //$NON-NLS-1$
-					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.37")); //$NON-NLS-1$
+					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.37")); //$NON-NLS-1$
 				}
 			}
 		}
 
 		// Registramos el protocolo afirma
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.24")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.24")); //$NON-NLS-1$
 		try {
 			restoreProtocolRegistry(appDir.getAbsoluteFile(), workingDirectory.getAbsoluteFile());
 		}
 		catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "Error restaurando los valores del protocolo 'afirma'", e); //$NON-NLS-1$
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.25")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.25")); //$NON-NLS-1$
 		}
 
-		// Configuramos Firefox para que confie o no en los prestadores dados de alta en el almacen de confianza
-		// del sistema
+		// Configuramos Firefox para que confie en el almacen de confianza del sistema (opcion por defecto de Firefox)
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.41")); //$NON-NLS-1$
 
-		if (firefoxSecurityRoots) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.41")); //$NON-NLS-1$
-		} else {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.42")); //$NON-NLS-1$
-		}
 		try {
-			RestoreConfigFirefox.configureUseSystemTrustStore(firefoxSecurityRoots);
+			this.firefoxConfigRestaurator.configureUseSystemTrustStore(true);
 		}
 		catch (final MozillaProfileNotFoundException e) {
 			LOGGER.info("No se encontraron perfiles de Firefox en los que configurar la confianza en el almacen del sistema"); //$NON-NLS-1$
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.44")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.44")); //$NON-NLS-1$
 		}
 		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "Error configurando la confianza de Firefox en el almacen del sistema (activando: " + firefoxSecurityRoots + ")", e); //$NON-NLS-1$ //$NON-NLS-2$
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.43")); //$NON-NLS-1$
+			LOGGER.log(Level.WARNING, "Error configurando la confianza de Firefox en el almacen del sistema", e); //$NON-NLS-1$ //$NON-NLS-2$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.43")); //$NON-NLS-1$
 		}
 	}
 
@@ -308,6 +302,8 @@ final class RestoreConfigWindows implements RestoreConfig {
 	 * @param certFile El certificado a instalar. */
 	private static void installRootCAWindowsKeystore(final RestoreConfigPanel configPanel, final CertificateFile certFile) {
 
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.18")); //$NON-NLS-1$
+
 		final KeyStore ks;
 		try {
 			ks = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
@@ -315,7 +311,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		}
 		catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
 			LOGGER.severe("No se ha podido cargar el almacen de certificados de confianza de Windows: " + e); //$NON-NLS-1$
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.20")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.20")); //$NON-NLS-1$
 			return;
 		}
 
@@ -324,7 +320,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			final Certificate currentCert = ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER);
 			if (currentCert != null && currentCert.equals(certFile.getCert())) {
 				LOGGER.info("El certificado raiz ya se encontraba instalado en el almacen del sistema"); //$NON-NLS-1$
-				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.26")); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.26")); //$NON-NLS-1$
 				return;
 			}
 		}
@@ -334,15 +330,15 @@ final class RestoreConfigWindows implements RestoreConfig {
 
 		// Antes de la instalacion, intentamos desinstalar cualquier otro certificado con el
 		// mismo alias que se encuentre en el almacen
-		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.22")); //$NON-NLS-1$
+		configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.22")); //$NON-NLS-1$
 		try {
 			while (ks.getCertificate(RestoreConfigUtil.CERT_ALIAS_BROWSER) != null) {
-				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.35")); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.35")); //$NON-NLS-1$
 				ks.deleteEntry(RestoreConfigUtil.CERT_ALIAS_BROWSER);
 			}
 		}
 		catch (final KeyStoreException ke) {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.34")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.34")); //$NON-NLS-1$
 			LOGGER.info("No se ha podido eliminar alguna importacion previa del certificado raiz del almacen de Windows: " + ke.getMessage()); //$NON-NLS-1$
 		}
 
@@ -360,14 +356,14 @@ final class RestoreConfigWindows implements RestoreConfig {
 						);
 				final int result = JOptionPane.showConfirmDialog(
 					null,
-					SimpleAfirmaMessages.getString("RestoreConfigWindows.0"), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("RestoreConfigWindows.1"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreConfig.0"), //$NON-NLS-1$
+					SimpleAfirmaMessages.getString("RestoreConfig.1"), //$NON-NLS-1$
 					JOptionPane.OK_CANCEL_OPTION,
 					JOptionPane.WARNING_MESSAGE
 				);
 				if (result == JOptionPane.CANCEL_OPTION) {
 					LOGGER.severe("El usuario cancelo la instalacion del certificado SSL para el socket: " + e); //$NON-NLS-1$
-					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.32")); //$NON-NLS-1$
+					configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.32")); //$NON-NLS-1$
 					return;
 				}
 			}
@@ -375,45 +371,86 @@ final class RestoreConfigWindows implements RestoreConfig {
 		while (!installed);
 	}
 
-	/** Instala el certificado ra&iacute;z CA de Autofirma
+	/**
+	 * Instala el certificado ra&iacute;z CA de Autofirma
 	 * en el almac&eacute;n ra&iacute;z de Mozilla.
 	 *  @param configPanel Panel de configuraci&oacute;n con las trazas de ejecuci&oacute;n.
 	 *  @param certFile El certificado a instalar.
-	 *  @param installDir Directorio de instalaci&oacute;n. */
-	private static void installRootCAMozillaKeystore(final RestoreConfigPanel configPanel,
+	 *  @param workingDir Directorio de trabajo sobre el que tenemos permisos.
+	 */
+	private void installRootCAMozillaKeystore(final RestoreConfigPanel configPanel,
 			                                         final CertificateFile certFile,
-			                                         final File installDir) {
-		try {
-			// Obligamos a que se cierre Firefox antes de manipular el certificado en su almacen
-			final boolean closed = closeFirefox(configPanel);
+			                                         final File workingDir) {
 
-			// Si no se ha cerrado el navegador, es muy probable que no se pueda instalar el certificado de confianza,
-			// asi que mostramos un mensaje advirtiendolo
-			if (!closed) {
-				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.45")); //$NON-NLS-1$
-			}
+		List<MozillaProfile> profiles = this.firefoxConfigRestaurator.getMozillaProfiles();
+		if (profiles.isEmpty()) {
+			LOGGER.info("No se encontraron perfiles de Firefox en los que instalar el certificado raiz"); //$NON-NLS-1$
+			return;
+		}
 
-			// Es necesario copiar a disco certutil
-			RestoreConfigFirefox.copyConfigurationFiles(installDir);
+		// Obligamos a que se cierre Firefox antes de manipular el certificado en su almacen
+		final boolean closed = closeFirefox(configPanel);
 
-			// certutil no lanza ningun error si hay algun problema a partir de Firefox 50
+		// Si no se ha cerrado el navegador, es muy probable que no se pueda instalar el certificado de confianza,
+		// asi que mostramos un mensaje advirtiendolo
+		if (!closed) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.45")); //$NON-NLS-1$
+		}
+
+		// Es necesario copiar a disco certutil
+		File certUtilFile;
+        try {
+            certUtilFile = RestoreConfigFirefoxWindows.copyConfigurationFiles(workingDir);
+        } catch (IOException e) {
+			LOGGER.warning("No se ha podido copiar certutil al sistema para su uso: " + e); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.12")); //$NON-NLS-1$
+			return;
+        }
+
+		String certUtilPath = certUtilFile.getAbsolutePath();
+
+		boolean error = false;
+		for (MozillaProfile profile : profiles) {
+
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.48", profile.getName())); //$NON-NLS-1$
 
 			// Desinstalamos versiones previas
-			LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
-			RestoreConfigFirefox.uninstallRootCAMozillaKeyStore(installDir);
-			// Vuelvo a instalar lo que habia o el nuevo cer generado
-			RestoreConfigFirefox.installRootCAMozillaKeyStore(installDir, certFile.getFile());
-			// Elimino certutil tras su uso
-			RestoreConfigFirefox.removeConfigurationFiles(installDir);
+			try {
+				this.firefoxConfigRestaurator.uninstallTrustedCertificate(workingDir, profile, certUtilPath);
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING, "No se ha podido desinstalar el certificado de confianza anterior para el perfil: " + profile.getName(), e); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.30", profile.getName())); //$NON-NLS-1$
+			}
+
+			// Instalo el nuevo certificado (que puede ser el mismo que ya habia si no se ha generado uno nuevo)
+			try {
+				this.firefoxConfigRestaurator.installTrustedCertificate(workingDir, certFile.getFile(), profile, certUtilPath);
+			}
+			catch (final PasswordProtectedException e) {
+				LOGGER.log(Level.WARNING, "El perfil de Firefox '" + profile.getName() + "' esta protegido por "
+						+ "contrasena y no se podran instalar certificados con los permisos necesarios. Se omite para "
+						+ "delegar en la confianza en el almacen del sistema"); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.46", profile.getName())); //$NON-NLS-1$
+				error = true;
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.SEVERE, "Error instalando el certificado raiz en el perfil " + profile.getName(), e); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.31", profile.getName())); //$NON-NLS-1$
+				error = true;
+			}
+
+			// Eliminamos la informacion sensible que se haya guardado del perfil
+			profile.reset();
 		}
-		catch (final IOException | KeyStoreException e) {
-			LOGGER.log(Level.SEVERE, "Error instalando el certificado raiz: " + e, e); //$NON-NLS-1$
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.31", installDir.getAbsolutePath())); //$NON-NLS-1$
+
+		// Elimino certutil tras su uso
+		RestoreConfigFirefoxWindows.removeConfigurationFiles(workingDir);
+
+		if (error) {
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.47", workingDir.getAbsolutePath())); //$NON-NLS-1$
 		}
-		catch (final MozillaProfileNotFoundException e) {
-			LOGGER.warning("No se ha encontrado el perfil de Mozilla en Windows: " + e); //$NON-NLS-1$
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.12")); //$NON-NLS-1$
-		}
+
 	}
 
 	/**
@@ -484,16 +521,16 @@ final class RestoreConfigWindows implements RestoreConfig {
 		if (!checkSSLKeyStoreGenerated(installDir)) {
 
 			// Eliminando de disco las versiones previas de los certificados
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.16")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.16")); //$NON-NLS-1$
 			try {
 				deleteCertificatesFromDisk(installDir);
 			} catch (final IOException e) {
-				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.17")); //$NON-NLS-1$
+				configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.17")); //$NON-NLS-1$
 				LOGGER.log(Level.SEVERE, "Error al eliminar los certificados SSL anteriores de disco: " + e); //$NON-NLS-1$
 			}
 
 			// Generamos los certificados
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.5")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.5")); //$NON-NLS-1$
 			CertPack certPack;
 			try {
 				certPack = CertUtil.getCertPackForLocalhostSsl(ConfiguratorUtil.CERT_ALIAS, KS_PASSWORD);
@@ -505,7 +542,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			}
 
 			// Copiamos los certificados a disco
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.11")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.11")); //$NON-NLS-1$
 			File sslRootFile = new File(installDir, CA_CERTIFICATE_FILENAME);
 			try {
 				RestoreConfigUtil.installFile(certPack.getPkcs12(), new File(installDir, SSL_KEYSTORE_FILENAME));
@@ -545,7 +582,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 			}
 
 			// Copio a disco el certificado raiz
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.11")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.11")); //$NON-NLS-1$
 			File sslRootFile = new File(installDir, CA_CERTIFICATE_FILENAME);
 			try {
 				RestoreConfigUtil.installFile(sslRoot.getCert().getEncoded(), sslRootFile);
@@ -569,7 +606,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		}
 		// Si existen ambos no hago nada
 		else {
-			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfigWindows.14")); //$NON-NLS-1$
+			configPanel.appendMessage(SimpleAfirmaMessages.getString("RestoreConfig.14")); //$NON-NLS-1$
 			final File sslRootFile = new File(installDir, CA_CERTIFICATE_FILENAME);
 			sslRoot = new CertificateFile(CertUtil.loadCertificate(sslRootFile));
 			sslRoot.setFile(sslRootFile);
@@ -631,7 +668,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		// Copiamos al directorio de instalacion la aplicacion para restaurar el protocolo
 		final File batFile = new File(workingDir, RESTORE_PROTOCOL_BAT);
 		try (final FileOutputStream os = new FileOutputStream(batFile);
-				final InputStream is = RestoreConfigWindows.class.getResourceAsStream("/windows/" + RESTORE_PROTOCOL_BAT);) { //$NON-NLS-1$
+				final InputStream is = RestoreConfig.class.getResourceAsStream("/windows/" + RESTORE_PROTOCOL_BAT);) { //$NON-NLS-1$
 			os.write(AOUtil.getDataFromInputStream(is));
 			os.flush();
 		}
@@ -645,7 +682,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 		// permisos de administrador
 		final File executorFile = new File(workingDir, ADMIN_EXECUTOR_BAT);
 		try (final FileOutputStream os = new FileOutputStream(executorFile);
-				final InputStream is = RestoreConfigWindows.class.getResourceAsStream("/windows/" + ADMIN_EXECUTOR_BAT);) { //$NON-NLS-1$
+				final InputStream is = RestoreConfig.class.getResourceAsStream("/windows/" + ADMIN_EXECUTOR_BAT);) { //$NON-NLS-1$
 			String batchScript = new String(AOUtil.getDataFromInputStream(is));
 			batchScript = batchScript
 					.replace(REPLACE_PATH_BAT, batFile.getAbsolutePath().replace("\\", "\\\\")) //$NON-NLS-1$ //$NON-NLS-2$

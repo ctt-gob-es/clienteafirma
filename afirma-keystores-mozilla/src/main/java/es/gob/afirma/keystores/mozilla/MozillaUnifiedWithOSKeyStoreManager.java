@@ -133,7 +133,7 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 			for (final String descr : externalStores.keySet()) {
 				final AOKeyStoreManager tmpKsm = new AOKeyStoreManager();
 				try {
-					internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
+					initExternalStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
 				}
 				catch (final AOCancelledOperationException ex) {
 					LOGGER.warning(
@@ -148,7 +148,7 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 						continue;
 					}
 					try {
-						internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
+						initExternalStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
 					}
 					catch (final AOCancelledOperationException exc) {
 						LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + exc); //$NON-NLS-1$ //$NON-NLS-2$

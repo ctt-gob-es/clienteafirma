@@ -998,7 +998,6 @@ public class JSEUIManager implements AOUIManager {
 
 	    @Override
 	    public void setSelectedFile(final File file) {
-	        super.setSelectedFile(file);
             if (file != null) {
                 super.setSelectedFile(file);
                 this.file = file;

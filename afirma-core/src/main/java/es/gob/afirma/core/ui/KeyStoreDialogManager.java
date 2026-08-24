@@ -14,6 +14,7 @@ import java.io.IOException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
+import es.gob.afirma.core.keystores.KeyStoreType;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 
 /** Interfaz que implementan los di&aacute;logos de selecci&oacute;n de certificados. */
@@ -33,8 +34,11 @@ public interface KeyStoreDialogManager {
 	/** Identificador de almac&eacute;n de DNIe. */
 	int KEYSTORE_ID_DNIE = 4;
 
-	/** Identificador de almac&eacute;n externo PKCS#11. */
-	int KEYSTORE_ID_PKCS11 = 5;
+//	/** Identificador de almac&eacute;n externo PKCS#11. */
+//	int KEYSTORE_ID_PKCS11 = 5;
+
+	/** Identificador de almac&eacute;n del navegador (usado para almacenes gen&eacute;ricos NSS). */
+	int KEYSTORE_ID_BROWSER = 6;
 
 	/** Manda recargar al almac&eacute;n asociado actualmente al di&aacute;logo de
 	 * selecci&oacute;n.
@@ -54,12 +58,12 @@ public interface KeyStoreDialogManager {
 	 * Cambia el almac&eacute;n cargado en el di&aacute;logo al correspondiente al que corresponde
 	 * al indicado. Los tipos de almac&eacute;n a los que se puede cambiar se declaran en esta
 	 * misma interfaz.
-	 * @param keyStoreId Identificador de almac&eacute;n.
+	 * @param ksType Identificador de almac&eacute;n.
 	 * @param parent Componente padre sobre el que mostrar cualquier di&aacute;logo gr&aacute;fico.
 	 * @return {@code true} si se completa el cambio de almac&eacute;n, {@code false} en caso
 	 * contrario.
 	 */
-	boolean changeKeyStoreManager(int keyStoreId, Object parent);
+	boolean changeKeyStoreManager(KeyStoreType ksType, Object parent);
 
 	/**
 	 * Cambia el almac&eacute;n cargado a uno de tipo PKCS#11
@@ -75,7 +79,7 @@ public interface KeyStoreDialogManager {
 	 * Indica entre qu&eacute; tipos de almacenes se permite cambiar desde el di&aacute;logo de selecci&oacute;n.
 	 * @return Listado con el identificador de tipos de almac&eacute;n.
 	 */
-	int[] getAvailablesKeyStores();
+	KeyStoreType[] getAvailablesKeyStores();
 
 	/** Devuelve la clave asociada a un alias.
 	 * @param alias Alias de la clave que se desea recuperar.

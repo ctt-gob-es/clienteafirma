@@ -42,7 +42,7 @@ public class SignDetailsFormatter {
     	MIMETYPE_MAPPER.put("text/html", SimpleAfirmaMessages.getString("ValidationInfoDialog.28")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("image/tiff", SimpleAfirmaMessages.getString("ValidationInfoDialog.29")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("image/gif", SimpleAfirmaMessages.getString("ValidationInfoDialog.30")); //$NON-NLS-1$ //$NON-NLS-2$
-    	MIMETYPE_MAPPER.put("image/jpg", SimpleAfirmaMessages.getString("ValidationInfoDialog.39")); //$NON-NLS-1$ //$NON-NLS-2$
+    	MIMETYPE_MAPPER.put("image/jpg", SimpleAfirmaMessages.getString("ValidationInfoDialog.70")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("image/jpeg", SimpleAfirmaMessages.getString("ValidationInfoDialog.31")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("image/png", SimpleAfirmaMessages.getString("ValidationInfoDialog.32")); //$NON-NLS-1$ //$NON-NLS-2$
     	MIMETYPE_MAPPER.put("video/mpeg", SimpleAfirmaMessages.getString("ValidationInfoDialog.33")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -323,7 +323,6 @@ public class SignDetailsFormatter {
 	/**
 	 * Transforma el &aacute;rbol de firmantes a HTML.
 	 * @param signersNode &aacuerbol a transformar.
-	 * @param signID N&uacute;mero de firma.
 	 * @return Cadena en HTML con el &aacuerbol.
 	 */
 	private static String parseSignersTree(final AOTreeNode signersNode) {

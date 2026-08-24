@@ -78,7 +78,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			// Primero anadimos el almacen principal NSS
 			final AOKeyStoreManager ksm = getNssKeyStoreManager();
 			try {
-				ksm.init(type, store, pssCallBack, this.configParams, forceReset);
+				ksm.init(type, store, this.passwordCallback, this.configParams, forceReset);
 			}
 			catch(final Exception e) {
 				LOGGER.severe(
@@ -131,7 +131,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			for (final String descr : externalStores.keySet()) {
 				final AOKeyStoreManager tmpKsm = new AOKeyStoreManager();
 				try {
-					internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
+					initExternalStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
 				}
 				catch (final AOCancelledOperationException ex) {
 					LOGGER.warning(
@@ -146,7 +146,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 						continue;
 					}
 					try {
-						internalInitStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
+						initExternalStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
 					}
 					catch (final AOCancelledOperationException exc) {
 						LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + exc); //$NON-NLS-1$ //$NON-NLS-2$
@@ -191,12 +191,11 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
      * @throws IOException Si se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *                     almac&eacute;n de certificados.
      * @throws AOCancelledOperationException Cuando se cancela el di&aacute;logo de inserci&oacute;n de PIN. */
-	protected void internalInitStore(final AOKeyStoreManager tmpKsm,
-			                              final String descr,
-			                              final Object parentComponent,
-			                              final boolean forceReset,
-			                              final String libName) throws AOKeyStoreManagerException, IOException {
-
+	protected void initExternalStore(final AOKeyStoreManager tmpKsm,
+	                                 final String descr,
+	                                 final Object parentComponent,
+	                                 final boolean forceReset,
+	                                 final String libName) throws AOKeyStoreManagerException, IOException {
 		tmpKsm.init(
 			AOKeyStore.PKCS11,
 			null,
@@ -206,7 +205,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 							FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + descr, //$NON-NLS-1$ //$NON-NLS-2$
 							parentComponent),
 			new String[] {
-				libName, descr.toString()
+				libName, descr
 			},
 			forceReset
 		);

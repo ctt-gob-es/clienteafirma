@@ -56,13 +56,6 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
 	 */
 	JTextArea taskOutput;
 
-	/**
-	 * Casilla de verificaci&oacute;n con la que se puede activar o desactivar la opci&oacute;n de que Firefox
-	 * utilice el almac&eacute;n del sistema.
-	 */
-	JCheckBox firefoxIntegrationCb;
-
-
 	/**Constructor con par&aacute;metro de la clase
 	 * @param w Objeto Window para inicializar la instancia de la clase
 	 */
@@ -108,21 +101,6 @@ public final class RestoreConfigPanel extends JPanel implements KeyListener, Dis
     	c.weighty = 1.0;
     	c.gridy++;
         this.add(jsPanel, c);
-
-        this.firefoxIntegrationCb = new JCheckBox(SimpleAfirmaMessages.getString("RestoreConfigPanel.7")); //$NON-NLS-1$
-        this.firefoxIntegrationCb.setToolTipText(SimpleAfirmaMessages.getString("RestoreConfigPanel.8")); //$NON-NLS-1$
-        this.firefoxIntegrationCb.getAccessibleContext().setAccessibleName(SimpleAfirmaMessages.getString("RestoreConfigPanel.9")); //$NON-NLS-1$
-        this.firefoxIntegrationCb.getAccessibleContext().setAccessibleDescription(SimpleAfirmaMessages.getString("RestoreConfigPanel.8")); //$NON-NLS-1$
-
-        // La opcion de configurar Firefox para que use el almacen de confianza del sistema solo estara disponible
-        // en sistemas Windows y macOS.
-        if (Platform.getOS() == Platform.OS.WINDOWS || Platform.getOS() == Platform.OS.MACOSX) {
-        	c.fill = GridBagConstraints.HORIZONTAL;
-        	c.insets = new Insets(7, 15,  0,  15);
-        	c.gridy++;
-        	c.weighty = 0.0;
-        	this.add(this.firefoxIntegrationCb, c);
-        }
 
         // Creamos un panel para el boton de restauracion
         final JPanel buttonsPanel = createButtonsPanel();

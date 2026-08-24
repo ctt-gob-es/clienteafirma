@@ -922,33 +922,39 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 
        	// Comprobamos si es necesario buscar actualizaciones
         LOGGER.info("Comprobamos si es necesario buscar actualizaciones"); //$NON-NLS-1$
-       	if (updatesEnabled) { // Comprobamos si se desactivaron desde fuera
-			updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK)
-					&& !Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
-       		if (!updatesEnabled) {
-				LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de Autofirma" //$NON-NLS-1$
-       					);
-       		}
-       	}
 
-    	// Comprobamos actualizaciones si estan habilitadas
-        if (updatesEnabled && PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK)) {
-        	LOGGER.info("Buscamos actualizaciones"); //$NON-NLS-1$
-			Updater.checkForUpdates(null, sslContextConfigurationTask);
-		} else {
+		// Miramos si se ha configurado en el sistema que se omita la busqueda de actualizaciones
+		updatesEnabled = !Boolean.getBoolean(AVOID_UPDATE_CHECK)
+				&& !Boolean.parseBoolean(System.getenv(AVOID_UPDATE_CHECK_ENV));
+		if (!updatesEnabled) {
+			LOGGER.info("Se ha configurado en el sistema que se omita la busqueda de actualizaciones de Autofirma" //$NON-NLS-1$
+			);
+		}
+		// Comprobamos si se encuentra desactivada en la configuracion el buscar actualizaciones
+		else if (!PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_UPDATECHECK)) {
 			LOGGER.info("No se buscaran nuevas versiones de la aplicacion"); //$NON-NLS-1$
+		}
+		// Si no, se realiza la comprobacion
+		else {
+			LOGGER.info("Buscamos actualizaciones"); //$NON-NLS-1$
+			Updater.checkForUpdates(null, sslContextConfigurationTask);
 		}
 
     	try {
-
     		// Invocacion por protocolo
     		if (args != null && args.length > 0
     		 && args[0].toLowerCase().startsWith(PROTOCOL_URL_START_LOWER_CASE)) {
 
     			LOGGER.info("Identificamos que es una invocacion por protocolo"); //$NON-NLS-1$
 
-    			LOGGER.info("Iniciamos la carga del almacen de claves por defecto en segundo plano"); //$NON-NLS-1$
-    			ProtocolInvocationLauncher.initLoadKeyStoreTask();
+				// En sistemas distintos de Linux, se inicia la carga del almacen de claves por defecto en segundo
+				// plano para agilizar su uso cuando sea necesario. En Linux no se hace porque, al cargarlo, deja de
+				// funcionar la carga del resto de almacenes NSS (una vez se carga un almacen NSS, ya no se puede cargar
+				// otro, porque la biblioteca de NSS vuelve a cargar el mismo aunque se seleccione otro almacen)
+				if (!Platform.OS.LINUX.equals(Platform.getOS())) {
+					LOGGER.info("Iniciamos la carga del almacen de claves por defecto en segundo plano"); //$NON-NLS-1$
+					ProtocolInvocationLauncher.initLoadKeyStoreTask();
+				}
 
     			LOGGER.info("URL de invocacion:\n" + args[0]); //$NON-NLS-1$
     			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.3")); //$NON-NLS-1$
@@ -1300,17 +1306,6 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 	 */
 	private static boolean isHeadlessMode() {
 		return Boolean.getBoolean("java.awt.headless"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Establece si las actualizaciones est&aacute;n permitidas o si se desactivaron
-	 * mediante alg&uacute;n mecanismo a nivel de administraci&oacute;n.
-	 *
-	 * @param enable {@code true} si se debe permitir la b&uacute;squeda de
-	 *               actualizaciones, {@code false} en caso contrario.
-	 */
-	public static void setUpdatesEnabled(final boolean enable) {
-		updatesEnabled = enable;
 	}
 
 	/**

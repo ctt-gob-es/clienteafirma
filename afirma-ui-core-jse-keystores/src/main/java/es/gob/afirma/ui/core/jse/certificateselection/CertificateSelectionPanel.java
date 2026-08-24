@@ -54,6 +54,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyStoreType;
 import es.gob.afirma.core.keystores.NameCertificateBean;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 
@@ -75,6 +76,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	/** Nombre de la preferencia que almacena el nombre de &uacute;ltima la vista de certificado seleccionada. */
 	private static final String PREFERENCE_CERT_VIEW = "certView"; //$NON-NLS-1$
+
+	/** Nombre del tipo de almacen PKCS#11. */
+	private static final String KEYSTORE_TYPE_PKCS11 = "PKCS11"; //$NON-NLS-1$
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -102,7 +106,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			                  final String dialogSubHeadline,
 				              final boolean showControlButons,
 				              final boolean allowExternalStores,
-				              final int[] availablesKeyStoreTypes) {
+				              final es.gob.afirma.core.keystores.KeyStoreType[] availablesKeyStoreTypes) {
 
 		this.certificateBeans = el == null ? new NameCertificateBean[0] : el.clone();
 		this.dialogSubHeadline = dialogSubHeadline;
@@ -122,7 +126,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			              final String dialogHeadline,
 			              final boolean showControlButons,
 			              final boolean allowExternalStores,
-			              final int[] availablesKeyStoreTypes) {
+			              final es.gob.afirma.core.keystores.KeyStoreType[] availablesKeyStoreTypes) {
 
 		setLayout(new GridBagLayout());
 
@@ -237,30 +241,42 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				final JPopupMenu keystoresMenu = new JPopupMenu();
 
 				// Opcion del almacen del sistema
-				if (contains(availablesKeyStoreTypes, 1)) {
+				KeyStoreType storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.SYSTEM);
+				if (storeType != null) {
 					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.35")); //$NON-NLS-1$
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 1, menuItem.getText(), null));
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
 					keystoresMenu.add(menuItem);
 				}
 
 				// Opcion del almacen de Firefox
-				if (contains(availablesKeyStoreTypes, 2)) {
+				storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.MOZILLA);
+				if (storeType != null) {
 					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.36")); //$NON-NLS-1$
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 2, menuItem.getText(), null));
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
+					keystoresMenu.add(menuItem);
+				}
+
+				// Opcion del almacen del navegador
+				storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.BROWSER);
+				if (storeType != null) {
+					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.39")); //$NON-NLS-1$
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
 					keystoresMenu.add(menuItem);
 				}
 
 				// Opcion de almacen PKCS#12
-				if (contains(availablesKeyStoreTypes, 3)) {
+				storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.PKCS12);
+				if (storeType != null) {
 					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.37")); //$NON-NLS-1$
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 3, menuItem.getText(), null));
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
 					keystoresMenu.add(menuItem);
 				}
 
 				// Opcion del DNIe
-				if (contains(availablesKeyStoreTypes, 4)) {
+				storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.DNIE);
+				if (storeType != null) {
 					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 4, menuItem.getText(), null));
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
 					keystoresMenu.add(menuItem);
 				}
 
@@ -269,7 +285,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				for (final String key : userRegResult.keySet()) {
 				    final String value = userRegResult.get(key);
 					final JMenuItem menuItem = new JMenuItem(key);
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, new KeyStoreType(KEYSTORE_TYPE_PKCS11, KeyStoreType.PKCS11), key, value));
 					keystoresMenu.add(menuItem);
 				}
 
@@ -278,7 +294,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				for (final String key : systemRegResult.keySet()) {
 				    final String value = systemRegResult.get(key);
 					final JMenuItem menuItem = new JMenuItem(key);
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, 5, key, value));
+					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, new KeyStoreType(KEYSTORE_TYPE_PKCS11, KeyStoreType.PKCS11), key, value));
 					keystoresMenu.add(menuItem);
 				}
 
@@ -502,19 +518,19 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.add(this.certListPanel, c);
 	}
 
-	/** Indica si un valor entero se encuentra dentro de un array.
-	 * @param elements Array con los valores entre los que buscar.
-	 * @param value Valor a buscar.
-	 * @return {@code true} si se encuentra el valor, {@code false}
-	 * en caso contrario.
+	/**
+	 * Comprueba si alguno de los almacenes disponibles es almac&eacute;n del sistema.
+	 * @param storeTypes Tipos de almacenes disponibles.
+	 * @param type Tipo de almac&eacute;n a buscar.
+	 * @return Identificador de almac&eacute;n del sistema encontrado, {@code null} en caso contrario.
 	 */
-	private static boolean contains(final int[] elements, final int value) {
-		for (final int e : elements) {
-			if (e == value) {
-				return true;
+	private static KeyStoreType hasKeystore(final es.gob.afirma.core.keystores.KeyStoreType[] storeTypes, final int type) {
+		for (final es.gob.afirma.core.keystores.KeyStoreType storeType : storeTypes) {
+			if (storeType.getType() == type) {
+				return storeType;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	void setCertLineView(final CertificateLineView certLineView) {
@@ -892,30 +908,30 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 		private final CertificateSelectionPanel panel;
 		private final CertificateSelectionDialog dialog;
-		private final int keyStoreType;
+		private final KeyStoreType ksType;
 		private final String keyStoreName;
 		private final String ksLibPath;
 
-		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog, final int keyStoreType) {
+		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog, final KeyStoreType ksType) {
 			this.panel = panel;
 			this.dialog = dialog;
-			this.keyStoreType = keyStoreType;
+			this.ksType = ksType;
 			this.keyStoreName = null;
 			this.ksLibPath = null;
 		}
 
 		public ChangeKeyStoreActionListener(final CertificateSelectionPanel panel, final CertificateSelectionDialog dialog,
-											final int keyStoreType, final String ksName, final String ksLibPath) {
+		                                    final KeyStoreType ksType, final String ksName, final String ksLibPath) {
 			this.panel = panel;
 			this.dialog = dialog;
-			this.keyStoreType = keyStoreType;
+			this.ksType = ksType;
 			this.keyStoreName = ksName;
 			this.ksLibPath = ksLibPath;
 		}
 
 		@Override
 		public void actionPerformed(final ActionEvent e) {
-			UtilActions.doChangeKeyStore(this.keyStoreType, this.dialog, this.panel, this.keyStoreName, this.ksLibPath);
+			UtilActions.doChangeKeyStore(this.ksType, this.dialog, this.panel, this.keyStoreName, this.ksLibPath);
 		}
 	}
 }

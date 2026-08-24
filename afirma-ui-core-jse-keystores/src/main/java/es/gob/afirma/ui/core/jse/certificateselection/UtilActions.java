@@ -92,14 +92,14 @@ final class UtilActions {
 		}
 	}
 
-	static void doChangeKeyStore(final int keyStoreType, final CertificateSelectionDialog selectionDialog, final Component parent , final String ksName, final String ksLibPath) {
+	static void doChangeKeyStore(final es.gob.afirma.core.keystores.KeyStoreType ksType, final CertificateSelectionDialog selectionDialog, final Component parent , final String ksName, final String ksLibPath) {
 		if (parent != null) {
 			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		}
 
 		LOGGER.info("Se cambia al almacen de certificados " + LoggerUtil.getTrimStr(ksName)); //$NON-NLS-1$
 
-		selectionDialog.changeKeyStore(keyStoreType, ksName, ksLibPath);
+		selectionDialog.changeKeyStore(ksType, ksName, ksLibPath);
 
 		if (parent != null) {
 			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

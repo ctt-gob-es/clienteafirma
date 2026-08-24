@@ -32,25 +32,27 @@ import es.gob.afirma.keystores.SmartCardLockedException;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
-/** Gestor simple de <code>KeyStores</code>. Obtiene o un <code>KeyStore</code> de DNIe
- * v&iacute;a controlador 100% Java o el <code>KeyStore</code> por defecto del sistema operativo.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+/**
+ * Gestor simple de almac&eacute;n. Obtiene o un almac&eacute;n de DNIe
+ * v&iacute;a controlador 100% Java o el almac&eacute;n por defecto del sistema operativo.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
+ */
 public final class SimpleKeyStoreManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private SimpleKeyStoreManager() { /* No permitimos la instanciacion */ }
 
-    /** Obtiene un <code>KeyStore</code>.
-     * @param dnie <code>true</code> si desea obtenerse un <code>KeyStore</code> para DNIe, <code>false</code> si desea obtenerse
-     *        el <code>KeyStore</code> por defecto del sistema operativo.
+    /** Obtiene un almac&eacute;n.
+     * @param dnie {@code true} si desea obtenerse un almac&eacute;n para DNIe, {@code false} si desea
+	 *             obtenerse el por defecto del sistema operativo.
      * @param forced Si {@code true}, es obligatorio el uso del DNIe en caso de solicitarlo y no se
      * deber&aacute; cargar un almacen por defecto incluso si el usuario no lo proporciona.
      * @param parent Componente padre para la modalidad.
-     * @return <code>KeyStore</code> apropiado.
-     * @throws AOKeyStoreManagerException Si ocurre cualquier problema durante la obtenci&oacute;n del <code>KeyStore</code>.
+     * @return almac&eacute;n apropiado.
+     * @throws AOKeyStoreManagerException Si ocurre cualquier problema durante la obtenci&oacute;n del almac&eacute;n.
      * @throws NoDnieFoundException Si se obliga al uso de DNIe pero este no se proporciona.
-     * @throws KeystoreAlternativeException
+     * @throws KeystoreAlternativeException Si falla la carga del almac&eacute;n, pero se propone un almac&eacute;n alternativo.
      */
     static AOKeyStoreManager getKeyStore(final boolean dnie, final boolean forced, final Component parent)
     		throws AOKeyStoreManagerException, NoDnieFoundException, KeystoreAlternativeException {
@@ -167,8 +169,9 @@ public final class SimpleKeyStoreManager {
 						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 						JOptionPane.ERROR_MESSAGE
 					);
-				final boolean stopOperation = false;
-				while (!stopOperation) {
+
+				// Obtenemos un almacen, reintentando hasta que se consiga o falle definitivamente la operacion
+				while (true) {
 					try {
 						return getKeyStoreManager(
 							aoks,
@@ -191,7 +194,6 @@ public final class SimpleKeyStoreManager {
 									SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 									JOptionPane.ERROR_MESSAGE
 							);
-							continue;
 						}
 					} catch (final Exception e) {
 			        	AOUIFactory.showErrorMessage(
@@ -255,8 +257,8 @@ public final class SimpleKeyStoreManager {
 		final String mozProfileDir;
 		final String nssLibDir;
 		try {
-			mozProfileDir = MozillaKeyStoreUtilities.getMozillaUserProfileDirectory();
-			nssLibDir = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+			mozProfileDir = MozillaKeyStoreUtilities.getActiveProfilePath();
+			nssLibDir = MozillaKeyStoreUtilities.getSystemNSSLibDir(AOKeyStore.MOZ_UNI);
 		}
 		catch(final Exception e) {
 			LOGGER.warning("No se ha podido obtener el directorio de NSS del usuario: " + e); //$NON-NLS-1$
@@ -289,16 +291,12 @@ public final class SimpleKeyStoreManager {
     		return null;
     	}
 
-    	// Comprobamos si es un almacen que conozcamos y lo devolvemos. En caso de ser el de Mozilla,
-    	// si la operacion se ejecuta desde el navegador web, usamos la version del almacen que agrega
-    	// los certificados del sistema
+    	// Comprobamos si es un almacen que conozcamos y lo devolvemos. En caso de ejecutarse la operacion desde el
+		// navegador ser el de Mozilla y el sistema operativo ser Windows o MacOS, devolvemos el almacen de Mozilla que
+		// agrega los certificados del sistema
     	for (final AOKeyStore tempKs : AOKeyStore.values()) {
             if (tempKs.getName().equalsIgnoreCase(name.trim())) {
-            	AOKeyStore result = tempKs;
-            	if (invokedFromBrowser && tempKs == AOKeyStore.MOZ_UNI) {
-            		result = AOKeyStore.MOZ_UNI_WITH_OS;
-            	}
-            	return result;
+            	return adjustKeyStoreByEnvironment(tempKs, invokedFromBrowser);
             }
         }
 
@@ -313,18 +311,30 @@ public final class SimpleKeyStoreManager {
 		}
 
         try {
-        	AOKeyStore result = AOKeyStore.valueOf(name);
-        	if (invokedFromBrowser && result == AOKeyStore.MOZ_UNI) {
-        		result = AOKeyStore.MOZ_UNI_WITH_OS;
-        	}
-        	return result;
+        	return adjustKeyStoreByEnvironment(AOKeyStore.valueOf(name), invokedFromBrowser);
         }
         catch(final Exception e) {
         	Logger.getLogger("es.gob.afirma").warning("Almacen de claves no reconocido (" + name + "): " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
+
         return null;
     }
 
+	/**
+	 * Modifica el keystore configurado a uno m&aacute;s apropiado para el entorno de ejecuci&oacute;n si se considera
+	 * necesario.
+	 * @param keyStore Almac&eacute;n configurado.
+	 * @param invokedFromBrowser Indica si la operaci&oacute;n se inici&oacute; desde un navegador web.
+	 * @return Almac&eacute;n de claves ajustado al entorno de ejecuci&oacute;n, que puede ser el mismo que se indic&oacute;.
+	 */
+	private static AOKeyStore adjustKeyStoreByEnvironment(final AOKeyStore keyStore, boolean invokedFromBrowser) {
+		AOKeyStore result = keyStore;
+		if (invokedFromBrowser && keyStore == AOKeyStore.MOZ_UNI
+				&& (Platform.getOS() == OS.WINDOWS || Platform.getOS() == OS.MACOSX)) {
+			result = AOKeyStore.MOZ_UNI_WITH_OS;
+		}
+		return result;
+	}
 
     /** Obtiene el almac&eacute;n de claves por defecto de la aplicaci&oacute;n.
      * @return Almac&eacute;n de claves por defecto de la aplicaci&oacute;n. */

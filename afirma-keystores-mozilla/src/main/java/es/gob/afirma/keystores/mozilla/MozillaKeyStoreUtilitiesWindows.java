@@ -28,7 +28,7 @@ import es.gob.afirma.keystores.mozilla.bintutil.MsPortableExecutable;
 import es.gob.afirma.keystores.mozilla.bintutil.PEParserException;
 import es.gob.afirma.keystores.mozilla.bintutil.PeMachineType;
 
-final class MozillaKeyStoreUtilitiesWindows {
+public final class MozillaKeyStoreUtilitiesWindows {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -71,17 +71,6 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 	private MozillaKeyStoreUtilitiesWindows() {
 		// No permitimos la instanciacion
-	}
-
-	/**
-	 * Proporciona la ruta corta del directorio de perfil de Firefox con el formato
-	 * adecuado para permitir su carga con el NSS de Windows.
-	 * @param dir Directorio de NSS.
-	 * @return Ruta del directorio formateada o {@code null}
-	 */
-	static String cleanMozillaUserProfileDirectoryWindows(final String dir) {
-		final String shortName = KeyStoreUtilities.getWindowsShortName(dir);
-		return shortName != null ? shortName.replace('\\', '/') : null;
 	}
 
 	static String getSystemNSSLibDirWindows() throws IOException {
@@ -149,7 +138,7 @@ final class MozillaKeyStoreUtilitiesWindows {
 				    );
 				}
 
-				if(new File(tmp, SOFTOKN3_DLL).isFile()) {
+				if (new File(tmp, SOFTOKN3_DLL).isFile()) {
 					dir = tmp.getCanonicalPath();
 				}
 
@@ -173,43 +162,37 @@ final class MozillaKeyStoreUtilitiesWindows {
 
 		}
 
-		if (dir != null) {
-			final File nssP11 = new File(dir, SOFTOKN3_DLL);
-			if (!nssP11.isFile()) {
-				throw new FileNotFoundException(
+		final File nssP11 = new File(dir, SOFTOKN3_DLL);
+		if (!nssP11.isFile()) {
+			throw new FileNotFoundException(
 					"No se ha encontrado un NSS en Windows para el directorio " + dir //$NON-NLS-1$
-				);
-			}
-			if (!nssP11.canRead()) {
-				throw new FileNotFoundException(
-					"No se tiene permiso para leer NSS en Windows para el directorio " + dir //$NON-NLS-1$
-				);
-			}
-			try (
-				final InputStream fis = new FileInputStream(nssP11)
-			) {
-				final PeMachineType peArch = new MsPortableExecutable(
-					AOUtil.getDataFromInputStream(fis)
-				).getPeMachineType();
-				final String javaArch = Platform.getJavaArch();
-				if ((!peArch.equals(PeMachineType.INTEL_386) || !"32".equals(javaArch)) && (!peArch.equals(PeMachineType.X64) || !"64".equals(javaArch))) { //$NON-NLS-1$ //$NON-NLS-2$
-					LOGGER.info(
-						"Se usara un NSS local por ser este Java de " + javaArch + " bits y el NSS de sistema para la arquitectura " +  peArch //$NON-NLS-1$ //$NON-NLS-2$
-					);
-					return BundledNssHelper.getBundledNssDirectory();
-				}
-				LOGGER.info("Arquitectura del NSS encontrado: " + peArch); //$NON-NLS-1$
-			}
-			catch(final PEParserException e) {
-				LOGGER.warning(
-					"No se ha podido analizar la arquitectura del NSS encontrado: " + e //$NON-NLS-1$
-				);
-			}
-			return dir;
+			);
 		}
-
-		throw new FileNotFoundException("No se ha encontrado un NSS compatible en Windows"); //$NON-NLS-1$
-
+		if (!nssP11.canRead()) {
+			throw new FileNotFoundException(
+					"No se tiene permiso para leer NSS en Windows para el directorio " + dir //$NON-NLS-1$
+			);
+		}
+		try (
+				final InputStream fis = new FileInputStream(nssP11)
+		) {
+			final PeMachineType peArch = new MsPortableExecutable(
+					AOUtil.getDataFromInputStream(fis)
+			).getPeMachineType();
+			final String javaArch = Platform.getJavaArch();
+			if ((!peArch.equals(PeMachineType.INTEL_386) || !"32".equals(javaArch)) && (!peArch.equals(PeMachineType.X64) || !"64".equals(javaArch))) { //$NON-NLS-1$ //$NON-NLS-2$
+				LOGGER.info(
+						"Se usara un NSS local por ser este Java de " + javaArch + " bits y el NSS de sistema para la arquitectura " + peArch //$NON-NLS-1$ //$NON-NLS-2$
+				);
+				return BundledNssHelper.getBundledNssDirectory();
+			}
+			LOGGER.info("Arquitectura del NSS encontrado: " + peArch); //$NON-NLS-1$
+		} catch (final PEParserException e) {
+			LOGGER.warning(
+					"No se ha podido analizar la arquitectura del NSS encontrado: " + e //$NON-NLS-1$
+			);
+		}
+		return dir;
 	}
 
 	/** Recupera el listado de dependencias de la biblioteca "softkn3.dll" para el
@@ -271,5 +254,33 @@ final class MozillaKeyStoreUtilitiesWindows {
 		appData = null;
 		throw new IllegalStateException("No se ha podido determinar la situacion del directorio 'AppData' de Windows"); //$NON-NLS-1$
 
+	}
+
+
+	/**
+	 * Obtiene el directorio del perfil de usuario de Mozilla / Firefox activo en Windows.
+	 * @param iniPath Ruta al fichero de perfiles de Firefox.
+	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox.
+	 * @throws IOException Cuando no se ha podido identificar el directorio de perfil.
+	 */
+	public static String getActiveProfilePath(final String iniPath) throws IOException {
+		final String dir = NSPreferences.getActiveFirefoxUserProfilePath(new File(iniPath));
+		if (dir == null) {
+			throw new IOException("No se ha encontrado el directorio de perfil activo de Mozilla del usuario"); //$NON-NLS-1$
+		}
+
+		return cleanProfilePath(dir);
+	}
+
+
+	/**
+	 * Proporciona la ruta corta del directorio de perfil de Firefox con el formato
+	 * adecuado para permitir su carga con el NSS de Windows.
+	 * @param dir Directorio de NSS.
+	 * @return Ruta del directorio formateada o {@code null}
+	 */
+	public static String cleanProfilePath(final String dir) {
+		final String shortName = KeyStoreUtilities.getWindowsShortName(dir);
+		return shortName != null ? shortName.replace('\\', '/') : null;
 	}
 }

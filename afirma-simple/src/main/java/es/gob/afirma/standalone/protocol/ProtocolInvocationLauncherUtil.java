@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.protocol;
 
 import java.io.IOException;
+import java.security.KeyStoreException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -258,13 +259,21 @@ final class ProtocolInvocationLauncherUtil {
 		}
 
 		final PasswordCallback pwc = aoks.getStorePasswordCallback(null);
-
-		return AOKeyStoreManagerFactory.getAOKeyStoreManager(aoks, // Store
-				aoksLib, // Lib
-				null, // Description
-				pwc, // PasswordCallback
-				null // Parent
-				);
-
+		try {
+			return AOKeyStoreManagerFactory.getAOKeyStoreManager(aoks, // Store
+					aoksLib, // Lib
+					null, // Description
+					pwc, // PasswordCallback
+					null // Parent
+			);
+		}
+		catch (final KeystoreAlternativeException e) {
+			AOKeyStore ksType = e.getAlternativeKsm();
+			if (ksType != null && ksType == aoks) {
+				throw e;
+			}
+			LOGGER.warning("No se pudo cargar el almacen predefinido. Se tratara de cargar el almacen alternativo: " + ksType); //$NON-NLS-1$
+			return getAOKeyStoreManager(ksType, aoksLib);
+		}
 	}
 }

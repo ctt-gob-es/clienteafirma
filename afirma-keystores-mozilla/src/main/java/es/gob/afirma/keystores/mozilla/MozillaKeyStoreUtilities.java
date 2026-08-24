@@ -36,6 +36,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.BoundedBufferedReader;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.mozilla.AOSecMod.ModuleName;
 import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
@@ -48,10 +49,14 @@ public final class MozillaKeyStoreUtilities {
 
 	private static final String LIB_NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
 
+	/** Nombre del PKCS#11 NSS en sistemas UNIX. */
 	private static final String SOFTOKN3_SO = "libsoftokn3.so"; //$NON-NLS-1$
 
 	/** Nombre del PKCS#11 NSS en Windows. */
 	private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
+
+	/** Nombre del PKCS#11 NSS en macOS. */
+	private static final String SOFTOKN3_DYLIB = "libsoftokn3.dylib"; //$NON-NLS-1$
 
 	/** Nombre del fichero que declara los m&oacute;dulos de NSS en sustituci&oacute;n a 'secmod.db'. */
 	private static final String PKCS11TXT_FILENAME = "pkcs11.txt"; //$NON-NLS-1$
@@ -132,25 +137,26 @@ public final class MozillaKeyStoreUtilities {
 
 	/** Crea las l&iacute;neas de configuraci&oacute;n para el uso de las
 	 * bibliotecas NSS como m&oacute;dulo PKCS#11 por el proveedor de Sun.
+	 * @param ksName Nombre que asignar al almac&eacute;n de claves NSS.
 	 * @param userProfileDirectory Directorio donde se encuentra el perfil de
 	 *                             usuario de Mozilla Firefox.
 	 * @param libDir Directorio que contiene las bibliotecas NSS.
-	 * @return Propiedades de configuracion del proveedor
+	 * @return Propiedades de configuraci&oacute;n del proveedor
 	 *         PKCS#11 de Sun para acceder al KeyStore de Mozilla v&iacute;a NSS. */
-	public static String createPKCS11NSSConfig(final String userProfileDirectory, final String libDir) {
+	public static String createPKCS11NSSConfig(final String ksName, final String userProfileDirectory, final String libDir) {
 
 		final String softoknLib;
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			softoknLib = SOFTOKN3_DLL;
 		}
 		else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			softoknLib = "libsoftokn3.dylib"; //$NON-NLS-1$
+			softoknLib = SOFTOKN3_DYLIB;
 		}
 		else {
 			softoknLib = SOFTOKN3_SO;
 		}
 
-		final StringBuilder buffer = new StringBuilder("name=NSSCrypto-AFirma\r\n"); //$NON-NLS-1$
+		final StringBuilder buffer = new StringBuilder("name=" + ksName + "\r\n"); //$NON-NLS-1$
 
 		// Java 1.5 tenia un metodo indocumentado para acceder a NSS,
 		// http://docs.sun.com/app/docs/doc/819-3671/gcsoc?a=view
@@ -178,7 +184,7 @@ public final class MozillaKeyStoreUtilities {
 
 	static String getNssPathFromCompatibilityFile() throws IOException {
 		final File compatibility = new File(
-			getMozillaUserProfileDirectory(),
+			getActiveProfilePath(),
 			"compatibility.ini"  //$NON-NLS-1$
 		);
 		String dir = null;
@@ -208,12 +214,15 @@ public final class MozillaKeyStoreUtilities {
 		return dir;
 	}
 
-	/** Obtiene el directorio de las bibliotecas NSS (<i>Netscape Security
+	/**
+	 * Obtiene el directorio de las bibliotecas NSS (<i>Netscape Security
 	 * Services</i>) del sistema.
+	 * @param ksType Tipo de almac&eacute;n de claves para darle prioridad al uso de sus bibliotecas (opcional).
 	 * @return Directorio de las bibliotecas NSS del sistema.
 	 * @throws FileNotFoundException Si no se puede encontrar NSS en el sistema.
-     * @throws IOException En caso de errores de lectura/escritura. */
-	public static String getSystemNSSLibDir() throws IOException {
+     * @throws IOException En caso de errores de lectura/escritura.
+	 */
+	public static String getSystemNSSLibDir(final AOKeyStore ksType) throws IOException {
 
 		if (nssLibDir != null) {
 			return nssLibDir;
@@ -250,7 +259,7 @@ public final class MozillaKeyStoreUtilities {
 		}
 
 		else if (Platform.OS.LINUX.equals(Platform.getOS()) || Platform.OS.SOLARIS.equals(Platform.getOS())) {
-			nssLibDir = MozillaKeyStoreUtilitiesUnix.getNSSLibDirUnix();
+			nssLibDir = MozillaKeyStoreUtilitiesUnix.getNSSLibDirUnix(ksType);
 		}
 
 		else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -290,7 +299,7 @@ public final class MozillaKeyStoreUtilities {
 
 		final String profileDir;
 		try {
-			profileDir = getMozillaUserProfileDirectory();
+			profileDir = getActiveProfilePath();
 		}
 		catch (final IOException e) {
 			LOGGER.severe(
@@ -301,7 +310,8 @@ public final class MozillaKeyStoreUtilities {
 
 		// Comprobamos si tenemos que usar pkcs11.txt o secmod.db
 		final File pkcs11Txt = new File(profileDir, PKCS11TXT_FILENAME);
-		if ("sql".equals(System.getenv("NSS_DEFAULT_DB_TYPE")) || pkcs11Txt.exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+		String defaultNssType = System.getenv("NSS_DEFAULT_DB_TYPE");
+		if ((defaultNssType == null || "sql".equals(defaultNssType)) && pkcs11Txt.exists()) { //$NON-NLS-1$ //$NON-NLS-2$
 			try {
 				final List<ModuleName> modules = Pkcs11Txt.getModules(pkcs11Txt);
 				LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'pkcs11.txt'"); //$NON-NLS-1$
@@ -334,8 +344,42 @@ public final class MozillaKeyStoreUtilities {
 			);
 			return new ConcurrentHashMap<>(0);
 		}
+	}
 
+	/**
+	 * Obtiene las bibliotecas (nombres y rutas a los .dll o .so) de los m&oacute;dulos de seguridad externos (PKCS#11)
+	 * instalados en Mozilla / Firefox, indexados por su descripci&oacute;n dentro de un <code>ConcurrentHashMap</code>.
+	 * Los m&oacute;dulos se obtienen del declarados en Firefox cuando se encuentra el fichero <i>pkcs11.txt</i> en el directorio
+	 * de NSS.
+	 * @param nssKeystoreDir Directorio donde se encuentra el almac&eacute;n NSS.
+	 * @param includePreferredModules Si se establece a <code>true</code> incluye los m&oacute;dulos PKCS#11
+	 *                    del DNIe y CERES, si se establece a <code>false</code> los excluye.
+	 * @param includeKnownModules Si se establece a <code>true</code>, se buscar&aacute;n m&oacute;dulos PKCS#11
+	 *                            conocidos en directorios conocidos del sistema, aunque no esten datos de alta en
+	 *                           Firefox. Si se establece a {@code false} se devuelven &uacute;nicamente dados de alta.
+	 * @return Mapa con los nombres y las rutas de las bibliotecas PKCS#11 dadas de alta.
+	 */
+	public static Map<String, String> getExternalPkcs11ModulesFromPKCS11Txt(File nssKeystoreDir, boolean includePreferredModules, boolean includeKnownModules) {
 
+		// Comprobamos si tenemos que usar pkcs11.txt
+		final File pkcs11Txt = new File(nssKeystoreDir, PKCS11TXT_FILENAME);
+		if (pkcs11Txt.exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+				final List<ModuleName> modules = Pkcs11Txt.getModules(pkcs11Txt);
+				LOGGER.info("Obtenidos los modulos externos de Mozilla desde 'pkcs11.txt'"); //$NON-NLS-1$
+				return getPkcs11ModulesFromModuleNames(
+						modules,
+						includeKnownModules,
+						!includePreferredModules
+				);
+			}
+			catch (final IOException e) {
+				LOGGER.severe(
+						"No se han podido obtener los modulos externos de Mozilla desde 'pkcs11.txt': " + e //$NON-NLS-1$
+				);
+			}
+		}
+		return null;
 	}
 
 	/** Obtiene los m&oacute;dulos PKCS#11 a partir de sus descripciones.
@@ -545,9 +589,9 @@ public final class MozillaKeyStoreUtilities {
 	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
 	 * @throws IOException Cuando no se ha podido identificar el directorio de perfil.
 	 */
-	public static String getMozillaUserProfileDirectory() throws IOException {
+	public static String getActiveProfilePath() throws IOException {
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			return getMozillaUserProfileDirectoryWindows(
+			return MozillaKeyStoreUtilitiesWindows.getActiveProfilePath(
 				getProfilesIniPath()
 			);
 		}
@@ -555,7 +599,7 @@ public final class MozillaKeyStoreUtilities {
 		// usar el directorio global de NSS (para tratar ciertas configuraciones de NSS en las
 		// que ni siquiera existe el directorio de perfil de Firefox)
 		try {
-			return NSPreferences.getFireFoxUserProfileDirectory(
+			return NSPreferences.getActiveFirefoxUserProfilePath(
 				new File(getProfilesIniPath())
 			);
 		}
@@ -570,18 +614,13 @@ public final class MozillaKeyStoreUtilities {
 	}
 
 	/**
-	 * Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
-	 * @param iniPath Ruta al fichero de perfiles de Firefox.
-	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox.
-	 * @throws IOException Cuando no se ha podido identificar el directorio de perfil.
+	 * Obtiene la informaci&oacute;n de los perfiles de Mozilla firefox.
+	 * @param profilesInitFile Ruta al fichero de perfiles de Firefox.
+	 * @return Listado de pergiles de Mozilla / Firefox.
+	 * @throws IOException Cuando no se han podido recuperar los perfiles.
 	 */
-	public static String getMozillaUserProfileDirectoryWindows(final String iniPath) throws IOException {
-		final String dir = NSPreferences.getFireFoxUserProfileDirectory(new File(iniPath));
-		if (dir == null) {
-			throw new IOException("No se ha encontrado el directorio de perfil de Mozilla"); //$NON-NLS-1$
-		}
-
-		return MozillaKeyStoreUtilitiesWindows.cleanMozillaUserProfileDirectoryWindows(dir);
+	public static MozillaProfile[] getProfiles(File profilesInitFile) throws IOException {
+		return NSPreferences.getProfiles(profilesInitFile);
 	}
 
 	private static Provider loadNssJava9(final String nssDirectory, final String p11NSSConfigFileContents)
@@ -713,13 +752,32 @@ public final class MozillaKeyStoreUtilities {
 	                                                           SecurityException,
 	                                                           ClassNotFoundException {
 
-		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+		final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir(AOKeyStore.MOZ_UNI);
 
 		LOGGER.info("Directorio de bibliotecas NSS: " + nssDirectory); //$NON-NLS-1$
 
-		String profileDir = useSharedNss ?
-			SharedNssUtil.getSharedUserProfileDirectory() :
-				MozillaKeyStoreUtilities.getMozillaUserProfileDirectory();
+		String ksName;
+		String profileDir;
+		if (useSharedNss) {
+			ksName = "Afirma_Shared_NSS";
+			profileDir = SharedNssUtil.getSharedUserProfileDirectory();
+		} else {
+			ksName = "Afirma_Mozilla_NSS";
+			profileDir = MozillaKeyStoreUtilities.getActiveProfilePath();
+		}
+
+		return loadNSSProvider(ksName, nssDirectory, profileDir);
+	}
+
+	static Provider loadNSSProvider(String ksName, String nssDir, String profileDir) throws IOException,
+			AOException,
+			InstantiationException,
+			IllegalAccessException,
+			IllegalArgumentException,
+			InvocationTargetException,
+			NoSuchMethodException,
+			SecurityException,
+			ClassNotFoundException {
 
 		// Consideramos que se debe cargar el fichero de modulos de NSS en modo de base de datos
 		// cuando se encuentra la variable de sistema NSS_DEFAULT_DB_TYPE o se encuentra el fichero pkcs11.txt
@@ -732,23 +790,24 @@ public final class MozillaKeyStoreUtilities {
 			LOGGER.warning("No se pudo comprobar si el almacen de claves debia cargase como base de datos: " + e); //$NON-NLS-1$
 		}
 
-		final String p11NSSConfig = MozillaKeyStoreUtilities.createPKCS11NSSConfig(
-			profileDir,
-			nssDirectory
+		final String p11NSSConfig = createPKCS11NSSConfig(
+				ksName,
+				profileDir,
+				nssDir
 		);
 
 		// Mostramos la configuracion de NSS, sustituyendo la ruta del usuario del
 		// registro para evitar mostrar datos personales en el log
-		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfig.replace(Platform.getUserHome(), "USERHOME")); //$NON-NLS-1$ //$NON-NLS-2$
+		LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + LoggerUtil.getCleanUserHomePath(p11NSSConfig)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final Provider p = AOUtil.isJava9orNewer()
-				? loadNssJava9(nssDirectory, p11NSSConfig)
-				: loadNssJava8(nssDirectory, p11NSSConfig);
+				? loadNssJava9(nssDir, p11NSSConfig)
+				: loadNssJava8(nssDir, p11NSSConfig);
 
 		Security.addProvider(p);
 
 		LOGGER.info(
-			"Anadido proveedor PKCS#11 de NSS " + (useSharedNss ? "del sistema" : "de Mozilla") + ": " + p.getName() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				"Anadido proveedor PKCS#11 de NSS para el directorio de perfil " + new File(profileDir).getName() + ": " + p.getName() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		);
 		return p;
 	}
@@ -817,15 +876,13 @@ public final class MozillaKeyStoreUtilities {
 			if (!revisedLibs.contains(tmpLib) && !tmpLib.toLowerCase().contains("nssckbi")) { //$NON-NLS-1$
 				purgedTable.put(key, table.get(key));
 				revisedLibs.add(tmpLib);
-			}
-			else {
+			} else {
 				LOGGER.warning("Se eliminara el modulo '" + key //$NON-NLS-1$
-					+ "' porque ya existe uno con la misma biblioteca o es un modulo de certificados raiz: " //$NON-NLS-1$
+						+ "' porque ya existe uno con la misma biblioteca o es un modulo de certificados raiz: " //$NON-NLS-1$
 						+ table.get(key));
 			}
 		}
 
 		return purgedTable;
 	}
-
 }

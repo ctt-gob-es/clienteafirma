@@ -392,7 +392,7 @@ public abstract class UrlParameters {
 
 		// Si se ha indicado el parametro pero no un valor, se intepretara que no hay cifrado
 		final String key = params.get(KEY_PARAM);
-		if (key == null || key.length() == 0) {
+		if (key == null || key.isEmpty()) {
 			return null;
 		}
 
@@ -524,16 +524,4 @@ public abstract class UrlParameters {
 
 		return servletUrl;
 	}
-
-	/**
-	 * Excepcion que se&ntilde;ala cuando se ha denegado el acceso a un servicio local.
-	 */
-	protected static class LocalAccessNotAllowedException extends Exception {
-		private static final long serialVersionUID = -2823729189870521694L;
-
-		protected LocalAccessNotAllowedException(final String msg) {
-			super(msg);
-		}
-	}
-
 }
