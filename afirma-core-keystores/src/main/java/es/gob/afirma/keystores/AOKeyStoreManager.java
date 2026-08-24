@@ -101,10 +101,11 @@ public class AOKeyStoreManager implements KeyStoreManager {
     	this.ks = k;
     }
 
-    /** Obtiene el <code>KeyStore</code> principal asociado a este gestor de almacenes.
+    /**
+	 * Obtiene el <code>KeyStore</code> principal asociado a este gestor de almacenes.
      * En caso de un gestor de m&uacute;ltiples almacenes, no hay garant&iacute;a de que
      * este m&eacute;todo devuelva
-     * @return <code>KeyStore</code> principal asociado a este gestor de almacenes. */
+     */
     public KeyStore getKeyStore() {
     	return this.ks;
     }
@@ -165,7 +166,8 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     private Object[] storeParams;
 
-    /** Inicializa el almac&eacute;n. Se encarga tambi&eacute;n de a&ntilde;adir o
+    /**
+	 * Inicializa el almac&eacute;n. Se encarga tambi&eacute;n de a&ntilde;adir o
      * retirar los <i>Provider</i> necesarios para operar con dicho almac&eacute;n
      * @param type Tipo del almac&eacute;n de claves
      * @param store Flujo para la lectura directa del almac&eacute;n de claves
@@ -179,7 +181,8 @@ public class AOKeyStoreManager implements KeyStoreManager {
      * @throws es.gob.afirma.core.MissingLibraryException Cuando faltan bibliotecas necesarias para la inicializaci&oacute;n
      * @throws es.gob.afirma.core.InvalidOSException Cuando se pide un almac&eacute;n disponible solo en un sistema operativo
      *                            distinto al actual
-     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela algun di&aacute;logo de PIN. */
+     * @throws es.gob.afirma.core.AOCancelledOperationException Cuando se cancela algun di&aacute;logo de PIN.
+	 */
     public void init(final AOKeyStore type,
     		         final InputStream store,
     		         final PasswordCallback pssCallBack,
@@ -208,7 +211,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
         switch(this.ksType) {
         	case SINGLE:
-        		this.ks =  AOKeyStoreManagerHelperSingle.initSingle(store, pssCallBack);
+        		this.ks =  AOKeyStoreManagerHelperSingle.initSingle(store, this.storePasswordCallBack);
         		break;
         	case SMARTCAFE:
                 // En el "params" debemos traer los parametros:
@@ -244,7 +247,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
             	break;
         	case JAVACE:
         	case JCEKS:
-        		this.ks = AOKeyStoreManagerHelperJava.initJava(store, pssCallBack, this.ksType);
+        		this.ks = AOKeyStoreManagerHelperJava.initJava(store, this.storePasswordCallBack, this.ksType);
         		break;
         	case WINCA:
         	case WINADDRESSBOOK:
@@ -263,7 +266,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
         			newParams = new Object[params.length];
         			System.arraycopy(params, 0, newParams, 0, params.length);
         		}
-                this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(pssCallBack, newParams, forceReset,
+                this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(this.storePasswordCallBack, newParams, forceReset,
                 		getParentComponent());
                 break;
             default:
@@ -446,7 +449,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 				cleanedAliases.add(alias);
 			}
 		}
-		return cleanedAliases.toArray(new String[cleanedAliases.size()]);
+		return cleanedAliases.toArray(new String[0]);
 	}
 
 	@Override
