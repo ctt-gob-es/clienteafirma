@@ -183,6 +183,12 @@ final class ConfiguratorFirefoxMac {
 			return;
 		}
 
+		if (ConfiguratorFirefoxCommon.isNssDbPasswordProtected(certUtilFile.getAbsolutePath(), profileDir)) {
+			LOGGER.info("Omitimos la instalacion en el perfil con contrasena maestra del directorio " + profileDir.getName() //$NON-NLS-1$
+					+ " de Firefox para que se confie en el a traves de la confianza en el sistema"); //$NON-NLS-1$
+			return;
+		}
+
 		// Configuramos el script para exportar el PATH para que
 		// certUtil encuentre sus dependencias
 		final StringBuilder exportPathScript = new StringBuilder();

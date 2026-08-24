@@ -228,15 +228,23 @@ final class ConfiguratorFirefoxWindows {
 		final File certutilExe =
 				new File(appDir, CERTUTIL_DIR + File.separator + CERTUTIL_EXE);
 
+		if (ConfiguratorFirefoxCommon.isNssDbPasswordProtected(certutilExe.getAbsolutePath(), profile.getProfileDir())) {
+			LOGGER.info("Omitimos la instalacion en el perfil " + profile.getName() //$NON-NLS-1$
+					+ " de Firefox con contrasena maestra para que se confie en el a traves de la confianza en el sistema"); //$NON-NLS-1$
+			return;
+		}
+
 		// Si en el directorio del perfil existe el fichero pkcs11.txt entonces se trata
 		// de un almacen de certificados SQL
 		final boolean sqlDb = new File(profile.getProfileDir(), "pkcs11.txt").exists(); //$NON-NLS-1$
+		final String profileReference = escapePath((sqlDb ? "sql:" : "") + profile.getProfileDir().getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
+
 
 		final String[] certutilCommands = new String[] {
 				escapePath(certutilExe.getAbsolutePath()),
 				"-A", //$NON-NLS-1$
 				"-d", //$NON-NLS-1$
-				escapePath((sqlDb ? "sql:" : "") + profile.getProfileDir().getAbsolutePath()), //$NON-NLS-1$ //$NON-NLS-2$
+				profileReference,
 				"-i", //$NON-NLS-1$
 				escapePath(new File(appDir, FILE_AUTOFIRMA_CERTIFICATE).getAbsolutePath()), "-n", //$NON-NLS-1$
 				"\"" + ConfiguratorUtil.CERT_ALIAS + "\"", //$NON-NLS-1$ //$NON-NLS-2$
