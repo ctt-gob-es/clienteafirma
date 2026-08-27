@@ -21,7 +21,6 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.Locale;
 
-import javax.swing.JApplet;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -34,10 +33,7 @@ import es.gob.afirma.standalone.ui.VisorPanel;
 
 /** Ventana para la visualizaci&oacute;n de datos de firma.
  * @author Carlos Gamuci. */
-public class VisorFirma extends JApplet implements WindowListener {
-
-    /** Serial ID */
-    private static final long serialVersionUID = 7060676034863587322L;
+public class VisorFirma implements WindowListener {
 
 	/** Anchura por defecto con la que se muestra inicialmente la pantalla principal. */
 	private static final int DEFAULT_WINDOW_WIDTH = 780;
@@ -67,9 +63,8 @@ public class VisorFirma extends JApplet implements WindowListener {
     }
 
     /** Reinicia la pantalla con los datos de una nueva firma.
-     * @param asApplet Indica que si se desea cargar la pantalla en forma de Applet.
      * @param sigFile Nuevo fichero de firma. */
-    public void initialize(final boolean asApplet, final File sigFile) {
+    public void initialize(final File sigFile) {
 
         if (sigFile != null) {
             this.signFile = sigFile;
@@ -82,64 +77,69 @@ public class VisorFirma extends JApplet implements WindowListener {
 		}
         setDefaultLocale(buildLocale(defaultLocale));
 
+        this.currentPanel = new VisorPanel(
+    		this.signFile,
+    		null,
+    		this,
+    		this.standalone
+		);
 
-        if (asApplet) {
-            this.container = this;
+        if (this.parentComponent == null) {
+           	final MainScreen mainScreen = new MainScreen();
+           	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
+            this.container = mainScreen;
         }
         else {
-            this.currentPanel = new VisorPanel(
-        		this.signFile,
-        		null,
-        		this,
-        		this.standalone
-    		);
+        	JDialog dialog;
+        	if (this.parentComponent instanceof Frame) {
+        		dialog = new JDialog((Frame) this.parentComponent);
+        	}
+        	else if (this.parentComponent instanceof Window) {
+        		dialog = new JDialog((Window) this.parentComponent);
+        	}
+        	else if (this.parentComponent instanceof Dialog) {
+        		dialog = new JDialog((Dialog) this.parentComponent);
+        	}
+        	else {
+        		dialog = new JDialog();
+        	}
+        	dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+        	dialog.setSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 
-            if (this.parentComponent == null) {
-	           	final MainScreen mainScreen = new MainScreen();
-	           	mainScreen.showMainScreen(this, this.currentPanel, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
-	            this.container = mainScreen;
-            }
-            else {
-            	JDialog dialog;
-            	if (this.parentComponent instanceof Frame) {
-            		dialog = new JDialog((Frame) this.parentComponent);
-            	}
-            	else if (this.parentComponent instanceof Window) {
-            		dialog = new JDialog((Window) this.parentComponent);
-            	}
-            	else if (this.parentComponent instanceof Dialog) {
-            		dialog = new JDialog((Dialog) this.parentComponent);
-            	}
-            	else {
-            		dialog = new JDialog();
-            	}
-            	dialog.setModalityType(ModalityType.APPLICATION_MODAL);
-            	dialog.setSize(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
-
-            	final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-        		dialog.setLocation(cp.x - DEFAULT_WINDOW_WIDTH/2, cp.y - DEFAULT_WINDOW_WIDTH/2);
-        		dialog.add(this.currentPanel);
-            	this.container = dialog;
-            }
-
-            if (this.window != null) {
-                this.window.dispose();
-            }
-
-            this.window = (Window) this.container;
-            if (this.window instanceof JFrame) {
-            	((JFrame)this.window).getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
-            	((JFrame)this.window).setTitle(SimpleAfirmaMessages.getString("VisorFirma.0") + (this.signFile != null ? " - " + this.signFile.getAbsolutePath() : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            	if (LookAndFeelManager.needMaximizeWindow()) {
-            		((JFrame)this.window).setExtendedState(((JFrame)this.window).getExtendedState() | Frame.MAXIMIZED_BOTH);
-            	}
-            }
-            else if (this.window instanceof JDialog) {
-            	((JDialog)this.window).getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
-            	((JDialog)this.window).setTitle(SimpleAfirmaMessages.getString("VisorFirma.0") + (this.signFile != null ? " - " + this.signFile.getAbsolutePath() : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            	this.window.setVisible(true);
-            }
+        	final Point cp = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+    		dialog.setLocation(cp.x - DEFAULT_WINDOW_WIDTH/2, cp.y - DEFAULT_WINDOW_WIDTH/2);
+    		dialog.add(this.currentPanel);
+        	this.container = dialog;
         }
+
+        if (this.window != null) {
+            this.window.dispose();
+        }
+
+        this.window = (Window) this.container;
+        if (this.window instanceof JFrame) {
+        	((JFrame)this.window).getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
+        	((JFrame)this.window).setTitle(SimpleAfirmaMessages.getString("VisorFirma.0") + (this.signFile != null ? " - " + this.signFile.getAbsolutePath() : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        	if (LookAndFeelManager.needMaximizeWindow()) {
+        		((JFrame)this.window).setExtendedState(((JFrame)this.window).getExtendedState() | Frame.MAXIMIZED_BOTH);
+        	}
+        }
+        else if (this.window instanceof JDialog) {
+        	((JDialog)this.window).getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
+        	((JDialog)this.window).setTitle(SimpleAfirmaMessages.getString("VisorFirma.0") + (this.signFile != null ? " - " + this.signFile.getAbsolutePath() : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        	this.window.setVisible(true);
+        }
+    }
+
+    /** Reinicia la pantalla con los datos de una nueva firma.
+     * @param asApplet Par&aacute;metro ignorado. El visor ya no puede cargarse como
+     *                 <i>applet</i>, ya que la API de <i>applets</i> se elimin&oacute;
+     *                 de la plataforma Java.
+     * @param sigFile Nuevo fichero de firma.
+     * @deprecated Util&iacute;cese {@link #initialize(File)}. */
+    @Deprecated
+    public void initialize(final boolean asApplet, final File sigFile) {
+    	initialize(sigFile);
     }
 
     /**
@@ -220,8 +220,10 @@ public class VisorFirma extends JApplet implements WindowListener {
         if (sgFile == null) {
             return;
         }
-        initialize(VisorFirma.this.equals(VisorFirma.this.container), sgFile);
+        initialize(sgFile);
 
-        repaint();
+        if (this.container != null) {
+        	this.container.repaint();
+        }
     }
 }

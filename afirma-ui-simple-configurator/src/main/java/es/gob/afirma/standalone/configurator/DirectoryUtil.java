@@ -1,7 +1,6 @@
 package es.gob.afirma.standalone.configurator;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
@@ -76,10 +75,6 @@ public class DirectoryUtil {
 	
 	private static File getApplicationDirectory() {
 
-		if (isJnlpDeployment()) {
-			return getJNLPApplicationDirectory();
-		}
-
 		// Identificamos el directorio de instalacion
 		try {
 			return new File(
@@ -93,47 +88,4 @@ public class DirectoryUtil {
 		return null;
 	}
 	
-	/**
-	 * Obtiene el directorio de aplicaci&oacute;n que corresponde cuando se
-	 * ejecuta la aplicaci&oacute;n mediante un despliegue es JNLP.
-	 * @return Directorio de aplicaci&oacute;n.
-	 */
-	private static File getJNLPApplicationDirectory() {
-		if (Platform.getOS() == Platform.OS.WINDOWS) {
-			final File appDir = getWindowsAlternativeAppDir();
-			if (appDir.isDirectory() || appDir.mkdirs()) {
-				return appDir;
-			}
-		}
-		else if (Platform.getOS() == Platform.OS.MACOSX) {
-			final File appDir = getMacOsXAlternativeAppDir();
-			if (appDir.isDirectory() || appDir.mkdirs()) {
-				return appDir;
-			}
-		}
-		return new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
-	}
-	
-	/**
-	 * Comprueba si estamos en un despliegue JNLP de la aplicaci&oacute;n.
-	 * @return {@code true} si estamos en un despliegue JNLP, {@code false}
-	 * en caso contrario.
-	 */
-	private static boolean isJnlpDeployment() {
-
-		// Para comprobar si estamos en un despliegue JNLP sin crear una dependencia
-		// con javaws, hacemos una llamada equivalente a:
-		//     javax.jnlp.ServiceManager.lookup("javax.jnlp.ExtendedService");
-		// Si falla la llamda, no estamos en un despliegue JNLP
-		try {
-			final Class<?> serviceManagerClass = Class.forName("javax.jnlp.ServiceManager"); //$NON-NLS-1$
-			final Method lookupMethod = serviceManagerClass.getMethod("lookup", String.class); //$NON-NLS-1$
-			lookupMethod.invoke(null, "javax.jnlp.ExtendedService"); //$NON-NLS-1$
-		}
-		catch (final Throwable e) {
-			return false;
-		}
-		return true;
-	}
-
 }

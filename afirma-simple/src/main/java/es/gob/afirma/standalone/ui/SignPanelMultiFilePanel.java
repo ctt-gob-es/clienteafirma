@@ -152,7 +152,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
     		// y se abriran con el visor, mientras que el resto a traves de la aplicacion asociada
     		// en el sistema
     		if (signConfig.getSignValidity() != null) {
-    			new VisorFirma(false, null).initialize(false, signConfig.getDataFile());
+    			new VisorFirma(false, null).initialize(signConfig.getDataFile());
     		}
     		else {
     			SwingUtilities.invokeLater(() -> {
