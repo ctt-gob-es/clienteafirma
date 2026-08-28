@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -42,6 +43,33 @@ final class MozillaKeyStoreUtilitiesUnix {
 		// No instanciable
 	}
 
+	/** Busca los directorios <i>multiarch</i> de Debian y derivadas
+	 * (<code>/usr/lib/&lt;triplete&gt;</code>) en los que se encuentre NSS.
+	 * Solo devuelve aquellos en los que <code>libsoftokn3.so</code> exista
+	 * realmente, para no ensuciar la lista de rutas a comprobar.
+	 * @return Rutas encontradas, en orden alfab&eacute;tico. */
+	private static List<String> getMultiarchNssPaths() {
+		final List<String> paths = new ArrayList<>();
+		final File[] dirs = new File("/usr/lib").listFiles(); //$NON-NLS-1$
+		if (dirs == null) {
+			return paths;
+		}
+		Arrays.sort(dirs);
+		for (final File dir : dirs) {
+			if (!dir.isDirectory() || dir.getName().indexOf("-linux-") == -1) { //$NON-NLS-1$
+				continue;
+			}
+			final File nssSubDir = new File(dir, "nss"); //$NON-NLS-1$
+			if (new File(nssSubDir, SOFTOKN3_SO).isFile()) {
+				paths.add(nssSubDir.getAbsolutePath());
+			}
+			if (new File(dir, SOFTOKN3_SO).isFile()) {
+				paths.add(dir.getAbsolutePath());
+			}
+		}
+		return paths;
+	}
+
 	private static String[] getNssPaths() {
 		final List<String> nssPaths = new ArrayList<>();
 		final String javaArch = Platform.getJavaArch();
@@ -55,6 +83,14 @@ final class MozillaKeyStoreUtilitiesUnix {
 			nssPaths.add("/usr/lib/i386-linux-gnu/nss"); /* En algunos Ubuntu y Debian 32 */ //$NON-NLS-1$
 			nssPaths.add("/usr/lib/i386-linux-gnu"); //$NON-NLS-1$
 		}
+
+		// Resto de directorios "multiarch" de Debian y derivadas. Las dos ramas
+		// de arriba solo cubren x86, asi que en cualquier otra arquitectura NSS
+		// no se encuentra: en arm64 vive en "/usr/lib/aarch64-linux-gnu", y en
+		// armhf, riscv64, ppc64el o s390x en el triplete que corresponda.
+		// Se enumeran en lugar de escribirlos a mano para no repetir el mismo
+		// problema en la siguiente arquitectura que aparezca.
+		nssPaths.addAll(getMultiarchNssPaths());
 
 		nssPaths.add(systemLibDir + "/nss"); //$NON-NLS-1$
 		nssPaths.add(systemLibDir);
