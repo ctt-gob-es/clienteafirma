@@ -297,10 +297,19 @@ public class AOKeyStoreManager implements KeyStoreManager {
         	}
         }
 
-		return (KeyStore.PrivateKeyEntry) this.ks.getEntry(
+		final KeyStore.Entry entry = this.ks.getEntry(
 			alias,
 			protParam
 		);
+		if (!(entry instanceof KeyStore.PrivateKeyEntry)) {
+			// Los almacenes NSS de Mozilla pueden contener claves simetricas (SecretKeyEntry),
+			// que no son utilizables para firma
+			throw new UnrecoverableEntryException(
+				"La entrada '" + alias + "' no es una clave privada con certificado: " //$NON-NLS-1$ //$NON-NLS-2$
+					+ (entry == null ? "null" : entry.getClass().getName()) //$NON-NLS-1$
+			);
+		}
+		return (KeyStore.PrivateKeyEntry) entry;
     }
 
     @Override

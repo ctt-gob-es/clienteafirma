@@ -226,7 +226,11 @@ public final class KeyStoreUtilities {
                 }
 
                 if (tmpCert == null) {
-                    LOGGER.warning("El KeyStore no permite extraer el certificado publico para el alias especificado"); //$NON-NLS-1$
+                	// Entradas sin certificado (por ejemplo, claves simetricas que Mozilla
+                	// almacena en el perfil NSS, como la de cifrado de contrasenas) no son
+                	// utilizables para firma y no deben llegar al dialogo de seleccion
+                    LOGGER.warning("El KeyStore no permite extraer el certificado publico para el alias especificado, se descarta la entrada"); //$NON-NLS-1$
+                    aliassesByFriendlyName.remove(al);
                     continue;
                 }
 

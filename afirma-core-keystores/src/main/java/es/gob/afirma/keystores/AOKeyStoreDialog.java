@@ -242,23 +242,23 @@ public final class AOKeyStoreDialog implements KeyStoreDialogManager {
     				this.certFilters
     			);
 
-    	int i = 0;
-    	final NameCertificateBean[] namedCerts =
-    			new NameCertificateBean[aliassesByFriendlyName.size()];
+    	final List<NameCertificateBean> namedCerts = new ArrayList<>(aliassesByFriendlyName.size());
     	for (final String certAlias : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
     		final X509Certificate[] certChain = this.ksm.getCertificateChain(certAlias);
-    		if (certChain != null) {
-	    		namedCerts[i++] = new NameCertificateBean(
+    		// Entradas sin certificado (como las claves simetricas de los perfiles
+    		// de Mozilla) no se pueden mostrar ni usar para firmar
+    		if (certChain != null && certChain.length > 0) {
+	    		namedCerts.add(new NameCertificateBean(
 	    				certAlias,
 	    				aliassesByFriendlyName.get(certAlias),
-	    				certChain);
+	    				certChain));
     		}
     		else {
-    			LOGGER.warning("Se ha encontrado un certificado nulo en el almacen"); //$NON-NLS-1$
+    			LOGGER.warning("Se ha encontrado una entrada sin certificado en el almacen, no se mostrara"); //$NON-NLS-1$
     		}
     	}
 
-		return namedCerts;
+		return namedCerts.toArray(new NameCertificateBean[0]);
 	}
 
 	@Override
