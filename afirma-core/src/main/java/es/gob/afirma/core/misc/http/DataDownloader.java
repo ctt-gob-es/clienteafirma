@@ -78,7 +78,7 @@ public final class DataDownloader {
 				sslConfig = new SSLConfig();
 				sslConfig.setHostnameVerifier(SslSecurityManager.DUMMY_HOSTNAME_VERIFIER);
 				try {
-					final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
+					final SSLContext sslContext = SSLContext.getInstance("TLS"); //$NON-NLS-1$
 					sslContext.init(null, SslSecurityManager.DUMMY_TRUST_MANAGER, new SecureRandom());
 					sslConfig.setSSLSocketFactory(sslContext.getSocketFactory());
 				}
