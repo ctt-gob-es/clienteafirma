@@ -75,6 +75,7 @@ public final class DataDownloader {
 
 			SSLConfig sslConfig = null;
 			if (ignoreSSLSecurity) {
+				LOGGER.warning("Se deshabilitan las comprobaciones SSL para la descarga de: " + dataSource); //$NON-NLS-1$
 				sslConfig = new SSLConfig();
 				sslConfig.setHostnameVerifier(SslSecurityManager.DUMMY_HOSTNAME_VERIFIER);
 				try {
