@@ -9,22 +9,16 @@
 
 package es.gob.afirma.ui.core.jse.certificateselection;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.keystores.KeyStoreType;
+import es.gob.afirma.core.keystores.NameCertificateBean;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,31 +26,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.keystores.KeyStoreType;
-import es.gob.afirma.core.keystores.NameCertificateBean;
-import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
 final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
@@ -90,6 +59,8 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 	private JPanel textMessagePanel;
 
+	private String errorMessage;
+
 	private int selectedIndex = -1;
 
 	private NameCertificateBean[] certificateBeans;
@@ -101,9 +72,20 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
     private static boolean highContrast;
 
 	CertificateSelectionPanel(final NameCertificateBean[] el,
+	                          final CertificateSelectionDialog selectionDialog,
+	                          final String dialogHeadline,
+	                          final String dialogSubHeadline,
+	                          final boolean showControlButons,
+	                          final boolean allowExternalStores,
+	                          final es.gob.afirma.core.keystores.KeyStoreType[] availablesKeyStoreTypes) {
+		this(el, selectionDialog, dialogHeadline, dialogSubHeadline, null, showControlButons, allowExternalStores, availablesKeyStoreTypes);
+	}
+
+	CertificateSelectionPanel(final NameCertificateBean[] el,
 			                  final CertificateSelectionDialog selectionDialog,
 			                  final String dialogHeadline,
 			                  final String dialogSubHeadline,
+			                  final String errorMessage,
 				              final boolean showControlButons,
 				              final boolean allowExternalStores,
 				              final es.gob.afirma.core.keystores.KeyStoreType[] availablesKeyStoreTypes) {
@@ -112,6 +94,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.dialogSubHeadline = dialogSubHeadline;
 
 		this.certLineView = loadPreferredCertificateView();
+		this.errorMessage = errorMessage;
 
 		createUI(
 			selectionDialog,
@@ -126,7 +109,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			              final String dialogHeadline,
 			              final boolean showControlButons,
 			              final boolean allowExternalStores,
-			              final es.gob.afirma.core.keystores.KeyStoreType[] availablesKeyStoreTypes) {
+			              final es.gob.afirma.core.keystores.KeyStoreType[] availableKeyStoreTypes) {
 
 		setLayout(new GridBagLayout());
 
@@ -142,32 +125,31 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.gridy = 0;
 
 		final JLabel mainMessage = new JLabel(
-			dialogHeadline != null ?
-				dialogHeadline :
-					CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.0") //$NON-NLS-1$
+				dialogHeadline != null ?
+						dialogHeadline :
+						CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.0") //$NON-NLS-1$
 		);
 		mainMessage.setFont(TITLE_FONT);
 
-        // Establecemos la configuracion de color
-        final Object highContrastProp = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
-        if (highContrastProp instanceof Boolean) {
-        	CertificateSelectionPanel.highContrast = ((Boolean) highContrastProp).booleanValue();
-        }
+		// Establecemos la configuracion de color
+		final Object highContrastProp = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
+		if (highContrastProp instanceof Boolean) {
+			CertificateSelectionPanel.highContrast = ((Boolean) highContrastProp).booleanValue();
+		}
 
-        if (!CertificateSelectionPanel.highContrast) {
-        	try {
-        		mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
-        		windowColor = UIManager.getColor("window") != null ? //$NON-NLS-1$
-    	    			 new Color(UIManager.getColor("window").getRGB()) : //$NON-NLS-1$
-    	    			Color.WHITE;
-        	}
-        	catch (final Throwable e) {
-        		windowColor = Color.WHITE;
-    		}
-            setBackground(windowColor);
-        } else {
-    		mainMessage.setForeground(Color.WHITE);
-        }
+		if (!CertificateSelectionPanel.highContrast) {
+			try {
+				mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
+				windowColor = UIManager.getColor("window") != null ? //$NON-NLS-1$
+						new Color(UIManager.getColor("window").getRGB()) : //$NON-NLS-1$
+						Color.WHITE;
+			} catch (final Throwable e) {
+				windowColor = Color.WHITE;
+			}
+			setBackground(windowColor);
+		} else {
+			mainMessage.setForeground(Color.WHITE);
+		}
 
 		setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 
@@ -189,46 +171,47 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 
 			// Boton de refresco del almacen
 			final JButton refresh = new JButton(
-				new ImageIcon(
-					refreshImgResource,
-					CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
-				)
+					new ImageIcon(
+							refreshImgResource,
+							CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+					)
 			);
 			refresh.setBorder(BorderFactory.createEmptyBorder());
 			refresh.setRolloverEnabled(false);
 			refresh.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			refresh.getAccessibleContext().setAccessibleDescription(
-				CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
 			);
 			refresh.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.1")); //$NON-NLS-1$
 			refresh.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						UtilActions.doRefresh(selectionDialog, CertificateSelectionPanel.this);
+					new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							UtilActions.doRefresh(selectionDialog, CertificateSelectionPanel.this);
+						}
 					}
-				}
 			);
 			refresh.addFocusListener(
 					new FocusListener() {
-						  @Override
-						  public void focusGained(final FocusEvent e) {
-							  if (isHighContrast()) {
-								 refresh.setIcon(new ImageIcon(
-										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
-										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+						@Override
+						public void focusGained(final FocusEvent e) {
+							if (isHighContrast()) {
+								refresh.setIcon(new ImageIcon(
+										CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_black_18dp.png"), //$NON-NLS-1$
+										CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
 								));
-							 }
-						  }
-						  @Override
-						  public void focusLost(final FocusEvent e) {
-							  if (isHighContrast()) {
-								 refresh.setIcon(new ImageIcon(
-										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_white_18dp.png"), //$NON-NLS-1$
-										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+							}
+						}
+
+						@Override
+						public void focusLost(final FocusEvent e) {
+							if (isHighContrast()) {
+								refresh.setIcon(new ImageIcon(
+										CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_autorenew_white_18dp.png"), //$NON-NLS-1$
+										CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
 								));
-							 }
-						  }
+							}
+						}
 					}
 			);
 			this.add(refresh, c);
@@ -236,67 +219,12 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			c.gridx++;
 
 			// Boton de apertura de almacen externo
-			if (allowExternalStores && availablesKeyStoreTypes != null && availablesKeyStoreTypes.length > 0) {
+			if (allowExternalStores && availableKeyStoreTypes != null && availableKeyStoreTypes.length > 0) {
 
 				final JPopupMenu keystoresMenu = new JPopupMenu();
 
-				// Opcion del almacen del sistema
-				KeyStoreType storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.SYSTEM);
-				if (storeType != null) {
-					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.35")); //$NON-NLS-1$
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
-					keystoresMenu.add(menuItem);
-				}
-
-				// Opcion del almacen de Firefox
-				storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.MOZILLA);
-				if (storeType != null) {
-					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.36")); //$NON-NLS-1$
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
-					keystoresMenu.add(menuItem);
-				}
-
-				// Opcion del almacen del navegador
-				storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.BROWSER);
-				if (storeType != null) {
-					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.39")); //$NON-NLS-1$
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
-					keystoresMenu.add(menuItem);
-				}
-
-				// Opcion de almacen PKCS#12
-				storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.PKCS12);
-				if (storeType != null) {
-					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.37")); //$NON-NLS-1$
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
-					keystoresMenu.add(menuItem);
-				}
-
-				// Opcion del DNIe
-				storeType = hasKeystore(availablesKeyStoreTypes, es.gob.afirma.core.keystores.KeyStoreType.DNIE);
-				if (storeType != null) {
-					final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
-					keystoresMenu.add(menuItem);
-				}
-
-				// Opciones de los almacenes en tarjeta definidos por el usuario
-				final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
-				for (final String key : userRegResult.keySet()) {
-				    final String value = userRegResult.get(key);
-					final JMenuItem menuItem = new JMenuItem(key);
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, new KeyStoreType(KEYSTORE_TYPE_PKCS11, KeyStoreType.PKCS11), key, value));
-					keystoresMenu.add(menuItem);
-				}
-
-				// Opciones de los almacenes en tarjeta definidos por el sistema
-				final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
-				for (final String key : systemRegResult.keySet()) {
-				    final String value = systemRegResult.get(key);
-					final JMenuItem menuItem = new JMenuItem(key);
-					menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, new KeyStoreType(KEYSTORE_TYPE_PKCS11, KeyStoreType.PKCS11), key, value));
-					keystoresMenu.add(menuItem);
-				}
+				// Rellenamos el menu con los almacenes disponibles
+				addKeyStoreOptionsToMenu(keystoresMenu, availableKeyStoreTypes, selectionDialog);
 
 				URL openInBrowserImgResource;
 
@@ -307,45 +235,44 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				}
 
 				final JDropDownButton openButton = new JDropDownButton(
-					new ImageIcon(
-						openInBrowserImgResource,
-						CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
-					)
+						new ImageIcon(
+								openInBrowserImgResource,
+								CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
+						)
 				);
 				openButton.setComponentPopupMenu(keystoresMenu);
 				openButton.setRolloverEnabled(false);
 				openButton.setBorder(BorderFactory.createEmptyBorder());
 				openButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				openButton.getAccessibleContext().setAccessibleDescription(
-					CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
+						CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
 				);
 				openButton.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.2")); //$NON-NLS-1$
 				openButton.addFocusListener(
 						new FocusListener() {
-							  @Override
-							  public void focusGained(final FocusEvent e) {
-								  if (isHighContrast()) {
-									  openButton.setIcon(new ImageIcon(
-											 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
-											 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+							@Override
+							public void focusGained(final FocusEvent e) {
+								if (isHighContrast()) {
+									openButton.setIcon(new ImageIcon(
+											CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_black_18dp.png"), //$NON-NLS-1$
+											CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
 									));
-								 }
-							  }
-							  @Override
-							  public void focusLost(final FocusEvent e) {
-								  if (isHighContrast()) {
-									  openButton.setIcon(new ImageIcon(
-											 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_white_18dp.png"), //$NON-NLS-1$
-											 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+								}
+							}
+
+							@Override
+							public void focusLost(final FocusEvent e) {
+								if (isHighContrast()) {
+									openButton.setIcon(new ImageIcon(
+											CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_open_in_browser_white_18dp.png"), //$NON-NLS-1$
+											CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
 									));
-								 }
-							  }
+								}
+							}
 						}
 				);
 				this.add(openButton, c);
-						}
-
-
+			}
 
 
 			// Boton de ayuda
@@ -361,46 +288,47 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			}
 
 			final JButton help = new JButton(
-				new ImageIcon(
-					helpImgResource,
-					CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
-				)
+					new ImageIcon(
+							helpImgResource,
+							CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
+					)
 			);
 			help.setBorder(BorderFactory.createEmptyBorder());
 			help.setRolloverEnabled(false);
 			help.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			help.getAccessibleContext().setAccessibleDescription(
-				CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
+					CertificateSelectionDialogMessages.getString("UtilToolBar.3") //$NON-NLS-1$
 			);
 			help.setToolTipText(CertificateSelectionDialogMessages.getString("UtilToolBar.3")); //$NON-NLS-1$
 			help.addActionListener(
-				new ActionListener() {
-					@Override
-					public void actionPerformed(final ActionEvent e) {
-						UtilActions.doHelp();
+					new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							UtilActions.doHelp();
+						}
 					}
-				}
 			);
 			help.addFocusListener(
 					new FocusListener() {
-						  @Override
-						  public void focusGained(final FocusEvent e) {
-							  if (isHighContrast()) {
-								 help.setIcon(new ImageIcon(
-										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
-										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+						@Override
+						public void focusGained(final FocusEvent e) {
+							if (isHighContrast()) {
+								help.setIcon(new ImageIcon(
+										CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_help_black_18dp.png"), //$NON-NLS-1$
+										CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
 								));
-							 }
-						  }
-						  @Override
-						  public void focusLost(final FocusEvent e) {
-							  if (isHighContrast()) {
-								 help.setIcon(new ImageIcon(
-										 CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"), //$NON-NLS-1$
-										 CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
+							}
+						}
+
+						@Override
+						public void focusLost(final FocusEvent e) {
+							if (isHighContrast()) {
+								help.setIcon(new ImageIcon(
+										CertificateSelectionPanel.class.getResource("/resources/toolbar/ic_help_white_18dp.png"), //$NON-NLS-1$
+										CertificateSelectionDialogMessages.getString("UtilToolBar.1") //$NON-NLS-1$
 								));
-							 }
-						  }
+							}
+						}
 					}
 			);
 			this.add(help, c);
@@ -491,13 +419,13 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.textMessagePanel.setBorder(null);
 		this.add(this.textMessagePanel, c);
 
-		c.insets = new Insets(4, 15, 8, 15);
+		c.insets = new Insets(4, 15, 12, 15);
 		c.gridy++;
+
 
 		this.add(new JSeparator(), c);
 
-		c.insets = new Insets(8, 18, 13, 18);
-		c.weighty = 1.0;
+		c.insets = new Insets(0, 15, 8, 15);
 		c.gridy++;
 
 		this.certListPanel = new JPanel();
@@ -606,7 +534,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.textMessagePanel.removeAll();
 		if (certLines.size() <= 1) {
 			String msg;
-			if (certLines.size() == 1) {
+			if (this.errorMessage != null) {
+				msg = this.errorMessage;
+			}
+			else if (certLines.size() == 1) {
 				msg = this.dialogSubHeadline != null ?
 						this.dialogSubHeadline :
 							CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.1"); //$NON-NLS-1$
@@ -619,8 +550,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			textMessage.setOpaque(false);
 			textMessage.setText(msg);
 			textMessage.setFont(TEXT_FONT);
+			textMessage.setForeground(this.errorMessage != null ? Color.RED : Color.BLACK);
 			textMessage.setBorder(null);
-			textMessage.setPreferredSize(new Dimension(370, 40));
+			textMessage.setMinimumSize(new Dimension(370, 42));
 
 			final GridBagConstraints tmC = new GridBagConstraints();
 			tmC.fill = GridBagConstraints.BOTH;
@@ -715,6 +647,12 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	@Override
 	public void valueChanged(final ListSelectionEvent e) {
 		this.selectedIndex = this.certList.getSelectedIndex();
+	}
+
+	/** Actualiza el mensaje de error mostrado en el panel.
+	 * @param errorMessage Mensaje de error o {@code null} para ocultarlo. */
+	public void setErrorMessage(final String errorMessage) {
+		this.errorMessage = errorMessage;
 	}
 
 	/** Renderer para mostrar la informaci&oacute;n de un certificado. */
@@ -880,6 +818,68 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 			LOGGER.log(Level.WARNING, "No se pudo guardar la vista utilizada en las preferencias del usuario", e); //$NON-NLS-1$
 		}
 	}
+
+
+    private void addKeyStoreOptionsToMenu(JPopupMenu keystoresMenu, final KeyStoreType[] availablesKeyStoreTypes, final CertificateSelectionDialog selectionDialog) {
+
+        // Opcion del almacen del sistema
+        KeyStoreType storeType = hasKeystore(availablesKeyStoreTypes, KeyStoreType.SYSTEM);
+        if (storeType != null) {
+            final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.35")); //$NON-NLS-1$
+            menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
+            keystoresMenu.add(menuItem);
+        }
+
+        // Opcion del almacen de Firefox
+        storeType = hasKeystore(availablesKeyStoreTypes, KeyStoreType.MOZILLA);
+        if (storeType != null) {
+            final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.36")); //$NON-NLS-1$
+            menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
+            keystoresMenu.add(menuItem);
+        }
+
+        // Opcion del almacen del navegador
+        storeType = hasKeystore(availablesKeyStoreTypes, KeyStoreType.BROWSER);
+        if (storeType != null) {
+            final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.39")); //$NON-NLS-1$
+            menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
+            keystoresMenu.add(menuItem);
+        }
+
+        // Opcion de almacen PKCS#12
+        storeType = hasKeystore(availablesKeyStoreTypes, KeyStoreType.PKCS12);
+        if (storeType != null) {
+            final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.37")); //$NON-NLS-1$
+            menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
+            keystoresMenu.add(menuItem);
+        }
+
+        // Opcion del DNIe
+        storeType = hasKeystore(availablesKeyStoreTypes, KeyStoreType.DNIE);
+        if (storeType != null) {
+            final JMenuItem menuItem = new JMenuItem(CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.38")); //$NON-NLS-1$
+            menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, storeType, menuItem.getText(), null));
+            keystoresMenu.add(menuItem);
+        }
+
+        // Opciones de los almacenes en tarjeta definidos por el usuario
+        final Map<String, String> userRegResult = KeyStorePreferencesManager.getUserSmartCardsRegistered();
+        for (final String key : userRegResult.keySet()) {
+            final String value = userRegResult.get(key);
+            final JMenuItem menuItem = new JMenuItem(key);
+            menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, new KeyStoreType(KEYSTORE_TYPE_PKCS11, KeyStoreType.PKCS11), key, value));
+            keystoresMenu.add(menuItem);
+        }
+
+        // Opciones de los almacenes en tarjeta definidos por el sistema
+        final Map<String, String> systemRegResult = KeyStorePreferencesManager.getSystemSmartCardsRegistered();
+        for (final String key : systemRegResult.keySet()) {
+            final String value = systemRegResult.get(key);
+            final JMenuItem menuItem = new JMenuItem(key);
+            menuItem.addActionListener(new ChangeKeyStoreActionListener(this, selectionDialog, new KeyStoreType(KEYSTORE_TYPE_PKCS11, KeyStoreType.PKCS11), key, value));
+            keystoresMenu.add(menuItem);
+        }
+    }
 
 	private static class ChangeViewActionListener implements ActionListener {
 

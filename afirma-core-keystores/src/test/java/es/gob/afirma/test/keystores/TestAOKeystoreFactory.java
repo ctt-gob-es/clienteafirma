@@ -9,6 +9,16 @@
 
 package es.gob.afirma.test.keystores;
 
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import javax.security.auth.callback.PasswordCallback;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -17,18 +27,6 @@ import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.security.auth.callback.PasswordCallback;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 
 /**
  * Pruebas de AOKeyStoreFactory
@@ -55,7 +53,8 @@ public class TestAOKeystoreFactory {
 			null, 				// Lib
 			null, 				// Description
 			AOKeyStore.WINDOWS.getStorePasswordCallback(null),
-			null				// Parent
+			null,				// Parent
+			false
 		);
     	for (final String alias : ksm.getAliases()) {
     		System.out.println(alias);
@@ -84,7 +83,8 @@ public class TestAOKeystoreFactory {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         AOKeyStoreManager ksm;
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.APPLE, null, null, null, null);
+            ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.APPLE, null, null, null, null,				// Parent
+					false);
             Assert.assertNotNull(ksm);
             final String[] aliases = ksm.getAliases();
             Assert.assertNotNull(aliases);
@@ -109,13 +109,14 @@ public class TestAOKeystoreFactory {
         final PasswordCallback pc = new PasswordCallback(">", false); //$NON-NLS-1$
         pc.setPassword("12341234".toCharArray()); //$NON-NLS-1$
 
-        ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-                    AOKeyStore.PKCS12,
-                    tmpFile.getAbsolutePath(),
-                    null,
-                    pc,
-                    null
-        );
+		ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.PKCS12,
+				tmpFile.getAbsolutePath(),
+				null,
+				pc,
+				null,                // Parent
+				false
+		);
         Assert.assertNotNull(ksm);
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);

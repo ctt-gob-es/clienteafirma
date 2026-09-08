@@ -9,24 +9,32 @@
 
 package es.gob.afirma.keystores;
 
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
+import javax.security.auth.callback.PasswordCallback;
+
 /** Almacenes de claves y certificados soportados. */
 public enum AOKeyStore {
 
-    /** Windows / Internet Explorer (CAPI, certificados de usuario). */
+    /** Windows / Internet Explorer (CAPI, certificados de usuario) y JMulticard. */
     WINDOWS(
 		"Windows", //$NON-NLS-1$
 		0,
 		"Windows-MY", //$NON-NLS-1$
 		new CachePasswordCallback("winmydummy".toCharArray()), //$NON-NLS-1$
 		NullPasswordCallback.getInstance()
+	),
+	/** Windows / Internet Explorer (CAPI, certificados de usuario), JMulticard y PKCS#11 del DNIe. */
+	WINDOWS_UNI(
+			"Windows (Unificado)", //$NON-NLS-1$
+			0,
+			"Windows-MY", //$NON-NLS-1$
+			new CachePasswordCallback("winmydummy".toCharArray()), //$NON-NLS-1$
+			NullPasswordCallback.getInstance()
 	),
     /** Apple Mac OS X / Safari Keychain. */
     APPLE(
@@ -80,15 +88,6 @@ public enum AOKeyStore {
      * internos y externos unificados). */
     MOZ_UNI(
 		"Mozilla / Firefox (unificado)", //$NON-NLS-1$
-		8,
-		"PKCS11", //$NON-NLS-1$
-		NullPasswordCallback.getInstance(),
-		new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.5")) //$NON-NLS-1$
-	),
-    /** Mozilla / Firefox (NSS / PKCS#11, con m&oacute;dulos de seguridad
-     * internos y externos unificados) junto al almacen correspondiente al sistema operativo. */
-    MOZ_UNI_WITH_OS(
-		"Mozilla / Firefox (unificado) junto a almacen de SO", //$NON-NLS-1$
 		8,
 		"PKCS11", //$NON-NLS-1$
 		NullPasswordCallback.getInstance(),
@@ -200,6 +199,24 @@ public enum AOKeyStore {
 			NullPasswordCallback.getInstance(),
 			new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.15", "NSS de Brave")) //$NON-NLS-1$ //$NON-NLS-2$
 	),
+	/** Mozilla / Firefox (NSS / PKCS#11, con m&oacute;dulos de seguridad
+	 * internos y externos unificados) junto al almacen correspondiente al sistema operativo. */
+	MOZ_UNI_WITH_OS(
+			"Mozilla / Firefox (unificado) junto a almacen de SO", //$NON-NLS-1$
+			22,
+			"PKCS11", //$NON-NLS-1$
+			NullPasswordCallback.getInstance(),
+			new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStore.5")) //$NON-NLS-1$
+	),
+	/** Mozilla / Firefox (NSS / PKCS#11, con m&oacute;dulos de seguridad
+	 * internos y externos unificados) junto al almacen correspondiente al sistema operativo. */
+	PKCS11_DNIE(
+			"PKCS#11 DNIE", //$NON-NLS-1$
+			23,
+			"PKCS11", //$NON-NLS-1$
+			NullPasswordCallback.getInstance(),
+			new UIPasswordCallback(KeyStoreMessages.getString("DNIePasswordCallback.1")) //$NON-NLS-1$
+	),
 	/** Otro tipo de almac&eacute;n (deber&aacute;n inicializarse manualmente sus par&aacute;metros operativos). */
 	OTHER;
 
@@ -224,7 +241,7 @@ public enum AOKeyStore {
 
     AOKeyStore() {
     	this.name = "Tipo desconocido"; //$NON-NLS-1$
-    	this.ordinal = 18;
+    	this.ordinal = 99;
     	this.providerName = null;
     	this.certificatePasswordCallback = null;
     	this.storePasswordCallback = null;
@@ -298,7 +315,7 @@ public enum AOKeyStore {
     public static AOKeyStore getDefaultKeyStoreTypeByOs(final OS os) {
     	AOKeyStore aoks = null;
 		if (Platform.OS.WINDOWS.equals(os)) {
-			aoks = AOKeyStore.WINDOWS;
+			aoks = AOKeyStore.WINDOWS_UNI;
 		}
 		if (Platform.OS.MACOSX.equals(os)) {
 			aoks = AOKeyStore.APPLE;

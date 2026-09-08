@@ -39,11 +39,12 @@
  */
 package es.gob.afirma.keystores.jmulticard.ui;
 
+import javax.security.auth.callback.PasswordCallback;
+import javax.swing.*;
+import java.awt.*;
 import java.io.Console;
 import java.util.Locale;
 import java.util.logging.Logger;
-
-import javax.swing.JOptionPane;
 
 /** Gestor de di&aacute;logos gr&aacute;ficos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -106,5 +107,21 @@ public final class DialogBuilder {
         	return 1;
         }
 		return getConsoleConfirm(console, callBack);
+    }
+
+    public static PasswordCallback getDefaultDniePasswordCallback(final Component parentComponent) {
+        final String prompt = Messages.getString("CommonPasswordCallback.4"); //$NON-NLS-1$
+        final String title = Messages.getString("CommonPasswordCallback.1"); //$NON-NLS-1$
+        final PasswordCallback psc = new UIPasswordCallbackAccessibility(
+                prompt,
+                parentComponent,
+                prompt,
+                'P',
+                title,
+                "/images/dnie.png", //$NON-NLS-1$
+                true,
+                true
+        );
+        return psc;
     }
 }

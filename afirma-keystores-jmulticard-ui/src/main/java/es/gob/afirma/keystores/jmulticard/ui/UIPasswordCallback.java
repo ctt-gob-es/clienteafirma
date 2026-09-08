@@ -39,18 +39,11 @@
  */
 package es.gob.afirma.keystores.jmulticard.ui;
 
-import java.awt.Component;
-import java.awt.Dimension;
+import es.gob.jmulticard.CancelledOperationException;
 
 import javax.security.auth.callback.PasswordCallback;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-
-import es.gob.jmulticard.CancelledOperationException;
+import javax.swing.*;
+import java.awt.*;
 
 /** <i>PasswordCallbak</i> que muestra un di&aacute;logo para solicitar una
  * contrase&ntilde;a. */
@@ -75,20 +68,13 @@ public final class UIPasswordCallback extends PasswordCallback {
      * retiene ni almacena internamente en ning&uacute;n momento.
      * @param prompt Texto del di&aacute;logo para solicitar la contrase&ntilde;a.
      * @param parentComponent Componente padre para la modalidad del di&aacute;logo.
-     * @param dialogMessage Mensaje.
      * @param dialogTitle T&iacute;tulo del di&aacute;logo. */
     public UIPasswordCallback(final String prompt,
-    		                  final Object parentComponent,
-    		                  final String dialogMessage,
-    		                  final String dialogTitle) {
+                              final String dialogTitle,
+    		                  final Object parentComponent) {
         super(prompt, false);
         this.parent = parentComponent instanceof Component ? (Component) parentComponent : null;
-        if (prompt != null) {
-            this.message = prompt;
-        }
-        else {
-            this.message = dialogMessage;
-        }
+        this.message = prompt;
         this.title = dialogTitle;
     }
 

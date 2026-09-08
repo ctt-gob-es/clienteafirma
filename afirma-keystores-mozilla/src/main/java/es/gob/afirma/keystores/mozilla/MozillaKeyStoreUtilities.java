@@ -290,11 +290,11 @@ public final class MozillaKeyStoreUtilities {
 	 * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de Mozilla NSS / Firefox. */
 	static Map<String, String> getMozillaPKCS11Modules(final boolean excludePreferredModules,
 			                                           final boolean includeKnownModules) {
-		if (!excludePreferredModules) {
-			LOGGER.info("Se incluiran los modulos nativos de DNIe/CERES si se encuentran configurados"); //$NON-NLS-1$
+		if (excludePreferredModules) {
+			LOGGER.info("Se omitira la carga de los PKCS#11 de DNIe/CERES"); //$NON-NLS-1$
 		}
 		else {
-			LOGGER.info("Se excluiran los modulos nativos de DNIe/CERES en favor del controlador 100% Java"); //$NON-NLS-1$
+			LOGGER.info("Se incluiran los PKCS#11 de DNIe/CERES si se encuentran configurados"); //$NON-NLS-1$
 		}
 
 		final String profileDir;

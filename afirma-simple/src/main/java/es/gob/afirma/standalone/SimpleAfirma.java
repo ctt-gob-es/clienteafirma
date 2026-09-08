@@ -9,51 +9,6 @@
 
 package es.gob.afirma.standalone;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.HeadlessException;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URL;
-import java.nio.channels.FileLock;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.LogManager;
@@ -74,29 +29,35 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.common.PdfExtraParams;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.xml.XmlDSigProviderHelper;
-import es.gob.afirma.signvalidation.SignValider;
-import es.gob.afirma.signvalidation.SignValiderFactory;
-import es.gob.afirma.signvalidation.SignValidity;
+import es.gob.afirma.signvalidation.*;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
-import es.gob.afirma.signvalidation.ValidateBinarySignature;
-import es.gob.afirma.signvalidation.ValidatePdfSignature;
 import es.gob.afirma.standalone.configurator.common.ConfigUpdaterManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncher;
-import es.gob.afirma.standalone.ui.ClosePanel;
-import es.gob.afirma.standalone.ui.DNIeWaitPanel;
-import es.gob.afirma.standalone.ui.MainMenu;
-import es.gob.afirma.standalone.ui.MainScreen;
-import es.gob.afirma.standalone.ui.ProgressInfoDialogManager;
-import es.gob.afirma.standalone.ui.SignDetailPanel;
-import es.gob.afirma.standalone.ui.SignOperationConfig;
-import es.gob.afirma.standalone.ui.SignPanel;
-import es.gob.afirma.standalone.ui.SignResultListPanel;
-import es.gob.afirma.standalone.ui.SignatureResultViewer;
+import es.gob.afirma.standalone.ui.*;
 import es.gob.afirma.standalone.ui.tasks.SSLContextConfigurationTask;
 import es.gob.afirma.standalone.ui.tasks.SslSocketKeyStoreChecker;
 import es.gob.afirma.standalone.updater.Updater;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URL;
+import java.nio.channels.FileLock;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.logging.*;
 
 /**
  * Aplicaci&oacute;n gr&aacute;fica de Autofirma.
@@ -448,7 +409,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     	String lib = null;
     	if (this.ksManager == null) {
 	    	try {
-	    		final AOKeyStore aoks = SimpleKeyStoreManager.getDefaultKeyStoreType();
+				final AOKeyStore aoks = SimpleKeyStoreManager.getDefaultKeyStoreType();
 	    		if (aoks.equals(AOKeyStore.PKCS12) || aoks.equals(AOKeyStore.PKCS11)) {
 	    			lib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
 	    		}
@@ -457,7 +418,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 					    lib, // Lib
 						null, // Description
 						aoks.getStorePasswordCallback(this), // PasswordCallback
-						this // Parent
+						this, // Parent
+						false
 				);
 
 			} catch (final KeystoreAlternativeException e) {
@@ -473,7 +435,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						    lib, // Lib
 							null, // Description
 							aoks.getStorePasswordCallback(this), // PasswordCallback
-							this // Parent
+							this, // Parent
+							false
 					);
 				} catch (final Exception e1) {
 		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
@@ -494,7 +457,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						    lib, // Lib
 							null, // Description
 							aoks.getStorePasswordCallback(this), // PasswordCallback
-							this // Parent
+							this, // Parent
+							false
 					);
 				} catch (final Exception e1) {
 		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e); //$NON-NLS-1$
@@ -514,7 +478,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 						    lib, // Lib
 							null, // Description
 							aoks.getStorePasswordCallback(this), // PasswordCallback
-							this // Parent
+							this, // Parent
+							false
 					);
 				} catch (final Exception e1) {
 		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
@@ -536,7 +501,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     					    lib, // Lib
     						null, // Description
     						aoks.getStorePasswordCallback(this), // PasswordCallback
-    						this // Parent
+    						this, // Parent
+							false
     				);
 
     			} catch (final KeystoreAlternativeException e) {
@@ -552,7 +518,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     						    lib, // Lib
     							null, // Description
     							aoks.getStorePasswordCallback(this), // PasswordCallback
-    							this // Parent
+    							this, // Parent
+								false
     					);
     				} catch (final Exception e1) {
     		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
@@ -573,7 +540,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     						    lib, // Lib
     							null, // Description
     							aoks.getStorePasswordCallback(this), // PasswordCallback
-    							this // Parent
+    							this, // Parent
+								false
     					);
     				} catch (final Exception e1) {
     		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e); //$NON-NLS-1$
@@ -593,7 +561,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
     						    lib, // Lib
     							null, // Description
     							aoks.getStorePasswordCallback(this), // PasswordCallback
-    							this // Parent
+    							this, // Parent
+								false
     					);
     				} catch (final Exception e1) {
     		 			LOGGER.log(Level.SEVERE, "Error al seleccionar el almacen del sistema", e1); //$NON-NLS-1$
@@ -1021,8 +990,8 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 								null, // Lib
 								"AFIRMA-NSS-KEYSTORE", // Description //$NON-NLS-1$
 								null, // PasswordCallback
-								null // Parent
-								);
+								null, // Parent
+								false);
 						saf.setKeyStoreManager(ksm);
 					} catch (final Exception e1) {
 						LOGGER.severe(

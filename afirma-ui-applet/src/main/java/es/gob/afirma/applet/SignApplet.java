@@ -2354,9 +2354,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 		}
 	}
 
-	// ==============================================
+	// ----------------------------------------------
 	// Funcionalidades de multifirma masiva programatica
-	// ==============================================
+	// ----------------------------------------------
 
 	/** Manejador de firma masiva. */
 	private MassiveSignatureHelper massiveSignatureHelper = null;

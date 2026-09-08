@@ -9,18 +9,17 @@
 
 package es.gob.afirma.keystores.mozilla;
 
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+
+import javax.security.auth.callback.PasswordCallback;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
 import java.util.logging.Level;
-
-import javax.security.auth.callback.PasswordCallback;
-
-import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Almac&eacute;n de claves y certificados basado en NSS.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -38,7 +37,7 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 	 * @param sharedNss Si se indica <code>true</code> se usa el directorio de NSS compartido (de sistema), si por
 	 *                  el contrario se indica <code>false</code> se usa el NSS espec&iacute;fico de Mozilla. */
 	public NssKeyStoreManager(final Object parent, final boolean sharedNss) {
-		setKeyStoreType(AOKeyStore.MOZ_UNI);
+		setType(AOKeyStore.MOZ_UNI);
 		this.parentComponent = parent;
 		this.useSharedNss = sharedNss;
 	}
@@ -77,10 +76,11 @@ public final class NssKeyStoreManager extends AOKeyStoreManager {
 					"No se ha podido abrir el almacen sin contrasena, se intentara proporcionando una: " + e //$NON-NLS-1$
 				);
 				try {
-					keyStore.load(null, pssCallBack != null
-							? pssCallBack.getPassword()
-							: new UIPasswordCallback(FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.0"), //$NON-NLS-1$
-							this.parentComponent).getPassword());
+					keyStore.load(null,
+							pssCallBack != null
+									? pssCallBack.getPassword()
+									: new UIPasswordCallback(FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.0"), //$NON-NLS-1$
+										this.parentComponent).getPassword());
 				}
 				catch (final AOCancelledOperationException e1) {
 					throw e1;

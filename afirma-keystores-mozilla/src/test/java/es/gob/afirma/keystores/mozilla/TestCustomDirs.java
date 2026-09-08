@@ -1,12 +1,11 @@
 package es.gob.afirma.keystores.mozilla;
 
-import java.io.File;
-
-import org.junit.Test;
-
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import org.junit.Test;
+
+import java.io.File;
 
 /** Pruebas de directorios a medida para Mozilla Firefox.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -32,12 +31,13 @@ public class TestCustomDirs {
 		System.out.println(System.getProperty("es.gob.afirma.keystores.mozilla.UseEnvironmentVariables")); //$NON-NLS-1$
 		System.out.println();
 
-    	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-    	    AOKeyStore.MOZ_UNI, // Store
-    	    null, // Lib
-			"TEST-KEYSTORE", // Description //$NON-NLS-1$
-			null, // PasswordCallback
-			null // Parent
+		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.MOZ_UNI, // Store
+				null, // Lib
+				"TEST-KEYSTORE", // Description //$NON-NLS-1$
+				null, // PasswordCallback
+				null, // Parent
+				false // ForceReset
 		);
     	final String[] aliases = ksm.getAliases();
     	for (final String alias : aliases) {

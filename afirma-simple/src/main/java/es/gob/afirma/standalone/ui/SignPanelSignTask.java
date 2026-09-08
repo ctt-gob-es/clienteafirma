@@ -9,43 +9,9 @@
 
 package es.gob.afirma.standalone.ui;
 
-import java.awt.Component;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
-
-import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.CustomRuntimeConfigNeededException;
-import es.gob.afirma.core.ErrorCode;
-import es.gob.afirma.core.RuntimeConfigNeededException;
+import es.gob.afirma.core.*;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
-import es.gob.afirma.core.RuntimePasswordNeededException;
-import es.gob.afirma.core.keystores.AOCancelledSMOperationException;
-import es.gob.afirma.core.keystores.AuthenticationException;
-import es.gob.afirma.core.keystores.CertificateContext;
-import es.gob.afirma.core.keystores.KeyStoreManager;
-import es.gob.afirma.core.keystores.LockedKeyStoreException;
-import es.gob.afirma.core.keystores.PinException;
+import es.gob.afirma.core.keystores.*;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -79,6 +45,23 @@ import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 final class SignPanelSignTask extends SwingWorker<Void, Void> {
 
@@ -182,7 +165,7 @@ final class SignPanelSignTask extends SwingWorker<Void, Void> {
         		return;
         	}
         	catch (final Exception e) {
-        		LOGGER.severe("Ocurrio un error al extraer la clave privada del certificado seleccionado: " + e); //$NON-NLS-1$
+        		LOGGER.log(Level.SEVERE,"Ocurrio un error al extraer la clave privada del certificado seleccionado", e); //$NON-NLS-1$
         		showErrorMessage(SimpleAfirmaMessages.getString("SignPanel.56"), e); //$NON-NLS-1$
         		return;
         	}

@@ -9,31 +9,6 @@
 
 package es.gob.afirma.standalone;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.Console;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.JOptionPane;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
@@ -46,12 +21,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreDialog;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.CertificateFilter;
-import es.gob.afirma.keystores.KeystoreAlternativeException;
+import es.gob.afirma.keystores.*;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.signers.batch.client.BatchSigner;
@@ -70,18 +40,28 @@ import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
-import es.gob.afirma.standalone.plugins.AfirmaPlugin;
-import es.gob.afirma.standalone.plugins.Permission;
-import es.gob.afirma.standalone.plugins.PluginCommand;
-import es.gob.afirma.standalone.plugins.PluginCommandAction;
-import es.gob.afirma.standalone.plugins.PluginControlledException;
-import es.gob.afirma.standalone.plugins.PluginInfo;
+import es.gob.afirma.standalone.plugins.*;
 import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.plugins.manager.PluginLoader;
 import es.gob.afirma.standalone.plugins.manager.PluginsManager;
 import es.gob.afirma.standalone.ui.SignOperationConfig;
 import es.gob.afirma.standalone.ui.SignOperationConfig.CryptoOperation;
+
+import javax.swing.*;
+import java.io.*;
+import java.net.URL;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Clase para la gesti&oacute;n de los par&aacute;metros proporcionados desde l&iacute;nea de comandos.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -1018,7 +998,8 @@ final class CommandLineLauncher {
 			lib,
 			"CommandLine", //$NON-NLS-1$
 			pwd != null ? new CachePasswordCallback(pwd.toCharArray()) : null,
-			null
+			null,
+			false
 		);
 	}
 

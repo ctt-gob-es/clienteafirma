@@ -9,20 +9,18 @@
 
 package es.gob.afirma.keystores.mozilla;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.KeyStoreUtilities;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+
+import javax.security.auth.callback.PasswordCallback;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.logging.Level;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de Firefox accedidos
  *  v&iacute;a NSS en el que se tratan de forma unificada los m&oacute;dulos internos y externos.
@@ -31,10 +29,9 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 
 	/** Crea un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de Firefox. */
 	public MozillaUnifiedWithOSKeyStoreManager() {
-		setKeyStoreType(AOKeyStore.MOZ_UNI_WITH_OS);
+		setType(AOKeyStore.MOZ_UNI_WITH_OS);
 	}
 
-	/** Inicializa la clase gestora de almacenes de claves. */
 	@Override
 	public void init(final AOKeyStore type,
 			               final InputStream store,
@@ -47,7 +44,7 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 		this.passwordCallback = pssCallBack;
 		this.configParams = params != null ? params.clone() : null;
 
-		// Vaciamos el listado de almacenes agregados ya que esta llamada puede realizarse como
+		// Vaciamos el listado de almacenes agregados, ya que esta llamada puede realizarse como
 		// parte de una operacion de refresco del almacen
 		removeAll();
 
@@ -56,16 +53,13 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 		if (this.configParams != null && this.configParams.length > 0) {
 			parentComponent = this.configParams[0];
 		}
-		
-		List<String> nssThumbprints = new ArrayList<String>();
 
-		// Agregamos el almacen interno de Mozilla
+		// Salvo que se indique que solo se carguen los PKCS#11, primero agregamos el almacen interno de Mozilla
 		if (!Boolean.getBoolean(ONLY_PKCS11) && !Boolean.parseBoolean(System.getenv(ONLY_PKCS11_ENV))) {
-			// Primero anadimos el almacen principal NSS
+			LOGGER.info("Agregamos las entradas del almacen NSS de Firefox"); //$NON-NLS-1$
 			final AOKeyStoreManager ksm = getNssKeyStoreManager();
 			try {
-				ksm.init(type, store, pssCallBack, this.configParams, forceReset);
-				nssThumbprints = KeyStoreUtilities.getCertificateThumbprints(ksm);
+				ksm.init(type, store, this.passwordCallback, this.configParams, forceReset);
 			}
 			catch(final Exception e) {
 				LOGGER.severe(
@@ -76,18 +70,14 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 			addKeyStoreManager(ksm);
 		}
 
-		//Agregamos el almacen del SO si aplica
-		if (Platform.OS.WINDOWS.equals(Platform.getOS()) && !this.initialized) {
+		// Agregamos el almacen del SO si aplica
+		// Como almacenes secundarios que son, evitamos el reseteo si ya estaban cargados. Esto evita problemas con el
+		// PKCS#11 del DNIe
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			LOGGER.info("Agregamos las entradas del almacen de claves de Windows"); //$NON-NLS-1$
 			try {
-				final AOKeyStoreManager osKeystore = AOKeyStoreManagerFactory.getWindowsMyCapiKeyStoreManager(true);
-				
-				// Antes de agregar el almacen, comprobamos los certificados que ya existan
-				// en NSS para desactivarlos en el almacen Windows y asi evitar certificados duplicados				
-		        for (final String thumbprint : nssThumbprints) {
-		        	osKeystore.deactivateEntry(thumbprint);
-				}
-				
+				final AOKeyStoreManager osKeystore = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						AOKeyStore.WINDOWS, null, null, this.passwordCallback, parentComponent, false);
 				addKeyStoreManager(osKeystore);
 			} catch (final Exception e) {
 				LOGGER.severe("No se ha podido agregar el almacen de Windows: " + e); //$NON-NLS-1$
@@ -95,94 +85,93 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 		} else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 			LOGGER.info("Agregamos las entradas del almacen de claves del llavero de macOS"); //$NON-NLS-1$
 			try {
-				final AOKeyStoreManager osKeystore = AOKeyStoreManagerFactory.getMacOSXKeyStoreManager(
-						AOKeyStore.APPLE, null, true, parentComponent);
+				final AOKeyStoreManager osKeystore = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						AOKeyStore.APPLE, null, null, null, parentComponent, false);
 				addKeyStoreManager(osKeystore);
 			} catch (final Exception e) {
 				LOGGER.severe("No se ha podido agregar el almacen de MacOS: " + e); //$NON-NLS-1$
 			}
 		}
 
-		// Intentamos ahora agregar los almacenes externos preferentes ajenos a los
-		// dispositivos de seguridad configurados en Firefox haciendo uso del controlador Java
-		boolean excludePreferredKeyStores = false;
+		// Intentamos ahora agregar los almacenes de JMulticard. Estos almacenes siempre se agregan con maxima prioridad
+		boolean excludeJMulticardKeyStores = false;
 		if (forceReset || !this.initialized) {
 			try {
-				this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
-				setSmartCardAdded(this.preferredKsAdded);
+				this.smartcardLoadedByJMulticard = KeyStoreUtilities.addJMulticardKeyStoreManagers(this, parentComponent, forceReset);
+				setSmartCardAdded(this.smartcardLoadedByJMulticard);
 			}
 			catch (final AOCancelledOperationException e) {
 				LOGGER.info("Se cancelo el uso del driver Java: " + e); //$NON-NLS-1$
-				// En caso de haber detectado una tarjeta preferida pero haberse cancelado su uso,
-				// permitiremos utilizar el resto de modulos a excepcion de los PKCS#11 que tambien
-				// controlen las tarjetas preferidas, ya que se supone que no se desean utilizar
-				this.preferredKsAdded = false;
-				excludePreferredKeyStores = true;
+				this.smartcardLoadedByJMulticard = false;
+				// En caso de haya cancelado expresamente el uso de una tarjeta que se haya encontrado insertada,
+				// lo marcamos para que, al cargar el resto de modulos mediante PKCS#11 se omitan aquellos que se
+				// controlen desde JMulticard y que el usuario ha indicado que no desea utilizar
+				excludeJMulticardKeyStores = true;
 			}
 		}
 
-		// Si se pudo agregar algun almacen preferente entendemos que se desean usar y no cargamos los
-		// configurados en Firefox. Si no, iniciamos los almacenes externos. DNIe nunca se cargara como
-		// almacen externo. En el caso de las tarjetas CERES, si no se pudo cargar a traves del
-		// controlador JAVA, se intentara cargar a traves del PKCS#11 si estaba configurado en Firefox
-		if (!this.preferredKsAdded) {
-			final Map<String, String> externalStores = getExternalStores(excludePreferredKeyStores);
-
-			if (externalStores.size() > 0) {
-				final StringBuilder logStr = new StringBuilder(
-					"Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: " //$NON-NLS-1$
-				);
-				for (final String key : externalStores.keySet()) {
-					logStr.append("'"); //$NON-NLS-1$
-					logStr.append(externalStores.get(key));
-					logStr.append("' "); //$NON-NLS-1$
-				}
-				LOGGER.info(logStr.toString());
+		// Si se cargo alguna tarjeta con JMulticard entendemos que se desean usar y no cargamos ningun otro
+		// almacen externo. Si no, trataremos de cargar el DNI a traves de su PKCS#11.
+		if (!this.smartcardLoadedByJMulticard) {
+			try {
+				AOKeyStoreManager pkcs11DnieKsm = getDNIePKCS11KeyStoreManager(parentComponent, forceReset);
+				addKeyStoreManager(0, pkcs11DnieKsm);
+				setSmartCardAdded(true);
+				this.dnieLoadedBypkcs11 = true;
 			}
-			else {
-				LOGGER.info("No se han encontrado modulos PKCS#11 externos instalados en Firefox"); //$NON-NLS-1$
+			catch (final AOCancelledOperationException e) {
+				LOGGER.info("Se cancelo el uso del PKCS#11 del DNIe: " + e); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				LOGGER.log(Level.WARNING,
+						"No se ha podido cargar el DNIe a traves de su PKCS#11, se continuara con el resto de almacenes externos", e); //$NON-NLS-1$
 			}
 
-			for (final String descr : externalStores.keySet()) {
-				final AOKeyStoreManager tmpKsm = new AOKeyStoreManager();
-				try {
-					initExternalStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
-				}
-				catch (final AOCancelledOperationException ex) {
-					LOGGER.warning(
-						"Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex //$NON-NLS-1$ //$NON-NLS-2$
+			// Si no se ha cargado el DNIe, cargamos los PKCS#11 externos declarados en el propio Firefox
+			if (!this.dnieLoadedBypkcs11) {
+				final Map<String, String> externalStores = getExternalStores(excludeJMulticardKeyStores);
+
+				if (!externalStores.isEmpty()) {
+					final StringBuilder logStr = new StringBuilder(
+							"Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: " //$NON-NLS-1$
 					);
-					continue;
+					for (final String key : externalStores.keySet()) {
+						logStr.append("'"); //$NON-NLS-1$
+						logStr.append(externalStores.get(key));
+						logStr.append("' "); //$NON-NLS-1$
+					}
+					LOGGER.info(logStr.toString());
+				} else {
+					LOGGER.info("No se han encontrado modulos PKCS#11 externos instalados en Firefox"); //$NON-NLS-1$
 				}
-				catch (final Exception ex) {
-					// En ciertos sistemas Linux fallan las inicializaciones la primera vez por culpa de PC/SC, reintentamos
-					if (!Platform.OS.LINUX.equals(Platform.getOS())) {
-						LOGGER.warning("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-						continue;
-					}
+
+				for (final String descr : externalStores.keySet()) {
+					final AOKeyStoreManager tmpKsm;
 					try {
-						initExternalStore(tmpKsm, descr, parentComponent, forceReset, externalStores.get(descr));
+						tmpKsm = initExternalStore(externalStores.get(descr), descr, parentComponent, forceReset);
 					}
-					catch (final AOCancelledOperationException exc) {
-						LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + exc); //$NON-NLS-1$ //$NON-NLS-2$
-						continue;
-					}
-					catch(final Exception e) {
+					catch (final AOCancelledOperationException ex) {
 						LOGGER.warning(
-							"No se ha podido inicializar el PKCS#11 '" + descr + "' tras haberlo intentado dos veces: " + ex + ", " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								"Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex //$NON-NLS-1$ //$NON-NLS-2$
 						);
 						continue;
 					}
-				}
-				addKeyStoreManager(tmpKsm);
+					catch (final Exception ex) {
+						LOGGER.warning("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+						continue;
+					}
+					// Agregamos el almacen con maxima prioridad para que, dado un mismo certificado, se utilice el de
+					// tarjeta en lugar del certificado software. Esto no afecta al uso de JMulticard, ya que si se ha
+					// cargado un almacen de este tipo, no se cargan los PKCS#11 externos
+					addKeyStoreManager(0, tmpKsm);
 
-				LOGGER.info(
-					"El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas y se detiene la carga del resto de almacenes" //$NON-NLS-1$ //$NON-NLS-2$
-				);
-				break;
+					LOGGER.info(
+							"El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas y se detiene la carga del resto de almacenes" //$NON-NLS-1$ //$NON-NLS-2$
+					);
+					break;
+				}
 			}
 		}
-
 
 		if (lacksKeyStores()) {
 			LOGGER.warning(
@@ -190,13 +179,22 @@ public class MozillaUnifiedWithOSKeyStoreManager extends MozillaUnifiedKeyStoreM
 			);
 		}
 
-		setKeyStoreType(type);
+		setType(type);
 
 		this.initialized = true;
 	}
 
 	@Override
-	public void refresh() throws IOException {
+	public void refresh() {
+		if (getParentComponent() != null) {
+			if (this.passwordCallback != null && this.passwordCallback instanceof UIPasswordCallback) {
+				((UIPasswordCallback) this.passwordCallback).setParent(getParentComponent());
+			}
+			if (this.configParams == null || this.configParams.length == 0) {
+				this.configParams = new Object[1];
+			}
+			this.configParams[0] = getParentComponent();
+		}
 		init(AOKeyStore.MOZ_UNI_WITH_OS, null, this.passwordCallback, this.configParams, true);
 	}
 

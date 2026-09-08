@@ -9,6 +9,10 @@
 
 package es.gob.afirma.keystores;
 
+import es.gob.afirma.core.InvalidOSException;
+import es.gob.afirma.core.misc.Platform;
+
+import javax.security.auth.callback.PasswordCallback;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -18,16 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.security.auth.callback.PasswordCallback;
-
-import es.gob.afirma.core.InvalidOSException;
-import es.gob.afirma.core.misc.Platform;
+import java.util.*;
 
 /**
  * Gestor de claves del llavero de Apple OS X.
@@ -37,7 +32,7 @@ import es.gob.afirma.core.misc.Platform;
 final class AppleKeyStoreManager extends AOKeyStoreManager {
 
 	AppleKeyStoreManager() {
-		setKeyStoreType(AOKeyStore.APPLE);
+		setType(AOKeyStore.APPLE);
 	}
 
 	@Override

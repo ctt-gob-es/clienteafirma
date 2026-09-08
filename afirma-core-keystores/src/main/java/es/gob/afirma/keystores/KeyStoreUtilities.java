@@ -9,38 +9,28 @@
 
 package es.gob.afirma.keystores;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.TextOutputCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.login.LoginException;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.LoggerUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+
+import javax.security.auth.callback.*;
+import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.Provider;
+import java.security.cert.X509Certificate;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
 public final class KeyStoreUtilities {
@@ -103,7 +93,7 @@ public final class KeyStoreUtilities {
      * @param slot Lector de tarjetas en el que buscar la biblioteca.
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de un token gen&eacute;rico */
-    public static String createPKCS11ConfigFile(final String lib, final String name, final Integer slot) {
+    public static String createPKCS11ConfigFile(final String lib, final String name, final Integer slot, final String description) {
 
         final StringBuilder buffer = new StringBuilder("library="); //$NON-NLS-1$
 
@@ -120,6 +110,10 @@ public final class KeyStoreUtilities {
             //       https://bugs.openjdk.java.net/browse/JDK-8039912
             .append("\r\nshowInfo=true\r\n"); //$NON-NLS-1$
 
+		if (description != null) {
+			buffer.append("description=").append(description).append("\r\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
         if (slot != null) {
             buffer.append("slot=").append(slot).append("\r\n"); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -133,7 +127,7 @@ public final class KeyStoreUtilities {
         	}
         }
 
-        LOGGER.info("Creada configuracion PKCS#11:\r\n" + buffer.toString()); //$NON-NLS-1$
+        LOGGER.info("Creada configuracion PKCS#11:\r\n" + buffer); //$NON-NLS-1$
         return buffer.toString();
     }
 
@@ -206,9 +200,7 @@ public final class KeyStoreUtilities {
         if (ksm != null) {
 
         	X509Certificate tmpCert;
-            for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
-                tmpCert = null;
-
+            for (final String al : aliassesByFriendlyName.keySet().toArray(new String[0])) {
                 try {
                     tmpCert = ksm.getCertificate(al);
                 }
@@ -268,11 +260,11 @@ public final class KeyStoreUtilities {
             }
 
             // Aplicamos los filtros de certificados
-            if (certFilters != null && certFilters.size() > 0) {
+            if (certFilters != null && !certFilters.isEmpty()) {
             	// Tabla para los certificados que si hay que mostrar
             	final Map<String, String> filteredAliases = new Hashtable<>();
                 for (final CertificateFilter cf : certFilters) {
-                	final String[] certAliases = aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()]);
+                	final String[] certAliases = aliassesByFriendlyName.keySet().toArray(new String[0]);
                 	for (final String filteredAlias : cf.matches(certAliases, ksm)) {
                 		filteredAliases.put(filteredAlias, aliassesByFriendlyName.get(filteredAlias));
                 		aliassesByFriendlyName.remove(filteredAlias);
@@ -324,7 +316,7 @@ public final class KeyStoreUtilities {
             // CN o una version truncada si no nos cuela como X.500.
             // En este bucle usamos la clave tanto como clave como valor porque
             // asi se ha inicializado el mapa.
-            for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
+            for (final String al : aliassesByFriendlyName.keySet().toArray(new String[0])) {
                 final String value = aliassesByFriendlyName.get(al);
                 if (value.length() > ALIAS_MAX_LENGTH) {
                     tmpCN = AOUtil.getCN(value);
@@ -390,11 +382,14 @@ public final class KeyStoreUtilities {
 	 * @param aksm Almac&eacute;n agredado al que se desea a&ntilde;adir los almacenes preferentes.
 	 * @param parentComponent Componente padre para los di&aacute;logos de los almacenes preferentes
 	 *                        (solicitud de PIN, confirmaci&oacute;n de firma, etc.).
+	 * @param forceReset Indica si se debe forzar la reinicializaci&oacute;n de los almacenes preferentes si ya estaban inicializados.
 	 * @return Devuelve {@code true} cuando se ha detectado alguno de los almacenes preferentes,
 	 *         {@code false} en caso contrario.
 	 * @throws AOCancelledOperationException Cuando se cancela la carga del almac&eacute;n. */
-	public static boolean addPreferredKeyStoreManagers(final AggregatedKeyStoreManager aksm,
-			                                           final Object parentComponent) {
+	public static boolean addJMulticardKeyStoreManagers(final AggregatedKeyStoreManager aksm,
+	                                                    final Object parentComponent,
+														final boolean forceReset) {
+
 		// Anadimos el controlador Java del DNIe SIEMPRE excepto que se indique lo contrario
 		// mediante una variable de entorno de sistema operativo o una propiedad Java
 		if (
@@ -402,7 +397,7 @@ public final class KeyStoreUtilities {
 			!Boolean.parseBoolean(System.getenv(DISABLE_DNIE_NATIVE_DRIVER_ENV))
 		) {
 			try {
-				aksm.addKeyStoreManager(getDnieKeyStoreManager(parentComponent));
+				aksm.addKeyStoreManager(0, getJMulticardKeyStoreManager(AOKeyStore.DNIEJAVA, parentComponent, forceReset));
 				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
 			catch (final NoClassDefFoundError e) {
@@ -424,7 +419,7 @@ public final class KeyStoreUtilities {
 		) {
 			// Tarjeta CERES 430
 			try {
-				aksm.addKeyStoreManager(getCeres430KeyStoreManager(parentComponent));
+				aksm.addKeyStoreManager(0, getJMulticardKeyStoreManager(AOKeyStore.CERES_430, parentComponent, forceReset));
 				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
             catch (final NoClassDefFoundError e) {
@@ -439,7 +434,7 @@ public final class KeyStoreUtilities {
 
 			// Otras tarjetas CERES
 			try {
-				aksm.addKeyStoreManager(getCeresKeyStoreManager(parentComponent));
+				aksm.addKeyStoreManager(0, getJMulticardKeyStoreManager(AOKeyStore.CERES, parentComponent, forceReset));
 				return true; // Si instancia esta tarjeta, no pruebo el resto. No deberia haber varias tarjetas insertadas
 			}
             catch (final NoClassDefFoundError e) {
@@ -461,7 +456,7 @@ public final class KeyStoreUtilities {
 			Boolean.parseBoolean(System.getenv(ENABLE_GYDSC_NATIVE_DRIVER_ENV))
 		) {
 			try {
-				aksm.addKeyStoreManager(getSmartCafeKeyStoreManager(parentComponent));
+				aksm.addKeyStoreManager(0, getJMulticardKeyStoreManager(AOKeyStore.SMARTCAFE, parentComponent, forceReset));
 				return true; // Si instancia SmartCafe no pruebo otras tarjetas, no deberia haber varias tarjetas instaladas
 			}
             catch (final NoClassDefFoundError e) {
@@ -478,65 +473,29 @@ public final class KeyStoreUtilities {
 		return false;
 	}
 
-	private static AOKeyStoreManager getDnieKeyStoreManager(final Object parentComponent) throws KeystoreAlternativeException, IOException {
+	private static AOKeyStoreManager getJMulticardKeyStoreManager(AOKeyStore storeType, final Object parentComponent,
+			final boolean forceReset) throws KeystoreAlternativeException, IOException {
 		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-			AOKeyStore.DNIEJAVA,
+				storeType,
 			null,
 			null,
 			null,
-			parentComponent
+			parentComponent,
+			forceReset
 		);
-		LOGGER.info("El DNIe 100% Java ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-		tmpKsm.setPreferred(true);
+		LOGGER.info("Ha podido inicializarse " + storeType.getName() + " se anadiran sus entradas"); //$NON-NLS-1$
 		return tmpKsm;
 	}
 
-	private static AOKeyStoreManager getCeres430KeyStoreManager(final Object parentComponent) throws KeystoreAlternativeException, IOException {
-		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-			AOKeyStore.CERES_430, // Store
-			null,             // Lib (null)
-			null,             // Description (null)
-			null,             // PasswordCallback (no hay en la carga, hay en la firma)
-			parentComponent   // Parent
-		);
-		LOGGER.info("La tarjeta CERES 430 ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-		tmpKsm.setPreferred(true);
-		return tmpKsm;
-	}
-
-	private static AOKeyStoreManager getCeresKeyStoreManager(final Object parentComponent) throws KeystoreAlternativeException, IOException {
-		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-			AOKeyStore.CERES, // Store
-			null,             // Lib (null)
-			null,             // Description (null)
-			null,             // PasswordCallback (no hay en la carga, hay en la firma)
-			parentComponent   // Parent
-		);
-		LOGGER.info("La tarjeta CERES ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-		tmpKsm.setPreferred(true);
-		return tmpKsm;
-	}
-
-	private static AOKeyStoreManager getSmartCafeKeyStoreManager(final Object parentComponent) throws KeystoreAlternativeException, IOException {
-		final AOKeyStoreManager tmpKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-			AOKeyStore.SMARTCAFE, // Store
-			null,                 // Lib (null)
-			null,                 // Description (null)
-			null,                 // PasswordCallback (no hay en la carga, hay en la firma)
-			parentComponent       // Parent
-		);
-		LOGGER.info("La tarjeta SmartCafe ha podido inicializarse, se anadiran sus entradas"); //$NON-NLS-1$
-		tmpKsm.setPreferred(true);
-		return tmpKsm;
-	}
-
-    /** Obtiene un almac&eacute;n de claves agregando un gestor de <i>callbacks</i> gen&eacute;rico.
+    /**
+	 * Obtiene un almac&eacute;n de claves agregando un gestor de <i>callbacks</i> gen&eacute;rico.
      * @param ks Tipo de almac&eacute;n a obtener.
      * @param pssCallBack <i>PasswordCallback</i> para solilcitar la contrase&ntilde;a al usuario.
      * @param provider Proveedor de <code>KeyStore</code>.
      * @param parentComponent Componente padre para la modalidad.
      * @return Almac&eacute;n de claves con un gestor de <i>callbacks</i> gen&eacute;rico instalado.
-     * @throws KeyStoreException Si no se puede obtener el almac&eacute;n de claves. */
+     * @throws KeyStoreException Si no se puede obtener el almac&eacute;n de claves.
+	 */
     public static KeyStore getKeyStoreWithPasswordCallbackHandler(final AOKeyStore ks,
     		                                                      final PasswordCallback pssCallBack,
                                                                   final Provider provider,
@@ -565,20 +524,21 @@ public final class KeyStoreUtilities {
     		if (e.getCause() != null && e.getCause().getCause() != null &&
     				e.getCause().getCause() instanceof LoginException) {
     			final Throwable pkcs11Exception = e.getCause().getCause().getCause();
-    			boolean ksLocked = false;
-    			String msg = KeyStoreMessages.getString("KeyStoreUtilities.5"); //$NON-NLS-1$
-    			if (pkcs11Exception != null) {
-        			if (PIN_ERROR_LOCKED.equals(pkcs11Exception.getMessage())) {
-        				msg = KeyStoreMessages.getString("KeyStoreUtilities.7"); //$NON-NLS-1$
-        				ksLocked = true;
-        			}
-        			else if (PIN_ERROR_WRONG_LENGTH.equals(pkcs11Exception.getMessage())) {
-        				msg = KeyStoreMessages.getString("KeyStoreUtilities.8"); //$NON-NLS-1$
-        			}
-        			else if (PIN_ERROR_INCORRECT.equals(pkcs11Exception.getMessage())) {
-        				msg = KeyStoreMessages.getString("KeyStoreUtilities.5"); //$NON-NLS-1$
-        			}
-    			}
+				if (pkcs11Exception.getClass().getName().equals("es.gob.jmulticard.CancelledOperationException")) { //$NON-NLS-1$
+					throw new AOCancelledOperationException("El usuario cancelo el dialogo de PIN de JMulticard", pkcs11Exception);
+				}
+				boolean ksLocked = false;
+    			String msg;
+				if (PIN_ERROR_LOCKED.equals(pkcs11Exception.getMessage())) {
+					msg = KeyStoreMessages.getString("KeyStoreUtilities.7"); //$NON-NLS-1$
+					ksLocked = true;
+				} else if (PIN_ERROR_WRONG_LENGTH.equals(pkcs11Exception.getMessage())) {
+					msg = KeyStoreMessages.getString("KeyStoreUtilities.8"); //$NON-NLS-1$
+				} else if (PIN_ERROR_INCORRECT.equals(pkcs11Exception.getMessage())) {
+					msg = KeyStoreMessages.getString("KeyStoreUtilities.5"); //$NON-NLS-1$
+				} else {
+					 msg = KeyStoreMessages.getString("KeyStoreUtilities.5"); //$NON-NLS-1$
+				}
     			AOUIFactory.showMessageDialog(
     					parentComponent,
     					msg,
@@ -625,68 +585,6 @@ public final class KeyStoreUtilities {
         }
         return null;
     }
-    
-    /**
-     * Obtiene las huellas de certificados de un almac&eacute;n.
-     * @param ksm Almac&eacute;n del cual obtener las huellas.
-     * @return Lista de huellas de certificados.
-     */
-	public static List<String> getCertificateThumbprints(final AOKeyStoreManager ksm) {
-
-		final List<String> thumbprints = new ArrayList<>();
-
-		if (ksm == null) {
-			return thumbprints;
-		}
-
-		final MessageDigest md;
-		try {
-			md = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
-		}
-		catch (final NoSuchAlgorithmException e) {
-			LOGGER.warning(
-					"No se ha podido instanciar SHA1 para calcular huellas de certificados: " + e //$NON-NLS-1$
-			);
-			return thumbprints;
-	    }
-
-		final String[] aliases;
-		try {
-			aliases = ksm.getAliases();
-		}
-		catch (final Exception e) {
-			LOGGER.warning(
-					"No se han podido obtener los alias del almacen PKCS#11 del DNIe: " + e //$NON-NLS-1$
-			);
-		return thumbprints;
-	    }
-
-		for (final String alias : aliases) {
-			try {
-				final X509Certificate cert = ksm.getCertificate(alias);
-				if (cert != null) {
-					thumbprints.add(
-							AOUtil.hexify(
-								md.digest(cert.getEncoded()),
-								false
-							)
-					);
-				}
-	        }
-			catch (final CertificateEncodingException e) {
-				LOGGER.warning(
-						"No se ha podido calcular la huella del certificado del DNIe: " + e //$NON-NLS-1$
-				);
-	        }
-			catch (final Exception e) {
-				LOGGER.warning(
-						"No se ha podido procesar el certificado del alias '" + alias + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-			}
-		}
-
-		return thumbprints;
-	}
 
     /** Manejador para la gesti&oacute;n de la contrase&ntilde;a (y otros di&aacute;logos)
      * de un almac&eacute;n de claves. */

@@ -1,24 +1,25 @@
 package es.gob.afirma.keystores.jmulticard.ui;
 
+import es.gob.jmulticard.callback.CardWithRetriesPasswordCallback;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Timer;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
 
-import es.gob.jmulticard.callback.CardWithRetriesPasswordCallback;
-
-
-/** <code>CallbackHandler</code> que gestiona los <code>Callbacks</code> de petici&oacute;n de
+/**
+ * <code>CallbackHandler</code> que gestiona los <code>Callbacks</code> de petici&oacute;n de
  * informaci&oacute;n al usuario cuando utiliza un DNIe. Esta clase <i>cachea</i> las respuestas
  * de confirmaci&oacute;n y contrase&ntilde;a del usuario de tal forma que no requerir&aacute;a
  * que las vuelva a introducir. La cach&eacute; se borra autom&aacute;ticamente pasado un tiempo
- * determinado. */
+ * determinado.
+ */
 public final class DnieCacheCallbackHandler implements CallbackHandler, CacheElement {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$

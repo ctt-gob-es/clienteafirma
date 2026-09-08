@@ -9,17 +9,6 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.awt.Component;
-import java.io.IOException;
-import java.security.KeyStoreException;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.security.auth.callback.PasswordCallback;
-
-import org.json.JSONException;
-
 import es.gob.afirma.ciphers.ServerCipher;
 import es.gob.afirma.ciphers.ServerCipherFactory;
 import es.gob.afirma.core.AOException;
@@ -35,19 +24,20 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOTriphaseException;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.AggregatedKeyStoreManager;
-import es.gob.afirma.keystores.DNIePKCS11KeyStoreManager;
-import es.gob.afirma.keystores.KeyStoreErrorCode;
 import es.gob.afirma.keystores.KeystoreAlternativeException;
-import es.gob.afirma.keystores.jmulticard.ui.UIPasswordCallbackAccessibility;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.standalone.SimpleAfirmaMessages;
 import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.plugins.SignOperation.Operation;
 import es.gob.afirma.standalone.ui.tasks.LoadKeystoreTask;
+import org.json.JSONException;
+
+import javax.security.auth.callback.PasswordCallback;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 final class ProtocolInvocationLauncherUtil {
 
@@ -75,7 +65,7 @@ final class ProtocolInvocationLauncherUtil {
 					append("?op=get&v=1_0&id=") //$NON-NLS-1$
 							.append(params.getFileId());
 
-		LOGGER.info("Intentamos recuperar los datos del servidor con la URL:\n" + dataUrl.toString()); //$NON-NLS-1$
+		LOGGER.info("Intentamos recuperar los datos del servidor con la URL:\n" + dataUrl); //$NON-NLS-1$
 
 		//Comprobamos que ya se haya configurado el contexto SSL
 		try {
@@ -214,7 +204,13 @@ final class ProtocolInvocationLauncherUtil {
 		else {
 			try {
 				final AOSigner signer = AOSignerFactory.getSigner(data);
-				format = AOSignerFactory.getSignFormat(signer);
+				if (signer != null) {
+					format = AOSignerFactory.getSignFormat(signer);
+				}
+				else {
+					LOGGER.info("Los datos no se corresponden con un formato de firma soportado"); //$NON-NLS-1$
+					format = null;
+				}
 			}
 			catch (final IOException e) {
 				LOGGER.severe(
@@ -271,7 +267,8 @@ final class ProtocolInvocationLauncherUtil {
 					aoksLib, // Lib
 					null, // Description
 					pwc, // PasswordCallback
-					null // Parent
+					null, // Parent
+					false
 			);
 		}
 		catch (final KeystoreAlternativeException e) {
@@ -282,44 +279,5 @@ final class ProtocolInvocationLauncherUtil {
 			LOGGER.warning("No se pudo cargar el almacen predefinido. Se tratara de cargar el almacen alternativo: " + ksType); //$NON-NLS-1$
 			return getAOKeyStoreManager(ksType, aoksLib);
 		}
-	}
-
-	/**
-	 * Obtiene el almacen del DNIe mediante su PKCS#11
-	 * @return Almac&eacute;n de DNIe.
-	 * @throws KeystoreAlternativeException si ocurre un error al acceder o validar el keystore alternativo.
-	 * @throws IOException si se produce un error de entrada/salida durante la lectura o escritura de datos.
-	 */
-    public static AggregatedKeyStoreManager getDNIePKCS11KeyStoreManager(final Component parent) throws KeystoreAlternativeException, IOException {
-
-    	final AggregatedKeyStoreManager dniKsm = new DNIePKCS11KeyStoreManager();
-		try {
-			final String prompt = SimpleAfirmaMessages.getString("DNIePasswordCallback.1"); //$NON-NLS-1$
-			final String title = SimpleAfirmaMessages.getString("DNIePasswordCallback.3"); //$NON-NLS-1$
-			final PasswordCallback psc = new UIPasswordCallbackAccessibility(
-					prompt,
-					parent,
-					prompt,
-					'P',
-					title,
-					"/images/dnie.png", //$NON-NLS-1$
-					true,
-					true
-				);
-
-			LOGGER.info(" ================== Establecemos el PasswordCallback de DNIe para que se use en la carga del PKCS#11");
-
-			dniKsm.init(AOKeyStore.PKCS11, null, psc, null, false);
-		}
-		catch (final AOKeyStoreManagerException e) {
-			throw new KeystoreAlternativeException(
-                 AOKeyStore.PKCS11,
-                 "Error al obtener almacen PKCS11: " + e, //$NON-NLS-1$
-                 e,
-                 KeyStoreErrorCode.Internal.LOADING_PKCS11_DNIE_ERROR
-             );
-		}
-
-		return dniKsm;
 	}
 }

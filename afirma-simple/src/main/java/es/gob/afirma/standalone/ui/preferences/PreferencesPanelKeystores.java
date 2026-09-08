@@ -9,15 +9,23 @@
 
 package es.gob.afirma.standalone.ui.preferences;
 
-import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE;
-import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.*;
+import es.gob.afirma.keystores.filters.PseudonymFilter;
+import es.gob.afirma.keystores.filters.SkipAuthDNIeFilter;
+import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.SimpleKeyStoreManager;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog;
 
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -31,35 +39,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
-import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.LoggerUtil;
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
-import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreDialog;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.CertificateFilter;
-import es.gob.afirma.keystores.KeyStoreErrorCode;
-import es.gob.afirma.keystores.MultipleCertificateFilter;
-import es.gob.afirma.keystores.filters.PseudonymFilter;
-import es.gob.afirma.keystores.filters.SkipAuthDNIeFilter;
-import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
-import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.SimpleKeyStoreManager;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
-import es.gob.afirma.ui.core.jse.certificateselection.CertificateSelectionDialog;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE;
+import static es.gob.afirma.standalone.configurator.common.PreferencesManager.PREFERENCE_KEYSTORE_SIGN_ONLY_CERTS;
 
 /** Pesta&ntilde;a de configuraci&oacute;n de las preferencias de certificados.
  * @author Jos&eacute; Montero. */
@@ -166,16 +147,16 @@ final class PreferencesPanelKeystores extends JScrollPane {
 		    		PreferencesPanelKeystores.this.localKeystoreSelectedPath = ks.getLib();
 
 		    	} else if (ks.getName().equals(AOKeyStore.DNIEJAVA.getName()) && e.getModifiers() != 0) {
-		    		final AOKeyStoreManager ksm = new AOKeyStoreManager();
+					// Inicializamos el almacen del DNIe unicamente para comprobar que es seleccionable
 		    		try {
-		    			// Proporcionamos el componente padre como parametro
-		    			ksm.init(
-		    					AOKeyStore.DNIEJAVA,
-		    					null,
-		    					null,
-		    					new Object[] { this },
-		    					true
-		    					);
+						AOKeyStoreManagerFactory.getAOKeyStoreManager(
+								AOKeyStore.DNIEJAVA,
+								null,
+								null,
+								null,
+								PreferencesPanelKeystores.this,
+								true
+						);
 		    		}
 		    		catch (final AOCancelledOperationException aoce) {
 		    			PreferencesPanelKeystores.this.keystores.setSelectedIndex(0);
@@ -258,7 +239,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
 						lib,
 						"default", //$NON-NLS-1$
 						ks.getStorePasswordCallback(this),
-						this
+						this,
+							true
 					);
 
 					String libName = null;
@@ -612,7 +594,8 @@ final class PreferencesPanelKeystores extends JScrollPane {
 					((RegisteredKeystore) this.smartCards.getSelectedItem()).getLib(),
 					((RegisteredKeystore) this.smartCards.getSelectedItem()).getName(),
 					ks.getStorePasswordCallback(container),
-					container
+					container,
+					false // El contenido de las tarjetas no suele cambiar
 				);
 			if (ksm != null) {
 				AOUIFactory.showMessageDialog(container, SimpleAfirmaMessages.getString("PreferencesPanelKeyStores.29"), //$NON-NLS-1$

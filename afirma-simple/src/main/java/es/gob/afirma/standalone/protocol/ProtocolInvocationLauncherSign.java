@@ -9,38 +9,10 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.MessageDigest;
-import java.security.cert.CertificateEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-
 import es.gob.afirma.ciphers.ServerCipher;
 import es.gob.afirma.ciphers.ServerCipherFactory;
-import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.AOControlledException;
-import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.core.AOInvalidSignatureFormatException;
-import es.gob.afirma.core.CustomRuntimeConfigNeededException;
-import es.gob.afirma.core.ErrorCode;
-import es.gob.afirma.core.RuntimeConfigNeededException;
+import es.gob.afirma.core.*;
 import es.gob.afirma.core.RuntimeConfigNeededException.RequestType;
-import es.gob.afirma.core.RuntimePasswordNeededException;
-import es.gob.afirma.core.SignaturePolicyIncompatibilityException;
 import es.gob.afirma.core.keystores.CertificateContext;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.keystores.LockedKeyStoreException;
@@ -54,22 +26,9 @@ import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
-import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.signers.AOSignerFactory;
-import es.gob.afirma.core.signers.AOTriphaseException;
-import es.gob.afirma.core.signers.AOTriphaseSigner;
-import es.gob.afirma.core.signers.CounterSignTarget;
-import es.gob.afirma.core.signers.ExtraParamsProcessor;
-import es.gob.afirma.core.signers.OptionalDataInterface;
+import es.gob.afirma.core.signers.*;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreDialog;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AggregatedKeyStoreManager;
-import es.gob.afirma.keystores.CertificateFilter;
-import es.gob.afirma.keystores.KeyStoreErrorCode;
+import es.gob.afirma.keystores.*;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.EncodedCertificateFilter;
 import es.gob.afirma.signers.pades.AOPDFSigner;
@@ -87,21 +46,10 @@ import es.gob.afirma.signvalidation.SignValiderFactory;
 import es.gob.afirma.signvalidation.SignValidity;
 import es.gob.afirma.signvalidation.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signvalidation.SignValidity.VALIDITY_ERROR;
-import es.gob.afirma.standalone.DesktopUtil;
-import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.SimpleErrorCode;
-import es.gob.afirma.standalone.SimpleKeyStoreManager;
+import es.gob.afirma.standalone.*;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
-import es.gob.afirma.standalone.plugins.AfirmaPlugin;
-import es.gob.afirma.standalone.plugins.EncryptingException;
-import es.gob.afirma.standalone.plugins.Permission;
-import es.gob.afirma.standalone.plugins.PluginControlledException;
-import es.gob.afirma.standalone.plugins.PluginInfo;
-import es.gob.afirma.standalone.plugins.SignDataProcessor;
-import es.gob.afirma.standalone.plugins.SignOperation;
+import es.gob.afirma.standalone.plugins.*;
 import es.gob.afirma.standalone.plugins.SignOperation.Operation;
-import es.gob.afirma.standalone.plugins.SignResult;
 import es.gob.afirma.standalone.plugins.manager.PermissionChecker;
 import es.gob.afirma.standalone.plugins.manager.PluginException;
 import es.gob.afirma.standalone.so.macos.MacUtils;
@@ -109,6 +57,15 @@ import es.gob.afirma.standalone.ui.DataDebugDialog;
 import es.gob.afirma.standalone.ui.ProgressInfoDialogManager;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog;
 import es.gob.afirma.standalone.ui.pdf.SignPdfDialog.SignPdfDialogListener;
+
+import javax.swing.*;
+import java.io.*;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.MessageDigest;
+import java.security.cert.CertificateEncodingException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 final class ProtocolInvocationLauncherSign {
 
@@ -258,7 +215,7 @@ final class ProtocolInvocationLauncherSign {
 	}
 
 	private static SignResult sign(final SignOperation signOperation, final UrlParametersToSign options,
-			final boolean isMassiveSign, final PrivateKeyEntry pkeSelected)
+			final boolean isMassiveSign, final PrivateKeyEntry pkePreSelected)
 					throws SocketOperationException {
 
 		byte[] data = signOperation.getData();
@@ -530,19 +487,27 @@ final class ProtocolInvocationLauncherSign {
 		// Si hay marcado un almacen como el ultimo seleccionado, lo usamos (este es el caso en el que se llaman
 		// varias operaciones de firma dentro de la misma invocacion a la aplicacion)
 		AOKeyStore aoks = null;
+		String keyStoreLib = null;
 		if (lastSelectedKeyStore != null && !lastSelectedKeyStore.isEmpty()) {
 			aoks = SimpleKeyStoreManager.getLastSelectedKeystore();
+			if (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks)) {
+				keyStoreLib = SimpleKeyStoreManager.getLastSelectedKeystoreLib();
+			}
 		}
 		// Si no, si el usuario definio un almacen por defecto para usarlo en las llamadas a la aplicacion, lo usamos
 		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
 				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore, true);
+				if (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks)) {
+					keyStoreLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+				}
 			}
 		}
 		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
 		else {
 			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore(), true);
+			keyStoreLib = options.getDefaultKeyStoreLib();
 		}
 
 		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
@@ -551,25 +516,25 @@ final class ProtocolInvocationLauncherSign {
 		}
 
 		PrivateKeyEntry pke = null;
-		String keyStoreLib = null;
 
 		// Identificamos si hay una clave preseleccionada que debemos usar. Si no, identificamos
 		// la biblioteca por defecto que se usara si el almacen lo requiere
 		if (options.getSticky() && !options.getResetSticky()
 				&& ProtocolInvocationLauncher.getStickyKeyEntry() != null
-				&& pkeSelected == null) {
+				&& pkePreSelected == null) {
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
-		} else if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
-			keyStoreLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
-		} else {
-			keyStoreLib = options.getDefaultKeyStoreLib();
 		}
 
 		final boolean stickySignatory = options.getSticky();
 
-		final SignOperationResult operationResult = selectCertAndSign(pke, aoks, keyStoreLib, filterManager, stickySignatory,
-				data, algorithm, signer, cryptoOperation, extraParams);
-
+		final SignOperationResult operationResult;
+		try {
+			operationResult = selectCertAndSign(pke, aoks, keyStoreLib, filterManager, stickySignatory,
+					data, algorithm, signer, cryptoOperation, extraParams);
+		}
+		finally {
+			ProgressInfoDialogManager.hideProgressDialog();
+		}
 		pke = operationResult.getPke();
 		final byte[] signature = operationResult.getResult();
 
@@ -597,32 +562,17 @@ final class ProtocolInvocationLauncherSign {
 		return result;
 	}
 
-	private static SignOperationResult selectCertAndSign(final PrivateKeyEntry pkeSelected, final AOKeyStore aoks,
+	private static SignOperationResult selectCertAndSign(final PrivateKeyEntry pkePreSelected, final AOKeyStore aoks,
 			final String keyStoreLib, final CertFilterManager filterManager, final boolean stickySignatory,
 			final byte[] data, final String algorithm, final AOSigner signer,
 			final SignOperation.Operation cryptoOperation, final Properties extraParams)
 					throws SocketOperationException {
 
-		PrivateKeyEntry pke = pkeSelected;
-
-
-		LOGGER.info(" =============== ESTABLECEMOS EL CERTIFICADO PARA FIRMAR");
-
-		if (pkeSelected == null) {
-
-			LOGGER.info(" =============== EL CERTIFICADO NO ESTABA PRESELECCIONADO");
-
+		PrivateKeyEntry pke = pkePreSelected;
+		if (pkePreSelected == null) {
 			AOKeyStoreManager ksm;
-
 			try {
 				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, keyStoreLib);
-	        	if (ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) ksm).isSmartCardAdded()) {
-
-	        		LOGGER.info(" =============== NO HABIA UNA TARJETA ANTERIOR EN EL ALMACEN");
-
-		        	final AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager(null);
-		        	((AggregatedKeyStoreManager) ksm).addKeyStoreManager(dniePkcs11Aksm);
-	        	}
 			}
 			catch (final AOCancelledOperationException e) {
 				LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
@@ -667,9 +617,6 @@ final class ProtocolInvocationLauncherSign {
 				// seleccion)
 				final CertificateContext context = dialog.getSelectedCertificateContext();
 				final KeyStoreManager currentKsm = context.getKeyStoreManager();
-
-				LOGGER.info("==================== Vamos a recuperar el keyentry del almacen: " + currentKsm); //$NON-NLS-1$
-
 				pke = currentKsm.getKeyEntry(context.getAlias());
 			}
 			catch (final AOCancelledOperationException e) {
@@ -801,7 +748,7 @@ final class ProtocolInvocationLauncherSign {
 							);
 					break;
 				default:
-					LOGGER.severe("Error al realizar la operacion firma"); //$NON-NLS-1$
+					LOGGER.severe("Operacion de firma no soportada"); //$NON-NLS-1$
 					throw new SocketOperationException(SimpleErrorCode.Request.UNSUPPORTED_OPERATION);
 				}
 			}

@@ -9,12 +9,11 @@
 
 package es.gob.afirma.ui.core.jse.certificateselection;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.Toolkit;
+import es.gob.afirma.core.keystores.NameCertificateBean;
+import es.gob.afirma.core.ui.KeyStoreDialogManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
@@ -22,13 +21,6 @@ import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
-import es.gob.afirma.core.keystores.NameCertificateBean;
-import es.gob.afirma.core.ui.KeyStoreDialogManager;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de Windows 7.
  * @author Carlos Gamuci
@@ -82,7 +74,14 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 
 	    this.currentKeyStoreTypeName = this.ksdm.getKeyStoreName();
 
-	    final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
+		String errorMessage = null;
+	    NameCertificateBean[] certs;
+		try {
+			certs = this.ksdm.getNameCertificates();
+		} catch (IllegalStateException e) {
+			certs = new NameCertificateBean[0];
+			errorMessage = CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.40");
+		}
 
 	    Arrays.sort(certs, CERT_NAME_COMPARATOR);
 	    this.csd = new CertificateSelectionPanel(
@@ -90,6 +89,7 @@ public final class CertificateSelectionDialog extends MouseAdapter {
     		this,
     		dialogHeadline,
     		dialogSubHeadline,
+			errorMessage,
     		showControlButons,
     		ksdm.isExternalStoresOpeningAllowed(),
     		this.ksdm.getAvailablesKeyStores()
@@ -180,7 +180,8 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	    		final AtomicReference<Boolean> certShowedReference = new AtomicReference<>();
 		    	final AtomicReference<String> selectedCertAliasReference = new AtomicReference<>();
 		    	SwingUtilities.invokeAndWait(() -> {
-		    		this.certDialog.setVisible(true);
+
+					this.certDialog.setVisible(true);
 
 		    		// Comprobamos el numero de certificados que se mostraban en el dialogo
 		    		certShowedReference.set(new Boolean(this.csd.getShowedCertsCount() > 0));
@@ -250,9 +251,12 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	}
 
 	/** Refresca el almacen de certificados y el di&aacute;logo de selecci&oacute;n. */
-	public void refreshKeystore() {
+	public void refreshKeystore(Component parent) {
 
 		try {
+			if (parent != null && parent.isShowing()) {
+				this.ksdm.setParent(parent);
+			}
 			this.ksdm.refresh();
 		}
 		catch (final Exception e) {
@@ -266,22 +270,43 @@ public final class CertificateSelectionDialog extends MouseAdapter {
 	/** Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n. */
 	private void refreshDialog() {
 
-		final NameCertificateBean[] certs = this.ksdm.getNameCertificates();
-		Arrays.sort(certs, CERT_NAME_COMPARATOR);
-
-		refreshDialog(certs);
+		String errorMessage = null;
+        NameCertificateBean[] certs;
+		try {
+			certs = this.ksdm.getNameCertificates();
+		}
+		catch (final IllegalStateException e) {
+			certs = new NameCertificateBean[0];
+			errorMessage = CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.40"); //$NON-NLS-1$
+		}
+        Arrays.sort(certs, CERT_NAME_COMPARATOR);
+		refreshDialog(certs, errorMessage);
 	}
 
-	/** Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n
+	/**
+	 * Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n
 	 * mostrando los certificados indicados.
-	 * @param certs Lista de certificados que se deben mostrar. */
+	 * @param certs Lista de certificados que se deben mostrar.
+	 */
 	private void refreshDialog(final NameCertificateBean[] certs) {
+		refreshDialog(certs, (String) null);
+	}
+
+	/**
+	 * Refresca el apartado gr&aacute;fico del di&aacute;logo de selecci&oacute;n
+	 * mostrando los certificados indicados.
+	 * @param certs Lista de certificados que se deben mostrar.
+	 * @param errorMessage Mensaje de error que se debe mostrar en el di&aacute;logo o {@code null} si no debe mostrar
+	 *                     ninguno.
+	 */
+	private void refreshDialog(final NameCertificateBean[] certs, String errorMessage) {
 
 		// Ya que al refrescarga el dialogo pueden aparecer otros nuevos (como alguno de solicitud de PIN),
 		// dejamos de obligar a que este este siempre encima
 		this.certDialog.setAlwaysOnTop(false);
 
 		try {
+			this.csd.setErrorMessage(errorMessage);
 			this.csd.refresh(certs);
 		}
 		catch (final Exception e) {

@@ -157,7 +157,7 @@
 	</build>
 	
 	<profiles>
-		<!-- ===== Construccion por defecto ===== -->
+		<!-- Construccion por defecto -->
 		<profile>
 			<id>env-dev</id>
 			<activation>
@@ -215,7 +215,7 @@
 			</build>
 	    </profile>
 
-		<!-- ===== Construccion para la generacion de aplicaciones finales y servicios ===== -->
+		<!-- Construccion para la generacion de aplicaciones finales y servicios -->
 		<profile>
 			<id>env-install</id>
 			<activation>
@@ -266,7 +266,7 @@
 			
 		</profile>
 		
-		<!-- ===== Construccion para informe sonar ===== -->
+		<!-- Construccion para informe sonar -->
 		<profile>
 			<id>sonar</id>
 			
@@ -342,7 +342,7 @@
 			</build>
 	    </profile>
 		
-		<!-- ===== Construccion para despliegue en el repositorio de artefactos del MINHAP ===== -->
+		<!-- Construccion para despliegue en el repositorio de artefactos del MINHAP -->
 		<profile>
 			<id>minhap</id>
 			
@@ -418,7 +418,7 @@
 	    </profile>
 		
 		
-		<!-- ===== Construccion para despliegue en el repositorio de artefactos de Maven ===== -->
+		<!-- Construccion para despliegue en el repositorio de artefactos de Maven -->
 		<profile>
 			<id>env-deploy</id>
 			<activation>

@@ -9,18 +9,17 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.net.InetSocketAddress;
-import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import es.gob.afirma.core.misc.protocol.ProtocolVersion;
+import es.gob.afirma.standalone.protocol.AfirmaWebSocketServerManager.BindingErrorListener;
 import org.java_websocket.WebSocket;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import es.gob.afirma.core.misc.protocol.ProtocolVersion;
-import es.gob.afirma.standalone.protocol.AfirmaWebSocketServerManager.BindingErrorListener;
+import java.net.InetSocketAddress;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Servidor para la comunicaci&oacute;n por <i>WebSocket</i> acorde a la versi&oacute;n
@@ -136,7 +135,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 
 	@Override
 	public void onMessage(final WebSocket ws, final String message) {
-		LOGGER.info("Recibimos una peticion en el socket del puerto: " + getAddress().getPort()); //$NON-NLS-1$
+		LOGGER.fine("Recibimos una peticion en el socket del puerto: " + getAddress().getPort()); //$NON-NLS-1$
 
 		// Indicamos que el socket esta operativo y recibiendo peticiones
 		// para evitar el cierre de seguridad
@@ -149,6 +148,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 		// Si recibimos cualquier cosa distinta de un eco, consideraremos que es una peticion de
 		// operacion y la procesaremos como tal
 		else {
+			LOGGER.info("Recibimos una peticion de operacion en el puerto " + getAddress().getPort()); //$NON-NLS-1$
 			// Si se trata de una operacion de firma de lote, incrementamos el tiempo de timeout
 			final boolean batchOperation = message.startsWith(HEADER_BATCH_1) || message.startsWith(HEADER_BATCH_2);
 			setConnectionLostTimeout(batchOperation ? 240 : 60);

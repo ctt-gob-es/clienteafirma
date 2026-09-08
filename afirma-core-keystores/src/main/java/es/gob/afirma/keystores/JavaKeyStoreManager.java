@@ -9,10 +9,9 @@
 
 package es.gob.afirma.keystores;
 
+import javax.security.auth.callback.PasswordCallback;
 import java.io.IOException;
 import java.io.InputStream;
-
-import javax.security.auth.callback.PasswordCallback;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves tipo JKS.
  * Contempla la posibilidad de que el almac&eacute;n y las claves tengan la misma o distintas contrase&ntilde;as.
@@ -20,7 +19,7 @@ import javax.security.auth.callback.PasswordCallback;
 public final class JavaKeyStoreManager extends FileKeyStoreManager {
 
 	JavaKeyStoreManager() {
-		setKeyStoreType(AOKeyStore.JAVA);
+		setType(AOKeyStore.JAVA);
 	}
 
 	/** {@inheritDoc} */

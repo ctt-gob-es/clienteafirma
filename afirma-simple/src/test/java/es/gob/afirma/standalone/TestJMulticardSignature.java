@@ -1,20 +1,19 @@
 package es.gob.afirma.standalone;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.util.Properties;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.util.Properties;
 
 /** Clase de prueba de firma con JMulticard a trav&eacute;s del almac&eacute;n de Firefox. Se incluye
  * en este proyecto por disponer de todas las bibliotecas necesarias. */
@@ -34,7 +33,8 @@ public final class TestJMulticardSignature {
 			null,
 			null,
 			ks.getStorePasswordCallback(null),
-			null
+			null,
+			false
 		);
 
 		String selectedAlias = null;

@@ -9,6 +9,24 @@
 
 package es.gob.afirma.standalone.protocol;
 
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.InvalidDomainSSLCertificateException;
+import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.*;
+import es.gob.afirma.signers.batch.client.TriphaseDataParser;
+import es.gob.afirma.standalone.JMulticardUtilities;
+import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.SimpleErrorCode;
+import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
+import es.gob.afirma.standalone.ui.AboutDialog;
+import es.gob.afirma.standalone.ui.OSXHandler;
+import es.gob.afirma.standalone.ui.tasks.LoadKeystoreTask;
+
+import javax.net.ssl.SSLHandshakeException;
+import javax.swing.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
@@ -22,35 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.net.ssl.SSLHandshakeException;
-import javax.swing.JOptionPane;
-
-import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.ErrorCode;
-import es.gob.afirma.core.InvalidDomainSSLCertificateException;
-import es.gob.afirma.core.misc.LoggerUtil;
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.misc.protocol.ParameterException;
-import es.gob.afirma.core.misc.protocol.ParameterLocalAccessRequestedException;
-import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParser;
-import es.gob.afirma.core.misc.protocol.ProtocolInvocationUriParserUtil;
-import es.gob.afirma.core.misc.protocol.ProtocolVersion;
-import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
-import es.gob.afirma.core.misc.protocol.UrlParametersToLoad;
-import es.gob.afirma.core.misc.protocol.UrlParametersToSave;
-import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
-import es.gob.afirma.core.misc.protocol.UrlParametersToSign;
-import es.gob.afirma.core.misc.protocol.UrlParametersToSignAndSave;
-import es.gob.afirma.signers.batch.client.TriphaseDataParser;
-import es.gob.afirma.standalone.JMulticardUtilities;
-import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.standalone.SimpleErrorCode;
-import es.gob.afirma.standalone.configurator.common.PreferencesManager;
-import es.gob.afirma.standalone.protocol.ProtocolInvocationLauncherUtil.DecryptionException;
-import es.gob.afirma.standalone.ui.AboutDialog;
-import es.gob.afirma.standalone.ui.OSXHandler;
-import es.gob.afirma.standalone.ui.tasks.LoadKeystoreTask;
 
 /**
  * Gestiona la ejecuci&oacute;n de Autofirma en una invocaci&oacute;n por
@@ -96,7 +85,15 @@ public final class ProtocolInvocationLauncher {
 	 */
 	private static final int DEFAULT_WEBSOCKET_PORT = 63117;
 
-    /** Clave privada fijada para reutilizarse en operaciones sucesivas. */
+	/**
+	 * Propiedad del sistema con la que se indica que debe usarse el PKCS#11 del DNIe en lugar del CSP/MiniDriver
+	 * de Windows. Esta propiedad no deber&iacute;a usarse cuando se encuentre JMulticard activado, ya que lo
+	 * pedir&iacute;a simultaneamente.
+	 */
+	private static final String SYSTEM_PROPERTY_ENABLED_PKCS11_DNIE = "dnie.pkcs11.enabled"; //$NON-NLS-1$
+
+
+	/** Clave privada fijada para reutilizarse en operaciones sucesivas. */
 	private static PrivateKeyEntry stickyKeyEntry = null;
 
 	/**
@@ -222,6 +219,12 @@ public final class ProtocolInvocationLauncher {
 		final boolean jMulticardEnabled = PreferencesManager
 				.getBoolean(PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
         JMulticardUtilities.configureJMulticard(jMulticardEnabled);
+
+		// En el caso de Windows, cuando no se encuentre habilitado JMulticard, indicamos al almacen
+		// mediante variable de sistema que puede usar el PKCS#11 del DNIe para usarlo
+		if (!jMulticardEnabled && Platform.getOS() == Platform.OS.WINDOWS) {
+			System.setProperty(SYSTEM_PROPERTY_ENABLED_PKCS11_DNIE, Boolean.TRUE.toString());
+		}
 
         // Por defecto, usaremos la version de protocolo proporcionada para la operacion,
         // aunque se extraera de la URL de llamada en caso de se una peticion de apertura de
@@ -795,7 +798,7 @@ public final class ProtocolInvocationLauncher {
 				// solo entra en la excepcion en el caso de que haya que devolver errores a
 				// traves del servidor intermedio
                 catch(final SocketOperationException e) {
-                    LOGGER.severe("Error durante la operacion de firma: " + e); //$NON-NLS-1$
+                    LOGGER.log(Level.SEVERE,"Error durante la operacion de firma", e); //$NON-NLS-1$
                     msg = ProtocolInvocationLauncherErrorManager.getErrorMessage(requestedProtocolVersion, e.getErrorCode());
                 }
 
@@ -1161,7 +1164,6 @@ public final class ProtocolInvocationLauncher {
 		}
 		return false;
 	}
-
 
 	/**
 	 * Inicia en segundo plano la tarea para cargar del almac&eacute;n de claves por defecto

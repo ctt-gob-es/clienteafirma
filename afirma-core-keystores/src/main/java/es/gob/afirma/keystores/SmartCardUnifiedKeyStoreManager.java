@@ -9,16 +9,16 @@
 
 package es.gob.afirma.keystores;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
-/** Representa a un <i>AOKeyStoreManager</i> que presenta los certificados de las
+import javax.security.auth.callback.PasswordCallback;
+import java.io.IOException;
+import java.io.InputStream;
+
+/**
+ * Representa a un <i>AOKeyStoreManager</i> que presenta los certificados de las
  * tarjetas detectadas en encontrado como parte de un &uacute;nico almacen de claves.
  * El uso que se plantea para este almac&eacute;n es el de servir para sustituir al
  * almac&eacute;n de Windows cuando se detecte que no se puede acceder al mismo. Este
@@ -27,7 +27,8 @@ import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
  * a las tarjetas. Tambi&eacute;n se har&aacute; uso del controlador 100% Java de DNIe
  * y se dar&aacute; prioridad al DNIe sobre el resto de tarjetas. Debido a que la carga
  * de este controlador puede interferir con el uso de los PKCS#11, si se detecta un DNIe
- * se ignorar&aacute;n el resto de tarjetas. */
+ * se ignorar&aacute;n el resto de tarjetas.
+ */
 public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 	private PasswordCallback passwordCallback = null;
@@ -41,8 +42,8 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 
 	/** Crea un <i>AOKeyStoreManager</i> para acceso a las tarjetas inteligentes
 	 * conocidas que se encuentren en el sistema. */
-	public SmartCardUnifiedKeyStoreManager() {
-		setKeyStoreType(AOKeyStore.KNOWN_SMARTCARDS);
+	SmartCardUnifiedKeyStoreManager() {
+		setType(AOKeyStore.KNOWN_SMARTCARDS);
 	}
 
 	/** Inicializa la clase gestora de almacenes de claves. */
@@ -66,7 +67,7 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 		// dispositivos de seguridad configurados en Firefox haciendo uso del controlador Java
 		if (forceReset || !this.initialized) {
 			try {
-				this.preferredKsAdded = KeyStoreUtilities.addPreferredKeyStoreManagers(this, parentComponent);
+				this.preferredKsAdded = KeyStoreUtilities.addJMulticardKeyStoreManagers(this, parentComponent, forceReset);
 				setSmartCardAdded(this.preferredKsAdded);
 			}
 			catch (final AOCancelledOperationException e) {
@@ -158,7 +159,7 @@ public class SmartCardUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			final boolean forceReset,
 			final String libName) throws AOKeyStoreManagerException, IOException {
 
-		final AOKeyStoreManager ksm = new AOKeyStoreManager();
+		final AOKeyStoreManager ksm = new Pkcs11KeyStoreManager();
 		ksm.init(
 				AOKeyStore.PKCS11,
 				null,

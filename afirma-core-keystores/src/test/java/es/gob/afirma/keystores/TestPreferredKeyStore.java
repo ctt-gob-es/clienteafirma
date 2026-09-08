@@ -10,25 +10,33 @@ public final class TestPreferredKeyStore {
 	 * @throws Exception En cualquier error. */
 	public static void main(final String[] args) throws Exception {
 
-		final AggregatedKeyStoreManager aksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+
+
+		final AOKeyStoreManager aksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			AOKeyStore.WINDOWS,
 			null, // Lib
 			"CAPI-CERES", // Description //$NON-NLS-1$
 			AOKeyStore.WINDOWS.getStorePasswordCallback(null),
-			null // Parent
+			null, // Parent
+			false
+		);
+		AggregatedKeyStoreManager multiKsm = new AggregatedKeyStoreManager(aksm);
+
+		final AOKeyStoreManager ceresKsm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+			AOKeyStore.CERES,
+			null, // Lib
+			"CERES 100% Java", // Description //$NON-NLS-1$
+			AOKeyStore.CERES.getStorePasswordCallback(null),
+			null, // Parent
+			false
 		);
 
-		final AOKeyStoreManager ceresKsm = new AOKeyStoreManager();
-		ceresKsm.init(AOKeyStore.CERES, null, AOKeyStore.CERES.getStorePasswordCallback(null), null, false);
-		ceresKsm.setPreferred(true);
-
-		aksm.addKeyStoreManager(ceresKsm);
+		multiKsm.addKeyStoreManager(ceresKsm);
 
 		final String[] aliases = aksm.getAliases();
 		for (final String alias : aliases) {
 			System.out.println(alias);
 		}
-
 	}
 
 }

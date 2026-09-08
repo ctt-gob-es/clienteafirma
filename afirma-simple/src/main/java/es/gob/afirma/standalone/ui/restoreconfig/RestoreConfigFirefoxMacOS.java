@@ -9,6 +9,14 @@
 
 package es.gob.afirma.standalone.ui.restoreconfig;
 
+import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.keystores.mozilla.MozillaProfile;
+import es.gob.afirma.keystores.mozilla.ProfilesIni;
+import es.gob.afirma.standalone.SimpleAfirmaMessages;
+import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
+import es.gob.afirma.standalone.so.macos.ShellScript;
+import es.gob.afirma.standalone.so.macos.UnixUtils;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,14 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import es.gob.afirma.core.misc.LoggerUtil;
-import es.gob.afirma.keystores.mozilla.MozillaProfile;
-import es.gob.afirma.keystores.mozilla.ProfilesIni;
-import es.gob.afirma.standalone.SimpleAfirmaMessages;
-import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
-import es.gob.afirma.standalone.so.macos.ShellScript;
-import es.gob.afirma.standalone.so.macos.UnixUtils;
 
 
 /**
@@ -46,9 +46,9 @@ final class RestoreConfigFirefoxMacOS {
 	private static final String CERTUTIL_EXE = "certutil"; //$NON-NLS-1$;
 	private static final String RESOURCE_CERTUTIL = "/osx/certutil.osx.zip"; //$NON-NLS-1$
 
-	// ==============
-	// == Propiedades usadas para configurar FireFox para que confie en los certificados del Llavero
-	// ==============
+	// --------------
+	// -- Propiedades usadas para configurar FireFox para que confie en los certificados del Llavero
+	// --------------
 
 	private static final String CUSTOM_PROFILE_PREFERENCES_FILENAME = "user.js"; //$NON-NLS-1$
 	private static final String MOZ_PREFERENCE_FILE_HEADER =

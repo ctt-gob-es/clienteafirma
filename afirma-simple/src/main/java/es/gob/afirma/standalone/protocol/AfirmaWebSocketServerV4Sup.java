@@ -9,14 +9,13 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.net.InetAddress;
-import java.util.Collections;
-
-import org.java_websocket.WebSocket;
-
 import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.standalone.SimpleErrorCode;
+import org.java_websocket.WebSocket;
+
+import java.net.InetAddress;
+import java.util.Collections;
 
 /**
  * Servidor para la comunicaci&oacute;n por <i>WebSocket</i> acorde a la versi&oacute;n 4
@@ -62,7 +61,7 @@ public final class AfirmaWebSocketServerV4Sup extends AfirmaWebSocketServer {
 
 	@Override
 	public void onMessage(final WebSocket ws, final String message) {
-		LOGGER.info("Recibimos una peticion en el socket del puerto " + getAddress().getPort()); //$NON-NLS-1$
+		LOGGER.fine("Recibimos una peticion en el socket del puerto " + getAddress().getPort()); //$NON-NLS-1$
 
 		// Comprobamos que la peticion haya llegado del mismo equipo
 		final InetAddress remoteAddress = ws.getRemoteSocketAddress().getAddress();
@@ -96,6 +95,8 @@ public final class AfirmaWebSocketServerV4Sup extends AfirmaWebSocketServer {
 			// de espera y se haran consultas recurrentes hasta obtener el resultado
 			WebSocketServerOperationHandler.handleOperation(this.protocol, message, this.sessionId, this, ws);
 		} else {
+			LOGGER.info("Recibimos una peticion de operacion en el puerto " + getAddress().getPort() //$NON-NLS-1$
+					+ " y la atendemos de forma sincrona"); //$NON-NLS-1$
 			// Si se trata de una operacion de firma de lote, incrementamos el tiempo de timeout
 			final boolean batchOperation = message.startsWith(HEADER_BATCH_1) || message.startsWith(HEADER_BATCH_2);
 			setConnectionLostTimeout(batchOperation ? 240 : 60);

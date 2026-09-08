@@ -10,13 +10,8 @@
 package es.gob.afirma.keystores.mozilla;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.AggregatedKeyStoreManager;
+import es.gob.afirma.keystores.*;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
-import es.gob.afirma.keystores.mozilla.shared.SharedNssUtil;
 
 import javax.security.auth.callback.PasswordCallback;
 import java.awt.*;
@@ -26,14 +21,14 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.logging.Level;
 
-/** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves tipo NSS de sistema (compartido)
+/**
+ * Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves tipo NSS de sistema (compartido)
  * en el que se tratan de forma unificada los m&oacute;dulos internos y externos.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
+ */
 public final class MozillaLikeKeyStoreManager extends AggregatedKeyStoreManager {
 
-	private File nssKeystoreDir;
-
-	private Component parentComponent = null;
+	private final File nssKeystoreDir;
 
 	/** Crea un <i>AOKeyStoreManager</i> para acceso a almacenes de claves
 	 * tipo NSS compartido (de sistema). */
@@ -62,7 +57,6 @@ public final class MozillaLikeKeyStoreManager extends AggregatedKeyStoreManager 
 	/** Crea un <i>AOKeyStoreManager</i> para acceso a almacenes de claves
 	 * tipo NSS compartido (de sistema). */
 	public MozillaLikeKeyStoreManager(AOKeyStore storeType) {
-
 		File nssDir;
 		switch (storeType) {
 			case NSS_CHROME:
@@ -102,11 +96,11 @@ public final class MozillaLikeKeyStoreManager extends AggregatedKeyStoreManager 
 			               final boolean forceReset) throws AOKeyStoreManagerException, IOException {
 
 		// Guardamos los datos que parametros que podamos volver a necesitar
-		this.setKeyStoreType(type);
+		this.setType(type);
 		this.setEntryPasswordCallBack(pssCallBack);
 
 		if (params != null && params.length > 0 && params[0] instanceof Component) {
-			this.parentComponent = (Component) params[0];
+			setParentComponent(params[0]);
 		}
 
 		// Inicializamos el almac&eacute;n NSS interno
@@ -149,46 +143,37 @@ public final class MozillaLikeKeyStoreManager extends AggregatedKeyStoreManager 
 	private AOKeyStoreManager initPkcs11KeyStoreManager(String name, String libraryPath, boolean forceReset)
 			throws AOKeyStoreManagerException, IOException {
 
-		AOKeyStoreManager p11Ksm = new AOKeyStoreManager();
-		try {
-			p11Ksm.init(
-					AOKeyStore.PKCS11,
-					null,
-					new UIPasswordCallback(
-							FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + name, //$NON-NLS-1$ //$NON-NLS-2$
-							this.parentComponent),
-					new String[]{libraryPath, name},
+        try {
+            return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+                    AOKeyStore.PKCS11, libraryPath, name,
+                    new UIPasswordCallback(
+                            FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + name, //$NON-NLS-1$ //$NON-NLS-2$
+                            getParentComponent()),
+					getParentComponent(),
 					forceReset
-			);
-		}
-		catch (final AOCancelledOperationException e) {
-			throw e;
-		}
-		catch (final Exception e) {
-			// En ciertos sistemas Linux fallan las inicializaciones la primera vez por culpa de PC/SC, asi que, si no
-			// es Linux, lanzamos la excepcion, y si es Linux, reintentamos
-			if (!Platform.OS.LINUX.equals(Platform.getOS())) {
-				throw e;
-			}
-
-			p11Ksm.init(
-					AOKeyStore.PKCS11,
-					null,
-					new UIPasswordCallback(
-							FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + name, //$NON-NLS-1$ //$NON-NLS-2$
-							this.parentComponent),
-					new String[] { libraryPath, name },
-					forceReset
-			);
-		}
-
-		return p11Ksm;
+            );
+        }
+        catch (KeystoreAlternativeException e) {
+            throw new AOKeyStoreManagerException("Fallo la carga del DNIe a traves de su PKCS#11", e,
+					KeyStoreErrorCode.Internal.LOADING_PKCS11_DNIE_ERROR);
+        }
 	}
 
 	@Override
 	public void refresh() throws IOException {
+
+		// Actualizamos el componente padre de los parametros
+		PasswordCallback pc = getEntryPasswordCallBack();
+		Object[] params = null;
+		if (getParentComponent() != null) {
+			params = new Object[] { getParentComponent() };
+			if (pc != null && pc instanceof UIPasswordCallback) {
+				((UIPasswordCallback) pc).setParent(getParentComponent());
+			}
+		}
+
 		try {
-			init(getType(), null, getEntryPasswordCallBack(), new Object[] { parentComponent }, true);
+			init(getType(), null, pc, params, true);
 		}
 		catch (IOException e) {
 			throw e;

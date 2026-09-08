@@ -9,16 +9,6 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.CertificateEncodingException;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import es.gob.afirma.ciphers.ServerCipher;
 import es.gob.afirma.ciphers.ServerCipherFactory;
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -38,13 +28,7 @@ import es.gob.afirma.core.misc.protocol.ParameterException;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersForBatch;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
-import es.gob.afirma.keystores.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreDialog;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AggregatedKeyStoreManager;
-import es.gob.afirma.keystores.CertificateFilter;
-import es.gob.afirma.keystores.KeyStoreErrorCode;
+import es.gob.afirma.keystores.*;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.keystores.filters.EncodedCertificateFilter;
 import es.gob.afirma.signers.batch.client.BatchSigner;
@@ -55,6 +39,16 @@ import es.gob.afirma.standalone.SimpleKeyStoreManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.ui.ProgressInfoDialogManager;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.CertificateEncodingException;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 final class ProtocolInvocationLauncherBatch {
 
@@ -99,19 +93,27 @@ final class ProtocolInvocationLauncherBatch {
 		// Si hay marcado un almacen como el ultimo seleccionado, lo usamos (este es el caso en el que se llaman
 		// varias operaciones de firma dentro de la misma invocacion a la aplicacion)
 		AOKeyStore aoks = null;
+		String keyStoreLib = null;
 		if (lastSelectedKeyStore != null && !lastSelectedKeyStore.isEmpty()) {
 			aoks = SimpleKeyStoreManager.getLastSelectedKeystore();
+			if (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks)) {
+				keyStoreLib = SimpleKeyStoreManager.getLastSelectedKeystoreLib();
+			}
 		}
 		// Si no, si el usuario definio un almacen por defecto para usarlo en las llamadas a la aplicacion, lo usamos
 		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
 				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore, true);
+				if (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks)) {
+					keyStoreLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+				}
 			}
 		}
 		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
 		else {
 			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore(), true);
+			keyStoreLib = options.getDefaultKeyStoreLib();
 		}
 
 		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
@@ -123,7 +125,7 @@ final class ProtocolInvocationLauncherBatch {
 
 		SignOperationResult operationResult;
 		try {
-			operationResult = sign(options, aoks, useDefaultStore, filterManager, protocolVersion);
+			operationResult = sign(options, aoks, keyStoreLib, useDefaultStore, filterManager, protocolVersion);
 		}
 		catch (final AOCancelledOperationException | SocketOperationException e) {
 			ProgressInfoDialogManager.hideProgressDialog();
@@ -222,8 +224,9 @@ final class ProtocolInvocationLauncherBatch {
 		return result.toString();
 	}
 
-	private static SignOperationResult sign(final UrlParametersForBatch options, final AOKeyStore aoks, final boolean useDefaultStore,
-			final CertFilterManager filterManager, final ProtocolVersion protocolVersion)
+	private static SignOperationResult sign(final UrlParametersForBatch options, final AOKeyStore ks, final String ksLib,
+											final boolean useDefaultStore, final CertFilterManager filterManager,
+											final ProtocolVersion protocolVersion)
 			throws AOCancelledOperationException, SocketOperationException {
 
 		final PrivateKeyEntry pke;
@@ -234,20 +237,9 @@ final class ProtocolInvocationLauncherBatch {
 
 		} else {
 
-			final String aoksLib;
-			if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
-				aoksLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
-			} else {
-				aoksLib = options.getDefaultKeyStoreLib();
-			}
-
 			final AOKeyStoreManager ksm;
 			try {
-				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, aoksLib);
-	        	if (ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) ksm).isSmartCardAdded()) {
-		        	final AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager(null);
-		        	((AggregatedKeyStoreManager) ksm).addKeyStoreManager(dniePkcs11Aksm);
-	        	}
+				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(ks, ksLib);
 			}
 			catch (final AOCancelledOperationException e) {
 				LOGGER.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
@@ -265,8 +257,8 @@ final class ProtocolInvocationLauncherBatch {
 					MacUtils.focusApplication();
 				}
 				String libName = null;
-				if (aoksLib != null) {
-					final File file = new File(aoksLib);
+				if (ksLib != null) {
+					final File file = new File(ksLib);
 					libName = file.getName();
 				}
 				ProgressInfoDialogManager.hideProgressDialog();
@@ -337,7 +329,7 @@ final class ProtocolInvocationLauncherBatch {
 			}
 			final CertFilterManager newFilterManager = new CertFilterManager(filters, filters != null, true);
 			ProtocolInvocationLauncher.setStickyKeyEntry(null);
-			return sign(options, aoks, useDefaultStore, newFilterManager, protocolVersion);
+			return sign(options, ks, ksLib, useDefaultStore, newFilterManager, protocolVersion);
 		}
 		catch (final AOCancelledOperationException e) {
 			LOGGER.info("Operacion cancelada por el usuario: " + LoggerUtil.getTrimStr(e.toString())); //$NON-NLS-1$

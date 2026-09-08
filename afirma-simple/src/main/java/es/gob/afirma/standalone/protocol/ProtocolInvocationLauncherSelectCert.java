@@ -9,15 +9,6 @@
 
 package es.gob.afirma.standalone.protocol;
 
-import java.io.File;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.CertificateEncodingException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.net.ssl.SSLHandshakeException;
-
 import es.gob.afirma.ciphers.ServerCipher;
 import es.gob.afirma.ciphers.ServerCipherFactory;
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -30,13 +21,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.core.misc.protocol.UrlParametersToSelectCert;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
-import es.gob.afirma.keystores.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreDialog;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AggregatedKeyStoreManager;
-import es.gob.afirma.keystores.CertificateFilter;
-import es.gob.afirma.keystores.KeyStoreErrorCode;
+import es.gob.afirma.keystores.*;
 import es.gob.afirma.keystores.filters.CertFilterManager;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -45,6 +30,14 @@ import es.gob.afirma.standalone.SimpleKeyStoreManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 import es.gob.afirma.standalone.ui.ProgressInfoDialogManager;
+
+import javax.net.ssl.SSLHandshakeException;
+import java.io.File;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.CertificateEncodingException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 final class ProtocolInvocationLauncherSelectCert {
 
@@ -91,37 +84,38 @@ final class ProtocolInvocationLauncherSelectCert {
 			ProgressInfoDialogManager.showProgressDialog(SimpleAfirmaMessages.getString("ProgressInfoDialog.2")); //$NON-NLS-1$
 		}
 
-        final String lastSelectedKeyStore = KeyStorePreferencesManager.getLastSelectedKeystore();
+		final String lastSelectedKeyStore = KeyStorePreferencesManager.getLastSelectedKeystore();
 		final boolean useDefaultStore = PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_USE_DEFAULT_STORE_IN_BROWSER_CALLS);
 
 		// Si hay marcado un almacen como el ultimo seleccionado, lo usamos (este es el caso en el que se llaman
 		// varias operaciones de firma dentro de la misma invocacion a la aplicacion)
 		AOKeyStore aoks = null;
+		String keyStoreLib = null;
 		if (lastSelectedKeyStore != null && !lastSelectedKeyStore.isEmpty()) {
 			aoks = SimpleKeyStoreManager.getLastSelectedKeystore();
+			if (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks)) {
+				keyStoreLib = SimpleKeyStoreManager.getLastSelectedKeystoreLib();
+			}
 		}
 		// Si no, si el usuario definio un almacen por defecto para usarlo en las llamadas a la aplicacion, lo usamos
 		else if (useDefaultStore) {
 			final String defaultStore = PreferencesManager.get(PreferencesManager.PREFERENCE_KEYSTORE_DEFAULT_STORE);
 			if (!PreferencesManager.VALUE_KEYSTORE_DEFAULT.equals(defaultStore)) {
 				aoks = SimpleKeyStoreManager.getKeyStore(defaultStore, true);
+				if (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks)) {
+					keyStoreLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
+				}
 			}
 		}
 		// Si no, si en la llamada se definio el almacen que se debia usar, lo usamos
 		else {
 			aoks = SimpleKeyStoreManager.getKeyStore(options.getDefaultKeyStore(), true);
+			keyStoreLib = options.getDefaultKeyStoreLib();
 		}
 
 		// Si aun no se ha definido el almacen, se usara el por defecto para el sistema operativo
 		if (aoks == null) {
 			aoks = AOKeyStore.getDefaultKeyStoreTypeByOs(Platform.getOS());
-		}
-
-		final String aoksLib;
-		if (useDefaultStore && (AOKeyStore.PKCS12.equals(aoks) || AOKeyStore.PKCS11.equals(aoks))) {
-			aoksLib = PreferencesManager.get(PreferencesManager.PREFERENCE_LOCAL_KEYSTORE_PATH);
-		} else {
-			aoksLib = options.getDefaultKeyStoreLib();
 		}
 		final CertFilterManager filterManager = new CertFilterManager(options.getExtraParams());
 		final List<CertificateFilter> filters = filterManager.getFilters();
@@ -132,15 +126,12 @@ final class ProtocolInvocationLauncherSelectCert {
 
 			LOGGER.info("Se usa Sticky Signature y tenemos valor de clave privada"); //$NON-NLS-1$
 			pke = ProtocolInvocationLauncher.getStickyKeyEntry();
+			ProgressInfoDialogManager.hideProgressDialog();
 
 		} else {
 			AOKeyStoreManager ksm;
 			try {
-				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, aoksLib);
-	        	if (ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) ksm).isSmartCardAdded()) {
-		        	final AggregatedKeyStoreManager dniePkcs11Aksm = ProtocolInvocationLauncherUtil.getDNIePKCS11KeyStoreManager(null);
-		        	((AggregatedKeyStoreManager) ksm).addKeyStoreManager(dniePkcs11Aksm);
-	        	}
+				ksm = ProtocolInvocationLauncherUtil.getAOKeyStoreManager(aoks, keyStoreLib);
 			}
 			catch (final AOCancelledOperationException e) {
 				throw e;
@@ -156,8 +147,8 @@ final class ProtocolInvocationLauncherSelectCert {
 			try {
 				MacUtils.focusApplication();
 				String libName = null;
-				if (aoksLib != null) {
-					final File file = new File(aoksLib);
+				if (keyStoreLib != null) {
+					final File file = new File(keyStoreLib);
 					libName = file.getName();
 				}
 				ProgressInfoDialogManager.hideProgressDialog();

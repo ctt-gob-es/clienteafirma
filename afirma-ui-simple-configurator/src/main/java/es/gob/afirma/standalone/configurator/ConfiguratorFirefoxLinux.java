@@ -246,6 +246,12 @@ final class ConfiguratorFirefoxLinux {
 				continue;
 			}
 
+			if (ConfiguratorFirefoxCommon.isNssDbPasswordProtected(certUtilAbsolutePath, profileDir)) {
+				LOGGER.info("No se puede instalar el certificado de confianza en el perfil de Mozilla Firefox "
+						+ profileDir.getAbsolutePath() + " porque esta protegido con contrasena. Ejecute la funcion de restauracion para agregarlo"); //$NON-NLS-1$ //$NON-NLS-2$
+				continue;
+			}
+
 			// Si en el directorio del perfil existe el fichero pkcs11.txt entonces se trata
 			// de un almacen de certificados SQL
 			final boolean sqlDb = new File(profileDir, "pkcs11.txt").exists(); //$NON-NLS-1$

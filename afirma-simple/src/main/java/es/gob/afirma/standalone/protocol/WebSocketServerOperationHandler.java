@@ -1,13 +1,12 @@
 package es.gob.afirma.standalone.protocol;
 
+import es.gob.afirma.core.misc.protocol.ProtocolVersion;
+import org.java_websocket.WebSocket;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import org.java_websocket.WebSocket;
-
-import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 
 public class WebSocketServerOperationHandler {
 
@@ -34,12 +33,13 @@ public class WebSocketServerOperationHandler {
 									   final WebSocket ws) {
 
 		if (operation.startsWith(GET_RESULT_URL)) {
+			LOGGER.fine("Recibimos una peticion asincrona de solicitud de resultado"); //$NON-NLS-1$
 			getResultAndSendResponse(server, ws, sessionId);
 		} else {
-
+			LOGGER.info("Recibimos una peticion de operacion en el Websocket y la atendemos de forma asincrona"); //$NON-NLS-1$
 			try {
 				final ActiveWebSocketOperationThread activeWebSocketWaitingThread
-				= new ActiveWebSocketOperationThread(protocol, operation, sessionId);
+					= new ActiveWebSocketOperationThread(protocol, operation, sessionId);
 
 	    		activeWebSocketWaitingThread.start();
 	    		waitingThreadMap.put(sessionId, activeWebSocketWaitingThread);
@@ -70,7 +70,7 @@ public class WebSocketServerOperationHandler {
 			server.broadcast(WAIT_RESPONSE, Collections.singletonList(ws));
 		} else if (websocketOperationThread.isAlive()) {
 			// Se devuelve respuesta de espera al socket, la operacion no ha terminado
-			LOGGER.info("El hilo con la operacion sigue ejecutandose para la sesion: " + sessionId); //$NON-NLS-1$
+			LOGGER.fine("El hilo con la operacion sigue ejecutandose para la sesion: " + sessionId); //$NON-NLS-1$
 			server.broadcast(WAIT_RESPONSE, Collections.singletonList(ws));
 		} else {
 			// La operacion ha terminado y devolvemos su resultado

@@ -1,20 +1,5 @@
 package es.gob.afirma.keystores.mozilla;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.security.*;
-import java.security.KeyStore.PrivateKeyEntry;
-import java.util.Enumeration;
-import java.util.logging.Logger;
-
-import javax.security.auth.callback.PasswordCallback;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -24,6 +9,18 @@ import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import javax.security.auth.callback.PasswordCallback;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.security.*;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.util.Enumeration;
+import java.util.logging.Logger;
 
 /** Pruebas simples de almacenes Mozilla NSS. */
 public final class SimpleTest {
@@ -64,11 +61,12 @@ public final class SimpleTest {
 		);
 
     	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-    	    AOKeyStore.MOZ_UNI, // Store
-    	    null, // Lib
-			"TEST-KEYSTORE", // Description //$NON-NLS-1$
-			null, // PasswordCallback
-			null // Parent
+				AOKeyStore.MOZ_UNI, // Store
+				null, // Lib
+				"TEST-KEYSTORE", // Description //$NON-NLS-1$
+				null, // PasswordCallback
+				null, // Parent
+				false // ForceReset
 		);
 
     	System.out.println("Certificados:"); //$NON-NLS-1$
@@ -134,12 +132,13 @@ public final class SimpleTest {
 
     	final PasswordCallback callback = new CachePasswordCallback("1111".toCharArray());
 
-    	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-    	    AOKeyStore.MOZ_UNI, // Store
-    	    null, // Lib
-			"TEST-KEYSTORE", // Description //$NON-NLS-1$
-			callback, // PasswordCallback
-			null // Parent
+		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.MOZ_UNI, // Store
+				null, // Lib
+				"TEST-KEYSTORE", // Description //$NON-NLS-1$
+				callback, // PasswordCallback
+				null, // Parent
+				false // ForceReset
 		);
 
     	System.out.println("Certificados:"); //$NON-NLS-1$
@@ -259,12 +258,13 @@ public final class SimpleTest {
     @Test
     @Ignore // Necesita NSS
     public void testSystemKeyStoreManagerCreation() throws Exception {
-    	final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-    	    AOKeyStore.SHARED_NSS, // Store
-    	    null, // Lib
-			"TEST-KEYSTORE", // Description //$NON-NLS-1$
-			null, // PasswordCallback
-			null // Parent
+		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+				AOKeyStore.SHARED_NSS, // Store
+				null, // Lib
+				"TEST-KEYSTORE", // Description //$NON-NLS-1$
+				null, // PasswordCallback
+				null, // Parent
+				false // ForceReset
 		);
     	final String[] aliases = ksm.getAliases();
     	for (final String alias : aliases) {

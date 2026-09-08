@@ -46,7 +46,7 @@ public final class GenericNssKeyStoreManager extends AOKeyStoreManager {
 	 * @param keystoreDir Directorio del almac&eacute;n de claves NSS.
 	 */
 	public GenericNssKeyStoreManager(AOKeyStore ksType, final File keystoreDir) {
-		setKeyStoreType(ksType);
+		setType(ksType);
 		if (keystoreDir == null) {
 			throw new IllegalArgumentException("El directorio del almacén NSS no puede ser nulo"); //$NON-NLS-1$
 		}
@@ -59,7 +59,7 @@ public final class GenericNssKeyStoreManager extends AOKeyStoreManager {
 	 * @param nssKeystorePath Ruta absoluta del directorio del almac&eacute;n de claves NSS.
 	 */
 	public GenericNssKeyStoreManager(AOKeyStore ksType, final String nssKeystorePath) {
-		setKeyStoreType(ksType);
+		setType(ksType);
 		if (nssKeystorePath == null) {
 			throw new IllegalArgumentException("El directorio del almacén NSS no puede ser nulo"); //$NON-NLS-1$
 		}

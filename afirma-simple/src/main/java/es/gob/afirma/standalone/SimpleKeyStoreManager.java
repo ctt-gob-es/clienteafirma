@@ -9,28 +9,21 @@
 
 package es.gob.afirma.standalone;
 
-import java.awt.Component;
-import java.io.IOException;
-import java.security.UnrecoverableKeyException;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import javax.swing.JOptionPane;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.core.prefs.KeyStorePreferencesManager;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeyStoreErrorCode;
-import es.gob.afirma.keystores.KeystoreAlternativeException;
-import es.gob.afirma.keystores.SmartCardLockedException;
+import es.gob.afirma.keystores.*;
 import es.gob.afirma.keystores.mozilla.MozillaKeyStoreUtilities;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.security.UnrecoverableKeyException;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Gestor simple de almac&eacute;n. Obtiene o un almac&eacute;n de DNIe
@@ -41,10 +34,17 @@ public final class SimpleKeyStoreManager {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+	/**
+	 * Propiedad del sistema con la que se indica que debe usarse el PKCS#11 del DNIe en lugar del CSP/MiniDriver
+	 * de Windows. Esta propiedad no deber&iacute;a usarse cuando se encuentre JMulticard activado, ya que lo
+	 * pedir&iacute;a simultaneamente.
+	 */
+	private static final String SYSTEM_PROPERTY_ENABLED_PKCS11_DNIE = "dnie.pkcs11.enabled"; //$NON-NLS-1$
+
     private SimpleKeyStoreManager() { /* No permitimos la instanciacion */ }
 
     /** Obtiene un almac&eacute;n.
-     * @param dnie {@code true} si desea obtenerse un almac&eacute;n para DNIe, {@code false} si desea
+     * @param useDnieJavaController {@code true} si desea obtenerse un almac&eacute;n para DNIe, {@code false} si desea
 	 *             obtenerse el por defecto del sistema operativo.
      * @param forced Si {@code true}, es obligatorio el uso del DNIe en caso de solicitarlo y no se
      * deber&aacute; cargar un almacen por defecto incluso si el usuario no lo proporciona.
@@ -54,12 +54,11 @@ public final class SimpleKeyStoreManager {
      * @throws NoDnieFoundException Si se obliga al uso de DNIe pero este no se proporciona.
      * @throws KeystoreAlternativeException Si falla la carga del almac&eacute;n, pero se propone un almac&eacute;n alternativo.
      */
-    static AOKeyStoreManager getKeyStore(final boolean dnie, final boolean forced, final Component parent)
+    static AOKeyStoreManager getKeyStore(final boolean useDnieJavaController, final boolean forced, final Component parent)
     		throws AOKeyStoreManagerException, NoDnieFoundException, KeystoreAlternativeException {
 
-    	// -- Se ha habilitado el uso de DNIe --
-
-        if (dnie) {
+    	// Si se ha seleccionado el uso de DNIe, lo usaremos a traves de JMulticard
+        if (useDnieJavaController) {
 
             JMulticardUtilities.configureJMulticard(true);
 
@@ -112,7 +111,7 @@ public final class SimpleKeyStoreManager {
                     		}
                     		break;
 
-            		case "es.gob.jmulticard.card.dnie.BurnedDnieCardException": //$NON-NLS-1$
+            		case "es.gob.jmulticard.card.useDnieJavaController.BurnedDnieCardException": //$NON-NLS-1$
 	            		AOUIFactory.showErrorMessage(
             				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.5"), //$NON-NLS-1$
             				SimpleAfirmaMessages.getString("SimpleKeyStoreManager.6"), //$NON-NLS-1$
@@ -139,24 +138,31 @@ public final class SimpleKeyStoreManager {
             }
         }
 
-        // El por defecto
+        // Aplicamos el comportamiento por defecto, si no se seleccionó el uso de DNIe o si no se pudo cargar
 
-        // -- Comportamiento por defecto --
-
-        // Configuramos el uso de JMulticard segun lo establecido en el dialogo de preferencias
+        // A pesar de no usar JMulticard para cargar el almacen principal, habilitamos o no su uso segun lo establecido
+		// en las preferencias de la aplicacion
         final boolean enableJMulticard = PreferencesManager.getBoolean(
         		PreferencesManager.PREFERENCE_GENERAL_ENABLED_JMULTICARD);
 
         JMulticardUtilities.configureJMulticard(enableJMulticard);
+
+		// En el caso de Windows, cuando no se encuentre habilitado JMulticard, indicamos al almacen
+		// mediante variable de sistema que puede usar el PKCS#11 del DNIe para usarlo
+		if (!enableJMulticard && Platform.getOS() == OS.WINDOWS) {
+			System.setProperty(SYSTEM_PROPERTY_ENABLED_PKCS11_DNIE, Boolean.TRUE.toString());
+		}
 
         // Identificamos el almacen por defecto
         final AOKeyStore aoks = getDefaultKeyStoreType();
 
         LOGGER.info("Cargando almacen por defecto: " + aoks.getName()); //$NON-NLS-1$
 
+		AOKeyStoreManager ksm = null;
+
         // Cargamos el almacen
         try {
-			return getKeyStoreManager(
+			ksm = getKeyStoreManager(
 				aoks,
 				parent
 			);
@@ -171,9 +177,9 @@ public final class SimpleKeyStoreManager {
 					);
 
 				// Obtenemos un almacen, reintentando hasta que se consiga o falle definitivamente la operacion
-				while (true) {
+				while (ksm == null) {
 					try {
-						return getKeyStoreManager(
+						ksm = getKeyStoreManager(
 							aoks,
 							parent
 						);
@@ -184,7 +190,7 @@ public final class SimpleKeyStoreManager {
 								SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 								JOptionPane.WARNING_MESSAGE
 						);
-						return loadSystemAOKSManager(parent);
+						ksm = loadSystemAOKSManager(parent);
 					} catch (final IOException ioe2) {
 						if (ioe.getCause() != null && ioe.getCause().getCause() != null
 								&& ioe.getCause().getCause() instanceof UnrecoverableKeyException) {
@@ -202,18 +208,20 @@ public final class SimpleKeyStoreManager {
 			    				JOptionPane.ERROR_MESSAGE,
 			    				e
 			    			);
-			        	return loadSystemAOKSManager(parent);
+			        	ksm = loadSystemAOKSManager(parent);
 					}
 				}
 			}
-			AOUIFactory.showErrorMessage(
-					SimpleAfirmaMessages.getString("SimpleKeyStoreManager.11", aoks.getName()), //$NON-NLS-1$
-					SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-					JOptionPane.ERROR_MESSAGE,
-					ioe
-			);
+			if (ksm == null) {
+				AOUIFactory.showErrorMessage(
+						SimpleAfirmaMessages.getString("SimpleKeyStoreManager.11", aoks.getName()), //$NON-NLS-1$
+						SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE,
+						ioe
+				);
 
-			return loadSystemAOKSManager(parent);
+				ksm = loadSystemAOKSManager(parent);
+			}
 
 		} catch (final AOCancelledOperationException aoce) {
 			AOUIFactory.showMessageDialog(
@@ -222,7 +230,7 @@ public final class SimpleKeyStoreManager {
 					SimpleAfirmaMessages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 					JOptionPane.WARNING_MESSAGE
 			);
-			return loadSystemAOKSManager(parent);
+			ksm = loadSystemAOKSManager(parent);
 		} catch (final Exception e) {
         	AOUIFactory.showErrorMessage(
         		SimpleAfirmaMessages.getString("SimpleKeyStoreManager.11", aoks.getName()), //$NON-NLS-1$
@@ -231,9 +239,10 @@ public final class SimpleKeyStoreManager {
 				e
 			);
 
-        	return loadSystemAOKSManager(parent);
-
+        	ksm = loadSystemAOKSManager(parent);
 		}
+
+		return ksm;
     }
 
     private static AOKeyStoreManager getKeyStoreManager(final AOKeyStore aoks, final Component parent) throws IOException, KeystoreAlternativeException {
@@ -246,7 +255,8 @@ public final class SimpleKeyStoreManager {
     		lib,
     		null,
     		aoks.getStorePasswordCallback(parent),
-    		parent
+    		parent,
+			false
 		);
     }
 
@@ -385,13 +395,23 @@ public final class SimpleKeyStoreManager {
 
     /**
      * Obtiene el &uacute;ltimo almac&eacute;n de claves seleccionado por el usuario. En caso de que no est&eacute;
-     * definido o no sea un almac&eacute;n v&aacute;lido, se haya seleccionado.
-     * @return Almac&eacute;n de claves seleccionado por el usuario.
+     * definido o no sea un almac&eacute;n v&aacute;lido, se devolver&aacute; {@code null}.
+     * @return Almac&eacute;n de claves seleccionado por el usuario o {@code null} si no se seleccion&oacute; uno v&aacute;lido.
      */
     public static AOKeyStore getLastSelectedKeystore() {
     	final String savedStoreName = KeyStorePreferencesManager.getLastSelectedKeystore();
     	return getValidKeyStoreType(savedStoreName);
     }
+
+	/**
+	 * Obtiene la &uacute;ltima biblioteca de almac&eacute;n de claves seleccionada por el usuario. En caso de que
+	 * no se seleccionase ninguna (probablemente porque el almacen sea distinto de PKCS#11 o PKCS#12), se
+	 * devolver&aacute; {@code null}.
+	 * @return Biblioteca seleccionada por el usuario o {@code null} si no se seleccion&oacute;.
+	 */
+	public static String getLastSelectedKeystoreLib() {
+		return KeyStorePreferencesManager.getLastSelectedKeystoreLib();
+	}
 
     /**
      * Devuelve el gestor del almac&eacute;n de claves del sistema.

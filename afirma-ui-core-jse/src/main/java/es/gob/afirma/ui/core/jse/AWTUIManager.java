@@ -261,7 +261,6 @@ public final class AWTUIManager extends JSEUIManager {
     		final Object result = showDialogMethod.invoke(csd, Boolean.FALSE);
     		focusApplication();
 
-
     		return result instanceof String ? (String) result : null;
     	}
     	catch (final InvocationTargetException e) {

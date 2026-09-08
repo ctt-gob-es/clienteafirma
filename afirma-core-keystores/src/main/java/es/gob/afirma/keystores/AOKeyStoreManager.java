@@ -9,29 +9,20 @@
 
 package es.gob.afirma.keystores;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.KeyStore.ProtectionParameter;
-import java.security.KeyStoreException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
-
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.keystores.KeyStoreManager;
 import es.gob.afirma.core.misc.AOUtil;
+
+import javax.security.auth.callback.PasswordCallback;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.*;
+import java.security.KeyStore.ProtectionParameter;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.*;
+import java.util.logging.Logger;
 
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
  * crear KeyStores de distintos tipos, utilizando el proveedor JCA apropiado para cada caso
@@ -56,39 +47,54 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     private final Set<String> deactivatedCertificatesThumbprints = new HashSet<>();
 
+
     private String[] cachedAliases = null;
+
+//	private boolean aliasCacheAllowed = true;
+//
+//	/**
+//	 * Activa o desactiva la cache de alias precargados. Por defecto, est&aacute; activada.
+//	 * @param aliasCacheAllowed {@code true} para permitir la cach&eacute; de alias precargados,
+//	 * {@code false} para desactivarla.
+//	 */
+//	public void setAliasCacheAllowed(boolean aliasCacheAllowed) {
+//		this.aliasCacheAllowed = aliasCacheAllowed;
+//	}
+//
+//	/**
+//	 * Indica si est&aacute; permitida la cache de alias precargados.
+//	 * @return {@code true} si est&aacute; permitida la cach&eacute; de alias precargados,
+//	 * {@code false} en caso contrario.
+//	 */
+//	public boolean isAliasCacheAllowed() {
+//		return this.aliasCacheAllowed;
+//	}
 
     /** Borra la lista de alias precargados. */
     protected void resetCachedAliases() {
     	this.cachedAliases = null;
     }
 
-    /** Obtiene la lista de alias precargados.
-     * @return Lista de alias precargados. */
+    /**
+	 * Obtiene la lista de alias precargados.
+     * @return Lista de alias precargados.
+	 */
     protected String[] getCachedAliases() {
-    	return this.cachedAliases != null ? this.cachedAliases.clone() : null;
+    	return /* this.aliasCacheAllowed && */ this.cachedAliases != null ? this.cachedAliases.clone() : null;
     }
 
-    /** Establece la lista de alias precargados.
-     * @param ca Lista de alias precargados. */
+    /**
+	 * Establece la lista de alias precargados.
+     * @param ca Lista de alias precargados.
+	 */
     protected void setCachedAliases(final String[] ca) {
-    	this.cachedAliases = ca.clone();
+//		if (this.aliasCacheAllowed) {
+			this.cachedAliases = ca.clone();
+//		}
     }
 
-    private boolean preferred = false;
 
-    /** Indica si este gestor de almacenes es el preferente.
-     * @return <code>true</code> si este gestor de almacenes es el preferente,
-     *         <code>false</code> en caso contrario. */
-    protected boolean isPreferred() {
-    	return this.preferred;
-    }
-
-    void setPreferred(final boolean p) {
-    	this.preferred = p;
-    }
-
-    /** Tipo de almac&eacute;n. */
+	/** Tipo de almac&eacute;n. */
     private AOKeyStore ksType;
 
     /** Almacenes de claves. */
@@ -131,7 +137,7 @@ public class AOKeyStoreManager implements KeyStoreManager {
 
     /** Establece el tipo del almac&eacute;n principal de este gestor.
      * @param type Tipo del almac&eacute;n principal de este gestor. */
-    protected final void setKeyStoreType(final AOKeyStore type) {
+    protected final void setType(final AOKeyStore type) {
     	this.ksType = type;
     }
 
@@ -253,22 +259,6 @@ public class AOKeyStoreManager implements KeyStoreManager {
         	case WINADDRESSBOOK:
         		this.ks = AOKeyStoreManagerHelperCapiAddressBook.initCAPIAddressBook(this.ksType);
         		break;
-        	case PKCS11:
-
-                // En el "params" debemos traer los parametros:
-                // [0] -p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
-                // [1] -desc: Descripcion del token PKCS#11 (opcional)
-                // [2] -slot: Numero de lector de tarjeta (Sistema Operativo) [OPCIONAL]
-
-        		// Hacemos una copia por la mutabilidad
-        		Object[] newParams = null;
-        		if (params != null) {
-        			newParams = new Object[params.length];
-        			System.arraycopy(params, 0, newParams, 0, params.length);
-        		}
-                this.ks = AOKeyStoreManagerHelperPkcs11.initPKCS11(this.storePasswordCallBack, newParams, forceReset,
-                		getParentComponent());
-                break;
             default:
             	throw new UnsupportedOperationException("Tipo de almacen no soportado: " + this.ksType); //$NON-NLS-1$
         }
@@ -393,18 +383,11 @@ public class AOKeyStoreManager implements KeyStoreManager {
 			return new String[0];
 		}
 		return this.cachedAliases.clone();
-
     }
 
     @Override
     public String toString() {
-        final StringBuilder ret = new StringBuilder("Gestor de almacenes de claves "); //$NON-NLS-1$
-        ret.append(this.ksType);
-        if (this.ksType != null && this.ksType.getName() != null) {
-            ret.append(" con nombre "); //$NON-NLS-1$
-            ret.append(this.ksType.getName());
-        }
-        return ret.toString();
+        return "Gestor de almacenes de claves " + this.ksType;
     }
 
 	@Override
@@ -458,5 +441,13 @@ public class AOKeyStoreManager implements KeyStoreManager {
 			this.deactivatedCertificatesThumbprints.add(certificateThumbprint);
 		}
 		resetCachedAliases();
+	}
+
+	/**
+	 * Devuelve una referencia con la que identificar el almac&eacute;n de claves gestionado por este gestor.
+	 * @return Referencia &uacute;nica para este almac&eacute;n.
+	 */
+	public String getReference() {
+		return this.ksType.name();
 	}
 }

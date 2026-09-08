@@ -9,9 +9,9 @@
 
 package es.gob.afirma.keystores.callbacks;
 
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.afirma.core.ui.AOUIFactory;
+
+import javax.security.auth.callback.PasswordCallback;
 
 /** <i>PasswordCallbak</i> que muestra un di&aacute;logo para solicitar una
  * contrase&ntilde;a. */
@@ -50,6 +50,14 @@ public final class UIPasswordCallback extends PasswordCallback {
      * @param p Componente padre para la modalidad del di&aacute;logo. */
     public void setParent(final Object p) {
     	this.parent = p;
+    }
+
+    /**
+     * Recupera el componente padre para la modalidad del di&aacute;logo.
+     * @return Componente padre o {@code null} si no est&oacute; definido.
+     */
+    public Object getParent() {
+        return this.parent;
     }
 
     @Override

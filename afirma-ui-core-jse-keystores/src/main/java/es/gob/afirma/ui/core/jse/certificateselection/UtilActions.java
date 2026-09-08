@@ -9,16 +9,14 @@
 
 package es.gob.afirma.ui.core.jse.certificateselection;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Desktop;
+import es.gob.afirma.core.keystores.NameCertificateBean;
+import es.gob.afirma.core.misc.LoggerUtil;
+
+import java.awt.*;
 import java.net.URI;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
-
-import es.gob.afirma.core.keystores.NameCertificateBean;
-import es.gob.afirma.core.misc.LoggerUtil;
 
 final class UtilActions {
 
@@ -72,7 +70,7 @@ final class UtilActions {
 			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		}
 
-		selectionDialog.refreshKeystore();
+		selectionDialog.refreshKeystore(parent);
 
 		if (parent != null) {
 			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

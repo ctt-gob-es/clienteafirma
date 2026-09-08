@@ -9,15 +9,14 @@
 
 package es.gob.afirma.keystores.mozilla.shared;
 
-import java.io.InputStream;
-import java.util.Map;
-
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager;
 import es.gob.afirma.keystores.mozilla.NssKeyStoreManager;
+
+import javax.security.auth.callback.PasswordCallback;
+import java.io.InputStream;
+import java.util.Map;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves tipo NSS de sistema (compartido)
  * en el que se tratan de forma unificada los m&oacute;dulos internos y externos.
@@ -27,7 +26,7 @@ public final class SharedNssKeyStoreManager extends MozillaUnifiedKeyStoreManage
 	/** Crea un <i>AOKeyStoreManager</i> para acceso a almacenes de claves
 	 * tipo NSS compartido (de sistema). */
 	public SharedNssKeyStoreManager() {
-		setKeyStoreType(AOKeyStore.SHARED_NSS);
+		setType(AOKeyStore.SHARED_NSS);
 	}
 
 	@Override

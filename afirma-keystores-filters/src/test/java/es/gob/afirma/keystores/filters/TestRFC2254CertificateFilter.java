@@ -1,16 +1,15 @@
 package es.gob.afirma.keystores.filters;
 
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 /** Pruebas de filtros RFC 2254.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -67,13 +66,13 @@ public final class TestRFC2254CertificateFilter {
 
 		AOKeyStoreManager ksm;
 		if (Platform.getOS() == Platform.OS.WINDOWS) {
-			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.WINDOWS, null, "CAPI", null, null); //$NON-NLS-1$
+			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.WINDOWS, null, "CAPI", null, null, false); //$NON-NLS-1$
 		}
 		else if (Platform.getOS() == Platform.OS.MACOSX) {
-			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.APPLE, null, "Apple", null, null); //$NON-NLS-1$
+			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.APPLE, null, "Apple", null, null, false); //$NON-NLS-1$
 		}
 		else if (Platform.getOS() == Platform.OS.LINUX) {
-			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.MOZ_UNI, null, "Mozilla Unificado", null, null); //$NON-NLS-1$
+			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.MOZ_UNI, null, "Mozilla Unificado", null, null, false); //$NON-NLS-1$
 		}
 		else {
 			Assert.fail("Sistema no identificado"); //$NON-NLS-1$

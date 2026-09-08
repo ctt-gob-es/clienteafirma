@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
@@ -394,7 +395,7 @@ public class JSEUIManager implements AOUIManager {
     		return result instanceof String ? (String) result : null;
     	}
     	catch (final InvocationTargetException e) {
-    		LOGGER.severe("Se genero un error en el dialogo de seleccion de certificados: " + e); //$NON-NLS-1$
+    		LOGGER.log(Level.SEVERE, "Se genero un error en el dialogo de seleccion de certificados", e); //$NON-NLS-1$
     		if (e.getCause() instanceof RuntimeException) {
     			throw (RuntimeException) e.getCause();
     		}

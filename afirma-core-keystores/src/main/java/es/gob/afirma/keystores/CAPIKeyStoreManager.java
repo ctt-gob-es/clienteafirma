@@ -9,26 +9,19 @@
 
 package es.gob.afirma.keystores;
 
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.KeyStoreSpi;
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Security;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.Collections;
-
-import javax.security.auth.callback.PasswordCallback;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.InvalidOSException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.callbacks.FirstEmptyThenPinUiPasswordCallback;
+
+import javax.security.auth.callback.PasswordCallback;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.security.*;
+import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Collections;
 
 /** Clase gestora de claves y certificados en los almacenes <i>ROOT</i> y <i>MY</i> de CAPI.
  * @version 0.1 */
@@ -38,7 +31,7 @@ public final class CAPIKeyStoreManager extends AOKeyStoreManager {
 	private static KeyStore capiKsMy = null;
 
 	CAPIKeyStoreManager() {
-		setKeyStoreType(AOKeyStore.WINDOWS);
+		setType(AOKeyStore.WINDOWS);
 	}
 
     /** Obtiene la clave privada de un certificado.

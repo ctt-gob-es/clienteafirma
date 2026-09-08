@@ -9,22 +9,17 @@
 
 package es.gob.afirma.standalone;
 
-import java.awt.Component;
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import javax.security.auth.callback.PasswordCallback;
-import javax.swing.SwingWorker;
-
-import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.AggregatedKeyStoreManager;
-import es.gob.afirma.keystores.DNIePKCS11KeyStoreManager;
 import es.gob.afirma.keystores.KeystoreAlternativeException;
-import es.gob.afirma.keystores.jmulticard.ui.UIPasswordCallbackAccessibility;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.logging.Logger;
 
 final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
+
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
 
     private final SimpleAfirma simpleAFirma;
     private final Component parent;
@@ -43,15 +38,11 @@ final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
     @Override
     protected Void doInBackground() throws AOKeyStoreManagerException, KeystoreAlternativeException {
         if (SimpleAfirma.DEBUG) {
-            Logger.getLogger("es.gob.afirma").info("Solicitado establecimiento de KeyStore (DNIe=" + this.dnie + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            LOGGER.info("Solicitado establecimiento de KeyStore (DNIe=" + this.dnie + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
         try {
         	this.ksm = SimpleKeyStoreManager.getKeyStore(this.dnie, this.forced, this.parent);
-        	if (this.ksm instanceof AggregatedKeyStoreManager && !((AggregatedKeyStoreManager) this.ksm).isSmartCardAdded()) {
-	        	AggregatedKeyStoreManager dniePkcs11Aksm = getDNIePKCS11KeyStoreManager();
-	        	((AggregatedKeyStoreManager) this.ksm).addKeyStoreManager(dniePkcs11Aksm);
-        	}
         }
         catch (final NoDnieFoundException e) {
         	// No se pudo cargar el DNIe y era obligatorio su uso. En ese caso, no cargamos ningun almacen
@@ -60,46 +51,14 @@ final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
         	// la version anteriormente cargada
         	this.ksm = null;
         }
+
         return null;
     }
 
     @Override
     protected void done() {
-        if (this.simpleAFirma != null && this.ksm != null) {
+    if (this.simpleAFirma != null && this.ksm != null) {
             this.simpleAFirma.setKeyStoreManager(this.ksm);
         }
     }
-    
-	/**
-	 * Obtiene el almacen del DNIe mediante su PKCS#11
-	 * @return Almac&eacute;n de DNIe.
-	 * @throws KeystoreAlternativeException si ocurre un error al acceder o validar el keystore alternativo.
-	 * @throws IOException si se produce un error de entrada/salida durante la lectura o escritura de datos.
-	 */
-    public AggregatedKeyStoreManager getDNIePKCS11KeyStoreManager() {
-
-        final String prompt = SimpleAfirmaMessages.getString("DNIePasswordCallback.1"); //$NON-NLS-1$
-        final String title = SimpleAfirmaMessages.getString("DNIePasswordCallback.3"); //$NON-NLS-1$
-        final PasswordCallback psc = new UIPasswordCallbackAccessibility(
-                prompt,
-                this.parent,
-                prompt,
-                'P',
-                title,
-                "/images/dnie.png", //$NON-NLS-1$
-                true,
-                true
-        );
-
-    	final AggregatedKeyStoreManager ksmCapi = new DNIePKCS11KeyStoreManager();
-		try {
-			ksmCapi.init(AOKeyStore.PKCS11, null, psc, null, false);
-		}
-		catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error al cargar DNIe mediante su PKCS#11"); //$NON-NLS-1$ //$NON-NLS-2$          
-		}
-
-		return ksmCapi;
-	}
-
 }

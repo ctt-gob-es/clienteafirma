@@ -1,16 +1,15 @@
 package es.gob.afirma.keystores.filters;
 
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import es.gob.afirma.keystores.AOKeyStore;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 /** Pruebas del filtro de certificados por identificador de pol&iacute;tica de certificaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
@@ -38,7 +37,8 @@ public final class TestPseudonymFilter {
 			null,
 			"TIFSEU", //$NON-NLS-1$
 			new CachePasswordCallback("12345".toCharArray()), //$NON-NLS-1$
-			null
+			null,
+			false
 		);
 		final String[] aliases = ksm.getAliases();
 		System.out.println("ORIGINAL"); //$NON-NLS-1$

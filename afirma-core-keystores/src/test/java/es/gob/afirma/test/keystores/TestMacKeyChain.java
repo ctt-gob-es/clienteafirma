@@ -9,6 +9,15 @@
 
 package es.gob.afirma.test.keystores;
 
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.AOKeyStore;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -16,16 +25,6 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.AOKeyStore;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 
 /** Pruebas espec&iacute;ficas para los almacenes de Mac OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -56,12 +55,13 @@ public class TestMacKeyChain {
         }
 
         final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-    		AOKeyStore.APPLE,
-    		kc.getAbsolutePath(),
-    		"Mac-Afirma", //$NON-NLS-1$
-    		AOKeyStore.APPLE.getStorePasswordCallback(null),
-    		null
-		);
+                AOKeyStore.APPLE,
+                kc.getAbsolutePath(),
+                "Mac-Afirma", //$NON-NLS-1$
+                AOKeyStore.APPLE.getStorePasswordCallback(null),
+                null,
+                false
+        );
         Assert.assertNotNull(ksm);
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);
@@ -89,7 +89,8 @@ public class TestMacKeyChain {
         }
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
-        final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.APPLE, null, "Mac-Afirma", null, null); //$NON-NLS-1$
+        final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.APPLE, null,
+                "Mac-Afirma", null, null, false); //$NON-NLS-1$
         Assert.assertNotNull(ksm);
         final String[] aliases = ksm.getAliases();
         Assert.assertNotNull(aliases);

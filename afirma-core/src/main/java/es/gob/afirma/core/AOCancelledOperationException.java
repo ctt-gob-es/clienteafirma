@@ -33,7 +33,7 @@ public class AOCancelledOperationException extends AORuntimeException {
      * @param e
      * 		  Causa de la excepci&oacute;n.
      */
-    public AOCancelledOperationException(final String msg, final Exception e) {
-        super(msg, e, ErrorCode.Functional.CANCELLED_OPERATION);
+    public AOCancelledOperationException(final String msg, final Throwable cause) {
+        super(msg, cause, ErrorCode.Functional.CANCELLED_OPERATION);
     }
 }
