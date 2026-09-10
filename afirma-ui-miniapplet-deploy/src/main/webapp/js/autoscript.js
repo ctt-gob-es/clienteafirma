@@ -103,7 +103,7 @@ var AutoScript = ( function ( window, undefined ) {
 		    ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Descarga na App Store'></a>",
 		    loading: "Cargando",
 		    no_compatible_procedure: "Esta aplicaci&oacute;n non permite asinar desde o navegador en dispositivos m&oacute;biles.",
-				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/gl/ciudadanos/descargas'>Portal de Sinatura Electr&oacute;nica</a>",
+			pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/gl/ciudadanos/descargas'>Portal de Sinatura Electr&oacute;nica</a>",
 		    procedure_from_url: "Podes realizar o tr&aacute;mite dende a seguinte aplicaci&oacute;n:",
 		    restore_installation: "Se o tes instalado, podes restaurar a instalaci&oacute;n desde Autofirma en Ferramentas -> Restaurar instalaci&oacute;n.",
 		    retry_operation: "Reintento a operaci\u00F3n",
@@ -113,31 +113,31 @@ var AutoScript = ( function ( window, undefined ) {
 			warning: "Aviso:"
 	  	};
 		LOCALIZED_STRINGS["va_ES"] = {
-				access_from_pc: "Accedisca des d'un PC per a realitzar el tr&agrave;mit.",
-				android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descarrega-ho de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
-				checktime_warn: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Es recomana que es corregisca abans de polsar Acceptar per a continuar.",
-				checktime_err: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Ha de corregir l'hora del seu sistema i recarregar esta p&agrave;gina abans de continuar.",
-				checktime_local_time: "Hora del seu sistema",
-				checktime_server_time: "Hora del servidor",
-				close: "Tancar",
-				contact_admin: "Per favor, informe de l'error si el problema persisteix: ",
-				error_connecting_autofirma: "No &eacute;s possible connectar amb Autofirma a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tindre-ho instal·lat, pot descarregar-se des del següent enllaç:",
-				error_connecting_client: "No &eacute;s possible connectar amb el client de signatura a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tindre-ho instal·lat, pot descarregar-se des del següent enllaç:",
-				error_connecting_service: "No s'ha pogut connectar amb el servei de l'aplicaci&oacute; de signatura. &eacute;s probable que no puga completar signatures electr&ograve;niques des d'esta p&agrave;gina.",
-				error_connecting_server_recovering: "No es va poder connectar amb el servei de l'aplicaci&oacute; per a recuperar el resultat de l'operaci&oacute;.",
-				firefox_reinstall_message: "Instal·lar o restaurar Autofirma requerir&agrave; tancar el navegador i reiniciar el tr&agrave;mit.",
-				install_client: "<br>Si el t&eacute; instal·lat o l'acaba d'instal·lar, polse el bot&oacute; per a reintentar l'operaci&oacute;.",
-				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Desc&agrave;rrega en l'App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
-				loading: "Carregant",
-				no_compatible_procedure: "Esta aplicaci&oacute; no permet signar des del navegador en dispositius m&ograve;bils. ",
-				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/va/ciudadanos/descargas'>Portal de Signatura Electr&ograve;nica</a>",
-				procedure_from_url: "Pot realitzar el tr&agrave;mit des de la següent aplicaci&oacute;:",
-				restore_installation: "Si el t&eacute; instal·lat, pot restaurar la instal·laci&oacute; des d'Autofirma en Eines -> Restaurar instal·laci&oacute;",
-				retry_operation: "Reintentar operaci\u00F3",
-				timeout_receiving_sign: "No s'ha pogut connectar amb el client de signatura. Si no el t&eacute; instal·lat, pot descarregar-ho des de:",
-				unsecure_context: "El context d'execució no és segur i no s'usaran les funcions de xifrat avançades.",
-				ok: "Acceptar",
-				warning: "Advertiment:"
+			access_from_pc: "Accedisca des d'un PC per a realitzar el tr&agrave;mit.",
+			android_download_url: "<a href='https://play.google.com/store/apps/details?id=es.gob.afirma'><img alt='Descarrega-ho de Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png' style='width: 140px;'/></a>",
+			checktime_warn: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Es recomana que es corregisca abans de polsar Acceptar per a continuar.",
+			checktime_err: "S'ha detectat un desfasament horari entre el seu sistema i el servidor. Ha de corregir l'hora del seu sistema i recarregar esta p&agrave;gina abans de continuar.",
+			checktime_local_time: "Hora del seu sistema",
+			checktime_server_time: "Hora del servidor",
+			close: "Tancar",
+			contact_admin: "Per favor, informe de l'error si el problema persisteix: ",
+			error_connecting_autofirma: "No &eacute;s possible connectar amb Autofirma a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tindre-ho instal·lat, pot descarregar-se des del següent enllaç:",
+			error_connecting_client: "No &eacute;s possible connectar amb el client de signatura a causa d'un problema de comunicaci&oacute; o d'instal·laci&oacute; del client. En cas de no tindre-ho instal·lat, pot descarregar-se des del següent enllaç:",
+			error_connecting_service: "No s'ha pogut connectar amb el servei de l'aplicaci&oacute; de signatura. &eacute;s probable que no puga completar signatures electr&ograve;niques des d'esta p&agrave;gina.",
+			error_connecting_server_recovering: "No es va poder connectar amb el servei de l'aplicaci&oacute; per a recuperar el resultat de l'operaci&oacute;.",
+			firefox_reinstall_message: "Instal·lar o restaurar Autofirma requerir&agrave; tancar el navegador i reiniciar el tr&agrave;mit.",
+			install_client: "<br>Si el t&eacute; instal·lat o l'acaba d'instal·lar, polse el bot&oacute; per a reintentar l'operaci&oacute;.",
+			ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Desc&agrave;rrega en l&#27;App Store'></a>",
+		    loading: "Carregant",
+			no_compatible_procedure: "Esta aplicaci&oacute; no permet signar des del navegador en dispositius m&ograve;bils. ",
+			pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/va/ciudadanos/descargas'>Portal de Signatura Electr&ograve;nica</a>",
+			procedure_from_url: "Pot realitzar el tr&agrave;mit des de la següent aplicaci&oacute;:",
+			restore_installation: "Si el t&eacute; instal·lat, pot restaurar la instal·laci&oacute; des d'Autofirma en Eines -> Restaurar instal·laci&oacute;",
+			retry_operation: "Reintentar operaci\u00F3",
+			timeout_receiving_sign: "No s'ha pogut connectar amb el client de signatura. Si no el t&eacute; instal·lat, pot descarregar-ho des de:",
+			unsecure_context: "El context d'execució no és segur i no s'usaran les funcions de xifrat avançades.",
+			ok: "Acceptar",
+			warning: "Advertiment:"
 		};
 		LOCALIZED_STRINGS["ca_ES"] = {
 				access_from_pc: "Accedeixi des d'un PC per a realitzar el tr&agrave;mit.",
@@ -154,7 +154,7 @@ var AutoScript = ( function ( window, undefined ) {
 				error_connecting_server_recovering: "No es va poder connectar amb el servei de l'aplicaci&oacute; per a recuperar el resultat de l'operaci&oacute;.",
 				firefox_reinstall_message: "Instal·lar o restaurar Autofirma requerir&agrave; tancar el navegador i reiniciar el tr&agrave;mit.",
 				install_client: "<br>Si el t&eacute; instal·lat o l'acaba d'instal·lar, premi el bot&oacute; per a reintentar l'operaci&oacute;.",
-				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Desc&agrave;rrega en l'App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Desc&agrave;rrega en l&#27;App Store'></a>",
 				loading: "Carregant",
 				no_compatible_procedure: "Aquesta aplicaci&oacute; no permet signar des del navegador en dispositius m&ograve;bils. ",
 				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/ca/ciudadanos/descargas'>Portal de Signatura Electr&ograve;nica</a>",
@@ -181,7 +181,7 @@ var AutoScript = ( function ( window, undefined ) {
 				error_connecting_server_recovering: "Ezin izan da aplikazioaren zerbitzuarekin konektatu eragiketaren emaitza berreskuratzeko. ",
 				firefox_reinstall_message: "Autofirma instalatu edo berrezartzeko, nabigatzailea itxi eta izapidea berrabiarazi behar da. ",
 				install_client: "<br>Instalatuta baduzu edo instalatu berri baduzu, sakatu botoia eragiketa berriro saiatzeko. ",
-				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Deskargatu App Store-n' style='border-radius: 13px'; height: 140px></40px>",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Deskargatu App Store-n'></a>",
 				loading: "Kargatzen",
 				no_compatible_procedure: "Aplikazio honek ez du uzten nabigatzailetik gailu mugikorretan sinatzen. ",
 				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/eu/ciudadanos/descargas'>Sinadura elektronikoaren ataria</a>",
@@ -208,7 +208,7 @@ var AutoScript = ( function ( window, undefined ) {
 				error_connecting_server_recovering: "It was not possible to connect with the application service to recover the result of the operation. ",
 				firefox_reinstall_message: "Installing or restoring Autofirma will require closing the browser and restarting the process. ",
 				install_client: "<br>If you have it installed or just installed, press the button to retry the operation. ",
-				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200' style='display: inline-block; overflow: hidden; border-radius: 13px; width: 140px; height: 40px;'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Download from App Store' style='border-radius: 13px; width: 140px; height: 40px;'></a>",
+				ios_download_url: "<a href='https://apps.apple.com/us/app/cliente-firma-movil/id627410001?itsct=apps_box_badge&amp;itscg=30200'><img src='https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83&amp;releaseDate=1381536000' alt='Download from App Store'></a>",
 				loading: "Loading",
 				no_compatible_procedure: "This application does not allow you to sign from your browser on mobile devices. ",
 				pc_download_url: "<a target='_blank' href='https://firmaelectronica.gob.es/en/ciudadanos/descargas'>Electronic Signature Portal</a>",
@@ -323,7 +323,7 @@ var AutoScript = ( function ( window, undefined ) {
 		/** Comprueba si una cadena de texto es una URL (http/https). La alternativa implicaria ser un Base64. */ 
 		function isValidUrl(data) { 
 			return data != null && data.length > "https://".length &&
-				("http:" == data.substring(0, 5) || "https:" == data.substring(0, 6));
+				("http:" === data.substring(0, 5) || "https:" === data.substring(0, 6));
 		}
 
 		var downloadSuccessFunction = null;
@@ -383,17 +383,23 @@ var AutoScript = ( function ( window, undefined ) {
 		  },
 		  Functional: {
 		    CANCELLED_OP: {
-		      code: "AS500001", message: "Operacion cancelada por el usuario"
-		    },
-		    UPLOAD_FILE_SERVER: {
-		      code: "AS500008", message: "La operacion de carga de fichero no esta disponible por servidor intermedio"
-		    },
-		    UPLOAD_MULTIPLE_FILE_SERVER : {
-		      code: "AS500009", message: "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio"
-		    },
-		    NON_OPERATIVE_JS_METHOD : {
-		      code: "AS500010", message: "El metodo JavaScript no se encuentra operativo"
-		    }
+			  code: "AS500001", message: "Operacion cancelada por el usuario"
+			},
+			UPLOAD_FILE_SERVER: {
+			  code: "AS500008",
+			  message: "La operacion de carga de fichero no esta disponible por servidor intermedio"
+			},
+			UPLOAD_MULTIPLE_FILE_SERVER: {
+			  code: "AS500009",
+			  message: "La operacion de carga de multiples ficheros no esta disponible por servidor intermedio"
+			},
+			NON_OPERATIVE_JS_METHOD: {
+			  code: "AS500010", message: "El metodo JavaScript no se encuentra operativo"
+			},
+			SIGN_AND_SAVE_NOT_SUPPORTED: {
+			  code: "AS500011",
+			  message: "La operacion de firma y guardado no esta soportada por los clientes moviles"
+			}
 		  },
 		  Request: {
 		    RETRIEVE_URL_NOT_FOUND: {
@@ -4501,7 +4507,20 @@ var AutoScript = ( function ( window, undefined ) {
 			 * @param errorCallback M&eacute;todo a ejecutar en caso de error.
 			 */
 			function signAndSaveToFile (signId, dataB64, algorithm, format, extraParams, outputFileName, successCallback, errorCallback) {
-				
+
+				// Esta operacion no esta soportada por lo clientes Android e iOS
+				if (Platform.isAndroid() || Platform.isIOS()) {
+					errorType = "java.lang.UnsupportedOperationException";
+					errorMessage = ErrorCode.Functional.SIGN_AND_SAVE_NOT_SUPPORTED.message;
+					errorCode = ErrorCode.Functional.SIGN_AND_SAVE_NOT_SUPPORTED.code;
+					if (!errorCallback) {
+						throwException(errorType, ErrorCode.Functional.SIGN_AND_SAVE_NOT_SUPPORTED);
+					} else {
+						errorCallback(errorType, errorMessage, errorCode);
+					}
+					return;
+				}
+
 				var parameters = {
 					signId : signId,
 					dataB64 : dataB64,
@@ -4861,6 +4880,8 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Ejecuta un metodo de operacion enviando los datos por servidor intermedio
 			 * @param operationMethod Metodo de la operacion que debe ejecutar.
 			 * @param operationParameters Parametro con toda la informacion para la ejecucion del metodo
+			 * @param successCallback Funcion callback que debe ejecutarse en caso de exito.
+			 * @param errorCallback Funcion callback que debe ejecutarse en caso de error.
 			 */
 			function executeWithAdvancedCipher(operationMethod, operationParameters, successCallback, errorCallback) {
 
