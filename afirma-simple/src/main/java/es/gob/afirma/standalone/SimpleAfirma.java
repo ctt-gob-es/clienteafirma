@@ -40,6 +40,7 @@ import es.gob.afirma.standalone.ui.tasks.SSLContextConfigurationTask;
 import es.gob.afirma.standalone.ui.tasks.SslSocketKeyStoreChecker;
 import es.gob.afirma.standalone.updater.Updater;
 
+import javax.smartcardio.CardTerminal;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
@@ -220,7 +221,7 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
 				&& !PreferencesManager.getBoolean(PreferencesManager.PREFERENCE_GENERAL_HIDE_DNIE_START_SCREEN);
         if (showDNIeScreen) {
 	        try {
-	        	if (javax.smartcardio.TerminalFactory.getDefault().terminals().list().isEmpty()) {
+	        	if (getAvailableCardTerminals().isEmpty()) {
 	        		showDNIeScreen = false;
 	        	}
 			} catch (final Exception e) {
@@ -254,6 +255,26 @@ public final class SimpleAfirma implements PropertyChangeListener, WindowListene
         	}
         }
     }
+
+	/**
+	 * Obtiene el listado de lectores de tarjetas disponibles en el sistema, excluyendo aquellos que se sepa que no
+	 * pueden usarse con tarjetas f&iacute;sicas de certificados.
+	 * @return Listado de tarjetas o un array vac&iacute;o si no hay ninguno disponible.
+	 */
+	private List<CardTerminal> getAvailableCardTerminals() {
+		List<CardTerminal> terminals = new ArrayList<>(2);
+		try {
+			for (CardTerminal terminal : javax.smartcardio.TerminalFactory.getDefault().terminals().list()) {
+				if (!terminal.getName().toLowerCase(Locale.getDefault()).startsWith("windows hello")) {
+					terminals.add(terminal);
+				}
+			}
+		}
+		catch (final Exception e) {
+			LOGGER.log(Level.WARNING, "No se ha podido obtener la lista de lectores de tarjetas del sistema", e); //$NON-NLS-1$
+		}
+		return terminals;
+	}
 
 	private void configureMenuBar() {
 		if (this.window != null) {
