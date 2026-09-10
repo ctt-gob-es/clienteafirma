@@ -61,7 +61,12 @@ VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
 
 ;--------------------------------
 ;Idiomas
- 
+
+; Para generar instaladores en diferentes idiomas podemos escribir lo siguiente:
+;  !insertmacro MUI_LANGUAGE ${LANGUAGE}
+; De esta forma pasando la variable LANGUAGE al compilador podremos generar
+; paquetes en distintos idiomas sin cambiar el script
+											 
  !insertmacro MUI_LANGUAGE "Spanish"
  !insertmacro MUI_LANGUAGE "English"
  !insertmacro MUI_LANGUAGE "Catalan"
@@ -81,12 +86,6 @@ VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
  LicenseLangString LICENSE ${LANG_VALENCIAN} "license\licencia_va.txt"
  
  LicenseData $(LICENSE)
-
-; Para generar instaladores en diferentes idiomas podemos escribir lo siguiente:
-;  !insertmacro MUI_LANGUAGE ${LANGUAGE}
-; De esta forma pasando la variable LANGUAGE al compilador podremos generar
-; paquetes en distintos idiomas sin cambiar el script
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Configuration General ;
@@ -747,11 +746,10 @@ Function GetUninstallerFromRegistry
 	;Comprobamos si la aplicacion ya esta registrada
 	ClearErrors
 	ReadRegStr $R0 HKLM SOFTWARE\$PATH "InstallDir"
-	${If} ${Errors}
+	IfErrors 0 +4
 		StrCpy $R0 ""
 		StrCpy $R1 ""
 		Goto End
-	${EndIf}
 
 	;Buscamos el desinstalador de esa verion y lo ejecutamos
 	;Esto funciona tambien para las versiones MSI, ya que estas
@@ -782,17 +780,19 @@ Function RemoveOldVersionsWithUninstaller
 	Push $R2
 	Push $R3
 	Push $R4
+	; Directorio de instalacion anterior
+	Push $0
+	; Nombre del desinstalador
+	Push $1
 
 	;Comprobamos si la aplicacion ya esta registrada
 	Call GetUninstallerFromRegistry
-	Pop $R0 ;Directorio de instalacion
-	Pop $R1 ;Desinstalador
+	Pop $0 ;Directorio de instalacion
+	Pop $1 ;Desinstalador
 	
-	; Si no se encontro el desinstalador, buscamos la cadena de desinstalacion
-	${If} $R1 == ""
-		Goto End
-	${EndIf}
-
+	; Si no se encontro el desinstalador, no hacemos nada
+	StrCmp $1 "" End
+	
 	; Comprobamos si existe configuracion de usuario de Autofirma. Si no existe, vamos directamente a la
 	; desinstalacion de la version anterior de Autofirma y, si existe, hacemos copia para restaurarla una
 	; vez que desinstalemos esa version (el desinstalar una version elimina la configuracion).
@@ -821,14 +821,14 @@ Function RemoveOldVersionsWithUninstaller
 	InitUninstall:
 
 	;Ejecutamos el desinstalador si se ha encontrado y lo eliminamos despues
-	StrCmp $R1 "" +3 0
-		ExecWait '"$R0\$R1" /S _?=$R0'
-		RMDir /r $R1
+	StrCmp $1 "" +3 0
+		ExecWait '"$0\$1" /S _?=$0'
+		RMDir /r $1
 
 	;Si el directorio de instalacion nuevo es distinto al anterior,
 	;nos aseguramos del borrado eliminandolo
-	StrCmp $INSTDIR $R0 +2 0
-		RMDir /r /REBOOTOK $R0
+	StrCmp $INSTDIR $0 +2 0
+		RMDir /r /REBOOTOK $0
 
 	; Si habia una configuracion anterior de Autofirma, la restauramos
 	StrCmp $R2 "0" End 
@@ -841,6 +841,8 @@ Function RemoveOldVersionsWithUninstaller
 		DeleteRegKey HKCU $R2
 
 	End:
+	Pop $1
+	Pop $0
 	Pop $R4
 	Pop $R3
 	Pop $R2
@@ -867,16 +869,17 @@ Function RemoveOldVersionRegisterInWindows
     Push $3
     Push $4
     Push $5
+	; Clave de registro en la que se hara copia de la configuracion de la version anterior
     Push $6
+	; Cadena de desinstalacion
+	Push $7
 
 	; Se busca la cadena de desinstalacion del EXE
 	ClearErrors
-	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
+	ReadRegStr $7 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
 
 	; Si no se encontro registrada como EXE, buscamos como MSI 
-	${If} ${Errors}
-		Goto CheckMsiEntry
-	${EndIf}
+	IfErrors CheckMsiEntry
 
 	; Iniciamos la desinstalacion
 	Goto UninstallOlderVersion
@@ -902,9 +905,9 @@ Function RemoveOldVersionRegisterInWindows
 		; Comprobamos si el nombre la aplicacion de la entrada es el de la nuestra (Autofirma o AutoFirma). Si no, pasamos a la siguiente
 		StrCmp $3 "Autofirma" +2 0
 		StrCmp $3 "AutoFirma" 0 CheckRegistryLoop
-		ReadRegStr $R0 HKLM $1 "UninstallString"
+		ReadRegStr $7 HKLM $1 "UninstallString"
 
-	close:
+	Close:
 		${registry::Close} "$0"
 		${registry::Unload}
 
@@ -949,6 +952,7 @@ Function RemoveOldVersionRegisterInWindows
 
 	; Iniciamos la desinstalacion
 	InitUninstall:
+
 		; Tomamos la ruta de instalacion de la version anterior y la eliminamos del PATH. Si el desinstalador
 		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
 		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
@@ -961,19 +965,19 @@ Function RemoveOldVersionRegisterInWindows
 		; Almacenamos en $R1 la ruta desde la que ejecutar la desinstalacion (directorio del sistema)
 		; Almacenamos en $R2 la sentencia de desinstalacion agregando parametros para que sea silenciosa
 		StrCpy $R1 $SYSDIR
-		StrCpy $R2 "$R0 /qn"
+		StrCpy $R2 "$7 /qn"
 		
-		Push $R0
+		Push $7
 		Push "msiexec"
 		Call StrStr
 		Pop $0
 
 		; Si no es una instalacion MSI, pisamos las variables por las apropiadas para la desinstalacion convencional
 		StrCmp $0 "" 0 EjecutarDesinstalador
-			Push $R0
+			Push $7
 			Call GetParent
 			Pop $R1	
-			StrCpy $R2 '"$R0" /S _?=$R1'
+			StrCpy $R2 '"$7" /S _?=$R1'
 			; Si el directorio de instalacion es distinto del anterior, establecemos una variable para senalar que
 			; queremos que se elimine ese directorio despues de la desinstalacion, ya que sabemos que quedaran restos
 			; del instalador EXE anterior
@@ -1019,7 +1023,8 @@ Function RemoveOldVersionRegisterInWindows
 
 	End:
 	
-    Push $6
+    Push $7
+	Push $6
     Push $5
     Push $4
     Push $3

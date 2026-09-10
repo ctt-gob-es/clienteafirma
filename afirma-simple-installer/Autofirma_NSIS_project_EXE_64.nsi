@@ -58,7 +58,7 @@ VIAddVersionKey "FileDescription" "Autofirma (64 bits)"
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
   !insertmacro MUI_UNPAGE_FINISH
-
+  
 ; Creamos la pagina de configuracion personalizada
 !include nsDialogs.nsh
 
@@ -123,6 +123,7 @@ FunctionEnd
 
 ;--------------------------------
 ;Idiomas
+
 ; Para generar instaladores en diferentes idiomas podemos escribir lo siguiente:
 ;  !insertmacro MUI_LANGUAGE ${LANGUAGE}
 ; De esta forma pasando la variable LANGUAGE al compilador podremos generar
@@ -227,7 +228,6 @@ Section "Autofirma" sPrograma
 	Pop $R2
 
 	${If} $R1 != ""
-	
 		; Si es la misma version o superior, detenemos el proceso. Si no, se elimina.
 		${VersionCheckNew} $R1 ${VERSION} "$R3"
 		${If} $R3 = 0
@@ -658,7 +658,6 @@ Function isJava64Arch
 
 FunctionEnd
 
-
 !define CERT_STORE_CERTIFICATE_CONTEXT  1
 !define CERT_NAME_ISSUER_FLAG           1
 !define CERT_NAME_SIMPLE_DISPLAY_TYPE   4
@@ -764,9 +763,8 @@ Function CheckVersionInstalledByRegistry
 	ClearErrors
 	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
 
-	${If} ${Errors}
-		Goto CheckMsiEntry
-	${EndIf}  
+	; Si no se encontro la cadena de la instalacion EXE, pasamos a comprobar si se encuentra la del MSI				
+	IfErrors CheckMsiEntry
 	
 	; Se ha encontrado la entrada, se busca la version
 	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
@@ -1173,18 +1171,20 @@ Function RemoveOldVersions
     Push $3
     Push $4
     Push $5
+	; Clave de registro en la que se hara copia de la configuracion de la version anterior
     Push $6
+	; Cadena de desinstalacion
+	Push $7
   
 	; Comprueba que este ya instalada
 	ClearErrors
-	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
+	ReadRegStr $7 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
 
-	${If} ${Errors}
-		Goto CheckMsiEntry
-	${EndIf}
+	IfErrors CheckMsiEntry
 
 	; Se ha encontrado Autofirma instalado
 	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
+
 	${VersionCheckNew} $R1 ${VERSION} "$R2"
 	${If} $R2 = 2
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
@@ -1217,9 +1217,9 @@ Function RemoveOldVersions
 		; Comprobamos si el nombre la aplicacion de la entrada es el de la nuestra (Autofirma o AutoFirma). Si no, pasamos a la siguiente
 		StrCmp $3 "Autofirma" +2 0
 		StrCmp $3 "AutoFirma" 0 CheckRegistryLoop
-		ReadRegStr $R0 HKLM $1 "UninstallString"
+		ReadRegStr $7 HKLM $1 "UninstallString"
 
-	close:
+		Close:
 		${registry::Close} "$0"
 		${registry::Unload}
 
@@ -1268,6 +1268,7 @@ Function RemoveOldVersions
 
 	; Iniciamos la desinstalacion
 	InitUninstall:
+
 		; Tomamos la ruta de instalacion de la version anterior y la eliminamos del PATH. Si el desinstalador
 		; de la version 1.6.5 y anteriores funcionasen bien, esto no seria necesario
 		ReadRegStr $R1 HKLM "SOFTWARE\$PATH\" "InstallDir"
@@ -1280,19 +1281,19 @@ Function RemoveOldVersions
 		; Almacenamos en $R1 la ruta desde la que ejecutar la desinstalacion (directorio del sistema)
 		; Almacenamos en $R2 la sentencia de desinstalacion agregando parametros para que sea silenciosa
 		StrCpy $R1 $SYSDIR
-		StrCpy $R2 "$R0 /qn"
+		StrCpy $R2 "$7 /qn"
 		
-		Push $R0
+		Push $7
 		Push "msiexec"
 		Call StrStr
 		Pop $0
 
 		; Si no es una instalacion MSI, pisamos las variables por las apropiadas para la desinstalacion convencional
 		StrCmp $0 "" 0 EjecutarDesinstalador
-			Push $R0
+			Push $7
 			Call GetParent
 			Pop $R1	
-			StrCpy $R2 '"$R0" /S _?=$R1'
+			StrCpy $R2 '"$7" /S _?=$R1'
 			; Si el directorio de instalacion es distinto del anterior, establecemos una variable para senalar que
 			; queremos que se elimine ese directorio despues de la desinstalacion, ya que sabemos que quedaran restos
 			; del instalador EXE anterior
@@ -1338,7 +1339,8 @@ Function RemoveOldVersions
 
 	End:
 	
-    Push $6
+    Push $7
+	Push $6
     Push $5
     Push $4
     Push $3
@@ -1405,6 +1407,7 @@ Function un.UninstallFromRegistry
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\ui"
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\standalone"
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\core"
+	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\keystores"
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\plugin"
 	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob\afirma"
 	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob"

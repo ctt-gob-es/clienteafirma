@@ -58,8 +58,7 @@ VIAddVersionKey "FileDescription" "Autofirma (32 bits)"
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
   !insertmacro MUI_UNPAGE_FINISH
-
-
+  
 ; Creamos la pagina de configuracion personalizada
 !include nsDialogs.nsh
 
@@ -220,6 +219,7 @@ Section "Autofirma" sPrograma
 	Call CheckVersionInstalled
 	Pop $R1
 	Pop $R2
+
 	${If} $R1 != ""
 		; Si es la misma version o superior, detenemos el proceso. Si no, se elimina.
 		${VersionCheckNew} $R1 ${VERSION} "$R3"
@@ -230,6 +230,7 @@ Section "Autofirma" sPrograma
 		  MessageBox MB_OK $(NEWEST_VERSION)
 		  Quit
 		${EndIf}
+		
 		; Eliminamos la version encontrada, indicando su arquitectura para que se busque la correcta
 		${If} $R2 == 32
 		  SetRegView 32
@@ -446,14 +447,12 @@ Function .onInit
 
 FunctionEnd
 
-
 Function un.onInit
 
   StrCpy $Language ${LANG_SPANISH}
   !insertmacro MUI_UNGETLANGUAGE
   
 FunctionEnd
-
 
 ; Desactivamos la instalacion de la JRE si el usuario deselecciona
 ; esta opcion
@@ -634,7 +633,7 @@ Function AddCertificateToStore
 FunctionEnd
  
 ;Function CheckVersionInstalled
-; Identifica la version instalada de Autofirma y su arquitectura.
+; Identifica si hay una version instalada de Autofirma y su arquitectura.
 ; Uso:
 ;   Call CheckVersionInstalled
 ;   Pop $R0		; Version de la aplicacion instalada o cadena vacia si no se encontro
@@ -652,7 +651,7 @@ Function CheckVersionInstalled
 	Call CheckVersionInstalledByRegistry
 	Pop $R0
 
-	; Si se encontro la version de 64 instalada, salimos ya
+	; Si se encontro una version instalada, salimos ya
 	${If} $R0 != ""
 	  StrCpy $R1 64
 	  Goto End
@@ -726,9 +725,8 @@ Function CheckVersionInstalledByRegistry
 	ClearErrors
 	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
 
-	${If} ${Errors}
-		Goto CheckMsiEntry
-	${EndIf}  
+	; Si no se encontro la cadena de la instalacion EXE, pasamos a comprobar si se encuentra la del MSI
+	IfErrors CheckMsiEntry
 	
 	; Se ha encontrado la entrada, se busca la version
 	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
@@ -1122,23 +1120,37 @@ FunctionEnd
 
 ;Function RemoveOldVersions
 ;
-; Funcion para eliminar versiones anteriores de Autofirma. Las versiones se
-; buscan a traves del registro, para lo cual afecta si se tiene configurada la
+; Funcion que busca la cadena de desinstalacion de Autofirma registrada en el listado de
+; aplicaciones de Windows y la usa para la desinstalacion.
+; La cadena se busca a traves del registro, para lo cual afecta si se tiene configurada la
 ; vista de 32 o 64 bits
 ; Uso:
 ;   Call RemoveOldVersions
 Function RemoveOldVersions
+    Push $R0
+    Push $R1
+	Push $R2
+    Push $0
+    Push $1
+    Push $2
+    Push $3
+    Push $4
+    Push $5
+	; Clave de registro en la que se hara copia de la configuracion de la version anterior
+    Push $6
+	; Cadena de desinstalacion
+	Push $7
   
-	; Comprueba que no este ya instalada
+	; Se busca la cadena de desinstalacion del EXE
 	ClearErrors
-	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
+	ReadRegStr $7 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "UninstallString"
 
-	${If} ${Errors}
-		Goto CheckAutofirmaVersion
-	${EndIf}
+																; Si no se encontro registrada como EXE, buscamos como MSI 
+	IfErrors CheckMsiEntry
 	
 	; Se ha encontrado Autofirma instalado
 	ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$PATH\" "DisplayVersion"
+	
 	${VersionCheckNew} $R1 ${VERSION} "$R2"
 	${If} $R2 = 2
 		; Informamos de que existe una version anterior, ofrecemos el eliminarla y cerramos el
@@ -1151,24 +1163,29 @@ Function RemoveOldVersions
 	Goto End
 	
 	; No se encontro Autofirma instalado por el primer metodo, lo comprobamos de otra forma
-	CheckAutofirmaVersion:
+	CheckMsiEntry:
+
 		${registry::Open} "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" "/K=0 /V=1 /S=0 /B=1 /N='DisplayName'" $0
-		StrCmp $0 0 0 searchAutofirmaLoop
+		StrCmp $0 0 0 CheckRegistryLoop
 		Goto End
 
-		searchAutofirmaLoop:
+		CheckRegistryLoop:
+		
+		; Leemos la entrada
 		${registry::Find} "$0" $1 $2 $3 $4
 
-		; Si hemos terminado la busqueda, salimos del bucle
-		StrCmp $4 '' close
+		; Si ya no hay mas entradas, salimos del bucle
+		StrCmp $4 '' Close
 
-		; Si hemos encontrado el registro, obtenemos la cadena de desinstalacion, preparamos las variables y dejamos de repetir el bucle
-		StrCmp $4 "REG_SZ" 0 searchAutofirmaLoop
-		StrCmp $3 "AutoFirma" +2 0
-		StrCmp $3 "Autofirma" 0 searchAutofirmaLoop
-		ReadRegStr $R0 HKLM $1 "UninstallString"
+		; Si no es una clave valida, pasamos a la siguiente
+		StrCmp $4 "REG_SZ" 0 CheckRegistryLoop
 
-		close:
+		; Comprobamos si el nombre la aplicacion de la entrada es el de la nuestra (Autofirma o AutoFirma). Si no, pasamos a la siguiente
+		StrCmp $3 "Autofirma" +2 0
+		StrCmp $3 "AutoFirma" 0 CheckRegistryLoop
+		ReadRegStr $7 HKLM $1 "UninstallString"
+
+		Close:
 		${registry::Close} "$0"
 		${registry::Unload}
 
@@ -1230,26 +1247,26 @@ Function RemoveOldVersions
 		; Almacenamos en $R1 la ruta desde la que ejecutar la desinstalacion (directorio del sistema)																					   
 		; Almacenamos en $R2 la sentencia de desinstalacion agregando parametros para que sea silenciosa
 		StrCpy $R1 $SYSDIR
-		StrCpy $R2 "$R0 /qn"
+		StrCpy $R2 "$7 /qn"
 
-		Push $R0
+		Push $7
 		Push "msiexec"
 		Call StrStr
 		Pop $0
 
 		; Si no es una instalacion MSI, pisamos las variables por las apropiadas para la desinstalacion convencional
 		StrCmp $0 "" 0 EjecutarDesinstalador
-		Push $R0
+		Push $7
 		Call GetParent
 		Pop $R1	
-		StrCpy $R2 '"$R0" /S _?=$R1'
+		StrCpy $R2 '"$7" /S _?=$R1'
 		; Si el directorio de instalacion es distinto del anterior, establecemos una variable para senalar que
 		; queremos que se elimine ese directorio despues de la desinstalacion, ya que sabemos que quedaran restos
 		; del instalador EXE anterior
 		StrCmp $R1 $INSTDIR EjecutarDesinstalador 0
 			StrCpy $R3 "Uninstall"		  
 		
-		EjecutarDesinstalador:					
+		EjecutarDesinstalador:
 			ExecWait $R2
  
 		; Si se indico que se eliminase el desinstalador de la version anterior, lo hacemos
@@ -1287,7 +1304,19 @@ Function RemoveOldVersions
 		DeleteRegKey HKCU $6
 
 	End:
- 
+	
+    Push $7
+    Push $6
+    Push $5
+    Push $4
+    Push $3
+    Push $2
+    Push $1
+    Push $0
+	Push $R3		
+	Push $R2
+    Push $R1
+	Push $R0
 FunctionEnd
 
 ; Funcion para copiar los valores de una clave de registro a otra.
@@ -1345,6 +1374,7 @@ Function un.UninstallFromRegistry
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\ui"
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\standalone"
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\core"
+	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\keystores"
 	DeleteRegKey HKCU "Software\JavaSoft\Prefs\es\gob\afirma\plugin"
 	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob\afirma"
 	DeleteRegKey /ifempty HKCU "Software\JavaSoft\Prefs\es\gob"
