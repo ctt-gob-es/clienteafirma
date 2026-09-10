@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>afirma-server-triphase-signer-javax</artifactId>
+	<version>${triphase.service.version}</version>
+	<packaging>war</packaging>
+	
+	<name>afirma-server-triphase-signer-javax</name>
+	<description>Servicio de firma trifasica para Tomcat 9 y anteriores</description>
+	
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.10</version>
+	</parent>
+	
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-server-triphase-signer</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>javax.servlet</groupId>
+    		<artifactId>servlet-api</artifactId>
+    		<version>2.5</version>
+    		<scope>provided</scope>
+		</dependency>
+
+	</dependencies>
+	
+	<build>
+		<plugins>
+		
+			<!-- Plugin para obtener la fecha en la propiedad "current.date" para adjuntarla a la version -->
+			<plugin>
+			  <groupId>org.codehaus.mojo</groupId>
+			  <artifactId>build-helper-maven-plugin</artifactId>
+			  <version>1.12</version>
+			  <executions>
+			    <execution>
+			      <id>timestamp-property</id>
+			      <goals>
+			        <goal>timestamp-property</goal>
+			      </goals>
+			      <phase>validate</phase>
+			      <configuration>
+			        <name>current.date</name>
+			        <pattern>yyyy-MM-dd hh:mm</pattern>
+			        <locale>es,ES</locale>
+			      </configuration>
+			    </execution>
+			  </executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<fork>true</fork>
+					<compilerArgument>-XDignore.symbol.file</compilerArgument>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.3</version>
+				<configuration>  
+					<archive>  
+						<addMavenDescriptor>false</addMavenDescriptor> 
+					</archive> 
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<wtpapplicationxml>true</wtpapplicationxml>
+					<wtpversion>2.0</wtpversion>
+				</configuration>
+			</plugin>
+
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources/</directory>
+				<includes>
+					<include>version</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources/</directory>
+				<excludes>
+					<exclude>*.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
+	</build>
+</project>

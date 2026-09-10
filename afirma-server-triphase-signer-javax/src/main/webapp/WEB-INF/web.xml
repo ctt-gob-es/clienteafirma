@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+	
+	<display-name>TriPhaseSignerServer</display-name>
+	
+	<servlet>
+		<description>Servicio de firma electronica en 3 fases</description>
+		<servlet-name>SignatureService</servlet-name>
+		<servlet-class>es.gob.afirma.triphase.server.javax.SignatureService</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>SignatureService</servlet-name>
+		<url-pattern>/SignatureService</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<description>Realiza la primera fase de un proceso de firma por lote con JSON</description>
+		<servlet-name>JSONBatchPresigner</servlet-name>
+		<servlet-class>es.gob.afirma.triphase.server.javax.batch.server.JSONBatchPresigner</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>JSONBatchPresigner</servlet-name>
+		<url-pattern>/presign</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote con JSON</description>
+		<servlet-name>JSONBatchPostsigner</servlet-name>
+		<servlet-class>es.gob.afirma.triphase.server.javax.batch.server.JSONBatchPostsigner</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>JSONBatchPostsigner</servlet-name>
+		<url-pattern>/postsign</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<description>Indica la version del servicio</description>
+		<servlet-name>Version</servlet-name>
+		<servlet-class>es.gob.afirma.triphase.server.javax.VersionService</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>Version</servlet-name>
+		<url-pattern>/version</url-pattern>
+	</servlet-mapping>
+
+</web-app>
