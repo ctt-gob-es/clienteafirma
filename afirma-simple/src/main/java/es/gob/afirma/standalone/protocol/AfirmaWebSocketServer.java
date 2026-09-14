@@ -42,7 +42,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 	/** Uno de los prefijos que puede presentar el mensaje de invocaci&oacute;n de una firma de lote. Versi&oacute;n 2. */
 	private static final String HEADER_BATCH_2 = "afirma://batch/?"; //$NON-NLS-1$
 
-	private static final ProtocolVersion MIN_PROTOCOL_VERSION = ProtocolVersion.getInstance(ProtocolVersion.VERSION_0);
+	private static final ProtocolVersion MIN_PROTOCOL_VERSION = ProtocolVersion.getInstance(ProtocolVersion.VERSION_3);
 
 	/**
 	 * M&aacute;ximo n&uacute;mero de milisegundos que puede estar el websocket abierto
