@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>afirma-server-triphase-signer-javax</artifactId>
+	<artifactId>afirma-server-triphase-signer-jakarta</artifactId>
 	<version>${triphase.service.version}</version>
 	<packaging>war</packaging>
 	
-	<name>afirma-server-triphase-signer-javax</name>
-	<description>Servicio de firma trifasica para Tomcat 9 y anteriores</description>
+	<name>afirma-server-triphase-signer-jakarta</name>
+	<description>Servicio de firma trifasica para Tomcat 10 y superiores</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -33,10 +33,10 @@
 		</dependency>
 		
 		<dependency>
-    		<groupId>javax.servlet</groupId>
-    		<artifactId>servlet-api</artifactId>
-    		<version>2.5</version>
-    		<scope>provided</scope>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>6.1.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
@@ -112,6 +112,7 @@
 				</excludes>
 			</resource>
 		</resources>
+		
 		<finalName>afirma-signature-triphase-signer</finalName>
 	</build>
 </project>

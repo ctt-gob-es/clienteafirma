@@ -194,7 +194,8 @@
 				<module>afirma-server-triphase-signer-cache</module>
 				<module>afirma-server-triphase-signer-core</module>
 				<module>afirma-server-triphase-signer-document</module>
-				<module>afirma-signature-retriever</module>
+				<module>afirma-server-retriever</module>
+				<module>afirma-server-storage</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
 			</modules>
@@ -244,8 +245,11 @@
 				
 				<!-- Servicios -->
 				<module>afirma-server-triphase-signer-javax</module>
-				<module>afirma-signature-retriever-javax</module>
-				<module>afirma-signature-storage</module>
+				<module>afirma-server-triphase-signer-jakarta</module>
+				<module>afirma-server-retriever-javax</module>
+				<module>afirma-server-retriever-jakarta</module>
+				<module>afirma-server-storage-javax</module>
+				<module>afirma-server-storage-jakarta</module>
 				
 			</modules>
 			
@@ -318,8 +322,11 @@
 				
 				<!-- Servicios -->
 				<module>afirma-server-triphase-signer-javax</module>
-				<module>afirma-signature-retriever</module>
-				<module>afirma-signature-storage</module>
+				<module>afirma-server-triphase-signer-jakarta</module>
+				<module>afirma-server-retriever-javax</module>
+				<module>afirma-server-retriever-jakarta</module>
+				<module>afirma-server-storage-javax</module>
+				<module>afirma-server-storage-jakarta</module>
 			</modules>
 			
       		<build>
@@ -478,8 +485,11 @@
 				
 				<!-- Servicios -->
 				<module>afirma-server-triphase-signer-javax</module>
-				<module>afirma-signature-retriever</module>
-				<module>afirma-signature-storage</module>
+				<module>afirma-server-triphase-signer-jakarta</module>
+				<module>afirma-server-retriever-javax</module>
+				<module>afirma-server-retriever-jakarta</module>
+				<module>afirma-server-storage-javax</module>
+				<module>afirma-server-storage-jakarta</module>
 			</modules>
 			
 			<build>
