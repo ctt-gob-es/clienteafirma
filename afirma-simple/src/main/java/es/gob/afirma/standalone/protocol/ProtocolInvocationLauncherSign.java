@@ -397,8 +397,8 @@ final class ProtocolInvocationLauncherSign {
 					"Se ha pedido una firma XAdES explicita, este formato dejara de soportarse en proximas versiones" //$NON-NLS-1$
 					);
 			try {
-				data = MessageDigest.getInstance("SHA1").digest(data); //$NON-NLS-1$
-				extraParams.setProperty("mimeType", "hash/sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+				data = MessageDigest.getInstance("SHA-256").digest(data); //$NON-NLS-1$
+				extraParams.setProperty("mimeType", "hash/sha-256"); //$NON-NLS-1$ //$NON-NLS-2$
 			} catch (final Exception e) {
 				LOGGER.warning("Error al generar la huella digital de los datos para firmar como 'XAdES explicit', " //$NON-NLS-1$
 						+ "se realizara una firma XAdES corriente: " + e); //$NON-NLS-1$

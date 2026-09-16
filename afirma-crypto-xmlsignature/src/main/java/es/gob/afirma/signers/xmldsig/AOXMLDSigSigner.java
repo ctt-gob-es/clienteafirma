@@ -114,6 +114,11 @@ public final class AOXMLDSigSigner implements AOSigner {
     /** Algoritmo de huella digital por defecto para las referencias XML. */
     private static final String DIGEST_METHOD = DigestMethod.SHA1;
 
+    /** Algoritmo de huella digital usado por defecto en modo de firma expl&iacute;cita
+     * (formato en desuso, mantenido solo por compatibilidad) cuando no se indica un
+     * algoritmo de huella precalculada a trav&eacute;s de {@code precalculatedHashAlgorithm}. */
+    private static final String EXPLICIT_MODE_DEFAULT_DIGEST_ALGORITHM = "SHA-256"; //$NON-NLS-1$
+
     private static final String SIGNATURE_VALUE = "SignatureValue"; //$NON-NLS-1$
 
     private static final String URI_STR = "URI"; //$NON-NLS-1$
@@ -556,10 +561,10 @@ public final class AOXMLDSigSigner implements AOSigner {
                 // Vemos si hemos obtenido bien los datos de la URI
                 if (tmpData != null && tmpData.length > 0) {
                     try {
-                        digestValue = MessageDigest.getInstance("SHA1").digest(tmpData); //$NON-NLS-1$
+                        digestValue = MessageDigest.getInstance(EXPLICIT_MODE_DEFAULT_DIGEST_ALGORITHM).digest(tmpData);
                     }
                     catch (final Exception e) {
-                        throw new AOException("No se ha podido obtener el SHA1 de los datos de la URI externa", e, ErrorCode.Internal.UNSUPPORTED_HASH_ALGORITHM); //$NON-NLS-1$
+                        throw new AOException("No se ha podido obtener el " + EXPLICIT_MODE_DEFAULT_DIGEST_ALGORITHM + " de los datos de la URI externa", e, ErrorCode.Internal.UNSUPPORTED_HASH_ALGORITHM); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
             }
@@ -571,10 +576,10 @@ public final class AOXMLDSigSigner implements AOSigner {
             // Si solo tenemos los datos
             else {
                 try {
-                    digestValue = MessageDigest.getInstance("SHA1").digest(data); //$NON-NLS-1$
+                    digestValue = MessageDigest.getInstance(EXPLICIT_MODE_DEFAULT_DIGEST_ALGORITHM).digest(data);
                 }
                 catch (final Exception e) {
-                    throw new AOException("No se ha podido obtener el SHA1 de los datos proporcionados: " + e, e, ErrorCode.Internal.UNSUPPORTED_HASH_ALGORITHM); //$NON-NLS-1$
+                    throw new AOException("No se ha podido obtener el " + EXPLICIT_MODE_DEFAULT_DIGEST_ALGORITHM + " de los datos proporcionados: " + e, e, ErrorCode.Internal.UNSUPPORTED_HASH_ALGORITHM); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
 
@@ -594,13 +599,13 @@ public final class AOXMLDSigSigner implements AOSigner {
             // establecemos un tipo especial
             // que designa al hash. Independientemente del algoritmo de firma
             // utilizado, el Hash de las firmas
-            // explicitas de datos siempre sera SHA1, salvo que el hash se haya
-            // establecido desde fuera.
+            // explicitas de datos sera el indicado en EXPLICIT_MODE_DEFAULT_DIGEST_ALGORITHM,
+            // salvo que el hash se haya establecido desde fuera.
             if (precalculatedHashAlgorithm != null) {
                 mimeType = "hash/" + precalculatedHashAlgorithm.toLowerCase(); //$NON-NLS-1$
             }
             else {
-                mimeType = "hash/sha1"; //$NON-NLS-1$
+                mimeType = "hash/" + EXPLICIT_MODE_DEFAULT_DIGEST_ALGORITHM.toLowerCase(); //$NON-NLS-1$
             }
 
             dataElement.setAttributeNS(null, ID_IDENTIFIER, contentId);
