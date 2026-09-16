@@ -525,25 +525,35 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	 * @param certs Conjunto de datos de los certificados a mostrar. */
 	void refresh(final NameCertificateBean[] certs) {
 
-		this.certificateBeans = certs.clone();
-
 		// Devolvemos el scroll al inicio antes de refrescar la lista
 		if (this.sPane.getVerticalScrollBar() != null) {
 			this.sPane.getVerticalScrollBar().setValue(0);
 		}
 
-		// Actualizamos el listado
+		// Actualizamos el listado (esto tambien recalcula "certificateBeans" a partir
+		// de los certificados que realmente se hayan podido mostrar)
 		updateCertListInfo(certs);
 
 		// Seleccionamos el primer elemento
-		if (certs.length > 0) {
+		if (this.certificateBeans.length > 0) {
 			this.certList.setSelectedIndex(0);
 		}
 	}
 
+	/** Construye las l&iacute;neas visuales de la lista de certificados y, en paralelo,
+	 * el listado de certificados que efectivamente se muestran (en el mismo orden e &iacute;ndices
+	 * que las l&iacute;neas generadas). Un certificado cuya l&iacute;nea no pueda construirse se
+	 * descarta de ambos listados para evitar que el &iacute;ndice seleccionado en la lista visual
+	 * quede desalineado con el certificado real que representa.
+	 * @param certBeans Certificados sobre los que construir las l&iacute;neas.
+	 * @param view Vista con la que se deben construir las l&iacute;neas.
+	 * @param outShownBeans Listado en el que se agregar&aacute;n, en orden, los certificados
+	 *                      cuya l&iacute;nea se haya podido construir.
+	 * @return Listado de l&iacute;neas visuales de certificado. */
 	private static List<CertificateLine> createCertLines(
 			final NameCertificateBean[] certBeans,
-			final CertificateLineView view) {
+			final CertificateLineView view,
+			final List<NameCertificateBean> outShownBeans) {
 
 		final CertificateLineFactory certLineFactory = CertificateLineFactory.newInstance(view);
 		final List<CertificateLine> certLines = new ArrayList<>();
@@ -557,6 +567,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		    }
 			certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
 			certLines.add(certLine);
+			outShownBeans.add(nameCert);
 		}
 		return certLines;
 	}
@@ -583,7 +594,14 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	 */
 	void updateCertListInfo(final NameCertificateBean[] certs) {
 
-		final List<CertificateLine> certLines = createCertLines(certs, this.certLineView);
+		// Construimos las lineas visuales y, en paralelo, el listado de certificados que
+		// realmente se muestran (con los mismos indices que "certLines"). No usamos "certs"
+		// directamente porque algun certificado puede descartarse si su linea no se pudo
+		// construir, y eso desalinearia el indice seleccionado en la lista respecto al
+		// certificado que representa.
+		final List<NameCertificateBean> shownBeans = new ArrayList<>();
+		final List<CertificateLine> certLines = createCertLines(certs, this.certLineView, shownBeans);
+		this.certificateBeans = shownBeans.toArray(new NameCertificateBean[shownBeans.size()]);
 
 		// Actualizamos el mensaje del dialogo en base al numero de certificados
 		// Mostramos un texto de cabecera si corresponde
