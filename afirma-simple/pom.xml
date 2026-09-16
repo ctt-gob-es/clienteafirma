@@ -37,6 +37,13 @@
 		    <version>1.7.36</version>
 		</dependency>
 
+		<!-- Look&Feel moderno multiplataforma (Windows, macOS y Linux), con soporte de temas claro/oscuro. -->
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+			<version>3.7.2</version>
+		</dependency>
+
 		<dependency>
 			<groupId>es.gob.afirma</groupId>
 			<artifactId>afirma-ui-simpleafirma-plugins</artifactId>

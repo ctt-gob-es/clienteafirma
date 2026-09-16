@@ -20,7 +20,11 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
+
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.Platform.OS;
@@ -36,11 +40,16 @@ public final class LookAndFeelManager {
 		// No permitimos la instanciacion
 	}
 
-    /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
-    public static final Color DEFAULT_COLOR;
+    /** Color de fondo por defecto para los JPanel, JFrame y Applet. Se recalcula al aplicar
+     * el Look&amp;Feel (v&eacute;ase {@link #applyLookAndFeel(boolean)}) para reflejar el tema
+     * claro u oscuro realmente instalado. */
+    public static Color DEFAULT_COLOR;
 
-    /** Color de fondo secundario para los JPanel, JFrame y Applet. */
-    public static final Color SECUNDARY_COLOR;
+    /** Color de fondo secundario para los JPanel, JFrame y Applet (usado, por ejemplo, para
+     * resaltar cuadros de contenido dentro de un panel). Se recalcula al aplicar el
+     * Look&amp;Feel (v&eacute;ase {@link #applyLookAndFeel(boolean)}) para reflejar el tema
+     * claro u oscuro realmente instalado, salvo en modo de alto contraste. */
+    public static Color SECUNDARY_COLOR;
 
     /** Color transparente. */
     public static final Color TRANSPARENT_COLOR = new Color(255, 255, 255, 0);
@@ -50,6 +59,10 @@ public final class LookAndFeelManager {
 
     /** Indica si se detecta un sistema linux con GNOME y un tema oscuro habilitado. */
     public static final boolean GNOME_DARK_MODE;
+
+    /** Indica si el sistema operativo (Windows, macOS o GNOME en Linux) tiene
+     * configurado un tema oscuro. */
+    public static final boolean DARK_MODE;
 
     /** Tama&ntilde;o m&aacute;ximo de las fuentes por defecto antes de considerarse grandes. */
     private static final int LARGE_FONT_LIMIT = 13;
@@ -63,18 +76,9 @@ public final class LookAndFeelManager {
 
     static {
 
-    	// Obtenemos el color de la ventanas. Se protege porque puede producir errores en
-    	// algunas distribuciones de Linux
-    	Color windowColor;
-    	try {
-	    	 windowColor = UIManager.getColor("window") != null ? //$NON-NLS-1$
-	    			 new Color(UIManager.getColor("window").getRGB()) : //$NON-NLS-1$
-	    			 new Color(238, 238, 238);
-    	}
-    	catch (final Throwable e) {
-    		windowColor = new Color(238, 238, 238);
-		}
-    	DEFAULT_COLOR = windowColor;
+    	// Valor de partida para DEFAULT_COLOR hasta que se aplique el Look&Feel, para no dejar
+    	// la constante sin inicializar si algun componente la consulta antes de tiempo.
+    	DEFAULT_COLOR = new Color(238, 238, 238);
 
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
         if (highContrast instanceof Boolean) {
@@ -100,8 +104,18 @@ public final class LookAndFeelManager {
 
         if (Platform.getOS() == OS.LINUX) {
         	GNOME_DARK_MODE = isGnomeDarkMode();
+        	DARK_MODE = GNOME_DARK_MODE;
+        }
+        else if (Platform.getOS() == OS.WINDOWS) {
+        	DARK_MODE = isWindowsDarkMode();
+        	GNOME_DARK_MODE = false;
+        }
+        else if (Platform.getOS() == OS.MACOSX) {
+        	DARK_MODE = isMacDarkMode();
+        	GNOME_DARK_MODE = false;
         }
         else {
+        	DARK_MODE = false;
         	GNOME_DARK_MODE = false;
         }
 
@@ -125,41 +139,22 @@ public final class LookAndFeelManager {
     		return;
     	}
     	// Comprobamos si esta activado algun modo de accesibilidad. Si es asi,
-    	// usaremos el LookAndFeel del sistema
-        final boolean useSystemLookAndFeel = WINDOWS_HIGH_CONTRAST || LARGE_FONT || GNOME_DARK_MODE;
-
-        if (!useSystemLookAndFeel) {
-            UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
-            UIManager.put("RootPane.background", DEFAULT_COLOR); //$NON-NLS-1$
-            UIManager.put("TextPane.background", DEFAULT_COLOR); //$NON-NLS-1$
-            UIManager.put("TextArea.background", DEFAULT_COLOR); //$NON-NLS-1$
-            UIManager.put("InternalFrameTitlePane.background", DEFAULT_COLOR); //$NON-NLS-1$
-            UIManager.put("InternalFrame.background", DEFAULT_COLOR); //$NON-NLS-1$
-            UIManager.put("Label.background", DEFAULT_COLOR); //$NON-NLS-1$
-            UIManager.put("PopupMenuSeparator.background", DEFAULT_COLOR); //$NON-NLS-1$
-        }
+    	// usaremos el LookAndFeel del sistema en vez de forzar un tema propio, ya que
+    	// este respeta mejor las preferencias de accesibilidad del usuario
+        final boolean useSystemLookAndFeel = WINDOWS_HIGH_CONTRAST || LARGE_FONT;
 
         JFrame.setDefaultLookAndFeelDecorated(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
 
-        // Propiedades especificas para Mac OS X
+        // Propiedades especificas para Mac OS X necesarias independientemente del Look&Feel elegido
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            UIManager.put("OptionPane.background", DEFAULT_COLOR); //$NON-NLS-1$
-            UIManager.put("Panel.background", DEFAULT_COLOR); //$NON-NLS-1$
-            System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.awt.antialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.awt.textantialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.awt.rendering", "quality"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.graphics.EnableQ2DX", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        // Configuracion necesaria para que la aplicacion se muestre correctamente en pantallas HDPI
-        else if (Platform.OS.WINDOWS.equals(Platform.getOS()) && HDPIManager.isHDPIDevice()) {
-           	setLookAndFeel("Metal"); //$NON-NLS-1$
-        }
-        // Configuramos el Look&Feel del sistema si se considero necesario por los modos de accesibilidad
-        else if(useSystemLookAndFeel){
+
+        if (useSystemLookAndFeel) {
         	try {
         		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         	}
@@ -170,28 +165,47 @@ public final class LookAndFeelManager {
         	}
         }
         else {
-        	setLookAndFeel("Nimbus"); //$NON-NLS-1$
+        	setFlatLookAndFeel();
+        }
+
+        // Recalculamos los colores de fondo por defecto en base al Look&Feel realmente
+        // instalado, para que los paneles que los usan (via setBackground(DEFAULT_COLOR) o
+        // setBackground(SECUNDARY_COLOR)) se muestren correctos tanto en tema claro como en
+        // tema oscuro. En modo de alto contraste no se tocan, para no alterar ese modo de
+        // accesibilidad tal y como se ha configurado en el sistema
+        if (!useSystemLookAndFeel) {
+	        final Color panelBackground = UIManager.getColor("Panel.background"); //$NON-NLS-1$
+	        if (panelBackground != null) {
+	        	DEFAULT_COLOR = new Color(panelBackground.getRGB(), true);
+	        }
+	        // Se usa el fondo de los componentes de contenido (campos de texto, listas, etc.)
+	        // como color "secundario", ya que son los que FlatLaf diferencia visualmente del
+	        // fondo general del panel tanto en tema claro como en tema oscuro
+	        final Color contentBackground = UIManager.getColor("TextField.background"); //$NON-NLS-1$
+	        if (contentBackground != null) {
+	        	SECUNDARY_COLOR = new Color(contentBackground.getRGB(), true);
+	        }
         }
 
         applied = true;
     }
 
-    //Define el look and feel
-    private static void setLookAndFeel(final String lookandfeelName) {
+    /** Establece un Look&amp;Feel moderno (FlatLaf), acorde al sistema operativo y al
+     * tema claro/oscuro configurado por el usuario en dicho sistema. */
+    private static void setFlatLookAndFeel() {
     	try {
-            for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if (lookandfeelName.equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                	return;
-             	}
-             }
-
+	        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+	        	UIManager.setLookAndFeel(DARK_MODE ? new FlatMacDarkLaf() : new FlatMacLightLaf());
+	        }
+	        else {
+	        	UIManager.setLookAndFeel(DARK_MODE ? new FlatDarkLaf() : new FlatLightLaf());
+	        }
     	}
-    	 catch (final Exception e) {
-             LOGGER.warning(
-                    "No se ha podido establecer el 'Look&Feel' " + lookandfeelName + ": " + e //$NON-NLS-1$ //$NON-NLS-2$
-             );
-         }
+    	catch (final Exception e) {
+    		LOGGER.warning(
+   				"No se ha podido establecer el 'Look&Feel' FlatLaf: " + e //$NON-NLS-1$
+    		);
+    	}
     }
 
     /**
@@ -228,6 +242,29 @@ public final class LookAndFeelManager {
              	&& queryResultContains("gsettings get org.gnome.desktop.interface gtk-theme", "dark") //$NON-NLS-1$ //$NON-NLS-2$
         ;
     }
+
+	/**
+	 * Detecta si Windows tiene habilitado el tema oscuro para las aplicaciones, consultando
+	 * la clave de registro que usa el propio sistema para recordar esta preferencia.
+	 * @return {@code true} si el tema oscuro de Windows esta activo, {@code false} en caso contrario.
+	 */
+	private static boolean isWindowsDarkMode() {
+		// No se delimita la ruta de registro entre comillas: "Runtime.exec(String)" no
+		// invoca un shell y divide el comando por espacios sin interpretar comillas, y
+		// la ruta no contiene ningun espacio.
+		return queryResultContains(
+			"reg query HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize /v AppsUseLightTheme", //$NON-NLS-1$
+			"0x0" //$NON-NLS-1$
+		);
+	}
+
+	/**
+	 * Detecta si macOS tiene habilitado el modo oscuro del sistema.
+	 * @return {@code true} si el modo oscuro de macOS esta activo, {@code false} en caso contrario.
+	 */
+	private static boolean isMacDarkMode() {
+		return queryResultContains("defaults read -g AppleInterfaceStyle", "dark"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
 	private static boolean queryResultContains(final String cmd, final String subResult) {
 		return query(cmd).toLowerCase().contains(subResult);

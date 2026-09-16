@@ -44,6 +44,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.Scrollable;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import es.gob.afirma.core.misc.LoggerUtil;
@@ -271,7 +272,7 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 
             // Configuramos los colores
             if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
-            	setBackground(Color.WHITE);
+            	setBackground(LookAndFeelManager.DEFAULT_COLOR);
             }
 
 			setLayout(new GridBagLayout());
@@ -311,9 +312,8 @@ final class SignPanelMultiFilePanel extends JPanel implements Scrollable {
 
 			if (value.getInvalidSignatureText() == null) {
 				this.fileNameLabel.setText(value.getDataFile().getAbsolutePath().substring(this.basePathLength));
-				if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
-					this.fileNameLabel.setForeground(Color.BLACK);
-				}
+				// Sin texto de error, se deja el color de letra por defecto del tema activo
+				this.fileNameLabel.setForeground(UIManager.getColor("Label.foreground")); //$NON-NLS-1$
 			}
 			else if (value.getSignValidity() != null
 					&& SignValidity.SIGN_DETAIL_TYPE.PENDING_CONFIRM_BY_USER.equals(value.getSignValidity().get(0).getValidity())) {

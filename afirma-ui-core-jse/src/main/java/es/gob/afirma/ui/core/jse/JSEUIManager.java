@@ -10,18 +10,22 @@
 package es.gob.afirma.ui.core.jse;
 
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
@@ -42,6 +46,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -52,6 +57,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIManager;
 import es.gob.afirma.core.ui.GenericFileFilter;
 import es.gob.afirma.core.ui.KeyStoreDialogManager;
@@ -658,16 +664,181 @@ public class JSEUIManager implements AOUIManager {
 
         final Component parentComponent = parent instanceof Component ? (Component) parent : null;
 
+        // La seleccion de carpetas no tiene un equivalente nativo multiplataforma con
+        // "java.awt.FileDialog" (solo esta soportado, de forma no estandar, en macOS), asi
+        // que en ese caso se mantiene el selector Swing (JFileChooser) de siempre
+        if (selectDirectory) {
+        	return getLoadFilesWithFileChooser(
+    			dialogTitle, currentDir, filename, extensions, description, multiSelect, icon, parentComponent
+			);
+        }
+
+        return getLoadFilesNative(
+    		dialogTitle, currentDir, filename, extensions, multiSelect, icon, parentComponent
+		);
+    }
+
+    /** Pide al usuario que seleccione uno o varios ficheros mediante el di&aacute;logo com&uacute;n
+     * nativo del sistema operativo ({@code java.awt.FileDialog}).
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param currentDir Directorio inicial del di&aacute;logo.
+     * @param filename Nombre del fichero a localizar.
+     * @param extensions Extensiones predeterminadas para el fichero.
+     * @param multiSelect {@code true} para permitir selecci&oacute;n m&uacute;ltiple.
+     * @param icon Icono del di&aacute;logo de selecci&oacute;n (si el sistema operativo lo soporta).
+     * @param parentComponent Componente padre (para localizar la ventana due&ntilde;a del di&aacute;logo).
+     * @return Ficheros seleccionados por el usuario.
+     * @throws AOCancelledOperationException Si el usuario cancela el di&aacute;logo. */
+    private static File[] getLoadFilesNative(final String dialogTitle,
+    		                                  final String currentDir,
+    		                                  final String filename,
+    		                                  final String[] extensions,
+    		                                  final boolean multiSelect,
+    		                                  final Object icon,
+    		                                  final Component parentComponent) {
+
+    	final FileDialog fileDialog = createNativeFileDialog(dialogTitle, FileDialog.LOAD, parentComponent);
+
+    	if (icon instanceof Image) {
+    		fileDialog.setIconImage((Image) icon);
+    	}
+
+    	final String defaultDir = currentDir != null ? currentDir : get(PREFERENCE_DIRECTORY, null);
+    	if (defaultDir != null) {
+    		fileDialog.setDirectory(defaultDir);
+    	}
+
+    	// El filtro de nombre de fichero ("FilenameFilter") de "FileDialog" no funciona de forma
+    	// fiable en Windows (el dialogo nativo no llega a invocar el callback), asi que en su
+    	// lugar se usa un patron de fichero con la primera extension indicada. Esto solo se puede
+    	// combinar con un nombre de fichero por defecto ("filename") si no se indican extensiones.
+    	if (filename != null) {
+    		fileDialog.setFile(filename);
+    	}
+    	else if (extensions != null && extensions.length > 0) {
+    		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+    			fileDialog.setFile(toWindowsFilePattern(extensions[0]));
+    		}
+    		else {
+    			fileDialog.setFilenameFilter(new ExtensionFilenameFilter(extensions));
+    		}
+    	}
+
+    	fileDialog.setMultipleMode(multiSelect);
+
+    	fileDialog.setVisible(true);
+
+    	final File[] selectedFiles;
+    	if (multiSelect) {
+    		selectedFiles = fileDialog.getFiles();
+    	}
+    	else {
+    		final String selectedFileName = fileDialog.getFile();
+    		selectedFiles = selectedFileName != null ?
+    			new File[] { new File(fileDialog.getDirectory(), selectedFileName) } :
+    			new File[0];
+    	}
+
+    	final String selectedDir = fileDialog.getDirectory();
+    	fileDialog.dispose();
+
+    	if (selectedFiles.length == 0) {
+    		throw new AOCancelledOperationException();
+    	}
+
+    	if (selectedDir != null) {
+    		put(PREFERENCE_DIRECTORY, selectedDir);
+    	}
+
+    	return selectedFiles;
+    }
+
+    /** Crea un {@code java.awt.FileDialog} nativo, asociado a la ventana due&ntilde;a
+     * del componente padre indicado (o sin due&ntilde;o si no se localiza ninguna).
+     * @param dialogTitle T&iacute;tulo del di&aacute;logo.
+     * @param mode Modo del di&aacute;logo ({@link FileDialog#LOAD} o {@link FileDialog#SAVE}).
+     * @param parentComponent Componente padre.
+     * @return Di&aacute;logo de fichero nativo, todav&iacute;a no mostrado. */
+    private static FileDialog createNativeFileDialog(final String dialogTitle,
+    		                                          final int mode,
+    		                                          final Component parentComponent) {
+    	final Window ownerWindow = parentComponent != null ?
+			SwingUtilities.getWindowAncestor(parentComponent) : null;
+    	if (ownerWindow instanceof Dialog) {
+    		return new FileDialog((Dialog) ownerWindow, dialogTitle, mode);
+    	}
+    	if (ownerWindow instanceof Frame) {
+    		return new FileDialog((Frame) ownerWindow, dialogTitle, mode);
+    	}
+    	return new FileDialog((Frame) null, dialogTitle, mode);
+    }
+
+    /** Construye un patron de fichero de tipo <i>glob</i> (por ejemplo, {@code *.pdf}) a partir
+     * de una extension, para usarlo como filtro en el {@code FileDialog} nativo de Windows.
+     * @param extension Extension de fichero (con o sin punto inicial y con o sin asterisco).
+     * @return Patron de fichero. */
+    private static String toWindowsFilePattern(final String extension) {
+    	String pattern = extension;
+    	if (!pattern.startsWith("*")) { //$NON-NLS-1$
+    		if (!pattern.startsWith(".")) { //$NON-NLS-1$
+    			pattern = "." + pattern; //$NON-NLS-1$
+    		}
+    		pattern = "*" + pattern; //$NON-NLS-1$
+    	}
+    	return pattern;
+    }
+
+    /** Filtro de fichero por extension para {@code java.awt.FileDialog} que, ademas, deja
+     * pasar siempre los directorios para permitir navegar por el arbol de ficheros. */
+    private static final class ExtensionFilenameFilter implements FilenameFilter {
+
+    	private final String[] extensions;
+
+    	ExtensionFilenameFilter(final String[] extensions) {
+    		this.extensions = extensions.clone();
+    	}
+
+    	@Override
+    	public boolean accept(final File dir, final String name) {
+    		if (new File(dir, name).isDirectory()) {
+    			return true;
+    		}
+    		final String lowerCaseName = name.toLowerCase();
+    		for (final String extension : this.extensions) {
+    			if (lowerCaseName.endsWith("." + extension.toLowerCase())) { //$NON-NLS-1$
+    				return true;
+    			}
+    		}
+    		return false;
+    	}
+    }
+
+    /** Pide al usuario que seleccione uno o varios ficheros (o un directorio) mediante el
+     * selector de ficheros de Swing ({@code JFileChooser}).
+     * @param dialogTitle T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param currentDir Directorio inicial del di&aacute;logo.
+     * @param filename Nombre del fichero a localizar.
+     * @param extensions Extensiones predeterminadas para el fichero.
+     * @param description Descripci&oacute;n del tipo de fichero correspondiente con las extensiones.
+     * @param multiSelect {@code true} para permitir selecci&oacute;n m&uacute;ltiple.
+     * @param icon Icono del di&aacute;logo de selecci&oacute;n.
+     * @param parentComponent Componente padre (para la modalidad).
+     * @return Ficheros (o directorio) seleccionados por el usuario.
+     * @throws AOCancelledOperationException Si el usuario cancela el di&aacute;logo. */
+    private static File[] getLoadFilesWithFileChooser(final String dialogTitle,
+							   final String currentDir,
+							   final String filename,
+                               final String[] extensions,
+                               final String description,
+                               final boolean multiSelect,
+                               final Object icon,
+                               final Component parentComponent) {
+
         UIManager.put("FileChooser.lookInLabelText", JSEUIMessages.getString("JSEUIManager.93") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         UIManager.put("FileChooser.fileNameLabelText", JSEUIMessages.getString("JSEUIManager.94") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         UIManager.put("FileChooser.openButtonText", JSEUIMessages.getString("JSEUIManager.96"));  //$NON-NLS-1$//$NON-NLS-2$
         UIManager.put("FileChooser.cancelButtonText", JSEUIMessages.getString("JSEUIManager.97"));  //$NON-NLS-1$//$NON-NLS-2$
-
-        if (selectDirectory) {
-            UIManager.put("FileChooser.folderNameLabelText", JSEUIMessages.getString("JSEUIManager.98") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        } else {
-            UIManager.put("FileChooser.filesOfTypeLabelText", JSEUIMessages.getString("JSEUIManager.95") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
+        UIManager.put("FileChooser.folderNameLabelText", JSEUIMessages.getString("JSEUIManager.98") + ":"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         final JFileChooser jfc;
         if (icon instanceof Image) {
@@ -689,9 +860,7 @@ public class JSEUIManager implements AOUIManager {
         	}
         	jfc = new JFileChooser();
         }
-        if (selectDirectory) {
-        	jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        }
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         // Configuramos el directorio y fichero por defecto
         configureDefaultDir(jfc, currentDir, filename);

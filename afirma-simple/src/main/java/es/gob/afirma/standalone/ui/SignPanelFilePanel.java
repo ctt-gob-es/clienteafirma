@@ -62,7 +62,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         // Configuramos los colores
         Color bgColor = null;
         if (!LookAndFeelManager.WINDOWS_HIGH_CONTRAST) {
-        	bgColor = Color.WHITE;
+        	bgColor = LookAndFeelManager.DEFAULT_COLOR;
         	setBackground(bgColor);
         }
         setFocusable(true);
