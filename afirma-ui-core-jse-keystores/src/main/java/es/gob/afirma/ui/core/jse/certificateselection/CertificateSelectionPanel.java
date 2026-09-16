@@ -26,8 +26,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.URL;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,11 +47,14 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -89,6 +94,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	private int selectedIndex = -1;
 
 	private NameCertificateBean[] certificateBeans;
+
+	private NameCertificateBean[] displayedCertificateBeans;
+
+	private JTextField searchField;
 
 	private final String dialogSubHeadline;
 
@@ -469,6 +478,33 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		c.gridx = 0;
 		c.gridy++;
 
+		final JPanel searchPanel = new JPanel(new GridBagLayout());
+		searchPanel.setOpaque(false);
+		final GridBagConstraints searchConstraints = new GridBagConstraints();
+		searchConstraints.insets = new Insets(0, 0, 0, 8);
+		searchConstraints.anchor = GridBagConstraints.WEST;
+
+		final JLabel searchLabel = new JLabel(
+				CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.39")); //$NON-NLS-1$
+		searchLabel.setFont(TEXT_FONT);
+		if (isHighContrast()) {
+			searchLabel.setForeground(Color.WHITE);
+		}
+		searchPanel.add(searchLabel, searchConstraints);
+
+		this.searchField = new JTextField();
+		this.searchField.setFont(TEXT_FONT);
+		this.searchField.getAccessibleContext().setAccessibleDescription(searchLabel.getText());
+		searchLabel.setLabelFor(this.searchField);
+		searchConstraints.fill = GridBagConstraints.HORIZONTAL;
+		searchConstraints.insets = new Insets(0, 0, 0, 0);
+		searchConstraints.weightx = 1.0;
+		searchConstraints.gridx = 1;
+		searchPanel.add(this.searchField, searchConstraints);
+		this.add(searchPanel, c);
+
+		c.gridy++;
+
 		this.textMessagePanel = new JPanel();
 		this.textMessagePanel.setLayout(new GridBagLayout());
 		this.textMessagePanel.setOpaque(false);
@@ -493,6 +529,23 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList.setCellRenderer(new CertListCellRendered(windowColor, CertificateSelectionPanel.highContrast));
 
 		updateCertListInfo(this.certificateBeans);
+
+		this.searchField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(final DocumentEvent e) {
+				filterCertificateList();
+			}
+
+			@Override
+			public void removeUpdate(final DocumentEvent e) {
+				filterCertificateList();
+			}
+
+			@Override
+			public void changedUpdate(final DocumentEvent e) {
+				filterCertificateList();
+			}
+		});
 
 		this.certList.addListSelectionListener(this);
 		final CertLinkMouseListener mouseListener = new CertLinkMouseListener();
@@ -533,17 +586,80 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		}
 
 		// Actualizamos el listado
-		updateCertListInfo(certs);
+		filterCertificateList();
 
 		// Seleccionamos el primer elemento
-		if (certs.length > 0) {
+		if (this.displayedCertificateBeans.length > 0) {
 			this.certList.setSelectedIndex(0);
 		}
 	}
 
+	private void filterCertificateList() {
+		updateCertListInfo(filterCertificates(this.certificateBeans, this.searchField.getText()));
+		if (this.sPane.getVerticalScrollBar() != null) {
+			this.sPane.getVerticalScrollBar().setValue(0);
+		}
+		revalidate();
+		repaint();
+	}
+
+	/** Filtra por nombre y datos del titular sin distinguir may&uacute;sculas, tildes ni separadores.
+	 * @param certs Certificados disponibles en el di&aacute;logo.
+	 * @param searchText Texto que debe contener el nombre o el titular del certificado.
+	 * @return Certificados coincidentes, conservando su orden original. */
+	static NameCertificateBean[] filterCertificates(final NameCertificateBean[] certs, final String searchText) {
+		final String normalizedSearchText = normalizeSearchText(searchText);
+		if (normalizedSearchText.isEmpty()) {
+			return certs.clone();
+		}
+
+		final List<NameCertificateBean> filteredCerts = new ArrayList<>();
+		for (final NameCertificateBean cert : certs) {
+			final StringBuilder searchableText = new StringBuilder();
+			if (cert.getName() != null) {
+				searchableText.append(cert.getName());
+			}
+			if (cert.getCertificate() != null) {
+				searchableText.append(' ').append(cert.getCertificate().getSubjectX500Principal().getName());
+				final PrincipalStructure subjectPrincipal =
+						new PrincipalStructure(cert.getCertificate().getSubjectX500Principal());
+				appendRdnValue(searchableText, subjectPrincipal, PrincipalStructure.SERIALNUMBER);
+				appendRdnValue(searchableText, subjectPrincipal, PrincipalStructure.ORGANIZATION_IDENTIFIER);
+			}
+			if (normalizeSearchText(searchableText.toString()).contains(normalizedSearchText)) {
+				filteredCerts.add(cert);
+			}
+		}
+		return filteredCerts.toArray(new NameCertificateBean[filteredCerts.size()]);
+	}
+
+	private static void appendRdnValue(final StringBuilder searchableText, final PrincipalStructure principal,
+			final String rdn) {
+		final String rdnValue = principal.getRDNvalue(rdn);
+		if (rdnValue != null) {
+			searchableText.append(' ').append(rdnValue);
+		}
+	}
+
+	private static String normalizeSearchText(final String text) {
+		if (text == null) {
+			return ""; //$NON-NLS-1$
+		}
+		final String normalizedText = Normalizer.normalize(text, Normalizer.Form.NFD).toLowerCase(Locale.ROOT);
+		final StringBuilder cleanText = new StringBuilder(normalizedText.length());
+		for (int i = 0; i < normalizedText.length(); i++) {
+			final char character = normalizedText.charAt(i);
+			if (Character.isLetterOrDigit(character)) {
+				cleanText.append(character);
+			}
+		}
+		return cleanText.toString();
+	}
+
 	private static List<CertificateLine> createCertLines(
 			final NameCertificateBean[] certBeans,
-			final CertificateLineView view) {
+			final CertificateLineView view,
+			final List<NameCertificateBean> displayedCerts) {
 
 		final CertificateLineFactory certLineFactory = CertificateLineFactory.newInstance(view);
 		final List<CertificateLine> certLines = new ArrayList<>();
@@ -557,6 +673,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		    }
 			certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
 			certLines.add(certLine);
+			displayedCerts.add(nameCert);
 		}
 		return certLines;
 	}
@@ -567,10 +684,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	 * vista con la que deben mostrarse los certificados.
 	 */
 	void updateCertListInfo() {
-		updateCertListInfo(this.certificateBeans);
+		filterCertificateList();
 
 		// Mostramos y seleccionamos el primer elemento
-		if (this.certificateBeans.length > 0) {
+		if (this.displayedCertificateBeans.length > 0) {
 			this.certList.setSelectedIndex(0);
 			this.sPane.getVerticalScrollBar().setValue(0);
 		}
@@ -583,7 +700,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	 */
 	void updateCertListInfo(final NameCertificateBean[] certs) {
 
-		final List<CertificateLine> certLines = createCertLines(certs, this.certLineView);
+		final List<NameCertificateBean> displayedCerts = new ArrayList<>();
+		final List<CertificateLine> certLines = createCertLines(certs, this.certLineView, displayedCerts);
+		// Conservamos la correspondencia entre filas y alias aunque alguna fila no se pueda crear.
+		this.displayedCertificateBeans = displayedCerts.toArray(new NameCertificateBean[displayedCerts.size()]);
 
 		// Actualizamos el mensaje del dialogo en base al numero de certificados
 		// Mostramos un texto de cabecera si corresponde
@@ -596,7 +716,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 							CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.1"); //$NON-NLS-1$
 			}
 			else {
-				msg = CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.8"); //$NON-NLS-1$
+				msg = this.certificateBeans.length > 0 && !normalizeSearchText(this.searchField.getText()).isEmpty() ?
+						CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.40") : //$NON-NLS-1$
+						CertificateSelectionDialogMessages.getString("CertificateSelectionPanel.8"); //$NON-NLS-1$
 			}
 
 			final JTextPane textMessage = new JTextPane();
@@ -657,7 +779,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 	/** Recupera el alias del certificado seleccionado.
 	 * @return Alias del certificado seleccionado o {@code null} si no se seleccion&oacute; ninguno. */
 	String getSelectedCertificateAlias() {
-		return this.selectedIndex == -1 ? null : this.certificateBeans[this.selectedIndex].getAlias();
+		return this.selectedIndex == -1 ? null : this.displayedCertificateBeans[this.selectedIndex].getAlias();
 	}
 
 	/**
