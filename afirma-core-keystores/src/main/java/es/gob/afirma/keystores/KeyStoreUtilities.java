@@ -227,6 +227,7 @@ public final class KeyStoreUtilities {
 
                 if (tmpCert == null) {
                     LOGGER.warning("El KeyStore no permite extraer el certificado publico para el alias especificado"); //$NON-NLS-1$
+                    aliassesByFriendlyName.remove(al);
                     continue;
                 }
 
