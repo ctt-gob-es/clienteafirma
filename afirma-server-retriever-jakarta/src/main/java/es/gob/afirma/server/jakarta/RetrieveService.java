@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -65,7 +66,7 @@ public final class RetrieveService extends HttpServlet {
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
 		final PrintWriter out = response.getWriter();
-		out.println(result);
+		out.println(new String(result, StandardCharsets.UTF_8));
 		out.flush();
 				
 		LOGGER.info(" == FIN RECUPERACION"); //$NON-NLS-1$

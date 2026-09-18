@@ -112,6 +112,6 @@
 				</excludes>
 			</resource>
 		</resources>
-		<finalName>afirma-signature-triphase-signer</finalName>
+		<finalName>afirma-server-triphase-signer</finalName>
 	</build>
 </project>

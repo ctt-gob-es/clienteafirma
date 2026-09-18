@@ -7,7 +7,7 @@
   <servlet>
     <description>Servicio de almacenamiento temporal de firmas v1.5</description>
     <servlet-name>StorageService</servlet-name>
-    <servlet-class>es.gob.afirma.server.javax.StorageService</servlet-class>
+    <servlet-class>es.gob.afirma.server.jakarta.StorageService</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>StorageService</servlet-name>

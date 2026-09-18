@@ -87,8 +87,7 @@ public final class RetrieveServiceHandler {
 
 	/**
 	 * Recupera los datos del servidor.
-	 * @param out Respuesta a la petici&oacute;n.
-	 * @param request Petici&oacute;n.
+	 * @param parameters Par&aacute;metros de la petici&oacute;n.
 	 * @throws IOException Cuando ocurre un error al general la respuesta.
 	 */
 	private static byte[] retrieveSign(final Map<String, String> parameters) throws IOException {

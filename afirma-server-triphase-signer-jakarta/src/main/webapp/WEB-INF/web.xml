@@ -9,7 +9,7 @@
 	<servlet>
 		<description>Servicio de firma electronica en 3 fases</description>
 		<servlet-name>SignatureService</servlet-name>
-		<servlet-class>es.gob.afirma.triphase.server.javax.SignatureService</servlet-class>
+		<servlet-class>es.gob.afirma.triphase.server.jakarta.SignatureService</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -20,7 +20,7 @@
 	<servlet>
 		<description>Realiza la primera fase de un proceso de firma por lote con JSON</description>
 		<servlet-name>JSONBatchPresigner</servlet-name>
-		<servlet-class>es.gob.afirma.triphase.server.javax.batch.server.JSONBatchPresigner</servlet-class>
+		<servlet-class>es.gob.afirma.triphase.server.jakarta.batch.server.JSONBatchPresigner</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -31,7 +31,7 @@
 	<servlet>
 		<description>Realiza la tercera (y ultima) fase de un proceso de firma por lote con JSON</description>
 		<servlet-name>JSONBatchPostsigner</servlet-name>
-		<servlet-class>es.gob.afirma.triphase.server.javax.batch.server.JSONBatchPostsigner</servlet-class>
+		<servlet-class>es.gob.afirma.triphase.server.jakarta.batch.server.JSONBatchPostsigner</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -42,7 +42,7 @@
 	<servlet>
 		<description>Indica la version del servicio</description>
 		<servlet-name>Version</servlet-name>
-		<servlet-class>es.gob.afirma.triphase.server.javax.VersionService</servlet-class>
+		<servlet-class>es.gob.afirma.triphase.server.jakarta.VersionService</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>

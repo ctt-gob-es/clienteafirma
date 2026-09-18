@@ -216,7 +216,6 @@ public final class SignatureServiceHandler {
 			return;
 		}
 
-
 		// Obtenemos el formato de firma
 		final String format = requestParameters.get(PARAM_NAME_FORMAT);
 		LOGGER.info("Formato de firma seleccionado: " + format); //$NON-NLS-1$

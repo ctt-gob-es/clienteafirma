@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -37,7 +38,7 @@ public final class RetrieveService extends HttpServlet {
 
 	/** Log para registrar las acciones del servicio. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
-
+	
 	private static final String URL_DEFAULT_CHARSET = "utf-8";  //$NON-NLS-1$
 	
 	private static final int BUFFER_SIZE = 2048; 
@@ -55,8 +56,7 @@ public final class RetrieveService extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-		
-		
+				
 		byte[] result = RetrieveServiceHandler.process(parameters);
 		
 		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -64,7 +64,7 @@ public final class RetrieveService extends HttpServlet {
 		response.setCharacterEncoding("utf-8"); //$NON-NLS-1$
 
 		final PrintWriter out = response.getWriter();
-		out.println(result);
+		out.println(new String(result, StandardCharsets.UTF_8));
 		out.flush();
 				
 		LOGGER.info(" == FIN RECUPERACION"); //$NON-NLS-1$
@@ -72,7 +72,7 @@ public final class RetrieveService extends HttpServlet {
 	
 	/**
 	 * Extrae los parametros del payload de la aplicaci&oacute;n.
-	 * @param request Petici&oacute;n de entrada..
+	 * @param request Petici&oacute;n de entrada.
 	 * @return Mapa con el nombre y valor de los par&aacute;metros extra&iacute;dos.
 	 * @throws IOException Cuando no se puedan leer los par&aacute;metros de la petici&oacute;n.
 	 */

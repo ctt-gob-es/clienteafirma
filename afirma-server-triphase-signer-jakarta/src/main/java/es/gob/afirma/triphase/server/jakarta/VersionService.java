@@ -1,4 +1,4 @@
-package es.gob.afirma.triphase.server.javax;
+package es.gob.afirma.triphase.server.jakarta;
 
 import java.io.IOException;
 import java.io.InputStream;

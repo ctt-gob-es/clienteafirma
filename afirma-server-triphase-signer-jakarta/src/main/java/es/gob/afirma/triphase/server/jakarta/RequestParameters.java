@@ -6,7 +6,7 @@
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
-package es.gob.afirma.triphase.server.javax;
+package es.gob.afirma.triphase.server.jakarta;
 
 import java.io.BufferedReader;
 import java.io.IOException;

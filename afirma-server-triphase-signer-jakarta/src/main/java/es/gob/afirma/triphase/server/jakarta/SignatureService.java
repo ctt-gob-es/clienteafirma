@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.triphase.server.javax;
+package es.gob.afirma.triphase.server.jakarta;
 
 import java.io.IOException;
 import java.io.InputStream;
