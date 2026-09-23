@@ -362,7 +362,7 @@ public abstract class JSONSignBatch {
 		return ret.toString();
 	}
 
-	public static String printProcessResult(final ProcessResult result) {
+	private static String printProcessResult(final ProcessResult result) {
 		String jsonText = "{\"id\":\"" + scapeText(result.getId()) + "\", \"result\":\"" + result.getResult() + "\""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result.getDescription() != null) {
 			jsonText += ", \"description\":\"" + scapeText(result.getDescription()) + "\"";	 //$NON-NLS-1$ //$NON-NLS-2$

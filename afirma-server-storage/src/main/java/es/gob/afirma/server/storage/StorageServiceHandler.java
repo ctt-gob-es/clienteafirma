@@ -6,7 +6,7 @@
  *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
-package es.gob.afirma.server;
+package es.gob.afirma.server.storage;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

@@ -58,7 +58,6 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 			}
 			catch(final Exception e) {
 				errors.put(buildSignResult(ss.getId(), Result.ERROR_PRE, e));
-
 				if (this.stopOnError) {
 					ignoreRemaining = true;
 					LOGGER.log(Level.WARNING,
@@ -138,7 +137,6 @@ public final class JSONSignBatchSerial extends JSONSignBatch {
 				} else {
 					LOGGER.warning("Se continua con el siguiente elemento del lote"); //$NON-NLS-1$
 				}
-				continue;
 			}
 			ss.setProcessResult(resultado);
 		}

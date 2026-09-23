@@ -7,7 +7,7 @@
 	<packaging>war</packaging>
 	
 	<name>afirma-server-triphase-signer-jakarta</name>
-	<description>Servicio de firma trifasica para Tomcat 10 y superiores</description>
+	<description>Servicio de firma trifasica para Jakarta EE 9 y superiores</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>
@@ -16,7 +16,9 @@
 	</parent>
 	
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
+		<maven.compiler.target>11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
 	</properties>
 	
 	<dependencies>
@@ -64,7 +66,6 @@
 			    </execution>
 			  </executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

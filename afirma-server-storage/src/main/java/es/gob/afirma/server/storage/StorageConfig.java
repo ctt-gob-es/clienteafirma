@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.server;
+package es.gob.afirma.server.storage;
 
 import java.io.File;
 import java.io.FileInputStream;

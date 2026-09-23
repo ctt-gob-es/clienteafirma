@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.server.jakarta;
+package es.gob.afirma.server.retriever.javax;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,11 +20,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import es.gob.afirma.server.RetrieveServiceHandler;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import es.gob.afirma.server.retriever.RetrieveServiceHandler;
 
 /**
  * Servicio de almacenamiento temporal de firmas.
@@ -37,15 +38,13 @@ public final class RetrieveService extends HttpServlet {
 
 	/** Log para registrar las acciones del servicio. */
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
-
+	
 	private static final String URL_DEFAULT_CHARSET = "utf-8";  //$NON-NLS-1$
 	
 	private static final int BUFFER_SIZE = 2048; 
 	
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-
-		LOGGER.info(" == INICIO RECUPERACION"); //$NON-NLS-1$
 		
 		// Extraemos los parametros de la peticion
 		Map<String, String> parameters;
@@ -57,8 +56,7 @@ public final class RetrieveService extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-		
-		
+				
 		byte[] result = RetrieveServiceHandler.process(parameters);
 		
 		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -74,7 +72,7 @@ public final class RetrieveService extends HttpServlet {
 	
 	/**
 	 * Extrae los parametros del payload de la aplicaci&oacute;n.
-	 * @param request Petici&oacute;n de entrada..
+	 * @param request Petici&oacute;n de entrada.
 	 * @return Mapa con el nombre y valor de los par&aacute;metros extra&iacute;dos.
 	 * @throws IOException Cuando no se puedan leer los par&aacute;metros de la petici&oacute;n.
 	 */

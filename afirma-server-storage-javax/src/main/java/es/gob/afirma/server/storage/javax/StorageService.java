@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.server.jakarta;
+package es.gob.afirma.server.storage.javax;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,12 +20,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import es.gob.afirma.server.StorageServiceHandler;
+import es.gob.afirma.server.storage.StorageServiceHandler;
 
 /** Servicio de almacenamiento temporal de firmas. &Uacute;til para servir de intermediario en comunicaci&oacute;n
  * entre JavaScript y aplicaciones nativas.

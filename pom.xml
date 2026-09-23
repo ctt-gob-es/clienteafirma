@@ -190,12 +190,6 @@
 				<module>afirma-keystores-filters</module>
 				<module>afirma-keystores-mozilla</module>
 				<module>afirma-core-massive</module>
-				<module>afirma-server-triphase-signer</module>
-				<module>afirma-server-triphase-signer-cache</module>
-				<module>afirma-server-triphase-signer-core</module>
-				<module>afirma-server-triphase-signer-document</module>
-				<module>afirma-server-retriever</module>
-				<module>afirma-server-storage</module>
 				<module>afirma-simple-plugins</module>
 				<module>afirma-simple-plugins-manager</module>
 			</modules>
@@ -218,9 +212,9 @@
 			</build>
 	    </profile>
 
-		<!-- Construccion para la generacion de aplicaciones finales y servicios -->
+		<!-- Construccion para la generacion de Autofirma -->
 		<profile>
-			<id>env-install</id>
+			<id>autofirma</id>
 			<activation>
 				<property>
 				  <name>env</name>
@@ -243,14 +237,6 @@
 				<module>afirma-simple-plugin-hash</module>
 				<module>afirma-simple-plugin-validatecerts</module>
 				
-				<!-- Servicios -->
-				<module>afirma-server-triphase-signer-javax</module>
-				<module>afirma-server-triphase-signer-jakarta</module>
-				<module>afirma-server-retriever-javax</module>
-				<module>afirma-server-retriever-jakarta</module>
-				<module>afirma-server-storage-javax</module>
-				<module>afirma-server-storage-jakarta</module>
-				
 			</modules>
 			
 			<!-- Las instrucciones de construccion particulares estan dentro de cada modulo.
@@ -269,6 +255,77 @@
 					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		
+		<!-- Construccion para la generacion de Autofirma -->
+		<profile>
+			<id>services-javax</id>
+			<activation>
+				<property>
+				  <name>env</name>
+				  <value>javax</value>
+				</property>
+			</activation>
+			
+			<modules>
+			
+				<!-- Modulos core -->
+				<module>afirma-server-triphase-signer</module>
+				<module>afirma-server-retriever</module>
+				<module>afirma-server-storage</module>
+				<module>afirma-server-triphase-signer-cache</module>
+				<module>afirma-server-triphase-signer-core</module>
+				<module>afirma-server-triphase-signer-document</module>
+				
+				<!-- Servicios -->
+				<module>afirma-server-triphase-signer-javax</module>
+				<module>afirma-server-retriever-javax</module>
+				<module>afirma-server-storage-javax</module>
+			</modules>
+			
+			<!-- Las instrucciones de construccion particulares estan dentro de cada modulo.
+			     Aqui se agregan unas genericas por si fuese necesario -->
+			<build>
+       			<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+							<fork>true</fork>
+							<debug>false</debug>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+				<!-- Construccion para la generacion de Autofirma -->
+		<profile>
+			<id>services-jakarta</id>
+			<activation>
+				<property>
+				  <name>env</name>
+				  <value>jakarta</value>
+				</property>
+			</activation>
+			
+			<modules>
+			
+				<!-- Modulos core -->
+				<module>afirma-server-triphase-signer</module>
+				<module>afirma-server-retriever</module>
+				<module>afirma-server-storage</module>
+				<module>afirma-server-triphase-signer-cache</module>
+				<module>afirma-server-triphase-signer-core</module>
+				<module>afirma-server-triphase-signer-document</module>
+				
+				<!-- Servicios -->
+				<module>afirma-server-triphase-signer-jakarta</module>
+				<module>afirma-server-retriever-jakarta</module>
+				<module>afirma-server-storage-jakarta</module>
+			</modules>
 			
 		</profile>
 		

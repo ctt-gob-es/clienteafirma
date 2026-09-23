@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.server.javax;
+package es.gob.afirma.server.storage.jakarta;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,32 +20,29 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import es.gob.afirma.server.storage.StorageServiceHandler;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import es.gob.afirma.server.RetrieveServiceHandler;
-
-/**
- * Servicio de almacenamiento temporal de firmas.
- * &Uacute;til para servir de intermediario en comunicaci&oacute;n entre JavaScript y aplicaciones nativas.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s.
- */
-public final class RetrieveService extends HttpServlet {
+/** Servicio de almacenamiento temporal de firmas. &Uacute;til para servir de intermediario en comunicaci&oacute;n
+ * entre JavaScript y aplicaciones nativas.
+ * @author Tom&aacute;s Garc&iacute;a-;er&aacute;s. */
+public final class StorageService extends HttpServlet {
+	
+	/** <i>Log</i> para registrar las acciones del servicio. */
+	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
 	private static final long serialVersionUID = -3272368448371213403L;
 
-	/** Log para registrar las acciones del servicio. */
-	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
-	
 	private static final String URL_DEFAULT_CHARSET = "utf-8";  //$NON-NLS-1$
 	
 	private static final int BUFFER_SIZE = 2048; 
-	
+
 	@Override
 	protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
-		
+
 		// Extraemos los parametros de la peticion
 		Map<String, String> parameters;
 		try {
@@ -56,8 +53,8 @@ public final class RetrieveService extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-				
-		byte[] result = RetrieveServiceHandler.process(parameters);
+
+		byte[] result = StorageServiceHandler.process(parameters);
 		
 		response.setHeader("Access-Control-Allow-Origin", "*"); //$NON-NLS-1$ //$NON-NLS-2$
 		response.setContentType("text/plain"); //$NON-NLS-1$
@@ -66,8 +63,7 @@ public final class RetrieveService extends HttpServlet {
 		final PrintWriter out = response.getWriter();
 		out.println(new String(result, StandardCharsets.UTF_8));
 		out.flush();
-				
-		LOGGER.info(" == FIN RECUPERACION"); //$NON-NLS-1$
+		
 	}
 	
 	/**
@@ -122,4 +118,5 @@ public final class RetrieveService extends HttpServlet {
         }
         return baos.toByteArray();
     }
+
 }

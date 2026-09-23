@@ -1,3 +1,3 @@
 /** Servicio de almacenaje temporal en servidor intermedio.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
-package es.gob.afirma.server;
+package es.gob.afirma.server.storage;

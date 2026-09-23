@@ -1,4 +1,4 @@
-package es.gob.afirma.signfolder.server.proxy;
+package es.gob.afirma.server.storage.jakarta;
 
 import org.junit.Assert;
 import org.junit.Ignore;

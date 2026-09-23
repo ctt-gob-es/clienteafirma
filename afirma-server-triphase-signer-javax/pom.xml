@@ -7,7 +7,7 @@
 	<packaging>war</packaging>
 	
 	<name>afirma-server-triphase-signer-javax</name>
-	<description>Servicio de firma trifasica para Tomcat 9 y anteriores</description>
+	<description>Servicio de firma trifasica para Java EE 8 y anteriores</description>
 	
 	<parent>
 		<groupId>es.gob.afirma</groupId>

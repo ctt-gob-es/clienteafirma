@@ -7,7 +7,7 @@
  * You may contact the copyright holder at: soporte.afirma@seap.minhap.es
  */
 
-package es.gob.afirma.server;
+package es.gob.afirma.server.retriever;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
