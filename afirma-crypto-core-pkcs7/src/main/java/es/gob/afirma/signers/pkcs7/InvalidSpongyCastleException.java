@@ -22,8 +22,8 @@ public class InvalidSpongyCastleException extends InvalidLibraryException {
 	private final String fnd;
 
 	/** Crea una instancia de la excepci&oacute;n.
-	 * @param expected Versi&oacute;n esperada de SpongyCastle
-	 * @param found Versi&oacute;n encontrada (actual) de SpongyCastle
+	 * @param expected Versi&oacute;n esperada de BouncyCastle
+	 * @param found Versi&oacute;n encontrada (actual) de BouncyCastle
 	 * @param e Excepci&oacute;n original */
 	public InvalidSpongyCastleException(final String expected, final String found, final Throwable e) {
 		super("Se necesitaba SpongyCastle version " + expected + ", pero se encontro la version " + found, e, BinaryErrorCode.ThirdParty.BOUNCYCASTLE_VERSION_NOT_SUPPORTED); //$NON-NLS-1$ //$NON-NLS-2$
@@ -31,14 +31,14 @@ public class InvalidSpongyCastleException extends InvalidLibraryException {
 		this.fnd = found;
 	}
 
-	/** Obtiene la versi&oacute;n esperada de SpongyCastle.
-	 * @return Versi&oacute;n esperada de SpongyCastle */
+	/** Obtiene la versi&oacute;n esperada de BouncyCastle.
+	 * @return Versi&oacute;n esperada de BouncyCastle */
 	public String getExpectedVersion() {
 		return this.exp;
 	}
 
-	/** Obtiene la versi&oacute;n encontrada (actual) de SpongyCastle.
-	 * @return Versi&oacute;n encontrada (actual) de SpongyCastle */
+	/** Obtiene la versi&oacute;n encontrada (actual) de BouncyCastle.
+	 * @return Versi&oacute;n encontrada (actual) de BouncyCastle */
 	public String getFoundVersion() {
 		return this.fnd;
 	}

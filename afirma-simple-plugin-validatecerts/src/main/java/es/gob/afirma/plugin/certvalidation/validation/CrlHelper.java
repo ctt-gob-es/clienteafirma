@@ -30,16 +30,16 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.InitialDirContext;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1Primitive;
-import org.spongycastle.asn1.DERIA5String;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.x509.CRLDistPoint;
-import org.spongycastle.asn1.x509.DistributionPoint;
-import org.spongycastle.asn1.x509.DistributionPointName;
-import org.spongycastle.asn1.x509.Extension;
-import org.spongycastle.asn1.x509.GeneralName;
-import org.spongycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.http.DataDownloader;

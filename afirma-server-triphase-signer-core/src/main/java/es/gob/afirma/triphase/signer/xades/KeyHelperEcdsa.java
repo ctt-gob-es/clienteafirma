@@ -15,10 +15,10 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import org.spongycastle.asn1.x9.ECNamedCurveTable;
-import org.spongycastle.asn1.x9.X9ECParameters;
-import org.spongycastle.jcajce.provider.asymmetric.util.EC5Util;
-import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 final class KeyHelperEcdsa implements KeyHelper {
 
@@ -72,10 +72,10 @@ final class KeyHelperEcdsa implements KeyHelper {
 	    if(publicKey instanceof java.security.interfaces.ECPublicKey){
 	        final java.security.interfaces.ECPublicKey pk = (java.security.interfaces.ECPublicKey) publicKey;
 	        final ECParameterSpec params = pk.getParams();
-	        return deriveCurveName(EC5Util.convertSpec(params, false));
+	        return deriveCurveName(EC5Util.convertSpec(params));
 	    }
-	    else if(publicKey instanceof org.spongycastle.jce.interfaces.ECPublicKey) {
-	        final org.spongycastle.jce.interfaces.ECPublicKey pk = (org.spongycastle.jce.interfaces.ECPublicKey) publicKey;
+	    else if(publicKey instanceof org.bouncycastle.jce.interfaces.ECPublicKey) {
+	        final org.bouncycastle.jce.interfaces.ECPublicKey pk = (org.bouncycastle.jce.interfaces.ECPublicKey) publicKey;
 	        return deriveCurveName(pk.getParameters());
 	    }
 	    else {
@@ -85,7 +85,7 @@ final class KeyHelperEcdsa implements KeyHelper {
 		}
 	}
 
-	private static final String deriveCurveName(final org.spongycastle.jce.spec.ECParameterSpec ecParameterSpec) throws NoSuchAlgorithmException {
+	private static final String deriveCurveName(final org.bouncycastle.jce.spec.ECParameterSpec ecParameterSpec) throws NoSuchAlgorithmException {
 	    for (final Enumeration names = ECNamedCurveTable.getNames(); names.hasMoreElements();) {
 	        final String name = (String) names.nextElement();
 	        final X9ECParameters params = ECNamedCurveTable.getByName(name);

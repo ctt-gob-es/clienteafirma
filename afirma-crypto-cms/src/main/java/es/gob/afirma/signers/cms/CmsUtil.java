@@ -14,15 +14,15 @@ import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.Signature;
 
-import org.spongycastle.asn1.ASN1Encoding;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1OctetString;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.BEROctetString;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.cms.ContentInfo;
-import org.spongycastle.cms.CMSProcessable;
-import org.spongycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.BEROctetString;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.cms.CMSProcessable;
+import org.bouncycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ErrorCode;
