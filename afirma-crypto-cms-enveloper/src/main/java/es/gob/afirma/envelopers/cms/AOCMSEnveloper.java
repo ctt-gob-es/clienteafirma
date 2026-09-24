@@ -30,10 +30,10 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -557,7 +557,7 @@ public class AOCMSEnveloper implements AOEnveloper {
     	final Enumeration<?> objects = dsq.getObjects();
 
     	// Elementos que contienen los elementos OID Data
-    	final org.spongycastle.asn1.ASN1ObjectIdentifier doi = (org.spongycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
+    	final org.bouncycastle.asn1.ASN1ObjectIdentifier doi = (org.bouncycastle.asn1.ASN1ObjectIdentifier) objects.nextElement();
 
     	try {
     		if (doi.equals(PKCSObjectIdentifiers.data)) {

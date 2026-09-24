@@ -22,10 +22,10 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.cms.EncryptedContentInfo;
-import org.spongycastle.asn1.cms.EncryptedData;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.cms.EncryptedContentInfo;
+import org.bouncycastle.asn1.cms.EncryptedData;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;

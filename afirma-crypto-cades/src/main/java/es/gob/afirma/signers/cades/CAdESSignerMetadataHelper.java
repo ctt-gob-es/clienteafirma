@@ -14,10 +14,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.spongycastle.asn1.ASN1Encodable;
-import org.spongycastle.asn1.DERSequence;
-import org.spongycastle.asn1.DERUTF8String;
-import org.spongycastle.asn1.esf.SignerLocation;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.esf.SignerLocation;
 
 /** Clase de utilidad para el manejo de las estructuras CAdES <i>id-aa-ets-signerLocation</i> y
  * <i>id-aa-ets-signerAttr</i>.

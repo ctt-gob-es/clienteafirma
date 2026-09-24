@@ -12,23 +12,23 @@ package es.gob.afirma.envelopers.cms;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1Integer;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.AuthEnvelopedData;
-import org.spongycastle.asn1.cms.AuthenticatedData;
-import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
-import org.spongycastle.asn1.cms.CompressedData;
-import org.spongycastle.asn1.cms.EncryptedContentInfo;
-import org.spongycastle.asn1.cms.EnvelopedData;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AuthEnvelopedData;
+import org.bouncycastle.asn1.cms.AuthenticatedData;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.cms.CompressedData;
+import org.bouncycastle.asn1.cms.EncryptedContentInfo;
+import org.bouncycastle.asn1.cms.EnvelopedData;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.cms.SignerInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.signers.pkcs7.DigestedData;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
@@ -80,7 +80,7 @@ final class ValidateCMS {
                  * Si no es un objeto de tipo Dara se pasa al manejo de la
                  * excepcion
                  */
-                new DEROctetString(doj.getObject());
+                new DEROctetString(doj.getBaseObject());
             }
         }
         catch (final Exception ex) {
@@ -109,7 +109,7 @@ final class ValidateCMS {
             else {
                 // Contenido de SignedData
                 final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+                final ASN1Sequence datos = (ASN1Sequence) doj.getBaseObject();
                 final SignedData sd = SignedData.getInstance(datos);
                 final ASN1Set signerInfosSd = sd.getSignerInfos();
 
@@ -173,7 +173,7 @@ final class ValidateCMS {
                  * conversion ha sido correcta. De no ser asi, se pasaria al
                  * manejo de la excepcion.
                  */
-                new DigestedData((ASN1Sequence) doj.getObject());
+                new DigestedData((ASN1Sequence) doj.getBaseObject());
             }
         }
         catch (final Exception ex) {
@@ -202,7 +202,7 @@ final class ValidateCMS {
             else {
                 // Contenido de Data
                 final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                final ASN1Sequence asq = (ASN1Sequence) doj.getObject();
+                final ASN1Sequence asq = (ASN1Sequence) doj.getBaseObject();
 
                 /*
                  * Si no es de tipo EncryptedData se pasa al manejo de la
@@ -244,7 +244,7 @@ final class ValidateCMS {
                  * Si no se construye el objeto correctamente, se pasa al manejo
                  * de la excepcion
                  */
-                EnvelopedData.getInstance(doj.getObject());
+                EnvelopedData.getInstance(doj.getBaseObject());
             }
 
         }
@@ -274,7 +274,7 @@ final class ValidateCMS {
             else {
                 // Contenido de SignedData
                 final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+                final ASN1Sequence datos = (ASN1Sequence) doj.getBaseObject();
                 final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(datos);
                 final ASN1Set signerInfosSd = sd.getSignerInfos();
 
@@ -313,7 +313,7 @@ final class ValidateCMS {
             else {
                 // Contenido de AuthenticatedData
                 final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                final ASN1Sequence authenticatedData = (ASN1Sequence) doj.getObject();
+                final ASN1Sequence authenticatedData = (ASN1Sequence) doj.getBaseObject();
                 AuthenticatedData.getInstance(authenticatedData);
             }
         }
@@ -345,7 +345,7 @@ final class ValidateCMS {
             }
             else {
                 final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                final ASN1Sequence authenticatedEnvelopedData = (ASN1Sequence) doj.getObject();
+                final ASN1Sequence authenticatedEnvelopedData = (ASN1Sequence) doj.getBaseObject();
                 AuthEnvelopedData.getInstance(authenticatedEnvelopedData);
             }
 
@@ -377,7 +377,7 @@ final class ValidateCMS {
             else {
                 // Contenido de CompressedData
                 final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                final ASN1Sequence compressedData = (ASN1Sequence) doj.getObject();
+                final ASN1Sequence compressedData = (ASN1Sequence) doj.getBaseObject();
                 CompressedData.getInstance(compressedData);
             }
         }

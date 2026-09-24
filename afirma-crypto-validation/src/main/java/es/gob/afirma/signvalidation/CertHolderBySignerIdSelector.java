@@ -9,9 +9,9 @@
 
 package es.gob.afirma.signvalidation;
 
-import org.spongycastle.cert.X509CertificateHolder;
-import org.spongycastle.cms.SignerId;
-import org.spongycastle.util.Selector;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cms.SignerId;
+import org.bouncycastle.util.Selector;
 
 public final class CertHolderBySignerIdSelector implements Selector<X509CertificateHolder> {
 

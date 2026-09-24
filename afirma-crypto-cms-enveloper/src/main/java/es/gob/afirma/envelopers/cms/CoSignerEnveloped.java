@@ -26,33 +26,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.spongycastle.asn1.ASN1Encodable;
-import org.spongycastle.asn1.ASN1EncodableVector;
-import org.spongycastle.asn1.ASN1Encoding;
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1OctetString;
-import org.spongycastle.asn1.ASN1Primitive;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.DERPrintableString;
-import org.spongycastle.asn1.DERSet;
-import org.spongycastle.asn1.DERUTCTime;
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.AttributeTable;
-import org.spongycastle.asn1.cms.CMSAttributes;
-import org.spongycastle.asn1.cms.ContentInfo;
-import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
-import org.spongycastle.asn1.cms.SignerIdentifier;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.asn1.x500.X500Name;
-import org.spongycastle.asn1.x500.style.RFC4519Style;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
-import org.spongycastle.asn1.x509.Certificate;
-import org.spongycastle.asn1.x509.TBSCertificate;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERUTCTime;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
+import org.bouncycastle.asn1.cms.SignerIdentifier;
+import org.bouncycastle.asn1.cms.SignerInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.RFC4519Style;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -133,7 +133,7 @@ final class CoSignerEnveloped {
         e.nextElement();
         // Contenido de signedAndEnvelopedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
+        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getBaseObject();// contenido
                                                                         // del
                                                                         // signedAndEnvelopedData
 
@@ -275,7 +275,7 @@ final class CoSignerEnveloped {
         // Contenido de signedAndEnvelopedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
         // Contenido del signedAndEnvelopedData
-        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();
+        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getBaseObject();
 
         final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(contentSignedData);
 
@@ -344,8 +344,8 @@ final class CoSignerEnveloped {
                     final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
                     final ASN1ObjectIdentifier oids = (ASN1ObjectIdentifier) elemento.getObjectAt(0);
                     if (CMSAttributes.messageDigest.getId().toString().equals(oids.toString())) {
-                        final DERSet derSetHash = (DERSet) elemento.getObjectAt(1);
-                        final DEROctetString derHash = (DEROctetString) derSetHash.getObjectAt(0);
+                        final ASN1Set derSetHash = ASN1Set.getInstance(elemento.getObjectAt(1));
+                        final ASN1OctetString derHash = ASN1OctetString.getInstance(derSetHash.getObjectAt(0));
                         md = derHash.getOctets();
                     }
                 }

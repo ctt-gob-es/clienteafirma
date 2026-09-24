@@ -16,29 +16,29 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1Integer;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.DERUTCTime;
-import org.spongycastle.asn1.cms.AuthEnvelopedData;
-import org.spongycastle.asn1.cms.AuthenticatedData;
-import org.spongycastle.asn1.cms.CMSAttributes;
-import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
-import org.spongycastle.asn1.cms.CompressedData;
-import org.spongycastle.asn1.cms.ContentInfo;
-import org.spongycastle.asn1.cms.EncryptedContentInfo;
-import org.spongycastle.asn1.cms.EnvelopedData;
-import org.spongycastle.asn1.cms.IssuerAndSerialNumber;
-import org.spongycastle.asn1.cms.KeyTransRecipientInfo;
-import org.spongycastle.asn1.cms.RecipientInfo;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerIdentifier;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERUTCTime;
+import org.bouncycastle.asn1.cms.AuthEnvelopedData;
+import org.bouncycastle.asn1.cms.AuthenticatedData;
+import org.bouncycastle.asn1.cms.CMSAttributes;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.cms.CompressedData;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.EncryptedContentInfo;
+import org.bouncycastle.asn1.cms.EnvelopedData;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
+import org.bouncycastle.asn1.cms.KeyTransRecipientInfo;
+import org.bouncycastle.asn1.cms.RecipientInfo;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.cms.SignerIdentifier;
+import org.bouncycastle.asn1.cms.SignerInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
@@ -176,7 +176,7 @@ final class CMSInformation {
 		detalle = detalle + AppletMessages.getString("CMSInformation.0") + SP + DIGESTED_DATA + CR; //$NON-NLS-1$
 
 		//obtenemos el digestedData
-		final DigestedData dd = new DigestedData((ASN1Sequence)doj.getObject());
+		final DigestedData dd = new DigestedData((ASN1Sequence)doj.getBaseObject());
 
 		//obtenemos la version
 		detalle = detalle + AppletMessages.getString("CMSInformation.1") + SP + dd.getVersion() + CR; //$NON-NLS-1$
@@ -196,7 +196,7 @@ final class CMSInformation {
 	private static String getFromCompressedData(final ASN1TaggedObject doj) {
 		String detalle = ""; //$NON-NLS-1$
 		detalle = detalle + "Tipo:" + SP + COMPRESSED_DATA + CR; //$NON-NLS-1$
-		final CompressedData ed = CompressedData.getInstance(doj.getObject());
+		final CompressedData ed = CompressedData.getInstance(doj.getBaseObject());
 
 		//obtenemos la version
 		detalle = detalle + AppletMessages.getString("CMSInformation.1") + SP + ed.getVersion() + CR; //$NON-NLS-1$
@@ -245,14 +245,14 @@ final class CMSInformation {
 
 		switch (envelopeType) {
 		case TYPE_ENVELOPED_DATA:
-			final EnvelopedData enveloped = EnvelopedData.getInstance(doj.getObject());
+			final EnvelopedData enveloped = EnvelopedData.getInstance(doj.getBaseObject());
 			version = enveloped.getVersion();
 			rins = enveloped.getRecipientInfos();
 			encryptedContentInfo = enveloped.getEncryptedContentInfo();
 			unprotectedAttrs = enveloped.getUnprotectedAttrs();
 			break;
 		case TYPE_AUTHENTICATED_DATA:
-			final AuthenticatedData authenticated = AuthenticatedData.getInstance(doj.getObject());
+			final AuthenticatedData authenticated = AuthenticatedData.getInstance(doj.getBaseObject());
 			version = authenticated.getVersion();
 			rins = authenticated.getRecipientInfos();
 			aid = authenticated.getMacAlgorithm();
@@ -261,7 +261,7 @@ final class CMSInformation {
 			unprotectedAttrs = authenticated.getUnauthAttrs();
 			break;
 		case TYPE_AUTHENTICATED_ENVELOPED_DATA:
-			final AuthEnvelopedData authEnveloped = AuthEnvelopedData.getInstance(doj.getObject());
+			final AuthEnvelopedData authEnveloped = AuthEnvelopedData.getInstance(doj.getBaseObject());
 			version = authEnveloped.getVersion();
 			rins = authEnveloped.getRecipientInfos();
 			encryptedContentInfo = authEnveloped.getAuthEncryptedContentInfo();
@@ -269,21 +269,21 @@ final class CMSInformation {
 			unprotectedAttrs = authEnveloped.getUnauthAttrs();
 			break;
 		case TYPE_SIGNED_ENVELOPED_DATA:
-			final SignedAndEnvelopedData signedEnv = new SignedAndEnvelopedData((ASN1Sequence)doj.getObject());
+			final SignedAndEnvelopedData signedEnv = new SignedAndEnvelopedData((ASN1Sequence)doj.getBaseObject());
 			version = signedEnv.getVersion();
 			rins = signedEnv.getRecipientInfos();
 			encryptedContentInfo = signedEnv.getEncryptedContentInfo();
 			signerInfosSd = signedEnv.getSignerInfos();
 			break;
 		case TYPE_SIGNED_DATA:
-			final SignedData signed = SignedData.getInstance(doj.getObject());
+			final SignedData signed = SignedData.getInstance(doj.getBaseObject());
 			version = signed.getVersion();
 			ds = signed.getDigestAlgorithms();
 			ci = signed.getEncapContentInfo();
 			signerInfosSd = signed.getSignerInfos();
 			break;
 		case TYPE_ENCRYPTED_DATA:
-			final ASN1Sequence encrypted = (ASN1Sequence) doj.getObject();
+			final ASN1Sequence encrypted = (ASN1Sequence) doj.getBaseObject();
 			version = ASN1Integer.getInstance(encrypted.getObjectAt(0));
 			encryptedContentInfo = EncryptedContentInfo.getInstance(encrypted.getObjectAt(1));
 			if (encrypted.size() == 3) {
@@ -342,9 +342,9 @@ final class CMSInformation {
 			detalle = detalle + AppletMessages.getString("CMSInformation.20") + SP + aid.getAlgorithm() + CR; //$NON-NLS-1$
 
 			//digestAlgorithm
-			final ASN1Sequence seq =(ASN1Sequence)doj.getObject();
+			final ASN1Sequence seq =(ASN1Sequence)doj.getBaseObject();
 			final ASN1TaggedObject da = (ASN1TaggedObject)seq.getObjectAt(4);
-			final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(da.getObject());
+			final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(da.getBaseObject());
 			detalle = detalle + AppletMessages.getString("CMSInformation.21") + SP + dai.getAlgorithm() + CR; //$NON-NLS-1$
 
 			//obtenemos datos de los datos cifrados.
@@ -360,7 +360,7 @@ final class CMSInformation {
 		}
 		else if (envelopeType == TYPE_SIGNED_ENVELOPED_DATA) {
 			//algoritmo de firma
-			final ASN1Sequence seq =(ASN1Sequence)doj.getObject();
+			final ASN1Sequence seq =(ASN1Sequence)doj.getBaseObject();
 			final ASN1Set da = (ASN1Set)seq.getObjectAt(2);
 			final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(da.getObjectAt(0));
 			detalle = detalle + AppletMessages.getString("CMSInformation.21") + SP + dai.getAlgorithm() + CR; //$NON-NLS-1$
