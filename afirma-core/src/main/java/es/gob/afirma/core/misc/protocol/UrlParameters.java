@@ -11,8 +11,10 @@ package es.gob.afirma.core.misc.protocol;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
@@ -422,7 +424,7 @@ public abstract class UrlParameters {
 	 * @param url URL que se desea validar.
 	 * @return URL formada y validada.
 	 * @throws IllegalArgumentException Cuando ocurre alg&uacute;n problema al validar la URL.
-	 * @throws LocalAccessRequestException Cuando la URL usa los dominios localhost o 127.0.0.1.
+	 * @throws LocalAccessRequestException Cuando la URL apunta a una direccion local.
 	 */
 	protected static URL validateURL(final String url) throws IllegalArgumentException, LocalAccessRequestException {
 
@@ -442,10 +444,28 @@ public abstract class UrlParameters {
 				"El protocolo de la URL proporcionada para el servlet no esta soportado: " + servletUrl.getProtocol() //$NON-NLS-1$
 			);
 		}
-		// Comprobamos que la URL sea una llamada al servlet y que no sea local
-		if ("localhost".equals(servletUrl.getHost()) || "127.0.0.1".equals(servletUrl.getHost())) { //$NON-NLS-1$ //$NON-NLS-2$
+		// Comprobamos que la URL no apunte a una direccion local
+		final String host = servletUrl.getHost();
+		if ("localhost".equals(host) || "127.0.0.1".equals(host)) { //$NON-NLS-1$ //$NON-NLS-2$
 			throw new LocalAccessRequestException(
 				"El host de la URL proporcionada para el Servlet es local" //$NON-NLS-1$
+			);
+		}
+		// Resolvemos el host para comprobar que no apunta a una direccion local
+		// Evita bypasses via DNS rebinding, IP en decimal/octal/hex, etc.
+		try {
+			final InetAddress[] addresses = InetAddress.getAllByName(host);
+			for (final InetAddress addr : addresses) {
+				if (addr.isLoopbackAddress() || addr.isAnyLocalAddress()) {
+					throw new LocalAccessRequestException(
+						"El host de la URL proporcionada para el Servlet resuelve a una direccion local: " + addr //$NON-NLS-1$
+					);
+				}
+			}
+		}
+		catch (final UnknownHostException e) {
+			throw new IllegalArgumentException(
+				"No se ha podido resolver el host de la URL: " + host //$NON-NLS-1$
 			);
 		}
 		// El servlet no puede recibir parametros
