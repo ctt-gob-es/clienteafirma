@@ -101,6 +101,8 @@ int launch(const char *commandName)
                                            @"-Djdk.tls.maxHandshakeMessageSize=65536",
                                            @"--add-exports",
                                            @"java.desktop/com.apple.eawt=ALL-UNNAMED",
+                                           @"--add-opens",
+                                           @"java.base/apple.security=ALL-UNNAMED",
                                            @"-Dcom.apple.macos.useScreenMenuBar=true",
                                            @"-Xdock:name=Autofirma",
                                            [NSString stringWithFormat:@"-Xdock:icon=%@/Contents/Resources/JAR/icon.icns", mainBundlePath],
