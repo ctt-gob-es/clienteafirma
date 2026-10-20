@@ -536,7 +536,7 @@ public final class MainMenu extends JMenuBar {
     		return;
     	}
     	if (file != null && file.length > 0 && file[0] != null && file[0].isFile()) {
-    		new VisorFirma(false, null).initialize(false, file[0]);
+    		new VisorFirma(false, null).initialize(file[0]);
     	} else {
     		AOUIFactory.showErrorMessage(
 			        SimpleAfirmaMessages.getString("SignPanel.123"), //$NON-NLS-1$

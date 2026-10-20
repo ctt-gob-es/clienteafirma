@@ -360,7 +360,7 @@ final class CommandLineLauncher {
  		if (inputFile == null) {
  			throw new CommandLineException(CommandLineMessages.getString("CommandLineLauncher.5"), true);  //$NON-NLS-1$
  		}
- 		new VisorFirma(true, null).initialize(false, inputFile);
+ 		new VisorFirma(true, null).initialize(inputFile);
  	}
 
 	/** Mostramos el panel de firmas. Se usara la configuraci&oacute;n de firma establecida

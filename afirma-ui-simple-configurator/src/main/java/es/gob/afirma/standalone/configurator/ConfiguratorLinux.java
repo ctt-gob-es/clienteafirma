@@ -40,7 +40,6 @@ final class ConfiguratorLinux implements Configurator {
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	private static final String ALTERNATIVE_APP_SUBDIR = ".afirma/Autofirma"; //$NON-NLS-1$
 
 	private static final String UNINSTALL_SCRIPT_NAME = "uninstall.sh"; //$NON-NLS-1$
 	private static final String INSTALL_SCRIPT_NAME = "script.sh"; //$NON-NLS-1$
@@ -49,18 +48,12 @@ final class ConfiguratorLinux implements Configurator {
     private static final String FILE_AUTOFIRMA_CERTIFICATE = "Autofirma_ROOT.cer"; //$NON-NLS-1$
     private static final String KS_PASSWORD = "654321"; //$NON-NLS-1$
 
-	private final boolean jnlpInstance;
-
-    public ConfiguratorLinux(final boolean jnlpInstance) {
-		this.jnlpInstance = jnlpInstance;
-	}
-
     @Override
     public void configure(final Console window) throws IOException, GeneralSecurityException, HeadlessException {
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.2")); //$NON-NLS-1$
 
-        final File appDir = getApplicationDirectory(this.jnlpInstance);
+        final File appDir = getApplicationDirectory();
 
         LOGGER.info(Messages.getString("ConfiguratorLinux.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
@@ -128,45 +121,14 @@ final class ConfiguratorLinux implements Configurator {
         return new File(appConfigDir, KS_FILENAME).exists();
     }
 
-	private static File getApplicationDirectory(final boolean jnlpDeployment) {
-
-		// Devolver un directorio que utilizar como directorio de instalacion cuando
-		// se realice un despliegue JNLP
-		if (jnlpDeployment) {
-			try {
-				return getIntApplicationDirectory();
-			} catch (final IOException e) {
-				LOGGER.severe("No se encuentra ni ha podido generarse el directorio de aplicacion: " + e); //$NON-NLS-1$
-			}
-		}
+	private static File getApplicationDirectory() {
 
 		return ConfiguratorUtil.getApplicationDirectory();
 	}
 
-	/** Obtiene un directorio en el que almacenar los ficheros de la aplicaci&oacute;n.
-	 * @return Directorio de aplicaci&oacute;n.
-	 * @throws IOException EN cualquier error. */
-	private static File getIntApplicationDirectory() throws IOException {
-		final String userHome;
-		try {
-			userHome = System.getProperty("user.home"); //$NON-NLS-1$
-		}
-		catch (final Exception e) {
-			throw new IOException("No se ha podido identificar el directorio del usuario para almacenar los ficheros de instalacion", e); //$NON-NLS-1$
-		}
-		if (userHome == null) {
-			throw new IOException("No se encuentra definido el directorio del usuario"); //$NON-NLS-1$
-		}
-		final File appDir = new File(userHome, ALTERNATIVE_APP_SUBDIR);
-		if (!appDir.isDirectory() && !appDir.mkdirs()) {
-			throw new IOException("No ha podido crearse el directorio para los ficheros de aplicacion"); //$NON-NLS-1$
-		}
-		return appDir;
-	}
-
 	@Override
 	public File getAplicationDirectory() {
-		return getApplicationDirectory(false);
+		return getApplicationDirectory();
 	}
 
 	@Override
