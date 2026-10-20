@@ -9,7 +9,6 @@
 
 package es.gob.afirma.standalone.ui;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -20,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.configurator.common.PreferencesManager;
 
 /** Di&aacute;logo que muestra mensajes con la informaci&oacute;n
@@ -45,7 +45,7 @@ public final class ProgressInfoDialog extends JDialog {
 
 	    final RoundedPanel panel = new RoundedPanel(20);
 	    panel.setLayout(new GridBagLayout());
-	    panel.setBackground(Color.WHITE);
+	    panel.setBackground(LookAndFeelManager.DEFAULT_COLOR);
 
 	    final GridBagConstraints c = new GridBagConstraints();
 	    c.gridx = 0;
