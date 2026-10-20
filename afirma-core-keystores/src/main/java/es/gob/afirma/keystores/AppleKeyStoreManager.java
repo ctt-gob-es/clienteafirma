@@ -11,11 +11,15 @@ package es.gob.afirma.keystores;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.KeyStoreSpi;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -34,6 +38,8 @@ import es.gob.afirma.core.misc.Platform;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class AppleKeyStoreManager extends AOKeyStoreManager {
 
+	private KeyStoreSpi keyStoreSpi = null;
+
 	AppleKeyStoreManager() {
 		setKeyStoreType(AOKeyStore.APPLE);
 	}
@@ -45,7 +51,7 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 	         final Object[] params,
 	         final boolean forceReset) throws AOKeyStoreManagerException,
 	                                          IOException {
-		setKeyStore(AppleKeyStoreManager.initApple(store));
+		setKeyStore(initApple(store));
 
 		getAliasesWithoutDuplicates();
 	}
@@ -78,16 +84,18 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 		return null;
 	}
 
-	private static KeyStore initApple(final InputStream store) throws AOKeyStoreManagerException, IOException {
+	private KeyStore initApple(final InputStream store) throws AOKeyStoreManagerException, IOException {
 		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
 			throw new InvalidOSException("Apple Mac OS X"); //$NON-NLS-1$
 		}
 
 		final KeyStore tmpks;
 
-		// Inicializamos
+		// Inicializamos conservando el SPI, necesario para rescanKeychainIfTrustedCertificates()
 		try {
-			tmpks = KeyStore.getInstance(AOKeyStore.APPLE.getProviderName());
+			final Provider appleProvider = Security.getProvider("Apple"); //$NON-NLS-1$
+			this.keyStoreSpi = (KeyStoreSpi) appleProvider.getService("KeyStore", AOKeyStore.APPLE.getProviderName()).newInstance(null); //$NON-NLS-1$
+			tmpks = new KeyStore(this.keyStoreSpi, appleProvider, AOKeyStore.APPLE.getProviderName()) { /* Constructor protegido */ };
 		}
 		catch (final Exception e) {
 			throw new AOKeyStoreManagerException(
@@ -108,7 +116,42 @@ final class AppleKeyStoreManager extends AOKeyStoreManager {
 		return tmpks;
 	}
 
+	/** Recupera las identidades que un certificado con ajustes de confianza ("Confiar siempre")
+	 * oculta en JDK 17 y 21 (JDK-8320362): un segundo recorrido del llavero las da de alta con un
+	 * alias alternativo. Requiere <code>--add-opens java.base/apple.security=ALL-UNNAMED</code>.
+	 * TODO: Eliminar rescanKeychainIfTrustedCertificates(), su llamada, el campo keyStoreSpi, la prueba
+	 * TestAppleKeyStoreManagerHiddenIdentities y el --add-opens del lanzador de macOS al actualizar el
+	 * JRE empaquetado a JDK 23 o superior. */
+	private void rescanKeychainIfTrustedCertificates() {
+		try {
+			boolean trustedCertificatesFound = false;
+			final Enumeration<String> aliases = getKeyStore().aliases();
+			while (!trustedCertificatesFound && aliases.hasMoreElements()) {
+				trustedCertificatesFound = getKeyStore().isCertificateEntry(aliases.nextElement());
+			}
+			if (!trustedCertificatesFound) {
+				return;
+			}
+			final Method scanKeychain = this.keyStoreSpi.getClass().getDeclaredMethod("_scanKeychain"); //$NON-NLS-1$
+			scanKeychain.setAccessible(true);
+			scanKeychain.invoke(this.keyStoreSpi);
+			LOGGER.info("Se ha recorrido de nuevo el llavero para recuperar las identidades ocultas por certificados con ajustes de confianza"); //$NON-NLS-1$
+		}
+		catch (final NoSuchMethodException e) {
+			LOGGER.info("El almacen del llavero no permite un nuevo recorrido, se omite: " + e); //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			LOGGER.warning(
+				"No se ha podido recorrer de nuevo el llavero para recuperar las identidades ocultas por los ajustes de confianza. " //$NON-NLS-1$
+				+ "Si algun certificado personal tiene configurado 'Confiar siempre' en Acceso a Llaveros, cambie su confianza a " //$NON-NLS-1$
+				+ "'Usar ajustes por omision del sistema' o ejecute la JVM con --add-opens java.base/apple.security=ALL-UNNAMED: " + e //$NON-NLS-1$
+			);
+		}
+	}
+
 	private void getAliasesWithoutDuplicates() throws AOKeyStoreManagerException {
+
+		rescanKeychainIfTrustedCertificates();
 
 		// Obtenemos los objetos del llavero
 		final Enumeration<String> aliases;
