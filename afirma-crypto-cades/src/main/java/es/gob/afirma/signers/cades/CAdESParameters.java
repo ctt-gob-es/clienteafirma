@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.ASN1UTF8String;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
@@ -102,6 +102,25 @@ public class CAdESParameters {
 
 		final CAdESParameters dataConfig = new CAdESParameters();
 
+
+		/// Identificamos si debemos generar una firma baseline para establecer la configuracion
+		// propia para estas firmas
+		final boolean baselineProfile = AOSignConstants.SIGN_PROFILE_BASELINE.equals(
+				config.getProperty(CAdESExtraParams.PROFILE));
+
+		// Almacenamos el perfil configurado que, en caso de no ser baseline, sera el avanzado
+		if (baselineProfile) {
+			dataConfig.setProfileSet(AOSignConstants.SIGN_PROFILE_BASELINE);
+		} else {
+			dataConfig.setProfileSet(AOSignConstants.SIGN_PROFILE_ADVANCED);
+		}
+
+		// En el estandar baseline ETSI EN 319 122-1 V1.1.1 se indica expresamente que no se
+		// deberia incluir el IssuerSerial en el atributo del certificado firmante. Sin embargo,
+		// los validadores suelen emitir advertencias cuando se omite este atributo, asi que
+		// se seguira agregando
+		//dataConfig.setIncludedIssuerSerial(!baselineProfile);
+
 		// Identificamos si se debe incluir el atributo SigningCertificateV2
 		boolean signingCertificateV2;
 		if (AOSignConstants.isSHA2SignatureAlgorithm(algorithm)) {
@@ -163,9 +182,14 @@ public class CAdESParameters {
 		dataConfig.setClaimedRoles(claimedRoles);
 
 		// Incluir politica de certificacion del certificado firmante en la firma
+		// Por defecto, no se incluye para las firmas baseline y si para el resto
+		final String defaultDoNotIncludePolicyOnSigningCertificateStringValue = baselineProfile
+				? Boolean.TRUE.toString()
+				: Boolean.FALSE.toString();
 		final boolean doNotIncludePolicyOnSigningCertificate = Boolean.parseBoolean(
 				config.getProperty(
-						CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE, Boolean.FALSE.toString()
+						CAdESExtraParams.DO_NOT_INCLUDE_POLICY_ON_SIGNING_CERTIFICATE,
+						defaultDoNotIncludePolicyOnSigningCertificateStringValue
 						)
 				);
 		dataConfig.setIncludedPolicyOnSigningCertificate(!doNotIncludePolicyOnSigningCertificate);
@@ -250,7 +274,7 @@ public class CAdESParameters {
 							contentTypeOid = contentHints.getContentType().getId();
 							// Si no se proporciono la descripcion, aprovechamos y tambien la cogemos
 							if (contentTypeDescription == null) {
-								final DERUTF8String descriptionAttr = contentHints.getContentDescription();
+								final ASN1UTF8String descriptionAttr = contentHints.getContentDescriptionUTF8();
 								if (descriptionAttr != null) {
 									contentTypeDescription = descriptionAttr.getString();
 								}
@@ -322,24 +346,6 @@ public class CAdESParameters {
 
 		// Metadatos con la localizacion de firma
 		dataConfig.setMetadata(CAdESSignerMetadataHelper.getCAdESSignerMetadata(config));
-
-		/// Identificamos si debemos generar una firma baseline para establecer la configuracion
-		// propia para estas firmas
-		final boolean baselineProfile = AOSignConstants.SIGN_PROFILE_BASELINE.equals(
-				config.getProperty(CAdESExtraParams.PROFILE));
-
-		// Almacenamos el perfil configurado que, en caso de no ser baseline, sera el avanzado
-		if (baselineProfile) {
-			dataConfig.setProfileSet(AOSignConstants.SIGN_PROFILE_BASELINE);
-		} else {
-			dataConfig.setProfileSet(AOSignConstants.SIGN_PROFILE_ADVANCED);
-		}
-
-		// En el estandar baseline ETSI EN 319 122-1 V1.1.1 se indica expresamente que no se
-		// deberia incluir el IssuerSerial en el atributo del certificado firmante. Sin embargo,
-		// los validadores suelen emitir advertencias cuando se omite este atributo, asi que
-		// se seguira agregando
-		//dataConfig.setIncludedIssuerSerial(!baselineProfile);
 
 		// Configuracion establecida, que puede contener mas informacion que la requerida para la generacion de la firma CAdES
 		dataConfig.setExtraParams(config);
@@ -535,7 +541,7 @@ public class CAdESParameters {
 
 	/**
 	 * Recupera el texto descriptivo del tipo de contenido.
-	 * @return Descripci&oacute;n del tipo de contenido o {@code null} si no se estableci&oacute;.
+	 * @return MimeType del contenido.
 	 */
 	public String getMimeType() {
 		return this.mimetype;
@@ -543,7 +549,7 @@ public class CAdESParameters {
 
 	/**
 	 * Establece el texto descriptivo del tipo de contenido.
-	 * @param contentDescription Descripci&oacute;n del tipo de contenido o {@code null} si no se estableci&oacute;.
+	 * @param mimeType MimeType del contenido.
 	 */
 	private void setMimeType(final String mimeType) {
 		this.mimetype = mimeType;
