@@ -159,7 +159,7 @@ final class RestoreConfigFirefoxCommon {
 	static char[] showPasswordDialog(final String profileName, final boolean passwordFailed, final Component parent) throws AOCancelledOperationException {
 
 		String message =
-				(passwordFailed ? SimpleAfirmaMessages.getString("SimpleKeyStoreManager.14")  + " " : "") // Si la contrasena es incorrecta, se antepone el texto que lo notifica
+				(passwordFailed ? SimpleAfirmaMessages.getString("SimpleKeyStoreManager.12")  + " " : "") // Si la contrasena es incorrecta, se antepone el texto que lo notifica
 				+ SimpleAfirmaMessages.getString("SimpleKeyStoreManager.0", profileName); //$NON-NLS-1$	// Texto que solicita la contrasena
 
 		return es.gob.afirma.core.ui.AOUIFactory.getPassword(
