@@ -36,10 +36,10 @@ public final class LookAndFeelManager {
 		// No permitimos la instanciacion
 	}
 
-    /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
+    /** Color de fondo por defecto para los JPanel y JFrame. */
     public static final Color DEFAULT_COLOR;
 
-    /** Color de fondo secundario para los JPanel, JFrame y Applet. */
+    /** Color de fondo secundario para los JPanel y JFrame. */
     public static final Color SECUNDARY_COLOR;
 
     /** Color transparente. */
@@ -90,12 +90,9 @@ public final class LookAndFeelManager {
         if (defaultFontHeight instanceof Integer) {
            LARGE_FONT = ((Integer) defaultFontHeight).intValue() > LARGE_FONT_LIMIT;
         }
-        // En Linux usamos siempre la misma configuracion que al detectar un tamano de fuente grande
-        else if (Platform.OS.LINUX.equals(Platform.getOS())) {
-            LARGE_FONT = true;
-        }
         else {
-            LARGE_FONT = false;
+            // En Linux usamos siempre la misma configuracion que al detectar un tamano de fuente grande
+            LARGE_FONT = Platform.OS.LINUX.equals(Platform.getOS());
         }
 
         if (Platform.getOS() == OS.LINUX) {

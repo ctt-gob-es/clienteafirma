@@ -125,11 +125,11 @@ public final class AutofirmaConfiguratorSilent implements ConsoleListener {
 	public AutofirmaConfiguratorSilent(final ConfigArgs config) {
 
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(false,
+			this.configurator = new ConfiguratorWindows(
 					config.getCertificatePath(), config.getKeystorePath());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
-		    this.configurator = new ConfiguratorLinux(false);
+		    this.configurator = new ConfiguratorLinux();
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
             this.configurator = new ConfiguratorMacOSX();

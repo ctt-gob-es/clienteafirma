@@ -22,8 +22,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
@@ -58,14 +56,12 @@ final class ConfiguratorWindows implements Configurator {
 	 */
 	private static final int UNINSTALL_CERT_RETRIES = 3;
 
-	private final boolean jnlpInstance;
 	private final String certificatePath;
 	private final String keyStorePath;
 
 	private final ConfiguratorFirefoxWindows firefoxConfigurator;
 
-	public ConfiguratorWindows(final boolean jnlpInstance, final String certificatePath, final String keyStorePath) {
-		this.jnlpInstance = jnlpInstance;
+	public ConfiguratorWindows(final String certificatePath, final String keyStorePath) {
 		this.certificatePath = certificatePath;
 		this.keyStorePath = keyStorePath;
 		this.firefoxConfigurator = new ConfiguratorFirefoxWindows();
@@ -76,7 +72,7 @@ final class ConfiguratorWindows implements Configurator {
 
 		window.print(Messages.getString("ConfiguratorWindows.2")); //$NON-NLS-1$
 
-		final File appDir = getApplicationDirectory(this.jnlpInstance);
+		final File appDir = getApplicationDirectory();
 
 		window.print(Messages.getString("ConfiguratorWindows.3") + appDir.getAbsolutePath()); //$NON-NLS-1$
 
@@ -130,14 +126,6 @@ final class ConfiguratorWindows implements Configurator {
 						certPack.getCaCertificate().getEncoded(),
 						new File(appDir, CA_CERT_FILENAME));
 
-				// En los despliegues JNLP nunca se proporcionan certificados. Ademas, en estos casos, el
-				// instalador no lo habra instalado en el almacen de Windows, asi que lo tendremos que
-				// hacer ahora
-				if (this.jnlpInstance) {
-					JOptionPane.showMessageDialog(window.getParentComponent(), Messages.getString("ConfiguratorWindows.17")); //$NON-NLS-1$
-					window.print(Messages.getString("ConfiguratorWindows.6")); //$NON-NLS-1$
-					importCARootOnWindowsKeyStore(certPack.getCaCertificate(), CertUtil.ROOT_CERTIFICATE_PRINCIPAL);
-				}
 			}
 
 			// Intentamos desinstalar cualquier certificado nuestro que pueda haber antes de instalar el nuevo
@@ -171,31 +159,16 @@ final class ConfiguratorWindows implements Configurator {
 		window.print(Messages.getString("ConfiguratorWindows.8")); //$NON-NLS-1$
 	}
 
-	/** Recupera el directorio de la aplicaci&oacute;n, que podr&aacute; variar
-	 * seg&uacute;n si est&aacute; instalada o si se trata de un despliegue JNLP.
-	 * @param jnlpDeployment <code>true</code> si se trata de un despliegue JNLP,
-	 *                       <code>false</code> en caso contrario.
+	/** Recupera el directorio de la aplicaci&oacute;n.
 	 * @return Directorio en el que se almacenan los recursos de la aplicaci&oacute;n.
 	 */
-	private static File getApplicationDirectory(final boolean jnlpDeployment) {
-
-		// Si el despliegue es JNLP seleccionamos un directorio de Windows en el que
-		// se puedan crear los ficheros sin permisos especiales
-		if (jnlpDeployment) {
-			final String commonDir = System.getenv("ALLUSERSPROFILE"); //$NON-NLS-1$
-			final File appDir = new File (commonDir, "Autofirma"); //$NON-NLS-1$
-			if (appDir.isDirectory() || appDir.mkdirs()) {
-				return appDir;
-			}
-			return new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
-		}
-
+	private static File getApplicationDirectory() {
 		return ConfiguratorUtil.getApplicationDirectory();
 	}
 
 	@Override
 	public File getAplicationDirectory() {
-		return getApplicationDirectory(false);
+		return getApplicationDirectory();
 	}
 
 	@Override
@@ -219,8 +192,8 @@ final class ConfiguratorWindows implements Configurator {
 
 		LOGGER.info("Desinstalamos el certificado raiz del almacen de Firefox"); //$NON-NLS-1$
 		firefoxConfigurator.uninstallRootCAMozillaKeyStore(
-				getApplicationDirectory(this.jnlpInstance),
-                UNINSTALL_CERT_RETRIES);
+				getApplicationDirectory(),
+				UNINSTALL_CERT_RETRIES);
 
 		// Listamos los plugins instalados
 		List<AfirmaPlugin> plugins = null;
@@ -284,54 +257,13 @@ final class ConfiguratorWindows implements Configurator {
 		LOGGER.info("Eliminamos la entrada de Autofirma en el PATH"); //$NON-NLS-1$
 		try {
 			final Path cmd = WindowsCmdExecutor.copyCmdFromResources("windows/autofirma-removepath.ps1"); //$NON-NLS-1$
-			WindowsCmdExecutor.executePathPs(cmd, WAITING_TIME_IN_SECONDS, getApplicationDirectory(false).getAbsolutePath());
+			WindowsCmdExecutor.executePathPs(cmd, WAITING_TIME_IN_SECONDS, getApplicationDirectory().getAbsolutePath());
 		} catch (final Exception e) {
 			LOGGER.log(Level.WARNING, "No se pudo eliminar correctamente la ruta de instalacion de la variable PATH", e); //$NON-NLS-1$
 		}
 
 		// No es necesario eliminar nada mas porque el proceso de desinstalacion de Windows
 		// eliminara el directorio de aplicacion con todo su contenido
-	}
-
-	/**
-	 * Instala el certificado SSL en el almac&eacute;n de autoridades de confianza Windows
-	 * sin necesidad de tener permisos de administrador.
-	 * @param cert Certificado a instalar.
-	 * @param principal Principal del certificado.
-	 * @throws GeneralSecurityException Cuando no se tiene acceso al almac&eacute;n de
-	 * autoridades de certificaci&oacute;n.
-	 * @throws IOException Cuando no se pudo cargar el almac&eacute;n.
-	 */
-	private static void importCARootOnWindowsKeyStore(final Certificate cert, final String principal) throws GeneralSecurityException, IOException {
-
-		final KeyStore ks = KeyStore.getInstance("Windows-ROOT"); //$NON-NLS-1$
-		ks.load(null,  null);
-
-		boolean installed = false;
-		boolean cancelled = false;
-		do {
-			try {
-				ks.setCertificateEntry(principal, cert);
-				installed = true;
-			}
-			catch (final KeyStoreException e) {
-				LOGGER.warning(
-						"No se pudo instalar la CA del certificado SSL para el socket en el almacen de Windows: " + e //$NON-NLS-1$
-						);
-				final int result = JOptionPane.showConfirmDialog(
-						null,
-						Messages.getString("ConfiguratorWindows.0"), //$NON-NLS-1$
-						Messages.getString("ConfiguratorWindows.1"), //$NON-NLS-1$
-						JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE
-						);
-				if (result == JOptionPane.CANCEL_OPTION) {
-					cancelled = true;
-					LOGGER.severe("El usuario cancelo la instalacion del certificado SSL para el socket: " + e); //$NON-NLS-1$
-				}
-			}
-		}
-		while (!installed && !cancelled);
 	}
 
 	/**
@@ -353,7 +285,7 @@ final class ConfiguratorWindows implements Configurator {
 		}
 
 		String certAlias;
-		final File caCertFile = new File(getApplicationDirectory(false), CA_CERT_FILENAME);
+		final File caCertFile = new File(getApplicationDirectory(), CA_CERT_FILENAME);
 		if (caCertFile.isFile() && caCertFile.canRead()) {
 			try (InputStream certInputStream = new FileInputStream(caCertFile)) {
 				final CertificateFactory certFactory = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$

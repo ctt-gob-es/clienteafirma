@@ -53,9 +53,6 @@ public class AutofirmaConfigurator implements ConsoleListener {
 	 * del proceso de instalaci&oacute;n. */
 	public static final String PARAMETER_HEADLESS = "-headless"; //$NON-NLS-1$
 
-	/** Indica que se realiza una carga mediante JNLP. */
-	public static final String PARAMETER_JNLP_INSTANCE = "-jnlp"; //$NON-NLS-1$
-
 	/** Indica la ruta del certificado pasado por el administrador. */
 	public static final String PARAMETER_CERTIFICATE_PATH = "-certificate_path"; //$NON-NLS-1$
 
@@ -151,20 +148,14 @@ public class AutofirmaConfigurator implements ConsoleListener {
 
 		this.config = config;
 
-		final boolean jnlpDeployment = this.config.isJnlpInstance();
-		if (jnlpDeployment) {
-			LOGGER.info("Se configurara la aplicacion en modo JNLP"); //$NON-NLS-1$
-		}
-		else {
-			LOGGER.info("Se configurara la aplicacion en modo nativo"); //$NON-NLS-1$
-		}
+		LOGGER.info("Se configurara la aplicacion en modo nativo"); //$NON-NLS-1$
 
 		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			this.configurator = new ConfiguratorWindows(jnlpDeployment,
+			this.configurator = new ConfiguratorWindows(
 					this.config.getCertificatePath(), this.config.getKeystorePath());
 		}
 		else if (Platform.OS.LINUX == Platform.getOS()){
-		    this.configurator = new ConfiguratorLinux(jnlpDeployment);
+		    this.configurator = new ConfiguratorLinux();
 		}
 		else if (Platform.OS.MACOSX == Platform.getOS()){
             this.configurator = new ConfiguratorMacOSX();
@@ -416,7 +407,6 @@ public class AutofirmaConfigurator implements ConsoleListener {
 		private Operation op = Operation.INSTALLATION;
 		private boolean needKeep = false;
 		private boolean headless = false;
-		private boolean jnlpInstance = false;
 		private String certificatePath = ""; //$NON-NLS-1$
 		private String keystorePath = ""; //$NON-NLS-1$
 		private String configPath = ""; //$NON-NLS-1$
@@ -437,8 +427,6 @@ public class AutofirmaConfigurator implements ConsoleListener {
 						this.needKeep = true;
 					} else if (PARAMETER_HEADLESS.equalsIgnoreCase(arg)) {
 						this.headless = true;
-					} else if (PARAMETER_JNLP_INSTANCE.equalsIgnoreCase(arg)) {
-						this.jnlpInstance = true;
 					} else if (PARAMETER_CERTIFICATE_PATH.equalsIgnoreCase(arg)) {
 						if (i < args.length - 1) {
 							this.certificatePath = args[++i];
@@ -470,10 +458,6 @@ public class AutofirmaConfigurator implements ConsoleListener {
 
 		public boolean isHeadless() {
 			return this.headless;
-		}
-
-		public boolean isJnlpInstance() {
-			return this.jnlpInstance;
 		}
 
 		public String getCertificatePath() {

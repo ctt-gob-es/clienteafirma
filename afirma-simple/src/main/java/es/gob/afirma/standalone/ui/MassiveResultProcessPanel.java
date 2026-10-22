@@ -357,7 +357,7 @@ final class MassiveResultProcessPanel extends JPanel {
 		if (index >= 0) {
 			final SignOperationConfig item = list.getModel().getElementAt(index);
 			if (item.getSignatureFile() != null) {
-				SwingUtilities.invokeLater(() -> new VisorFirma(false, parent).initialize(false, item.getSignatureFile()));
+				SwingUtilities.invokeLater(() -> new VisorFirma(false, parent).initialize(item.getSignatureFile()));
 			}
 		}
 	}

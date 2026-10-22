@@ -83,7 +83,7 @@ final class SignPanelFilePanel extends JPanel implements Scrollable {
         	openFileButton.addActionListener(
         			ae -> {
         				if (file.getName().endsWith(".csig") || file.getName().endsWith(".xsig")) { //$NON-NLS-1$ //$NON-NLS-2$
-        					new VisorFirma(false, null).initialize(false, file);
+        					new VisorFirma(false, null).initialize(file);
         				}
         				else {
         					try {
