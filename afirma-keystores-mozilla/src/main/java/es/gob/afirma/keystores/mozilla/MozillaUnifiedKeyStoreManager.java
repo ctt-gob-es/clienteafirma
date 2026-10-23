@@ -229,7 +229,7 @@ public class MozillaUnifiedKeyStoreManager extends AggregatedKeyStoreManager {
 			final boolean forceReset) throws IOException, KeystoreAlternativeException {
 
 		PasswordCallback psc = new UIPasswordCallback(
-				FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + descr, //$NON-NLS-1$ //$NON-NLS-2$
+				FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1", descr), //$NON-NLS-1$ //$NON-NLS-2$
 				parentComponent);
 
 		return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.PKCS11, libName, descr, psc, parentComponent, forceReset);

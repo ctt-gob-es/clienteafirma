@@ -147,7 +147,7 @@ public final class MozillaLikeKeyStoreManager extends AggregatedKeyStoreManager 
             return AOKeyStoreManagerFactory.getAOKeyStoreManager(
                     AOKeyStore.PKCS11, libraryPath, name,
                     new UIPasswordCallback(
-                            FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + name, //$NON-NLS-1$ //$NON-NLS-2$
+                            FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1", name), //$NON-NLS-1$ //$NON-NLS-2$
                             getParentComponent()),
 					getParentComponent(),
 					forceReset

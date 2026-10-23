@@ -37,38 +37,38 @@ final class FirefoxKeyStoreMessages {
         // No permitimos la instanciacion
     }
 
+	/** Cambia la localizaci&oacute;n a la establecida por defecto. */
+	private static void updateLocale() {
+		if (LanguageManager.isDefaultLocale(Locale.getDefault()) && !LanguageManager.existDefaultLocaleNewVersion()) {
+			RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
+		} else {
+			RESOURCE_BUNDLE = setImportedLangResource();
+		}
+	}
+
     static String getString(final String key) {
-        try {
-            return RESOURCE_BUNDLE.getString(key);
-        }
-        catch (final Exception e) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (final Exception ignored) {
+			// Fallback a base locale
 			try {
 				final Locale baseLocale = LanguageManager.readMetadataBaseLocale(Locale.getDefault());
-				final ResourceBundle temporalBundle;
-
-				if (LanguageManager.isDefaultLocale(baseLocale)) {
-					temporalBundle = ResourceBundle.getBundle(BUNDLE_NAME, baseLocale);
-				} else {
-					temporalBundle = setImportedLangResource();
+				final ResourceBundle tempBundle = LanguageManager.isDefaultLocale(baseLocale) ? ResourceBundle.getBundle(BUNDLE_NAME, baseLocale) : setImportedLangResource();
+				return tempBundle.getString(key);
+			} catch (final Exception ignored2) {
+				// Fallback a es_ES
+				final Locale esLocale = new Locale("es", "ES"); //$NON-NLS-1$ //$NON-NLS-2$
+				final ResourceBundle esBundle = ResourceBundle.getBundle(BUNDLE_NAME, esLocale);
+				try {
+					return esBundle.getString(key);
+				} catch (final Exception e) {
+					LOGGER.warning("Falta el recurso para la clave: " + key); //$NON-NLS-1$
+					return "!" + key + "!";//$NON-NLS-1$//$NON-NLS-2$
 				}
-
-				return temporalBundle.getString(key);
-
-			} catch (final Exception e1) {
-				return '!' + key + '!';
 			}
-        }
+		}
     }
-    
-    /** Cambia la localizaci&oacute;n a la establecida por defecto. */
-    private static void updateLocale() {
-    	if (LanguageManager.isDefaultLocale(Locale.getDefault()) && !LanguageManager.existDefaultLocaleNewVersion()) {
-    		RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
-    	} else {
-    		RESOURCE_BUNDLE = setImportedLangResource();
-    	}
-    }
-	
+
     private static ResourceBundle setImportedLangResource() {
     	final File localeDir = new File(LanguageManager.getLanguagesDir(), Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry()); //$NON-NLS-1$
 		final File file = new File(localeDir, BUNDLE_BASENAME + "_" + Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry() + ".properties"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -81,4 +81,29 @@ final class FirefoxKeyStoreMessages {
 		}
         return null;
     }
+
+	/**
+	 * Recupera el texto identificado con la clave proporcionada y sustituye las
+	 * subcadenas de tipo "%i" por el texto correspondiente segun posicion de los
+	 * parametros indicados despues de la clave. Las posiciones empiezan a contar
+	 * por 0. As&iacute;, el texto "%0" se sustituira por el segundo par&aacute;metro
+	 * de la funci&oacute;n, el texto "%1" por el siguiente,...<br>
+	 * Introducir m&aacute;s de 10 cadenas distintas para sustituir
+	 * conllevar&aacute; errores en el resultado.
+	 * @param key Clave del texto.
+	 * @param params Par&aacute;metros que se desean insertar.
+	 * @return Recurso textual con las subcadenas sustituidas.
+	 */
+	public static String getString(final String key, final String... params) {
+		String text = getString(key);
+		if (params != null) {
+			for (int i = 0; i < params.length; i++) {
+				if (params[i] != null) {
+					text = text.replace("%" + i, params[i]); //$NON-NLS-1$
+				}
+			}
+		}
+		return text;
+	}
+
 }
