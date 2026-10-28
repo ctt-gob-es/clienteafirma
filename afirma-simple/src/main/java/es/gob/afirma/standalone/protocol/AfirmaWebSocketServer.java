@@ -11,6 +11,7 @@ package es.gob.afirma.standalone.protocol;
 
 import java.net.InetSocketAddress;
 import java.util.Collections;
+import java.util.EventObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,8 +20,10 @@ import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.standalone.protocol.AfirmaWebSocketServerManager.BindingErrorListener;
+import es.gob.afirma.standalone.ui.OSXHandler;
 
 /**
  * Servidor para la comunicaci&oacute;n por <i>WebSocket</i> acorde a la versi&oacute;n
@@ -54,7 +57,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 
 	private Thread innactivityWatcher = null;
 
-	private WebSocket wsClient = null;
+	private volatile WebSocket wsClient = null;
 
 	protected String sessionId;
 
@@ -82,6 +85,42 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 			}
 		});
 	}
+
+    /** Instala la politica de salida del proceso que atiende al navegador. */
+    void installQuitHandler() {
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            try {
+                OSXHandler.setQuitHandler(this, AfirmaWebSocketServer.class.getMethod(
+                        "handleQuitRequest", EventObject.class, Object.class)); //$NON-NLS-1$
+                LOGGER.info("Registrado el manejador Quit del WebSocket en macOS"); //$NON-NLS-1$
+            }
+            catch (final ReflectiveOperationException e) {
+                LOGGER.log(Level.WARNING, "No se pudo registrar el manejador Quit del WebSocket", e); //$NON-NLS-1$
+            }
+        }
+    }
+
+    /** Atiende Quit sin interrumpir una sesion que sigue siendo propiedad del navegador.
+     * @param event Evento nativo de salida.
+     * @param response Respuesta de salida de Java 8 o posterior.
+     * @throws ReflectiveOperationException Si no se puede responder al evento.
+     */
+    public void handleQuitRequest(final EventObject event, final Object response)
+            throws ReflectiveOperationException {
+        Class<?> responseClass;
+        try {
+            responseClass = Class.forName("java.awt.desktop.QuitResponse"); //$NON-NLS-1$
+        }
+        catch (final ClassNotFoundException e) {
+            responseClass = Class.forName("com.apple.eawt.QuitResponse"); //$NON-NLS-1$
+        }
+        final WebSocket browser = this.wsClient;
+        final boolean connected = browser != null && browser.isOpen();
+        LOGGER.info(connected
+                ? "Quit recibido: se cancela porque el navegador sigue conectado" //$NON-NLS-1$
+                : "Quit recibido: se permite salir porque no hay navegador conectado"); //$NON-NLS-1$
+        responseClass.getMethod(connected ? "cancelQuit" : "performQuit").invoke(response); //$NON-NLS-1$ //$NON-NLS-2$
+    }
 
 	@Override
 	public void onOpen(final WebSocket ws, final ClientHandshake handshake) {
