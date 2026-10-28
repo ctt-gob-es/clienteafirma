@@ -88,6 +88,7 @@ public class AfirmaWebSocketServerManager {
 				sc = SecureSocketUtils.getSecureSSLContext();
 				instance.setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sc));
 				instance.setBindingErrorListener(new BindingErrorListener(channelInfo, requestedProtocolVersion, asynchronous));
+				instance.installQuitHandler();
 				instance.start();
 
 				// Iniciamos un temporizador para cerrar el socket si no se recibe una
