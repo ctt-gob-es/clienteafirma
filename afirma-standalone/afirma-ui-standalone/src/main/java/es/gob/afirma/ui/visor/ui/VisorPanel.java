@@ -425,7 +425,11 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
      */
     private static SignValidity validateSign(final byte[] sign, final byte[] data) throws IOException {
         if (DataAnalizerUtil.isSignedPDF(sign)) {
-        	return new ValidatePdfSignature().validate(sign);
+            try {
+				return new ValidatePdfSignature().validate(sign);
+			} catch (RuntimeConfigNeededException|IOException e) {
+				throw new IOException(e);
+			}
         }
         else if (DataAnalizerUtil.isSignedInvoice(sign)) { // Factura electronica
             return new ValidateXMLSignature().validate(sign);
