@@ -36,7 +36,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import org.spongycastle.asn1.ASN1EncodableVector;
 import org.spongycastle.asn1.ASN1Sequence;
@@ -163,7 +162,7 @@ final class CertUtil {
 		expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
 		final X509v3CertificateBuilder generator = new JcaX509v3CertificateBuilder(
 			new X500Name("CN=" + commonName), //$NON-NLS-1$
-			BigInteger.valueOf(new Random().nextInt()),
+			BigInteger.valueOf(new SecureRandom().nextInt()),
     		new Date(),
     		expirationDate,
     		new X500Name("CN=" + commonName), //$NON-NLS-1$
@@ -244,7 +243,7 @@ final class CertUtil {
 
 			final X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
 				issuerDN,
-				BigInteger.valueOf(new Random().nextInt()),
+				BigInteger.valueOf(new SecureRandom().nextInt()),
 				new Date(),
 	    		expirationDate,
 	    		new X500Name("CN="+cn), //$NON-NLS-1$

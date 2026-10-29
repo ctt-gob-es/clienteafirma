@@ -23,11 +23,11 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -195,7 +195,7 @@ final class RestoreConfigFirefox {
 			uninstall.append("\n"); //$NON-NLS-1$
 
 			// Obtenemos la ruta de los scripts
-			final Random r = new Random();
+			final SecureRandom r = new SecureRandom();
 			path = new File(targetDir,  LINUX_SCRIPT_NAME + r.nextInt() + ".sh").getAbsolutePath(); //$NON-NLS-1$
 			uninstallPath = new File(targetDir, LINUX_UNINSTALLSCRIPT_NAME + r.nextInt() + ".sh").getAbsolutePath(); //$NON-NLS-1$
 			final File installScript = new File(path);
@@ -518,7 +518,7 @@ final class RestoreConfigFirefox {
 				uninstall.append(command[7] + ' ');
 			}
 
-			final Random r = new Random();
+			final SecureRandom r = new SecureRandom();
 			path = new File(workingDir, LINUX_SCRIPT_NAME + r.nextInt() + ".sh").getAbsolutePath(); //$NON-NLS-1$
 			uninstallPath = new File(workingDir, LINUX_UNINSTALLSCRIPT_NAME + r.nextInt() + ".sh").getAbsolutePath(); //$NON-NLS-1$
 
