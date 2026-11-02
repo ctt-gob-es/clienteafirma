@@ -19,6 +19,7 @@ Generado en T3 de la OT Fase 1.
 | `afirma-crypto-cadestri-client` | `TestCAdES`, `TestCadesTriphase`, `TestTriphaseCountersign` | Requieren servicio trifásico de red. |
 | `afirma-crypto-padestri-client` | `TestPdfTriphase` | Requiere servicio trifásico de red. |
 | `afirma-crypto-xades` | `TestJavaBug8182580` | Depende de bug específico de JDK. |
+| `afirma-keystores-filters` | `TestRFC2254CertificateFilter.TestRFC2254CertificateRecursiveFilter` | Requiere almacén de claves del sistema (CAPI/Apple/NSS); se omite con `Assume` cuando no hay almacén real (CI). |
 
 ## Módulos no incluidos en `make test`
 
@@ -39,6 +40,4 @@ Los tests que necesitan certificado lo generan en el propio test (BouncyCastle/k
 |--------|------|-------|---------|
 | `afirma-crypto-ooxml` | `TestOOXML.testSignature`, `TestOOXML.testCoSignature`, `TestOOXMLVersions.testSignature` | La firma OOXML consultaba la pantalla (número de monitores, resolución y profundidad de color) y fallaba con `HeadlessException` en equipos sin pantalla (CI, servidores). Es un fallo real: también rompería la firma en un servidor. | `OOXMLOfficeObjectHelper` usa valores neutros (1 monitor, 1920x1080, 32 bits) cuando `GraphicsEnvironment.isHeadless()`. |
 
-## Pendiente de verificar
-
-Los módulos `afirma-crypto-validation`, `afirma-crypto-xadestri-client` y `afirma-core-massive` no llegaron a ejecutarse (Maven paró en `afirma-crypto-ooxml`). Si fallan tras el arreglo, se clasifican aquí con su motivo.
+Verificado el 2026-11-02: los tres módulos (`afirma-crypto-validation`, `afirma-crypto-xadestri-client`, `afirma-core-massive`) pasan en CI (PR 123) y en local (`mvn -B -ntp -Djava.awt.headless=true test`).
