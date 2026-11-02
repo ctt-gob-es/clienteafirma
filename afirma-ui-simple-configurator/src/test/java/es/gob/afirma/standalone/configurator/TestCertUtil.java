@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -57,6 +58,36 @@ public final class TestCertUtil {
 			fos.flush();
 		}
 		System.out.println("Fichero de CA: " + caFile.getAbsolutePath());
+	}
+
+	/** Comprueba que los seriales de los certificados generados son positivos y distintos.
+	 * Regresi&oacute;n: se generaban con java.util.Random, que puede devolver negativos
+	 * (serial inv&aacute;lido seg&uacute;n RFC 5280) y repetirlos. */
+	@SuppressWarnings("static-method")
+	@Test
+	public void testSerialesPositivosYDistintos() throws Exception {
+		final CertPack primero = CertUtil.getCertPackForLocalhostSsl("Autofirma", "654321"); //$NON-NLS-1$ //$NON-NLS-2$
+		final CertPack segundo = CertUtil.getCertPackForLocalhostSsl("Autofirma", "654321"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final X509Certificate caPrimero = (X509Certificate) primero.getCaCertificate();
+		final X509Certificate sslPrimero = (X509Certificate) primero.getSslCertificate();
+		final X509Certificate caSegundo = (X509Certificate) segundo.getCaCertificate();
+
+		Assert.assertEquals(
+			"El serial de la CA debe ser positivo", //$NON-NLS-1$
+			1,
+			caPrimero.getSerialNumber().signum()
+		);
+		Assert.assertEquals(
+			"El serial del certificado SSL debe ser positivo", //$NON-NLS-1$
+			1,
+			sslPrimero.getSerialNumber().signum()
+		);
+		Assert.assertNotEquals(
+			"Dos generaciones no deben compartir serial de CA", //$NON-NLS-1$
+			caPrimero.getSerialNumber(),
+			caSegundo.getSerialNumber()
+		);
 	}
 
 	/** Prueba la generaci&oacute;n del certificado y almac&eacute;n de claves.

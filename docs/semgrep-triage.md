@@ -34,29 +34,42 @@ Leyenda: **FP** = falso positivo técnico · **RA** = riesgo aceptado por diseñ
 
 | Regla | Nº | Clase | Justificación |
 |---|---|---|---|
-| `command-injection-process-builder` | 14 | FP | `ProcessBuilder(List<String>)` + `start()`: no hay intérprete de shell. Los comandos son literales o se componen con constantes (`osascript -e`, `tasklist.exe`, `wmic`, `certutil`). Semgrep marca cualquier `ProcessBuilder` con argumentos dinámicos. |
-| `unsafe-reflection` | 12 | RA | Carga de plugins y de gestores de almacén por reflexión a partir de la configuración **local** del usuario (diseño del producto). No hay entrada remota. Endurecimiento propuesto: lista blanca de clases. |
-| `crypto.use-of-sha1` | 8 | RA | SHA-1 exigido por formatos heredados: `CertID` de OCSP (RFC 6960), huellas de certificados y nombres de fichero temporales. El único uso sobre datos a firmar es el modo «XAdES explícita», ya marcado como obsoleto con aviso en log y pendiente de retirada. |
-| `overly-permissive-file-permission` | 6 | HP | `addAllPermissionsToFile` aplica `0777` a scripts auxiliares de macOS. Real: reducir a `0700`/`0755` según si es ejecutable y revisar si el script se ejecuta como otro usuario. |
-| `weak-random` | 4 | HP | Seriales de certificados autofirmados locales y nombres de fichero generados con `java.util.Random`. Real, corrección barata: `SecureRandom`. Pendiente de test que lo cubra. |
-| `crlf-injection-logs` | 3 | FP | Se registra en log un identificador ya saneado (`getTrim`) o un literal; no hay escritura de log con salto de línea controlado por el atacante. |
+| `command-injection-process-builder` | 25 | FP | `ProcessBuilder(List<String>)` + `start()`: no hay intérprete de shell. Los comandos son literales o se componen con constantes (`osascript -e`, `tasklist.exe`, `wmic`, `certutil`). Semgrep marca cualquier `ProcessBuilder` con argumentos dinámicos. |
+| `unsafe-reflection` | 21 | RA | Carga de plugins y de gestores de almacén por reflexión a partir de la configuración **local** del usuario (diseño del producto). No hay entrada remota. Endurecimiento propuesto: lista blanca de clases. |
+| `crypto.use-of-sha1` | 14 | RA | SHA-1 exigido por formatos heredados: `CertID` de OCSP (RFC 6960), huellas de certificados y nombres de fichero temporales. El único uso sobre datos a firmar es el modo «XAdES explícita», ya marcado como obsoleto con aviso en log y pendiente de retirada. |
+| `overly-permissive-file-permission` | 9 | **Arreglada** | `AOFileUtils.setAllPermissions`, `UnixUtils.addAllPermissionsToFile` y `ConfiguratorMacUtils.addExexPermissionsToFile` concedían `0777`. Ahora conceden `0755`: se elimina la escritura para grupo y otros. Test: `AOFileUtilsPermissionsTest` (falla sin el cambio). |
+| `weak-random` | 4 | **Arreglada** | Los seriales de los certificados autofirmados se generaban con `java.util.Random` (podían ser negativos, inválidos según RFC 5280). Ahora `SecureRandom().nextInt(Integer.MAX_VALUE)` en los dos `CertUtil`. Test: `TestCertUtil.testSerialesPositivosYDistintos` (reproduce el serial negativo sin el cambio). |
+| `crlf-injection-logs` | 2 | FP | Se registra en log un identificador ya saneado (`getTrim`) o un literal; no hay escritura de log con salto de línea controlado por el atacante. |
 | `permissive-cors` | 2 | RA | Servidores **locales** de almacenamiento/recuperación de firmas (`localhost`) que deben aceptar cualquier origen para que el navegador pueda invocarlos. Restringir el origen rompería el protocolo `afirma://`. |
 | `no-direct-response-writer` | 2 | FP | Escritura directa en la respuesta de un servlet que devuelve texto plano o XML ya generado por el propio servicio, no HTML con datos de usuario. |
 | `httpservlet-path-traversal` | 2 | FP | `RetrieveService` compone la ruta con `composeTargetFile(...)`, que valida y lanza `SecurityException` si el destino sale del directorio configurado (control explícito justo debajo). |
-| `weak-ssl-context` | 1 | RA | `SecureSocketUtils` construye el contexto TLS del socket local del protocolo; la política estricta se controla con `strictSslChecks` (activada por defecto). |
+| `weak-ssl-context` | 7 | RA | `SecureSocketUtils` construye el contexto TLS del socket local del protocolo; la política estricta se controla con `strictSslChecks` (activada por defecto). |
 | `eval-detected`, `react-unsanitized-method`, `django-no-csrf-token`, `missing-integrity`, `plaintext-http-link` | 4+2+1+1+19 | EX | Todos en recursos web heredados (applets, demo, ayuda HTML). Ver tabla de exclusiones. |
+| `insecure-trust-manager`, `insecure-hostname-verifier`, `bypass-tls-verification` | 9 | RA | Viven en `SslSecurityManager` y `CMSTimestamper`, que implementan la desactivación **opcional** de comprobaciones TLS cuando `strictSslChecks=false`. Por defecto `strictSslChecks` está **activo** y no se usa ninguno de esos objetos. Es una preferencia documentada del producto (issue #92). |
+| `unencrypted-socket` | 1 | RA | Socket del cliente TSP sobre el que se monta TLS; la conexión se envuelve con `SSLSocketFactory` antes de enviar datos. |
+| `ecb-cipher`, `des-is-deprecated`, `cbc-padding-oracle` | 7 | RA | Modo `cipher2` (`DesServerCipher`, `AesServerCipher`) y encriptación CMS (`cms-enveloper`): algoritmos heredados exigidos por el formato y por clientes antiguos. Se conservan por compatibilidad; el producto firma con CAdES/XAdES/PAdES, no cifra con estos modos por defecto. |
+| `documentbuilderfactory-disallow-doctype-decl-missing`, `transformerfactory-dtds-not-disabled` | 3 | FP | `XAdESTspUtil` y `SecureXmlTransformer` desactivan entidades externas y DTD externos (`external-general-entities=false`, `ACCESS_EXTERNAL_DTD=""`, `FEATURE_SECURE_PROCESSING`). La regla busca el literal `disallow-doctype-decl`, que no se usa a propósito para seguir admitiendo DOCTYPE interno en firmas legítimas. |
+| `httpurlconnection-http-request` | 1 | FP | Está en un **test** (`TestXAdES`) que apunta a un servidor local de pruebas. |
 | `ssrf` | 3 | EX | `afirma-windows-store` (no publicado). |
 | `jdbc-sqli` | 1 | EX | Servlet de datos de prueba de los applets. |
 | `renovate-missing-minimum-release-age` | 4 | Arreglado | `minimumReleaseAge` añadido a las reglas de `packageRules` con `automerge: true`. |
 
+## Cambios de código aplicados
+
+| Regla | Cambio | Test |
+|---|---|---|
+| `weak-random` | `SecureRandom` en los seriales de certificado de `CertUtil` (afirma-simple y afirm-ui-simple-configurator). | `TestCertUtil.testSerialesPositivosYDistintos` |
+| `overly-permissive-file-permission` | Permisos `0755` en lugar de `0777` en `AOFileUtils`, `UnixUtils` y `ConfiguratorMacUtils`. | `AOFileUtilsPermissionsTest` |
+
+Ambos test se comprobaron en rojo antes del arreglo (el de seriales reproducía
+`expected:<1> but was:<-1>`).
+
 ## Hardening pendiente (seguimiento)
 
-1. `weak-random`: usar `SecureRandom` en los dos `CertUtil` (seriales de certificado).
-2. `overly-permissive-file-permission`: permisos mínimos en los scripts auxiliares.
-3. `unsafe-reflection`: lista blanca de clases para plugins y almacenes.
+1. `unsafe-reflection`: lista blanca de clases para plugins y almacenes
+   (cambio de diseño; requiere compatibilidad con plugins de terceros).
 
-Ninguno bloquea la release: son mejoras acotadas con test propio. Cuando se
-arreglen, la alerta se cierra sola en el siguiente escaneo.
+No bloquea la release.
 
 ## Cómo revisar
 

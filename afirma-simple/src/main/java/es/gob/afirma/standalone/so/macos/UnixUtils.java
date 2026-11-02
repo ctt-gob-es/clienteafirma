@@ -38,8 +38,6 @@ public class UnixUtils {
 		perms.add(PosixFilePermission.GROUP_READ);
 		perms.add(PosixFilePermission.OTHERS_READ);
 		perms.add(PosixFilePermission.OWNER_WRITE);
-		perms.add(PosixFilePermission.GROUP_WRITE);
-		perms.add(PosixFilePermission.OTHERS_WRITE);
 		try {
 			Files.setPosixFilePermissions(
 				Paths.get(f.getAbsolutePath()),
