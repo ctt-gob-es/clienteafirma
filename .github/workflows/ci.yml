@@ -242,7 +242,7 @@ jobs:
           python-version: "3.x"
 
       - name: Install Semgrep
-        run: pip3 install semgrep
+        run: pip3 install semgrep==1.183.0
 
       - name: Semgrep current tree (SARIF, no upload)
         run: |

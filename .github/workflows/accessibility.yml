@@ -42,7 +42,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip3 install pytest
+          pip3 install pytest==9.2.0
 
       - name: Run accessibility code verification tests
         continue-on-error: true
@@ -82,7 +82,7 @@ jobs:
             python3-gi \
             gir1.2-atspi-2.0 \
             libatspi2.0-dev
-          pip3 install pytest
+          pip3 install pytest==9.2.0
 
       - name: Set up JDK 8 for build
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
