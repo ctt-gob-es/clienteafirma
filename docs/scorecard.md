@@ -14,7 +14,8 @@ objetivo: el objetivo es que cada alerta esté arreglada o justificada.
 
 | Regla | Alertas | Estado | Motivo |
 |---|---|---|---|
-| `PinnedDependenciesID` | 4 | **Arreglada** | Instalaciones `pip` sin hashes → ahora `--require-hashes` con `requirements/ci-*.txt`. |
+| `PinnedDependenciesID` | 4 | **Arreglada** | Instalaciones `pip` sin hashes → ahora `--require-hashes` con `requirements/ci-*.txt`. Verificado: Scorecard ya no las reporta. |
+| Semgrep OSS (varias reglas) | ~90 | Triadas | Triaje completo en [`semgrep-triage.md`](semgrep-triage.md). Incluye el hallazgo de que el escaneo llevaba tiempo sin ejecutarse. |
 | `BinaryArtifactsID` | 20 | Descartada (justificada) | Binarios heredados del proyecto oficial; ver `docs/binarios-heredados.md`. |
 | `CIIBestPracticesID` | 1 | Descartada (justificada) | Requiere solicitud humana al programa OpenSSF Best Practices Badge. |
 | `MaintainedID` | 1 | Descartada (justificada) | Mide actividad en ventana temporal; el fork es reciente. Se reevalúa. |
@@ -49,6 +50,18 @@ pip install --require-hashes -r requirements/ci-semgrep.txt   # verificación lo
 
 Comprobación: `rg "pip3? install" .github/workflows` debe mostrar solo líneas con
 `--require-hashes -r requirements/ci-*.txt`.
+
+## 1 bis. Semgrep — el escaneo estaba roto y ahora funciona
+
+Al fijar por hash las dependencias de CI se descubrió que el job `Semgrep` nunca
+analizaba nada: `pip3 install semgrep` sin versión instalaba una versión
+incompatible con el Python del runner (3.15) y el paso fallaba, pero el workflow lo
+ocultaba con `|| true`. Con `semgrep==1.183.0` (hash-pinned) y
+`python-version: "3.14"` el escaneo funciona: 143 hallazgos, ~90 alertas.
+
+Las rutas heredadas que no se compilan ni publican quedan fuera vía
+`.semgrepignore`, y cada regla está clasificada (falso positivo, riesgo aceptado o
+hardening pendiente) en [`semgrep-triage.md`](semgrep-triage.md).
 
 ## 2. `BinaryArtifactsID` — descartada
 

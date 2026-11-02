@@ -48,7 +48,8 @@
       "pinDigests": true,
       "addLabels": [
         "dependencies"
-      ]
+      ],
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "Maven runtime/cripto: sin automerge.",
@@ -75,7 +76,8 @@
       "automergeType": "pr",
       "addLabels": [
         "dependencies"
-      ]
+      ],
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "Maven plugins por nombre (no major).",
@@ -95,7 +97,8 @@
       "automergeType": "pr",
       "addLabels": [
         "dependencies"
-      ]
+      ],
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "BouncyCastle: manual.",
