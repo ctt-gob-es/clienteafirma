@@ -17,7 +17,8 @@
   "platformAutomerge": true,
   "enabledManagers": [
     "maven",
-    "github-actions"
+    "github-actions",
+    "pip-compile"
   ],
   "rangeStrategy": "bump",
   "labels": [
@@ -135,6 +136,16 @@
       "automerge": false,
       "addLabels": [
         "breaking-change"
+      ]
+    },
+    {
+      "description": "Pip (requirements CI con hashes): sin automerge.",
+      "matchManagers": [
+        "pip-compile"
+      ],
+      "automerge": false,
+      "addLabels": [
+        "dependencies"
       ]
     }
   ]
