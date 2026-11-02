@@ -7,15 +7,20 @@ prefijo de regla `...ID` (por ejemplo `PinnedDependenciesID`). Este documento es
 la referencia única para las alertas abiertas y descartadas: cada aviso se
 justifica con un motivo, una acción tomada y cómo volver a comprobarlo.
 
-Nota de partida (2026-11-02): nota global **5,1 / 10**. La nota no es el
-objetivo: el objetivo es que cada alerta esté arreglada o justificada.
+Nota de partida (2026-11-02): nota global **5,1 / 10**. Tras esta ronda: **5,3 / 10**
+y **0 alertas abiertas** en code scanning (100 arregladas, 100 descartadas con motivo).
+La nota no es el objetivo: el objetivo es que cada alerta esté arreglada o justificada.
+
+`Pinned-Dependencies` pasó de 7 a **10**; `Token-Permissions` y `Security-Policy` en 10.
+Lo que queda por debajo es proceso del proyecto (Code-Review, Maintained, CII-Best-Practices,
+Binary-Artifacts, Fuzzing, Signed-Releases), no código sin triar.
 
 ## Resumen
 
 | Regla | Alertas | Estado | Motivo |
 |---|---|---|---|
 | `PinnedDependenciesID` | 4 | **Arreglada** | Instalaciones `pip` sin hashes → ahora `--require-hashes` con `requirements/ci-*.txt`. Verificado: Scorecard ya no las reporta. |
-| Semgrep OSS (varias reglas) | ~90 | Triadas | Triaje completo en [`semgrep-triage.md`](semgrep-triage.md). Incluye el hallazgo de que el escaneo llevaba tiempo sin ejecutarse. |
+| Semgrep OSS (18 reglas) | 99 | **Arregladas (13) o descartadas con motivo (86)** | Triaje en [`semgrep-triage.md`](semgrep-triage.md). Incluye el hallazgo de que el escaneo llevaba tiempo sin ejecutarse. |
 | `BinaryArtifactsID` | 20 | Descartada (justificada) | Binarios heredados del proyecto oficial; ver `docs/binarios-heredados.md`. |
 | `CIIBestPracticesID` | 1 | Descartada (justificada) | Requiere solicitud humana al programa OpenSSF Best Practices Badge. |
 | `MaintainedID` | 1 | Descartada (justificada) | Mide actividad en ventana temporal; el fork es reciente. Se reevalúa. |
@@ -100,6 +105,20 @@ Trabajo futuro (Fase 3), no bloqueante:
    `SecureXmlBuilder` (XML/XXE), `ZipSecurePaths` (zip slip) y los parsers DER/PKCS#7.
 2. Ejecutarlo en un job programado (cron semanal) con límite de tiempo, no en cada PR.
 3. Cuando exista el target, este aviso desaparece por sí solo.
+
+## Estado final de la ronda (2026-11-02)
+
+- Alertas abiertas: **0**.
+- Arregladas con código y test (cierran solas en el siguiente escaneo): `weak-random`
+  (seriales con `SecureRandom`), `overly-permissive-file-permission` (permisos `0700`),
+  `renovate-missing-minimum-release-age` (`minimumReleaseAge` en todas las reglas).
+- Descartadas con motivo y comentario individual, apuntando a este documento o a
+  [`semgrep-triage.md`](semgrep-triage.md): 100 (falsos positivos técnicos, riesgo
+  aceptado por diseño y rutas heredadas excluidas).
+
+Cuando aparezca una alerta nueva, este es el orden: (1) comprobar si es real,
+(2) arreglarla con test, (3) si no es accionable, añadirla a este documento con su
+motivo y descartarla citándolo.
 
 ## Cómo revisar este documento
 
