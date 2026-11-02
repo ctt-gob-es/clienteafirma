@@ -26,6 +26,7 @@ repositorio, o recursos de terceros empaquetados:
 | `afirma-windows-store/` | Aplicación Windows Store; no es el producto Linux/macOS publicado. |
 | `afirma-simple-installer/` | Recursos de instalador (scripts y ayuda), no código de aplicación. |
 | `**/src/main/resources/help/` | Ayuda HTML empaquetada (enlaces y licencias). |
+| `**/doc-files/` | Documentación javadoc empaquetada en los módulos (HTML de referencia). |
 
 ## Clasificación por regla
 
@@ -37,7 +38,7 @@ Leyenda: **FP** = falso positivo técnico · **RA** = riesgo aceptado por diseñ
 | `command-injection-process-builder` | 25 | FP | `ProcessBuilder(List<String>)` + `start()`: no hay intérprete de shell. Los comandos son literales o se componen con constantes (`osascript -e`, `tasklist.exe`, `wmic`, `certutil`). Semgrep marca cualquier `ProcessBuilder` con argumentos dinámicos. |
 | `unsafe-reflection` | 21 | RA | Carga de plugins y de gestores de almacén por reflexión a partir de la configuración **local** del usuario (diseño del producto). No hay entrada remota. Endurecimiento propuesto: lista blanca de clases. |
 | `crypto.use-of-sha1` | 14 | RA | SHA-1 exigido por formatos heredados: `CertID` de OCSP (RFC 6960), huellas de certificados y nombres de fichero temporales. El único uso sobre datos a firmar es el modo «XAdES explícita», ya marcado como obsoleto con aviso en log y pendiente de retirada. |
-| `overly-permissive-file-permission` | 9 | **Arreglada** | `AOFileUtils.setAllPermissions`, `UnixUtils.addAllPermissionsToFile` y `ConfiguratorMacUtils.addExexPermissionsToFile` concedían `0777`. Ahora conceden `0755`: se elimina la escritura para grupo y otros. Test: `AOFileUtilsPermissionsTest` (falla sin el cambio). |
+| `overly-permissive-file-permission` | 9 | **Arreglada** | `AOFileUtils.setAllPermissions`, `UnixUtils.addAllPermissionsToFile` y `ConfiguratorMacUtils.addExexPermissionsToFile` concedían `0777`. Ahora conceden `0700` (solo el dueño): se elimina cualquier permiso para grupo y otros. Test: `AOFileUtilsPermissionsTest` (falla sin el cambio). |
 | `weak-random` | 4 | **Arreglada** | Los seriales de los certificados autofirmados se generaban con `java.util.Random` (podían ser negativos, inválidos según RFC 5280). Ahora `SecureRandom().nextInt(Integer.MAX_VALUE)` en los dos `CertUtil`. Test: `TestCertUtil.testSerialesPositivosYDistintos` (reproduce el serial negativo sin el cambio). |
 | `crlf-injection-logs` | 2 | FP | Se registra en log un identificador ya saneado (`getTrim`) o un literal; no hay escritura de log con salto de línea controlado por el atacante. |
 | `permissive-cors` | 2 | RA | Servidores **locales** de almacenamiento/recuperación de firmas (`localhost`) que deben aceptar cualquier origen para que el navegador pueda invocarlos. Restringir el origen rompería el protocolo `afirma://`. |
@@ -52,7 +53,7 @@ Leyenda: **FP** = falso positivo técnico · **RA** = riesgo aceptado por diseñ
 | `httpurlconnection-http-request` | 1 | FP | Está en un **test** (`TestXAdES`) que apunta a un servidor local de pruebas. |
 | `ssrf` | 3 | EX | `afirma-windows-store` (no publicado). |
 | `jdbc-sqli` | 1 | EX | Servlet de datos de prueba de los applets. |
-| `renovate-missing-minimum-release-age` | 4 | Arreglado | `minimumReleaseAge` añadido a las reglas de `packageRules` con `automerge: true`. |
+| `renovate-missing-minimum-release-age` | 4 | Arreglado | `minimumReleaseAge: "7 days"` añadido a **todas** las entradas de `packageRules`. |
 
 ## Cambios de código aplicados
 

@@ -19,3 +19,6 @@ afirma-simple-installer/
 
 # Ayuda empaquetada (HTML estático con enlaces y licencias).
 **/src/main/resources/help/
+
+# Documentacion javadoc empaquetada (HTML con enlaces de referencia).
+**/doc-files/

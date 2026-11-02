@@ -14,7 +14,7 @@ import org.junit.Test;
  * Regresi&oacute;n: no deben concederse permisos de escritura a grupo ni a otros usuarios. */
 public final class AOFileUtilsPermissionsTest {
 
-	/** Comprueba que setAllPermissions deja el fichero con permisos 0755 como m&aacute;ximo.
+	/** Comprueba que setAllPermissions deja el fichero con permisos 0700.
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
@@ -44,6 +44,22 @@ public final class AOFileUtilsPermissionsTest {
 			Assert.assertFalse(
 				"El fichero queda escribible por otros usuarios", //$NON-NLS-1$
 				perms.contains(PosixFilePermission.OTHERS_WRITE)
+			);
+			Assert.assertFalse(
+				"El fichero queda legible por otros usuarios", //$NON-NLS-1$
+				perms.contains(PosixFilePermission.OTHERS_READ)
+			);
+			Assert.assertFalse(
+				"El fichero queda ejecutable por otros usuarios", //$NON-NLS-1$
+				perms.contains(PosixFilePermission.OTHERS_EXECUTE)
+			);
+			Assert.assertFalse(
+				"El fichero queda ejecutable por el grupo", //$NON-NLS-1$
+				perms.contains(PosixFilePermission.GROUP_EXECUTE)
+			);
+			Assert.assertFalse(
+				"El fichero queda legible por el grupo", //$NON-NLS-1$
+				perms.contains(PosixFilePermission.GROUP_READ)
 			);
 			Assert.assertTrue(
 				"El duenio debe poder leer, escribir y ejecutar", //$NON-NLS-1$

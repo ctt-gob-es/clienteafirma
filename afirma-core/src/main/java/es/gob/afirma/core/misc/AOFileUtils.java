@@ -228,12 +228,8 @@ public final class AOFileUtils {
 		if (isPosixSupported()) {
 			final Set<PosixFilePermission> perms = new HashSet<>();
 			perms.add(PosixFilePermission.OWNER_READ);
-			perms.add(PosixFilePermission.GROUP_READ);
-			perms.add(PosixFilePermission.OTHERS_READ);
 			perms.add(PosixFilePermission.OWNER_WRITE);
 			perms.add(PosixFilePermission.OWNER_EXECUTE);
-			perms.add(PosixFilePermission.GROUP_EXECUTE);
-			perms.add(PosixFilePermission.OTHERS_EXECUTE);
 			try {
 				Files.setPosixFilePermissions(file.toPath(), perms);
 			}

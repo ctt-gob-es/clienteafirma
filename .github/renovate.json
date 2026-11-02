@@ -56,7 +56,8 @@
       "matchManagers": [
         "maven"
       ],
-      "automerge": false
+      "automerge": false,
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "Maven plugins de build/test (no major): automerge patch+minor.",
@@ -112,7 +113,8 @@
       "groupName": "BouncyCastle",
       "addLabels": [
         "dependencies"
-      ]
+      ],
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "iText / xmlsec / santuario: manual.",
@@ -129,7 +131,8 @@
       "groupName": "iText / xmlsec / santuario",
       "addLabels": [
         "dependencies"
-      ]
+      ],
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "Majors: siempre manual.",
@@ -139,7 +142,8 @@
       "automerge": false,
       "addLabels": [
         "breaking-change"
-      ]
+      ],
+      "minimumReleaseAge": "7 days"
     },
     {
       "description": "Pip (requirements CI con hashes): sin automerge.",
@@ -149,7 +153,8 @@
       "automerge": false,
       "addLabels": [
         "dependencies"
-      ]
+      ],
+      "minimumReleaseAge": "7 days"
     }
   ]
 }
