@@ -267,10 +267,10 @@ jobs:
           set -euo pipefail
           test -s KEYS
           gpg --batch --yes --import KEYS
-          if ! git rev-parse --verify --quiet "refs/tags/${REF_NAME}" >/dev/null; then
-            git fetch --no-tags origin "refs/tags/${REF_NAME}:refs/tags/${REF_NAME}"
-          fi
-          git tag -v "$REF_NAME"
+          git fetch --no-tags origin "refs/tags/${REF_NAME}"
+          tag_object="$(git rev-parse FETCH_HEAD)"
+          test "$(git cat-file -t "$tag_object")" = tag
+          git verify-tag "$tag_object"
 
       - name: Verify checksums and every OpenPGP signature
         run: |
