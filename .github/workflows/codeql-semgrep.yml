@@ -6,9 +6,9 @@ concurrency:
 
 on:
   push:
-    branches: [master, main, plan/clienteafirma-alertas]
+    branches: [master, main, 'plan/*']
   pull_request:
-    branches: [master, main, plan/clienteafirma-alertas]
+    branches: [master, main, 'plan/*']
   schedule:
     - cron: '0 3 * * 0'  # Weekly on Sunday
   workflow_dispatch:
@@ -20,7 +20,6 @@ jobs:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    continue-on-error: true
     permissions:
       security-events: write
       contents: read
@@ -59,24 +58,21 @@ jobs:
         uses: github/codeql-action/analyze@fca7ace96b7d713c7035871441bd52efbe39e27e # v3.28.19
         with:
           category: "/language:${{ matrix.language }}"
+          output: codeql-results
           upload: false
 
       - name: Upload CodeQL SARIF as artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: codeql-results
-          path: |
-            **/results/**/*.sarif
-            **/codeql-*.sarif
-            **/*codeql*.sarif
-          if-no-files-found: warn
+          path: codeql-results/
+          if-no-files-found: error
           retention-days: 7
 
   semgrep:
     name: Semgrep
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    continue-on-error: true
     permissions:
       security-events: write
       contents: read
@@ -100,7 +96,7 @@ jobs:
         run: |
           semgrep scan --config=auto --config=p/ci \
             --sarif --output=semgrep.sarif \
-            --error --max-target-bytes=1000000 || true
+            --max-target-bytes=1000000
 
       - name: Upload Semgrep SARIF to code scanning
         uses: github/codeql-action/upload-sarif@fca7ace96b7d713c7035871441bd52efbe39e27e # v3.28.19
@@ -113,7 +109,7 @@ jobs:
         with:
           name: semgrep-results
           path: semgrep.sarif
-          if-no-files-found: ignore
+          if-no-files-found: error
           retention-days: 7
 
   # CodeQL SARIF stays as artifact only (default setup blocks advanced upload).
@@ -124,12 +120,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [codeql, semgrep]
-    continue-on-error: true
     permissions:
       contents: read
     steps:
       - name: Download CodeQL SARIF
-        continue-on-error: true
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: codeql-results

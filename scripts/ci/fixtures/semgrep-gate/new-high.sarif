@@ -12,7 +12,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": { "uri": "src/Old.java" },
-                "region": { "startLine": 10 }
+                "region": { "startLine": 10, "snippet": { "text": "oldCall(input);" } }
               }
             }
           ]
@@ -24,7 +24,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": { "uri": "src/New.java" },
-                "region": { "startLine": 3 }
+                "region": { "startLine": 3, "snippet": { "text": "newCall(input);" } }
               }
             }
           ]

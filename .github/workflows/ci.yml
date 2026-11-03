@@ -6,9 +6,9 @@ concurrency:
 
 on:
   push:
-    branches: [master, main, plan/clienteafirma-alertas]
+    branches: [master, main, 'plan/*']
   pull_request:
-    branches: [master, main, plan/clienteafirma-alertas]
+    branches: [master, main, 'plan/*']
   workflow_dispatch:
 
 permissions: {}
@@ -30,6 +30,9 @@ jobs:
 
       - name: Contract + community script lint
         run: make quality
+
+      - name: Static CI gate checks
+        run: bash scripts/ci/test-ci-gates.sh
 
       - name: Set up JDK 8
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
@@ -139,7 +142,6 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    continue-on-error: true
     permissions:
       contents: read
       security-events: write
@@ -161,7 +163,6 @@ jobs:
     name: Generate SBOM
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    continue-on-error: true
     permissions:
       contents: write
       id-token: write
@@ -250,7 +251,7 @@ jobs:
           set -euo pipefail
           semgrep scan --config=auto --config=p/ci \
             --sarif --output=semgrep-current.sarif \
-            --max-target-bytes=1000000 || true
+            --max-target-bytes=1000000
           test -f semgrep-current.sarif
 
       - name: Semgrep baseline (PR base commit)
@@ -263,7 +264,7 @@ jobs:
           git checkout --quiet "$BASE_SHA"
           semgrep scan --config=auto --config=p/ci \
             --sarif --output=semgrep-baseline.sarif \
-            --max-target-bytes=1000000 || true
+            --max-target-bytes=1000000
           git checkout --quiet "$HEAD_SHA"
           test -f semgrep-baseline.sarif
 
@@ -296,22 +297,41 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Require required jobs success (skipped is OK)
+      - name: Require success; only dependency-review may skip outside PR
         env:
-          RESULTS: ${{ join(needs.*.result, ',') }}
+          EVENT_NAME: ${{ github.event_name }}
+          QUALITY_RESULT: ${{ needs.quality.result }}
+          TEST_RESULT: ${{ needs.test.result }}
+          COMMUNITY_RESULT: ${{ needs.community.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          CRYPTO_RESULT: ${{ needs.crypto-validation.result }}
+          DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
+          SBOM_RESULT: ${{ needs.sbom.result }}
+          SMOKE_RESULT: ${{ needs.smoke.result }}
+          SEMGREP_RESULT: ${{ needs.semgrep-diff-gate.result }}
         run: |
           set -euo pipefail
-          echo "needs results: $RESULTS"
-          # Fail on failure or cancelled. skipped (e.g. dependency-review on push) is OK.
-          # continue-on-error jobs report success even when their steps failed.
-          IFS=',' read -r -a parts <<< "$RESULTS"
-          for r in "${parts[@]}"; do
-            case "$r" in
-              success|skipped) ;;
-              *)
-                echo "ci-gate failing: found result '$r'"
-                exit 1
-                ;;
-            esac
-          done
+          require_success() {
+            local job="$1" result="$2"
+            echo "${job}: ${result}"
+            if [[ "$result" != success ]]; then
+              echo "ci-gate failing: ${job} returned '${result}' (success required)" >&2
+              exit 1
+            fi
+          }
+          require_success quality "$QUALITY_RESULT"
+          require_success test "$TEST_RESULT"
+          require_success community "$COMMUNITY_RESULT"
+          require_success build "$BUILD_RESULT"
+          require_success crypto-validation "$CRYPTO_RESULT"
+          require_success sbom "$SBOM_RESULT"
+          require_success smoke "$SMOKE_RESULT"
+          require_success semgrep-diff-gate "$SEMGREP_RESULT"
+          echo "dependency-review: $DEPENDENCY_REVIEW_RESULT"
+          if [[ "$EVENT_NAME" == pull_request ]]; then
+            require_success dependency-review "$DEPENDENCY_REVIEW_RESULT"
+          elif [[ "$DEPENDENCY_REVIEW_RESULT" != skipped ]]; then
+            echo "ci-gate failing: dependency-review may only be skipped outside pull_request" >&2
+            exit 1
+          fi
           echo "ci-gate OK"

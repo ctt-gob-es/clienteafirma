@@ -1,9 +1,30 @@
 # Hoja de ruta de integración — Autofirma comunitaria
 
-**Fecha de refresco:** 2026-11-01 · **Versión:** 3.0
+**Fecha de refresco:** 2026-11-03 · **Versión:** 3.1
 **Repositorio canónico:** [Soluciones-Alexendros/clienteafirma-alexendros](https://github.com/Soluciones-Alexendros/clienteafirma-alexendros), rama `master`.
 
 Este documento recoge solo lo que se puede comprobar hoy en `master` o en GitHub. Cada punto marcado como hecho tiene al final una comprobación concreta. Si algo no se puede comprobar, no se da por hecho. El tablero diario está en [TASKS.md](../TASKS.md).
+
+---
+
+## Actualización OT Fase 1 · Cierre (2026-11-03)
+
+La fuente detallada de esta ejecución es [`docs/informe-fase2.md`](../informe-fase2.md). Las secciones posteriores conservan el inventario histórico del 2026-11-01; esta actualización prevalece cuando difieran.
+
+| Etapa | Estado comprobado | Referencia |
+| --- | --- | --- |
+| E0.1 · Contención de release histórica | Notas y comando preparados; Alejandro aún no los ejecuta | PR #141 |
+| E0.3 · Registro de riesgos | H1–H15, ini4j, Dependabot, Scorecard y BinaryArtifacts registrados | PR #140, `docs/RISK-REGISTER.md` |
+| E1.1–E1.3 · Gates bloqueantes | Implementados; PR rojo #145 demostró SBOM y `ci-gate` en fallo | PR #144, run 41653635499 |
+| E1.4 · Huella Semgrep | Huella de contenido con tests de desplazamiento y cambio | PR #142 |
+| E1.5 · Comprobación documental | `check-docs-truth.sh` y notas derivadas del inventario | PR #143 |
+| E2.1/E2.2/E2.4/E2.6 · Release fiable | Implementada; firma real pendiente de secreto y entorno protegido | PR #146 |
+| E2.7 · Notas = assets | Generador/validador implementado y conectado al workflow de T5 | PR #143 y #146 |
+| Retirada ini4j | Exclusión implementada y prueba de proxy verde | PR #138 |
+| Dependencias Python CI | Actualización incompatible con el pin de Semgrep; riesgo aceptado y 0 alertas abiertas | PR #139, `docs/dependabot-ci.md` |
+| Cierre de la OT | Pendiente de fusiones, release firmada de prueba y PR final | No completado |
+
+E3, E4.2 y E5 continúan fuera de alcance. No se declara ninguna release nueva como validada ni libre de SpongyCastle.
 
 ---
 

@@ -73,6 +73,11 @@ for f in scripts/ci/*.sh; do
 done
 ok "cabeceras scripts/ci/"
 
+bash scripts/ci/check-docs-truth.sh
+ok "documentación contrastada con fuentes"
+python3 scripts/ci/test-release-notes.py
+ok "notas de release derivadas de assets"
+
 for job in quality test smoke community; do
   grep -Eq "^[[:space:]]*${job}:" .github/workflows/ci.yml \
     || fail "ci.yml sin job $job"

@@ -264,6 +264,13 @@
 		    <groupId>org.bidib.com.github.markusbernhardt</groupId>
 		    <artifactId>proxy-vole</artifactId>
 		    <version>1.0.18</version>
+			<exclusions>
+				<!-- CVE-2022-41404: detección de proxy validada por ProxyUtilTest sin ini4j. -->
+				<exclusion>
+					<groupId>org.ini4j</groupId>
+					<artifactId>ini4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Libreria "Java Native Access" -->

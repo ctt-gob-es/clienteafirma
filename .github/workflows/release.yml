@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: 'Create GitHub Release (false = dry-run artifacts only)'
+        description: 'Create a DRAFT GitHub Release (false = unsigned dry-run artifacts only)'
         required: false
         default: 'false'
         type: choice
@@ -17,31 +17,42 @@ on:
 
 permissions: {}
 
+env:
+  RELEASE_NAME: ${{ github.event_name == 'workflow_dispatch' && format('dry-run-{0}', github.sha) || github.ref_name }}
+  DO_PUBLISH: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish == 'true') }}
+  APPIMAGETOOL_VERSION: '13'
+  APPIMAGETOOL_SHA256: 'df3baf5ca5facbecfc2f3fa6713c29ab9cefa8fd8c1eac5d283b79cab33e4acb'
+
 jobs:
-  release:
-    name: Create GitHub Release
+  build:
+    name: Build and test without secrets
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:
-      contents: write
-      packages: write
-      attestations: write
-      id-token: write
-    env:
-      RELEASE_NAME: ${{ github.event_name == 'workflow_dispatch' && format('dry-run-{0}', github.sha) || github.ref_name }}
-      DO_PUBLISH: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish == 'true') }}
+      contents: read
     steps:
-      - name: Checkout repository
+      - name: Checkout the exact tag or dispatch SHA
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Confirm the tag points to the tested SHA
+        if: github.event_name == 'push'
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          tag_sha="$(git rev-parse "${REF_NAME}^{commit}")"
+          test "$tag_sha" = "$GITHUB_SHA"
+          echo "TAG_COMMIT=$tag_sha" >> "$GITHUB_ENV"
+          echo "Building exact tag SHA: $tag_sha"
+
       - name: Set up JDK 8
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
         with:
           distribution: temurin
-          java-version: 8
+          java-version: '8'
           cache: maven
           cache-dependency-path: pom.xml
 
@@ -50,275 +61,298 @@ jobs:
         with:
           maven-version: '3.9.9'
 
-      - name: Build all modules
-        run: |
-          if [ -z "${SOURCE_DATE_EPOCH:-}" ]; then
-            SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
-          fi
-          export SOURCE_DATE_EPOCH
-          echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH" >> "$GITHUB_ENV"
-          mvn -B clean install -DskipTests -Dproject.build.outputTimestamp="$SOURCE_DATE_EPOCH"
+      - name: Check release workflow invariants
+        run: bash scripts/ci/test-release-workflow.sh
 
-      - name: Build env-install profile (JAR + services)
+      - name: Run complete validation on the checked-out SHA
+        run: make validate
+
+      - name: Install a virtual display for UI tests
         run: |
-          mvn -B clean install -DskipTests -Denv=install -Dproject.build.outputTimestamp="$SOURCE_DATE_EPOCH" -pl '!afirma-server-triphase-signer,!afirma-signature-retriever,!afirma-signature-storage'
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+
+      - name: Build all release modules with tests
+        run: |
+          set -euo pipefail
+          source_date_epoch="$(git log -1 --format=%ct)"
+          echo "SOURCE_DATE_EPOCH=$source_date_epoch" >> "$GITHUB_ENV"
+          xvfb-run -a mvn -B clean install -Denv=install \
+            -Dproject.build.outputTimestamp="$source_date_epoch" \
+            -pl '!afirma-server-triphase-signer,!afirma-signature-retriever,!afirma-signature-storage' -am
 
       - name: Run F2 regression vectors
-        run: |
-          bash scripts/f2-regression.sh
+        run: bash scripts/f2-regression.sh
 
-      - name: "SEC-2026-010: Verify reproducible JAR build"
+      - name: Verify reproducible JAR in two worktrees
         run: |
           set -euo pipefail
-          WORK="$RUNNER_TEMP/reproducible-verify"
-          mkdir -p "$WORK"
-          REPO="$GITHUB_WORKSPACE"
-          # Pin wall-clock independent timestamps for both clean builds (SEC-2026-010).
-          SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          work="$RUNNER_TEMP/reproducible-verify"
+          mkdir -p "$work"
+          repo="$GITHUB_WORKSPACE"
           export SOURCE_DATE_EPOCH
-          MVN_REPRO=(-Dproject.build.outputTimestamp="${SOURCE_DATE_EPOCH}")
-
-          git worktree add "$WORK/worktree1" HEAD
+          git worktree add "$work/worktree1" HEAD
           (
-            cd "$WORK/worktree1"
-            mvn -B clean install -DskipTests -Denv=install "${MVN_REPRO[@]}" -pl afirma-simple -am
-            cp afirma-simple/target/autofirma.jar "$WORK/build1.jar"
-            sha256sum "$WORK/build1.jar" > "$WORK/build1.sha256"
+            cd "$work/worktree1"
+            xvfb-run -a mvn -B clean package -Denv=install \
+              -Dproject.build.outputTimestamp="$SOURCE_DATE_EPOCH" \
+              -pl afirma-simple -am
+            cp afirma-simple/target/autofirma.jar "$work/build1.jar"
           )
-
-          git worktree add "$WORK/worktree2" HEAD
+          git worktree add "$work/worktree2" HEAD
           (
-            cd "$WORK/worktree2"
-            mvn -B clean install -DskipTests -Denv=install "${MVN_REPRO[@]}" -pl afirma-simple -am
-            cp afirma-simple/target/autofirma.jar "$WORK/build2.jar"
-            sha256sum "$WORK/build2.jar" > "$WORK/build2.sha256"
+            cd "$work/worktree2"
+            xvfb-run -a mvn -B clean package -Denv=install \
+              -Dproject.build.outputTimestamp="$SOURCE_DATE_EPOCH" \
+              -pl afirma-simple -am
+            cp afirma-simple/target/autofirma.jar "$work/build2.jar"
           )
-
-          sha256_1=$(cut -d' ' -f1 "$WORK/build1.sha256")
-          sha256_2=$(cut -d' ' -f1 "$WORK/build2.sha256")
-          echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
+          sha256_1="$(sha256sum "$work/build1.jar" | cut -d' ' -f1)"
+          sha256_2="$(sha256sum "$work/build2.jar" | cut -d' ' -f1)"
           echo "Build 1 SHA256: $sha256_1"
           echo "Build 2 SHA256: $sha256_2"
-          mkdir -p "$REPO/verify-reproducible"
-          if [ "$sha256_1" != "$sha256_2" ]; then
-            echo "Reproducible build FAILED: Hashes differ — publishing first differing ZIP entry (ROADMAP SEC-2026-010)"
-            python3 - "$WORK/build1.jar" "$WORK/build2.jar" "$REPO/verify-reproducible/first-zip-diff.txt" <<'PY'
-          import sys, zipfile
-          a, b, out = sys.argv[1], sys.argv[2], sys.argv[3]
-          za, zb = zipfile.ZipFile(a), zipfile.ZipFile(b)
-          na = {i.filename: i for i in za.infolist()}
-          nb = {i.filename: i for i in zb.infolist()}
-          lines = []
-          for name in sorted(set(na) | set(nb)):
-              ia, ib = na.get(name), nb.get(name)
-              if ia is None or ib is None:
-                  lines.append(f"missing entry: {name} only_in={'a' if ib is None else 'b'}")
-                  break
-              da, db = za.read(name), zb.read(name)
-              if da != db or ia.date_time != ib.date_time or ia.compress_type != ib.compress_type:
-                  lines.append(f"first-diff: {name}")
-                  lines.append(f"  date_time_a={ia.date_time} date_time_b={ib.date_time}")
-                  lines.append(f"  compress_a={ia.compress_type} compress_b={ib.compress_type}")
-                  lines.append(f"  size_a={len(da)} size_b={len(db)} content_equal={da == db}")
-                  break
-          else:
-              lines.append("no per-entry content/time diffs found (outer hashes still differ)")
-          open(out, "w", encoding="utf-8").write("\n".join(lines) + "\n")
-          print("\n".join(lines))
-          PY
-            echo "SHA256_1: $sha256_1" > "$REPO/verify-reproducible/reproducible-build.sha256"
-            echo "SHA256_2: $sha256_2" >> "$REPO/verify-reproducible/reproducible-build.sha256"
-            echo "STATUS: DIFFER (see first-zip-diff.txt)" >> "$REPO/verify-reproducible/reproducible-build.sha256"
+          mkdir -p "$repo/verify-reproducible"
+          if [[ "$sha256_1" != "$sha256_2" ]]; then
+            {
+              echo "SHA256_1: $sha256_1"
+              echo "SHA256_2: $sha256_2"
+              echo 'STATUS: DIFFER'
+            } > "$repo/verify-reproducible/reproducible-build.sha256"
             exit 1
           fi
-          echo "Reproducible build verified"
-          echo "SHA256: $sha256_1" > "$REPO/verify-reproducible/reproducible-build.sha256"
+          echo "SHA256: $sha256_1" > "$repo/verify-reproducible/reproducible-build.sha256"
+          git worktree remove "$work/worktree1" --force
+          git worktree remove "$work/worktree2" --force
 
-          git worktree remove "$WORK/worktree1" --force
-          git worktree remove "$WORK/worktree2" --force
-
-      - name: Import GPG key
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        run: |
-          if [ -n "$GPG_PRIVATE_KEY" ]; then
-            printf '%s' "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
-            gpg --list-secret-keys --keyid-format LONG
-          else
-            echo "ERROR: GPG_PRIVATE_KEY no configurado; release bloqueada." >&2
-            exit 1
-          fi
-
-      - name: Install appimagetool and FUSE
-        continue-on-error: true
-        run: |
-          wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O /usr/local/bin/appimagetool
-          chmod +x /usr/local/bin/appimagetool
-          sudo apt-get update && sudo apt-get install -y libfuse2
-
-      - name: Package Linux artifacts (DEB, RPM, AppImage)
-        continue-on-error: true
-        run: |
-          bash scripts/f6-package-linux.sh
-          ARCH=x86_64 bash scripts/f6-appimage.sh
-
-      - name: Collect artifacts
+      - name: Install pinned appimagetool and FUSE
         run: |
           set -euo pipefail
+          url="https://github.com/AppImage/AppImageKit/releases/download/${APPIMAGETOOL_VERSION}/obsolete-appimagetool-x86_64.AppImage"
+          curl -fsSL --retry 3 "$url" -o "$RUNNER_TEMP/appimagetool"
+          echo "${APPIMAGETOOL_SHA256}  ${RUNNER_TEMP}/appimagetool" | sha256sum -c -
+          sudo install -m 0755 "$RUNNER_TEMP/appimagetool" /usr/local/bin/appimagetool
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+
+      - name: Package required Linux artifacts
+        run: |
+          set -euo pipefail
+          bash scripts/f6-package-linux.sh
+          # appimagetool 13/mksquashfs no admite SOURCE_DATE_EPOCH junto a sus opciones internas.
+          env -u SOURCE_DATE_EPOCH ARCH=x86_64 bash scripts/f6-appimage.sh
+
+      - name: Collect and require release artifacts
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
           mkdir -p release-artifacts
-          test -f afirma-simple/target/autofirma.jar
+          test -s afirma-simple/target/autofirma.jar
           cp afirma-simple/target/autofirma.jar "release-artifacts/autofirma-${RELEASE_NAME}.jar"
-          find packaging -name 'autofirma-2026_*.deb' -exec cp {} release-artifacts/ \; 2>/dev/null || true
-          find packaging/stage-rpm -name '*.rpm' -exec cp {} release-artifacts/ \; 2>/dev/null || true
-          find . -maxdepth 1 -name '*.AppImage' -exec cp {} release-artifacts/ \; 2>/dev/null || true
-          find packaging/flatpak -name '*.flatpak' -exec cp {} release-artifacts/ \; 2>/dev/null || true
+          mapfile -d '' deb_files < <(find packaging -name 'autofirma-2026_*.deb' -print0)
+          ((${#deb_files[@]} > 0)) || { echo 'DEB asset is required' >&2; exit 1; }
+          cp "${deb_files[@]}" release-artifacts/
+          appimages=(dist/appimage/*.AppImage)
+          ((${#appimages[@]} > 0)) || { echo 'AppImage asset is required' >&2; exit 1; }
+          cp "${appimages[@]}" release-artifacts/
+          mapfile -d '' rpm_files < <(find packaging/stage-rpm -name '*.rpm' -print0)
+          if ((${#rpm_files[@]} > 0)); then cp "${rpm_files[@]}" release-artifacts/; fi
+          mapfile -d '' flatpak_files < <(find packaging/flatpak -name '*.flatpak' -print0)
+          if ((${#flatpak_files[@]} > 0)); then cp "${flatpak_files[@]}" release-artifacts/; fi
           cp verify-reproducible/reproducible-build.sha256 release-artifacts/reproducible-build.sha256
 
-      - name: Generate SBOM with CycloneDX
+      - name: Generate and require SBOM
         run: |
           set -euo pipefail
-          # env-dev (default) omits afirma-simple; env-install puts it in the reactor.
           mvn -B org.cyclonedx:cyclonedx-maven-plugin:2.7.6:makeBom -Denv=install -pl afirma-simple
-          test -f afirma-simple/target/bom.json
+          test -s afirma-simple/target/bom.json
           cp afirma-simple/target/bom.json release-artifacts/bom.json
 
-      - name: Generate SHA256SUMS
+      - name: Generate SHA256SUMS from the real inventory
         run: |
           set -euo pipefail
           cd release-artifacts
-          # Write outside the dir: shell creates the redirect target before find runs.
-          OUT="$RUNNER_TEMP/SHA256SUMS"
-          find . -maxdepth 1 -type f ! -name 'SHA256SUMS' ! -name 'SHA256SUMS.asc' ! -name '*.asc' -print0 \
-            | sort -z \
-            | xargs -0 sha256sum > "$OUT"
-          mv "$OUT" SHA256SUMS
+          out="$RUNNER_TEMP/SHA256SUMS"
+          find . -maxdepth 1 -type f ! -name 'SHA256SUMS' -print0 \
+            | sort -z | xargs -0 sha256sum > "$out"
+          mv "$out" SHA256SUMS
 
-      - name: Sign artifacts with GPG
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        run: |
-          if [ -n "$GPG_PRIVATE_KEY" ]; then
-            cd release-artifacts
-            find . -maxdepth 1 -type f \( -name '*.jar' -o -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' -o -name '*.flatpak' -o -name '*.sha256' -o -name 'bom.json' \) | while read -r f; do
-              if [ -f "$f" ]; then
-                gpg --armor --detach-sign --output "$f.asc" "$f"
-              fi
-            done
-          else
-            echo "ERROR: GPG_PRIVATE_KEY no configurado; release bloqueada." >&2
-            exit 1
-          fi
-
-      - name: Sign SHA256SUMS with GPG
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        run: |
-          if [ -n "$GPG_PRIVATE_KEY" ]; then
-            cd release-artifacts
-            gpg --armor --detach-sign --output SHA256SUMS.asc SHA256SUMS
-          else
-            echo "ERROR: GPG_PRIVATE_KEY no configurado; release bloqueada." >&2
-            exit 1
-          fi
-
-      - name: Upload release artifacts
+      - name: Upload unsigned build artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: release-artifacts
+          name: release-build-${{ github.run_id }}
           path: release-artifacts/
           if-no-files-found: error
           retention-days: 14
 
-      - name: Create Release Notes
-        if: env.DO_PUBLISH == 'true'
+  sign:
+    name: Sign in the protected release environment
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish == 'true')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: release
+    permissions:
+      contents: read
+    steps:
+      - name: Download unsigned build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-build-${{ github.run_id }}
+          path: release-artifacts
+
+      - name: Import the signing key without logging it
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$GPG_PRIVATE_KEY" ]]; then
+            echo 'ERROR: GPG_PRIVATE_KEY is required; configure it in the protected release environment.' >&2
+            exit 1
+          fi
+          printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
+
+      - name: Sign every artifact and SHA256SUMS
+        run: |
+          set -euo pipefail
+          cd release-artifacts
+          find . -maxdepth 1 -type f ! -name '*.asc' -print0 | sort -z | while IFS= read -r -d '' file; do
+            gpg --batch --yes --armor --detach-sign --output "$file.asc" "$file"
+          done
+          originals="$(find . -maxdepth 1 -type f ! -name '*.asc' | wc -l)"
+          signatures="$(find . -maxdepth 1 -type f -name '*.asc' | wc -l)"
+          test "$originals" = "$signatures"
+
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-signed-${{ github.run_id }}
+          path: release-artifacts/
+          if-no-files-found: error
+          retention-days: 14
+
+  validate:
+    name: Validate signatures and inventory with public KEYS
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish == 'true')
+    needs: sign
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout public verification material
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Download signed artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-signed-${{ github.run_id }}
+          path: release-artifacts
+
+      - name: Import versioned public KEYS and verify the signed tag
+        if: github.event_name == 'push'
         env:
           REF_NAME: ${{ github.ref_name }}
         run: |
-          printf '%s\n' "## Autofirma ${REF_NAME}" "" "### Qué incluye" "- JAR autoejecutable (\`autofirma.jar\`)" "- Paquete DEB (Debian/Ubuntu)" "- Checksums SHA256 para cada artefacto" "- SBOM (CycloneDX JSON)" "- Firmas GPG (\`.asc\`) y checksums SHA256" "" "### Verificación" "\`\`\`bash" "# Verificar firma GPG" "gpg --verify autofirma-${REF_NAME}.jar.asc autofirma-${REF_NAME}.jar" "" "# Verificar checksum" "sha256sum -c SHA256SUMS" "\`\`\`" "" "### Cambios" "Ver [CHANGELOG.md](CHANGELOG.md) para detalles." "" "### Licencia" "GPL-2.0+ / EUPL-1.1" > release-notes.md
+          set -euo pipefail
+          test -s KEYS
+          gpg --batch --yes --import KEYS
+          git fetch --no-tags origin "refs/tags/${REF_NAME}:refs/tags/${REF_NAME}"
+          git tag -v "$REF_NAME"
 
-      - name: Create GitHub Release
-        if: env.DO_PUBLISH == 'true'
+      - name: Verify checksums and every OpenPGP signature
+        run: |
+          set -euo pipefail
+          cd release-artifacts
+          sha256sum -c SHA256SUMS
+          shopt -s nullglob
+          signatures=(*.asc)
+          ((${#signatures[@]} > 0)) || { echo 'No .asc signatures found' >&2; exit 1; }
+          for signature in "${signatures[@]}"; do
+            test -f "${signature%.asc}"
+            gpg --verify "$signature" "${signature%.asc}"
+          done
+          originals="$(find . -maxdepth 1 -type f ! -name '*.asc' | wc -l)"
+          test "$originals" = "${#signatures[@]}"
+
+      - name: Require SBOM, reproducibility evidence and required packages
+        run: |
+          set -euo pipefail
+          cd release-artifacts
+          test -s bom.json
+          test -s reproducible-build.sha256
+          compgen -G 'autofirma-*.jar' >/dev/null
+          compgen -G '*.deb' >/dev/null
+          compgen -G '*.AppImage' >/dev/null
+
+      - name: Generate notes from signed assets and check their truth
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/release_notes.py \
+            --assets-dir release-artifacts --release-name "$RELEASE_NAME" --output release-notes.md
+          python3 scripts/ci/release_notes.py --assets-dir release-artifacts --check release-notes.md
+
+  publish:
+    name: Create the verified draft release
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish == 'true')
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout release notes generator
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Download verified signed artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-signed-${{ github.run_id }}
+          path: release-artifacts
+
+      - name: Generate and validate final notes
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/release_notes.py \
+            --assets-dir release-artifacts --release-name "$RELEASE_NAME" --output release-notes.md
+          python3 scripts/ci/release_notes.py --assets-dir release-artifacts --check release-notes.md
+
+      - name: Create GitHub Release as draft
         uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
         with:
           tag_name: ${{ github.ref_name }}
           name: Autofirma ${{ github.ref_name }}
           body_path: release-notes.md
-          files: |
-            release-artifacts/*
+          files: release-artifacts/*
           draft: true
-          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
+          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') || contains(github.ref_name, '-test') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Attest SBOM
-        if: env.DO_PUBLISH == 'true' && github.repository == 'Soluciones-Alexendros/clienteafirma-alexendros'
+      - name: Attest every published artifact
+        if: github.repository == 'Soluciones-Alexendros/clienteafirma-alexendros'
         uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
         with:
-          subject-path: release-artifacts/bom.json
+          subject-path: release-artifacts/*
 
-      - name: Dry-run summary
-        if: env.DO_PUBLISH != 'true'
+      - name: Report draft URL
         run: |
-          echo "Dry-run complete: artifacts uploaded as release-artifacts (no GitHub Release)."
-          ls -la release-artifacts
+          echo "Draft created for review; not published: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
 
-  validate:
-    name: Validate Release Artifacts
+  dry-run:
+    name: Dry-run summary without signing or release
+    if: github.event_name == 'workflow_dispatch' && inputs.publish != 'true'
+    needs: build
     runs-on: ubuntu-latest
-    needs: release
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - name: Download release artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: release-artifacts
-          path: .
-
-      - name: Verify GPG signatures
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        run: |
-          if [ -n "$GPG_PRIVATE_KEY" ]; then
-            find . -maxdepth 1 -type f -name '*.asc' | while read -r f; do
-              if [ -f "$f" ]; then
-                gpg --verify "$f" "${f%.asc}" && echo "OK $f verified" || exit 1
-              fi
-            done
-          else
-            echo "ERROR: GPG_PRIVATE_KEY no configurado; release bloqueada." >&2
-            exit 1
-          fi
-
-      - name: Verify SHA256SUMS
-        run: |
-          sha256sum -c SHA256SUMS
-
-      - name: Verify SBOM and reproducible build
-        run: |
-          test -f bom.json
-          test -f reproducible-build.sha256
-          echo "SBOM and reproducible-build.sha256 present"
-
-  notify:
-    name: Notify Completion
-    runs-on: ubuntu-latest
-    needs: [release, validate]
     timeout-minutes: 5
     permissions:
       contents: read
     steps:
-      - name: Notify completion
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          INPUT_PUBLISH: ${{ inputs.publish }}
-          REF_NAME: ${{ github.ref_name }}
-          REPOSITORY: ${{ github.repository }}
-        run: |
-          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$INPUT_PUBLISH" != "true" ]; then
-            echo "Dry-run Release completed (no publish)"
-          else
-            echo "Release ${REF_NAME} published successfully"
-            echo "URL: https://github.com/${REPOSITORY}/releases/tag/${REF_NAME}"
-          fi
+      - run: |
+          echo 'Dry-run complete: unsigned build artifacts only; no tag, signature or GitHub Release created.'
