@@ -48,6 +48,7 @@ assert 'secrets.GPG_PRIVATE_KEY' not in jobs['validate'], 'validate debe usar so
 assert 'GPG_PASSPHRASE' not in jobs['validate'], 'validate accede a la passphrase'
 assert 'gpg --batch --yes --import KEYS' in jobs['validate'], 'validate no importa KEYS'
 assert 'git tag -v "$REF_NAME"' in jobs['validate'], 'validate no verifica el tag firmado'
+assert 'if ! git rev-parse --verify --quiet "refs/tags/${REF_NAME}"' in jobs['validate'], 'validate no evita clobber del tag ya descargado'
 assert 'secrets.GPG_PRIVATE_KEY' not in jobs['publish'], 'publish no necesita la clave privada'
 assert '--draft' in jobs['publish'], 'la release no queda en borrador'
 for job in ('validate', 'publish'):
