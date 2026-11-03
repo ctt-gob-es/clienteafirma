@@ -53,8 +53,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '8'
-          cache: maven
-          cache-dependency-path: pom.xml
 
       - name: Set up Maven
         uses: stCarolas/setup-maven@d6af6abeda15e98926a57b5aa970a96bb37f97d1 # v5
@@ -210,13 +208,23 @@ jobs:
             exit 1
           fi
           printf '%s' "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpgconf --kill gpg-agent
 
       - name: Sign every artifact and SHA256SUMS
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           set -euo pipefail
+          if [[ -z "$GPG_PASSPHRASE" ]]; then
+            echo 'ERROR: GPG_PASSPHRASE is required for non-interactive signing.' >&2
+            exit 1
+          fi
           cd release-artifacts
           find . -maxdepth 1 -type f ! -name '*.asc' -print0 | sort -z | while IFS= read -r -d '' file; do
-            gpg --batch --yes --armor --detach-sign --output "$file.asc" "$file"
+            gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \
+              --local-user A8EF66BB6B3A3FC0365E18226B4AE42D2F924E93! \
+              --armor --detach-sign --output "$file.asc" "$file" <<< "$GPG_PASSPHRASE"
           done
           originals="$(find . -maxdepth 1 -type f ! -name '*.asc' | wc -l)"
           signatures="$(find . -maxdepth 1 -type f -name '*.asc' | wc -l)"
@@ -324,16 +332,19 @@ jobs:
           python3 scripts/ci/release_notes.py --assets-dir release-artifacts --check release-notes.md
 
       - name: Create GitHub Release as draft
-        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Autofirma ${{ github.ref_name }}
-          body_path: release-notes.md
-          files: release-artifacts/*
-          draft: true
-          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') || contains(github.ref_name, '-test') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          prerelease=()
+          case "$GITHUB_REF_NAME" in
+            *-rc*|*-beta*|*-alpha*|*-test*) prerelease=(--prerelease) ;;
+          esac
+          gh release create "$GITHUB_REF_NAME" release-artifacts/* \
+            -R Soluciones-Alexendros/clienteafirma-alexendros \
+            --title "Autofirma ${GITHUB_REF_NAME}" \
+            --notes-file release-notes.md \
+            --draft "${prerelease[@]}"
 
       - name: Attest every published artifact
         if: github.repository == 'Soluciones-Alexendros/clienteafirma-alexendros'
