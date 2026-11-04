@@ -10,13 +10,27 @@
 package es.gob.afirma.core.ciphers;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 
-/** Confuiguraciones de algoritmo / modo de bloque / relleno para cifrado. */
+/** Confuiguraciones de algoritmo / modo de bloque / relleno para cifrado.
+ * <p>Los algoritmos marcados como obsoletos (DES, PBE con MD5 o SHA-1, RC2-40 y
+ * HmacMD5/HmacSHA1) solo se aceptan al <b>crear</b> cifrados nuevos si se activa
+ * expresamente <code>-DallowLegacyCiphers=true</code>. Para <b>descifrar</b> contenido
+ * heredado se usa {@link #forDeciphering(AOCipherAlgorithm, AOCipherBlockMode, AOCipherPadding)},
+ * que siempre los admite y deja un aviso en el log.</p> */
 public final class AOCipherConfig {
+
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+    /** Algoritmos obsoletos de los que ya se ha avisado al descifrar. */
+    private static final Set<String> WARNED_LEGACY_FOR_DECIPHER = Collections.synchronizedSet(new HashSet<String>());
 
     /** Algoritmo de cifrado. */
     private AOCipherAlgorithm algo;
@@ -27,7 +41,10 @@ public final class AOCipherConfig {
     /** Padding que aplicar al cifrado. */
     private AOCipherPadding padding;
 
-    /** Construyye una configuraci&oacute;n de cifrado.
+    /** Indica si la configuracion se creo para descifrar contenido heredado. */
+    private final boolean forDeciphering;
+
+    /** Construyye una configuraci&oacute;n de cifrado para crear cifrados nuevos.
      * @param algo
      *        Algoritmo de cifrado
      * @param mode
@@ -35,19 +52,42 @@ public final class AOCipherConfig {
      * @param padd
      *        Relleno (<i>padding</i>) del cifrado */
     public AOCipherConfig(final AOCipherAlgorithm algo, final AOCipherBlockMode mode, final AOCipherPadding padd) {
+        this(algo, mode, padd, false);
+    }
+
+    /** Construye una configuraci&oacute;n de cifrado.
+     * @param algo Algoritmo de cifrado.
+     * @param mode Modo de bloque (si es nulo se usa el de creacion, CBC).
+     * @param padd Relleno.
+     * @param deciphering Si es {@code true}, la configuracion es para descifrar contenido
+     *                    heredado y se admiten los algoritmos obsoletos. */
+    private AOCipherConfig(final AOCipherAlgorithm algo, final AOCipherBlockMode mode,
+                           final AOCipherPadding padd, final boolean deciphering) {
 
         // En caso de nulos tomamos defectos y algunas combinaciones
         // predefinidas
         final AOCipherAlgorithm ciphAlgo = algo != null ? algo : AOCipherAlgorithm.getDefault();
 
+        if (ciphAlgo.isLegacy() && !deciphering && !CipherConstants.isLegacyAllowed()) {
+            throw new IllegalArgumentException(
+                "El algoritmo de cifrado '" + ciphAlgo.getName() + "' esta obsoleto y no se permite crear " + //$NON-NLS-1$ //$NON-NLS-2$
+                "cifrados nuevos con el. Use -D" + CipherConstants.ALLOW_LEGACY_CIPHERS_PROPERTY + "=true solo si " + //$NON-NLS-1$ //$NON-NLS-2$
+                "acepta el riesgo." //$NON-NLS-1$
+            );
+        }
+        if (ciphAlgo.isLegacy() && deciphering) {
+            warnLegacyForDecipher(ciphAlgo);
+        }
+
         AOCipherBlockMode ciphMode = mode;
         if (ciphMode == null) {
-            if (ciphAlgo.equals(AOCipherAlgorithm.PBEWITHMD5ANDDES) || ciphAlgo.equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE)
-                || ciphAlgo.equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40)) {
+            if (ciphAlgo.supportsPassword()) {
+                // Los algoritmos basados en contrasena llevan su modo en la configuracion JCE
                 ciphMode = AOCipherBlockMode.CBC;
             }
             else {
-                ciphMode = AOCipherBlockMode.ECB;
+                // Nunca ECB por defecto en la creacion de cifrados nuevos
+                ciphMode = AOCipherBlockMode.getDefault();
             }
         }
 
@@ -58,6 +98,18 @@ public final class AOCipherConfig {
         this.algo = ciphAlgo;
         this.mode = ciphMode;
         this.padding = ciphPadding;
+        this.forDeciphering = deciphering;
+    }
+
+    /** Crea la configuraci&oacute;n necesaria para <b>descifrar</b> contenido heredado.
+     * Admite los algoritmos obsoletos y deja un aviso en el log (sin datos del contenido).
+     * @param algo Algoritmo de cifrado leido del mensaje.
+     * @param mode Modo de bloque, si se conoce.
+     * @param padd Relleno, si se conoce.
+     * @return Configuracion de descifrado. */
+    public static AOCipherConfig forDeciphering(final AOCipherAlgorithm algo, final AOCipherBlockMode mode,
+                                                final AOCipherPadding padd) {
+        return new AOCipherConfig(algo, mode, padd, true);
     }
 
     /** Genera un objeto AOCipherConfig a partir de una cadena que siga uno de
@@ -73,7 +125,8 @@ public final class AOCipherConfig {
      * @param cipherConfig
      *        Configuraci&oacute;n de cifrado.
      * @throws NoSuchAlgorithmException
-     *         Cuando el algoritmo no est&aacute; soportado. */
+     *         Cuando el algoritmo no est&aacute; soportado o es obsoleto y no se ha
+     *         activado <code>allowLegacyCiphers</code>. */
     public static AOCipherConfig parse(final String cipherConfig) throws NoSuchAlgorithmException {
         // Desmenbramos el algoritmo por si se ha indicado el modo de bloque y
         // el padding
@@ -86,6 +139,11 @@ public final class AOCipherConfig {
         if (cipAlgo == null) {
             throw new NoSuchAlgorithmException();
         }
+        if (cipAlgo.isLegacy() && !CipherConstants.isLegacyAllowed()) {
+            throw new NoSuchAlgorithmException(
+                "Algoritmo de cifrado obsoleto no permitido: " + cipAlgo.getName() //$NON-NLS-1$
+            );
+        }
 
         // Establecemos el resto de la configuracion
         if (algoConfig.length == 3) {
@@ -93,6 +151,32 @@ public final class AOCipherConfig {
             cipPadding = AOCipherPadding.getValueOf(algoConfig[2]);
         }
         return new AOCipherConfig(cipAlgo, cipBlockMode, cipPadding);
+    }
+
+    /** Indica si la configuracion usa un algoritmo obsoleto.
+     * @return {@code true} si el algoritmo es obsoleto. */
+    public boolean isLegacy() {
+        return this.algo.isLegacy();
+    }
+
+    /** Indica si la configuracion se creo para descifrar contenido heredado.
+     * @return {@code true} si es una configuracion de descifrado. */
+    public boolean isForDeciphering() {
+        return this.forDeciphering;
+    }
+
+    /** Olvida los avisos ya emitidos. Solo para pruebas. */
+    static void resetLegacyWarningsForTests() {
+        WARNED_LEGACY_FOR_DECIPHER.clear();
+    }
+
+    private static void warnLegacyForDecipher(final AOCipherAlgorithm algorithm) {
+        if (WARNED_LEGACY_FOR_DECIPHER.add(algorithm.getName())) {
+            LOGGER.warning(
+                "Se descifra contenido heredado con el algoritmo obsoleto '" + algorithm.getName() + //$NON-NLS-1$
+                "'. Se admite por compatibilidad; no se usa para cifrar." //$NON-NLS-1$
+            );
+        }
     }
 
     @Override
@@ -139,6 +223,13 @@ public final class AOCipherConfig {
      * @param algo
      *        Algoritmo. */
     public void setAlgorithm(final AOCipherAlgorithm algo) {
+        if (algo != null && algo.isLegacy() && !this.forDeciphering && !CipherConstants.isLegacyAllowed()) {
+            throw new IllegalArgumentException(
+                "El algoritmo de cifrado '" + algo.getName() + "' esta obsoleto y no se permite crear " + //$NON-NLS-1$ //$NON-NLS-2$
+                "cifrados nuevos con el. Use -D" + CipherConstants.ALLOW_LEGACY_CIPHERS_PROPERTY + "=true solo si " + //$NON-NLS-1$ //$NON-NLS-2$
+                "acepta el riesgo." //$NON-NLS-1$
+            );
+        }
         this.algo = algo;
     }
 

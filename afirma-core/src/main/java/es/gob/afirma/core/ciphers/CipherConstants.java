@@ -13,8 +13,19 @@ package es.gob.afirma.core.ciphers;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CipherConstants {
 
+    /** Propiedad del sistema que permite usar algoritmos de cifrado obsoletos al crear
+     * cifrados nuevos. Por defecto esta desactivada. */
+    public static final String ALLOW_LEGACY_CIPHERS_PROPERTY = "allowLegacyCiphers"; //$NON-NLS-1$
+
     private CipherConstants() {
         // No permitimos la instanciacion
+    }
+
+    /** Indica si se permite crear cifrados nuevos con algoritmos obsoletos.
+     * @return {@code true} solo si se ha activado expresamente
+     *         <code>-DallowLegacyCiphers=true</code>. */
+    public static boolean isLegacyAllowed() {
+        return Boolean.getBoolean(ALLOW_LEGACY_CIPHERS_PROPERTY);
     }
 
     /** Algoritmos de cifrado soportados. */
@@ -26,26 +37,26 @@ public final class CipherConstants {
         /** Blowfish. */
         BLOWFISH("Blowfish", "Blowfish", false, true, "1.3.6.1.4.1.3029.1.1.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        /** Data Encryption Standard (DES). */
-        DES("DES", "Data Encryption Standard (DES)", false, true, "1.2.840.113549.3.6"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        /** Data Encryption Standard (DES). Obsoleto: solo con <code>allowLegacyCiphers</code>. */
+        DES("DES", "Data Encryption Standard (DES)", false, true, "1.2.840.113549.3.6", true), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         /** Triple DES (3DES). */
         TRIPLEDES("DESede", "Triple DES (3DES)", false, true, "1.2.840.113549.3.7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        /** Contrase&ntilde;a con MD5 y DES. */
-        PBEWITHMD5ANDDES("PBEWithMD5AndDES", "Contrase\u00F1a con MD5 y DES", true, false, "1.2.840.113549.1.5.3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        /** Contrase&ntilde;a con MD5 y DES. Obsoleto: solo con <code>allowLegacyCiphers</code>. */
+        PBEWITHMD5ANDDES("PBEWithMD5AndDES", "Contrase\u00F1a con MD5 y DES", true, false, "1.2.840.113549.1.5.3", true), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        /** Contrase&ntilde;a con SHA1 y 3DES. */
-        PBEWITHSHA1ANDDESEDE("PBEWithSHA1AndDESede", "Contrase\u00F1a con SHA1 y 3DES", true, false, "1.2.840.113549.1.5.10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        /** Contrase&ntilde;a con SHA1 y 3DES. Obsoleto: solo con <code>allowLegacyCiphers</code>. */
+        PBEWITHSHA1ANDDESEDE("PBEWithSHA1AndDESede", "Contrase\u00F1a con SHA1 y 3DES", true, false, "1.2.840.113549.1.5.10", true), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        /** Contrase&ntilde;a con SHA1 y RC2. */
-        PBEWITHSHA1ANDRC2_40("PBEWithSHA1AndRC2_40", "Contrase\u00F1a con SHA1 y RC2", true, false, "1.2.840.113549.1.5.11"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        /** Contrase&ntilde;a con SHA1 y RC2. Obsoleto: solo con <code>allowLegacyCiphers</code>. */
+        PBEWITHSHA1ANDRC2_40("PBEWithSHA1AndRC2_40", "Contrase\u00F1a con SHA1 y RC2", true, false, "1.2.840.113549.1.5.11", true), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        /** MAC HMACMD5 **/
-        HMACMD5("HmacMD5", "HmacMD5", false, true, "1.3.6.1.5.5.8.1.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        /** MAC HMACMD5. Obsoleto: solo con <code>allowLegacyCiphers</code>. */
+        HMACMD5("HmacMD5", "HmacMD5", false, true, "1.3.6.1.5.5.8.1.1", true), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-        /** MAC HMACSHA1 **/
-        HMACSHA1("HmacSHA1", "HmacSHA1", false, true, "1.2.840.113549.2.7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        /** MAC HMACSHA1. Obsoleto: solo con <code>allowLegacyCiphers</code>. */
+        HMACSHA1("HmacSHA1", "HmacSHA1", false, true, "1.2.840.113549.2.7", true), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         /** MAC HMACSHA256 **/
         HMACSHA256("HmacSHA256", "HmacSHA256", false, true, "1.2.840.113549.2.9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -66,11 +77,17 @@ public final class CipherConstants {
         }
 
         private AOCipherAlgorithm(final String n, final String d, final boolean p, final boolean k, final String oi) {
+            this(n, d, p, k, oi, false);
+        }
+
+        private AOCipherAlgorithm(final String n, final String d, final boolean p, final boolean k, final String oi,
+                final boolean legacy) {
             this.name = n;
             this.description = d;
             this.password = p;
             this.key = k;
             this.oid = oi;
+            this.legacy = legacy;
         }
 
         private String name;
@@ -78,6 +95,14 @@ public final class CipherConstants {
         private boolean password;
         private boolean key;
         private String oid;
+        private boolean legacy;
+
+        /** Indica si el algoritmo esta obsoleto y solo puede usarse con
+         * <code>-DallowLegacyCiphers=true</code> al crear cifrados nuevos.
+         * @return {@code true} si el algoritmo es obsoleto. */
+        public boolean isLegacy() {
+            return this.legacy;
+        }
 
         /** Indica si el algoritmo de cifrado soporta contrase&ntilde;as.
          * @return <code>true</code> si el algoritmo soporta contrase&ntilde;as
@@ -183,6 +208,16 @@ public final class CipherConstants {
         CFB("CFB", "Cipher FeedBack (CFB)"), //$NON-NLS-1$ //$NON-NLS-2$
         /** Output FeedBack (OFB). */
         OFB("OFB", "Output FeedBack (OFB)"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        /** Modo de bloque por defecto al crear un cifrado nuevo. ECB nunca es el
+         * valor por defecto. */
+        private static final AOCipherBlockMode DEFAULT_BLOCK_MODE = CBC;
+
+        /** Obtiene el modo de bloque por defecto para la creacion de cifrados nuevos.
+         * @return Modo de bloque por defecto (CBC). */
+        public static AOCipherBlockMode getDefault() {
+            return DEFAULT_BLOCK_MODE;
+        }
 
         private String name;
         private String description;

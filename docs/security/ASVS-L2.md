@@ -224,6 +224,8 @@ preferencia antes de actualizarlos impediría firmar.
 | Canal local sin TLS 1.3 | El objetivo de compilación es Java 8, que no soporta TLS 1.3, y sus suites forman un conjunto distinto del de TLS 1.2 | Reabrir si se eleva el objetivo mínimo a Java 11 (T3) |
 | Conexiones salientes fijadas a TLS 1.2 | `SslSecurityManager` construye sus `SSLContext` con `TLSv1.2` (antes `SSL`, que permitía versiones obsoletas); Java 8 no implementa TLS 1.3 | Al subir a Java 11, pasar a `TLS` con suites de 1.3 habilitadas (T5) |
 | WAR trifásico fuera de alcance | Laboratorio F8, no desplegado | Reabrir V4/V13 si se expone |
+| Descifrado con algoritmos obsoletos | Descifrar contenido heredado (sobres CMS con DES, PBE-MD5-DES, PBE-SHA1-DESede, PBE-SHA1-RC2-40, HmacMD5 o HmacSHA1) siempre está permitido, con aviso en el log sin datos del contenido: bloquearlo rompería la lectura de sobres existentes (mismo criterio que T4 con los almacenes instalados) | La puerta `allowLegacyCiphers` solo afecta a la creación; revisar cuando no queden sobres heredados (T9) |
+| Módulos heredados fuera de la reactor | `afirma-crypto-cipher` (IV fijo en `getParams`) y `afirma-crypto-cms-enveloper` (no compila en la base: faltan las dependencias de BouncyCastle) no forman parte de ninguna reactor y no se prueban en CI; `afirma-standalone` y `afirma-ui-applet` son sus únicos consumidores | Decidir por separado si se eliminan o se recuperan; si se recuperan, deben usar `allowLegacyCiphers`, `AOCipherConfig.forDeciphering` e IV aleatorio por operación (T9) |
 
 ## 8. Riesgo residual registrado fuera de esta matriz
 
@@ -232,7 +234,8 @@ preferencia antes de actualizarlos impediría firmar.
 | SEC-009 / H15 | Plugins sin firma; gobernanza en una sola persona | En tratamiento (T13) y aceptado (H15) | `docs/RISK-REGISTER.md` |
 | H4 | TSA y TLS posiblemente insuficientes | Pendiente de reproducción (T6) | `docs/RISK-REGISTER.md` |
 | H5 | Token trifásico sin validar | **Confirmado y tratado (T7)**: ver §6.2 | `docs/RISK-REGISTER.md` |
-| H6 | Canal local: loopback, TLS y sesión | Pendiente de reproducción (T8) | `docs/RISK-REGISTER.md` |
+| H6 | Canal local: loopback, TLS y sesión | **Confirmado y tratado parcialmente (T8)**: ver §6.3; con `strictWebSocketSession=false` sigue abierto por defecto | `docs/RISK-REGISTER.md` |
+| H16 | Algoritmos de cifrado débiles por defecto (DES/ECB/PBE-MD5) | **Confirmado y tratado (T9)**: ver §6.4 | `docs/RISK-REGISTER.md` |
 | SEC-010 | Almacén del canal local en instalación por máquina sin escritura: se mantiene la contraseña heredada con aviso | Abierto, con condiciones de salida en 2.1 (T4) | `docs/security/ASVS-L2.md` |
 
 Ninguna de las hipótesis H4–H6 se presenta aquí como vulnerabilidad verificada.
@@ -316,3 +319,51 @@ registrado) que la web pueda conocer; debe aparecer en el informe de T20.
   levantan los servidores reales y cubren: sesión válida, sin `idsession`, de otra sesión,
   repetida y caducada; `Origin` permitido y no permitido; cabecera CORS en ambos modos; y
   ausencia del `idsession` en los logs. Se ejecutan dentro de `make test`.
+
+## §6.4 · Cifrado simétrico: modo por defecto y algoritmos obsoletos (T9)
+
+Reproducido con `tests/legacy-ciphers-repro/LegacyCiphersRepro.java`, compilado igual contra
+la base (`1c3a389bd`) y contra la rama, y con `AOCipherConfigTest` dentro de `make test`:
+
+| Caso | Base | Rama T9 |
+| --- | --- | --- |
+| Configuración por defecto (`algo`, `modo` y `padding` nulos) | `AES/ECB/PKCS5PADDING` | `AES/CBC/PKCS5PADDING` |
+| `AOCipherConfig.parse("AES")` | `AES/ECB/PKCS5PADDING` | `AES/CBC/PKCS5PADDING` |
+| `new AOCipherConfig(DES, null, null)` | Aceptado (`DES/ECB/...`) | `IllegalArgumentException` |
+| PBE-MD5-DES, PBE-SHA1-DESede, PBE-SHA1-RC2-40, HmacMD5, HmacSHA1 sin opción | Aceptados | `IllegalArgumentException` (y `NoSuchAlgorithmException` en `parse`) |
+| Los mismos con `-DallowLegacyCiphers=true` | Aceptados | Aceptados (opción explícita) |
+| `AOCipherConfig.forDeciphering(...)` con un algoritmo obsoleto | No existe | Permitido siempre, con un aviso por algoritmo y sin datos del contenido |
+
+### Reglas
+
+- **Modo por defecto:** `AOCipherBlockMode.getDefault()` es CBC y solo se aplica cuando se crea
+  una configuración con `mode == null`. El modo explícito se respeta (incluido `ECB`, para no
+  romper flujos existentes que lo piden a propósito). En descifrado el modo sale del mensaje.
+- **IV:** el vector de inicialización debe ser aleatorio por operación en los modos que lo
+  necesitan; nunca fijo.
+- **Puerta de legado:** `allowLegacyCiphers` (por defecto `false`, como `strictSslChecks`,
+  `strictTriphaseToken` y `strictWebSocketSession`) habilita DES, PBE-MD5-DES,
+  PBE-SHA1-DESede, PBE-SHA1-RC2-40, HmacMD5 y HmacSHA1 **solo al crear** cifrados nuevos.
+  RC2-40 entra en la puerta por decisión del Arquitecto (2026-11-04), aunque no figuraba en la
+  lista literal de la OT.
+- **Descifrado heredado:** `AOCipherConfig.forDeciphering(...)` no aplica la puerta, deja un
+  aviso por algoritmo en el log (sin contenido) y es el punto que deben usar los caminos de
+  descifrado.
+- **Sin fugas:** los mensajes de error y los avisos nombran el algoritmo, nunca datos,
+  claves ni contenido.
+
+### Deuda registrada
+
+`afirma-crypto-cipher` (con `AOSunJCECipher` y sus IV fijos `IV_8`/`IV_16`) y
+`afirma-crypto-cms-enveloper` (que usa `getParams` con IV fijo y en la base **no compila** por
+dependencias de BouncyCastle ausentes) están fuera de todas las reactor: no los toca T9. Si se
+recuperan, deben adoptar `allowLegacyCiphers`, `AOCipherConfig.forDeciphering` e IV aleatorio
+por operación. Se decide por separado si se eliminan.
+
+### Pruebas
+
+- `AOCipherConfigTest` (afirma-core, 10 casos) dentro de `make test`: defecto distinto de ECB,
+  `parse` sin ECB, ECB explícito respetado, rechazo por defecto de los seis algoritmos
+  obsoletos (constructor, `parse` y `setAlgorithm`), aceptación con la opción, descifrado
+  heredado siempre permitido, aviso único sin datos, algoritmos modernos intactos.
+- `tests/legacy-ciphers-repro/LegacyCiphersRepro.java`: reproducción base/rama.

@@ -166,3 +166,25 @@ grep -F 'WebSocketChannelIntegrationTest' Makefile >/dev/null \
   || fail "make test no ejecuta las pruebas del websocket real"
 
 echo "test-ci-gates: T8 OK"
+
+# T9: modo por defecto distinto de ECB y algoritmos obsoletos detras de una opcion.
+CIPHER_DIR="afirma-core/src/main/java/es/gob/afirma/core/ciphers"
+grep -F 'ALLOW_LEGACY_CIPHERS_PROPERTY = "allowLegacyCiphers"' "$CIPHER_DIR/CipherConstants.java" >/dev/null \
+  || fail "no existe la opcion explicita allowLegacyCiphers"
+grep -F 'public static boolean isLegacyAllowed()' "$CIPHER_DIR/CipherConstants.java" >/dev/null \
+  || fail "CipherConstants no expone la comprobacion de la opcion de legado"
+grep -F 'private static final AOCipherBlockMode DEFAULT_BLOCK_MODE = CBC;' "$CIPHER_DIR/CipherConstants.java" >/dev/null \
+  || fail "el modo de bloque por defecto no es CBC"
+! grep -F 'DEFAULT_BLOCK_MODE = ECB' "$CIPHER_DIR/CipherConstants.java" >/dev/null \
+  || fail "el modo de bloque por defecto sigue siendo ECB"
+grep -F 'ciphAlgo.isLegacy() && !deciphering && !CipherConstants.isLegacyAllowed()' "$CIPHER_DIR/AOCipherConfig.java" >/dev/null \
+  || fail "la creacion de cifrados no aplica la puerta de legado"
+grep -F 'public static AOCipherConfig forDeciphering(' "$CIPHER_DIR/AOCipherConfig.java" >/dev/null \
+  || fail "no existe el camino de descifrado heredado"
+grep -F 'warnLegacyForDecipher' "$CIPHER_DIR/AOCipherConfig.java" >/dev/null \
+  || fail "el descifrado heredado no deja aviso"
+# Los seis algoritmos obsoletos deben estar marcados con la bandera de legado.
+legacy_count="$(grep -cE '^[[:space:]]+(DES|PBEWITHMD5ANDDES|PBEWITHSHA1ANDDESEDE|PBEWITHSHA1ANDRC2_40|HMACMD5|HMACSHA1)\(".*, true\), //' "$CIPHER_DIR/CipherConstants.java" || true)"
+[ "$legacy_count" -eq 6 ] || fail "los seis algoritmos obsoletos no estan marcados como legacy ($legacy_count)"
+
+echo "test-ci-gates: T9 OK"
