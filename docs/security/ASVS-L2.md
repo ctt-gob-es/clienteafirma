@@ -38,7 +38,7 @@ en sus propias fases.
 | V6 Criptografía | Sí | Brecha confirmada | DES/ECB por defecto, PBE MD5/SHA1, SHA-1 en ODF, SpongyCastle (T9, T10, T15, T16) |
 | V7 Errores y logging | Sí | Brecha confirmada | `printStackTrace` y trazas de PIN (T12) |
 | V8 Protección de datos | Sí | Brecha parcial | Permisos del PFX y del secreto corregidos a solo el usuario (T4); queda `readObject` de `PdfSignResult` (T14) |
-| V9 Comunicaciones | Sí | Cumple con excepciones | Canal local en TLS 1.2 con suites filtradas (T3); ninguna vía interna desactiva la validación con `strictSslChecks=true` y la configuración remota la valida (T5). Queda la TSA (T6) |
+| V9 Comunicaciones | Sí | Cumple con excepciones | Canal local en TLS 1.2 con suites filtradas (T3); ninguna vía interna desactiva la validación con `strictSslChecks=true`, la configuración remota la valida (T5) y la TSA respeta el modo estricto y valida la respuesta (T6). Excepción: SHA-1 y canales en claro solo en modo permisivo |
 | V10 Código malicioso | Sí | Brecha confirmada | Plugins por `URLClassLoader` sin firma ni huella (T13) |
 | V11 Lógica de negocio | No aplica | N/A | Sin lógica multiusuario ni antifraude |
 | V12 Archivos y recursos | Parcial | Brecha confirmada | Nombres temporales con `Random`; permisos (T11) |
@@ -110,6 +110,7 @@ Columna `→ Sink` = punto exacto de efecto; `Control` = lo que hoy lo frena; `B
 | F8 | Bytes de cliente al trifásico de laboratorio | `XAdESTriPhaseSignerUtil.getDocumentFromBytes` (`afirma-server-triphase-signer-core/.../XAdESTriPhaseSignerUtil.java` L406–409) | → Sink: Parser XML del servidor | `SecureXmlBuilder`; WAR no expuesto | T14 |
 | F9 | JAR de plugin elegido por el usuario | `PluginLoader.loadPlugin` (`afirma-simple/.../plugins/manager/PluginLoader.java` L49–60) | → Sink: Ejecución de código en el proceso del cliente | Consentimiento del usuario en la UI; sin firma ni huella | T13 |
 | F10 | PDF del usuario | `AOPDFSigner` (`afirma-crypto-pdf/.../pades/AOPDFSigner.java`) sobre `afirma-lib-itext:1.7` | → Sink: Análisis y escritura del PDF firmado | Librería heredada; sin vectores negativos de PDF incremental | T15, T18 |
+| F11 | URL de TSA (`tsaURL` de los parámetros de firma) | `TsaParams` → `CMSTimestamper.getTimeStampToken` → `TsaResponseValidator` | → Sink: Sello de tiempo añadido a la firma | `strictSslChecks` para el canal (sin confianza ciega ni HTTP en claro), nonce obligatorio, firma, EKU, cadena PKIX y hora del sello (T6) | T6 |
 
 Inventario de parsers XML en `master` (código principal, sin tests): `DocumentBuilderFactory.newInstance` 5,
 `SAXParserFactory` 6, `XMLInputFactory` 0, `TransformerFactory` 6; `SecureXmlBuilder` se usa en 28 ficheros.
@@ -142,12 +143,35 @@ y los valores por defecto de la JVM no cambian.
 Criterio de cierre de T5: **ninguna vía desactiva la validación cuando `strictSslChecks=true`**;
 el modo permisivo exige acción explícita, avisa con el motivo y solo afecta a esa petición.
 
+## 6.1. TSA: canal y validación de la respuesta (T6)
+
+H4 estaba **pendiente de reproducción**; la reproducción con una TSA sintética local
+(`SyntheticTsa`, sin red externa) confirmó la brecha y fijó el alcance del cambio:
+
+| Caso reproducido antes de T6 | Comportamiento observado | Estado tras T6 |
+| --- | --- | --- |
+| TLS con certificado no confiable y `strictSslChecks=true` | **Aceptaba** el sello: `configureHttpsConnection` instalaba un `TrustManager` que no valida nada cuando no hay truststore y no consultaba el modo estricto | Rechaza: en estricto se usa la confianza del sistema y se fuerza la verificación de hostname |
+| TSA por `http://` (o `socket://`) con `strictSslChecks=true` | **Aceptaba** el canal en claro | Rechaza; en permisivo avisa con el motivo y el host |
+| Sello sin los certificados del firmante | **Aceptaba** (no se verificaba la firma) | Rechaza |
+| Sello firmado con un certificado sin EKU `id-kp-timeStamping` | **Aceptaba** | Rechaza |
+| Certificado de la TSA sin cadena a una CA de confianza | **Aceptaba** | Rechaza en estricto (PKIX, revocación desactivada: el cliente no consulta CRL/OCSP al sellar) |
+| Hora del sello alejada de la del equipo | No se comprobaba | Rechaza si se desvía más de 24 h |
+| Nonce o imprint alterados | Rechazaba (`TimeStampResponse.validate`) | Se mantiene, ahora con nonce aleatorio obligatorio en cada petición |
+| `getTimeStampToken(..., null, ...)` | Usaba **SHA-1** | Usa SHA-256; SHA-1 explícito solo en modo permisivo, con aviso |
+
+Archivos: `afirma-crypto-core-pkcs7-tsp/.../CMSTimestamper.java` (transporte, TLS, nonce y algoritmo),
+`.../TsaResponseValidator.java` (firma, EKU, cadena y hora) y `TsaValidationTest` (13 casos con la TSA
+sintética: válida, nonce, imprint, EKU, sin certificados, sin ancla, TLS no confiable, HTTP en estricto,
+permisivo con aviso, SHA-256 por defecto, SHA-1 rechazado, hora irrazonable y avisos sin ruta).
+
 ## 7. Excepciones documentadas
 
 | Excepción | Motivo | Condición de salida |
 | --- | --- | --- |
 | SHA-1 permitido en ODF | Compatibilidad con firmas ODF heredadas (`AOSignConstants.isSHA1AllowedForFormat`, L439–446) | Se mantiene mientras existan documentos ODF firmados con SHA-1 en circulación; revisar en cada fase |
 | SHA-1 prohibido en XAdES, CAdES y PAdES | `AOSignConstants.validateSHA1ForFormat` (L454) lanza `IllegalArgumentException`; cubierto por `SHA1RejectionTest` | Cierre verificado por `make test` (T10) |
+| SHA-1 en la TSA | El algoritmo de huella del sello se puede fijar explícitamente a SHA-1, pero solo en modo permisivo (`strictSslChecks=false`) y con aviso; nunca por defecto | Revisar cuando no queden TSAs que solo admitan SHA-1 (T6) |
+| Revocación de la TSA sin comprobar | El sellado es una operación en línea: no se consultan CRL/OCSP para no añadir dependencias de red ni bloquear el sellado | Reabrir si se exige validación de revocación en el sellado (T6) |
 | Canal local sin TLS 1.3 | El objetivo de compilación es Java 8, que no soporta TLS 1.3, y sus suites forman un conjunto distinto del de TLS 1.2 | Reabrir si se eleva el objetivo mínimo a Java 11 (T3) |
 | Conexiones salientes fijadas a TLS 1.2 | `SslSecurityManager` construye sus `SSLContext` con `TLSv1.2` (antes `SSL`, que permitía versiones obsoletas); Java 8 no implementa TLS 1.3 | Al subir a Java 11, pasar a `TLS` con suites de 1.3 habilitadas (T5) |
 | WAR trifásico fuera de alcance | Laboratorio F8, no desplegado | Reabrir V4/V13 si se expone |
@@ -171,7 +195,8 @@ test -f docs/security/ASVS-L2.md && grep -c '→ Sink' docs/security/ASVS-L2.md 
 make validate
 make interop-selftest   # T3b: scripts de interoperabilidad (sin red ni docker)
 
-bash scripts/ci/test-ci-gates.sh                                          # gate estático de T5
+bash scripts/ci/test-ci-gates.sh                                          # gates estáticos de T5 y T6
+mvn -B -pl afirma-crypto-core-pkcs7-tsp -am test -Dtest=TsaValidationTest  # TSA sintética (T6)
 mvn -B -pl afirma-core -Dtest=StrictSslChecksTest test                    # 12 casos de T5
 
 grep -rn 'KSPASS\|CTPASS' afirma-simple/src/main/java/es/gob/afirma/standalone/protocol/SecureSocketUtils.java  # sin resultados (T4)

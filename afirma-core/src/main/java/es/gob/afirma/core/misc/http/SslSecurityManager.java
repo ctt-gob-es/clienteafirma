@@ -215,6 +215,26 @@ public final class SslSecurityManager {
 		return chain;
 	}
 
+	/**
+	 * Devuelve los <code>TrustManager</code> que no validan certificados. Solo deben usarse en
+	 * modo permisivo: el llamador es responsable de comprobar antes
+	 * {@link #isStrictSslChecks()}.
+	 * @return Copia defensiva de los <code>TrustManager</code> permisivos.
+	 */
+	public static TrustManager[] getPermissiveTrustManagers() {
+		return DUMMY_TRUST_MANAGER.clone();
+	}
+
+	/**
+	 * Devuelve el verificador de nombres que acepta cualquier <i>host</i>. Solo debe usarse en
+	 * modo permisivo: el llamador es responsable de comprobar antes
+	 * {@link #isStrictSslChecks()}.
+	 * @return Verificador de nombres permisivo.
+	 */
+	public static HostnameVerifier getPermissiveHostnameVerifier() {
+		return DUMMY_HOSTNAME_VERIFIER;
+	}
+
 	/** Recorta el motivo para que el aviso no arrastre datos de la petici&oacute;n. */
 	private static String cleanReason(final String reason) {
 		if (reason == null || reason.trim().isEmpty()) {

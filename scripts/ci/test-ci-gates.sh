@@ -67,3 +67,29 @@ grep -F 'downloadData(filePath, false)' afirma-ui-simple-configurator-common/src
   || fail "ConfigUpdaterManager no descarga la configuracion con validacion TLS"
 
 echo "test-ci-gates: T5 OK"
+
+# T6: la TSA respeta strictSslChecks y valida la respuesta (firma, EKU, cadena y hora).
+TSA_DIR="afirma-crypto-core-pkcs7-tsp/src/main/java/es/gob/afirma/signers/tsp/pkcs7"
+grep -F 'isStrictSslChecks()' "$TSA_DIR/CMSTimestamper.java" >/dev/null \
+  || fail "CMSTimestamper no consulta strictSslChecks"
+grep -F 'else if (strictSsl) {' "$TSA_DIR/CMSTimestamper.java" >/dev/null \
+  || fail "CMSTimestamper no usa la confianza del sistema en modo estricto"
+# La TSA no define sus propios trust managers: usa los permisivos centralizados de T5
+! grep -F 'checkServerTrusted' "$TSA_DIR/CMSTimestamper.java" >/dev/null \
+  || fail "CMSTimestamper define trust managers propios"
+grep -F 'SslSecurityManager.getPermissiveTrustManagers()' "$TSA_DIR/CMSTimestamper.java" >/dev/null \
+  || fail "CMSTimestamper no usa los trust managers permisivos centralizados"
+grep -F 'TsaResponseValidator.validate(' "$TSA_DIR/CMSTimestamper.java" >/dev/null \
+  || fail "CMSTimestamper no valida la respuesta de la TSA"
+grep -F 'isSignatureValid(' "$TSA_DIR/TsaResponseValidator.java" >/dev/null \
+  || fail "el validador de TSA no verifica la firma del sello"
+grep -F 'id_kp_timeStamping' "$TSA_DIR/TsaResponseValidator.java" >/dev/null \
+  || fail "el validador de TSA no comprueba el EKU de sellado de tiempo"
+grep -F 'MAX_CLOCK_SKEW_MILLIS' "$TSA_DIR/TsaResponseValidator.java" >/dev/null \
+  || fail "el validador de TSA no comprueba la hora razonable"
+grep -F 'id_sha256.getId()' "$TSA_DIR/CMSTimestamper.java" >/dev/null \
+  || fail "CMSTimestamper no usa SHA-256 como algoritmo por defecto"
+! grep -F 'new String(rawResponse)' "$TSA_DIR/CMSTimestamper.java" >/dev/null \
+  || fail "CMSTimestamper registra o propaga el contenido de la respuesta de la TSA"
+
+echo "test-ci-gates: T6 OK"
