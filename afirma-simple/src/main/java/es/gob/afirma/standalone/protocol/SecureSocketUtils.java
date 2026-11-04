@@ -23,9 +23,23 @@ public class SecureSocketUtils {
 	private static final String CTPASS = "654321"; //$NON-NLS-1$
 	private static final String KEYSTORE_NAME = "autofirma.pfx"; //$NON-NLS-1$
 	private static final String PKCS12 = "PKCS12"; //$NON-NLS-1$
-	private static final String SSLCONTEXT = "TLSv1"; //$NON-NLS-1$
+
+	/** Protocolo TLS usado para crear el contexto del canal local. TLS 1.0 y 1.1 quedan
+	 * excluidos (ASVS 4.0.3 V9.1.3). */
+	private static final String SSLCONTEXT = "TLSv1.2"; //$NON-NLS-1$
+
+	/** Protocolos que se habilitan en los sockets del canal local. */
+	private static final String[] ENABLED_PROTOCOLS = new String[] { "TLSv1.2" }; //$NON-NLS-1$
 
 	private static KeyManagerFactory kmf = null;
+
+	/**
+	 * Obtiene los protocolos TLS que deben habilitarse en los sockets del canal local.
+	 * @return Copia de la lista de protocolos habilitados.
+	 */
+	public static String[] getEnabledProtocols() {
+		return ENABLED_PROTOCOLS.clone();
+	}
 
 	/**
 	 * Obtiene un contexto SSL para la apertura de un socket/websocket seguro.

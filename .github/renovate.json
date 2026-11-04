@@ -102,6 +102,21 @@
       "minimumReleaseAge": "7 days"
     },
     {
+      "description": "DSS: sin automerge; revisión visual del resultado de interop.",
+      "matchManagers": [
+        "maven"
+      ],
+      "matchPackageNames": [
+        "eu.europa.ec.joinup.sd-dss:*"
+      ],
+      "automerge": false,
+      "groupName": "DSS",
+      "addLabels": [
+        "visual-review"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
       "description": "BouncyCastle: manual.",
       "matchManagers": [
         "maven"

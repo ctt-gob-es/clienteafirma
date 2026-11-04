@@ -3,3 +3,14 @@
 # Product Java trees (clienteafirma/) are gitignored — not covered here.
 set -e
 make quality
+
+# T3b: nunca versionar PKCS#12 ni la evidencia local de interoperabilidad.
+staged="$(git diff --cached --name-only --diff-filter=ACM | grep -Ei '\.(p12|pfx)$' || true)"
+if [ -n "$staged" ]; then
+	echo "ERROR: no se puede versionar un PKCS#12: $staged" >&2
+	exit 1
+fi
+if git diff --cached --name-only | grep -q '^interop-local/'; then
+	echo "ERROR: interop-local/ no se versiona" >&2
+	exit 1
+fi

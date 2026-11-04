@@ -1,0 +1,167 @@
+name: DSS image
+
+# Construye y publica el validador propio sobre EU DSS que usa el job `interop`
+# (OT Fase 2 · T3b · A4). La imagen se cita siempre por digest.
+#
+# Cadena de publicacion: tests -> build -> escaneo Trivy (falla con HIGH/CRITICAL
+# corregibles) -> push a GHCR -> SBOM + attestation de procedencia.
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+  # Permite construir la imagen desde una rama de trabajo antes de que el workflow
+  # exista en la rama por defecto (workflow_dispatch exige master).
+  push:
+    tags:
+      - 'dss-image-v*'
+  pull_request:
+    paths:
+      - 'tests/interop-dss/**'
+      - '.github/workflows/dss-image.yml'
+
+permissions: {}
+
+concurrency:
+  group: dss-image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: interop-dss-validator
+  # GHCR exige minusculas en el nombre del repositorio de la imagen.
+  IMAGE_OWNER: soluciones-alexendros
+
+jobs:
+  build:
+    name: Build, scan and publish interop-dss-validator
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Unit tests (TOTAL_PASSED with its CA, INDETERMINATE with another)
+        working-directory: tests/interop-dss
+        run: mvn -B test
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
+
+      - name: Build image locally for scanning
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6.9.0
+        with:
+          context: tests/interop-dss
+          file: tests/interop-dss/Dockerfile
+          load: true
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Install Trivy (verificado por checksum, sin acciones de terceros)
+        env:
+          TRIVY_VERSION: '0.76.1'
+        run: |
+          set -euo pipefail
+          base="https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}"
+          asset="trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          curl -fsSL -o "$asset" "${base}/${asset}"
+          curl -fsSL -o trivy_checksums.txt "${base}/trivy_${TRIVY_VERSION}_checksums.txt"
+          grep " ${asset}$" trivy_checksums.txt | sha256sum -c -
+          tar -xzf "$asset" trivy
+          sudo install -m 0755 trivy /usr/local/bin/trivy
+          trivy --version
+
+      - name: Trivy scan (fail on fixable HIGH/CRITICAL)
+        run: |
+          set -euo pipefail
+          trivy image \
+            --scanners vuln \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --exit-code 1 \
+            --no-progress \
+            "${{ env.IMAGE_NAME }}:scan"
+
+      - name: Trivy SBOM (CycloneDX)
+        run: |
+          set -euo pipefail
+          trivy image \
+            --format cyclonedx \
+            --output interop-dss-validator.sbom.cdx.json \
+            --no-progress \
+            "${{ env.IMAGE_NAME }}:scan"
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push (by digest)
+        id: build
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6.9.0
+        with:
+          context: tests/interop-dss
+          file: tests/interop-dss/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}:latest
+          labels: |
+            org.opencontainers.image.title=interop-dss-validator
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          sbom: false
+
+      - name: Attest build provenance
+        if: github.event_name != 'pull_request'
+        uses: actions/attest-build-provenance@520d128f165991a6c774bcb264f323e3d70747f4 # v2.2.0
+        with:
+          subject-name: ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Publish the digest for vars.DSS_IMAGE
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}"
+          digest="${{ steps.build.outputs.digest }}"
+          {
+            echo "## Validador DSS publicado"
+            echo
+            echo "- Commit: \`${{ github.sha }}\`"
+            echo "- Imagen: \`${image}@${digest}\`"
+            echo
+            echo "Asigna ese valor a la variable de repositorio \`DSS_IMAGE\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "DSS_IMAGE=${image}@${digest}"
+
+      - name: Upload SBOM and image digest
+        if: always()
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        with:
+          name: interop-dss-validator-sbom
+          path: interop-dss-validator.sbom.cdx.json
+          if-no-files-found: warn
+          retention-days: 30

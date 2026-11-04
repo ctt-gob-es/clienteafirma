@@ -38,7 +38,7 @@ en sus propias fases.
 | V6 Criptografía | Sí | Brecha confirmada | DES/ECB por defecto, PBE MD5/SHA1, SHA-1 en ODF, SpongyCastle (T9, T10, T15, T16) |
 | V7 Errores y logging | Sí | Brecha confirmada | `printStackTrace` y trazas de PIN (T12) |
 | V8 Protección de datos | Sí | Brecha parcial | Permisos del PFX; `readObject` de `PdfSignResult` (T4, T14) |
-| V9 Comunicaciones | Sí | Brecha confirmada | `TLSv1` en canal local; `DUMMY_TRUST` alcanzable; descarga de configuración sin TLS (T3, T5, T6) |
+| V9 Comunicaciones | Sí | Brecha parcial | Canal local ya en TLS 1.2 con suites filtradas (T3); quedan `DUMMY_TRUST` y descarga de configuración (T5) y TSA (T6) |
 | V10 Código malicioso | Sí | Brecha confirmada | Plugins por `URLClassLoader` sin firma ni huella (T13) |
 | V11 Lógica de negocio | No aplica | N/A | Sin lógica multiusuario ni antifraude |
 | V12 Archivos y recursos | Parcial | Brecha confirmada | Nombres temporales con `Random`; permisos (T11) |
@@ -80,7 +80,7 @@ Columna `→ Sink` = punto exacto de efecto; `Control` = lo que hoy lo frena; `B
 | F2 | URL de `stservlet`/recurso en los parámetros | `UrlHttpManagerImpl.readUrl` (`afirma-core/.../misc/http/UrlHttpManagerImpl.java` L214–226) → `SslSecurityManager` | → Sink: Conexión TLS saliente y envío del documento | `strictSslChecks=true` por defecto; modo permisivo si se pide explícitamente | T5 |
 | F3 | Configuración remota | `ConfigUpdaterManager.readFromUrl` (`afirma-ui-simple-configurator-common/.../ConfigUpdaterManager.java` L118) → `DataDownloader.downloadData(filePath, false, true)` (`afirma-core/.../misc/http/DataDownloader.java` L57, L77–82) | → Sink: Descarga HTTPS sin validar el certificado | **Ninguno**: `ignoreSSLSecurity=true` aunque `strictSslChecks=true` | T5 |
 | F4 | Mensaje al websocket local | `AfirmaWebSocketServerV4Sup.onMessage` (`afirma-simple/.../protocol/AfirmaWebSocketServerV4Sup.java` L64–103) → `ProtocolInvocationLauncher.launch` | → Sink: Operación de firma | `isLocalAddress` solo acepta `127.0.0.1` (L121–123) e `idsession` (L78–83); sin validar `Origin` | T8 |
-| F5 | Petición HTTP al socket TLS local | `ServiceInvocationManager.startService` → `CommandProcessorThread.run` (`afirma-simple/.../protocol/CommandProcessorThread.java` L92–134) | → Sink: Respuesta con el resultado de la operación | Comprobación de host en L164–165 (`127.0.0.1`, `::1`) e `idsession`; respuesta con `Access-Control-Allow-Origin: *` (L510) | T8 |
+| F5 | Petición HTTP al socket TLS local | `ServiceInvocationManager.startService` → `CommandProcessorThread.run` (`afirma-simple/.../protocol/CommandProcessorThread.java` L92–134) | → Sink: Respuesta con el resultado de la operación | TLS 1.2 con suites ECDHE/DHE sin SHA-1 (T3), `setEnabledProtocols`, suites filtradas por soporte; comprobación de host en L164–165 (`127.0.0.1`, `::1`) e `idsession`; respuesta con `Access-Control-Allow-Origin: *` (L510) | T8 |
 | F6 | Documento XML de hashes del usuario | `XmlHashDocument.load` (`afirma-simple-plugin-hash/.../XmlHashDocument.java` L151) | → Sink: Parser XML (DOM) | `SecureXmlBuilder.getSecureDocumentBuilder()` | T14 |
 | F7 | OOXML del usuario | `ContentTypeManager.getDocumentBuilder` (`afirma-crypto-ooxml/.../ContentTypeManager.java` L93) | → Sink: Parser XML del `[Content_Types].xml` | `SecureXmlBuilder` | T14 |
 | F8 | Bytes de cliente al trifásico de laboratorio | `XAdESTriPhaseSignerUtil.getDocumentFromBytes` (`afirma-server-triphase-signer-core/.../XAdESTriPhaseSignerUtil.java` L406–409) | → Sink: Parser XML del servidor | `SecureXmlBuilder`; WAR no expuesto | T14 |
@@ -110,6 +110,7 @@ salvo estas dos, que solo obtienen el certificado del servidor y no transportan 
 | --- | --- | --- |
 | SHA-1 permitido en ODF | Compatibilidad con firmas ODF heredadas (`AOSignConstants.isSHA1AllowedForFormat`, L439–446) | Se mantiene mientras existan documentos ODF firmados con SHA-1 en circulación; revisar en cada fase |
 | SHA-1 prohibido en XAdES, CAdES y PAdES | `AOSignConstants.validateSHA1ForFormat` (L454) lanza `IllegalArgumentException`; cubierto por `SHA1RejectionTest` | Cierre verificado por `make test` (T10) |
+| Canal local sin TLS 1.3 | El objetivo de compilación es Java 8, que no soporta TLS 1.3, y sus suites forman un conjunto distinto del de TLS 1.2 | Reabrir si se eleva el objetivo mínimo a Java 11 (T3) |
 | WAR trifásico fuera de alcance | Laboratorio F8, no desplegado | Reabrir V4/V13 si se expone |
 
 ## 8. Riesgo residual registrado fuera de esta matriz
@@ -128,7 +129,15 @@ Ninguna de las hipótesis H4–H6 se presenta aquí como vulnerabilidad verifica
 ```bash
 test -f docs/security/ASVS-L2.md && grep -c '→ Sink' docs/security/ASVS-L2.md   # >= 4 flujos
 make validate
+make interop-selftest   # T3b: scripts de interoperabilidad (sin red ni docker)
 ```
+
+El job `interop` (`.github/workflows/interop.yml`, tarea T3b) comprueba en cada PR el
+endurecimiento TLS del canal local, la compatibilidad de Firefox, Chromium y Edge con las
+suites habilitadas, y la validación con EU DSS de una firma hecha con certificado sintético.
+
+La firma completa **desde el navegador** (diálogo de confirmación de la GUI de Autofirma) no se
+automatiza: sigue siendo prueba manual antes de publicar cada versión (`make interop-local`).
 
 La matriz debe actualizarse en la misma tarea que cierre cada brecha: un cambio de estado sin
 prueba asociada es un error de este documento.

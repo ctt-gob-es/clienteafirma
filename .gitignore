@@ -97,3 +97,8 @@ node_modules/
 # Archify / Playwright MCP artefactos locales
 .archify/
 .playwright-mcp/
+
+# Interoperabilidad (T3b): certificados y evidencia local nunca se versionan
+*.p12
+*.pfx
+interop-local/
