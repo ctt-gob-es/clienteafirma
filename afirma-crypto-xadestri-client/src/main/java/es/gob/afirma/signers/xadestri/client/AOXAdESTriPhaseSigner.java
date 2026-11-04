@@ -50,6 +50,7 @@ import es.gob.afirma.core.signers.AOTriphaseSigner;
 import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.OptionalDataInterface;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.signers.pkcs7.TriphaseTokenValidator;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
 import es.gob.afirma.core.signers.TriphaseUtil;
 import es.gob.afirma.core.util.tree.AOTreeModel;
@@ -501,6 +502,9 @@ public class AOXAdESTriPhaseSigner extends AOTriphaseSigner implements OptionalD
 			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e, ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE); //$NON-NLS-1$
 		}
+
+		// T7: token firmado del servidor (firma, EKU, cadena, vigencia y ligadura con la peticion)
+		TriphaseTokenValidator.validate(triphaseData, documentId, format, cryptoOperation, extraParams);
 
 		final String preResultAsBase64 = Base64.encode(
 			TriphaseDataSigner.doSign(

@@ -30,7 +30,7 @@ en sus propias fases.
 | Capítulo ASVS 4.0.3 | Aplica | Estado | Brecha / tarea |
 | --- | --- | --- | --- |
 | V1 Arquitectura y modelado de amenazas | Sí | En curso | Sin modelo de amenazas previo; este documento lo abre (T2) |
-| V2 Autenticación | Sí | Pendiente de reproducción | Token trifásico sin verificar firma/EKU/cadena (H5, T7) |
+| V2 Autenticación | Sí | Cumple con límite | Token trifásico validado (firma, EKU, cadena, vigencia y ligadura con la petición) cuando el servidor lo envía; la exigencia del token es una preferencia desactivada por defecto por compatibilidad (T7) |
 | V2.5 Credenciales y secretos | Sí | Cumple con límite | El PFX local ya no usa contraseña fija: secreto aleatorio por usuario en fichero 0600 y migración de almacenes heredados (T4). Límite: instalador y almacenes de solo lectura |
 | V3 Gestión de sesión | Sí | Brecha parcial | `idsession` opcional; origen del websocket sin validar (T8) |
 | V4 Control de acceso | No aplica | Fuera de alcance | Cliente monousuario; WAR trifásico no expuesto |
@@ -164,12 +164,61 @@ Archivos: `afirma-crypto-core-pkcs7-tsp/.../CMSTimestamper.java` (transporte, TL
 sintética: válida, nonce, imprint, EKU, sin certificados, sin ancla, TLS no confiable, HTTP en estricto,
 permisivo con aviso, SHA-256 por defecto, SHA-1 rechazado, hora irrazonable y avisos sin ruta).
 
+## 6.2. Token trifásico: validación de la respuesta del servidor (T7)
+
+H5 estaba **pendiente de reproducción**. La reproducción con un servidor trifásico sintético
+local (protocolo `pre`/`post` real, sin el WAR de laboratorio) la **confirma**: el cliente
+aceptaba cualquier respuesta del servidor sin verificar nada. El token no existía en el protocolo
+(`TriphaseData` no tenía campo de token) y `CertUtil` solo maneja EKU en el configurador.
+
+| Caso reproducido antes de T7 | Comportamiento observado |
+| --- | --- |
+| Token con la firma alterada | **Acepta** la sesión y llega a la postfirma |
+| Token firmado con un certificado sin EKU de sellado | **Acepta** |
+| Token firmado con un certificado sin ancla de confianza | **Acepta** |
+| Token con certificado caducado | **Acepta** |
+| Token caducado | **Acepta** |
+| Token de otra sesión o de otro documento | **Acepta** |
+| Sin token | **Acepta** en silencio |
+
+**Token trifásico (versión 1).** Firma CMS (`SignedData` con el contenido encapsulado) sobre una
+carga útil de líneas `clave=valor`, codificada en Base64 y transportada en el atributo `token` del
+nodo `<firmas>` de la respuesta de prefirma:
+
+```
+afirma-triphase-token-v1
+session=<identificador de sesion>
+doc=<identificador del documento enviado por el cliente>
+format=<formato de firma>
+op=<operacion criptografica>
+iat=<milisegundos desde epoch>
+exp=<milisegundos desde epoch>
+```
+
+**Validación (falla en cerrado si el token se envía).** Firma del firmante, EKU de sellado
+(`id-kp-emailProtection`) o de servicio (`id-kp-serverAuth`), cadena PKIX contra las anclas de
+confianza (`triphaseTrustStore` o almacén del sistema, sin revocación), vigencia del certificado,
+vigencia del token (vida máxima 24 h y desfase máximo 5 min) y ligadura con la petición
+(documento, formato y operación). Un token inválido se rechaza **antes** de firmar la prefirma y
+antes de la postfirma.
+
+**Alcance.** CAdES, XAdES, PAdES (trifásicas) y lotes de firma; el cliente PKCS#1/NONE usa el mismo
+validador por reflexión. Los mensajes y avisos no incluyen el token, el documento ni la URL con
+parámetros.
+
+**Compatibilidad.** La exigencia del token es una preferencia (`strictTriphaseToken`, por defecto
+`false`, activable también con `-DstrictTriphaseToken=true`). Con servidores que no lo emiten y la
+preferencia desactivada se registra un aviso y se continúa; con la preferencia activa se rechaza.
+Riesgo de compatibilidad: los servidores trifásicos desplegados no emiten el token; activar la
+preferencia antes de actualizarlos impediría firmar.
+
 ## 7. Excepciones documentadas
 
 | Excepción | Motivo | Condición de salida |
 | --- | --- | --- |
 | SHA-1 permitido en ODF | Compatibilidad con firmas ODF heredadas (`AOSignConstants.isSHA1AllowedForFormat`, L439–446) | Se mantiene mientras existan documentos ODF firmados con SHA-1 en circulación; revisar en cada fase |
 | SHA-1 prohibido en XAdES, CAdES y PAdES | `AOSignConstants.validateSHA1ForFormat` (L454) lanza `IllegalArgumentException`; cubierto por `SHA1RejectionTest` | Cierre verificado por `make test` (T10) |
+| Token trifásico opcional | La exigencia del token firmado está **desactivada por defecto** (`strictTriphaseToken=false`) para no romper los servidores trifásicos desplegados que aún no lo emiten; si el servidor envía un token, **siempre** se valida | Activar por defecto cuando los servidores desplegados emitan el token (T7) |
 | SHA-1 en la TSA | El algoritmo de huella del sello se puede fijar explícitamente a SHA-1, pero solo en modo permisivo (`strictSslChecks=false`) y con aviso; nunca por defecto | Revisar cuando no queden TSAs que solo admitan SHA-1 (T6) |
 | Revocación de la TSA sin comprobar | El sellado es una operación en línea: no se consultan CRL/OCSP para no añadir dependencias de red ni bloquear el sellado | Reabrir si se exige validación de revocación en el sellado (T6) |
 | Canal local sin TLS 1.3 | El objetivo de compilación es Java 8, que no soporta TLS 1.3, y sus suites forman un conjunto distinto del de TLS 1.2 | Reabrir si se eleva el objetivo mínimo a Java 11 (T3) |
@@ -182,7 +231,7 @@ permisivo con aviso, SHA-256 por defecto, SHA-1 rechazado, hora irrazonable y av
 | --- | --- | --- | --- |
 | SEC-009 / H15 | Plugins sin firma; gobernanza en una sola persona | En tratamiento (T13) y aceptado (H15) | `docs/RISK-REGISTER.md` |
 | H4 | TSA y TLS posiblemente insuficientes | Pendiente de reproducción (T6) | `docs/RISK-REGISTER.md` |
-| H5 | Token trifásico sin validar | Pendiente de reproducción (T7) | `docs/RISK-REGISTER.md` |
+| H5 | Token trifásico sin validar | **Confirmado y tratado (T7)**: ver §6.2 | `docs/RISK-REGISTER.md` |
 | H6 | Canal local: loopback, TLS y sesión | Pendiente de reproducción (T8) | `docs/RISK-REGISTER.md` |
 | SEC-010 | Almacén del canal local en instalación por máquina sin escritura: se mantiene la contraseña heredada con aviso | Abierto, con condiciones de salida en 2.1 (T4) | `docs/security/ASVS-L2.md` |
 
@@ -197,6 +246,7 @@ make interop-selftest   # T3b: scripts de interoperabilidad (sin red ni docker)
 
 bash scripts/ci/test-ci-gates.sh                                          # gates estáticos de T5 y T6
 mvn -B -pl afirma-crypto-core-pkcs7-tsp -am test -Dtest=TsaValidationTest  # TSA sintética (T6)
+mvn -B -pl afirma-crypto-cadestri-client -am test -Dtest=TriphaseTokenTest  # token trifásico (T7)
 mvn -B -pl afirma-core -Dtest=StrictSslChecksTest test                    # 12 casos de T5
 
 grep -rn 'KSPASS\|CTPASS' afirma-simple/src/main/java/es/gob/afirma/standalone/protocol/SecureSocketUtils.java  # sin resultados (T4)

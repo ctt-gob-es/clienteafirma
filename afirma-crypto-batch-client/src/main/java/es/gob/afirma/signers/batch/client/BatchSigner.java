@@ -40,6 +40,7 @@ import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.signers.pkcs7.TriphaseTokenValidator;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
 
 /** Cliente del servicio de firma por lote.
@@ -449,6 +450,9 @@ public final class BatchSigner {
 		}
 
 		final TriphaseData td1 = TriphaseData.parser(ret);
+
+		// T7: token firmado del servidor; el documento ligado es el propio lote enviado
+		TriphaseTokenValidator.validate(td1, batchUrlSafe, null, null, extraParams);
 
 		// El cliente hace los PKCS#1 generando TD2, que envia de nuevo al servidor
 		final TriphaseData td2 = TriphaseDataSigner.doSign(

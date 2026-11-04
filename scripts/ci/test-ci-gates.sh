@@ -93,3 +93,28 @@ grep -F 'id_sha256.getId()' "$TSA_DIR/CMSTimestamper.java" >/dev/null \
   || fail "CMSTimestamper registra o propaga el contenido de la respuesta de la TSA"
 
 echo "test-ci-gates: T6 OK"
+
+# T7: token firmado de la sesion trifasica validado en todos los caminos del cliente.
+TOKEN_DIR="afirma-crypto-core-pkcs7/src/main/java/es/gob/afirma/signers/pkcs7"
+grep -F 'getToken()' afirma-core/src/main/java/es/gob/afirma/core/signers/TriphaseData.java >/dev/null \
+  || fail "TriphaseData no expone el token firmado de la sesion"
+for f in \
+    afirma-crypto-cadestri-client/src/main/java/es/gob/afirma/signers/cadestri/client/AOCAdESTriPhaseSigner.java \
+    afirma-crypto-xadestri-client/src/main/java/es/gob/afirma/signers/xadestri/client/AOXAdESTriPhaseSigner.java \
+    afirma-crypto-padestri-client/src/main/java/es/gob/afirma/signers/padestri/client/PDFTriPhaseSignerUtil.java \
+    afirma-crypto-batch-client/src/main/java/es/gob/afirma/signers/batch/client/BatchSigner.java \
+    afirma-core/src/main/java/es/gob/afirma/core/signers/AOPkcs1TriPhaseSigner.java ; do
+  grep -q 'TriphaseTokenValidator' "$f" || fail "$f no valida el token trifasico"
+done
+grep -F 'signer.verify(' "$TOKEN_DIR/TriphaseTokenValidator.java" >/dev/null \
+  || fail "el validador del token trifasico no verifica la firma"
+grep -F 'id_kp_emailProtection' "$TOKEN_DIR/TriphaseTokenValidator.java" >/dev/null \
+  || fail "el validador del token trifasico no comprueba el EKU de sellado"
+grep -F 'CertPathBuilder' "$TOKEN_DIR/TriphaseTokenValidator.java" >/dev/null \
+  || fail "el validador del token trifasico no valida la cadena PKIX"
+grep -F 'MAX_TOKEN_LIFETIME_MILLIS' "$TOKEN_DIR/TriphaseTokenValidator.java" >/dev/null \
+  || fail "el validador del token trifasico no comprueba su vigencia"
+grep -F 'strictTriphaseToken' "$TOKEN_DIR/TriphaseTokenValidator.java" >/dev/null \
+  || fail "el token trifasico no es activable por preferencia"
+
+echo "test-ci-gates: T7 OK"
