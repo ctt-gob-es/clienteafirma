@@ -188,7 +188,7 @@ public final class SslSecurityManager {
 
 		final CertificateCapture capture = new CertificateCapture();
 		try {
-			final SSLContext sc = SSLContext.getInstance("TLS"); //$NON-NLS-1$
+			final SSLContext sc = SSLContext.getInstance("TLSv1.2"); //$NON-NLS-1$
 			sc.init(null, new TrustManager[] { capture }, secureRandom);
 			try (SSLSocket socket = (SSLSocket) sc.getSocketFactory().createSocket()) {
 				socket.connect(new InetSocketAddress(host, port), CERTIFICATE_CONNECT_TIMEOUT);
