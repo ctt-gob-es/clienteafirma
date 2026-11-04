@@ -31,13 +31,13 @@ en sus propias fases.
 | --- | --- | --- | --- |
 | V1 Arquitectura y modelado de amenazas | Sí | En curso | Sin modelo de amenazas previo; este documento lo abre (T2) |
 | V2 Autenticación | Sí | Pendiente de reproducción | Token trifásico sin verificar firma/EKU/cadena (H5, T7) |
-| V2.5 Credenciales y secretos | Sí | Brecha confirmada | Contraseña fija del PFX local (T4) |
+| V2.5 Credenciales y secretos | Sí | Cumple con límite | El PFX local ya no usa contraseña fija: secreto aleatorio por usuario en fichero 0600 y migración de almacenes heredados (T4). Límite: instalador y almacenes de solo lectura |
 | V3 Gestión de sesión | Sí | Brecha parcial | `idsession` opcional; origen del websocket sin validar (T8) |
 | V4 Control de acceso | No aplica | Fuera de alcance | Cliente monousuario; WAR trifásico no expuesto |
 | V5 Validación de entrada | Sí | Mitigado sin gate | XXE cerrado en sinks de usuario; falta anti-regresión (T14) |
 | V6 Criptografía | Sí | Brecha confirmada | DES/ECB por defecto, PBE MD5/SHA1, SHA-1 en ODF, SpongyCastle (T9, T10, T15, T16) |
 | V7 Errores y logging | Sí | Brecha confirmada | `printStackTrace` y trazas de PIN (T12) |
-| V8 Protección de datos | Sí | Brecha parcial | Permisos del PFX; `readObject` de `PdfSignResult` (T4, T14) |
+| V8 Protección de datos | Sí | Brecha parcial | Permisos del PFX y del secreto corregidos a solo el usuario (T4); queda `readObject` de `PdfSignResult` (T14) |
 | V9 Comunicaciones | Sí | Brecha parcial | Canal local ya en TLS 1.2 con suites filtradas (T3); quedan `DUMMY_TRUST` y descarga de configuración (T5) y TSA (T6) |
 | V10 Código malicioso | Sí | Brecha confirmada | Plugins por `URLClassLoader` sin firma ni huella (T13) |
 | V11 Lógica de negocio | No aplica | N/A | Sin lógica multiusuario ni antifraude |
@@ -47,6 +47,30 @@ en sus propias fases.
 
 Criterio de cierre: cada fila pasa a «Cumple» solo con una prueba ejecutable en el repositorio
 (`make validate`, `make test` o un gate dedicado) y evidencia citada en esta tabla.
+
+### 2.1 Secreto del almacén del canal local (T4)
+
+Brecha cerrada: `autofirma.pfx` se protegía con la contraseña fija `654321`, publicada en el
+código y en los instaladores. Estado actual:
+
+| Elemento | Comportamiento |
+| --- | --- |
+| Secreto | 32 bytes de `SecureRandom` codificados en Base64, generados en el primer arranque que necesita el canal |
+| Ubicación | `autofirma.pfx.secret` en el mismo directorio que el almacén |
+| Creación | Atómica: el temporal nace en 0600 (POSIX) o con ACL de solo el propietario (Windows) antes de escribir el secreto, y se mueve con `ATOMIC_MOVE` |
+| Permisos | 0600 en Linux y macOS; ACL con una sola entrada `ALLOW` para el propietario en Windows. Si el secreto aparece con permisos abiertos se corrige y se registra un aviso (sin el valor) |
+| Uso | `SecureSocketUtils` carga la contraseña desde el fichero y la borra de memoria (`Arrays.fill`) al terminar; no se registra ni aparece en excepciones |
+| Compatibilidad | Si el almacén solo abre con la contraseña heredada se vuelve a cifrar con el secreto: copia `.bak`, escritura atómica, verificación (carga y recuperación de clave) y borrado del `.bak`. La contraseña heredada solo vive como constante de migración |
+| Reinstalación | Si el instalador regenera el almacén con la contraseña heredada y el secreto ya existe, se reutiliza el secreto y se vuelve a migrar |
+| Sin permiso de escritura | En una instalación por máquina cuyo directorio no es escribible por el usuario (caso típico: `C:\\Program Files\\Autofirma` en Windows) no se puede reescribir el almacén: se mantiene la contraseña heredada y se registra un aviso de riesgo. Condición de salida: mover el almacén a un directorio por usuario o conceder escritura en la instalación |
+
+La generación del almacén en el instalador y en el configurador (`KS_PASSWORD`) queda como deuda
+de esa condición de salida: el instalador se ejecuta elevado y una ACL de solo el usuario
+instalador dejaría el canal inoperante para el resto de usuarios de la máquina.
+
+Evidencia: `afirma-core-keystores/src/main/java/es/gob/afirma/keystores/LocalKeyStoreSecrets.java`,
+pruebas `LocalKeyStoreSecretsTest` (7 casos, incluido el saludo TLS real) que corren en `make test`,
+y comprobación de migración en la ruta del producto en `scripts/interop/tls-probe.sh`.
 
 ## 3. Activos y actores
 
@@ -121,6 +145,7 @@ salvo estas dos, que solo obtienen el certificado del servidor y no transportan 
 | H4 | TSA y TLS posiblemente insuficientes | Pendiente de reproducción (T6) | `docs/RISK-REGISTER.md` |
 | H5 | Token trifásico sin validar | Pendiente de reproducción (T7) | `docs/RISK-REGISTER.md` |
 | H6 | Canal local: loopback, TLS y sesión | Pendiente de reproducción (T8) | `docs/RISK-REGISTER.md` |
+| SEC-010 | Almacén del canal local en instalación por máquina sin escritura: se mantiene la contraseña heredada con aviso | Abierto, con condiciones de salida en 2.1 (T4) | `docs/security/ASVS-L2.md` |
 
 Ninguna de las hipótesis H4–H6 se presenta aquí como vulnerabilidad verificada.
 
@@ -130,6 +155,10 @@ Ninguna de las hipótesis H4–H6 se presenta aquí como vulnerabilidad verifica
 test -f docs/security/ASVS-L2.md && grep -c '→ Sink' docs/security/ASVS-L2.md   # >= 4 flujos
 make validate
 make interop-selftest   # T3b: scripts de interoperabilidad (sin red ni docker)
+
+grep -rn 'KSPASS\|CTPASS' afirma-simple/src/main/java/es/gob/afirma/standalone/protocol/SecureSocketUtils.java  # sin resultados (T4)
+mvn -B -pl afirma-core-keystores -am test -Dtest=LocalKeyStoreSecretsTest    # secreto, 0600 y socket TLS (T4)
+bash scripts/interop/tls-probe.sh                                          # A1 + migración y 0600 en la ruta real (T4)
 ```
 
 El job `interop` (`.github/workflows/interop.yml`, tarea T3b) comprueba en cada PR el

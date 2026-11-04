@@ -5,6 +5,8 @@
 # + SecureSocketUtils) y sondea con openssl s_client:
 #   - TLS 1.2 con ECDHE debe conectar;
 #   - TLS 1.0, TLS 1.1, RSA estatico y CBC-SHA1 deben fallar.
+# Ademas comprueba T4: el producto genera el secreto local (0600) y migra el almacen
+# heredado, que deja de abrir con la contrasena antigua.
 #
 # Requiere: openssl, java, maven y el PFX sintetico generado en ${CERTS_DIR}.
 # Uso: scripts/interop/tls-probe.sh [directorio-certs]
@@ -23,20 +25,21 @@ ok() { echo "OK: $*"; }
 [ -f "$CERTS_DIR/rsa.p12" ] || fail "faltan los certificados de prueba en $CERTS_DIR (ejecuta gen-test-certs.sh)"
 command -v openssl >/dev/null || fail "openssl no disponible"
 
-# La contrasena del PFX del canal local es la misma que exige la aplicacion: se lee del
-# codigo para no duplicar el valor en dos sitios. T4 cambia este mecanismo.
-KS_PASS="$(sed -n 's/.*KSPASS = "\([^"]*\)".*/\1/p' "$MODULE/src/main/java/es/gob/afirma/standalone/protocol/SecureSocketUtils.java" | head -1)"
-if [ -z "$KS_PASS" ]; then
-	# Tras T4 el PFX deja de usar una constante; se acepta INTEROP_KS_PASS explicita.
-	KS_PASS="${INTEROP_KS_PASS:-}"
-fi
-[ -n "$KS_PASS" ] || fail "no se ha podido determinar la contrasena del PFX del canal local"
+# La contrasena del PFX del canal local ya no es una constante del codigo (T4): el producto
+# genera un secreto local en el primer arranque (autofirma.pfx.secret, 0600) y migra el
+# almacen heredado. Aqui se prepara un PFX con la contrasena heredada, sin fichero de
+# secreto, para comprobar esa migracion en la ruta real del producto.
+LEGACY_KS_PASS="${INTEROP_LEGACY_KS_PASS:-654321}"
+SECRET_FILE="$APP_DIR/autofirma.pfx.secret"
+rm -f "$SECRET_FILE"
 
-echo "[tls-probe] compilando afirma-simple (sin tests)"
-(cd "$ROOT" && mvn -B -q -Denv=install -pl afirma-simple -am -DskipTests test-compile) || fail "no compila afirma-simple"
+echo "[tls-probe] compilando e instalando afirma-simple (sin tests)"
+# Se instala en el repositorio local para que el classpath de ejecucion use los JAR
+# recien construidos (el canal depende ahora de afirma-core-keystores).
+(cd "$ROOT" && mvn -B -q -Denv=install -pl afirma-simple -am -DskipTests install) || fail "no compila afirma-simple"
 
 # SecureSocketUtils busca autofirma.pfx en el directorio de la aplicacion
-# (padre de target/classes) con la contrasena fija del producto.
+# (padre de target/classes) con la contrasena heredada que debe migrar el producto.
 SOURCE_P12="${INTEROP_CHANNEL_P12:-$CERTS_DIR/rsa.p12}"
 SOURCE_PASS="${INTEROP_CHANNEL_PASS:-$(cat "$CERTS_DIR/p12pass")}"
 [ -f "$SOURCE_P12" ] || fail "no existe el PKCS#12 del canal: $SOURCE_P12"
@@ -44,7 +47,7 @@ openssl pkcs12 -in "$SOURCE_P12" -passin "pass:$SOURCE_PASS" -nodes \
 	-out "$APP_DIR/interop-channel.pem" >/dev/null 2>&1 \
 	|| fail "no se pudo leer el PKCS#12 del canal"
 openssl pkcs12 -export -in "$APP_DIR/interop-channel.pem" \
-	-passout "pass:$KS_PASS" -out "$APP_DIR/autofirma.pfx" 2>/dev/null \
+	-passout "pass:$LEGACY_KS_PASS" -out "$APP_DIR/autofirma.pfx" 2>/dev/null \
 	|| fail "no se pudo preparar autofirma.pfx"
 rm -f "$APP_DIR/interop-channel.pem"
 chmod 600 "$APP_DIR/autofirma.pfx"
@@ -104,3 +107,22 @@ probe_fail "RSA estatico (TLS 1.2)"  -tls1_2 -cipher 'AES256-GCM-SHA384'
 probe_fail "CBC-SHA1 (TLS 1.2)"      -tls1_2 -cipher 'ECDHE-RSA-AES256-SHA'
 
 echo "[tls-probe] OK: el canal local solo admite TLS 1.2 con suites modernas (log: $LOG)"
+
+# T4 · el almacen heredado se migra a un secreto local con permisos 0600
+echo "[tls-probe] ---- T4: secreto local del canal ----"
+[ -f "$SECRET_FILE" ] || fail "el producto no genero el fichero de secreto local"
+if perms="$(stat -c '%a' "$SECRET_FILE" 2>/dev/null)"; then
+	:
+else
+	perms="$(stat -f '%Lp' "$SECRET_FILE" 2>/dev/null || true)"
+fi
+[ "$perms" = "600" ] || fail "el fichero de secreto no tiene permisos 0600 (tiene '${perms:-desconocidos}')"
+LOCAL_SECRET="$(cat "$SECRET_FILE")"
+[ -n "$LOCAL_SECRET" ] || fail "el fichero de secreto esta vacio"
+if openssl pkcs12 -in "$APP_DIR/autofirma.pfx" -passin "pass:$LEGACY_KS_PASS" -noout 2>/dev/null; then
+	fail "el almacen sigue abriendo con la contrasena heredada: no se migro"
+fi
+openssl pkcs12 -in "$APP_DIR/autofirma.pfx" -passin "pass:$LOCAL_SECRET" -noout 2>/dev/null \
+	|| fail "el almacen migrado no abre con el secreto local"
+unset LOCAL_SECRET
+ok "secreto local generado (0600) y almacen heredado migrado"

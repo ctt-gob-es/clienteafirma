@@ -8,8 +8,9 @@ import es.gob.afirma.core.misc.protocol.ProtocolVersion;
  * <code>scripts/interop/tls-probe.sh</code> pueda sondearlo con <code>openssl s_client</code>.
  *
  * No abre interfaz gr&aacute;fica. El almac&eacute;n <code>autofirma.pfx</code> debe estar en el
- * directorio de la aplicaci&oacute;n (el padre de <code>target/classes</code>) con la
- * contrase&ntilde;a que espera {@link SecureSocketUtils}.
+ * directorio de la aplicaci&oacute;n (el padre de <code>target/classes</code>). La contrase&ntilde;a
+ * la resuelve {@link SecureSocketUtils} a trav&eacute;s del secreto local (T4): si solo existe
+ * el almac&eacute;n heredado, se genera el secreto y se migra antes de abrir el socket.
  *
  * Uso: java -Dinterop.port=8881 -Dinterop.session=interop ... TlsProbeServer
  */
