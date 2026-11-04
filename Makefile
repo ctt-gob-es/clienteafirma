@@ -11,7 +11,7 @@ help:
 	@printf '%s\n' \
 	  'make lint              contract checks (Propósito, LICENSE, POM)' \
 	  'make quality           lint + bash -n + shellcheck on scripts/*.sh' \
-	  'make test              mvn -pl afirma-core test' \
+	  'make test              mvn test (core + crypto + canal local real de T8)' \
 	  'make test-community    invariantes capa comunitaria (vectores, docs)' \
 	  'make smoke             inventario fork + smoke comunitario' \
 	  'make build             package afirma-core (+deps)' \
@@ -38,6 +38,12 @@ TEST_MODULES := afirma-core,afirma-core-keystores,afirma-core-massive,afirma-cry
 
 test:
 	mvn -B -pl $(TEST_MODULES) -am test
+# Canal local real (T8): servidores websocket y HTTP con sus clientes.
+# Se usa el perfil env-install para que la reactor incluya los modulos del fork
+# (con -Pautofirma, afirma-core se resolveria del repositorio central).
+	mvn -B -Denv=install -pl afirma-simple -am \
+		-Dtest='HttpChannelIntegrationTest,WebSocketChannelIntegrationTest' \
+		-Dsurefire.failIfNoSpecifiedTests=false test
 
 test-crypto:
 	cd tests/validation-harness && mvn -B test

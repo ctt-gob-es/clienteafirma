@@ -263,3 +263,56 @@ automatiza: sigue siendo prueba manual antes de publicar cada versión (`make in
 
 La matriz debe actualizarse en la misma tarea que cierre cada brecha: un cambio de estado sin
 prueba asociada es un error de este documento.
+
+## §6.3 · Sesión del websocket local (T8)
+
+H6 se reprodujo con el canal local real (servidor HTTP y websocket de producción) antes del
+cambio, con el programa `tests/local-channel-repro/LocalChannelRepro.java` compilado igual
+contra la base y contra la rama:
+
+| Caso | Base (`e42f6b865`) | Rama T8 en estricto |
+| --- | --- | --- |
+| Petición HTTP sin `idsession` | Aceptada | Rechazada |
+| CORS a un origen desconocido | `Access-Control-Allow-Origin: *` | Sin cabecera (`Vary: Origin` solo si se permite) |
+| Mensaje websocket sin `idsession` | Aceptado | Rechazado |
+
+### Comportamiento por modo
+
+| Aspecto | `strictWebSocketSession=false` (por defecto) | `strictWebSocketSession=true` |
+| --- | --- | --- |
+| `idsession` | Se mantiene el comportamiento heredado (solo se compara si el canal tiene identificador) y se avisa de las anomalías | Obligatorio, con formato válido, registrado, vigente y de un solo uso |
+| Caducidad | El registro aplica el TTL, pero la sesión se acepta con aviso | Rechazo `EXPIRED` |
+| Uso único | Se consume al cerrar el canal; si se reutiliza, se avisa y se acepta | Rechazo `REUSED` |
+| `Origin` | Se acepta cualquier origen y se avisa si no está configurado | Solo los orígenes configurados; lista vacía rechaza todo |
+| CORS | `Access-Control-Allow-Origin: *` (como antes) | Se devuelve el `Origin` permitido y `Vary: Origin`; si no se permite, no hay cabecera |
+
+### Riesgo residual (explícito)
+
+Con los valores por defecto la brecha **sigue abierta en instalaciones normales**: no se exige
+`idsession`, no se valida el `Origin` y la respuesta CORS es abierta. Activarlo por defecto
+será una tarea propia cuando exista un servidor que emita un `idsession` v1 (aleatorio y
+registrado) que la web pueda conocer; debe aparecer en el informe de T20.
+
+### Configuración
+
+- `strictWebSocketSession` (por defecto `false`) o `-DstrictWebSocketSession=true`.
+- `websocket.allowedOrigins`: lista separada por comas; admite `*.dominio`. Por defecto vacía.
+- `websocket.sessionTtlMillis`: TTL del `idsession`; por defecto 120000 ms (2 min), acotado a
+  [1000, 3600000] ms y aplicado dentro de `WebSocketSessionValidator` con reloj inyectable.
+
+### Garantías comunes
+
+- El registro está acotado (`MAX_TRACKED_SESSIONS` = 128 activas) y purga las caducadas en cada
+  operación.
+- Ni el `idsession` ni el contenido de los mensajes se registran: los avisos indican el estado
+  (`MISSING`, `EXPIRED`, `REUSED`, `UNKNOWN`), nunca el valor.
+
+### Pruebas
+
+- `WebSocketSessionValidatorTest` (afirma-core, 14 casos) con reloj inyectable: válida, sin
+  sesión, de otra sesión, repetida, en uso concurrente, caducada, formato, aleatoriedad,
+  memoria acotada, origen permitido y no permitido, CORS en ambos modos y TTL acotado.
+- `HttpChannelIntegrationTest` y `WebSocketChannelIntegrationTest` (afirma-simple, 19 casos)
+  levantan los servidores reales y cubren: sesión válida, sin `idsession`, de otra sesión,
+  repetida y caducada; `Origin` permitido y no permitido; cabecera CORS en ambos modos; y
+  ausencia del `idsession` en los logs. Se ejecutan dentro de `make test`.

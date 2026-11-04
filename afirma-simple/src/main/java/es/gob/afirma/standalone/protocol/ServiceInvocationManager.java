@@ -25,6 +25,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.LocalChannelSessions;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 
@@ -92,6 +93,19 @@ public final class ServiceInvocationManager {
 		final SSLServerSocket ssocket = tryPorts(channelInfo.getPorts(), ssocketFactory);
 		ssocket.setReuseAddress(true);
 
+		// Registramos la sesion del canal con su caducidad. En modo estricto, si la web no
+		// proporciono identificador, se genera uno aleatorio que la web no puede conocer: por
+		// eso el modo estricto no esta activo por defecto.
+		String idSession = channelInfo.getIdSession();
+		if (LocalChannelSessions.isStrict() && (idSession == null || idSession.isEmpty())) {
+			idSession = LocalChannelSessions.validator().registerNew();
+		}
+		else if (idSession != null && !idSession.isEmpty()
+				&& !LocalChannelSessions.validator().register(idSession)) {
+			LOGGER.warning("El identificador de sesion del canal ya se uso o no tiene un formato valido"); //$NON-NLS-1$
+		}
+		final String channelSessionId = idSession;
+
 		// Restringimos el protocolo y las suites del canal local. Java no responde a los
 		// mecanismos tradicionales para desactivar un protocolo (como la propiedad
 		// "jdk.tls.disabledAlgorithms"), asi que se fijan de forma explicita en el socket.
@@ -107,8 +121,9 @@ public final class ServiceInvocationManager {
 		/** Temporizador para cerrar la aplicaci&oacute;n cuando pase un tiempo de inactividad. */
 		final Timer timer = new Timer(SOCKET_TIMEOUT, evt -> {
 			LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
+			LocalChannelSessions.closeChannel(channelSessionId);
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				MacUtils.closeMacService(channelInfo.getIdSession());
+				MacUtils.closeMacService(channelSessionId);
 			}
 			Runtime.getRuntime().halt(0);
 		});
@@ -116,7 +131,7 @@ public final class ServiceInvocationManager {
 
 		while (true){
 			try {
-				new CommandProcessorThread(ssocket.accept(), timer, channelInfo.getIdSession(), protocolVersion).start();
+				new CommandProcessorThread(ssocket.accept(), timer, channelSessionId, protocolVersion).start();
 			}
 			catch (final SocketTimeoutException e) {
 				LOGGER.severe("Tiempo de espera del socket terminado: " + e); //$NON-NLS-1$

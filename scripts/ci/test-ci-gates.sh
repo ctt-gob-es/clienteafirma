@@ -118,3 +118,51 @@ grep -F 'strictTriphaseToken' "$TOKEN_DIR/TriphaseTokenValidator.java" >/dev/nul
   || fail "el token trifasico no es activable por preferencia"
 
 echo "test-ci-gates: T7 OK"
+
+# T8: idsession con caducidad y uso unico, y Origin validado en el canal local.
+HTTP_DIR="afirma-simple/src/main/java/es/gob/afirma/standalone/protocol"
+CORE_DIR="afirma-core/src/main/java/es/gob/afirma/core/misc/protocol"
+
+# La cabecera CORS no se fija de forma incondicional: la decide LocalChannelSessions.
+! grep -F 'Access-Control-Allow-Origin: *' "$HTTP_DIR/CommandProcessorThread.java" >/dev/null \
+  || fail "CommandProcessorThread fija Access-Control-Allow-Origin: * de forma incondicional"
+grep -F 'LocalChannelSessions.corsHeaders(' "$HTTP_DIR/CommandProcessorThread.java" >/dev/null \
+  || fail "CommandProcessorThread no usa las cabeceras CORS del canal local"
+
+# Caducidad y uso unico dentro del validador, no en quien llama.
+grep -F 'SESSION_TTL_PROPERTY' "$CORE_DIR/LocalChannelSessions.java" >/dev/null \
+  || fail "el idsession no tiene caducidad configurable"
+grep -F 'this.clock.millis() > expiry.longValue()' "$CORE_DIR/WebSocketSessionValidator.java" >/dev/null \
+  || fail "el validador de sesiones no aplica la caducidad"
+grep -F 'MAX_TRACKED_SESSIONS' "$CORE_DIR/WebSocketSessionValidator.java" >/dev/null \
+  || fail "el registro de sesiones no acota la memoria"
+grep -F 'public synchronized void purge()' "$CORE_DIR/WebSocketSessionValidator.java" >/dev/null \
+  || fail "el registro de sesiones no purga las caducadas"
+grep -F 'public synchronized void consume(' "$CORE_DIR/WebSocketSessionValidator.java" >/dev/null \
+  || fail "el registro de sesiones no aplica el uso unico"
+
+# Sin comodin por defecto en la lista de origenes.
+grep -F 'return value == null ? "" : value.trim();' "$CORE_DIR/LocalChannelSessions.java" >/dev/null \
+  || fail "la lista de origenes permitidos tiene un valor por defecto distinto de vacio"
+grep -F 'Vary: Origin' "$CORE_DIR/WebSocketOriginValidator.java" >/dev/null \
+  || fail "la respuesta CORS estricta no declara Vary: Origin"
+
+# Los dos caminos, HTTP y websocket, pasan por la validacion.
+grep -F 'LocalChannelSessions.isStrict()' "$HTTP_DIR/CommandProcessorThread.java" >/dev/null \
+  || fail "el camino HTTP no respeta strictWebSocketSession"
+grep -F 'guardSession(' "$HTTP_DIR/AfirmaWebSocketServer.java" >/dev/null \
+  || fail "el websocket no valida la sesion"
+grep -F 'guardSession(' "$HTTP_DIR/AfirmaWebSocketServerV4Sup.java" >/dev/null \
+  || fail "el websocket v4 no valida la sesion"
+grep -F 'releaseSession(' "$HTTP_DIR/AfirmaWebSocketServer.java" >/dev/null \
+  || fail "el websocket no consume la sesion al cerrar"
+grep -F 'LocalChannelSessions.closeChannel(' "$HTTP_DIR/ServiceInvocationManager.java" >/dev/null \
+  || fail "el canal HTTP no consume la sesion al cerrar"
+
+# Las pruebas de integracion del canal real forman parte de make test.
+grep -F 'HttpChannelIntegrationTest' Makefile >/dev/null \
+  || fail "make test no ejecuta las pruebas del canal HTTP real"
+grep -F 'WebSocketChannelIntegrationTest' Makefile >/dev/null \
+  || fail "make test no ejecuta las pruebas del websocket real"
+
+echo "test-ci-gates: T8 OK"
