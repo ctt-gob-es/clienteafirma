@@ -52,6 +52,8 @@ public final class DataDownloader {
 	 * @param gzipped Indica si los datos de entrada est&aacute;n comprimidos con GZIP y deben devolverse
 	 *                descomprimidos.
 	 * @param ignoreSSLSecurity Indica si se deber&iacute;a ignorar la validaci&oacute;n SSL de los datos.
+	 *                            Solo se aplica en modo permisivo: con <code>strictSslChecks=true</code>
+	 *                            (defecto) la validaci&oacute;n TLS se respeta y se registra un aviso.
 	 * @return Datos obtenidos del origen indicado.
 	 * @throws IOException Si no se pueden obtener los datos. */
 	public static byte[] downloadData(final String ds, final boolean gzipped, final boolean ignoreSSLSecurity) throws IOException {
@@ -75,15 +77,29 @@ public final class DataDownloader {
 
 			SSLConfig sslConfig = null;
 			if (ignoreSSLSecurity) {
-				sslConfig = new SSLConfig();
-				sslConfig.setHostnameVerifier(SslSecurityManager.DUMMY_HOSTNAME_VERIFIER);
-				try {
-					final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
-					sslContext.init(null, SslSecurityManager.DUMMY_TRUST_MANAGER, new SecureRandom());
-					sslConfig.setSSLSocketFactory(sslContext.getSocketFactory());
+				if (SslSecurityManager.isStrictSslChecks()) {
+					// Defensa en profundidad: con comprobaciones estrictas (defecto) la peticion
+					// de ignorar la validacion no tiene efecto, aunque el llamador la solicite.
+					LOGGER.warning(
+						"Se ignora la peticion de descargar datos sin validar el certificado TLS (motivo: descarga de datos, host: " //$NON-NLS-1$
+						+ getHost(dataSource) + "): strictSslChecks activo" //$NON-NLS-1$
+					);
 				}
-				catch (final Exception e) {
-					LOGGER.log(Level.WARNING, "No se ha podido configurar la conexion para que ignore los problemas de confianza SSL", e); //$NON-NLS-1$
+				else {
+					LOGGER.warning(
+						"Se descargan datos sin validar el certificado TLS (motivo: peticion explicita de descarga, host: " //$NON-NLS-1$
+						+ getHost(dataSource) + "); strictSslChecks=false" //$NON-NLS-1$
+					);
+					sslConfig = new SSLConfig();
+					sslConfig.setHostnameVerifier(SslSecurityManager.DUMMY_HOSTNAME_VERIFIER);
+					try {
+						final SSLContext sslContext = SSLContext.getInstance("TLSv1.2"); //$NON-NLS-1$
+						sslContext.init(null, SslSecurityManager.DUMMY_TRUST_MANAGER, new SecureRandom());
+						sslConfig.setSSLSocketFactory(sslContext.getSocketFactory());
+					}
+					catch (final Exception e) {
+						LOGGER.log(Level.WARNING, "No se ha podido configurar la conexion para que ignore los problemas de confianza SSL", e); //$NON-NLS-1$
+					}
 				}
 			}
 
@@ -165,6 +181,19 @@ public final class DataDownloader {
 	 * @throws IOException Si no se pueden obtener los datos. */
 	public static byte[] downloadData(final String ds) throws IOException {
 		return downloadData(ds, false, false);
+	}
+
+	/** Obtiene solo el host de una URL, para los avisos (nunca la ruta ni los parametros).
+	 * @param url URL de la que se quiere el host.
+	 * @return Host de la URL o cadena vac&iacute;a si no se puede determinar. */
+	private static String getHost(final String url) {
+		try {
+			final String host = new java.net.URL(url).getHost();
+			return host != null ? host : ""; //$NON-NLS-1$
+		}
+		catch (final Exception e) {
+			return ""; //$NON-NLS-1$
+		}
 	}
 
 	private static byte[] gunzipBytes(final byte[] compressedData) throws IOException {

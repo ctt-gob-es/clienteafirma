@@ -115,7 +115,9 @@ public class ConfigUpdaterManager {
 		byte[] configData = null;
 		if (filePath.toLowerCase(Locale.US).startsWith("https:")) { //$NON-NLS-1$
 			try {
-				configData = DataDownloader.downloadData(filePath, false, true);
+				// La validacion TLS la decide strictSslChecks (activa por defecto): la descarga
+				// de configuracion remota no debe desactivarla (T5).
+				configData = DataDownloader.downloadData(filePath, false);
 			} catch(final Exception e) {
 				throw new IOException("No se ha podido descargar el fichero del enlace remoto", e); //$NON-NLS-1$
 			}

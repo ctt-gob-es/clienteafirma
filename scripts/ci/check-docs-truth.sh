@@ -18,9 +18,9 @@ grep -Fq 'org.bouncycastle` **' README.md || fail "README no identifica la coord
 grep -Fq "**${bc_version}**" README.md || fail "README y pom discrepan en BouncyCastle ${bc_version}"
 ok "BouncyCastle ${bc_version} coincide en README.md y pom.xml"
 
-grep -R -F -q 'System.getProperty(JAVA_PARAM_STRICT_SSL_CHECKS, Boolean.TRUE.toString())' \
+grep -Fq 'SslSecurityManager.isStrictSslChecks()' \
   afirma-core/src/main/java/es/gob/afirma/core/misc/http/UrlHttpManagerImpl.java \
-  || fail "UrlHttpManagerImpl no activa SSL estricto por defecto"
+  || fail "UrlHttpManagerImpl no consulta el modo SSL estricto"
 grep -R -F -q 'System.getProperty(UrlHttpManagerImpl.JAVA_PARAM_STRICT_SSL_CHECKS, Boolean.TRUE.toString())' \
   afirma-core/src/main/java/es/gob/afirma/core/misc/http/SslSecurityManager.java \
   || fail "SslSecurityManager no activa SSL estricto por defecto"

@@ -206,9 +206,12 @@ final class ImportCertificatesDialog extends JDialog {
 			final URL domainUrl = buildUrl(domainTxt.getText());
 			X509Certificate [] x509certs;
 			try {
-				x509certs = downloadServerCerts(domainUrl, false);
+				x509certs = downloadServerCerts(domainUrl);
 			} catch (final SSLHandshakeException sslhe) {
-				x509certs = downloadServerCerts(domainUrl, true);
+				// Uso aceptable y delimitado: si el certificado no es de confianza se recupera la
+				// cadena sin validarla y sin permitir el intercambio de datos, para que el usuario
+				// decida si la importa. No se desactiva la validacion TLS de la conexion.
+				x509certs = captureServerCerts(domainUrl);
 			}
 			final ConfirmImportCertDialog confirmImportCertDialog = new ConfirmImportCertDialog(x509certs, this);
 			confirmImportCertDialog.setVisible(true);
@@ -246,15 +249,36 @@ final class ImportCertificatesDialog extends JDialog {
 	}
 
 
-	private static X509Certificate[] downloadServerCerts(final URL domainUrl, final boolean disableSSL) throws FileNotFoundException, IOException, GeneralSecurityException {
+	private static X509Certificate[] downloadServerCerts(final URL domainUrl) throws FileNotFoundException, IOException, GeneralSecurityException {
 
 		final HttpsURLConnection conn = (HttpsURLConnection) domainUrl.openConnection();
-		if (disableSSL) {
-			SslSecurityManager.disableSslChecks(conn);
-		}
 		conn.connect();
 		final Certificate [] trustedServerCerts = conn.getServerCertificates();
 		conn.disconnect();
+
+		return getChainToImport(trustedServerCerts);
+	}
+
+	/**
+	 * Recupera la cadena del servidor sin validarla y sin permitir el intercambio de datos.
+	 * @param domainUrl URL del servidor.
+	 * @return Certificados que el usuario podr&iacute;a importar.
+	 * @throws IOException Si no se puede recuperar la cadena.
+	 */
+	private static X509Certificate[] captureServerCerts(final URL domainUrl) throws IOException {
+
+		return getChainToImport(SslSecurityManager.retrieveServerCertificateChain(
+				domainUrl.toString(),
+				"importacion manual de certificados del servidor")); //$NON-NLS-1$
+	}
+
+	/**
+	 * Selecciona los certificados que se ofrecen para importar a partir de la cadena del
+	 * servidor: si llega m&aacute;s de uno se importa la cadena de certificaci&oacute;n.
+	 * @param trustedServerCerts Cadena presentada por el servidor.
+	 * @return Certificados a importar.
+	 */
+	private static X509Certificate[] getChainToImport(final Certificate[] trustedServerCerts) {
 
 		X509Certificate [] x509certs = null;
 

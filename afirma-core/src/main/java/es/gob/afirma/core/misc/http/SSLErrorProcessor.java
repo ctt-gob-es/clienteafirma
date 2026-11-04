@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -388,14 +387,12 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	 */
 	private static Certificate[] downloadFromRemoteServer(final String domainName) throws Exception {
 
-		final URL url = new URL(domainName);
-		final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-		SslSecurityManager.disableSslChecks(conn);
-		conn.connect();
-		final Certificate[] trustedServerCerts = conn.getServerCertificates();
-		conn.disconnect();
-
-		return trustedServerCerts;
+		// Se recupera la cadena del servidor sin validarla y sin permitir el intercambio de
+		// datos (el saludo TLS se aborta al capturarla). No se desactiva la validacion TLS
+		// de la conexion ni la global, tampoco en modo permisivo.
+		return SslSecurityManager.retrieveServerCertificateChain(
+				new URL(domainName).toString(),
+				"importar el certificado del servidor para confiar en el"); //$NON-NLS-1$
 	}
 
 	/**
@@ -430,7 +427,10 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 					AOUIFactory.WARNING_MESSAGE
 			);
 		}
-		catch (final Exception e) {
+		catch (final Throwable e) {
+			// Un fallo al mostrar el aviso (por ejemplo, sin gestor de interfaces graficas
+			// registrado en integraciones de la libreria) no puede alterar la decision de
+			// seguridad: la conexion se rechaza igualmente.
 			LOGGER.warning("No se pudo mostrar el aviso SSL estricto: " + e); //$NON-NLS-1$
 		}
 	}

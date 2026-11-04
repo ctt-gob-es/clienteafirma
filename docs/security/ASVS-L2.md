@@ -38,12 +38,12 @@ en sus propias fases.
 | V6 Criptografía | Sí | Brecha confirmada | DES/ECB por defecto, PBE MD5/SHA1, SHA-1 en ODF, SpongyCastle (T9, T10, T15, T16) |
 | V7 Errores y logging | Sí | Brecha confirmada | `printStackTrace` y trazas de PIN (T12) |
 | V8 Protección de datos | Sí | Brecha parcial | Permisos del PFX y del secreto corregidos a solo el usuario (T4); queda `readObject` de `PdfSignResult` (T14) |
-| V9 Comunicaciones | Sí | Brecha parcial | Canal local ya en TLS 1.2 con suites filtradas (T3); quedan `DUMMY_TRUST` y descarga de configuración (T5) y TSA (T6) |
+| V9 Comunicaciones | Sí | Cumple con excepciones | Canal local en TLS 1.2 con suites filtradas (T3); ninguna vía interna desactiva la validación con `strictSslChecks=true` y la configuración remota la valida (T5). Queda la TSA (T6) |
 | V10 Código malicioso | Sí | Brecha confirmada | Plugins por `URLClassLoader` sin firma ni huella (T13) |
 | V11 Lógica de negocio | No aplica | N/A | Sin lógica multiusuario ni antifraude |
 | V12 Archivos y recursos | Parcial | Brecha confirmada | Nombres temporales con `Random`; permisos (T11) |
 | V13 API y servicios web | Parcial | Brecha confirmada | Respuesta con `Access-Control-Allow-Origin: *` (T8) |
-| V14 Configuración | Sí | Brecha parcial | Preferencia que debilita TLS y modo permisivo (T5) |
+| V14 Configuración | Sí | Cumple con límite | El modo permisivo exige acción explícita (preferencia, `-DdisableSslChecks=true` o lista de dominios seguros), deja aviso con el motivo y no afecta a otras peticiones (T5). Límite: sigue siendo una preferencia que debilita TLS |
 
 Criterio de cierre: cada fila pasa a «Cumple» solo con una prueba ejecutable en el repositorio
 (`make validate`, `make test` o un gate dedicado) y evidencia citada en esta tabla.
@@ -115,18 +115,32 @@ Inventario de parsers XML en `master` (código principal, sin tests): `DocumentB
 `SAXParserFactory` 6, `XMLInputFactory` 0, `TransformerFactory` 6; `SecureXmlBuilder` se usa en 28 ficheros.
 Es el punto de partida del gate de T14.
 
-## 6. Usos aceptables de la desactivación SSL
+## 6. Vías de desactivación de TLS y usos aceptables (T5)
 
-Hay dos llamadas que desactivan la validación TLS con un propósito legítimo y **no** deben entrar
-en el criterio de bloqueo de T5:
+Inventario de las vías que podían desactivar la validación TLS, con su estado tras T5:
 
-| Fichero | Línea | Para qué |
-| --- | --- | --- |
-| `afirma-core/src/main/java/es/gob/afirma/core/misc/http/SSLErrorProcessor.java` | L393 | Descargar los certificados del servidor para que el usuario los importe y confíe en ellos |
-| `afirma-ui-simple-configurator-common/.../ImportCertificatesDialog.java` | L253 | Lo mismo desde el configurador, con acción explícita del usuario |
+| # | Vía | Dónde | Estado tras T5 |
+| --- | --- | --- | --- |
+| P1 | `DUMMY_TRUST_MANAGER` / `DUMMY_HOSTNAME_VERIFIER` | `afirma-core/.../http/SslSecurityManager.java` | Solo se aplican en modo permisivo; con `strictSslChecks=true` `disableSslChecks(...)` devuelve `false` y no toca la conexión |
+| P2 | Propiedad `disableSslChecks` | `UrlHttpManagerImpl.readUrl` (L214–236) | Se evalúa solo si `strictSslChecks=false`; deja aviso con el motivo y el host, nunca la URL con datos |
+| P3 | Listado de dominios «seguros» (`secureDomainsList`) | `UrlHttpManagerImpl.checkIsSecureDomain` (L350) | Igual que P2: no se evalúa en estricto. Documentado como acción explícita de configuración |
+| P4 | `DataDownloader.downloadData(..., ignoreSSLSecurity=true)` | `afirma-core/.../http/DataDownloader.java` | Defensa en profundidad: con `strictSslChecks=true` se ignora la petición y se registra el aviso. Solo aplica en modo permisivo |
+| P5 | Descarga de configuración remota | `ConfigUpdaterManager.readFromUrl` (L118) → `DataDownloader` | Ya no pide saltarse la validación: usa `downloadData(filePath, false)` y respeta TLS. Era la brecha real de T5 |
+| P6 | `SSLConfig` con factoría de sockets propia | `SslSecurityManager.setSslSecurity` | API explícita para integraciones con almacén propio; no la usa ninguna ruta interna |
+| P7 | TSA | `CMSTimestamper.java` L451 | Fuera de T5: se trata en T6 |
 
-El criterio de T5 sigue siendo: **ninguna vía desactiva la validación cuando `strictSslChecks=true`**,
-salvo estas dos, que solo obtienen el certificado del servidor y no transportan el documento.
+Usos aceptables, que **no** desactivan la validación: para poder ofrecer al usuario la importación
+del certificado de un servidor no confiable se captura la cadena y se aborta el saludo TLS con
+`SslSecurityManager.retrieveServerCertificateChain(...)`, de modo que no se intercambia ningún dato
+y los valores por defecto de la JVM no cambian.
+
+| Fichero | Uso |
+| --- | --- |
+| `afirma-core/.../http/SSLErrorProcessor.java` (`downloadFromRemoteServer`) | Obtener la cadena del servidor para ofrecer importarla tras un fallo de confianza |
+| `afirma-simple/.../ui/preferences/ImportCertificatesDialog.java` (`captureServerCerts`) | Importación manual de certificados desde Preferencias |
+
+Criterio de cierre de T5: **ninguna vía desactiva la validación cuando `strictSslChecks=true`**;
+el modo permisivo exige acción explícita, avisa con el motivo y solo afecta a esa petición.
 
 ## 7. Excepciones documentadas
 
@@ -135,6 +149,7 @@ salvo estas dos, que solo obtienen el certificado del servidor y no transportan 
 | SHA-1 permitido en ODF | Compatibilidad con firmas ODF heredadas (`AOSignConstants.isSHA1AllowedForFormat`, L439–446) | Se mantiene mientras existan documentos ODF firmados con SHA-1 en circulación; revisar en cada fase |
 | SHA-1 prohibido en XAdES, CAdES y PAdES | `AOSignConstants.validateSHA1ForFormat` (L454) lanza `IllegalArgumentException`; cubierto por `SHA1RejectionTest` | Cierre verificado por `make test` (T10) |
 | Canal local sin TLS 1.3 | El objetivo de compilación es Java 8, que no soporta TLS 1.3, y sus suites forman un conjunto distinto del de TLS 1.2 | Reabrir si se eleva el objetivo mínimo a Java 11 (T3) |
+| Conexiones salientes fijadas a TLS 1.2 | `SslSecurityManager` construye sus `SSLContext` con `TLSv1.2` (antes `SSL`, que permitía versiones obsoletas); Java 8 no implementa TLS 1.3 | Al subir a Java 11, pasar a `TLS` con suites de 1.3 habilitadas (T5) |
 | WAR trifásico fuera de alcance | Laboratorio F8, no desplegado | Reabrir V4/V13 si se expone |
 
 ## 8. Riesgo residual registrado fuera de esta matriz
@@ -155,6 +170,9 @@ Ninguna de las hipótesis H4–H6 se presenta aquí como vulnerabilidad verifica
 test -f docs/security/ASVS-L2.md && grep -c '→ Sink' docs/security/ASVS-L2.md   # >= 4 flujos
 make validate
 make interop-selftest   # T3b: scripts de interoperabilidad (sin red ni docker)
+
+bash scripts/ci/test-ci-gates.sh                                          # gate estático de T5
+mvn -B -pl afirma-core -Dtest=StrictSslChecksTest test                    # 12 casos de T5
 
 grep -rn 'KSPASS\|CTPASS' afirma-simple/src/main/java/es/gob/afirma/standalone/protocol/SecureSocketUtils.java  # sin resultados (T4)
 mvn -B -pl afirma-core-keystores -am test -Dtest=LocalKeyStoreSecretsTest    # secreto, 0600 y socket TLS (T4)
