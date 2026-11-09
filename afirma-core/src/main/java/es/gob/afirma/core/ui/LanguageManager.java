@@ -211,11 +211,14 @@ public class LanguageManager {
 
 				final String entryName = entry.getName();
 
+				final File destRoot = entryName.startsWith("help/") || entryName.startsWith("help\\") //$NON-NLS-1$ //$NON-NLS-2$
+						? HELP_DIR
+						: new File(dirPath);
 				File outputFile;
 				if (entryName.startsWith("help/") || entryName.startsWith("help\\")) { //$NON-NLS-1$ //$NON-NLS-2$
-					outputFile = new File(HELP_DIR, entryName.substring(("help" + File.separator).length())); //$NON-NLS-1$
+					outputFile = es.gob.afirma.core.misc.ZipSecurePaths.safeResolve(HELP_DIR, entryName.substring(("help" + File.separator).length())); //$NON-NLS-1$
 				} else {
-					outputFile = new File(dirPath, entryName);
+					outputFile = es.gob.afirma.core.misc.ZipSecurePaths.safeResolve(new File(dirPath), entryName);
 				}
 
 				if (entry.isDirectory()) {

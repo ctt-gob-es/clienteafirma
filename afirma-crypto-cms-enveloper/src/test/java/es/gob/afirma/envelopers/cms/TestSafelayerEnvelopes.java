@@ -21,7 +21,7 @@ public final class TestSafelayerEnvelopes {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void openSafelayerEnvelope() throws Exception {
 
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$

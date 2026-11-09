@@ -16,9 +16,9 @@
 	</parent>
 
 	<properties>
-		<afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
+		<afirma.keytool.keystore>${env.AFIRMA_KEYSTORE_PATH}</afirma.keytool.keystore>
 		<afirma.keytool.alias>codesign</afirma.keytool.alias>
-		<afirma.keytool.password>afirma</afirma.keytool.password>
+		<afirma.keytool.password>${env.AFIRMA_KEYSTORE_PASS}</afirma.keytool.password>
 		<afirma.jar.name>AutoFirmaWS</afirma.jar.name>
 		<afirma.legible.version>V${project.version}</afirma.legible.version>
 		<afirma.finalName>${afirma.jar.name}__${afirma.legible.version}</afirma.finalName>
@@ -257,6 +257,7 @@
 					<keystore>${afirma.keytool.keystore}</keystore>
 					<alias>${afirma.keytool.alias}</alias>
 					<storepass>${afirma.keytool.password}</storepass>
+					<skip>${afirma.code.sign.skip}</skip>
 					<verify>true</verify>
 				</configuration>
 			</plugin>
@@ -445,24 +446,6 @@
 				</dependencies>
 			</plugin>
  -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<keystore>${afirma.keytool.keystore}</keystore>
-					<alias>${afirma.keytool.alias}</alias>
-					<storepass>${afirma.keytool.password}</storepass>
-					<signedjar>${project.build.directory}/${project.build.finalName}-signed.jar</signedjar>
-					<verify>true</verify>
-				</configuration>
-			</plugin>
 
 		</plugins>
 	</build>

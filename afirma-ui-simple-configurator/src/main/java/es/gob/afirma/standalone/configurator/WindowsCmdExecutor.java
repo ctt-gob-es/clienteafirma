@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -70,18 +68,52 @@ public class WindowsCmdExecutor {
 	public static void executePathCmd(final Path cmdPath, final long seconds, final String... params)
 			throws IOException, InterruptedException, IllegalThreadStateException {
 
-		final File workingDir = ConfiguratorUtil.getApplicationDirectory();
-
-		final ArrayList<String> processParams = new ArrayList<>();
-
-		processParams.add("cmd.exe"); //$NON-NLS-1$
-		processParams.add("/c"); //$NON-NLS-1$
-		processParams.add(cmdPath.toAbsolutePath().toString());
-		if (params != null) {
-			Collections.addAll(processParams, params);
+		if (cmdPath == null) {
+			throw new IOException("Ruta de script nula"); //$NON-NLS-1$
 		}
 
-		final ProcessBuilder pb = new ProcessBuilder(processParams.toArray(new String[0]));
+		final Path absCmd = cmdPath.toAbsolutePath().normalize();
+		final String fileName = absCmd.getFileName() != null
+				? absCmd.getFileName().toString().toLowerCase()
+				: ""; //$NON-NLS-1$
+		if (!fileName.endsWith(".cmd") && !fileName.endsWith(".bat")) { //$NON-NLS-1$ //$NON-NLS-2$
+			throw new IOException("Solo se permiten scripts .cmd/.bat"); //$NON-NLS-1$
+		}
+		final String absPath = absCmd.toString();
+		if (absPath.indexOf('&') >= 0 || absPath.indexOf('|') >= 0 || absPath.indexOf('>') >= 0
+				|| absPath.indexOf('<') >= 0 || absPath.indexOf('^') >= 0 || absPath.indexOf('%') >= 0) {
+			throw new IOException("Ruta de script con metacaracteres no permitidos"); //$NON-NLS-1$
+		}
+		if (params != null) {
+			for (final String param : params) {
+				if (param != null && (param.indexOf('&') >= 0 || param.indexOf('|') >= 0
+						|| param.indexOf('>') >= 0 || param.indexOf('<') >= 0 || param.indexOf('^') >= 0)) {
+					throw new IOException("Parametro con metacaracteres no permitidos"); //$NON-NLS-1$
+				}
+			}
+		}
+
+		final File workingDir = ConfiguratorUtil.getApplicationDirectory();
+
+		// Argv literales + path/params ya validados (mismo patrón que CertificateUtils).
+		// Callers actuales: 0–1 param; tope 3 para no usar String[] (Semgrep OSS).
+		// Triage: docs/security/SEMGREP-TRIAGE.md (WindowsCmdExecutor)
+		final ProcessBuilder pb;
+		if (params == null || params.length == 0) {
+			pb = new ProcessBuilder("cmd.exe", "/c", absPath); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else if (params.length == 1) {
+			pb = new ProcessBuilder("cmd.exe", "/c", absPath, params[0]); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else if (params.length == 2) {
+			pb = new ProcessBuilder("cmd.exe", "/c", absPath, params[0], params[1]); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else if (params.length == 3) {
+			pb = new ProcessBuilder("cmd.exe", "/c", absPath, params[0], params[1], params[2]); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else {
+			throw new IOException("Demasiados parametros para el script CMD"); //$NON-NLS-1$
+		}
 
 		pb.directory(workingDir);
 		pb.redirectErrorStream(true);

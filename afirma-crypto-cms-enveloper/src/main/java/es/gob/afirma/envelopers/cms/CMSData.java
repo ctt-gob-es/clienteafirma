@@ -11,10 +11,10 @@ package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
 
-import org.spongycastle.asn1.ASN1Encoding;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.cms.ContentInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 /** Clase que implementa firma digital PKCS#7/CMS Data. La Estructura del mensaje
  * es la siguiente:<br>
@@ -31,7 +31,7 @@ import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * </pre>
  *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
- * para crear un mensaje Data de SpongyCastle. */
+ * para crear un mensaje Data de BouncyCastle. */
 
 final class CMSData {
 

@@ -36,7 +36,7 @@ public final class Pdf2ImagesConverterTests {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	//XXX: Esto va a fallar porque ahora la conversion de imagenes no realiza las de todo el documento
 	public void testPdf2ImagesConverter() throws Exception {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
@@ -55,7 +55,7 @@ public final class Pdf2ImagesConverterTests {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testPdfLoad() throws Exception {
 		final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE));
 		LOGGER.info("Inicio de la carga"); //$NON-NLS-1$

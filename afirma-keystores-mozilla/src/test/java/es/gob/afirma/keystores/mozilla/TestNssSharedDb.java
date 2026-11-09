@@ -158,7 +158,7 @@ public final class TestNssSharedDb {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere base de datos NSS de Mozilla")
 	public void testLoadSystemSharedNSS() {
 
 		final SharedNssKeyStoreManager ksm = new SharedNssKeyStoreManager();

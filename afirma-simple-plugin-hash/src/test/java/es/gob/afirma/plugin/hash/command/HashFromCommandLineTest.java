@@ -15,7 +15,7 @@ public final class HashFromCommandLineTest {
 	/** Prueba de la comprobaci&oacute;n de huellas digitales. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba de línea de comandos no ejecutada en CI")
 	public void testHashCheck() {
 		HashUIHelper.checkHashUI(new File("C:\\Users\\tomas\\AppData\\Local\\Temp\\sample-facturae.xml"), null); //$NON-NLS-1$
 	}
@@ -28,7 +28,7 @@ public final class HashFromCommandLineTest {
 	 * usuario. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba de línea de comandos no ejecutada en CI")
 	public void testHashCheckDirectory() throws IllegalArgumentException, PluginControlledException {
 		new CheckHashCommand().start(
 				new String[] {

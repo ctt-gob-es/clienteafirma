@@ -136,7 +136,7 @@ public class TestPAdES {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
     public void testTimestampedSignatureAndDocument() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -224,7 +224,7 @@ public class TestPAdES {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
     public void testTimestampedDocument() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -288,7 +288,7 @@ public class TestPAdES {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
     public void testTimestampedDocumentWithoutSignature() throws Exception {
 
         final byte[] testPdf;
@@ -333,7 +333,7 @@ public class TestPAdES {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
     public void testTimestampedSignature() throws Exception {
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$

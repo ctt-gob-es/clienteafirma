@@ -12,6 +12,11 @@ package es.gob.afirma.standalone.protocol;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
@@ -20,6 +25,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.swing.Timer;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.misc.protocol.LocalChannelSessions;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.standalone.so.macos.MacUtils;
 
@@ -38,51 +44,21 @@ public final class ServiceInvocationManager {
 	/** Listado de versiones de protocolo soportadas. */
 	private static final int[] SUPPORTED_PROTOCOL_VERSIONS = new int[] { 1, 2, CURRENT_PROTOCOL_VERSION };
 
+	/** Suites TLS 1.2 admitidas en el canal local. Solo suites con intercambio de claves
+	 * efimero (ECDHE/DHE) y sin MAC SHA-1: se descartan las suites de RSA estatico
+	 * (TLS_RSA_WITH_*), las de ECDH estatico (TLS_ECDH_*) y las CBC con SHA-1
+	 * (ASVS 4.0.3 V9.1.3 y V6.2). */
 	private static final String[] ENABLED_CIPHER_SUITES = new String[] {
 			"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
 			"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
 			"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
-			"TLS_RSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
-			"TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
-			"TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
-			"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
-			"TLS_DHE_DSS_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
 			"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
-			"TLS_RSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
-			"TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
-			"TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
+			"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384", //$NON-NLS-1$
 			"TLS_DHE_RSA_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
-			"TLS_DHE_DSS_WITH_AES_128_GCM_SHA256", //$NON-NLS-1$
-
-
 			"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384", //$NON-NLS-1$
 			"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384", //$NON-NLS-1$
-			"TLS_RSA_WITH_AES_256_CBC_SHA256", //$NON-NLS-1$
-			"TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384", //$NON-NLS-1$
-			"TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384", //$NON-NLS-1$
-			"TLS_DHE_RSA_WITH_AES_256_CBC_SHA256", //$NON-NLS-1$
-			"TLS_DHE_DSS_WITH_AES_256_CBC_SHA256", //$NON-NLS-1$
-			"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
-			"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
-			"TLS_RSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
-			"TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
-			"TLS_ECDH_RSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
-			"TLS_DHE_RSA_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
-			"TLS_DHE_DSS_WITH_AES_256_CBC_SHA", //$NON-NLS-1$
 			"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
-			"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
-			"TLS_RSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
-			"TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
-			"TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
-			"TLS_DHE_RSA_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
-			"TLS_DHE_DSS_WITH_AES_128_CBC_SHA256", //$NON-NLS-1$
-			"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
-			"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
-			"TLS_RSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
-			"TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
-			"TLS_ECDH_RSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
-			"TLS_DHE_RSA_WITH_AES_128_CBC_SHA", //$NON-NLS-1$
-			"TLS_DHE_DSS_WITH_AES_128_CBC_SHA" //$NON-NLS-1$
+			"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256" //$NON-NLS-1$
 	};
 
 	/** Constructor vac&iacute;o privado para que no se pueda instanciar la clase ya que es est&aacute;tico. */
@@ -117,22 +93,37 @@ public final class ServiceInvocationManager {
 		final SSLServerSocket ssocket = tryPorts(channelInfo.getPorts(), ssocketFactory);
 		ssocket.setReuseAddress(true);
 
-		// TODO: Restringimos las suites a utilizar a las por defecto de Java 11 (compatible con Java 8 y posteriores)
-		// omitiendo las suites de TLSv1.3 ya que la implementacion de estas no es compatible con la implementacion
-		// de Chrome v74 y anteriores (probablemente porque la version implementada en Java se basa en uno de los
-		// ultimos bocetos del estandar y no en la version final).
-		// Se hace de esta manera porque Java no responde a los mecanismos tradicionales para desactivar el protocolo
-		// (como la propiedad "jdk.tls.disabledAlgorithms").
-		// Una vez se implemente una version compatible del estandar se deberia eliminar esta limitacion.
-		ssocket.setEnabledCipherSuites(ENABLED_CIPHER_SUITES);
+		// Registramos la sesion del canal con su caducidad. En modo estricto, si la web no
+		// proporciono identificador, se genera uno aleatorio que la web no puede conocer: por
+		// eso el modo estricto no esta activo por defecto.
+		String idSession = channelInfo.getIdSession();
+		if (LocalChannelSessions.isStrict() && (idSession == null || idSession.isEmpty())) {
+			idSession = LocalChannelSessions.validator().registerNew();
+		}
+		else if (idSession != null && !idSession.isEmpty()
+				&& !LocalChannelSessions.validator().register(idSession)) {
+			LOGGER.warning("El identificador de sesion del canal ya se uso o no tiene un formato valido"); //$NON-NLS-1$
+		}
+		final String channelSessionId = idSession;
+
+		// Restringimos el protocolo y las suites del canal local. Java no responde a los
+		// mecanismos tradicionales para desactivar un protocolo (como la propiedad
+		// "jdk.tls.disabledAlgorithms"), asi que se fijan de forma explicita en el socket.
+		// TLS 1.3 no se habilita: el objetivo de compilacion del producto es Java 8, que no
+		// lo soporta, y sus suites forman un conjunto distinto del de TLS 1.2.
+		ssocket.setEnabledProtocols(SecureSocketUtils.getEnabledProtocols());
+		ssocket.setEnabledCipherSuites(
+			filterSupportedCipherSuites(ENABLED_CIPHER_SUITES, ssocket.getSupportedCipherSuites())
+		);
 
 		// Empieza la cuenta atras del temporizador.
 
 		/** Temporizador para cerrar la aplicaci&oacute;n cuando pase un tiempo de inactividad. */
 		final Timer timer = new Timer(SOCKET_TIMEOUT, evt -> {
 			LOGGER.warning("Se ha caducado la conexion. Se deja de escuchar en el puerto..."); //$NON-NLS-1$
+			LocalChannelSessions.closeChannel(channelSessionId);
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-				MacUtils.closeMacService(channelInfo.getIdSession());
+				MacUtils.closeMacService(channelSessionId);
 			}
 			Runtime.getRuntime().halt(0);
 		});
@@ -140,12 +131,31 @@ public final class ServiceInvocationManager {
 
 		while (true){
 			try {
-				new CommandProcessorThread(ssocket.accept(), timer, channelInfo.getIdSession(), protocolVersion).start();
+				new CommandProcessorThread(ssocket.accept(), timer, channelSessionId, protocolVersion).start();
 			}
 			catch (final SocketTimeoutException e) {
 				LOGGER.severe("Tiempo de espera del socket terminado: " + e); //$NON-NLS-1$
 			}
 		}
+	}
+
+	/** Filtra las suites solicitadas dejando solo las soportadas por la maquina virtual.
+	 * @param requested Suites que se quieren habilitar.
+	 * @param supported Suites soportadas por el socket.
+	 * @return Suites que se deben habilitar.
+	 * @throws IOException Si ninguna de las suites solicitadas esta soportada. */
+	private static String[] filterSupportedCipherSuites(final String[] requested, final String[] supported) throws IOException {
+		final Set<String> supportedSet = new HashSet<>(Arrays.asList(supported));
+		final List<String> enabled = new ArrayList<>();
+		for (final String suite : requested) {
+			if (supportedSet.contains(suite)) {
+				enabled.add(suite);
+			}
+		}
+		if (enabled.isEmpty()) {
+			throw new IOException("Ninguna de las suites TLS configuradas para el canal local esta soportada por la maquina virtual"); //$NON-NLS-1$
+		}
+		return enabled.toArray(new String[enabled.size()]);
 	}
 
 	/** Intenta realizar una conexi&oacute; por <i>socket</i> en los puertos que se pasan por par&aacute;metro.

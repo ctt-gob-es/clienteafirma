@@ -15,7 +15,7 @@ public final class TestMisc {
 	/** Prueba de limpieza de delimitadores de nodos. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void testNodeClean() {
 
 		final String cleanValue = "<ds:KeyInfo xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"Signature-763862fd-6530-40d4-a5f8-d12726489625-KeyInfo\">"; //$NON-NLS-1$

@@ -7,25 +7,38 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
+import es.gob.afirma.keystores.LocalKeyStoreSecrets;
 import es.gob.afirma.standalone.DesktopUtil;
 
 public class SecureSocketUtils {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-	// parametros para carga del certificado SSL
-	private static final String KSPASS = "654321"; //$NON-NLS-1$
-	private static final String CTPASS = "654321"; //$NON-NLS-1$
 	private static final String KEYSTORE_NAME = "autofirma.pfx"; //$NON-NLS-1$
 	private static final String PKCS12 = "PKCS12"; //$NON-NLS-1$
-	private static final String SSLCONTEXT = "TLSv1"; //$NON-NLS-1$
+
+	/** Protocolo TLS usado para crear el contexto del canal local. TLS 1.0 y 1.1 quedan
+	 * excluidos (ASVS 4.0.3 V9.1.3). */
+	private static final String SSLCONTEXT = "TLSv1.2"; //$NON-NLS-1$
+
+	/** Protocolos que se habilitan en los sockets del canal local. */
+	private static final String[] ENABLED_PROTOCOLS = new String[] { "TLSv1.2" }; //$NON-NLS-1$
 
 	private static KeyManagerFactory kmf = null;
+
+	/**
+	 * Obtiene los protocolos TLS que deben habilitarse en los sockets del canal local.
+	 * @return Copia de la lista de protocolos habilitados.
+	 */
+	public static String[] getEnabledProtocols() {
+		return ENABLED_PROTOCOLS.clone();
+	}
 
 	/**
 	 * Obtiene un contexto SSL para la apertura de un socket/websocket seguro.
@@ -61,17 +74,23 @@ public class SecureSocketUtils {
 
 		LOGGER.info("Se utilizara el siguiente almacen para establecer el socket SSL: " + sslKeyStoreFile.getAbsolutePath()); //$NON-NLS-1$
 
-		// pass del fichero
-		final char ksPass[] = KSPASS.toCharArray();
-		final char ctPass[] = CTPASS.toCharArray();
-		// generamos el key store desde el fichero del certificado, de tipo PKCS12
-		final KeyStore ks = KeyStore.getInstance(PKCS12);
-		try (InputStream is = new FileInputStream(sslKeyStoreFile)) {
-			ks.load(is, ksPass);
+		// El secreto se genera en el primer arranque y se guarda con permisos de solo el
+		// usuario junto al almacen; los almacenes heredados se migran aqui (T4).
+		final char[] ksPass = LocalKeyStoreSecrets.resolvePassword(sslKeyStoreFile);
+		try {
+			// generamos el key store desde el fichero del certificado, de tipo PKCS12
+			final KeyStore ks = KeyStore.getInstance(PKCS12);
+			try (InputStream is = new FileInputStream(sslKeyStoreFile)) {
+				ks.load(is, ksPass);
+			}
+			// key manager factory por defecto (de tipo SunX509 en OpenJDK, o de tipo ibmX509 en IBM JVM)
+			kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			kmf.init(ks, ksPass);
 		}
-		// key manager factory por defecto (de tipo SunX509 en OpenJDK, o de tipo ibmX509 en IBM JVM)
-		kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		kmf.init(ks, ctPass);
+		finally {
+			// La contrasena no se conserva en memoria tras la carga
+			Arrays.fill(ksPass, '\0');
+		}
 
 		return kmf;
 	}

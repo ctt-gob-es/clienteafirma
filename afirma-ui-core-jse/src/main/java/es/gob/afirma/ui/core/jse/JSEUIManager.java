@@ -138,7 +138,9 @@ public class JSEUIManager implements AOUIManager {
     		new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height)
 		);
         lbText.setLabelFor(pwd);
+        pwd.getAccessibleContext().setAccessibleName(lbText.getText());
         final JPanel panel = new JPanel();
+        panel.getAccessibleContext().setAccessibleDescription(lbText.getText());
 
         final GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;

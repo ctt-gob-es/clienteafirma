@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.cms.AttributeTable;
-import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
-import org.spongycastle.asn1.esf.ESFAttributes;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.cert.X509CRLHolder;
-import org.spongycastle.cms.CMSSignedData;
-import org.spongycastle.cms.SignerInformation;
-import org.spongycastle.cms.SignerInformationStore;
-import org.spongycastle.util.CollectionStore;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.esf.ESFAttributes;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.cert.X509CRLHolder;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.util.CollectionStore;
 
 import com.aowagie.text.pdf.AcroFields;
 import com.aowagie.text.pdf.PdfDictionary;
@@ -658,7 +658,7 @@ public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetect
 		// Obtenemos los datos firmados
 		CMSSignedData signedData = null;
 		try {
-			signedData = new CMSSignedData(contents);
+			signedData = new CMSSignedData(es.gob.afirma.signers.pkcs7.Asn1LegacyTimeNormalizer.retagMisencodedUtcTime(contents));
 			// Comprobamos que la firma tiene al menos un firmante
 			if (signedData.getSignerInfos().getSigners().size() == 0) {
 				throw new Exception("No existen firmantes en el documento"); //$NON-NLS-1$
@@ -777,7 +777,7 @@ public class SignatureFormatDetectorPadesCades implements ISignatureFormatDetect
 	 */
 	public static boolean isASN1Format(final byte[] signature) {
 		try {
-			final CMSSignedData signedData = new CMSSignedData(signature);
+			final CMSSignedData signedData = new CMSSignedData(es.gob.afirma.signers.pkcs7.Asn1LegacyTimeNormalizer.retagMisencodedUtcTime(signature));
 			signedData.getSignedContent().getContentType();
 			if (signedData.getSignedContent() != null
 					&& !CMSObjectIdentifiers.signedData.equals(signedData.getSignedContent().getContentType())) {

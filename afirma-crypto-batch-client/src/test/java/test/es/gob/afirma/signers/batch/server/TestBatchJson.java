@@ -46,7 +46,7 @@ public class TestBatchJson {
 
 
 	@Test
-	@Ignore
+	@Ignore("Requiere servidor de firma por lotes")
 	public void testBatch() throws CertificateEncodingException, IOException, AOException {
 
 		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$
@@ -62,7 +62,7 @@ public class TestBatchJson {
 	}
 
 	@Test
-	@Ignore
+	@Ignore("Requiere servidor de firma por lotes")
 	public void testBatchWithCounterSigns() throws CertificateEncodingException, IOException, AOException, GeneralSecurityException {
 
 		final String batchPreSignerUrl = BASE_URL + "presign"; //$NON-NLS-1$

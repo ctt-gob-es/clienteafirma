@@ -1096,7 +1096,7 @@ public final class ProtocolInvocationLauncher {
 
 		String idSession = urlParams.get(IDSESSION_PARAM);
 		if (idSession != null && !idSession.isEmpty()){
-		    LOGGER.info("Se ha recibido un id de sesion: " + idSession); //$NON-NLS-1$
+		    LOGGER.info("Se ha recibido un id de sesion"); //$NON-NLS-1$
 		    // El ID de sesion solo puede estar conformado por numeros. Usar otra cadena nos expondria
 		    // a una injeccion de codigo en los AppleScripts que se ejecuten con el
 		    boolean valid = true;

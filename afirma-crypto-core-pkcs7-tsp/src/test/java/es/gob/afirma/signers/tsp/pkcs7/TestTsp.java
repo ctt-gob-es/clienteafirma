@@ -21,7 +21,7 @@ public class TestTsp {
 	 * @throws Exception En cualquier error */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void TestRfc3161TokenHttp() throws Exception {
 
 		final CMSTimestamper cmsTsp = new CMSTimestamper(

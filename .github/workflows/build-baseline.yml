@@ -1,0 +1,93 @@
+name: build-baseline
+
+on:
+  push:
+    branches: [master, main, plan/clienteafirma-alertas]
+  pull_request:
+    branches: [master, main, plan/clienteafirma-alertas]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build-linux-jdk8:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      # Full reactor first (BC modules), then product profile for JAR/WARs.
+      - name: Build (full install + env=install)
+        run: |
+          mvn -B clean install -Dmaven.test.skip=true
+          mvn -B install -Dmaven.test.skip=true -Denv=install
+
+      - name: Upload autofirma.jar
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: autofirma-jar
+          path: afirma-simple/target/autofirma.jar
+          if-no-files-found: error
+
+      - name: Upload installed es.gob.afirma Maven artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: m2-afirma
+          path: ~/.m2/repository/es/gob/afirma
+          if-no-files-found: error
+
+  f2-vectors:
+    needs: build-linux-jdk8
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+          cache-dependency-path: |
+            pom.xml
+            tests/validation-harness/pom.xml
+
+      - name: Restore es.gob.afirma artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: m2-afirma
+          path: ~/.m2/repository/es/gob/afirma
+
+      - name: Download autofirma.jar
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: autofirma-jar
+          path: afirma-simple/target
+
+      - name: F2 regression gate
+        run: bash scripts/f2-regression.sh
+
+      - name: F2 validation harness (integrity + negatives)
+        working-directory: tests/validation-harness
+        env:
+          VECTORS_DIR: ${{ github.workspace }}/vectors
+        run: mvn -B test -Dvectors.dir="${VECTORS_DIR}"

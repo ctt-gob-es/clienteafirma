@@ -17,7 +17,7 @@
 	<description>Componentes escritorio de afirma</description>
 
 	<properties>
-        <afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
+        <afirma.keytool.keystore>${env.AFIRMA_KEYSTORE_PATH}</afirma.keytool.keystore>
 	</properties>
 	
 	<modules>

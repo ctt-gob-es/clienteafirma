@@ -620,6 +620,12 @@ final class ConfiguratorMacOSX implements Configurator {
 			params.add("security"); //$NON-NLS-1$
 			params.add("find-certificate"); //$NON-NLS-1$
 			params.add("-c"); //$NON-NLS-1$
+			if (commonName == null || commonName.isEmpty()
+					|| commonName.indexOf(';') >= 0 || commonName.indexOf('|') >= 0
+					|| commonName.indexOf('&') >= 0 || commonName.indexOf('`') >= 0
+					|| commonName.indexOf('$') >= 0 || commonName.indexOf('\n') >= 0) {
+				throw new IOException("CommonName de certificado no permitido"); //$NON-NLS-1$
+			}
 			params.add(commonName);
 			params.add("-Z"); //$NON-NLS-1$
 

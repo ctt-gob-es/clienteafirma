@@ -30,7 +30,7 @@ public class CertificateSelectionDialogTest {
 	 * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere almacén de certificados específico")
 	public void showCertDialogTest() throws Exception {
 
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(

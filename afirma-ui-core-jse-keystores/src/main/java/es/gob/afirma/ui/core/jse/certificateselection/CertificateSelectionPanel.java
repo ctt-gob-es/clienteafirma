@@ -300,6 +300,9 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 				openButton.setRolloverEnabled(false);
 				openButton.setBorder(BorderFactory.createEmptyBorder());
 				openButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				openButton.getAccessibleContext().setAccessibleName(
+					CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
+				);
 				openButton.getAccessibleContext().setAccessibleDescription(
 					CertificateSelectionDialogMessages.getString("UtilToolBar.2") //$NON-NLS-1$
 				);
@@ -491,6 +494,10 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList = new JList<>();
 		this.certList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.certList.setCellRenderer(new CertListCellRendered(windowColor, CertificateSelectionPanel.highContrast));
+		this.certList.getAccessibleContext().setAccessibleName("Lista de certificados"); //$NON-NLS-1$
+		this.certList.getAccessibleContext().setAccessibleDescription(
+			"Seleccione el certificado con el que desea firmar" //$NON-NLS-1$
+		);
 
 		updateCertListInfo(this.certificateBeans);
 

@@ -11,6 +11,8 @@ package es.gob.afirma.standalone.protocol;
 
 import java.net.InetSocketAddress;
 import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,7 +21,11 @@ import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import es.gob.afirma.core.misc.protocol.LocalChannelSessions;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
+import es.gob.afirma.core.misc.protocol.WebSocketOriginValidator;
+import es.gob.afirma.core.misc.protocol.WebSocketSessionValidator;
+import es.gob.afirma.standalone.SimpleErrorCode;
 import es.gob.afirma.standalone.protocol.AfirmaWebSocketServerManager.BindingErrorListener;
 
 /**
@@ -58,6 +64,16 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 
 	protected String sessionId;
 
+	/** Prefijo del parametro con el identificador de sesion. */
+	private static final String IDSESSION_PARAM_PREFIX = "idsession="; //$NON-NLS-1$
+
+	/** Sufijo de fin de peticion que puede acompanar al identificador de sesion. */
+	private static final String EOF_TOKEN = "@EOF"; //$NON-NLS-1$
+
+	protected final WebSocketSessionValidator sessionValidator;
+
+	private final ConcurrentMap<WebSocket, String> validatedSessions = new ConcurrentHashMap<>();
+
 	/**
 	 * Genera un servidor websocket que atiende las peticiones de Autofirma.
 	 * @param port Puerto a trav&eacute;s del que realizar la comunicaci&oacute;n.
@@ -65,10 +81,21 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 	 * para usar el servicio.
 	 */
 	public AfirmaWebSocketServer(final int port, final String sessionId) {
+		this(port, sessionId, LocalChannelSessions.validator());
+	}
+
+	/**
+	 * Genera un servidor websocket con un registro de sesiones propio.
+	 * @param port Puerto a trav&eacute;s del que realizar la comunicaci&oacute;n.
+	 * @param sessionId Identificador con el que se deber&aacute; autenticar la web.
+	 * @param sessionValidator Registro de sesiones del canal local.
+	 */
+	public AfirmaWebSocketServer(final int port, final String sessionId, final WebSocketSessionValidator sessionValidator) {
 		super(new InetSocketAddress(port));
 		setReuseAddr(true);
 
 		this.sessionId = sessionId;
+		this.sessionValidator = sessionValidator != null ? sessionValidator : LocalChannelSessions.validator();
 
 		// Nos aseguramos de que al cierre de la aplicacion, se dejara de escuchar en el puerto
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -87,9 +114,108 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 	public void onOpen(final WebSocket ws, final ClientHandshake handshake) {
 		LOGGER.info("Apertura del socket del puerto " + getAddress().getPort()); //$NON-NLS-1$
 
+		if (!checkOrigin(handshake)) {
+			ws.close(CloseFrame.POLICY_VALIDATION, "Origen no permitido"); //$NON-NLS-1$
+			return;
+		}
+
 		if (this.wsClient == null) {
 			this.wsClient = ws;
 		}
+	}
+
+	/**
+	 * Valida el encabezado <code>Origin</code> del saludo. En modo estricto se rechaza
+	 * cualquier origen no configurado; en permisivo se acepta y se avisa.
+	 * @param handshake Saludo del cliente.
+	 * @return {@code true} si la conexion puede continuar.
+	 */
+	private static boolean checkOrigin(final ClientHandshake handshake) {
+		final String origin = handshake == null ? null : handshake.getFieldValue("Origin"); //$NON-NLS-1$
+		final boolean strict = LocalChannelSessions.isStrict();
+		if (WebSocketOriginValidator.isConfigured(origin, LocalChannelSessions.getAllowedOrigins())) {
+			return true;
+		}
+		if (!strict) {
+			LOGGER.warning("Origen del canal local no configurado; se acepta en modo permisivo"); //$NON-NLS-1$
+			return true;
+		}
+		LOGGER.warning("Origen del canal local no permitido; se rechaza la conexion"); //$NON-NLS-1$
+		return false;
+	}
+
+	/**
+	 * Valida el identificador de sesion del mensaje. Aplica caducidad y uso unico.
+	 * @param ws Conexion que envia el mensaje.
+	 * @param message Mensaje recibido.
+	 * @return {@code true} si el mensaje puede procesarse.
+	 */
+	protected boolean guardSession(final WebSocket ws, final String message) {
+		final String received = getSessionIdFromMessage(message);
+		final boolean strict = LocalChannelSessions.isStrict();
+
+		if (!strict) {
+			if (this.sessionId != null && !this.sessionId.equals(received)) {
+				LOGGER.warning("La peticion no incluia el id de sesion correcto"); //$NON-NLS-1$
+				return false;
+			}
+			if (this.sessionValidator.validate(received) != WebSocketSessionValidator.Status.OK) {
+				LOGGER.warning("Sesion del canal local no verificada; se acepta en modo permisivo"); //$NON-NLS-1$
+			}
+			return true;
+		}
+
+		final WebSocketSessionValidator.Status status = this.sessionValidator.validate(received);
+		if (status != WebSocketSessionValidator.Status.OK) {
+			LOGGER.warning("Sesion del canal local rechazada (" + status + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+			return false;
+		}
+		if (this.sessionId != null && !this.sessionId.equals(received)) {
+			LOGGER.warning("La peticion no incluia el id de sesion correcto"); //$NON-NLS-1$
+			return false;
+		}
+		this.sessionValidator.markInUse(received);
+		this.validatedSessions.put(ws, received);
+		return true;
+	}
+
+	/**
+	 * Consume el identificador de sesion asociado a una conexion cerrada.
+	 * @param ws Conexion cerrada.
+	 */
+	protected void releaseSession(final WebSocket ws) {
+		final String used = this.validatedSessions.remove(ws);
+		if (used != null) {
+			this.sessionValidator.consume(used);
+		}
+	}
+
+	/**
+	 * Extrae el identificador de sesion de un mensaje.
+	 * @param message Mensaje recibido.
+	 * @return Identificador o {@code null} si no se encuentra.
+	 */
+	protected static String getSessionIdFromMessage(final String message) {
+		if (message == null) {
+			return null;
+		}
+		final int idx = message.indexOf(IDSESSION_PARAM_PREFIX);
+		if (idx < 0) {
+			return null;
+		}
+		int end = idx + IDSESSION_PARAM_PREFIX.length();
+		while (end < message.length()) {
+			final char c = message.charAt(end);
+			if (!(Character.isLetterOrDigit(c) || c == '-' || c == '_')) {
+				break;
+			}
+			end++;
+		}
+		String id = message.substring(idx + IDSESSION_PARAM_PREFIX.length(), end);
+		if (id.endsWith(EOF_TOKEN)) {
+			id = id.substring(0, id.length() - EOF_TOKEN.length());
+		}
+		return id.isEmpty() ? null : id;
 	}
 
 	/**
@@ -123,6 +249,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 		// Sin embargo, comprobamos que sea este el primer cliente que lo abrio y no otra instancia
 		// de la aplicacion que luego ha intentado acceder a el
 		LOGGER.info("Se ha cerrado la comunicacion con el socket del puerto " + getAddress().getPort() + " . Codigo: " + code + ": " + reason); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		releaseSession(ws);
 		if (this.wsClient == null || this.wsClient.equals(ws)) {
 			LOGGER.info("Cerramos la aplicacion"); //$NON-NLS-1$
 			Runtime.getRuntime().halt(0);
@@ -141,6 +268,14 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 		// Indicamos que el socket esta operativo y recibiendo peticiones
 		// para evitar el cierre de seguridad
 		markAsWorking();
+
+		if (!guardSession(ws, message)) {
+			broadcast(
+				ProtocolInvocationLauncherErrorManager.getErrorMessage(MIN_PROTOCOL_VERSION, SimpleErrorCode.Request.INVALID_SESSION_ID),
+				Collections.singletonList(ws)
+			);
+			return;
+		}
 
 		// Si recibimos en el socket un eco, lo respondemos con un OK
 		if (message.startsWith(ECHO_REQUEST_PREFIX)) {

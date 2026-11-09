@@ -75,3 +75,30 @@ hs_err_pid*
 
 # macOS
 .DS_Store
+
+# Community layer (Autofirma-2026) — toolchains y salidas locales
+tools/
+integra/
+fire/
+dist/
+packaging/stage-deb/
+packaging/stage-rpm/
+packaging/*.deb
+vectors/out/
+vectors/manifest/latest.txt
+tests/**/target/
+docs/*.log
+.cursor/
+.idea/
+*.iml
+*.pyc
+node_modules/
+
+# Archify / Playwright MCP artefactos locales
+.archify/
+.playwright-mcp/
+
+# Interoperabilidad (T3b): certificados y evidencia local nunca se versionan
+*.p12
+*.pfx
+interop-local/

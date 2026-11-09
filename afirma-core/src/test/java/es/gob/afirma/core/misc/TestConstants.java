@@ -13,7 +13,7 @@ public final class TestConstants {
 	/** Prueba de obtenci&oacute;n de nombre de algoritmo de huella <i>NONE</i>. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testDigestNone() {
 		final String digestAlgo = AOSignConstants.getDigestAlgorithmName("NONEwithRSA"); //$NON-NLS-1$
 		System.out.println(digestAlgo);

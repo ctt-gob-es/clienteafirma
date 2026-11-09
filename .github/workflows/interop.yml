@@ -1,0 +1,149 @@
+name: Interop
+
+on:
+  # Sin filtro de rama base: T3b debe cubrir tambien los PR apilados sobre ramas de tarea.
+  pull_request:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: interop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  interop:
+    name: Interop (TLS, navegadores, DSS)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Node 22
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: '22'
+
+      - name: Install system tooling
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends openssl curl python3 xvfb
+          # Edge no esta en los repos de Ubuntu: canal oficial de Microsoft.
+          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+            | gpg --dearmor | sudo tee /usr/share/keyrings/microsoft.gpg >/dev/null
+          echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main' \
+            | sudo tee /etc/apt/sources.list.d/microsoft-edge.list >/dev/null
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends microsoft-edge-stable
+
+      - name: Self-test of the interop scripts (no network)
+        run: |
+          set -euo pipefail
+          bash scripts/ci/test-interop-scripts.sh
+
+      - name: Generate synthetic test certificates (never committed)
+        run: |
+          set -euo pipefail
+          bash scripts/interop/gen-test-certs.sh "$RUNNER_TEMP/afirma-interop-certs"
+          chmod -R go-rwx "$RUNNER_TEMP/afirma-interop-certs"
+
+      - name: A1 · TLS hardening of the local channel
+        env:
+          INTEROP_CERTS_DIR: ${{ runner.temp }}/afirma-interop-certs
+          INTEROP_TLS_LOG: ${{ runner.temp }}/interop-tls-probe.log
+        run: |
+          set -euo pipefail
+          xvfb-run -a bash scripts/interop/tls-probe.sh "$INTEROP_CERTS_DIR"
+
+      - name: A2 · Browsers (Firefox, Chromium, Edge)
+        env:
+          INTEROP_CERTS_DIR: ${{ runner.temp }}/afirma-interop-certs
+          INTEROP_OUT: ${{ runner.temp }}/interop-out
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright@1.64.1
+          npx playwright install --with-deps firefox chromium
+          node scripts/interop/browser-interop.mjs
+
+      - name: A3 · Synthetic signature with the test certificate
+        env:
+          INTEROP_OUT: ${{ runner.temp }}/interop-out
+          INTEROP_CERTS_DIR: ${{ runner.temp }}/afirma-interop-certs
+        run: |
+          set -euo pipefail
+          mkdir -p "$INTEROP_OUT"
+          # Dos vectores: XAdES enveloped (autocontenido) y CAdES detached (necesita el
+          # documento original, que se envia en el campo opcional 'content').
+          printf '<?xml version="1.0" encoding="UTF-8"?>\n<interop>vector sintetico</interop>\n' > "$RUNNER_TEMP/vector.xml"
+          printf 'vector sintetico de interoperabilidad\n' > "$RUNNER_TEMP/plain.txt"
+          mvn -B -q -Denv=install -pl afirma-simple -am -DskipTests package
+          java -jar afirma-simple/target/autofirma.jar sign \
+            -i "$RUNNER_TEMP/vector.xml" -o "$INTEROP_OUT/firma.xsig" \
+            -store "pkcs12:$INTEROP_CERTS_DIR/rsa.p12" \
+            -password "$(cat "$INTEROP_CERTS_DIR/p12pass")" \
+            -alias interop-rsa -format xades
+          java -jar afirma-simple/target/autofirma.jar sign \
+            -i "$RUNNER_TEMP/plain.txt" -o "$INTEROP_OUT/firma.csig" \
+            -store "pkcs12:$INTEROP_CERTS_DIR/rsa.p12" \
+            -password "$(cat "$INTEROP_CERTS_DIR/p12pass")" \
+            -alias interop-rsa -format cades
+
+      - name: Log in to GHCR for the DSS image
+        run: |
+          set -euo pipefail
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      # Mientras no exista la primera imagen publicada (vars.DSS_IMAGE vacia) este paso
+      # queda en modo aviso: no bloquea el PR. En cuanto haya imagen, vuelve a ser
+      # bloqueante. Condicion de salida documentada en docs/security/INTEROP-DSS.md.
+      - name: A4 · EU DSS validation (XAdES enveloped + CAdES detached)
+        continue-on-error: ${{ vars.DSS_IMAGE == '' }}
+        env:
+          INTEROP_OUT: ${{ runner.temp }}/interop-out
+          INTEROP_CERTS_DIR: ${{ runner.temp }}/afirma-interop-certs
+          DSS_URL: ${{ vars.DSS_URL }}
+          DSS_IMAGE: ${{ vars.DSS_IMAGE }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DSS_IMAGE:-}" ] && [ -z "${DSS_URL:-}" ]; then
+            echo "::warning title=A4 en modo aviso::No hay imagen de DSS publicada (vars.DSS_IMAGE) ni instancia (vars.DSS_URL). Lanza el workflow 'DSS image' y asigna el digest. Ver docs/security/INTEROP-DSS.md"
+          fi
+          echo "[interop] vector 1/2: XAdES enveloped"
+          bash scripts/interop/dss-validate.sh "$INTEROP_OUT/firma.xsig" "$INTEROP_CERTS_DIR/ca.crt"
+          echo "[interop] vector 2/2: CAdES detached con documento original"
+          bash scripts/interop/dss-validate.sh "$INTEROP_OUT/firma.csig" "$INTEROP_CERTS_DIR/ca.crt" "$RUNNER_TEMP/plain.txt"
+
+      - name: C · Repository hygiene (no PKCS#12 committed)
+        run: |
+          set -euo pipefail
+          bash scripts/interop/check-no-pkcs12.sh
+
+      - name: Upload interop evidence
+        if: always()
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        with:
+          name: interop-evidence
+          path: |
+            ${{ runner.temp }}/interop-out
+            ${{ runner.temp }}/interop-tls-probe.log
+          if-no-files-found: warn
+          retention-days: 14

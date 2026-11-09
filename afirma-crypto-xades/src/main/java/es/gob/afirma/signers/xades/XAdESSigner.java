@@ -1337,7 +1337,11 @@ public final class XAdESSigner {
 	 */
 	private static void checkParams(final String algorithm, final Properties extraParams) {
 
-    	if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { //$NON-NLS-1$
+    	if (algorithm.toUpperCase(Locale.US).startsWith("MD")) { 
+
+        // SEC-2026-008: Rechazar SHA-1 excepto para formato ODF
+        final String format = extraParams.getProperty(XAdESExtraParams.FORMAT);
+        AOSignConstants.validateSHA1ForFormat(algorithm, format); //$NON-NLS-1$
     		throw new IllegalArgumentException("XAdES no permite huellas digitales MD2 o MD5 (Decision 130/2011 CE)"); //$NON-NLS-1$
     	}
 

@@ -29,8 +29,8 @@ public final class TestEnvelopes {
     @SuppressWarnings("static-method")
 	@Before
     public void initProvider() {
-    	if (Security.getProvider(org.spongycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME) == null) {
-    		Security.addProvider(new org.spongycastle.jce.provider.BouncyCastleProvider());
+    	if (Security.getProvider(org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME) == null) {
+    		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     	}
     }
 

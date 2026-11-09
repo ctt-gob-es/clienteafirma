@@ -29,7 +29,7 @@ public class CustomDialogTest {
 	/**
 	 * Comprobaci&oacute;n de las caracter&iacute;sticas de accesibilidad de los CustomDialog
 	 */
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	@Test
 	public void testShowMessageDialog(){
 		LOGGER.info("testShowMessageDialog"); //$NON-NLS-1$
@@ -49,7 +49,7 @@ public class CustomDialogTest {
 	/**
 	 * Comprobaci&oacute;n de las caracter&iacute;sticas de accesibilidad de los CustomDialog
 	 */
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	@Test
 	public void testShowConfirmDialog(){
 		LOGGER.info("testShowConfirmDialog"); //$NON-NLS-1$
@@ -75,7 +75,7 @@ public class CustomDialogTest {
 	/**
 	 * Comprobaci&oacute;n de las caracter&iacute;sticas de accesibilidad de los CustomDialog
 	 */
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	@Test
 	public void testShowInputDialog(){
 		LOGGER.info("testShowInputDialog"); //$NON-NLS-1$
@@ -95,7 +95,7 @@ public class CustomDialogTest {
 	/**
 	 * Comprobaci&oacute;n de las caracter&iacute;sticas de accesibilidad de los CustomDialog
 	 */
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	@Test
 	public void testShowInputPasswordDialog(){
 		LOGGER.info("testShowInputPasswordDialog"); //$NON-NLS-1$
@@ -122,7 +122,7 @@ public class CustomDialogTest {
 	 * @return boolean Resultado de la validaci&oacute;n
 	 */
 	@SuppressWarnings("static-method")
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public boolean checkComponentMessageDialog(final CustomDialog cD){
 		for (int i = 0; i<cD.getComponentCount();i++){
 			if (cD.getComponent(i) instanceof JRootPane){

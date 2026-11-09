@@ -85,24 +85,38 @@ public class ShellScript {
 	private String run(final boolean asAdmin) throws IOException, InterruptedException {
 
 		final List<String> params = new ArrayList<>();
-		params.add("/usr/bin/osascript"); //$NON-NLS-1$
-		params.add("-e"); //$NON-NLS-1$
+		File scriptToRun = this.scriptFile;
+		File tempScript = null;
 
-
-		String scriptText;
-		if (this.scriptFile != null) {
-			scriptText = this.scriptFile.getAbsolutePath();
-		} else {
-			scriptText = this.script;
+		if (scriptToRun == null) {
+			// Texto en memoria: volcar a fichero temporal y ejecutar con bash (sin shell -c)
+			tempScript = File.createTempFile("afirma-shell-", ".sh"); //$NON-NLS-1$ //$NON-NLS-2$
+			tempScript.deleteOnExit();
+			Files.write(tempScript.toPath(), this.script.getBytes(DEFAULT_CHARSET));
+			if (!tempScript.setExecutable(true, true)) {
+				LOGGER.fine("No se pudo marcar el script temporal como ejecutable"); //$NON-NLS-1$
+			}
+			scriptToRun = tempScript;
 		}
-		scriptText = "do shell script \"" + scriptText + "\""; //$NON-NLS-1$ //$NON-NLS-2$
-		if (asAdmin) {
-			scriptText += " with administrator privileges"; //$NON-NLS-1$
-		}
-		params.add(scriptText);
 
-		//TODO: Pasar a fine
-		LOGGER.info("Ejecutando shell script: " + scriptText); //$NON-NLS-1$
+		final String canonical = scriptToRun.getCanonicalPath();
+		if (canonical.indexOf('"') >= 0 || canonical.indexOf('$') >= 0 || canonical.indexOf('`') >= 0) {
+			throw new IOException("Ruta de script no permitida"); //$NON-NLS-1$
+		}
+
+		if (!asAdmin) {
+			params.add("/bin/bash"); //$NON-NLS-1$
+			params.add(canonical);
+		}
+		else {
+			// Elevacion macOS: osascript con ruta escapada (sin interpolar el cuerpo del script)
+			params.add("/usr/bin/osascript"); //$NON-NLS-1$
+			params.add("-e"); //$NON-NLS-1$
+			final String escaped = canonical.replace("\\", "\\\\").replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			params.add("do shell script \"/bin/bash " + escaped + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		LOGGER.info("Ejecutando script: " + canonical + (asAdmin ? " (admin)" : "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		final ProcessBuilder processBuilder = new ProcessBuilder(params);
 		final Process process = processBuilder.start();
@@ -122,8 +136,11 @@ public class ShellScript {
 			output = AOUtil.getDataFromInputStream(standardStream);
 		}
 
-		if (this.deleteFile) {
+		if (this.deleteFile && this.scriptFile != null) {
 			Files.delete(this.scriptFile.toPath());
+		}
+		if (tempScript != null) {
+			Files.deleteIfExists(tempScript.toPath());
 		}
 
 		return output != null ? new String(output, DEFAULT_CHARSET) : null;

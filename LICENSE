@@ -1,0 +1,23 @@
+SPDX-License-Identifier: GPL-2.0-or-later OR EUPL-1.1
+
+Este repositorio es un fork de Cliente @firma / Autofirma. El código del
+cliente y los textos legales originales de CTT no se sustituyen aquí.
+
+Licencia dual del producto (upstream):
+
+  - GNU General Public License versión 2 o posterior (GPL-2.0+)
+  - European Union Public Licence versión 1.1 (EUPL-1.1)
+
+Copyright del producto: Agencia Estatal de Administración Digital /
+Centro de Transferencia de Tecnología (CTT), Gobierno de España.
+
+Textos completos y condiciones de uso en el directorio `license/`:
+
+  - license/LICENSE.txt          (condiciones de uso del Cliente @firma)
+  - license/gpl-2.0.txt          (GPL-2.0)
+  - license/autofirma-LICENSE.txt
+  - y las licencias de dependencias embebidas
+
+Puedes usar, modificar y redistribuir bajo cualquiera de las dos licencias,
+según los términos duales del upstream. Este fichero de raíz solo declara
+el SPDX; no pisa los textos de `license/`.

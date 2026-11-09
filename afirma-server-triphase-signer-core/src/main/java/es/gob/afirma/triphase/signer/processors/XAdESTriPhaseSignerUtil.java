@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -27,6 +26,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.xades.XAdESUtil;
 import es.gob.afirma.signers.xml.Utils;
@@ -406,9 +406,7 @@ final class XAdESTriPhaseSignerUtil {
 	private static Document getDocumentFromBytes(final byte[] data) throws SAXException,
 	                                                                       IOException,
 	                                                                       ParserConfigurationException {
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        return dbf.newDocumentBuilder().parse(
+		return SecureXmlBuilder.getSecureDocumentBuilder().parse(
     		new ByteArrayInputStream(data)
 		);
 	}

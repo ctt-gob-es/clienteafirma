@@ -18,7 +18,7 @@
 	</parent>
 	
 	<properties>
-        <afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
+        <afirma.keytool.keystore>${env.AFIRMA_KEYSTORE_PATH}</afirma.keytool.keystore>
 	</properties>
 
 	<dependencies>
@@ -252,19 +252,7 @@
  			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
-					<keystore>${afirma.keytool.keystore}</keystore>
-					<alias>${afirma.keytool.alias}</alias>
-					<storepass>${afirma.keytool.password}</storepass>
- 					<signedjar>${project.build.directory}/${project.build.finalName}-signed.jar</signedjar>
-					<verify>true</verify>
 					<archive>
 						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
 					</archive>

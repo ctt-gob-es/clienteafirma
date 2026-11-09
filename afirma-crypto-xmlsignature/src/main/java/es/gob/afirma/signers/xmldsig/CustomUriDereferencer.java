@@ -32,9 +32,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.misc.http.UrlHttpManagerFactory;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
-import es.gob.afirma.signers.xml.Utils;
 
 /** Dereferenciador a medida de referencias XML DOM. */
 public final class CustomUriDereferencer implements URIDereferencer {
@@ -156,7 +156,7 @@ public final class CustomUriDereferencer implements URIDereferencer {
 				}
 				try {
 					return getStreamData(
-							Utils.getNewDocumentBuilder().parse(
+							SecureXmlBuilder.getSecureDocumentBuilder().parse(
 									new ByteArrayInputStream(externalContent)));
 				}
 				catch (final ParserConfigurationException e1) {

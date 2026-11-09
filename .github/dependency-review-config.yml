@@ -1,0 +1,32 @@
+# Configuration for Dependency Review
+# https://github.com/actions/dependency-review-action
+
+# Fail on high severity vulnerabilities
+fail-on-severity: high
+
+# Allow specific GHSA IDs if needed (use sparingly)
+# allow-ghsas:
+#   - GHSA-xxxx-xxxx-xxxx
+
+# Fail on specific scopes (compile, runtime, test, provided)
+# fail-on-scopes:
+#   - compile
+#   - runtime
+
+# Severity thresholds
+severity-threshold: high
+
+# Exclude dev dependencies from checks (if applicable)
+# exclude-dev-dependencies: true
+
+# Alert on license violations
+# license-policy:
+#   allowed-licenses:
+#     - MIT
+#     - Apache-2.0
+#     - BSD-3-Clause
+#     - GPL-2.0-or-later
+#     - EUPL-1.1
+
+# Alert on deprecated packages
+# deprecated-packages: true

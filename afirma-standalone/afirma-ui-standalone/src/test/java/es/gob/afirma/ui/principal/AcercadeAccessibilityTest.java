@@ -137,7 +137,7 @@ public class AcercadeAccessibilityTest {
 	/**
 	 * Metodo que obtiene una lista de codigos de atajos a los botones de un panel.
 	 */
-	@Ignore
+	@Ignore("Requiere GUI / lector de pantalla Orca")
 	private void getKeyCodeList(final JPanel panel, final List <Integer> keyCodeList) {
 		//Array de componentes del panel
 		final Component[] components = panel.getComponents();
@@ -166,7 +166,7 @@ public class AcercadeAccessibilityTest {
 	/**
 	 * Metodo que comprueba si los JTextPane son editables.
 	 */
-	@Ignore
+	@Ignore("Requiere GUI / lector de pantalla Orca")
 	private boolean isJTextPaneEditable(final JPanel panel) {
 		final boolean result = false;
 		//Array de componentes del panel

@@ -24,7 +24,7 @@ public final class TestJavaBug8182580 {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Error conocido de JDK / prueba inestable")
 	public void testSignXadesEc() throws Exception {
 		final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		ks.load(

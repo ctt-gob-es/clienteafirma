@@ -92,7 +92,7 @@ public class PanelConfiguracionAccessibilityTest {
 	/**
 	 * Metodo que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton, Checkbox) de un panel.
 	 */
-	@Ignore
+	@Ignore("Requiere GUI / lector de pantalla Orca")
 	private void getKeyCodeList(final JPanel panel, final List <Integer> keyCodeList) {
 		//Array de componentes del panel
 		final Component[] components = panel.getComponents();

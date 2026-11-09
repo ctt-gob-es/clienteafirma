@@ -66,7 +66,7 @@ public final class TestMacCaInstall {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testInstallRootCaWithProcess() throws Exception {
 
 		final File f = new File(TestMacCaInstall.class.getResource("/Autofirma_ROOT.cer").toURI()); //$NON-NLS-1$
@@ -139,7 +139,7 @@ public final class TestMacCaInstall {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testInstallSslCertWithProcess() throws Exception {
 
 		final File f = new File(TestMacCaInstall.class.getResource("/127_0_0_1.cer").toURI()); //$NON-NLS-1$

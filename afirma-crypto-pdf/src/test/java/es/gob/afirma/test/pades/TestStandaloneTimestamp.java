@@ -34,7 +34,7 @@ public final class TestStandaloneTimestamp {
      * @throws Exception en cualquier error. */
     @SuppressWarnings("static-method")
     @Test
-    @Ignore
+    @Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testTimestampCosignedPdf() throws Exception {
     	final byte[] inPdf;
     	try (
@@ -63,7 +63,7 @@ public final class TestStandaloneTimestamp {
      * @throws Exception en cualquier error. */
     @SuppressWarnings("static-method")
     @Test
-    @Ignore
+    @Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testTimestampPdf() throws Exception {
     	final byte[] inPdf;
     	try (

@@ -221,21 +221,64 @@ public final class LookAndFeelManager {
 	 * @return {@code true} si encontramos configurado un tema oscuro de GNOME, {@code false} en caso contrario.
 	 */
 	private static boolean isGnomeDarkMode() {
-        return
-             (queryResultContains("echo $XDG_CURRENT_DESKTOP", "gnome") || //$NON-NLS-1$ //$NON-NLS-2$
-             queryResultContains("echo $XDG_DATA_DIRS | grep -Eo 'gnome'", "gnome") || //$NON-NLS-1$ //$NON-NLS-2$
-             queryResultContains("ps -e | grep -E -i \"gnome\"", "gnome")) //$NON-NLS-1$ //$NON-NLS-2$
-             	&& queryResultContains("gsettings get org.gnome.desktop.interface gtk-theme", "dark") //$NON-NLS-1$ //$NON-NLS-2$
-        ;
-    }
-
-	private static boolean queryResultContains(final String cmd, final String subResult) {
-		return query(cmd).toLowerCase().contains(subResult);
+		return isGnomeDesktop()
+				&& readProcessOutput(runGsettingsGtkTheme()).toLowerCase().contains("dark"); //$NON-NLS-1$
 	}
 
-	private static String query(final String cmd) {
+	private static boolean isGnomeDesktop() {
+		final String desktop = System.getenv("XDG_CURRENT_DESKTOP"); //$NON-NLS-1$
+		if (desktop != null && desktop.toLowerCase().contains("gnome")) { //$NON-NLS-1$
+			return true;
+		}
+		final String dataDirs = System.getenv("XDG_DATA_DIRS"); //$NON-NLS-1$
+		if (dataDirs != null && dataDirs.toLowerCase().contains("gnome")) { //$NON-NLS-1$
+			return true;
+		}
+		return readProcessOutput(runPsList()).toLowerCase().contains("gnome"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Solo admite los binarios literales usados para detectar el tema (sin ruta).
+	 * @param binary Nombre del ejecutable propuesto.
+	 * @return {@code true} si es {@code gsettings} o {@code ps} sin separadores de ruta.
+	 */
+	static boolean isAllowedThemeBinary(final String binary) {
+		if (binary == null || binary.isEmpty()) {
+			return false;
+		}
+		if (binary.indexOf('/') >= 0 || binary.indexOf('\\') >= 0) {
+			return false;
+		}
+		return "gsettings".equals(binary) || "ps".equals(binary); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/** ProcessBuilder con argv literal (sin shell). */
+	private static ProcessBuilder runGsettingsGtkTheme() {
+		if (!isAllowedThemeBinary("gsettings")) { //$NON-NLS-1$
+			return null;
+		}
+		return new ProcessBuilder(
+				"gsettings", //$NON-NLS-1$
+				"get", //$NON-NLS-1$
+				"org.gnome.desktop.interface", //$NON-NLS-1$
+				"gtk-theme" //$NON-NLS-1$
+		);
+	}
+
+	/** ProcessBuilder con argv literal (sin shell). */
+	private static ProcessBuilder runPsList() {
+		if (!isAllowedThemeBinary("ps")) { //$NON-NLS-1$
+			return null;
+		}
+		return new ProcessBuilder("ps", "-e"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	private static String readProcessOutput(final ProcessBuilder builder) {
+		if (builder == null) {
+			return ""; //$NON-NLS-1$
+		}
 		try {
-			final Process process = Runtime.getRuntime().exec(cmd);
+			final Process process = builder.start();
 			final StringBuilder stringBuilder = new StringBuilder();
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				String actualReadLine;

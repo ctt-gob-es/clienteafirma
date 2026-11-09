@@ -52,7 +52,7 @@ public class TestPadesBaseline {
 
 	private AOPDFSigner signer = null;
 
-	/** Antes de ejecutar cualquier prueba se ejecutar&aacute; este m&eacute;todo que cargar6aacute;
+	/** Antes de ejecutar cualquier prueba se ejecutar&aacute; este m&eacute;todo que cargar&aacute;
 	 * todos los objetos que se vaya a necesitar en las distintas pruebas.
 	 * @throws Exception En cualquier error. */
 	@Before
@@ -80,9 +80,12 @@ public class TestPadesBaseline {
 		this.commitmentTypeIndicationsParams = new Properties();
 		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS, "2"); //$NON-NLS-1$
 		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER, "1"); //$NON-NLS-1$ //$NON-NLS-2$
-		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "1.2.3.4|1.56.23.1"); //$NON-NLS-1$ //$NON-NLS-2$
+		// RFC 5754 OIDs for commitment type indication qualifiers
+		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS,
+			"1.2.3.4|1.2.840.113549.1.9.16.6.1"); //$NON-NLS-1$ //$NON-NLS-2$
 		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "1" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER, "6"); //$NON-NLS-1$ //$NON-NLS-2$
-		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "1" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS, "1.56.23.2"); //$NON-NLS-1$ //$NON-NLS-2$
+		this.commitmentTypeIndicationsParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "1" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS,
+			"1.2.840.113549.1.9.16.6.2"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Tipos erroneos que no deberian declararse
 		this.contentHintParams = new Properties();
@@ -302,6 +305,27 @@ public class TestPadesBaseline {
 		System.out.println("Prueba " + new TestPadesBaseline() { /* Vacio */ }.getClass().getEnclosingMethod().getName() + ": " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		checkSign(result, algorithm);
+	}
+
+	/**
+	 * Prueba negativa: OID de calificador de commitment-type-indication inv&aacute;lido.
+	 * Debe fallar al intentar firmar con un OID mal formado.
+	 * @throws Exception en cualquier error. */
+	@Test(expected = AOException.class)
+	public void testFirmaBaselineConOIDInvalido() throws Exception {
+
+		final Properties invalidParams = new Properties();
+		invalidParams.setProperty(PdfExtraParams.PROFILE, AOSignConstants.SIGN_PROFILE_BASELINE);
+		invalidParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATIONS, "1"); //$NON-NLS-1$
+		invalidParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_IDENTIFIER, "1"); //$NON-NLS-1$ //$NON-NLS-2$
+		// OID inválido: no cumple formato OID (falta punto, caracteres inválidos)
+		invalidParams.setProperty(PdfExtraParams.COMMITMENT_TYPE_INDICATION_PREFIX + "0" + PdfExtraParams.COMMITMENT_TYPE_INDICATION_QUALIFIERS,
+			"1.56.23.1"); //$NON-NLS-1$
+
+		this.signer.sign(
+				this.data, AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+				this.pke.getPrivateKey(), this.pke.getCertificateChain(),
+				invalidParams);
 	}
 
 	/**

@@ -36,34 +36,33 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
-import org.spongycastle.asn1.ASN1EncodableVector;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.DERSequence;
-import org.spongycastle.asn1.oiw.OIWObjectIdentifiers;
-import org.spongycastle.asn1.x500.X500Name;
-import org.spongycastle.asn1.x509.AlgorithmIdentifier;
-import org.spongycastle.asn1.x509.BasicConstraints;
-import org.spongycastle.asn1.x509.Extension;
-import org.spongycastle.asn1.x509.GeneralName;
-import org.spongycastle.asn1.x509.GeneralNames;
-import org.spongycastle.asn1.x509.KeyPurposeId;
-import org.spongycastle.asn1.x509.KeyUsage;
-import org.spongycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.spongycastle.cert.CertIOException;
-import org.spongycastle.cert.X509ExtensionUtils;
-import org.spongycastle.cert.X509v3CertificateBuilder;
-import org.spongycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.spongycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.spongycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.spongycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.spongycastle.jce.provider.BouncyCastleProvider;
-import org.spongycastle.operator.ContentSigner;
-import org.spongycastle.operator.DigestCalculator;
-import org.spongycastle.operator.OperatorCreationException;
-import org.spongycastle.operator.bc.BcDigestCalculatorProvider;
-import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.X509ExtensionUtils;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.DigestCalculator;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 /** Utilidades para la creaci&oacute;n de certificados X.509.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -73,7 +72,7 @@ final class CertUtil {
 
 	private static final int KEY_SIZE = 2048;
 
-	private static final String PROVIDER = "SC"; //$NON-NLS-1$
+	private static final String PROVIDER = "BC"; //$NON-NLS-1$
 
 	private static final String DEFAULT_LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
 
@@ -163,7 +162,7 @@ final class CertUtil {
 		expirationDate.setTime(new Date().getTime()+(long)10*365*24*3600*1000);
 		final X509v3CertificateBuilder generator = new JcaX509v3CertificateBuilder(
 			new X500Name("CN=" + commonName), //$NON-NLS-1$
-			BigInteger.valueOf(new Random().nextInt()),
+			BigInteger.valueOf(new SecureRandom().nextInt(Integer.MAX_VALUE)),
     		new Date(),
     		expirationDate,
     		new X500Name("CN=" + commonName), //$NON-NLS-1$
@@ -244,7 +243,7 @@ final class CertUtil {
 
 			final X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
 				issuerDN,
-				BigInteger.valueOf(new Random().nextInt()),
+				BigInteger.valueOf(new SecureRandom().nextInt(Integer.MAX_VALUE)),
 				new Date(),
 	    		expirationDate,
 	    		new X500Name("CN="+cn), //$NON-NLS-1$

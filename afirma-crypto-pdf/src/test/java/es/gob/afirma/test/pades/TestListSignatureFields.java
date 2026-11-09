@@ -50,7 +50,7 @@ public final class TestListSignatureFields {
 
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testAnalizeSignatureFields() throws Exception {
 		PdfReader reader;
 		try (InputStream fis = new FileInputStream("C:\\Users\\carlos.gamuci\\Desktop\\test\\descargar_signed_campo.pdf")) { //$NON-NLS-1$

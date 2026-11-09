@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -71,6 +70,14 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 		// relanzamos la excepcion sin hacer nada mas
 		if (!(cause instanceof SSLHandshakeException)) {// || cause.getCause() instanceof java.security.cert.CertificateException) {
 			LOGGER.info("El error no es de tipo SSLHandShake y no la tratamos"); //$NON-NLS-1$
+			throw cause;
+		}
+
+		// Con comprobaciones estrictas (defecto) no ofrecemos importar ni desactivar:
+		// solo informamos en lenguaje llano y dejamos cerrar.
+		if (Boolean.parseBoolean(System.getProperty(
+				UrlHttpManagerImpl.JAVA_PARAM_STRICT_SSL_CHECKS, Boolean.TRUE.toString()))) {
+			showStrictSslFailureDialog();
 			throw cause;
 		}
 
@@ -380,14 +387,12 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	 */
 	private static Certificate[] downloadFromRemoteServer(final String domainName) throws Exception {
 
-		final URL url = new URL(domainName);
-		final HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-		SslSecurityManager.disableSslChecks(conn);
-		conn.connect();
-		final Certificate[] trustedServerCerts = conn.getServerCertificates();
-		conn.disconnect();
-
-		return trustedServerCerts;
+		// Se recupera la cadena del servidor sin validarla y sin permitir el intercambio de
+		// datos (el saludo TLS se aborta al capturarla). No se desactiva la validacion TLS
+		// de la conexion ni la global, tampoco en modo permisivo.
+		return SslSecurityManager.retrieveServerCertificateChain(
+				new URL(domainName).toString(),
+				"importar el certificado del servidor para confiar en el"); //$NON-NLS-1$
 	}
 
 	/**
@@ -396,6 +401,38 @@ public class SSLErrorProcessor implements HttpErrorProcessor {
 	 */
 	public boolean isCancelled() {
 		return this.cancelled;
+	}
+
+	/**
+	 * Texto del aviso cuando falla la comprobaci&oacute;n del servidor (modo estricto).
+	 * Orden fijo: qu&eacute; ha pasado, qu&eacute; revisar, c&oacute;mo desactivar en Preferencias.
+	 * @return Mensaje multil&iacute;nea localizado.
+	 */
+	public static String buildStrictSslFailureMessage() {
+		return CoreMessages.getString("SSLStrictFailureDialog.2") + "\n\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ CoreMessages.getString("SSLStrictFailureDialog.3") + "\n\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ CoreMessages.getString("SSLStrictFailureDialog.4"); //$NON-NLS-1$
+	}
+
+	private static void showStrictSslFailureDialog() {
+		if (!hasGraphicsEnvironment()) {
+			LOGGER.info("Fallo SSL estricto sin entorno grafico; no se muestra dialogo"); //$NON-NLS-1$
+			return;
+		}
+		try {
+			AOUIFactory.showMessageDialog(
+					null,
+					buildStrictSslFailureMessage(),
+					CoreMessages.getString("SSLStrictFailureDialog.1"), //$NON-NLS-1$
+					AOUIFactory.WARNING_MESSAGE
+			);
+		}
+		catch (final Throwable e) {
+			// Un fallo al mostrar el aviso (por ejemplo, sin gestor de interfaces graficas
+			// registrado en integraciones de la libreria) no puede alterar la decision de
+			// seguridad: la conexion se rechaza igualmente.
+			LOGGER.warning("No se pudo mostrar el aviso SSL estricto: " + e); //$NON-NLS-1$
+		}
 	}
 
 }

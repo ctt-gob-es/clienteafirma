@@ -273,6 +273,9 @@ public final class PreferencesManager {
 	/** Lista de dominios seguros donde realizar conexiones SSL. */
 	public static final String PREFERENCE_GENERAL_SECURE_DOMAINS_LIST = "secureDomainsList"; //$NON-NLS-1$
 
+	/** Indica si se exige el token firmado del servidor trif&aacute;sico (por defecto, no). */
+	public static final String PREFERENCE_GENERAL_STRICT_TRIPHASE_TOKEN = "strictTriphaseToken"; //$NON-NLS-1$
+
 	/** Configuraci&oacute;n de <i>proxy</i> seleccionada.
 	 * Un valor de <code>true</code> en esta preferencia indica que debe usarse el <i>proxy</i> configurado,
 	 * y un valor de <code>false</code> que no usar&aacute; <i>proxy</i> en las conexiones de red. */

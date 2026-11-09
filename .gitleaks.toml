@@ -1,0 +1,36 @@
+# Gitleaks config — clienteafirma-alexendros
+# Allowlist: test fixtures, vendored crypto demos, and SEC-2026-001 retired installer
+# material (still in git history). Do not allowlist live secrets.
+
+title = "clienteafirma-alexendros"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Test fixtures, vendored JS crypto demos, BouncyCastle sources, retired installer paths (SEC-2026-001)"
+paths = [
+  '''(?i)src/test/''',
+  '''(?i)/test/resources/''',
+  '''(?i)crypto-material-allowlist\.txt$''',
+  '''(?i)jsrsasign''',
+  '''(?i)qunit-do-''',
+  '''(?i)Org/BouncyCastle/''',
+  '''(?i)bouncycastle''',
+  '''(?i)afirma\.keystore$''',
+  '''(?i)Autofirma_sign\.pfx$''',
+  '''(?i)App1_TemporaryKey\.pfx$''',
+  '''(?i)\.p12$''',
+  '''(?i)\.pfx$''',
+  '''(?i)\.jks$''',
+  '''(?i)sample-factura''',
+  '''(?i)ClienteAfirma/''',
+  '''(?i)ProxyUtil\.java$''',
+  '''(?i)Updater\.java$''',
+  '''(?i)miniapplet.*\.js$''',
+  '''(?i)DNInB\.js$''',
+  '''(?i)afirma-ios/''',
+  '''(?i)digidoc-openxades''',
+  '''(?i)out-digidoc-openxades''',
+  '''(?i)\.storyboard$''',
+]

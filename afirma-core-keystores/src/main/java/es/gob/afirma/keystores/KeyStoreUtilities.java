@@ -369,10 +369,22 @@ public final class KeyStoreUtilities {
 			return originalPath;
 		}
 
+		final String absPath = dir.getAbsolutePath();
+		if (absPath.indexOf('&') >= 0 || absPath.indexOf('|') >= 0 || absPath.indexOf('>') >= 0
+				|| absPath.indexOf('<') >= 0 || absPath.indexOf('^') >= 0 || absPath.indexOf('%') >= 0) {
+			LOGGER.warning("Ruta con metacaracteres; se omite nombre corto Windows"); //$NON-NLS-1$
+			return originalPath;
+		}
+
 		try {
-			final Process p = new ProcessBuilder(
-				"cmd.exe", "/c", "for %f in (\"" + dir.getAbsolutePath() + "\") do @echo %~sf" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			).start();
+			// Path via entorno (sin concatenar en la linea de comando)
+			final ProcessBuilder pb = new ProcessBuilder(
+					"cmd.exe", //$NON-NLS-1$
+					"/c", //$NON-NLS-1$
+					"for %f in (\"%AFIRMA_PATH_TO_SHORT%\") do @echo %~sf" //$NON-NLS-1$
+			);
+			pb.environment().put("AFIRMA_PATH_TO_SHORT", absPath); //$NON-NLS-1$
+			final Process p = pb.start();
 			try (
 				final InputStream is = p.getInputStream()
 			) {

@@ -41,7 +41,6 @@ import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathType;
 import javax.xml.crypto.dsig.spec.XPathType.Filter;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
@@ -57,6 +56,7 @@ import org.w3c.dom.ls.LSSerializer;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 
@@ -65,42 +65,6 @@ public final class Utils {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private static DocumentBuilderFactory SECURE_BUILDER_FACTORY;
-
-
-	static {
-		SECURE_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-		try {
-			SECURE_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
-		}
-		catch (final Exception e) {
-			LOGGER.log(Level.WARNING, "No se ha podido establecer el procesado seguro en la factoria XML: " + e); //$NON-NLS-1$
-		}
-
-		// Los siguientes atributos deberia establececerlos automaticamente la implementacion de
-		// la biblioteca al habilitar la caracteristica anterior. Por si acaso, los establecemos
-		// expresamente
-		final String[] securityProperties = new String[] {
-				javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD,
-				javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA,
-				javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET
-		};
-		for (final String securityProperty : securityProperties) {
-			try {
-				SECURE_BUILDER_FACTORY.setAttribute(securityProperty, ""); //$NON-NLS-1$
-			}
-			catch (final Exception e) {
-				// Podemos las trazas en debug ya que estas propiedades son adicionales
-				// a la activacion de el procesado seguro
-				LOGGER.log(Level.FINE, "No se ha podido establecer una propiedad de seguridad '" + securityProperty + "' en la factoria XML"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-		}
-
-		SECURE_BUILDER_FACTORY.setValidating(false);
-		SECURE_BUILDER_FACTORY.setNamespaceAware(true);
-	}
-
-
     private Utils() {
         // No permitimos la instanciacion
     }
@@ -108,11 +72,13 @@ public final class Utils {
 
 	/**
 	 * Obtiene un objeto para la composici&oacute;n de documentos DOM.
+	 * Delega en {@link SecureXmlBuilder} (fail-closed: DOCTYPE, entidades
+	 * externas y XInclude deshabilitados).
 	 * @return Objeto para la composici&oacute;n de documentos DOM.
 	 * @throws ParserConfigurationException Cuando no se puede obtener el objeto.
 	 */
 	public static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
-		return SECURE_BUILDER_FACTORY.newDocumentBuilder();
+		return SecureXmlBuilder.getSecureDocumentBuilder();
 	}
 
     /** A&ntilde;ade la cabecera de hoja de estilo a un XML dado.

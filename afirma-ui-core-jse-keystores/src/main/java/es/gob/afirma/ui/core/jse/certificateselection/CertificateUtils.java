@@ -13,15 +13,12 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -52,12 +49,12 @@ public final class CertificateUtils {
 	 * @param certificate Certificado que deseamos abrir. */
 	public static void openCert(final Component parent, final X509Certificate certificate) {
 
-		// Si estamos en macOS, tratamos de abrir el certificado mediante QuickLook con un script
+		// Si estamos en macOS, tratamos de abrir el certificado mediante QuickLook (argv, sin shell)
 		if (Platform.getOS() == OS.MACOSX) {
 			try {
 				final File certFile = saveTemp(certificate.getEncoded(), CERTIFICATE_DEFAULT_EXTENSION);
 				certFile.deleteOnExit();
-				runMacOsScript("qlmanage -p " + certFile.getAbsolutePath().replace(" ", "\\ ")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				new ProcessBuilder("qlmanage", "-p", certFile.getAbsolutePath()).start(); //$NON-NLS-1$ //$NON-NLS-2$
 				return;
 			} catch (final Exception e) {
 				LOGGER.warning("No ha sido posible abrir el certificado mediante QuickLook: " + e); //$NON-NLS-1$
@@ -88,13 +85,22 @@ public final class CertificateUtils {
 				}
 			}
 
-			// En Windows con entornos Java 5 intentamos abrirlo manualmente
+			// En Windows con entornos Java 5 intentamos abrirlo manualmente (argv, sin concatenar)
 			if (Platform.getOS() == OS.WINDOWS) {
 				LOGGER.info("Se visualizan mediante una llamada al sistema los datos del certificado con numero de serie: " + AOUtil.hexify(certificate.getSerialNumber().toByteArray(), false));  //$NON-NLS-1$
 				try {
 					final File certFile = saveTemp(certificate.getEncoded(), CERTIFICATE_DEFAULT_EXTENSION);
+					final String abs = certFile.getAbsolutePath();
+					if (abs.indexOf('&') >= 0 || abs.indexOf('|') >= 0 || abs.indexOf('^') >= 0) {
+						throw new IOException("Ruta de certificado temporal no permitida"); //$NON-NLS-1$
+					}
+					// start exige titulo (cadena vacia) cuando la ruta puede tener espacios
 					new ProcessBuilder(
-							"cmd", "/C", "start", "\"" + CertificateSelectionDialogMessages.getString("CertificateUtils.0") + "\"", "\"" + certFile.getAbsolutePath() + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+							"cmd.exe", //$NON-NLS-1$
+							"/c", //$NON-NLS-1$
+							"start", //$NON-NLS-1$
+							"", //$NON-NLS-1$
+							abs
 							).start();
 					return;
 				}
@@ -171,45 +177,5 @@ public final class CertificateUtils {
 	static boolean isExpired(final X509Certificate cert) {
 		final long currentDate = new Date().getTime();
 		return currentDate >= cert.getNotAfter().getTime() || currentDate <= cert.getNotBefore().getTime();
-	}
-
-
-	/**
-	 * Ejecuta una sentencia de macOS a modo de script.
-	 * @param script Texto del script.
-	 * @return Texto devuelto por el script o {@code null} si no se devolvi&oacute; nada.
-	 * @throws IOException Cuando falla la ejecuci&oacute;n del script.
-	 * @throws InterruptedException Cuando finaliza inesperadamente la ejecuci&oacute;n del script.
-	 */
-	private static String runMacOsScript(final String script) throws IOException, InterruptedException {
-
-		final String scriptText = "do shell script \"" + script + "\""; //$NON-NLS-1$ //$NON-NLS-2$
-
-		final List<String> params = new ArrayList<>();
-		params.add("/usr/bin/osascript"); //$NON-NLS-1$
-		params.add("-e"); //$NON-NLS-1$
-		params.add(scriptText);
-
-		LOGGER.info("Ejecutando shell script: " + scriptText); //$NON-NLS-1$
-
-		final ProcessBuilder processBuilder = new ProcessBuilder(params);
-		final Process process = processBuilder.start();
-		final int processResult = process.waitFor();
-		if (processResult != 0) {
-			byte[] errorOutput = null;
-			try (final InputStream errorStream = process.getErrorStream()) {
-				errorOutput = AOUtil.getDataFromInputStream(errorStream);
-			}
-			LOGGER.warning("El script finalizo con un error y la salida : " + ( //$NON-NLS-1$
-					errorOutput != null ? new String(errorOutput) : "")); //$NON-NLS-1$
-			throw new IOException("La ejecucion del script devolvio el codigo de finalizacion: " + processResult); //$NON-NLS-1$
-		}
-
-		byte[] output = null;
-		try (final InputStream standardStream = process.getInputStream()) {
-			output = AOUtil.getDataFromInputStream(standardStream);
-		}
-
-		return output != null ? new String(output, "utf-8") : null; //$NON-NLS-1$
 	}
 }

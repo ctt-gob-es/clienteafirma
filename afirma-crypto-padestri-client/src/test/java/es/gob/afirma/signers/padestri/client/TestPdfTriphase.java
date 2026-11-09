@@ -112,7 +112,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception En cualquier error. */
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void testFirma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -140,7 +140,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica de un PDF certificado.
 	 * @throws Exception En cualquier error. */
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void testFirmaPdfCertificado() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -199,7 +199,7 @@ public class TestPdfTriphase {
 	 * el portafirmas del MinHAP.
 	 * @throws Exception Cuando ocurre cualquier error. */
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void testFirmaParamsPortafirmas() throws Exception {
 
 		final AOSigner signer = new AOPDFTriPhaseSigner();
@@ -232,7 +232,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica con adjunto en el PDF.
 	 * @throws Exception En cualquier error. */
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void firmaConAdjunto() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -280,7 +280,7 @@ public class TestPdfTriphase {
 	/** Prueba de firma trif&aacute;sica normal.
 	 * @throws Exception En cualquier error. */
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void cofirma() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -334,7 +334,7 @@ public class TestPdfTriphase {
 	 * @throws Exception En cualquier error.
 	 */
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void firmaConContrasenaSinIndicar() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 
@@ -367,7 +367,7 @@ public class TestPdfTriphase {
 	 * @throws Exception En cualquier error.
 	 */
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void firmaConContrasenaErronea() throws Exception {
 		final AOSigner signer = new AOPDFTriPhaseSigner();
 

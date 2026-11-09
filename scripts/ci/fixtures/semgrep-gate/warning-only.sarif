@@ -1,0 +1,23 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "tool": { "driver": { "name": "Semgrep OSS" } },
+      "results": [
+        {
+          "ruleId": "java.lang.security.audit.example.warn",
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "src/Warn.java" },
+                "region": { "startLine": 1 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -79,7 +79,7 @@ public class TestAOKeystoreFactory {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere almacén de certificados específico")
     public void testAOKeystoreFactory() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         AOKeyStoreManager ksm;

@@ -50,6 +50,16 @@ public final class XAdESTspUtil {
 				javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING,
 				Boolean.TRUE.booleanValue()
 			);
+			D_FACTORY.setFeature("http://xml.org/sax/features/external-general-entities", false); //$NON-NLS-1$
+			D_FACTORY.setFeature("http://xml.org/sax/features/external-parameter-entities", false); //$NON-NLS-1$
+			D_FACTORY.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false); //$NON-NLS-1$
+			try {
+				D_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+				D_FACTORY.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); //$NON-NLS-1$
+			}
+			catch (final Exception e) {
+				/* no todas las implementaciones soportan estos atributos */
+			}
 		}
 	    catch (final ParserConfigurationException e) {
 			LOGGER.warning(
@@ -58,6 +68,8 @@ public final class XAdESTspUtil {
 		}
 	    D_FACTORY.setValidating(false);
 	    D_FACTORY.setNamespaceAware(true);
+	    D_FACTORY.setXIncludeAware(false);
+	    D_FACTORY.setExpandEntityReferences(false);
     }
 
 	private XAdESTspUtil() {

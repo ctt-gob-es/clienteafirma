@@ -1,0 +1,337 @@
+name: CI
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [master, main, 'plan/*']
+  pull_request:
+    branches: [master, main, 'plan/*']
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Contract + community script lint
+        run: make quality
+
+      - name: Static CI gate checks
+        run: bash scripts/ci/test-ci-gates.sh
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      - name: Validate parent POM
+        run: mvn -N -B validate
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      - name: unit tests (core + crypto modules)
+        run: make test
+
+  community:
+    name: community
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Community invariants
+        run: make test-community
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      - name: Package afirma-core
+        run: make build
+
+      - name: Upload afirma-core JAR
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: afirma-core
+          path: afirma-core/target/*.jar
+          if-no-files-found: error
+          retention-days: 7
+
+  crypto-validation:
+    name: crypto-validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: test
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      - name: Run crypto validation tests
+        run: |
+          cd tests/validation-harness
+          mvn -B test
+
+  dependency-review:
+    name: Dependency Review
+    # SEC-2026-007: delta review needs PR base/head refs (fails on push to master).
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        with:
+          config-file: '.github/dependency-review-config.yml'
+          fail-on-severity: high
+          allow-ghsas: ''
+          fail-on-scopes: ''
+
+  sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      # CycloneDX/maven-generate-sbom-action is unpublished; use the Maven plugin.
+      # env=install now includes fork crypto modules (see pom.xml) so Central
+      # SpongyCastle 1.9.1 artifacts are not mixed with BouncyCastle sources.
+      - name: Build project and generate CycloneDX SBOM
+        run: |
+          mvn -B clean install -DskipTests -Denv=install \
+            org.cyclonedx:cyclonedx-maven-plugin:2.7.6:makeAggregateBom \
+            -DoutputFormat=json \
+            -DoutputName=bom \
+            -DschemaVersion=1.5
+          test -f target/bom.json
+
+      - name: Upload SBOM as artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sbom
+          path: target/bom.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attest SBOM
+        if: github.repository == 'Soluciones-Alexendros/clienteafirma-alexendros'
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-path: target/bom.json
+
+  smoke:
+    name: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Inventory + community smoke
+        run: make smoke
+
+  # #89: fail only on NEW high/error Semgrep findings (no second SARIF upload).
+  semgrep-diff-gate:
+    name: semgrep-diff-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Fixture gate unit checks
+        run: bash scripts/ci/test-semgrep-new-high-gate.sh
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          # Version fijada: los hashes de requirements/ci-*.txt se generan con ella.
+          python-version: "3.14"
+
+      - name: Install Semgrep (hash-pinned)
+        run: pip3 install --require-hashes -r requirements/ci-semgrep.txt
+
+      - name: Semgrep current tree (SARIF, no upload)
+        run: |
+          set -euo pipefail
+          semgrep scan --config=auto --config=p/ci \
+            --sarif --output=semgrep-current.sarif \
+            --max-target-bytes=1000000
+          test -f semgrep-current.sarif
+
+      - name: Semgrep baseline (PR base commit)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          git checkout --quiet "$BASE_SHA"
+          semgrep scan --config=auto --config=p/ci \
+            --sarif --output=semgrep-baseline.sarif \
+            --max-target-bytes=1000000
+          git checkout --quiet "$HEAD_SHA"
+          test -f semgrep-baseline.sarif
+
+      - name: Fail on new high/error findings
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 scripts/ci/semgrep-new-high-gate.py \
+            --sarif semgrep-current.sarif \
+            --baseline semgrep-baseline.sarif
+
+      - name: Push/dispatch — fixture gate only (full upload stays in codeql-semgrep)
+        if: github.event_name != 'pull_request'
+        run: 'echo "Non-PR run: fixture gate already executed; no diff baseline."'
+
+  ci-gate:
+    name: ci-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always() && !cancelled()
+    needs:
+      - quality
+      - test
+      - community
+      - build
+      - crypto-validation
+      - dependency-review
+      - sbom
+      - smoke
+      - semgrep-diff-gate
+    permissions:
+      contents: read
+    steps:
+      - name: Require success; only dependency-review may skip outside PR
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          QUALITY_RESULT: ${{ needs.quality.result }}
+          TEST_RESULT: ${{ needs.test.result }}
+          COMMUNITY_RESULT: ${{ needs.community.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          CRYPTO_RESULT: ${{ needs.crypto-validation.result }}
+          DEPENDENCY_REVIEW_RESULT: ${{ needs.dependency-review.result }}
+          SBOM_RESULT: ${{ needs.sbom.result }}
+          SMOKE_RESULT: ${{ needs.smoke.result }}
+          SEMGREP_RESULT: ${{ needs.semgrep-diff-gate.result }}
+        run: |
+          set -euo pipefail
+          require_success() {
+            local job="$1" result="$2"
+            echo "${job}: ${result}"
+            if [[ "$result" != success ]]; then
+              echo "ci-gate failing: ${job} returned '${result}' (success required)" >&2
+              exit 1
+            fi
+          }
+          require_success quality "$QUALITY_RESULT"
+          require_success test "$TEST_RESULT"
+          require_success community "$COMMUNITY_RESULT"
+          require_success build "$BUILD_RESULT"
+          require_success crypto-validation "$CRYPTO_RESULT"
+          require_success sbom "$SBOM_RESULT"
+          require_success smoke "$SMOKE_RESULT"
+          require_success semgrep-diff-gate "$SEMGREP_RESULT"
+          echo "dependency-review: $DEPENDENCY_REVIEW_RESULT"
+          if [[ "$EVENT_NAME" == pull_request ]]; then
+            require_success dependency-review "$DEPENDENCY_REVIEW_RESULT"
+          elif [[ "$DEPENDENCY_REVIEW_RESULT" != skipped ]]; then
+            echo "ci-gate failing: dependency-review may only be skipped outside pull_request" >&2
+            exit 1
+          fi
+          echo "ci-gate OK"

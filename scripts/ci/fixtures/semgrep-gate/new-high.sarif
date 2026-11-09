@@ -1,0 +1,35 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "tool": { "driver": { "name": "Semgrep OSS" } },
+      "results": [
+        {
+          "ruleId": "java.lang.security.audit.example.old",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "src/Old.java" },
+                "region": { "startLine": 10, "snippet": { "text": "oldCall(input);" } }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "java.lang.security.audit.example.new",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "src/New.java" },
+                "region": { "startLine": 3, "snippet": { "text": "newCall(input);" } }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

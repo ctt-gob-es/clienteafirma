@@ -124,7 +124,7 @@ public final class SimpleTest {
      * @throws Exception En cualquier error. */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere base de datos NSS de Mozilla")
     public void testDirectNssUsage() throws Exception {
     	final KeyStore keyStore = KeyStore.getInstance(
 			"PKCS11", //$NON-NLS-1$

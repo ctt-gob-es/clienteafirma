@@ -21,7 +21,7 @@ public final class FileDialogsTest {
 	 */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void showSelectMultiFileTest() throws IOException {
 		for (final File f : AOUIFactory.getLoadFiles(
 			"Seleccion multiple de ficheros", //$NON-NLS-1$

@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
@@ -26,6 +25,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.SecureXmlBuilder;
 
 /** Clase para la lectura de los content types declarados en un documento OOXML y la
  * identificaci&oacute;n del content type de un fichero en base a ellos. */
@@ -33,11 +33,6 @@ final class ContentTypeManager {
 
 	private final Map<String, String> defaultContentTypes = new HashMap<>();
 	private final Map<String, String> overrideContentTypes = new HashMap<>();
-
-	private static final DocumentBuilderFactory DOC_FACTORY = DocumentBuilderFactory.newInstance();
-	static {
-		DOC_FACTORY.setNamespaceAware(true);
-	}
 
 	private static final String SLASH = "/"; //$NON-NLS-1$
 
@@ -95,7 +90,7 @@ final class ContentTypeManager {
 	 * @return Nueva instancia del <code>DocumentBuilder</code>.
 	 * @throws ParserConfigurationException Si hay problemas en el proceso de obtenci&oacute;n. */
 	private static DocumentBuilder getNewDocumentBuilder() throws ParserConfigurationException {
-		return DOC_FACTORY.newDocumentBuilder();
+		return SecureXmlBuilder.getSecureDocumentBuilder();
 	}
 
 	/** Recupera el valor de un atributo.

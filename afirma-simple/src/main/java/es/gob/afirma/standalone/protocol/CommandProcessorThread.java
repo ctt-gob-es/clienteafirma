@@ -12,6 +12,9 @@ import java.util.logging.Logger;
 import javax.swing.Timer;
 
 import es.gob.afirma.core.ErrorCode;
+import es.gob.afirma.core.misc.protocol.LocalChannelSessions;
+import es.gob.afirma.core.misc.protocol.WebSocketOriginValidator;
+import es.gob.afirma.core.misc.protocol.WebSocketSessionValidator;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.standalone.SimpleErrorCode;
@@ -81,11 +84,31 @@ class CommandProcessorThread extends Thread {
 
 	private final ProtocolVersion protocolVersion;
 
+	/** Registro de sesiones del canal local; aplica caducidad y uso unico. */
+	private final WebSocketSessionValidator sessionValidator;
+
+	/** Origen declarado por el cliente en la peticion HTTP, si lo hubiera. */
+	private String requestOrigin = null;
+
 	public CommandProcessorThread(final Socket socket, final Timer timer, final String idSession, final ProtocolVersion protocolVersion) {
+		this(socket, timer, idSession, protocolVersion, LocalChannelSessions.validator());
+	}
+
+	/**
+	 * Crea el procesador con un registro de sesiones propio (pruebas e inyeccion).
+	 * @param socket Socket de la conexion.
+	 * @param timer Temporizador de inactividad de la aplicacion.
+	 * @param idSession Identificador de sesion esperado.
+	 * @param protocolVersion Version del protocolo.
+	 * @param sessionValidator Registro de sesiones a consultar.
+	 */
+	public CommandProcessorThread(final Socket socket, final Timer timer, final String idSession,
+			final ProtocolVersion protocolVersion, final WebSocketSessionValidator sessionValidator) {
 		this.localSocket = socket;
 		this.timer = timer;
 		this.idSession = idSession;
 		this.protocolVersion = protocolVersion;
+		this.sessionValidator = sessionValidator != null ? sessionValidator : LocalChannelSessions.validator();
 	}
 
 	@Override
@@ -130,7 +153,13 @@ class CommandProcessorThread extends Thread {
 				LOGGER.warning("Se ha recibido una peticion vacia"); //$NON-NLS-1$
 			}
 			else {
-				LOGGER.fine("Peticion HTTP recibida:\n" + httpRequest); //$NON-NLS-1$
+				this.requestOrigin = extractOrigin(httpRequest);
+				if (!checkOrigin()) {
+					sendError(SimpleErrorCode.Request.MALFORMED_REQUEST_TO_SOCKET);
+					closeSocket(this.localSocket);
+					return;
+				}
+				LOGGER.fine("Peticion HTTP recibida"); //$NON-NLS-1$
 				processCommand(httpRequest, this.localSocket);
 
 			}
@@ -155,6 +184,40 @@ class CommandProcessorThread extends Thread {
 		closeSocket(this.localSocket);
 	}
 
+
+	/** Extrae el valor del encabezado <code>Origin</code> de la peticion HTTP recibida.
+	 * @param httpRequest Peticion HTTP en crudo.
+	 * @return Origen declarado o {@code null} si no lo hay. */
+	private static String extractOrigin(final String httpRequest) {
+		for (final String line : httpRequest.split("\\r?\\n")) { //$NON-NLS-1$
+			if (line.isEmpty()) {
+				break;
+			}
+			final int sep = line.indexOf(':');
+			if (sep > 0 && "origin".equalsIgnoreCase(line.substring(0, sep).trim())) { //$NON-NLS-1$
+				return line.substring(sep + 1).trim();
+			}
+		}
+		return null;
+	}
+
+	/** Comprueba el origen de la peticion segun el modo configurado.
+	 * En modo estricto se rechaza cualquier origen no configurado; en permisivo se
+	 * acepta y se avisa.
+	 * @return {@code true} si la peticion puede procesarse. */
+	private boolean checkOrigin() {
+		final boolean strict = LocalChannelSessions.isStrict();
+		final String allowed = LocalChannelSessions.getAllowedOrigins();
+		if (WebSocketOriginValidator.isConfigured(this.requestOrigin, allowed)) {
+			return true;
+		}
+		if (!strict) {
+			LOGGER.warning("Origen del canal local no configurado; se acepta en modo permisivo"); //$NON-NLS-1$
+			return true;
+		}
+		LOGGER.warning("Origen del canal local no permitido; se rechaza la peticion"); //$NON-NLS-1$
+		return false;
+	}
 
 	/** Comprueba que la direcci&oacute;n que intenta conectarse es local.
 	 * @param a Direcci&oacute;n a probar.
@@ -495,7 +558,7 @@ class CommandProcessorThread extends Thread {
 	 * @param ok Indica si la operacion finaliz&oacute; bien o mal.
 	 * @param response La respuesta que se mandar&aacute; en el HTTP.
 	 * @return Devuelve el byte array con la respuesta en formato HTTP. */
-	private static byte[] createHttpResponse(final boolean ok, final String response) {
+	private byte[] createHttpResponse(final boolean ok, final String response) {
 		final StringBuilder sb = new StringBuilder();
 		if (ok) {
 			sb.append("HTTP/1.1 200 OK\n"); //$NON-NLS-1$
@@ -507,7 +570,7 @@ class CommandProcessorThread extends Thread {
 		sb.append("Pragma: no-cache\n"); //$NON-NLS-1$
 		sb.append("Server: Cliente @firma\n"); //$NON-NLS-1$
 		sb.append("Content-Type: text/html; charset=utf-8\n"); //$NON-NLS-1$
-		sb.append("Access-Control-Allow-Origin: *\n"); //$NON-NLS-1$
+		sb.append(LocalChannelSessions.corsHeaders(this.requestOrigin));
 		sb.append('\n');
 		if (response != null) {
 			sb.append(Base64.encode(response.getBytes(StandardCharsets.UTF_8), true));
@@ -630,9 +693,44 @@ class CommandProcessorThread extends Thread {
 	 * @param requestSessionId Identificador de sesi&oacute;n enviado en la petici&oacute;n.
 	 * @throws IllegalArgumentException Cuando el identificador no sea correcto. */
 	private void checkIdSession (final String requestSessionId) throws IllegalArgumentException {
-		// se esperaba un idSession y no se ha recibido
-		if (this.idSession != null && !this.idSession.equals(requestSessionId)) {
-			throw new IllegalArgumentException("No se ha recibido el idSession esperado."); //$NON-NLS-1$
+		final boolean strict = LocalChannelSessions.isStrict();
+
+		if (!strict) {
+			// Comportamiento heredado: solo se compara si el canal tiene un id esperado.
+			if (this.idSession != null && !this.idSession.equals(requestSessionId)) {
+				throw new IllegalArgumentException("No se ha recibido el idSession esperado."); //$NON-NLS-1$
+			}
+			warnIfSessionAnomalous(requestSessionId);
+			return;
+		}
+
+		final WebSocketSessionValidator.Status status = this.sessionValidator.validate(requestSessionId);
+		switch (status) {
+			case OK:
+				if (this.idSession == null || !this.idSession.equals(requestSessionId)) {
+					throw new IllegalArgumentException("No se ha recibido el idSession esperado."); //$NON-NLS-1$
+				}
+				return;
+			case MISSING:
+				throw new IllegalArgumentException("No se ha recibido el idSession esperado."); //$NON-NLS-1$
+			case MALFORMED:
+				throw new IllegalArgumentException("El idSession recibido no tiene un formato valido."); //$NON-NLS-1$
+			case EXPIRED:
+				throw new IllegalArgumentException("El idSession recibido ha caducado."); //$NON-NLS-1$
+			case REUSED:
+				throw new IllegalArgumentException("El idSession recibido ya se ha utilizado."); //$NON-NLS-1$
+			case UNKNOWN:
+			default:
+				throw new IllegalArgumentException("El idSession recibido no corresponde a ninguna sesion."); //$NON-NLS-1$
+		}
+	}
+
+	/** En modo permisivo se acepta la peticion pero se avisa de las anomalias de la sesion.
+	 * @param requestSessionId Identificador recibido. */
+	private void warnIfSessionAnomalous(final String requestSessionId) {
+		final WebSocketSessionValidator.Status status = this.sessionValidator.validate(requestSessionId);
+		if (status != WebSocketSessionValidator.Status.OK) {
+			LOGGER.warning("Sesion del canal local no verificada (" + status + "); se acepta en modo permisivo"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

@@ -85,12 +85,7 @@ final class BundledNssHelper {
 	        ZipEntry entry;
 	        while ((entry = zipIs.getNextEntry()) != null) {
 
-	        	final File outFile = new File(outDir, entry.getName()).getCanonicalFile();
-
-				 if (!isParent(outDir, outFile)) {
-					 zipIs.closeEntry();
-					 throw new IOException("Se ha encontrado en el archivo comprimido una ruta que apuntaba fuera del directorio de destino"); //$NON-NLS-1$
-				 }
+	        	final File outFile = es.gob.afirma.core.misc.ZipSecurePaths.safeResolve(outDir, entry.getName());
 
 	            if (entry.isDirectory()) {
 	                outFile.mkdirs();
@@ -106,7 +101,7 @@ final class BundledNssHelper {
 	            	catch (final Exception e) {
 	            		// Si el motivo del error por el que no se pudo descomprimir es que el fichero
 	            		// esta bloqueado (caso de que exista y no se pueda sustituir), ignoramos el error
-	            		if (!new File(outDir, entry.getName()).exists()) {
+	            		if (!outFile.exists()) {
 	            			zipIs.closeEntry();
 	            			throw new IOException("No se pudo descomprimir una de las dependencias para la carga de NSS", e); //$NON-NLS-1$
 	            		}
@@ -127,12 +122,11 @@ final class BundledNssHelper {
 	  * @throws IOException Cuando no se pueda canonizar el nombre de fichero hijo.
 	  */
 	 private static boolean isParent(final File parentDir, final File childFile) throws IOException {
-
 		 final File parent = parentDir.getCanonicalFile();
-		 File intermediateDir = childFile.getCanonicalFile();
-		 while (intermediateDir != null && !intermediateDir.equals(parent)) {
-			 intermediateDir = intermediateDir.getParentFile();
-		 }
-		 return intermediateDir != null;
+		 final File child = childFile.getCanonicalFile();
+		 final String parentPath = parent.getPath();
+		 final String childPath = child.getPath();
+		 final String prefix = parentPath.endsWith(File.separator) ? parentPath : parentPath + File.separator;
+		 return childPath.equals(parentPath) || childPath.startsWith(prefix);
 	 }
 }

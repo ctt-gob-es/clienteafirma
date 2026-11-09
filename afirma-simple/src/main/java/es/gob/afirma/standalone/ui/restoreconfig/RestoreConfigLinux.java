@@ -393,7 +393,7 @@ final class RestoreConfigLinux implements RestoreConfig {
 		Process p;
 		try {
 
-			final String[] commands = { "/bin/bash", "-c", "ps -aux"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			final String[] commands = { "ps", "-aux" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 			p = executeProcess(commands);
 
@@ -521,6 +521,43 @@ final class RestoreConfigLinux implements RestoreConfig {
 	}
 
 	static Process executeProcess(final String... command) throws IOException {
+
+		if (command == null || command.length == 0) {
+			throw new IOException("Comando vacio"); //$NON-NLS-1$
+		}
+		final String binary = command[0];
+		final String baseName = new File(binary).getName();
+		// Lista blanca de binarios de restauracion (argv en lista, sin shell)
+		final boolean allowed = "ps".equals(baseName) //$NON-NLS-1$
+				|| "id".equals(baseName) //$NON-NLS-1$
+				|| "chmod".equals(baseName) //$NON-NLS-1$
+				|| "rm".equals(baseName) //$NON-NLS-1$
+				|| "cut".equals(baseName) //$NON-NLS-1$
+				|| "pkexec".equals(baseName) //$NON-NLS-1$
+				|| "bash".equals(baseName); //$NON-NLS-1$
+		if (!allowed) {
+			throw new IOException("Comando no permitido: " + binary); //$NON-NLS-1$
+		}
+		// pkexec solo con ruta absoluta de script (sin metacaracteres)
+		if ("pkexec".equals(baseName) && command.length > 1) { //$NON-NLS-1$
+			final String scriptPath = command[1];
+			if (!new File(scriptPath).isAbsolute()
+					|| scriptPath.indexOf(';') >= 0
+					|| scriptPath.indexOf('|') >= 0
+					|| scriptPath.indexOf('&') >= 0
+					|| scriptPath.indexOf('$') >= 0
+					|| scriptPath.indexOf('`') >= 0) {
+				throw new IOException("Ruta de script no permitida para pkexec"); //$NON-NLS-1$
+			}
+		}
+		// Prohibir bash -c (inyeccion); scripts se invocan como argumento de path
+		if ("bash".equals(baseName)) { //$NON-NLS-1$
+			for (int i = 1; i < command.length; i++) {
+				if ("-c".equals(command[i])) { //$NON-NLS-1$
+					throw new IOException("Ejecucion via shell -c no permitida"); //$NON-NLS-1$
+				}
+			}
+		}
 
 		if (LOGGER.isLoggable(Level.INFO)) {
 			final StringBuilder buffer = new StringBuilder();

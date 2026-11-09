@@ -103,7 +103,7 @@ public class MainOptionsPaneAccessibilityTest {
 	/**
 	 * Metodo que obtiene una lista de codigos de atajos a los botones, etiquetas y checkbox de un panel.
 	 */
-	@Ignore
+	@Ignore("Requiere GUI / lector de pantalla Orca")
 	private void getKeyCodeList(final JPanel panel, final List <Integer> keyCodeList) {
 		//Array de componentes del panel
 		final Component[] components = panel.getComponents();
@@ -150,7 +150,7 @@ public class MainOptionsPaneAccessibilityTest {
 	 * Metodo que activa todos los checkBox de un panel.
 	 * @param panel panel
 	 */
-	@Ignore
+	@Ignore("Requiere GUI / lector de pantalla Orca")
 	private void activateAllCheckBox(final JPanel panel) {
 		//Array de componentes del panel
 		final Component[] components = panel.getComponents();
@@ -177,7 +177,7 @@ public class MainOptionsPaneAccessibilityTest {
 	/**
 	 * Metodo que obtiene la propiedad labelFor de las etiquetas de un panel.
 	 */
-	@Ignore
+	@Ignore("Requiere GUI / lector de pantalla Orca")
 	private void getLabelForComponentList(final JPanel panel, final List <Component> componentList) {
 		//Array de componentes del panel
 		final Component[] components = panel.getComponents();

@@ -1,0 +1,45 @@
+name: Alerta de seguridad
+description: Una regla de code scanning y qué hacemos con ella
+title: "[Mx] Herramienta · regla · origen (n)"
+labels: ["tipo:codigo"]
+body:
+  - type: input
+    id: regla
+    attributes:
+      label: Regla
+      description: Herramienta e identificador de la regla (p. ej. CodeQL java/insecure-trustmanager)
+    validations:
+      required: true
+  - type: textarea
+    id: ficheros
+    attributes:
+      label: Fichero(s)
+      description: Un fichero por línea, con el número de alertas
+    validations:
+      required: true
+  - type: dropdown
+    id: oficial
+    attributes:
+      label: ¿Viene del oficial (ctt-gob-es/clienteafirma)?
+      options: ["Sí", "No"]
+    validations:
+      required: true
+  - type: dropdown
+    id: propuesta
+    attributes:
+      label: Propuesta
+      options: ["Arreglar", "Justificar y mantener como el oficial", "Desestimar"]
+    validations:
+      required: true
+  - type: textarea
+    id: motivo
+    attributes:
+      label: Motivo
+      description: Obligatorio si se justifica o se desestima
+  - type: textarea
+    id: comprobacion
+    attributes:
+      label: Cómo se comprueba
+      description: Qué tiene que pasar para cerrar el issue
+    validations:
+      required: true

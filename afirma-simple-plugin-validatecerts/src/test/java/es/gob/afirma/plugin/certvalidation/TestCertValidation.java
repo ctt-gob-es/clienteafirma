@@ -18,7 +18,7 @@ public final class TestCertValidation {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testFnmt() throws Exception {
 		final X509Certificate cert;
 		try (
@@ -38,7 +38,7 @@ public final class TestCertValidation {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testGen() throws Exception {
 		final X509Certificate cert;
 		try (

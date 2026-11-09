@@ -20,7 +20,7 @@ public final class SignFromCommandLineTest {
 	 * @throws Exception Cuando ocurre cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba de línea de comandos no ejecutada en CI")
 	public void testSignPadesVisible() throws Exception {
 
 		final String inputFile = new File(SignFromCommandLineTest.class.getResource(PDF_FILE).toURI()).getAbsolutePath();
@@ -52,7 +52,7 @@ public final class SignFromCommandLineTest {
 	 * @throws Exception Cuando ocurre cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba de línea de comandos no ejecutada en CI")
 	public void testSignPadesVisibleWithRubric() throws Exception {
 
 		final String inputFile = new File(SignFromCommandLineTest.class.getResource(PDF_FILE).toURI()).getAbsolutePath();
@@ -85,7 +85,7 @@ public final class SignFromCommandLineTest {
 	 * @throws Exception Cuando ocurre cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba de línea de comandos no ejecutada en CI")
 	public void testSignPadesVisibleMultiplePages() throws Exception {
 
 		final String inputFile = new File(SignFromCommandLineTest.class.getResource(PDF_MULTIPLE_PAGES_FILE).toURI()).getAbsolutePath();

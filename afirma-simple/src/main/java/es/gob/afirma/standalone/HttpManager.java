@@ -81,10 +81,14 @@ public class HttpManager {
 	 * contrario.
 	 */
 	public static void setSecureConnections(final boolean secure) {
+		// Preferencia marcada: comprobaciones estrictas. Desmarcada: permite el modo
+		// permisivo heredado (disableSslChecks) para servidores con certificado propio.
+		System.setProperty(
+				UrlHttpManagerImpl.JAVA_PARAM_STRICT_SSL_CHECKS,
+				Boolean.toString(secure));
 		System.setProperty(
 				UrlHttpManagerImpl.JAVA_PARAM_DISABLE_SSL_CHECKS,
 				Boolean.toString(!secure));
-
 	}
 
 	/**

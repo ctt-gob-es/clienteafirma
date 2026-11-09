@@ -20,7 +20,7 @@ public final class SaveTest {
 	 */
     @SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void showSaveFileDialogTest() throws IOException {
 		final AOUIManager m = new JSEUIManager();
 		m.saveDataToFile(

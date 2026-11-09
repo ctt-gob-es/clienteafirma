@@ -16,9 +16,9 @@
 	</parent>
 
 	<properties>
-		<afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
+		<afirma.keytool.keystore>${env.AFIRMA_KEYSTORE_PATH}</afirma.keytool.keystore>
 		<afirma.keytool.alias>codesign</afirma.keytool.alias>
-		<afirma.keytool.password>afirma</afirma.keytool.password>
+		<afirma.keytool.password>${env.AFIRMA_KEYSTORE_PASS}</afirma.keytool.password>
 		<afirma.jar.name>miniapplet-full</afirma.jar.name>
 	</properties>
 
@@ -283,6 +283,7 @@
 							<keystore>${afirma.keytool.keystore}</keystore>
 							<alias>${afirma.keytool.alias}</alias>
 							<storepass>${afirma.keytool.password}</storepass>
+							<skip>${afirma.code.sign.skip}</skip>
 							<verify>true</verify>
 						</configuration>
 					</plugin>
@@ -430,6 +431,7 @@
 						<keystore>${afirma.keytool.keystore}</keystore>
 						<alias>${afirma.keytool.alias}</alias>
 						<storepass>${afirma.keytool.password}</storepass>
+						<skip>${afirma.code.sign.skip}</skip>
 						<verify>true</verify>
 					</configuration>
 				</plugin>

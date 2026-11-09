@@ -48,7 +48,7 @@
 		
 		<afirma.lib.itext.version>1.7</afirma.lib.itext.version>
 		<afirma.lib.others.version>0.0.10</afirma.lib.others.version>
-		<spongycastle.version>1.58.0.0</spongycastle.version>
+		<bouncycastle.version>1.86</bouncycastle.version>
 		
 		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
 		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
@@ -59,6 +59,9 @@
 
 		<!-- test-dependencies -->		
 		<junit.version>4.13.2</junit.version>
+
+		<!-- true salvo -Dafirma.code.sign.skip=false y almacén fuera de Git -->
+		<afirma.code.sign.skip>true</afirma.code.sign.skip>
 	</properties>
 
 	<dependencyManagement>
@@ -106,21 +109,21 @@
 			</dependency>
 
 			<dependency>
-				<groupId>com.madgag.spongycastle</groupId>
-				<artifactId>core</artifactId>
-				<version>${spongycastle.version}</version>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 
 			<dependency>
-				<groupId>com.madgag.spongycastle</groupId>
-				<artifactId>prov</artifactId>
-				<version>${spongycastle.version}</version>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcpkix-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			
 			<dependency>
-				<groupId>com.madgag.spongycastle</groupId>
-				<artifactId>bcpkix-jdk15on</artifactId>
-				<version>${spongycastle.version}</version>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcutil-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
 			</dependency>
 			
 			<dependency>
@@ -157,9 +160,40 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>3.3.0</version>
+					<configuration>
+						<!-- Reproducible JARs when -Dproject.build.outputTimestamp / SOURCE_DATE_EPOCH is set -->
+						<outputTimestamp>${project.build.outputTimestamp}</outputTimestamp>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.cyclonedx</groupId>
+					<artifactId>cyclonedx-maven-plugin</artifactId>
+					<version>2.7.6</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.8</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 	
 	<profiles>
@@ -270,8 +304,45 @@
 				</property>
 			</activation>
 			
+			<!--
+			  Property activation turns off activeByDefault (env-dev). Without the
+			  crypto modules below, Maven resolves es.gob.afirma:*-1.9.1 from Central
+			  (SpongyCastle) and afirma-simple (BouncyCastle) fails to compile.
+			-->
 			<modules>
-				<!-- Modulos core -->
+				<!-- Crypto stack (fork BC) required by afirma-simple -->
+				<module>afirma-core</module>
+				<module>afirma-core-prefs</module>
+				<module>afirma-core-keystores</module>
+				<module>afirma-core-massive</module>
+				<module>afirma-crypto-core-pkcs7</module>
+				<module>afirma-crypto-cms</module>
+				<module>afirma-crypto-cades</module>
+				<module>afirma-crypto-cades-multi</module>
+				<module>afirma-crypto-core-pkcs7-tsp</module>
+				<module>afirma-crypto-core-xml</module>
+				<module>afirma-crypto-pdf-common</module>
+				<module>afirma-crypto-pdf</module>
+				<module>afirma-crypto-odf</module>
+				<module>afirma-crypto-xades</module>
+				<module>afirma-crypto-xmlsignature</module>
+				<module>afirma-crypto-ooxml</module>
+				<module>afirma-crypto-validation</module>
+				<module>afirma-crypto-cadestri-client</module>
+				<module>afirma-crypto-xadestri-client</module>
+				<module>afirma-crypto-padestri-client</module>
+				<module>afirma-crypto-batch-client</module>
+				<module>afirma-keystores-filters</module>
+				<module>afirma-keystores-mozilla</module>
+				<module>afirma-keystores-jmulticard-ui</module>
+				<module>afirma-ui-utils</module>
+				<module>afirma-simple-plugins</module>
+				<module>afirma-simple-plugins-manager</module>
+				<module>afirma-server-triphase-signer-cache</module>
+				<module>afirma-server-triphase-signer-core</module>
+				<module>afirma-server-triphase-signer-document</module>
+
+				<!-- Modulos UI core -->
 				<module>afirma-ui-simple-configurator-common</module>
 				<module>afirma-ui-core-jse</module>
 				<module>afirma-ui-core-jse-keystores</module>

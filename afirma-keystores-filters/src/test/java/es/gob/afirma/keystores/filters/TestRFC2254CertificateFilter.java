@@ -4,6 +4,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Platform;
@@ -66,6 +67,7 @@ public final class TestRFC2254CertificateFilter {
 		final RFC2254CertificateFilter filter = new RFC2254CertificateFilter(null, "cn=ANF Global Root CA", true);  //$NON-NLS-1$
 
 		AOKeyStoreManager ksm;
+		try {
 		if (Platform.getOS() == Platform.OS.WINDOWS) {
 			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.WINDOWS, null, "CAPI", null, null); //$NON-NLS-1$
 		}
@@ -77,6 +79,12 @@ public final class TestRFC2254CertificateFilter {
 		}
 		else {
 			Assert.fail("Sistema no identificado"); //$NON-NLS-1$
+			return;
+		}
+		}
+		catch (final Exception e) {
+			// Sin almacen real (CI o equipo sin perfil de Firefox/NSS): se omite, no es fallo del filtro
+			Assume.assumeNoException("Almacen de claves del sistema no disponible", e); //$NON-NLS-1$
 			return;
 		}
 		final String[] aceptados = filter.matches(ksm.getAliases(), ksm);

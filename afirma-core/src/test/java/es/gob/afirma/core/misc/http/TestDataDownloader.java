@@ -48,7 +48,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere conexión de red / servicio externo")
 	public void doDirectPost() throws Exception {
 		final URL u = new URL(TEST_POST_URL);
 		final HttpURLConnection conn = (HttpURLConnection) u.openConnection();
@@ -83,7 +83,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere conexión de red / servicio externo")
 	public void testDataDownloaderFile() throws Exception {
 		final byte[] data = DataDownloader.downloadData(
 			"file://c:/Windows/WindowsUpdate.log" //$NON-NLS-1$
@@ -95,7 +95,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere conexión de red / servicio externo")
 	public void testDataDownloaderInvalidUrl() throws Exception {
 		final byte[] data = UrlHttpManagerFactory.getInstalledManager().readUrl(
 			"http://dasdasdasd.asd?kaka=caca", //$NON-NLS-1$
@@ -108,7 +108,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere conexión de red / servicio externo")
 	public void testPost() throws Exception {
 		final byte[] data = UrlHttpManagerFactory.getInstalledManager().readUrl(
 			TEST_POST,
@@ -124,7 +124,7 @@ public final class TestDataDownloader {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere conexión de red / servicio externo")
 	public void testGet() throws Exception {
 		final byte[] data = UrlHttpManagerFactory.getInstalledManager().readUrl(
 			TEST_GET,

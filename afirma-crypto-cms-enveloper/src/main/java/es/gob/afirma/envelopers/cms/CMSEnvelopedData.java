@@ -23,17 +23,17 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-import org.spongycastle.asn1.ASN1Encoding;
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.DERSet;
-import org.spongycastle.asn1.cms.ContentInfo;
-import org.spongycastle.asn1.cms.EnvelopedData;
-import org.spongycastle.asn1.cms.OriginatorInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.cms.EnvelopedData;
+import org.bouncycastle.asn1.cms.OriginatorInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -57,7 +57,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * </pre>
  *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
- * para crear un mensaje Data de SpongyCastle. */
+ * para crear un mensaje Data de BouncyCastle. */
 
 public final class CMSEnvelopedData {
 
@@ -223,7 +223,7 @@ public final class CMSEnvelopedData {
             // Contenido de Data
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-            final EnvelopedData ed = EnvelopedData.getInstance(doj.getObject());
+            final EnvelopedData ed = EnvelopedData.getInstance(doj.getBaseObject());
 
             // Obtenemos los originatorInfo
             OriginatorInfo origInfo = ed.getOriginatorInfo();

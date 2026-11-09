@@ -1,0 +1,79 @@
+# secrets (gitleaks binary) + sca (OSV-Scanner). Pattern from Alexendros/alexendrosdev.
+# Do not use gitleaks-action (requires licence). Pin actions by SHA.
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [master, main, plan/clienteafirma-alertas]
+  schedule:
+    - cron: '17 5 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets:
+    name: secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # Binary gitleaks (not the paid action). Checksum for release v8.30.1.
+      - name: gitleaks
+        run: |
+          set -euo pipefail
+          curl -sSfL -o gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          ./gitleaks detect --source . --redact --verbose -c .gitleaks.toml
+
+  sca:
+    name: sca
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Detect lockfiles (npm/pnpm/Cargo)
+        run: |
+          set -euo pipefail
+          if [ -f pnpm-lock.yaml ] || [ -f package-lock.json ] || [ -f yarn.lock ] || [ -f Cargo.lock ]; then
+            echo "JS/Rust lockfile present — native audit would apply in a polyglot repo."
+          else
+            echo "No npm/pnpm/Cargo lockfile; this is a Maven desktop client. Native JS/Rust audit skipped."
+          fi
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      - name: Generate CycloneDX SBOM for OSV
+        run: |
+          set -euo pipefail
+          mvn -B -q org.cyclonedx:cyclonedx-maven-plugin:2.7.6:makeAggregateBom \
+            -DoutputFormat=json \
+            -DoutputName=bom \
+            -DschemaVersion=1.5 \
+            -DskipTests
+          test -f target/bom.json
+
+      - name: OSV-Scanner
+        uses: google/osv-scanner-action/osv-scanner-action@19ec1116569a47416e11a45848722b1af31a857b # v1.9.0
+        with:
+          scan-args: |-
+            --config=osv-scanner.toml
+            --sbom=target/bom.json

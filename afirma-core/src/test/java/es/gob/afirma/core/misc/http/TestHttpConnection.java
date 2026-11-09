@@ -13,7 +13,7 @@ public final class TestHttpConnection {
 	 * @throws IOException En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere conexión de red / servicio externo")
 	public void testHttpsConnection() throws IOException {
 		final byte[] webPage = new es.gob.afirma.core.misc.http.UrlHttpManagerImpl().readUrl(
 			"https://valide.redsara.es/valide/",  //$NON-NLS-1$

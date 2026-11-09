@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Portal de prueba afirma:// — Autofirma-2026 F6</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; }
+    code { background: #f4f4f4; padding: 0.1em 0.3em; }
+    button { font-size: 1.1rem; padding: 0.5rem 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Prueba de protocolo <code>afirma://</code></h1>
+  <p>
+    Este portal mínimo comprueba que el SO asocia <code>x-scheme-handler/afirma</code>
+    al cliente empaquetado en F6. No sustituye un trámite real de AAPP.
+  </p>
+  <p>
+    <button type="button" id="launch">Abrir Autofirma (afirma://)</button>
+  </p>
+  <p id="status" role="status"></p>
+  <script>
+    // Invocación mínima: abre el cliente. Un trámite real usa autoscript.js 1.9.
+    document.getElementById('launch').onclick = function () {
+      var url = 'afirma://';
+      document.getElementById('status').textContent = 'Invocando ' + url + ' …';
+      window.location.href = url;
+    };
+  </script>
+  <hr />
+  <h2>Firma por CLI (Firefox / Chromium sin handler)</h2>
+  <pre>autofirma sign -i documento.pdf -o documento-firmado.pdf \
+  -store pkcs12:/ruta/cert.p12 -password *** -alias "alias" -format pades</pre>
+</body>
+</html>

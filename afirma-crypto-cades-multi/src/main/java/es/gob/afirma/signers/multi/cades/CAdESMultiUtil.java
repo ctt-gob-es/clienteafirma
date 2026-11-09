@@ -16,23 +16,23 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import org.spongycastle.asn1.ASN1Encodable;
-import org.spongycastle.asn1.ASN1EncodableVector;
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Primitive;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.BERSet;
-import org.spongycastle.asn1.cms.AttributeTable;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.spongycastle.asn1.x509.Certificate;
-import org.spongycastle.cms.CMSException;
-import org.spongycastle.cms.CMSSignedData;
-import org.spongycastle.cms.SignerInformation;
-import org.spongycastle.cms.SignerInformationStore;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.BERSet;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
 
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
 import es.gob.afirma.core.SigningLTSException;
@@ -90,7 +90,7 @@ public final class CAdESMultiUtil {
 	public static void checkLongTermAttributes(final byte[] signedDataBytes) throws SigningLTSException, AOInvalidSignatureFormatException {
 		final CMSSignedData signedData;
 		try {
-			signedData = new CMSSignedData(signedDataBytes);
+			signedData = new CMSSignedData(es.gob.afirma.signers.pkcs7.Asn1LegacyTimeNormalizer.retagMisencodedUtcTime(signedDataBytes));
 		}
 		catch (final CMSException e) {
 			throw new AOInvalidSignatureFormatException(
@@ -152,7 +152,7 @@ public final class CAdESMultiUtil {
 	static SignedData readData(final byte[] signature) throws IOException {
 		final ASN1Sequence dsq;
 		try (
-			final ASN1InputStream is = new ASN1InputStream(signature);
+			final ASN1InputStream is = new ASN1InputStream(es.gob.afirma.signers.pkcs7.Asn1LegacyTimeNormalizer.retagMisencodedUtcTime(signature));
 		) {
 			dsq = (ASN1Sequence) is.readObject();
 		}
@@ -161,7 +161,7 @@ public final class CAdESMultiUtil {
 		e.nextElement();
 		// Contenido de SignedData
 		final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-		final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject(); // contenido del SignedData
+		final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getBaseObject(); // contenido del SignedData
 
 		return SignedData.getInstance(contentSignedData);
 	}

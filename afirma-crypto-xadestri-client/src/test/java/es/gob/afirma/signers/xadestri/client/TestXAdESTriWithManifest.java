@@ -30,7 +30,7 @@ public final class TestXAdESTriWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void testXadesEnvelopingUseManifestBinary() throws Exception {
 
 		System.out.println("Firma XAdES Trifasica Enveloping con Manifest de datos binarios"); //$NON-NLS-1$
@@ -66,7 +66,7 @@ public final class TestXAdESTriWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void testXadesEnvelopingUseManifestXML() throws Exception {
 
 		System.out.println("Firma XAdES Enveloping con Manifest de XML"); //$NON-NLS-1$
@@ -102,7 +102,7 @@ public final class TestXAdESTriWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void testXadesEnvelopedUseManifest() throws Exception {
 
 		System.out.println("Firma XAdES Enveloped con Manifest"); //$NON-NLS-1$
@@ -139,7 +139,7 @@ public final class TestXAdESTriWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void testCoSignXadesWithManifest() throws Exception {
 
 		System.out.println("Cofirma de firma XAdES con Manifest"); //$NON-NLS-1$
@@ -172,7 +172,7 @@ public final class TestXAdESTriWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void testCounterSignXadesWithManifest() throws Exception {
 
 		System.out.println("Contrafirma de firma XAdES con Manifest"); //$NON-NLS-1$

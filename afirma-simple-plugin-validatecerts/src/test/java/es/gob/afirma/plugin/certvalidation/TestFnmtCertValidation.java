@@ -45,7 +45,7 @@ public final class TestFnmtCertValidation {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testRevoked() throws Exception {
 		final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 		for (final String c : REVOCADOS) {
@@ -82,7 +82,7 @@ public final class TestFnmtCertValidation {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	public void testValid() throws Exception {
 		final CertificateFactory cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 		for (final String c : ACTIVOS) {

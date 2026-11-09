@@ -1,0 +1,175 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    "helpers:pinGitHubActionDigests",
+    ":semanticCommits",
+    ":timezone(Europe/Madrid)"
+  ],
+  "minimumReleaseAge": "7 days",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "schedule": [
+    "before 10am on monday"
+  ],
+  "rebaseWhen": "conflicted",
+  "platformAutomerge": true,
+  "enabledManagers": [
+    "maven",
+    "github-actions",
+    "pip-compile"
+  ],
+  "rangeStrategy": "bump",
+  "labels": [
+    "dependencies"
+  ],
+  "pinDigests": true,
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "minimumReleaseAge": "3 days",
+    "labels": [
+      "security"
+    ]
+  },
+  "packageRules": [
+    {
+      "description": "GitHub Actions (no major): agrupar y automergear patch+minor, fijadas por digest.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "GitHub Actions (no major)",
+      "automerge": true,
+      "automergeType": "pr",
+      "pinDigests": true,
+      "addLabels": [
+        "dependencies"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Maven runtime/cripto: sin automerge.",
+      "matchManagers": [
+        "maven"
+      ],
+      "automerge": false,
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Maven plugins de build/test (no major): automerge patch+minor.",
+      "matchManagers": [
+        "maven"
+      ],
+      "matchDepTypes": [
+        "build",
+        "test"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Maven plugins de build (no major)",
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "dependencies"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Maven plugins por nombre (no major).",
+      "matchManagers": [
+        "maven"
+      ],
+      "matchPackageNames": [
+        "maven-*-plugin",
+        "junit*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Maven plugins de build (no major)",
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "dependencies"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "DSS: sin automerge; revisión visual del resultado de interop.",
+      "matchManagers": [
+        "maven"
+      ],
+      "matchPackageNames": [
+        "eu.europa.ec.joinup.sd-dss:*"
+      ],
+      "automerge": false,
+      "groupName": "DSS",
+      "addLabels": [
+        "visual-review"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "BouncyCastle: manual.",
+      "matchManagers": [
+        "maven"
+      ],
+      "matchPackageNames": [
+        "org.bouncycastle:*"
+      ],
+      "automerge": false,
+      "groupName": "BouncyCastle",
+      "addLabels": [
+        "dependencies"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "iText / xmlsec / santuario: manual.",
+      "matchManagers": [
+        "maven"
+      ],
+      "matchPackageNames": [
+        "com.itextpdf:*",
+        "*xmlsec*",
+        "*santuario*",
+        "org.apache.santuario:*"
+      ],
+      "automerge": false,
+      "groupName": "iText / xmlsec / santuario",
+      "addLabels": [
+        "dependencies"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Majors: siempre manual.",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false,
+      "addLabels": [
+        "breaking-change"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Pip (requirements CI con hashes): sin automerge.",
+      "matchManagers": [
+        "pip-compile"
+      ],
+      "automerge": false,
+      "addLabels": [
+        "dependencies"
+      ],
+      "minimumReleaseAge": "7 days"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+name: workflow-lint
+
+on:
+  push:
+    branches: [master, main, plan/clienteafirma-alertas]
+    paths:
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download actionlint (pinned release)
+        env:
+          ACTIONLINT_VERSION: "1.7.7"
+        run: |
+          set -euo pipefail
+          VER="${ACTIONLINT_VERSION}"
+          ARCHIVE="actionlint_${VER}_linux_amd64.tar.gz"
+          URL="https://github.com/rhysd/actionlint/releases/download/v${VER}/${ARCHIVE}"
+          curl -fsSL -o "$ARCHIVE" "$URL"
+          curl -fsSL -o checksums.txt \
+            "https://github.com/rhysd/actionlint/releases/download/v${VER}/actionlint_${VER}_checksums.txt"
+          grep " ${ARCHIVE}\$" checksums.txt | sha256sum -c -
+          tar -xzf "$ARCHIVE" actionlint
+          sudo mv actionlint /usr/local/bin/actionlint
+          actionlint -version
+
+      - name: Lint workflows
+        run: actionlint -color

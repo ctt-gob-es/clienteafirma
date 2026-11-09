@@ -251,8 +251,20 @@ final class XMLSignatureInput {
         if (this.dfactory == null) {
             this.dfactory = DocumentBuilderFactory.newInstance();
             this.dfactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE.booleanValue());
+            this.dfactory.setFeature("http://xml.org/sax/features/external-general-entities", false); //$NON-NLS-1$
+            this.dfactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false); //$NON-NLS-1$
+            this.dfactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false); //$NON-NLS-1$
+            try {
+            	this.dfactory.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, ""); //$NON-NLS-1$
+            	this.dfactory.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); //$NON-NLS-1$
+            }
+            catch (final Exception e) {
+            	/* algunas implementaciones no soportan estos atributos */
+            }
             this.dfactory.setValidating(false);
             this.dfactory.setNamespaceAware(true);
+            this.dfactory.setXIncludeAware(false);
+            this.dfactory.setExpandEntityReferences(false);
         }
         final DocumentBuilder db = this.dfactory.newDocumentBuilder();
         // select all nodes, also the comments.

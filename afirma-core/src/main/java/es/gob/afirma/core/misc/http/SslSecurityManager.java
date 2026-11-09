@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -22,7 +25,9 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -64,12 +69,21 @@ public final class SslSecurityManager {
 	private static final String KEYSTORE_TYPE = "javax.net.ssl.keyStoreType"; //$NON-NLS-1$
 	private static final String KEYSTORE_DEFAULT_TYPE = "JKS"; //$NON-NLS-1$
 
-	private static final String SSL_CONTEXT = "SSL";//$NON-NLS-1$
+	private static final String SSL_CONTEXT = "TLSv1.2";//$NON-NLS-1$
 
 	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
 	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
 
 	private static final SecureRandom secureRandom = new SecureRandom();
+
+	/** Tiempo m&aacute;ximo para conectar con el servidor al recuperar su certificado. */
+	private static final int CERTIFICATE_CONNECT_TIMEOUT = 10000;
+
+	/** Motivo por defecto cuando quien pide desactivar la validaci&oacute;n no lo declara. */
+	private static final String UNSPECIFIED_REASON = "peticion sin motivo declarado"; //$NON-NLS-1$
+
+	/** Longitud m&aacute;xima del motivo que se registra, para no volcar datos en el log. */
+	private static final int MAX_REASON_LENGTH = 120;
 
 	private static boolean afirmaTrustStoreConfigured = false;
 
@@ -77,29 +91,187 @@ public final class SslSecurityManager {
 		// No instanciable
 	}
 
+	/** Indica si est&aacute;n activas las comprobaciones estrictas de TLS (<code>strictSslChecks</code>,
+	 * activas por defecto).
+	 * @return {@code true} si nunca debe desactivarse la validaci&oacute;n TLS. */
+	public static boolean isStrictSslChecks() {
+		return Boolean.parseBoolean(
+			System.getProperty(UrlHttpManagerImpl.JAVA_PARAM_STRICT_SSL_CHECKS, Boolean.TRUE.toString())
+		);
+	}
+
 	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
 	 * cualquier certificado.
 	 * @param conn Conexi&oacute;n de la que desactivar las comprobaciones SSL.
+	 * @return {@code true} si se desactivaron; {@code false} si no se hizo por estar activo
+	 *         <code>strictSslChecks</code>.
 	 * @throws GeneralSecurityException Si hay problemas al desactivar el uso de almacen de claves. */
-	public static void disableSslChecks(final HttpsURLConnection conn) throws GeneralSecurityException {
+	public static boolean disableSslChecks(final HttpsURLConnection conn) throws GeneralSecurityException {
+		return disableSslChecks(conn, UNSPECIFIED_REASON);
+	}
+
+	/** Deshabilita las comprobaciones de certificados en una conexi&oacute;n SSL concreta.
+	 * <p>
+	 * Con <code>strictSslChecks=true</code> (defecto) no se desactiva nunca: se devuelve
+	 * {@code false} y la conexi&oacute;n conserva la validaci&oacute;n por defecto.
+	 * </p>
+	 * @param conn Conexi&oacute;n de la que desactivar las comprobaciones SSL.
+	 * @param reason Motivo de la desactivaci&oacute;n. No debe contener URLs con datos del usuario.
+	 * @return {@code true} si se desactivaron; {@code false} en caso contrario.
+	 * @throws GeneralSecurityException Si hay problemas al desactivar el uso de almacen de claves. */
+	public static boolean disableSslChecks(final HttpsURLConnection conn, final String reason) throws GeneralSecurityException {
+
+		if (isStrictSslChecks()) {
+			LOGGER.info("strictSslChecks activo: no se deshabilitan comprobaciones SSL en la conexion"); //$NON-NLS-1$
+			return false;
+		}
+
+		if (conn == null) {
+			throw new IllegalArgumentException("La conexion no puede ser nula"); //$NON-NLS-1$
+		}
 
 		final SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
 		sc.init(null, DUMMY_TRUST_MANAGER, secureRandom);
 
 		conn.setSSLSocketFactory(sc.getSocketFactory());
 		conn.setHostnameVerifier(DUMMY_HOSTNAME_VERIFIER);
+
+		LOGGER.warning("Validacion TLS desactivada en una conexion (motivo: " + cleanReason(reason) //$NON-NLS-1$
+				+ "); strictSslChecks=false"); //$NON-NLS-1$
+		return true;
 	}
 
 	/** Deshabilita las comprobaciones de certificados en conexiones SSL, acept&aacute;dose entonces
-	 * cualquier certificado.
+	 * cualquier certificado. Con <code>strictSslChecks=true</code> no hace nada.
 	 * @throws GeneralSecurityException Si hay problemas al desactivar el uso de almacen de claves. */
 	public static void disableSslChecks() throws GeneralSecurityException {
+		if (isStrictSslChecks()) {
+			LOGGER.info("strictSslChecks activo: no se deshabilitan comprobaciones SSL globales"); //$NON-NLS-1$
+			return;
+		}
 		setTrustManagerAndKeyManager(
 			DUMMY_TRUST_MANAGER,
 			DUMMY_HOSTNAME_VERIFIER,
 			null,
 			null
 		);
+		LOGGER.warning("Validacion TLS desactivada de forma global (motivo: " //$NON-NLS-1$
+				+ cleanReason(UNSPECIFIED_REASON) + "); strictSslChecks=false"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Recupera la cadena de certificados que presenta un servidor sin validarla y sin
+	 * permitir el intercambio de datos: el saludo TLS se aborta en cuanto se captura la
+	 * cadena. Es el &uacute;nico mecanismo admitido para que la aplicaci&oacute;n pueda ofrecer
+	 * al usuario importar el certificado de un servidor no confiable, tambi&eacute;n con
+	 * <code>strictSslChecks=true</code>.
+	 * @param url URL del servidor (solo se usa el host y el puerto).
+	 * @param reason Motivo de la captura. No debe contener URLs con datos del usuario.
+	 * @return Cadena de certificados presentada por el servidor.
+	 * @throws IOException Si no se puede conectar o el servidor no presenta certificado. */
+	public static X509Certificate[] retrieveServerCertificateChain(final String url, final String reason) throws IOException {
+
+		if (url == null || url.trim().isEmpty()) {
+			throw new IllegalArgumentException("La URL del servidor no puede ser nula ni vacia"); //$NON-NLS-1$
+		}
+
+		final URL parsed;
+		try {
+			parsed = new URL(url.trim());
+		}
+		catch (final MalformedURLException e) {
+			throw new IOException("La URL del servidor no es valida", e); //$NON-NLS-1$
+		}
+
+		final String host = parsed.getHost();
+		final int port = parsed.getPort() > 0 ? parsed.getPort() : parsed.getDefaultPort();
+
+		final CertificateCapture capture = new CertificateCapture();
+		try {
+			final SSLContext sc = SSLContext.getInstance("TLSv1.2"); //$NON-NLS-1$
+			sc.init(null, new TrustManager[] { capture }, secureRandom);
+			try (SSLSocket socket = (SSLSocket) sc.getSocketFactory().createSocket()) {
+				socket.connect(new InetSocketAddress(host, port), CERTIFICATE_CONNECT_TIMEOUT);
+				// El TrustManager lanza siempre: la cadena se captura y el saludo se aborta
+				socket.startHandshake();
+			}
+		}
+		catch (final SSLException e) {
+			// Esperado: la cadena ya esta capturada y no se ha intercambiado ningun dato
+			LOGGER.fine("Saludo TLS abortado tras capturar la cadena del servidor: " + e.getMessage()); //$NON-NLS-1$
+		}
+		catch (final GeneralSecurityException e) {
+			throw new IOException("No se ha podido preparar la captura del certificado del servidor", e); //$NON-NLS-1$
+		}
+
+		final X509Certificate[] chain = capture.getChain();
+		if (chain == null || chain.length == 0) {
+			throw new IOException("El servidor no ha presentado ningun certificado"); //$NON-NLS-1$
+		}
+
+		LOGGER.warning("Se obtiene el certificado del servidor sin validar la cadena (motivo: " //$NON-NLS-1$
+				+ cleanReason(reason) + "; host: " + host + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		return chain;
+	}
+
+	/**
+	 * Devuelve los <code>TrustManager</code> que no validan certificados. Solo deben usarse en
+	 * modo permisivo: el llamador es responsable de comprobar antes
+	 * {@link #isStrictSslChecks()}.
+	 * @return Copia defensiva de los <code>TrustManager</code> permisivos.
+	 */
+	public static TrustManager[] getPermissiveTrustManagers() {
+		return DUMMY_TRUST_MANAGER.clone();
+	}
+
+	/**
+	 * Devuelve el verificador de nombres que acepta cualquier <i>host</i>. Solo debe usarse en
+	 * modo permisivo: el llamador es responsable de comprobar antes
+	 * {@link #isStrictSslChecks()}.
+	 * @return Verificador de nombres permisivo.
+	 */
+	public static HostnameVerifier getPermissiveHostnameVerifier() {
+		return DUMMY_HOSTNAME_VERIFIER;
+	}
+
+	/** Recorta el motivo para que el aviso no arrastre datos de la petici&oacute;n. */
+	private static String cleanReason(final String reason) {
+		if (reason == null || reason.trim().isEmpty()) {
+			return UNSPECIFIED_REASON;
+		}
+		final String clean = reason.trim();
+		return clean.length() > MAX_REASON_LENGTH ? clean.substring(0, MAX_REASON_LENGTH) : clean;
+	}
+
+	/** Captura la cadena que presenta el servidor y aborta el saludo: nunca acepta la conexi&oacute;n. */
+	private static final class CertificateCapture implements X509TrustManager {
+
+		private volatile X509Certificate[] chain;
+
+		CertificateCapture() {
+			super();
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			return new X509Certificate[0];
+		}
+
+		@Override
+		public void checkClientTrusted(final X509Certificate[] certs, final String authType) throws CertificateException {
+			throw new CertificateException("No se validan clientes: solo se captura el certificado del servidor"); //$NON-NLS-1$
+		}
+
+		@Override
+		public void checkServerTrusted(final X509Certificate[] certs, final String authType) throws CertificateException {
+			this.chain = certs != null ? certs.clone() : null;
+			throw new CertificateException("Cadena del servidor capturada sin validar: se aborta la conexion"); //$NON-NLS-1$
+		}
+
+		X509Certificate[] getChain() {
+			return this.chain != null ? this.chain.clone() : null;
+		}
 	}
 
 	/**
@@ -274,7 +446,7 @@ public final class SslSecurityManager {
 
 		LOGGER.info("Se configura el almacen de confianza de Autofirma"); //$NON-NLS-1$
 
-		final SSLContext sslContext = SSLContext.getInstance("SSL"); //$NON-NLS-1$
+		final SSLContext sslContext = SSLContext.getInstance(SSL_CONTEXT);
 		sslContext.init(null, new TrustManager[] { trustManager }, secureRandom);
 
 		HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());

@@ -117,6 +117,8 @@ final class OOXMLOfficeObjectHelper {
     	signatureInfoV1Element.appendChild(applicationVersionElement);
 
         final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        // Sin pantalla (servidores, CI) se usan valores neutros en lugar de fallar
+        final boolean headless = GraphicsEnvironment.isHeadless();
 
         final Element monitorsElement = document.createElementNS(
     		MS_DIGITAL_SIGNATURE_SCHEMA,
@@ -124,12 +126,12 @@ final class OOXMLOfficeObjectHelper {
 		);
         monitorsElement.setTextContent(
     		Integer.toString(
-				ge.getScreenDevices().length
+				headless ? 1 : ge.getScreenDevices().length
 			)
 		);
         signatureInfoV1Element.appendChild(monitorsElement);
 
-        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final Dimension screenSize = headless ? new Dimension(1920, 1080) : Toolkit.getDefaultToolkit().getScreenSize();
 
         final Element horizontalResolutionElement = document.createElementNS(
     		MS_DIGITAL_SIGNATURE_SCHEMA,
@@ -151,7 +153,7 @@ final class OOXMLOfficeObjectHelper {
 		);
         colorDepthElement.setTextContent(
     		Integer.toString(
-				ge.getScreenDevices()[0].getDisplayMode().getBitDepth()
+				headless ? 32 : ge.getScreenDevices()[0].getDisplayMode().getBitDepth()
 			)
 		);
         signatureInfoV1Element.appendChild(colorDepthElement);

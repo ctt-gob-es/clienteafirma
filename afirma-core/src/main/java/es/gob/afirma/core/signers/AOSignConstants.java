@@ -429,4 +429,33 @@ public final class AOSignConstants {
 						|| algorithm.endsWith("withDSA") //$NON-NLS-1$
 						|| algorithm.endsWith("withDSAinP1363Format")); //$NON-NLS-1$
 	}
+
+	/**
+	 * Comprueba si el algoritmo SHA-1 est&aacute; permitido para un formato de firma dado.
+	 * SHA-1 est&aacute; prohibido excepto para el formato ODF que tiene una excepci&oacute;n documentada.
+	 * @param format Formato de firma (ver constantes SIGN_FORMAT_*).
+	 * @return {@code true} si SHA-1 est&aacute; permitido para el formato, {@code false} en caso contrario.
+	 */
+	public static boolean isSHA1AllowedForFormat(final String format) {
+		if (format == null) {
+			return false;
+		}
+		// Excepci&oacute;n documentada: ODF permite SHA-1
+		return SIGN_FORMAT_ODF.equalsIgnoreCase(format) || SIGN_FORMAT_ODF_ALT1.equalsIgnoreCase(format);
+	}
+
+	/**
+	 * Valida si un algoritmo de firma SHA-1 est&aacute; permitido para el formato indicado.
+	 * Lanza una excepci&oacute;n si SHA-1 no est&aacute; permitido para el formato.
+	 * @param algorithm Algoritmo de firma.
+	 * @param format Formato de firma.
+	 * @throws IllegalArgumentException Si se intenta usar SHA-1 en un formato que no lo permite.
+	 */
+	public static void validateSHA1ForFormat(final String algorithm, final String format) {
+		if (isSHA1SignatureAlgorithm(algorithm) && !isSHA1AllowedForFormat(format)) {
+			throw new IllegalArgumentException(
+				"El algoritmo SHA-1 (" + algorithm + ") no est&aacute; permitido para el formato " + format + 
+				". SHA-1 est&aacute; prohibido por ser inseguro. Excepci&oacute;n: formato ODF."); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
 }

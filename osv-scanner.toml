@@ -1,0 +1,2 @@
+# OSV-Scanner config for clienteafirma-alexendros (Maven desktop client).
+# Add IgnoredVulns only with triage id + one-line reason. No silent ignores.

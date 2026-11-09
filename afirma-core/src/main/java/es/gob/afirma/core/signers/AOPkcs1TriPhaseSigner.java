@@ -10,6 +10,7 @@
 package es.gob.afirma.core.signers;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.PrivateKey;
@@ -154,6 +155,60 @@ public class AOPkcs1TriPhaseSigner extends AOTriphaseSigner {
 			final Properties xParams) throws AOException {
 
 		throw new UnsupportedOperationException("No se soporta la multifirma de firmas NONE"); //$NON-NLS-1$
+	}
+
+	/** Valida el token de la sesi&oacute;n trif&aacute;sica si el m&oacute;dulo de validaci&oacute;n
+	 * est&aacute; disponible en el classpath.
+	 * @param triphaseData Datos de la sesi&oacute;n devueltos por el servidor.
+	 * @param documentId Identificador del documento enviado.
+	 * @param format Formato de firma.
+	 * @param cryptoOperation Operaci&oacute;n criptogr&aacute;fica.
+	 * @param extraParams Par&aacute;metros de la operaci&oacute;n.
+	 * @throws AOException Si el token no es v&aacute;lido o, con validaci&oacute;n estricta, si no
+	 *                     hay forma de validarlo. */
+	private static void validateToken(final TriphaseData triphaseData,
+			                          final String documentId,
+			                          final String format,
+			                          final String cryptoOperation,
+			                          final Properties extraParams) throws AOException {
+
+		final boolean strict = Boolean.parseBoolean(
+			System.getProperty("strictTriphaseToken", Boolean.FALSE.toString())); //$NON-NLS-1$
+
+		final Class<?> validatorClass;
+		try {
+			validatorClass = Class.forName("es.gob.afirma.signers.pkcs7.TriphaseTokenValidator"); //$NON-NLS-1$
+		}
+		catch (final ClassNotFoundException e) {
+			if (strict) {
+				throw new AOException(
+					"No se ha encontrado el modulo de validacion del token trifasico y la validacion estricta esta activa", //$NON-NLS-1$
+					ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE);
+			}
+			LOGGER.warning("No se ha encontrado el modulo de validacion del token trifasico: no se puede autenticar la respuesta del servidor"); //$NON-NLS-1$
+			return;
+		}
+
+		try {
+			validatorClass
+				.getMethod("validate", TriphaseData.class, String.class, String.class, String.class, Properties.class) //$NON-NLS-1$
+				.invoke(null, triphaseData, documentId, format, cryptoOperation, extraParams);
+		}
+		catch (final InvocationTargetException e) {
+			if (e.getCause() instanceof AOException) {
+				throw (AOException) e.getCause();
+			}
+			throw new AOException(
+				"No se ha podido validar el token del servidor trifasico", //$NON-NLS-1$
+				e.getCause(),
+				ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE);
+		}
+		catch (final Exception e) {
+			throw new AOException(
+				"No se ha podido validar el token del servidor trifasico", //$NON-NLS-1$
+				e,
+				ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE);
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -340,6 +395,11 @@ public class AOPkcs1TriPhaseSigner extends AOTriphaseSigner {
 			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
 			throw new AOException("Error al analizar la prefirma enviada por el servidor: " + e, e, ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE); //$NON-NLS-1$
 		}
+
+		// T7: token firmado del servidor. La validacion vive en un modulo opcional con
+		// dependencias criptograficas, por lo que se invoca por reflexion (mismo patron que
+		// usa el resto del cliente para las dependencias opcionales).
+		validateToken(triphaseData, documentId, format, cryptoOperation, extraParams);
 
 		if (triphaseData.getSignsCount() <= 0) {
 			throw new AOException("No se han obtenido prefirmas del servicio de prefirma", ErrorCode.ThirdParty.PRESIGNS_NOT_FOUND); //$NON-NLS-1$

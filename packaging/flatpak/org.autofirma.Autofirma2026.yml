@@ -1,0 +1,32 @@
+# Flatpak skeleton (no build required for W4)
+# Runtime: org.freedesktop.Platform // 23.08
+# Nota: no se publica en Flathub en esta oleada; solo manifiesto de arranque.
+
+app-id: es.gob.afirma.Autofirma2026
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: autofirma
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --device=dri
+  - --filesystem=home
+modules:
+  - name: autofirma
+    buildsystem: simple
+    build-commands:
+      - install -D autofirma.jar /app/share/autofirma/autofirma.jar
+      - install -D autofirma.sh /app/bin/autofirma
+    sources:
+      - type: file
+        path: ../../clienteafirma/afirma-simple/target/autofirma.jar
+        dest-filename: autofirma.jar
+      - type: script
+        dest-filename: autofirma.sh
+        commands:
+          - |
+            #!/bin/sh
+            exec java -jar /app/share/autofirma/autofirma.jar "$@"

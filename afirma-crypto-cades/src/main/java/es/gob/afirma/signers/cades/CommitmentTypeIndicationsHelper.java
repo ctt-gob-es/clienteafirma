@@ -17,10 +17,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.DERSequence;
-import org.spongycastle.asn1.esf.CommitmentTypeIdentifier;
-import org.spongycastle.asn1.esf.CommitmentTypeIndication;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.esf.CommitmentTypeIdentifier;
+import org.bouncycastle.asn1.esf.CommitmentTypeIndication;
 
 /** Clase de utilidad para la gesti&oacute;n de los <i>CommitmentTypeIndication</i> de CAdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

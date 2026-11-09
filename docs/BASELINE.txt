@@ -1,0 +1,8 @@
+BASELINE_COMMIT=0d7f3cf01fb65d2be5b245622d2c8f490f36e718
+PRODUCT_VERSION=1.9.1
+JDK_TARGET=1.8
+UPSTREAM=https://github.com/ctt-gob-es/clienteafirma
+DATE=2026-10-01T00:00:00Z
+NOTE=Canónico: Soluciones-Alexendros/clienteafirma-alexendros. BASELINE_COMMIT pinea sync con upstream CTT 1.9.1. El traslado de organización ya está hecho.
+CANONICAL_REPO=https://github.com/Soluciones-Alexendros/clienteafirma-alexendros
+CANONICAL_REPO_DEST=https://github.com/Soluciones-Alexendros/clienteafirma-alexendros

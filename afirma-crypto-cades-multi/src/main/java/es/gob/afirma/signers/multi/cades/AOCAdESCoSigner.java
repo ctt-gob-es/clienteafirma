@@ -15,7 +15,7 @@ import java.security.cert.CertificateException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.spongycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedData;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidSignatureFormatException;
@@ -77,7 +77,7 @@ public final class AOCAdESCoSigner implements AOCoSigner {
 
         CMSSignedData signedData;
         try {
-        	signedData = new CMSSignedData(sign);
+        	signedData = new CMSSignedData(es.gob.afirma.signers.pkcs7.Asn1LegacyTimeNormalizer.retagMisencodedUtcTime(sign));
         }
         catch (final Exception e) {
         	throw new AOInvalidSignatureFormatException("La firma proporcionada no es CMS/CAdES", e); //$NON-NLS-1$

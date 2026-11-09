@@ -31,7 +31,7 @@ public final class TestPseudonymFilter {
 	 * @throws Exception en cualquier error. */
 	@Test
 	@SuppressWarnings("static-method")
-	@Ignore
+	@Ignore("Requiere almacén de certificados específico")
 	public void testPolicyIdFilter() throws Exception {
 		final AOKeyStoreManager ksm  = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			AOKeyStore.DNIEJAVA,

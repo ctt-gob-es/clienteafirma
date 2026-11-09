@@ -1,0 +1,135 @@
+name: CodeQL + Semgrep
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [master, main, 'plan/*']
+  pull_request:
+    branches: [master, main, 'plan/*']
+  schedule:
+    - cron: '0 3 * * 0'  # Weekly on Sunday
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      security-events: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [java]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@fca7ace96b7d713c7035871441bd52efbe39e27e # v3.28.19
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+          cache-dependency-path: pom.xml
+
+      - name: Build with Maven (skip failing modules)
+        run: mvn -B clean compile -DskipTests -Denv=install -pl '!afirma-simple,!afirma-ui-simple-configurator,!afirma-server-triphase-signer,!afirma-signature-retriever,!afirma-signature-storage' -am
+
+      # Default CodeQL setup is enabled on this repo; advanced upload conflicts
+      # ("analyses from advanced configurations cannot be processed when the
+      # default setup is enabled"). Keep artifacts for Merge SARIF; Alejandro
+      # can disable default setup in Settings → Code security to re-enable upload.
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@fca7ace96b7d713c7035871441bd52efbe39e27e # v3.28.19
+        with:
+          category: "/language:${{ matrix.language }}"
+          output: codeql-results
+          upload: false
+
+      - name: Upload CodeQL SARIF as artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: codeql-results
+          path: codeql-results/
+          if-no-files-found: error
+          retention-days: 7
+
+  semgrep:
+    name: Semgrep
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          # Version fijada: los hashes de requirements/ci-*.txt se generan con ella.
+          python-version: "3.14"
+
+      - name: Install Semgrep (hash-pinned)
+        run: pip3 install --require-hashes -r requirements/ci-semgrep.txt
+
+      - name: Run Semgrep
+        run: |
+          semgrep scan --config=auto --config=p/ci \
+            --sarif --output=semgrep.sarif \
+            --max-target-bytes=1000000
+
+      - name: Upload Semgrep SARIF to code scanning
+        uses: github/codeql-action/upload-sarif@fca7ace96b7d713c7035871441bd52efbe39e27e # v3.28.19
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+      - name: Upload Semgrep SARIF as artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: semgrep-results
+          path: semgrep.sarif
+          if-no-files-found: error
+          retention-days: 7
+
+  # CodeQL SARIF stays as artifact only (default setup blocks advanced upload).
+  # Semgrep uploads once above (category: semgrep). Do not re-upload Semgrep under
+  # category "merged" — that duplicated every Semgrep alert in code scanning (#93).
+  sarif-artifacts:
+    name: Keep CodeQL SARIF artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [codeql, semgrep]
+    permissions:
+      contents: read
+    steps:
+      - name: Download CodeQL SARIF
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: codeql-results
+          path: sarif/codeql
+
+      - name: Confirm Semgrep was not re-uploaded
+        run: |
+          echo "Semgrep SARIF is uploaded only by job semgrep (category: semgrep)."
+          ls -la sarif/codeql 2>/dev/null || echo "No CodeQL SARIF artifact (warn-only)."

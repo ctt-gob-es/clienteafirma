@@ -32,7 +32,9 @@ import es.gob.afirma.core.misc.http.UrlHttpManager;
 import es.gob.afirma.core.misc.http.UrlHttpMethod;
 import es.gob.afirma.core.signers.AOPkcs1Signer;
 import es.gob.afirma.core.signers.AOTriphaseException;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.TriphaseData;
+import es.gob.afirma.signers.pkcs7.TriphaseTokenValidator;
 import es.gob.afirma.core.signers.TriphaseDataSigner;
 import es.gob.afirma.core.signers.TriphaseUtil;
 import es.gob.afirma.signers.pades.common.BadPdfPasswordException;
@@ -186,6 +188,8 @@ final class PDFTriPhaseSignerUtil {
 			             final String algorithm,
 			             final PrivateKey key,
 			             final Certificate[] certChain,
+			             final String documentId,
+			             final String cryptoOperation,
 			             final Properties extraParams) throws AOException {
 
 		// Convertimos la respuesta del servidor en un objeto TriphaseData
@@ -197,6 +201,9 @@ final class PDFTriPhaseSignerUtil {
 			LOGGER.severe("Error al analizar la prefirma enviada por el servidor: " + e); //$NON-NLS-1$
 			throw new AOException("Error al analizar la prefirma enviada por el servidor", e, ErrorCode.ThirdParty.MALFORMED_PRESIGN_RESPONSE); //$NON-NLS-1$
 		}
+
+		// T7: token firmado del servidor (firma, EKU, cadena, vigencia y ligadura con la peticion)
+		TriphaseTokenValidator.validate(triphaseData, documentId, AOSignConstants.SIGN_FORMAT_PDF, cryptoOperation, extraParams);
 
 		return TriphaseDataSigner.doSign(
 			new AOPkcs1Signer(),

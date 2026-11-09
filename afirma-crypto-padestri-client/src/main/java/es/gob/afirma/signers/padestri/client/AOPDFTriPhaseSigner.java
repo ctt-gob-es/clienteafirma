@@ -113,6 +113,8 @@ public final class AOPDFTriPhaseSigner extends AOTriphaseSigner {
 				algorithm,
 				key,
 				certChain,
+				documentId,
+				"sign", //$NON-NLS-1$
 				extraParams
 			),
 			true

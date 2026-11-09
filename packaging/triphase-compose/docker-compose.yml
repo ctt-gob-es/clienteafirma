@@ -1,0 +1,23 @@
+# Compose local — servidor trifásico Autofirma (Tomcat 9 / javax)
+# No usa Jakarta. Requiere WARs construidos en clienteafirma (perfil install).
+#
+# Arranque:
+#   cd packaging/triphase-compose
+#   export WAR_DIR=../../clienteafirma
+#   docker compose up -d
+# Smoke: docs/F8-TRIFASICA-SMOKE.md
+
+services:
+  tomcat:
+    image: tomcat:9.0-jdk8-temurin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ${WAR_DIR:-../../clienteafirma}/afirma-server-triphase-signer/target/afirma-server-triphase-signer-2.9.1.war:/usr/local/tomcat/webapps/afirma-server-triphase-signer.war:ro
+      - ${WAR_DIR:-../../clienteafirma}/afirma-signature-storage/target/afirma-signature-storage-1.9.1.war:/usr/local/tomcat/webapps/afirma-signature-storage.war:ro
+      - ${WAR_DIR:-../../clienteafirma}/afirma-signature-retriever/target/afirma-signature-retriever-1.9.1.war:/usr/local/tomcat/webapps/afirma-signature-retriever.war:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10

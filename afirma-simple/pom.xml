@@ -16,9 +16,9 @@
 	</parent>
 
 	<properties>
-		<afirma.keytool.keystore>${basedir}/afirma.keystore</afirma.keytool.keystore>
+		<afirma.keytool.keystore>${env.AFIRMA_KEYSTORE_PATH}</afirma.keytool.keystore>
         <afirma.keytool.alias>codesign</afirma.keytool.alias>
-        <afirma.keytool.password>afirma</afirma.keytool.password>
+        <afirma.keytool.password>${env.AFIRMA_KEYSTORE_PASS}</afirma.keytool.password>
 	</properties>
 
 	<dependencies>
@@ -204,20 +204,17 @@
 			<artifactId>afirma-crypto-cipher2</artifactId>
 			<version>${clienteafirma.version}</version>
 		</dependency>
-
 		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>core</artifactId>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>prov</artifactId>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk18on</artifactId>
 		</dependency>
-		
 		<dependency>
-			<groupId>com.madgag.spongycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcutil-jdk18on</artifactId>
 		</dependency>
 
 		<dependency>
@@ -267,6 +264,13 @@
 		    <groupId>org.bidib.com.github.markusbernhardt</groupId>
 		    <artifactId>proxy-vole</artifactId>
 		    <version>1.0.18</version>
+			<exclusions>
+				<!-- CVE-2022-41404: detección de proxy validada por ProxyUtilTest sin ini4j. -->
+				<exclusion>
+					<groupId>org.ini4j</groupId>
+					<artifactId>ini4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Libreria "Java Native Access" -->
@@ -345,7 +349,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>3.2.1</version>
+					<version>3.5.3</version>
 					<executions>
 						<execution>
 							<phase>package</phase>

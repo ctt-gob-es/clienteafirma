@@ -75,7 +75,7 @@ public final class TestXAdESWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	@Deprecated
 	public void testXadesEnvelopingUseManifestBinary() throws Exception {
 
@@ -121,7 +121,7 @@ public final class TestXAdESWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	@Deprecated
 	public void testXadesEnvelopingUseManifestXML() throws Exception {
 
@@ -168,7 +168,7 @@ public final class TestXAdESWithManifest {
 	 * @throws Exception en cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test(expected=es.gob.afirma.core.AOUnsupportedSignFormatException.class)
-	@Ignore
+	@Ignore("Prueba no ejecutada en CI / requiere configuración específica")
 	@Deprecated
 	public void testXadesEnvelopedUseManifest() throws Exception {
 

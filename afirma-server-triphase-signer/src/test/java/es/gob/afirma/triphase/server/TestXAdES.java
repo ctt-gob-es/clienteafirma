@@ -80,7 +80,7 @@ public class TestXAdES {
      * @throws Exception en cualquier error
      */
     @Test
-    @Ignore
+    @Ignore("Requiere servicio externo de firma trifásica")
     public void testSignatureXAdES122Tri() throws Exception {
 
     	final byte[] signature = generateXAdES122Tri();
@@ -111,7 +111,7 @@ public class TestXAdES {
      * @throws Exception en cualquier error
      */
     @Test
-    @Ignore
+    @Ignore("Requiere servicio externo de firma trifásica")
     public void testSignatureXAdESTri() throws Exception {
 
     	final byte[] signature = generateXAdESTri();
@@ -144,7 +144,7 @@ public class TestXAdES {
      * @throws Exception en cualquier error
      */
     @Test
-    @Ignore
+    @Ignore("Requiere servicio externo de firma trifásica")
     public void testCounterSignTriXAdES122() throws Exception {
 
     	final byte[] signature = generateXAdES122();
@@ -179,7 +179,7 @@ public class TestXAdES {
      * @throws Exception en cualquier error
      */
     @Test
-    @Ignore
+    @Ignore("Requiere servicio externo de firma trifásica")
     public void testCoSignTriXAdES122() throws Exception {
 
     	final byte[] signature = generateXAdES122Tri();
@@ -217,7 +217,7 @@ public class TestXAdES {
      * @throws Exception en cualquier error.
      */
     @Test
-    @Ignore
+    @Ignore("Requiere servicio externo de firma trifásica")
     public void testCounterSignTriXAdES122Igae() throws Exception {
 
     	final byte[] signature = loadTestFile(TEST_FILE_XADES_1_2_2_IGAE);
@@ -237,7 +237,7 @@ public class TestXAdES {
      * @throws Exception en cualquier error.
      */
     @Test
-    @Ignore
+    @Ignore("Requiere servicio externo de firma trifásica")
     public void testCounterSignTriCosignatureXAdES() throws Exception {
 
     	final byte[] signature = loadTestFile(TEST_FILE_XADES_COSIGNATURE);

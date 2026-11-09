@@ -1,0 +1,24 @@
+# Rutas excluidas del análisis de Semgrep (semgrep scan respeta este fichero).
+# Criterio: código heredado del proyecto oficial que NO se compila ni se publica desde
+# este repositorio, o recursos de terceros empaquetados. Toda exclusión debe tener motivo
+# y estar reflejada en docs/semgrep-triage.md.
+
+# Applets / JNLP / webapps de demostración del cliente antiguo (no están en el reactor Maven).
+afirma-ui-applet-deploy/
+afirma-ui-miniapplet-deploy/
+afirma-standalone/
+
+# Servlets de datos de prueba de los applets (solo testdata, no se despliega).
+afirma-miniapplet-store-testdata/
+
+# Aplicación de Windows Store (no forma parte del producto Linux/macOS publicado).
+afirma-windows-store/
+
+# Recursos de instalador (scripts y ayuda empaquetada), no código de la aplicación.
+afirma-simple-installer/
+
+# Ayuda empaquetada (HTML estático con enlaces y licencias).
+**/src/main/resources/help/
+
+# Documentacion javadoc empaquetada (HTML con enlaces de referencia).
+**/doc-files/

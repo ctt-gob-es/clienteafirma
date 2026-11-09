@@ -40,6 +40,12 @@ public class SSLContextConfigurationTask extends Thread {
     	HttpManager.setSecureDomains(
     			PreferencesManager.get(PreferencesManager.PREFERENCE_GENERAL_SECURE_DOMAINS_LIST));
 
+    	// T7: exigencia del token firmado del servidor trifasico (por defecto, desactivada)
+    	final boolean strictTriphaseToken = PreferencesManager.getBoolean(
+    			PreferencesManager.PREFERENCE_GENERAL_STRICT_TRIPHASE_TOKEN);
+    	System.setProperty("strictTriphaseToken", Boolean.toString(strictTriphaseToken)); //$NON-NLS-1$
+    	LOGGER.info("Exigencia del token del servidor trifasico: " + strictTriphaseToken); //$NON-NLS-1$
+
     	// Configuramos las propiedades del sistema necesarias para que SSLErrorProcesor las trate correctamente
     	final boolean allowPersonalTruststore = PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_PERSONAL_TRUSTSTORE);
     	final boolean allowAutoImportTrustedCerts = PreferencesManager.getBoolean(PreferencesManager.ADMIN_PREFERENCE_ALLOW_AUTO_IMPORT_TRUSTED_CERTS);

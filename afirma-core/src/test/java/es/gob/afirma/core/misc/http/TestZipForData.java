@@ -23,7 +23,7 @@ public final class TestZipForData {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere conexión de red / servicio externo")
 	public void testSizes() throws Exception {
 		System.out.println("Tamano de los datos en Base64: " + SAMPLE_DATA.length()); //$NON-NLS-1$
 		final byte[] origBytes = Base64.decode(SAMPLE_DATA, true);
@@ -40,7 +40,7 @@ public final class TestZipForData {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere conexión de red / servicio externo")
 	public void testDownloadData() throws Exception {
 		final byte[] origBytes = Base64.decode(SAMPLE_DATA, true);
 		final byte[] compressedBytes = gzipBytes(origBytes);
@@ -55,7 +55,7 @@ public final class TestZipForData {
 	 * de un mapa de cadenas. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere conexión de red / servicio externo")
 	public void testParamParse() {
 		final Map<String, String> noParam = new HashMap<>(0);
 		final Map<String, String> noGzip = new HashMap<>(1);

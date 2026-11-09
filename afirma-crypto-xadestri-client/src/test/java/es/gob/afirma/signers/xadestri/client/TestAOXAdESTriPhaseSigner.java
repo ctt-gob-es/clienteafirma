@@ -134,7 +134,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaFirmaXAdESDetached() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(
@@ -175,7 +175,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaCofirmaXAdESDetached() throws Exception {
 		final byte[] signature;
 		try (
@@ -218,7 +218,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaXAdESDetached() throws Exception {
 
 		final byte[] signature;
@@ -259,7 +259,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaDeCofirmaXAdESDetached() throws Exception {
 
 		final byte[] signature;
@@ -296,7 +296,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaCofirmadeContrafirmaXAdESDetached() throws Exception {
 
 		final byte[] signature;
@@ -340,7 +340,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaDeContrafirmaXAdESDetached() throws Exception {
 
 		final byte[] signature;
@@ -377,7 +377,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaFirmaXAdESEnveloping() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(
@@ -418,7 +418,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaCofirmaXAdESEnveloping() throws Exception {
 
 		final byte[] signature;
@@ -462,7 +462,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaXAdESEnveloping() throws Exception {
 
 		final byte[] signature;
@@ -499,7 +499,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaXAdESDetachedXL() throws Exception {
 
 		final byte[] signature;
@@ -536,7 +536,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaDeCofirmaXAdESEnveloping() throws Exception {
 
 		final byte[] signature;
@@ -632,7 +632,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaCofirmadeContrafirmaXAdESEnveloping() throws Exception {
 
 		final byte[] signature;
@@ -676,7 +676,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaDeContrafirmaXAdESEnveloping() throws Exception {
 
 		final byte[] signature;
@@ -713,7 +713,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaFirmaXAdESEnveloped() throws Exception {
 
 		final byte[] data = AOUtil.getDataFromInputStream(
@@ -754,7 +754,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaCofirmaXAdESEnveloped() throws Exception {
 
 		final byte[] signature;
@@ -798,7 +798,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaXAdESEnveloped() throws Exception {
 
 		final byte[] signature;
@@ -835,7 +835,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaDeCofirmaXAdESEnveloped() throws Exception {
 
 		final byte[] signature;
@@ -872,7 +872,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaCofirmadeContrafirmaXAdESEnveloped() throws Exception {
 
 		final byte[] signature;
@@ -916,7 +916,7 @@ public class TestAOXAdESTriPhaseSigner {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
+	@Ignore("Requiere servicio externo de firma trifásica")
 	public void pruebaContrafirmaDeContrafirmaXAdESEnveloped() throws Exception {
 
 		final byte[] signature;

@@ -135,6 +135,24 @@ public final class TriphaseData {
 
 	private final List<TriSign> signs;
 	private String format;
+	private String token;
+
+	/**
+	 * Obtiene el token firmado con el que el servidor trif&aacute;sico autentica la sesi&oacute;n.
+	 * La validaci&oacute;n del token se hace en {@link TriphaseTokenValidator}.
+	 * @return Token en Base64 o {@code null} si el servidor no lo ha enviado.
+	 */
+	public String getToken() {
+		return this.token;
+	}
+
+	/**
+	 * Establece el token firmado de la sesi&oacute;n trif&aacute;sica.
+	 * @param tk Token en Base64.
+	 */
+	public void setToken(final String tk) {
+		this.token = tk;
+	}
 
 	/**
 	 * Obtiene el formato de las firmas.
@@ -321,17 +339,24 @@ public final class TriphaseData {
 		}
 
 		String format = null;
+		String token = null;
 		final NamedNodeMap nnm = rootSignsNode.getAttributes();
 		if (nnm != null) {
 			final Node tmpNode = nnm.getNamedItem("format"); //$NON-NLS-1$
 			if (tmpNode != null) {
 				format = tmpNode.getNodeValue();
 			}
+			final Node tokenNode = nnm.getNamedItem("token"); //$NON-NLS-1$
+			if (tokenNode != null) {
+				token = tokenNode.getNodeValue();
+			}
 		}
 
 		final List<TriSign> signsNodes = parseSignsNode(rootSignsNode);
 
-		return new TriphaseData(signsNodes, format);
+		final TriphaseData data = new TriphaseData(signsNodes, format);
+		data.setToken(token);
+		return data;
 	}
 
 	/** Analiza el nodo con el listado de firmas.
@@ -424,6 +449,11 @@ public final class TriphaseData {
 		if (this.format != null) {
 			builder.append(" format=\""); //$NON-NLS-1$
 			builder.append(this.format);
+			builder.append("\""); //$NON-NLS-1$
+		}
+		if (this.token != null) {
+			builder.append(" token=\""); //$NON-NLS-1$
+			builder.append(this.token);
 			builder.append("\""); //$NON-NLS-1$
 		}
 		builder.append(">\n"); //$NON-NLS-1$

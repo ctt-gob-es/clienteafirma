@@ -44,6 +44,12 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 	 * usa la confianza por defecto de la JVM. */
 	public static final String JAVA_PARAM_DISABLE_SSL_CHECKS = "disableSslChecks"; //$NON-NLS-1$
 
+	/** Si se establece a <code>true</code>, nunca se deshabilitan las comprobaciones SSL
+	 * (ni por dominio «seguro» ni por <code>disableSslChecks</code>). Por defecto <code>true</code>
+	 * (comprobaci&oacute;n activa). Puede desactivarse con la preferencia de conexiones seguras
+	 * o con <code>-DstrictSslChecks=false</code>. */
+	public static final String JAVA_PARAM_STRICT_SSL_CHECKS = "strictSslChecks"; //$NON-NLS-1$
+
 	/** Lista de dominios seguros para conexiones HTTPS. */
 	public static final String JAVA_PARAM_SECURE_DOMAINS_LIST = "secureDomainsList"; //$NON-NLS-1$
 
@@ -204,25 +210,33 @@ public class UrlHttpManagerImpl implements UrlHttpManager {
 				conn = (HttpURLConnection) uri.openConnection();
 			}
 
+			final boolean strictSsl = SslSecurityManager.isStrictSslChecks();
 			final String defaultSslCheck = System.getProperty(JAVA_PARAM_DISABLE_SSL_CHECKS, Boolean.FALSE.toString());
-			final boolean needDisableSslChecks = sslConfig == null && Boolean.parseBoolean(defaultSslCheck);
-			final boolean isSecureDomain = checkIsSecureDomain(uri);
+			// Con strictSslChecks=true (defecto) no se evalua ninguna via de desactivacion:
+			// ni la propiedad disableSslChecks ni el listado de dominios «seguros».
+			final boolean needDisableSslChecks = !strictSsl && sslConfig == null && Boolean.parseBoolean(defaultSslCheck);
+			final boolean isSecureDomain = !strictSsl && sslConfig == null && checkIsSecureDomain(uri);
 
 			// Si se trata de una conexion SSL:
-			// - Si me indicaron que el dominio es seguro o que directamente noes necesario validad el certificado,
-			// desactivamos la validacion de la conexion.
-			// - Si se establecio una conefiguracion de conexion concreta, la aplicamos.
+			// - Con strictSslChecks=true (defecto) nunca se desactiva la validacion.
+			// - En modo permisivo solo se desactiva por accion explicita del usuario
+			//   (propiedad disableSslChecks o listado de dominios seguros) y con aviso.
+			// - Si se establecio una configuracion de conexion concreta, la aplicamos.
 			if (conn instanceof HttpsURLConnection) {
+				boolean checksDisabled = false;
 				if (needDisableSslChecks || isSecureDomain) {
+					final String reason = (needDisableSslChecks
+							? "propiedad " + JAVA_PARAM_DISABLE_SSL_CHECKS //$NON-NLS-1$
+							: "dominio seguro configurado") //$NON-NLS-1$
+							+ ", host: " + uri.getHost(); //$NON-NLS-1$
 					try {
-						SslSecurityManager.disableSslChecks((HttpsURLConnection) conn);
-						LOGGER.info("Deshabilitada la comprobacion SSL para el acceso al dominio: " + uri.getHost()); //$NON-NLS-1$
+						checksDisabled = SslSecurityManager.disableSslChecks((HttpsURLConnection) conn, reason);
 					}
 					catch(final Exception e) {
 						LOGGER.warning("No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: " + e); //$NON-NLS-1$
 					}
 				}
-				else if (sslConfig != null) {
+				if (!checksDisabled && sslConfig != null) {
 					SslSecurityManager.setSslSecurity((HttpsURLConnection) conn, sslConfig);
 				}
 			}

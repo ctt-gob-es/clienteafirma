@@ -23,6 +23,7 @@ import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,36 +32,35 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Primitive;
-import org.spongycastle.asn1.DERSet;
-import org.spongycastle.asn1.cmp.PKIFailureInfo;
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.AttributeTable;
-import org.spongycastle.asn1.x509.X509ObjectIdentifiers;
-import org.spongycastle.cms.CMSSignedData;
-import org.spongycastle.cms.SignerInformation;
-import org.spongycastle.cms.SignerInformationStore;
-import org.spongycastle.tsp.TimeStampRequest;
-import org.spongycastle.tsp.TimeStampRequestGenerator;
-import org.spongycastle.tsp.TimeStampResponse;
-import org.spongycastle.tsp.TimeStampToken;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.cmp.PKIFailureInfo;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.tsp.TimeStampRequest;
+import org.bouncycastle.tsp.TimeStampRequestGenerator;
+import org.bouncycastle.tsp.TimeStampResponse;
+import org.bouncycastle.tsp.TimeStampToken;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ErrorCode;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
+import es.gob.afirma.core.misc.http.SslSecurityManager;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.BinaryErrorCode;
@@ -81,6 +81,9 @@ public final class CMSTimestamper {
 	private static final String STORE_TYPE_PKCS12 = "PKCS12"; //$NON-NLS-1$
 
 	static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+
+	/** Generador de aleatorios para el <i>nonce</i> de las peticiones de sello. */
+	private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final TimeStampRequestGenerator tsqGenerator;
     private final URI tsaURL;
@@ -195,7 +198,7 @@ public final class CMSTimestamper {
 
     /** A&ntilde;ade un sello de tiempo a las firmas encontradas dentro de una estructura PKCS#7.
      * @param pkcs7 Estructura que contiene las firmas a estampar un sello de tiempo
-     * @param hashAlgorithm Algoritmo de huella digital a usar en los sellos de tiempo (si se indica <code>null</code> se usa SHA-1)
+     * @param hashAlgorithm Algoritmo de huella digital a usar en los sellos de tiempo (si se indica <code>null</code> se usa SHA-256)
      * @param time Tiempo del sello
      * @return Nueva estructura PKCS#7 con los sellos de tiempo a&ntilde;adidos
      * @throws NoSuchAlgorithmException Si no se soporta el algoritmo de huella digital del sello de tiempo
@@ -254,16 +257,38 @@ public final class CMSTimestamper {
     }
 
     private byte[] getTSAResponse(final byte[] request) throws IOException {
-    	if (this.tsaURL.getScheme().equals("socket")) { //$NON-NLS-1$
+    	final String scheme = this.tsaURL.getScheme();
+    	if ("socket".equals(scheme) || "http".equals(scheme)) { //$NON-NLS-1$ //$NON-NLS-2$
+    		checkCleartextTsaAllowed(scheme);
+    	}
+    	if ("socket".equals(scheme)) { //$NON-NLS-1$
 			return getTSAResponseSocket(request);
     	}
-    	if (this.tsaURL.getScheme().equals("http")) { //$NON-NLS-1$
+    	if ("http".equals(scheme)) { //$NON-NLS-1$
     		return getTSAResponseHttp(request);
     	}
-    	if (this.tsaURL.getScheme().equals("https")) { //$NON-NLS-1$
+    	if ("https".equals(scheme)) { //$NON-NLS-1$
     		return getTSAResponseHttps(request);
     	}
-    	throw new UnsupportedOperationException("Protocolo de conexion con TSA no soportado: " + this.tsaURL.getScheme()); //$NON-NLS-1$
+    	throw new UnsupportedOperationException("Protocolo de conexion con TSA no soportado: " + scheme); //$NON-NLS-1$
+    }
+
+    /**
+     * Con <code>strictSslChecks=true</code> (defecto) no se permite hablar con la TSA por un
+     * canal en claro: ni el sello ni los datos que lo acompa&ntilde;an viajar&iacute;an sin
+     * cifrar ni autenticar.
+     * @param scheme Esquema de la URL de la TSA.
+     * @throws IOException Si el canal en claro no est&aacute; permitido.
+     */
+    private void checkCleartextTsaAllowed(final String scheme) throws IOException {
+    	if (SslSecurityManager.isStrictSslChecks()) {
+    		throw new IOException(
+    			"Conexion con la TSA por '" + scheme + "' en claro rechazada (host: " + this.tsaURL.getHost() //$NON-NLS-1$ //$NON-NLS-2$
+    				+ "): strictSslChecks activo"); //$NON-NLS-1$
+    	}
+    	LOGGER.warning(
+    		"Conexion con la TSA sin cifrar por '" + scheme + "' (host: " + this.tsaURL.getHost() //$NON-NLS-1$ //$NON-NLS-2$
+    			+ "); strictSslChecks=false"); //$NON-NLS-1$
     }
 
     private byte[] getTSAResponseSocket(final byte[] request) throws IOException {
@@ -296,7 +321,7 @@ public final class CMSTimestamper {
     	final byte[] resp = new byte[size - 1];
     	datainputstream.readFully(resp);
     	if (byte0 != 5 && byte0 != 6) {
-			throw new IOException("Obtenida resuesta incorrecta del servidor TSA: " + new String(resp)); //$NON-NLS-1$
+			throw new IOException("Respuesta incorrecta del servidor TSA (codigo: " + byte0 + ")"); //$NON-NLS-1$ //$NON-NLS-2$
     	}
     	socket.close();
 
@@ -387,29 +412,35 @@ public final class CMSTimestamper {
     		throw new IllegalArgumentException("La conexion no puede ser nula"); //$NON-NLS-1$
     	}
 
+    	// Con comprobaciones estrictas (defecto) ni se acepta cualquier certificado del servidor
+    	// ni se desactiva la verificacion del nombre de host
+    	final boolean strictSsl = SslSecurityManager.isStrictSslChecks();
+
     	if (!this.verifyHostname) {
+    		if (strictSsl) {
+    			LOGGER.warning("Se ignora 'verifyHostname=false' con strictSslChecks activo (host: " //$NON-NLS-1$
+    					+ this.tsaURL.getHost() + ")"); //$NON-NLS-1$
+    		}
+    		else {
+    			LOGGER.warning("No se comprobaran los nombres de host en la conexion SSL del sello de tiempo (host: " //$NON-NLS-1$
+    					+ this.tsaURL.getHost() + "); strictSslChecks=false"); //$NON-NLS-1$
 
-    		LOGGER.warning("No se comprobaran los nombres de host en la conexion SSL del sello de tiempo"); //$NON-NLS-1$
-
-    		// Podrian encontrarse varios tipos de conexion HTTPS
-
-	    	if (conn instanceof javax.net.ssl.HttpsURLConnection) {
-	    		((javax.net.ssl.HttpsURLConnection)conn).setHostnameVerifier(new HostnameVerifier() {
-	    			public boolean verify(final String hostname, final SSLSession session) {
-	    				return true;
-	    			}
-	    		});
-	    	}
-	    	else {
-	    		LOGGER.warning(
-    				"No se ha podido deshabilitar la comprobacion de nombre de host, tipo desconocido de conexion: " + conn.getClass().getName() //$NON-NLS-1$
-    			);
-	    	}
+    			// Podrian encontrarse varios tipos de conexion HTTPS
+    			if (conn instanceof javax.net.ssl.HttpsURLConnection) {
+    				((javax.net.ssl.HttpsURLConnection) conn).setHostnameVerifier(
+    					SslSecurityManager.getPermissiveHostnameVerifier());
+    			}
+    			else {
+    				LOGGER.warning(
+    					"No se ha podido deshabilitar la comprobacion de nombre de host, tipo desconocido de conexion: " + conn.getClass().getName() //$NON-NLS-1$
+    				);
+    			}
+    		}
     	}
 
     	final SSLContext sc;
     	try {
-    		sc = SSLContext.getInstance("TLS"); //$NON-NLS-1$
+    		sc = SSLContext.getInstance("TLSv1.2"); //$NON-NLS-1$
     	}
     	catch(final Exception e) {
     		throw new IOException("No se ha podido obtener el contexto de seguridad SSL: " + e, e); //$NON-NLS-1$
@@ -422,7 +453,7 @@ public final class CMSTimestamper {
     			final KeyStore keystore = KeyStore.getInstance(this.sslKeyStoreType == null ? "JKS" : this.sslKeyStoreType); //$NON-NLS-1$
 				keystore.load(new ByteArrayInputStream(this.sslKeyStoreFile), this.sslKeyStorePassword.toCharArray());
 				final KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-	    		keyManagerFactory.init(keystore, this.sslKeyStorePassword.toCharArray());
+    				keyManagerFactory.init(keystore, this.sslKeyStorePassword.toCharArray());
 
 	    		keyManagers = keyManagerFactory.getKeyManagers();
 			}
@@ -446,21 +477,17 @@ public final class CMSTimestamper {
     			throw new IOException("Error obteniendo el almacen de confianza con los certificados de CA con los que se configuro la SSL: " + e, e); //$NON-NLS-1$
 			}
     	}
+    	else if (strictSsl) {
+    		// Nunca se acepta cualquier certificado con comprobaciones estrictas: se usa el
+    		// almacen de confianza del sistema
+    		trustManagers = null;
+    	}
     	else {
-    		trustManagers = new TrustManager[] {
-    			new X509TrustManager() {
-					@Override
-					public void checkClientTrusted(final X509Certificate[] arg0, final String arg1) { /* No hacemos nada. */ }
-
-					@Override
-					public void checkServerTrusted(final X509Certificate[] arg0, final String arg1) { /* No hacemos nada. */ }
-
-					@Override
-					public X509Certificate[] getAcceptedIssuers() {
-						return new X509Certificate[0];
-					}
-				}
-    		};
+    		LOGGER.warning("No se validara el certificado del servidor de la TSA (host: " + this.tsaURL.getHost() //$NON-NLS-1$
+    				+ "); strictSslChecks=false"); //$NON-NLS-1$
+    		// Trust managers permisivos centralizados en SslSecurityManager (T5), que es el
+    		// unico punto donde se concentra la validacion TLS permisiva
+    		trustManagers = SslSecurityManager.getPermissiveTrustManagers();
     	}
 
     	// Se configura el contexto SSL
@@ -494,10 +521,16 @@ public final class CMSTimestamper {
      * @throws IOException Si hay errores en la comunicaci&oacute;n o en la lectura de datos con la TSA. */
     public byte[] getTimeStampToken(final byte[] imprint, final String hashAlgorithm, final Calendar time) throws AOException, IOException {
 
+    	// Sin SHA-1 por defecto: si no se indica algoritmo se usa SHA-256
+    	final String digestAlgorithm = resolveDigestAlgorithm(hashAlgorithm);
+
+    	// Se envia un nonce aleatorio obligatorio y se exige que la TSA lo devuelva
+    	final BigInteger nonce = new BigInteger(64, SECURE_RANDOM).abs().add(BigInteger.ONE);
+
     	final TimeStampRequest request = this.tsqGenerator.generate(
-               new ASN1ObjectIdentifier(hashAlgorithm != null ? AOAlgorithmID.getOID(hashAlgorithm) : X509ObjectIdentifiers.id_SHA1.getId()),
+               new ASN1ObjectIdentifier(digestAlgorithm),
                imprint,
-               BigInteger.valueOf(time != null ? time.getTimeInMillis() : System.currentTimeMillis())
+               nonce
           );
 
          final byte[] requestBytes = request.getEncoded();
@@ -507,7 +540,7 @@ public final class CMSTimestamper {
         	 rawResponse = getTSAResponse(requestBytes);
          }
          catch (final IOException e) {
-        	 throw new AOException("No se ha podido conectar con el servicio La respuesta de la TSA no tiene un formato valido: " + e, e, ErrorCode.Communication.TSA_CONNECTION_ERROR); //$NON-NLS-1$
+        	 throw new AOException("No se ha podido obtener la respuesta de la TSA (host: " + this.tsaURL.getHost() + "): " + e.getMessage(), e, ErrorCode.Communication.TSA_CONNECTION_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
          }
          catch (final Exception e) {
         	 throw new AOException("Error en la generacion del sello de tiempo: " + e, e, BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$
@@ -518,8 +551,9 @@ public final class CMSTimestamper {
             response = new TimeStampResponse(rawResponse);
          }
          catch (final Exception e) {
-        	LOGGER.severe("Respuesta de la TSA: " + new String(rawResponse)); //$NON-NLS-1$
-            throw new AOException("La respuesta de la TSA no tiene un formato valido: " + e, e, BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$
+        	// No se registra el contenido de la respuesta: puede incluir datos del solicitante
+        	LOGGER.severe("La respuesta de la TSA no tiene un formato valido (" + rawResponse.length + " bytes): " + e.getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOException("La respuesta de la TSA no tiene un formato valido", e, BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$
          }
 
          // Validamos los atributos de la respuesta (RFC 3161 PKIStatus)
@@ -532,15 +566,44 @@ public final class CMSTimestamper {
          final PKIFailureInfo failure = response.getFailInfo();
          final int value = failure == null ? 0 : failure.intValue();
          if (value != 0) {
-             throw new AOException("Respuesta invalida de la TSA ('" + this.tsaURL + "') con el codigo " + value, BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
+             throw new AOException("Respuesta invalida de la TSA (host: " + this.tsaURL.getHost() + ") con el codigo " + value, BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
          }
 
          // Extraemos el token de sello de tiempo (quitando la informacion de estado de las comunicaciones)
-         final TimeStampToken  tsToken = response.getTimeStampToken();
+         final TimeStampToken tsToken = response.getTimeStampToken();
          if (tsToken == null) {
-             throw new AOException("La respuesta de la TSA ('" + this.tsaURL + "') no contiene un sello de tiempo valido: " + new String(rawResponse), BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
+             throw new AOException("La respuesta de la TSA (host: " + this.tsaURL.getHost() + ") no contiene un sello de tiempo", BinaryErrorCode.Internal.GENERATING_TIMESTAMP_ERROR); //$NON-NLS-1$ //$NON-NLS-2$
          }
 
+         // Firma del sello, EKU de sellado de tiempo, cadena de confianza (en estricto) y
+         // hora razonable. El nonce y la huella ya los ha comprobado response.validate(request).
+         final KeyStore tsaTrustStore = this.sslTrustStoreFile != null && this.sslTrustStorePassword != null
+         		? TsaResponseValidator.loadTrustStore(this.sslTrustStoreFile, this.sslTrustStorePassword, this.sslTrustStoreType)
+         		: null;
+         TsaResponseValidator.validate(tsToken, tsaTrustStore, SslSecurityManager.isStrictSslChecks());
+
          return tsToken.getEncoded();
+     }
+
+    /**
+     * Resuelve el OID del algoritmo de huella: SHA-256 si no se indica ninguno y se rechaza
+     * SHA-1 con comprobaciones estrictas.
+     * @param hashAlgorithm Algoritmo de huella solicitado.
+     * @return OID del algoritmo a usar.
+     */
+    private static String resolveDigestAlgorithm(final String hashAlgorithm) {
+
+    	final String digestAlgorithm = hashAlgorithm != null
+    			? AOAlgorithmID.getOID(hashAlgorithm)
+    			: NISTObjectIdentifiers.id_sha256.getId();
+
+    	if (X509ObjectIdentifiers.id_SHA1.getId().equals(digestAlgorithm)) {
+    		if (SslSecurityManager.isStrictSslChecks()) {
+    			throw new IllegalArgumentException("SHA-1 no esta permitido en los sellos de tiempo con strictSslChecks activo"); //$NON-NLS-1$
+    		}
+    		LOGGER.warning("Se solicita el sello de tiempo con SHA-1 (configuracion explicita); strictSslChecks=false"); //$NON-NLS-1$
+    	}
+
+    	return digestAlgorithm;
      }
 }

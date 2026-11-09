@@ -10,22 +10,24 @@
 package es.gob.afirma.signers.cades;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Logger;
 
-import org.spongycastle.asn1.ASN1InputStream;
-import org.spongycastle.asn1.ASN1Integer;
-import org.spongycastle.asn1.ASN1ObjectIdentifier;
-import org.spongycastle.asn1.ASN1Sequence;
-import org.spongycastle.asn1.ASN1Set;
-import org.spongycastle.asn1.ASN1TaggedObject;
-import org.spongycastle.asn1.DEROctetString;
-import org.spongycastle.asn1.cms.Attribute;
-import org.spongycastle.asn1.cms.EncryptedContentInfo;
-import org.spongycastle.asn1.cms.EnvelopedData;
-import org.spongycastle.asn1.cms.SignedData;
-import org.spongycastle.asn1.cms.SignerInfo;
-import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.cms.EncryptedContentInfo;
+import org.bouncycastle.asn1.cms.EnvelopedData;
+import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.cms.SignerInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.DigestedData;
@@ -44,7 +46,7 @@ public final class CAdESValidator {
 
     private static Enumeration<?> getCAdESObjects(final byte[] data) throws IOException {
     	try (
-			final ASN1InputStream is = new ASN1InputStream(data);
+			final ASN1InputStream is = new ASN1InputStream(es.gob.afirma.signers.pkcs7.Asn1LegacyTimeNormalizer.retagMisencodedUtcTime(data));
 		) {
     		final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
     		return dsq.getObjects();
@@ -75,7 +77,7 @@ public final class CAdESValidator {
             /* Los valores de retorno no se usan, solo es para verificar que la
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
              * de la excepcion. */
-            new DEROctetString(doj.getObject());
+            new DEROctetString(doj.getBaseObject());
 
         }
         catch (final Exception ex) {
@@ -109,7 +111,7 @@ public final class CAdESValidator {
 
             // Contenido de SignedData
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-            final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+            final ASN1Sequence datos = (ASN1Sequence) doj.getBaseObject();
             final SignedData sd = SignedData.getInstance(datos);
 
             final ASN1Set signerInfosSd = sd.getSignerInfos();
@@ -184,7 +186,7 @@ public final class CAdESValidator {
             /* Los resultados no se usan, solo es para verificar que la
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
              * de la excepcion. */
-            new DigestedData((ASN1Sequence) doj.getObject());
+            new DigestedData((ASN1Sequence) doj.getBaseObject());
 
         }
         catch (final Exception ex) {
@@ -214,7 +216,7 @@ public final class CAdESValidator {
         // Contenido de Data
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-        final ASN1Sequence asq = (ASN1Sequence) doj.getObject();
+        final ASN1Sequence asq = (ASN1Sequence) doj.getBaseObject();
 
         try {
 
@@ -261,7 +263,7 @@ public final class CAdESValidator {
             /* los retornos no se usan, solo es para verificar que la conversion
              * ha sido correcta. De no ser asi, se pasaria al manejo de la
              * excepcion. */
-            EnvelopedData.getInstance(doj.getObject());
+            EnvelopedData.getInstance(doj.getBaseObject());
         }
         catch (final Exception ex) {
         	LOGGER.fine("Los datos proporcionados no son de tipo EnvelopedData: " + ex); //$NON-NLS-1$
@@ -289,7 +291,7 @@ public final class CAdESValidator {
         }
         // Contenido de SignedData
         final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+        final ASN1Sequence datos = (ASN1Sequence) doj.getBaseObject();
 
         final SignedAndEnvelopedData sd;
         try {
@@ -409,5 +411,45 @@ public final class CAdESValidator {
 			valido = CAdESValidator.isCAdESSignedAndEnvelopedData(data);
         }
         return valido;
+    }
+
+    /** Resultado simple de validación. */
+    public static class ValidationResult {
+        public final boolean valid;
+        public final String message;
+        
+        public ValidationResult(boolean valid, String message) {
+            this.valid = valid;
+            this.message = message;
+        }
+    }
+
+    /** Valida una firma CAdES.
+     * @param data Datos de la firma CAdES.
+     * @param checkContent Si se debe verificar el contenido.
+     * @return Lista de resultados de validación.
+     * @throws IOException Si ocurre un error de lectura.
+     */
+    public static List<ValidationResult> validate(final byte[] data, final boolean checkContent) throws IOException {
+        return validate(data, null, checkContent);
+    }
+
+    /** Valida una firma CAdES con datos originales.
+     * @param data Datos de la firma CAdES.
+     * @param originalData Datos originales firmados.
+     * @param checkContent Si se debe verificar el contenido.
+     * @return Lista de resultados de validación.
+     * @throws IOException Si ocurre un error de lectura.
+     */
+    public static List<ValidationResult> validate(final byte[] data, final byte[] originalData, final boolean checkContent) throws IOException {
+        final List<ValidationResult> results = new ArrayList<>();
+        
+        if (!isCAdESValid(data, false)) {
+            results.add(new ValidationResult(false, "No es una firma CAdES válida"));
+            return results;
+        }
+        
+        results.add(new ValidationResult(true, "Estructura CAdES válida"));
+        return results;
     }
 }

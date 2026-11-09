@@ -37,6 +37,10 @@ public class ConfirmSignatureDialog {
 				getParentComponent(parent),
 				SimpleAfirmaMessages.getString("ConfirmSignatureDialog.0")); //$NON-NLS-1$
 		this.dialog.setIconImages(DesktopUtil.getIconImages());
+		this.dialog.getAccessibleContext().setAccessibleName(
+				SimpleAfirmaMessages.getString("ConfirmSignatureDialog.0")); //$NON-NLS-1$
+		this.dialog.getAccessibleContext().setAccessibleDescription(
+				SimpleAfirmaMessages.getString("ConfirmSignatureDialog.4")); //$NON-NLS-1$
 
 		this.optionPane.addPropertyChangeListener(
 			    e -> {
@@ -71,8 +75,14 @@ public class ConfirmSignatureDialog {
 		// No volver a mostrar
 		panel.add(Box.createRigidArea(new Dimension(0, 12)));
 		this.confirmCb = new JCheckBox(SimpleAfirmaMessages.getString("ConfirmSignatureDialog.5")); //$NON-NLS-1$
+		this.confirmCb.getAccessibleContext().setAccessibleName(
+			SimpleAfirmaMessages.getString("ConfirmSignatureDialog.5") //$NON-NLS-1$
+		);
 		panel.add(this.confirmCb);
 
+		panel.getAccessibleContext().setAccessibleDescription(
+			SimpleAfirmaMessages.getString("ConfirmSignatureDialog.4") //$NON-NLS-1$
+		);
 
 		return panel;
 	}

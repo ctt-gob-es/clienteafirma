@@ -104,7 +104,7 @@ public class EnsobradoAccessibilityTest {
 	/**
 	 * Metodo que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton) de un panel.
 	 */
-	@Ignore
+	@Ignore("Requiere GUI / lector de pantalla Orca")
 	private void getKeyCodeList(final JPanel panel, final List <Integer> keyCodeList) {
 		//Array de componentes del panel
 		final Component[] components = panel.getComponents();
@@ -142,7 +142,7 @@ public class EnsobradoAccessibilityTest {
 	/**
 	 * Metodo que obtiene la propiedad labelFor de las etiquetas de un panel.
 	 */
-	@Ignore
+	@Ignore("Requiere GUI / lector de pantalla Orca")
 	private void getLabelForComponentList(final JPanel panel, final List <Component> componentList) {
 		//Array de componentes del panel
 		final Component[] components = panel.getComponents();

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Vulnerabilidad de seguridad
+    url: https://github.com/Alexendros/Autofirma-2026/security/advisories/new
+    about: No abras un issue público. Sigue SECURITY.md.
+  - name: Documentación
+    url: https://github.com/Alexendros/Autofirma-2026/blob/master/README.md
+    about: README, docs/MVP.md y docs/ESTADO-FASES.md antes de abrir un issue.

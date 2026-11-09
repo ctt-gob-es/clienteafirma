@@ -864,7 +864,7 @@ public class UtilsTest {
      * Comprobaci&oacute;n de que los componentes se remarcan al recibir el foco
      */
     @Test
-    @Ignore
+    @Ignore("Prueba no ejecutada en CI / requiere configuración específica")
     public void testRemarcar() {
 	UtilsTest.LOGGER.info("testRemarcar"); //$NON-NLS-1$
 
