@@ -2095,6 +2095,10 @@ var AutoScript = ( function ( window, undefined ) {
 			/** Indica si se ha establecido la conexion o no */
 			var connected = false;
 
+			/** Versiones para descartar eventos y reintentos de operaciones obsoletas. */
+			var connectionVersion = 0;
+			var operationVersion = 0;
+
 			/** Id de la sesion establecida. */
 			var idSession = AfirmaUtils.generateNewIdSession();
 			
@@ -2417,6 +2421,7 @@ var AutoScript = ( function ( window, undefined ) {
 			/** Envia una peticion a la aplicacion de firma. Si no la encuentra abierta, la arranca. */
 			execAppIntent = function (url, successCB, errorCB) {
 				
+				var currentOperationVersion = ++operationVersion;
 				setCallbacks(successCB, errorCB);
 				
 				// Almacenamos la URL en una propiedad global que se mantendra siempre actualizada
@@ -2429,6 +2434,7 @@ var AutoScript = ( function ( window, undefined ) {
 				// Si la aplicacion no esta abierta (primera ejecucion o se ejecuta despues del
 				// cierre de la aplicacion) es necesario abrirla y esperar a que este lista
 				if (!isAppOpened()) {
+					discardPendingWebSockets();
 					// Definimos los puertos en los que intentar la conexion
 					var ports = AfirmaUtils.getRandomPorts(minPort, maxPort);
 					try {
@@ -2436,7 +2442,7 @@ var AutoScript = ( function ( window, undefined ) {
 						openNativeApp(ports);
 						// Intentamos conectar con la app despues de esperar un tiempo prudencial
 						console.log("Tratamos de conectar con el cliente a traves de WebSockets en los puertos " + ports);
-						setTimeout(waitAppAndProcessRequest, 3000, ports, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, url, successCB, errorCB);
+						setTimeout(waitAppAndProcessRequest, 3000, ports, AutoScript.AUTOFIRMA_CONNECTION_RETRIES, url, successCB, errorCB, currentOperationVersion, connectionVersion);
 					} catch (e) {
 						errorCode = ErrorCode.Request.WEBSOCKET_INVOICE_APP.code;
 						var enabled = Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA, 
@@ -2450,13 +2456,57 @@ var AutoScript = ( function ( window, undefined ) {
 				// Si la aplicacion esta abierta, se envia de inmediato la peticion
 				else {
 					console.log("Enviamos el mensaje al socket abierto");
-					processRequest (AutoScript.AUTOFIRMA_CONNECTION_RETRIES)
+					processRequest(AutoScript.AUTOFIRMA_CONNECTION_RETRIES, currentOperationVersion, connectionVersion);
 				}
 			}
 
 			/** Indica si se sabe que la aplicacion esta abierta y lista para recibir peticiones. */
 			function isAppOpened() {
 				return !!ws && connected;
+			}
+
+			function discardPendingWebSockets() {
+				for (var i = 0; i < websocketsClients.length; i++) {
+					if (websocketsClients[i] !== ws) {
+						detachWebSocket(websocketsClients[i]);
+					}
+				}
+				websocketsClients.length = 0;
+			}
+
+			function detachWebSocket(webSocket) {
+				if (webSocket) {
+					webSocket.onopen = null;
+					webSocket.onclose = null;
+					webSocket.onmessage = null;
+					webSocket.onerror = null;
+				}
+			}
+
+			function invalidateConnection() {
+				connectionVersion++;
+				operationVersion++;
+				var previousWebSocket = ws;
+				ws = null;
+				connected = false;
+				currentOperationUrl = "";
+				setCallbacks(null, null);
+				detachWebSocket(previousWebSocket);
+				discardPendingWebSockets();
+				Dialog.disposeSupportDialog();
+			}
+
+			if (window.addEventListener) {
+				window.addEventListener("pagehide", function(evt) {
+					if (evt.persisted) {
+						invalidateConnection();
+					}
+				});
+				window.addEventListener("pageshow", function(evt) {
+					if (evt.persisted) {
+						invalidateConnection();
+					}
+				});
 			}
 		
 			/** Abre la aplicacion para que empiece a escuchar en el puerto por defecto. */
@@ -2488,7 +2538,11 @@ var AutoScript = ( function ( window, undefined ) {
 
 			/** Comprobacion recursiva de la disponibilidad de la aplicacion en los distintos
 			 * puertos hasta un maximo del numero de intentos indicados. */ 
-			waitAppAndProcessRequest = function (ports, retries, url, successCB, errorCB) {
+			waitAppAndProcessRequest = function (ports, retries, url, successCB, errorCB, currentOperationVersion, currentConnectionVersion) {
+
+				if (currentOperationVersion !== operationVersion || currentConnectionVersion !== connectionVersion) {
+					return;
+				}
 
 				if (!connected) {
 					if (retries > 0) {
@@ -2499,13 +2553,13 @@ var AutoScript = ( function ( window, undefined ) {
 								|| websocketsClients[i].readyState === WebSocket.CLOSED
 								|| websocketsClients[i].readyState === WebSocket.CLOSING) {
 									
-								websocketsClients[i] = createWebSocket(ports[i]);
+								websocketsClients[i] = createWebSocket(ports[i], currentOperationVersion, currentConnectionVersion);
 							} else {
 								console.log("El anterior websocket en el puerto " + ports[i] + " sigue intentandolo, asi que no creamos otro");
 						}
 						}
 
-						setTimeout(waitAppAndProcessRequest, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, retries - 1, url, successCB, errorCB);
+						setTimeout(waitAppAndProcessRequest, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ports, retries - 1, url, successCB, errorCB, currentOperationVersion, currentConnectionVersion);
 					}
 					else {
 						//Se cierra el dialogo de espera
@@ -2526,14 +2580,14 @@ var AutoScript = ( function ( window, undefined ) {
 				else {
 					// Enviamos la peticion
 					console.log("Enviamos el mensaje al socket");
-					processRequest (AutoScript.AUTOFIRMA_CONNECTION_RETRIES);
+					processRequest(AutoScript.AUTOFIRMA_CONNECTION_RETRIES, currentOperationVersion, currentConnectionVersion);
 				}
 			}
 			
 			/**
 			 * Crea el websocket con el comportamiento basico.
 			 */
-			function createWebSocket(port) {
+			function createWebSocket(port, currentOperationVersion, currentConnectionVersion) {
 				var webSocket;
 				
 				console.log("Creamos WebSocket en el puerto " + port + "\nEstado anterior: " + connected + "\nSocket definido: " + ws);
@@ -2547,6 +2601,11 @@ var AutoScript = ( function ( window, undefined ) {
 				}
 				
 				webSocket.onopen = function() {
+					if (currentOperationVersion !== operationVersion || currentConnectionVersion !== connectionVersion) {
+						detachWebSocket(this);
+						this.close();
+						return;
+					}
 					
 					// Si ya se habia abierto el websocket, lo respetamos
 					if (connected || !!ws) {
@@ -2566,7 +2625,7 @@ var AutoScript = ( function ( window, undefined ) {
 				};
 				
 				webSocket.onclose = function(e) {
-					if (ws != null && ws === this) {
+					if (currentConnectionVersion === connectionVersion && ws === this) {
 						connected = false;
 						console.log("Se cierra el socket. Codigo WebSocket de cierre en '" + ws.url + "': " + (e ? e.code : null));
 						ws = null;
@@ -2591,41 +2650,59 @@ var AutoScript = ( function ( window, undefined ) {
 			 * Si la aplicacion no responde volvemos a lanzar cada 2 segundos otra peticion echo hasta que una
 			 * peticion sea aceptada.
 			 */
-			function processRequest (retries) {
+			function processRequest (retries, currentOperationVersion, currentConnectionVersion) {
+
+				if (!connected || !ws || !isCurrentOperation(ws, currentOperationVersion, currentConnectionVersion)) {
+					return;
+				}
+				var webSocket = ws;
 
 				// Establecemos que se envie la peticion cuando responda algo
-				ws.onmessage = onMessageEchoFunction;
+				webSocket.onmessage = function() {
+					if (!isCurrentOperation(webSocket, currentOperationVersion, currentConnectionVersion)) {
+						return;
+					}
+					console.log("Respuesta de la peticion de eco");
+					webSocket.onmessage = function(evt) {
+						if (isCurrentOperation(webSocket, currentOperationVersion, currentConnectionVersion)) {
+							console.log("Respuesta obtenida de la operacion enviada");
+							processResponse(evt.data);
+						}
+					};
+					webSocket.send(currentOperationUrl);
+				};
 				
 				// Establecemos que se reintente la conexion en caso de error
-				ws.onerror = function(evt) {
+				webSocket.onerror = function(evt) {
+					if (!isCurrentOperation(webSocket, currentOperationVersion, currentConnectionVersion)) {
+						return;
+					}
 					console.log("Error en la comunicacion por websocket: " + evt);
-					sendEcho(ws, idSession, retries - 1);
+					sendEcho(webSocket, idSession, retries - 1, currentOperationVersion, currentConnectionVersion);
 				}
 				
 				// Enviamos una peticion de eco para comprobar que esta operativo, lo que despues hara que
 				// se lance la operacion real como se establece en la sentencia anterior
-				sendEcho(ws, idSession, retries);
-			}
-
-			/** Funcion que identifica la respuesta de una peticion de echo y envia a la aplicacion la operacion real. */
-			var onMessageEchoFunction = function() {
-				console.log("Respuesta de la peticion de eco");
-			
-				ws.onmessage = function (evt) {
-					console.log("Respuesta obtenida de la operacion enviada");
-					processResponse(evt.data);
-				}
-				
-				ws.send(currentOperationUrl);
+				sendEcho(webSocket, idSession, retries, currentOperationVersion, currentConnectionVersion);
 			};
+
+			function isCurrentOperation(webSocket, currentOperationVersion, currentConnectionVersion) {
+				return currentOperationVersion === operationVersion &&
+					currentConnectionVersion === connectionVersion &&
+					(!ws || ws === webSocket);
+			}
 			
 			/** Envia una peticion de eco y, en caso de error, aplica un retardo y lo reintenta hasta
 			 * un determinado numero de veces */
-			sendEcho = function (ws, idSession, retries) {
+			sendEcho = function (webSocket, idSession, retries, currentOperationVersion, currentConnectionVersion) {
+
+				if (!isCurrentOperation(webSocket, currentOperationVersion, currentConnectionVersion)) {
+					return;
+				}
 				
 				if (retries <= 0) {
 					var enabled =  Dialog.showErrorDialog(ERROR_CONNECTING_AFIRMA,
-																function (){sendEcho(ws, idSession, 1)}, 
+																function (){sendEcho(webSocket, idSession, 1, currentOperationVersion, currentConnectionVersion)}, 
 																function (){processErrorResponse("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSOCKET_INVOICE_APP);});
 					if (!enabled) {
 						processErrorResponse("java.util.concurrent.TimeoutException", ErrorCode.Request.WEBSOCKET_INVOICE_APP);
@@ -2633,19 +2710,19 @@ var AutoScript = ( function ( window, undefined ) {
 					return;
 				}
 				
-				if (ws.readyState === 1) {
+				if (webSocket.readyState === 1) {
 					try {						
-						ws.send("echo=-idsession=" + idSession + "@EOF");
+						webSocket.send("echo=-idsession=" + idSession + "@EOF");
 						Dialog.disposeSupportDialog();
 					}
 					catch (ex) {
 						console.log("Error en echo: " + ex);
-						setTimeout(sendEcho, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ws, idSession, retries - 1);
+						setTimeout(sendEcho, AutoScript.AUTOFIRMA_LAUNCHING_TIME, webSocket, idSession, retries - 1, currentOperationVersion, currentConnectionVersion);
 					}
 				}
 				else {
 					console.log("El socket aun no esta preparado");
-					setTimeout(sendEcho, AutoScript.AUTOFIRMA_LAUNCHING_TIME, ws, idSession, retries - 1);
+					setTimeout(sendEcho, AutoScript.AUTOFIRMA_LAUNCHING_TIME, webSocket, idSession, retries - 1, currentOperationVersion, currentConnectionVersion);
 				}
 			}
 
@@ -4523,7 +4600,7 @@ var AutoScript = ( function ( window, undefined ) {
 					&& serviceTimeout >= 0) {			params[params.length] = {key:"servicetimeout", value:serviceTimeout}; }
 
 				configureExtraParams(params, extraParams);
-					
+
 				params[params.length] = {key:"needcert", value:"true"}; 
 				
 				if (!!batchB64) {						params[params.length] = {key:"dat", value:batchB64}; }
