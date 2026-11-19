@@ -18,7 +18,7 @@ public interface BatchDocumentManager extends DocumentManager {
 
 	/**
 	 * Configura c&oacute;mo ha de guardarse la firma electr&oacute;nica.
-	 * cada implementaci&oacute;n requerir&aacute; unas propiedades distintas dentro del
+	 * Cada implementaci&oacute;n requerir&aacute; unas propiedades distintas dentro del
 	 * objeto de propiedades.
 	 * @param config Propiedades de configuraci&oacute;n del gestor.
 	 */

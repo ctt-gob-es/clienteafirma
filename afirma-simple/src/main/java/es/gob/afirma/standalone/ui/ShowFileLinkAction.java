@@ -70,18 +70,21 @@ public final class ShowFileLinkAction {
     	File tmp;
 		try {
 			tmp = File.createTempFile("afirma", "." + info.getExtension()); //$NON-NLS-1$ //$NON-NLS-2$
+			try (
+					final OutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
+			) {
+				bos.write(info.getData());
+			}
 		} catch (final IOException e) {
 			LOGGER.info("No se pudo crear el temporal para abrir el fichero: " + e); //$NON-NLS-1$
 			saveDataFile(info, parent);
 			return;
 		}
-        try (
-    		final OutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
-		) {
-        	bos.write(info.getData());
-        	Desktop.getDesktop().open(tmp);
-            tmp.deleteOnExit();
-        }
+
+		// Abrimos el temporal con la aplicacion por defecto del sistema
+		try {
+			Desktop.getDesktop().open(tmp);
+		}
         catch(final Exception e) {
         	LOGGER.warning("Error intentado abrir el fichero: " + e); //$NON-NLS-1$
         	AOUIFactory.showErrorMessage(
@@ -91,6 +94,9 @@ public final class ShowFileLinkAction {
                 e
             );
         }
+
+		// Solicitamos el borrado del temporal al salir de la aplicacion
+		tmp.deleteOnExit();
     }
 
     private static void saveDataFile(final DataFileInfo info, final Component parent) {
