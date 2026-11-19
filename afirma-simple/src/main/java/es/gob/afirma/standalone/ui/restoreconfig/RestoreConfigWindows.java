@@ -488,7 +488,7 @@ final class RestoreConfigWindows implements RestoreConfig {
 				Advapi32Util.registryCreateKey(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command"); //$NON-NLS-1$
 			}
 			// Sobreescribir los valores correctos
-			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", installDir + "\\Autofirma.exe %1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Advapi32Util.registrySetStringValue(WinReg.HKEY_CLASSES_ROOT, "afirma\\shell\\open\\command", "", "\"" + installDir + "\\Autofirma.exe\" \"%1\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 		} catch (final Exception | Error e) {
 

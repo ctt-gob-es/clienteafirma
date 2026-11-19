@@ -274,7 +274,7 @@ Section "Autofirma" sPrograma
 	;CascadeAfirma.reg
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "" $SIGN_STRING
 	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign" "Icon" "$INSTDIR\$PATH\Autofirma.exe"
-	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '$INSTDIR\$PATH\Autofirma.exe sign -gui -useconfig -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "*\shell\afirma.sign\command" "" '"$INSTDIR\$PATH\Autofirma.exe" sign -gui -useconfig -i "%1"'
 	
 	${If} $DEFAULT_LANGUAGE == "es_ES"
         StrCpy $BINARY_STRING "Firma binaria CMS/CAdES"
@@ -297,7 +297,7 @@ Section "Autofirma" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT ".csig" "" $BINARY_STRING
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify" "" "Verificar con Autofirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".csig\shell\Verify\command" "" '"$INSTDIR\$PATH\Autofirma.exe" verify -gui -i "%1"'
 
 	${If} $DEFAULT_LANGUAGE == "es_ES"
         StrCpy $XADES_STRING "Firma XMLDSig/XAdES"
@@ -320,13 +320,13 @@ Section "Autofirma" sPrograma
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig" "" $XADES_STRING
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify" "" "Verificar con Autofirma"
-	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '$INSTDIR\$PATH\Autofirma.exe verify -gui -i "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT ".xsig\shell\Verify\command" "" '"$INSTDIR\$PATH\Autofirma.exe" verify -gui -i "%1"'
 	
 	;Protocolo afirma
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "" "URL:Afirma Protocol"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma\DefaultIcon" "" "$INSTDIR\$PATH\ic_firmar.ico"
 	WriteRegStr HKEY_CLASSES_ROOT "afirma" "URL Protocol" ""
-	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '$INSTDIR\$PATH\Autofirma.exe "%1"'
+	WriteRegStr HKEY_CLASSES_ROOT "afirma\shell\open\command" "" '"$INSTDIR\$PATH\Autofirma.exe" "%1"'
 
 	; Eliminamos los certificados generados en caso de que existan por una instalacion previa
 	IfFileExists "$INSTDIR\$PATH\Autofirma_ROOT.cer" 0 +2
