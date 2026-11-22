@@ -44,6 +44,9 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 
 	private static final ProtocolVersion MIN_PROTOCOL_VERSION = ProtocolVersion.getInstance(ProtocolVersion.VERSION_0);
 
+	/** Direcci&oacute;n local en la que escucha el servidor. */
+	static final String LOCALHOST_ADDRESS = "127.0.0.1"; //$NON-NLS-1$
+
 	/**
 	 * M&aacute;ximo n&uacute;mero de milisegundos que puede estar el websocket abierto
 	 * antes de recibir la primera petici&oacute;n.
@@ -65,7 +68,8 @@ public class AfirmaWebSocketServer extends WebSocketServer {
 	 * para usar el servicio.
 	 */
 	public AfirmaWebSocketServer(final int port, final String sessionId) {
-		super(new InetSocketAddress(port));
+		// Solo se escucha en la interfaz local, ya que no se admiten peticiones de otras direcciones
+		super(new InetSocketAddress(LOCALHOST_ADDRESS, port));
 		setReuseAddr(true);
 
 		this.sessionId = sessionId;
