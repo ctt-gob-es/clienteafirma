@@ -11,6 +11,7 @@ package es.gob.afirma.standalone.protocol;
 
 import java.io.IOException;
 import java.net.BindException;
+import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.logging.Logger;
 
@@ -158,7 +159,9 @@ public final class ServiceInvocationManager {
 		checkNullParameter(socket, "El socket servidor no puede ser nulo"); //$NON-NLS-1$
 		for (final int port : ports) {
 			try {
-				final SSLServerSocket ssocket = (SSLServerSocket) socket.createServerSocket(port);
+				// Solo se escucha en la interfaz local, ya que no se admiten peticiones de otras direcciones
+				final SSLServerSocket ssocket = (SSLServerSocket) socket.createServerSocket(
+						port, 0, InetAddress.getByName(AfirmaWebSocketServer.LOCALHOST_ADDRESS));
 				LOGGER.info("Establecido el puerto " + port + " para el servicio Autofirma"); //$NON-NLS-1$ //$NON-NLS-2$
 				return ssocket;
 			}
