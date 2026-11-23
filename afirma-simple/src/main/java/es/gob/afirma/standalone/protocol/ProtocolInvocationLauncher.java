@@ -152,13 +152,12 @@ public final class ProtocolInvocationLauncher {
     	// cambiar de version de protocolo de la llamada, ya que esto romperia compatibilidad
     	// entre Autoscript 1.10 y Autofirma 1.9 (obligaria a los usuarios a actualizar a Autofirma
     	// 1.10). En futuras versiones esto se podra hacer con el uso de la MinorVersion del
-    	// protocolo, pero Autofirma 1.9 aun no lo admit&iacute;a, as&iacute; que no se puede usar
-    	// en Autoscript 1.10 para mantener la compatibilidad).
-		// Vamos a editar la version del protocolo recibido cuando recibamos una versi&oacute;n
-		// de c&oacute;digo mayor a 3 (la de Autoscript 1.10), pero el protocolo siga siendo la
-		// versi&oacute;n 4 (la de de Autoscript 1.9 y 1.10). Estableceremos que esta es la version
-    	// de protocolo 4.1, y as&iacute; sabremos que podemos usar las mejoras de Autoscript y
-    	// Autofirma 1.10.
+    	// protocolo, pero Autofirma 1.9 aun no lo admitia, asi que no se puede usar en Autoscript
+		// // 1.10 para mantener la compatibilidad).
+		// Vamos a editar la version del protocolo recibido cuando recibamos una version de codigo
+		// mayor a 3 (la de Autoscript 1.10), pero el protocolo siga siendo la version 4 (la de
+		// Autoscript 1.9 y 1.10). Estableceremos que esta es la version de protocolo 4.1, y asi
+		// sabremos que podemos usar las mejoras de Autoscript y Autofirma 1.10.
 		if (protocolVersion.getMajorVersion() == 4 && scriptVesionCode > 3) {
 			requestedProtocolVersion = ProtocolVersion.getInstance(ProtocolVersion.VERSION_4_1);
 		}

@@ -22,17 +22,33 @@ Este comando generará todos los módulos básicos del proyecto.
 
 ### Artefactos desplegables y aplicaciones
 
-Para la construcción de Autofirma (JAR) y los servicios que utiliza será necesario usar el perfil `env-install`. Este se puede activar mediante el comando:
+Para la construcción de Autofirma (JAR) será necesario usar el perfil `autofirma`. Se puede activar directamente con -P o mediante el comando:
 
 `mvn clean install -Denv=install`
 
-Con esto, se podrán construir los artefactos:
+Con esto, se podrán construir, entre otros, los artefactos:
 
-* `afirma-server-triphase-signer`: WAR con el servicio para la generación de firmas trifásicas.
-* `afirma-signature-retriever`: WAR con el servicio de recuperación de datos del servidor intermedio.
-* `afirma-signature-storage`: WAR con el servicio de guardado de datos en el servidor intermedio.
 * `afirma-simple`: JAR autoejecutable de Autofirma (`Autofirma.jar`).
 * `afirma-ui-simple-configurator`: JAR autoejecutable del configurador necesario para la instalación de Autofirma (`AutofirmaConfigurador.jar`).
+
+Hay dos versiones de cada uno de los servicios: los compatibles hasta Java EE 8 y los compatibles a partir de Jakarta EE 9. 
+
+* Para generar los servicios compatibles Java EE 8 y anteriores se puede usar el perfil `services-javax`. Los artefactos generados serán:
+    * `afirma-server-triphase-signer-javax`
+    * `afirma-server-retriever-javax`
+    * `afirma-server-storage-javax`
+
+* Para generar los servicios compatibles Jakarta EE 9 y posteriores se puede usar el perfil `services-jakarta`.
+    * `afirma-server-triphase-signer-jakarta`
+    * `afirma-server-retriever-jakarta`
+    * `afirma-server-storage-jakarta`
+	
+Aunque el id de artefacto sea distinto, los WAR generados por ambos perfiles tienen el mismo nombre para que puedan sustituirse uno por otro directamente. Estos son:
+
+* `afirma-server-triphase-signer`: WAR con el servicio para la generación de firmas trifásicas.
+* `afirma-signature-retriever`: WAR con el servicio de recuperación de datos del servidor intermedio (generado a partir de los módulos afirma-server-retriever-javax y afirma-server-retriever-jakarta).
+* `afirma-signature-storage`: WAR con el servicio de guardado de datos en el servidor intermedio.
+
 
 ### Despliegue en repositorio de artefactos
 
@@ -51,10 +67,12 @@ A continuación, se muestra un listado de los distintos módulos actualmente en 
 * `afirma-core`: Módulo con los componentes principales del proyecto.
 * `afirma-core-keystores`: Módulo con las clases de gestión de almacenes de claves de usuario.
 * `afirma-core-massive`: Módulo con funcionalidades para la ejecución de operaciones masivas de firma.
+* `afirma-core-prefs`: Módulo con las funciones de acceso a las preferencias de Autofirma.
 * `afirma-crypto-batch-client`: Módulo con el componente cliente para la invocación de las operaciones de firma de lote en servidor.
 * `afirma-crypto-cades`: Módulo con la lógica de generación de las firmas CAdES (excluidas cofirmas y contrafirmas) y ASiC-CAdES.
 * `afirma-crypto-cades-multi`: Módulo con la lógica de generación de las cofirmas y contrafirmas CAdES.
 * `afirma-crypto-cadestri-client`: Módulo con lógica de invocación para la generación de firmas trifásicas CAdES en servidor.
+* `afirma-crypto-cipher2': Módulo con la lógica de cifrado para la subida de datos al servidor intermedio.
 * `afirma-crypto-cms`: Módulo con la lógica de generación de las firmas CMS.
 * `afirma-crypto-core-pkcs7`: Módulo con la lógica básica de estructuras PKCS#7, necesarias para la generación de firmas ASN.1 (CAdES, PAdES, etc.).
 * `afirma-crypto-core-xml`: Módulo con la lógica básica de estructuras XML, necesarias para la generación de firmas XML (XAdES, ODF, OOXML, etc.).
@@ -68,23 +86,32 @@ A continuación, se muestra un listado de los distintos módulos actualmente en 
 * `afirma-crypto-xadestri-client`: Módulo con lógica de invocación para la generación de firmas trifásicas XAdES y de FacturaE en servidor.
 * `afirma-crypto-xmlsignature`: Módulo con la lógica de generación de las firmas XMLdSig.
 * `afirma-keystores-filters`: Módulo con los filtros de certificados utilizados por Autofirma.
+* `afirma-keystores-jmulticard-ui`: Módulo con las interfaces gráfica para el uso de JMulticard.
 * `afirma-keystores-mozilla`: Módulo para la gestión del almacén de claves de Mozilla Firefox.
-* `afirma-server-triphase-signer`: Módulo principal del servicio de firma trifásica y de lotes.
+* `afirma-server-retriever`: Módulo con la lógica del servicio de recuperación del servidor intermedio.
+* `afirma-server-retriever-jakarta`: Módulo del servicio de recuperación del servidor intermedio compatible con Jakarta EE 9 y posteriores.
+* `afirma-server-retriever-javax`: Módulo del servicio de recuperación del servidor intermedio compatible con Java EE 8 y anteriores.
+* `afirma-server-storage`: Módulo con la lógica del servicio de guardado del servidor intermedio.
+* `afirma-server-storage-jakarta`: Módulo del servicio de recuperación del servidor intermedio compatible con Jakarta EE 9 y posteriores.
+* `afirma-server-storage-javax`: Módulo del servicio de recuperación del servidor intermedio compatible con Java EE 8 y anteriores.
+* `afirma-server-triphase-signer`: Módulo con la lógica del servicio de firma trifásica y de lotes.
 * `afirma-server-triphase-signer-cache`: Módulo con la interfaz que define las operaciones de guardado y recuperación de datos de caché del servidor trifásico.
 * `afirma-server-triphase-signer-core`: Módulo con la funcionalidad básica de firma trifásica CAdES, PAdES, XAdES y de FacturaE.
 * `afirma-server-triphase-signer-document`: Módulo con la interfaz que define las operaciones de guardado y recuperación de documentos para firmar del servidor trifásico.
-* `afirma-signature-retriever`: Módulo principal del servicio de recuperación del servidor intermedio.
-* `afirma-signature-storage`: Módulo principal del servicio de guardado del servidor intermedio.
+* `afirma-server-triphase-signer-jakarta`: Módulo del servicio de firma trifásica compatible con Jakarta EE 9 y posteriores.
+* `afirma-server-triphase-signer-javax`: Módulo del servicio de firma trifásica compatible con Java EE 8 y anteriores.
 * `afirma-simple`: Módulo principal de la aplicación Autofirma.
 * `afirma-simple-installer`: Módulo con los componentes para la generación de los instaladores de Autofirma.
 * `afirma-simple-plugin-hash`: Módulo con el plugin de Autofirma para generación y validación de hashes.
 * `afirma-simple-plugin-hash-exe`: Módulo de la aplicación EXE para el registro de las entradas de generación y validación de hashes en el menú contextual de Windows.
-* `afirma-simple-plugin-validatecerts`: Módulo con el plugin de Autofirma para validación de firmas.
+* `afirma-simple-plugin-validatecerts`: Módulo con el plugin de Autofirma para validación de certificados.
 * `afirma-simple-plugins`: Módulo con los recursos base para la implementación de plugins de Autofirma.
+* `afirma-simple-plugins-manager`: Módulo con la lógica de gestión de los plugins de Autofirma.
 * `afirma-ui-core-jse`: Módulo con las interfaces gráficas genéricas usadas por las distintas aplicaciones de Autofirma.
 * `afirma-ui-core-jse-keystores`: Módulo con la interfaz gráfica del diálogo de selección de certificados.
 * `afirma-ui-miniapplet-deploy`: Módulo principal para el desarrollo de AutoScript.
 * `afirma-ui-simple-configurator`: Módulo principal de la aplicación de configuración ejecutada durante la instalación de Autofirma.
+* `afirma-ui-simple-configurator-common`: Módulo con lógica de configuración de Autofirma usada en la instalación y restauración.
 
 ### Módulos sin mantenimiento
 

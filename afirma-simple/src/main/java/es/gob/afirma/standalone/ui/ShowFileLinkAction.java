@@ -16,10 +16,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -34,6 +39,7 @@ import es.gob.afirma.standalone.ui.DataFileInfoDialog.Options;
 public final class ShowFileLinkAction {
 
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+	private static final int OPEN_FILE_RETRY_DELAY = 2000;
 
     private final String text;
     private final byte[] data;
@@ -67,25 +73,65 @@ public final class ShowFileLinkAction {
     }
 
     private static void openDataFile(final DataFileInfo info, final Component parent) {
-    	File tmp;
-		try {
-			tmp = File.createTempFile("afirma", "." + info.getExtension()); //$NON-NLS-1$ //$NON-NLS-2$
-		} catch (final IOException e) {
-			LOGGER.info("No se pudo crear el temporal para abrir el fichero: " + e); //$NON-NLS-1$
-			saveDataFile(info, parent);
-			return;
-		}
-        try (
-    		final OutputStream bos = new BufferedOutputStream(new FileOutputStream(tmp));
-		) {
-        	bos.write(info.getData());
-        	Desktop.getDesktop().open(tmp);
-            tmp.deleteOnExit();
+        final File tmp;
+        try {
+            tmp = createTempFile(info);
         }
-        catch(final Exception e) {
-        	LOGGER.warning("Error intentado abrir el fichero: " + e); //$NON-NLS-1$
-        	AOUIFactory.showErrorMessage(
-                SimpleAfirmaMessages.getString("ShowFileLinkAction.2", info.getExtension()),  //$NON-NLS-1$
+        catch (final IOException e) {
+            LOGGER.info("No se pudo crear el temporal para abrir el fichero: " + e); //$NON-NLS-1$
+            saveDataFile(info, parent);
+            return;
+        }
+
+        // Abrimos el temporal con la aplicacion por defecto del sistema
+        try {
+            Desktop.getDesktop().open(tmp);
+        }
+        catch (final Exception e) {
+            LOGGER.warning("Error intentando abrir el fichero; se reintentara: " + e); //$NON-NLS-1$
+            final Timer retryTimer = new Timer(OPEN_FILE_RETRY_DELAY, evt -> retryOpenDataFile(tmp, info));
+            retryTimer.setRepeats(false);
+            retryTimer.start();
+        }
+    }
+
+    private static File createTempFile(final DataFileInfo info) throws IOException {
+        final Path tempDirectory = new File(System.getProperty("java.io.tmpdir")).toPath(); //$NON-NLS-1$
+
+        // Cuando sea posible, le asignaremos permisos solo al propietario del fichero por seguridad
+        final Path tempPath;
+        if (Files.getFileAttributeView(tempDirectory, PosixFileAttributeView.class) != null) {
+            tempPath = Files.createTempFile(
+                tempDirectory,
+                "afirma", //$NON-NLS-1$
+                "." + info.getExtension(), //$NON-NLS-1$
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")) //$NON-NLS-1$
+            );
+        }
+        else {
+            tempPath = File.createTempFile("afirma", "." + info.getExtension(), tempDirectory.toFile()).toPath(); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+
+        // Guardamos el contenido
+        final File tempFile = tempPath.toFile();
+        try (
+            final OutputStream bos = new BufferedOutputStream(new FileOutputStream(tempFile));
+        ) {
+            bos.write(info.getData());
+        }
+        tempFile.deleteOnExit();
+
+        return tempFile;
+    }
+
+    private static void retryOpenDataFile(final File tmp, final DataFileInfo info) {
+        try {
+            Desktop.getDesktop().open(tmp);
+        }
+        catch (final Exception e) {
+            LOGGER.warning("Error intentando abrir el fichero tras el reintento: " + e); //$NON-NLS-1$
+            AOUIFactory.showErrorMessage(
+                SimpleAfirmaMessages.getString("ShowFileLinkAction.2", info.getExtension()), //$NON-NLS-1$
                 SimpleAfirmaMessages.getString("SimpleAfirma.7"), //$NON-NLS-1$
                 JOptionPane.ERROR_MESSAGE,
                 e
