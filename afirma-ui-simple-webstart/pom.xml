@@ -213,7 +213,8 @@
 							<excludes>
 								<exclude>windows/**</exclude>
 								<exclude>linux/**</exclude>
-								<exclude>osx/certutil.osx.zip</exclude>
+								<exclude>osx/certutil.osx.x64.zip</exclude>
+								<exclude>osx/certutil.osx.arm64.zip</exclude>
 							</excludes>
 						</filter>
 						<filter>

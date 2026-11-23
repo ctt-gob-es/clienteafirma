@@ -10,6 +10,7 @@
 package es.gob.afirma.standalone.ui.restoreconfig;
 
 import es.gob.afirma.core.misc.LoggerUtil;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.mozilla.MozillaProfile;
 import es.gob.afirma.keystores.mozilla.ProfilesIni;
 import es.gob.afirma.standalone.SimpleAfirmaMessages;
@@ -42,9 +43,12 @@ final class RestoreConfigFirefoxMacOS {
 	static final String COMMAND_EXPORT_PATH = "export PATH=$PATH:";//$NON-NLS-1$
 	static final String COMMAND_EXPORT_LIBRARY_LD = "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:";//$NON-NLS-1$
 
-	private static final String DIR_CERTUTIL = "certutil"; //$NON-NLS-1$
 	private static final String CERTUTIL_EXE = "certutil"; //$NON-NLS-1$;
-	private static final String RESOURCE_CERTUTIL = "/osx/certutil.osx.zip"; //$NON-NLS-1$
+	private static final String DIR_CERTUTIL_X64 = "certutil-x64"; //$NON-NLS-1$
+	private static final String DIR_CERTUTIL_ARM64 = "certutil-arm64"; //$NON-NLS-1$
+	private static final String RESOURCE_CERTUTIL_X64 = "/osx/certutil.osx.x64.zip"; //$NON-NLS-1$
+	private static final String RESOURCE_CERTUTIL_ARM64 = "/osx/certutil.osx.arm64.zip"; //$NON-NLS-1$
+	private static final String SYSTEM_ARM64_CHECK = "hw.optional.arm64"; //$NON-NLS-1$
 
 	// --------------
 	// -- Propiedades usadas para configurar FireFox para que confie en los certificados del Llavero
@@ -188,14 +192,14 @@ final class RestoreConfigFirefoxMacOS {
 	 */
 	String prepareCertUtil(final File appDir) throws IOException {
 
-		// Identificamos el directorio de certutil
-		final File certUtilDir = new File(appDir, DIR_CERTUTIL);
+		final boolean arm64 = getCertUtilMachineType() == Platform.MACHINE.ARM64;
+		final String certUtilDirName = arm64 ? DIR_CERTUTIL_ARM64 : DIR_CERTUTIL_X64;
+		final String certUtilResource = arm64 ? RESOURCE_CERTUTIL_ARM64 : RESOURCE_CERTUTIL_X64;
+		final File certUtilDir = new File(appDir, certUtilDirName);
+		final File certutilFile = new File(certUtilDir, CERTUTIL_EXE);
 
 		// Copiamos la version interna de certutil al directorio (incluso si ya existia)
-		copyCertUtils(certUtilDir);
-
-		// Identificamos el ejecutable
-		final File certutilFile = new File(certUtilDir, CERTUTIL_EXE);
+		copyCertUtils(certutilFile, certUtilResource, appDir);
 
 		// Comprobamos que el ejecutable exista y tenga permisos de ejecucion
 		checkCertutilExe(certutilFile);
@@ -205,6 +209,44 @@ final class RestoreConfigFirefoxMacOS {
 
 		// Devolvemos la ruta escapada
 		return certutilFile.getAbsolutePath();
+	}
+
+	/**
+	 * Identifica la arquitectura del sistema y, si no es posible, la de la JVM.
+	 * @return Arquitectura para la que debe ejecutarse CertUtil.
+	 */
+	private static Platform.MACHINE getCertUtilMachineType() {
+
+		try {
+			final Process process = new ProcessBuilder(
+					"/usr/sbin/sysctl", "-n", SYSTEM_ARM64_CHECK).redirectErrorStream(true).start(); //$NON-NLS-1$ //$NON-NLS-2$
+			try (final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				final String result = reader.readLine();
+				if (process.waitFor() == 0) {
+					if ("1".equals(result)) { //$NON-NLS-1$
+						return Platform.MACHINE.ARM64;
+					}
+					if ("0".equals(result)) { //$NON-NLS-1$
+						return Platform.MACHINE.AMD64;
+					}
+				}
+			}
+		}
+		catch (final IOException e) {
+			LOGGER.warning("No se pudo consultar la arquitectura del sistema: " + e); //$NON-NLS-1$
+		}
+		catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+			LOGGER.warning("Se interrumpio la consulta de la arquitectura del sistema: " + e); //$NON-NLS-1$
+		}
+
+		final Platform.MACHINE javaMachineType = Platform.getMachineType();
+		if (javaMachineType == Platform.MACHINE.AMD64 || javaMachineType == Platform.MACHINE.ARM64) {
+			return javaMachineType;
+		}
+
+		LOGGER.warning("No se pudo determinar la arquitectura; se utilizara CertUtil ARM64"); //$NON-NLS-1$
+		return Platform.MACHINE.ARM64;
 	}
 
 	/**
@@ -245,11 +287,11 @@ final class RestoreConfigFirefoxMacOS {
 	  * @param certUtilDir Directorio al que descomprimir las herramientas de configuraci&oacute;n.
 	  * @throws IOException Cuando ocurre un error al descomprimir o copiar.
 	  */
-	 private static void copyCertUtils(final File certUtilDir) throws IOException {
+	 private static void copyCertUtils(final File certUtilFile, final String resourcePath, final File appDir) throws IOException {
 
-		 if (!certUtilDir.exists()) {
-			 uncompressInternalZip(RESOURCE_CERTUTIL, certUtilDir.getParentFile());
-			 UnixUtils.addExexPermissionsToAllFilesOnDirectory(certUtilDir);
+		 if (!certUtilFile.isFile()) {
+			 uncompressInternalZip(resourcePath, appDir);
+			 UnixUtils.addExexPermissionsToAllFilesOnDirectory(certUtilFile.getParentFile());
 		 }
 	 }
 

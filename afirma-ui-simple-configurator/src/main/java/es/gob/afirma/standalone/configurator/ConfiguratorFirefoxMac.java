@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.BoundedBufferedReader;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.configurator.common.ConfiguratorUtil;
 
 /** Configurador para instalar un certificado SSL de confianza en Mozilla NSS.
@@ -33,8 +34,11 @@ final class ConfiguratorFirefoxMac {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String FILE_AUTOFIRMA_CERTIFICATE = "Autofirma_ROOT.cer"; //$NON-NLS-1$
-	private static final String CERTUTIL_RESOURCE = "/osx/certutil.osx.zip"; //$NON-NLS-1$
-	private static final String CERTUTIL_RELATIVE_PATH = "certutil/certutil"; //$NON-NLS-1$
+	private static final String CERTUTIL_RESOURCE_X64 = "/osx/certutil.osx.x64.zip"; //$NON-NLS-1$
+	private static final String CERTUTIL_RESOURCE_ARM64 = "/osx/certutil.osx.arm64.zip"; //$NON-NLS-1$
+	private static final String CERTUTIL_RELATIVE_PATH_X64 = "certutil-x64/certutil"; //$NON-NLS-1$
+	private static final String CERTUTIL_RELATIVE_PATH_ARM64 = "certutil-arm64/certutil"; //$NON-NLS-1$
+	private static final String SYSTEM_ARM64_CHECK = "hw.optional.arm64"; //$NON-NLS-1$
 	private static final String PROFILES_INI_RELATIVE_PATH = "/Library/Application Support/firefox/profiles.ini";//$NON-NLS-1$
 
 	private static final String COMMAND_EXPORT_PATH = "export PATH=$PATH:";//$NON-NLS-1$
@@ -274,9 +278,12 @@ final class ConfiguratorFirefoxMac {
 	 * @throws IOException Se lanza cuando CertUtil no existe o no se puede ejecutar. */
 	private static File prepareCertUtil(final File appDir) throws IOException {
 
-		final File certutilFile = new File(appDir, CERTUTIL_RELATIVE_PATH);
+		final boolean arm64 = getCertUtilMachineType() == Platform.MACHINE.ARM64;
+		final String certutilRelativePath = arm64 ? CERTUTIL_RELATIVE_PATH_ARM64 : CERTUTIL_RELATIVE_PATH_X64;
+		final String certutilResource = arm64 ? CERTUTIL_RESOURCE_ARM64 : CERTUTIL_RESOURCE_X64;
+		final File certutilFile = new File(appDir, certutilRelativePath);
 		if (!certutilFile.isFile()) {
-			ConfiguratorUtil.uncompressResource(CERTUTIL_RESOURCE, appDir);
+			ConfiguratorUtil.uncompressResource(certutilResource, appDir);
 		}
 
 		if (!certutilFile.isFile()) {
@@ -292,6 +299,44 @@ final class ConfiguratorFirefoxMac {
 		}
 
 		return certutilFile;
+	}
+
+	/**
+	 * Identifica la arquitectura del sistema y, si no es posible, la de la JVM.
+	 * @return Arquitectura para la que debe ejecutarse CertUtil.
+	 */
+	private static Platform.MACHINE getCertUtilMachineType() {
+
+		try {
+			final Process process = new ProcessBuilder(
+					"/usr/sbin/sysctl", "-n", SYSTEM_ARM64_CHECK).redirectErrorStream(true).start(); //$NON-NLS-1$ //$NON-NLS-2$
+			try (final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				final String result = reader.readLine();
+				if (process.waitFor() == 0) {
+					if ("1".equals(result)) { //$NON-NLS-1$
+						return Platform.MACHINE.ARM64;
+					}
+					if ("0".equals(result)) { //$NON-NLS-1$
+						return Platform.MACHINE.AMD64;
+					}
+				}
+			}
+		}
+		catch (final IOException e) {
+			LOGGER.warning("No se pudo consultar la arquitectura del sistema: " + e); //$NON-NLS-1$
+		}
+		catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+			LOGGER.warning("Se interrumpio la consulta de la arquitectura del sistema: " + e); //$NON-NLS-1$
+		}
+
+		final Platform.MACHINE javaMachineType = Platform.getMachineType();
+		if (javaMachineType == Platform.MACHINE.AMD64 || javaMachineType == Platform.MACHINE.ARM64) {
+			return javaMachineType;
+		}
+
+		LOGGER.warning("No se pudo determinar la arquitectura; se utilizara CertUtil ARM64"); //$NON-NLS-1$
+		return Platform.MACHINE.ARM64;
 	}
 
 	/** Obtiene los directorios de perfil de Mozilla del sistema.
@@ -382,5 +427,4 @@ final class ConfiguratorFirefoxMac {
 	}
 
 }
-
 
