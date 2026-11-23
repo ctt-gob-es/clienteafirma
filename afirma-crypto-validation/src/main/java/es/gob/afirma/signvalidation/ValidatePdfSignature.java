@@ -163,11 +163,14 @@ public final class ValidatePdfSignature extends SignValider {
 
 		// Por otra parte, si se debe comprobar si se ha producido un PDF Shadow Attack
 		// (modificacion de un documento tras la firma), se encuentran varias revisiones
-		// en el documento y hay al menos una posterior a la ultima firma (la de la
-		// posicion 0), se comprueba si el documento ha sufrido un PSA.
-		if (!avoidPSACheckByModifiedFormCheck && !allowPdfShadowAttack && af.getTotalRevisions() > 1 && af.getRevision(signNames.get(0)) < af.getTotalRevisions()) {
-			// La revision firmada mas reciente se encuentra en el primer lugar de la lista, por ello se accede a la posicion 0
-			try (final InputStream lastReviewStream = af.extractRevision(signNames.get(0))) {
+		// en el documento y hay al menos una posterior a la ultima firma, se comprueba
+		// si el documento ha sufrido un PSA.
+		// AcroFields.getSignatureNames() no devuelve las firmas ordenadas por revision
+		// (el orden depende del HashMap interno), asi que se busca expresamente la firma
+		// de la revision mas reciente.
+		final String lastSignName = getLastSignName(signNames, af);
+		if (!avoidPSACheckByModifiedFormCheck && !allowPdfShadowAttack && af.getTotalRevisions() > 1 && af.getRevision(lastSignName) < af.getTotalRevisions()) {
+			try (final InputStream lastReviewStream = af.extractRevision(lastSignName)) {
 				SignValidity validity = DataAnalizerUtil.checkPdfShadowAttack(sign, lastReviewStream, pagesToCheck);
 				// Si se devolvio informacion de validez, la firma no es completamente valida
 				if (validity != null) {
@@ -320,5 +323,25 @@ public final class ValidatePdfSignature extends SignValider {
 
 		return validityList;
 
+	}
+
+	/**
+	 * Obtiene el nombre de la firma correspondiente a la revisi&oacute;n firmada m&aacute;s reciente
+	 * del documento.
+	 * @param signNames Nombres de las firmas del documento.
+	 * @param af Campos del formulario del documento.
+	 * @return Nombre de la firma de la revisi&oacute;n m&aacute;s reciente.
+	 */
+	private static String getLastSignName(final List<String> signNames, final AcroFields af) {
+		String lastSignName = signNames.get(0);
+		int lastRevision = af.getRevision(lastSignName);
+		for (final String name : signNames) {
+			final int revision = af.getRevision(name);
+			if (revision > lastRevision) {
+				lastRevision = revision;
+				lastSignName = name;
+			}
+		}
+		return lastSignName;
 	}
 }
