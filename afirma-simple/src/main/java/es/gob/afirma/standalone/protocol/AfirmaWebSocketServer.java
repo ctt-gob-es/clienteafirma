@@ -23,7 +23,7 @@ import org.java_websocket.server.WebSocketServer;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.protocol.ProtocolVersion;
 import es.gob.afirma.standalone.protocol.AfirmaWebSocketServerManager.BindingErrorListener;
-import es.gob.afirma.standalone.ui.OSXHandler
+import es.gob.afirma.standalone.ui.OSXHandler;
 
 /**
  * Servidor para la comunicaci&oacute;n por <i>WebSocket</i> acorde a la versi&oacute;n
@@ -92,7 +92,7 @@ public class AfirmaWebSocketServer extends WebSocketServer {
             try {
                 OSXHandler.setQuitHandler(this, AfirmaWebSocketServer.class.getMethod(
                         "handleQuitRequest", EventObject.class, Object.class)); //$NON-NLS-1$
-                LOGGER.info("Registrado el manejador Quit del WebSocket en macOS"); //$NON-NLS-1$
+                LOGGER.info("Registrado el manejador de cierre de la aplicacion del WebSocket en macOS"); //$NON-NLS-1$
             }
             catch (final ReflectiveOperationException e) {
                 LOGGER.log(Level.WARNING, "No se pudo registrar el manejador Quit del WebSocket", e); //$NON-NLS-1$
@@ -100,9 +100,10 @@ public class AfirmaWebSocketServer extends WebSocketServer {
         }
     }
 
-    /** Atiende Quit sin interrumpir una sesion que sigue siendo propiedad del navegador.
+    /**
+     * Procesa el evento de cierre y lo bloquea si el websocket sigue abierto.
      * @param event Evento nativo de salida.
-     * @param response Respuesta de salida de Java 8 o posterior.
+     * @param response Respuesta de salida.
      * @throws ReflectiveOperationException Si no se puede responder al evento.
      */
     public void handleQuitRequest(final EventObject event, final Object response)
@@ -114,12 +115,16 @@ public class AfirmaWebSocketServer extends WebSocketServer {
         catch (final ClassNotFoundException e) {
             responseClass = Class.forName("com.apple.eawt.QuitResponse"); //$NON-NLS-1$
         }
-        final WebSocket browser = this.wsClient;
-        final boolean connected = browser != null && browser.isOpen();
-        LOGGER.info(connected
-                ? "Quit recibido: se cancela porque el navegador sigue conectado" //$NON-NLS-1$
-                : "Quit recibido: se permite salir porque no hay navegador conectado"); //$NON-NLS-1$
-        responseClass.getMethod(connected ? "cancelQuit" : "performQuit").invoke(response); //$NON-NLS-1$ //$NON-NLS-2$
+
+        final boolean connected = this.wsClient != null && this.wsClient.isOpen();
+        if (connected) {
+        	LOGGER.info("Peticion de cierre recibida. Se cancela porque el websocket sigue conectado"); //$NON-NLS-1$
+        	responseClass.getMethod("cancelQuit").invoke(response); //$NON-NLS-1$
+        }
+        else {
+            LOGGER.info("Peticion de cierre recibida. Se permite salir porque el websocket no esta conectado"); //$NON-NLS-1$
+            responseClass.getMethod("performQuit").invoke(response); //$NON-NLS-1$
+        }
     }
 
 	@Override
